@@ -15,6 +15,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -155,7 +156,7 @@ public class SecurityAgent implements ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public IFuture<byte[]> encryptAndSign(final Map<String, Object> header, final byte[] content)
+	public IFuture<byte[]> encryptAndSign(final IMsgHeader header, final byte[] content)
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
 		{
@@ -172,7 +173,7 @@ public class SecurityAgent implements ISecurityService
 				}
 				else
 				{
-					String rplat = ((IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER)).getRoot().toString();
+					String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
 					ICryptoSuite cs = currentcryptosuites.get(rplat);
 					if (cs != null)
 					{
@@ -402,9 +403,9 @@ public class SecurityAgent implements ISecurityService
 	 *  @param header The message header.
 	 *  @return True, if security message.
 	 */
-	protected static final boolean isSecurityMessage(Map<String, Object> header)
+	protected static final boolean isSecurityMessage(IMsgHeader header)
 	{
-		return Boolean.TRUE.equals(header.get(SECURITY_MESSAGE));
+		return Boolean.TRUE.equals(header.getProperty(SECURITY_MESSAGE));
 	}
 	
 	
@@ -420,7 +421,7 @@ public class SecurityAgent implements ISecurityService
 		 *  Test if handler should handle a message.
 		 *  @return True if it should handle the message. 
 		 */
-		public boolean isHandling(IMsgSecurityInfos secinfos, Map<String, Object> header, Object msg)
+		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
 			return isSecurityMessage(header);
 		}
@@ -439,7 +440,7 @@ public class SecurityAgent implements ISecurityService
 		 *  @param header The header.
 		 *  @param msg The message.
 		 */
-		public void handleMessage(IMsgSecurityInfos secinfos, Object messageid, Object msg)
+		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
 			if (msg instanceof InitialHandshakeMessage)
 			{

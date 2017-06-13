@@ -9,6 +9,7 @@ import java.util.Map;
 import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
@@ -98,9 +99,9 @@ public class SerializationServices implements ISerializationServices
 	 *  @param obj Object to be encoded.
 	 *  @return Encoded object.
 	 */
-	public byte[] encode(Map<String, Object> header, ClassLoader cl, Object obj)
+	public byte[] encode(IMsgHeader header, ClassLoader cl, Object obj)
 	{
-		IComponentIdentifier receiver = (IComponentIdentifier) header.get(MessageComponentFeature.RECEIVER);
+		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
 		ISerializer serial = getSendSerializer(receiver);
 		byte[] enc = serial.encode(obj, cl, getPreprocessors());
 		ICodec[] codecs = getSendCodecs(receiver);

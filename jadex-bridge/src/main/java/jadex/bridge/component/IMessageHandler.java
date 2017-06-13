@@ -1,7 +1,5 @@
 package jadex.bridge.component;
 
-import java.util.Map;
-
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 
 /**
@@ -13,7 +11,7 @@ public interface IMessageHandler
 	 *  Test if handler should handle a message.
 	 *  @return True if it should handle the message. 
 	 */
-	public boolean isHandling(IMsgSecurityInfos secinfos, Map<String, Object> header, Object msg);
+	public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg);
 	
 	/**
 	 *  Test if handler should be removed.
@@ -26,5 +24,5 @@ public interface IMessageHandler
 	 *  @param header The header.
 	 *  @param msg The message.
 	 */
-	public void handleMessage(IMsgSecurityInfos secinfos, Object messageid, Object msg);
+	public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg);
 }

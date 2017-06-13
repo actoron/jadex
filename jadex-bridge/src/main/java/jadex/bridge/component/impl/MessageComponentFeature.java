@@ -18,7 +18,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
-import jadex.bridge.component.IMessageId;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.SComponentManagementService;
@@ -42,14 +42,11 @@ import jadex.commons.transformation.traverser.SCloner;
  */
 public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature, IInternalMessageFeature
 {
-	/** Message header key for the sender. */
-	public static final String SENDER = "sender";
+	/** Key for the conversation ID of reply messages. */
+	public static final String CONVERSATION_ID = "__sendreplyconvid";
 	
-	/** Message header key for the receiver. */
-	public static final String RECEIVER = "receiver";
-	
-	/** Key for the message ID of reply messages. */
-	public static final String MESSAGE_ID = "msgid";
+	/** Header marker for the reply message. */
+	public static final String IS_REPLY = "__sendreplyisreply";
 	
 	//-------- attributes --------
 	
@@ -115,51 +112,16 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if (receiver == null)
 			return new Future<Void>(new IllegalArgumentException("Messages must have a receiver."));
 		
-		final Future<Void> ret = new Future<Void>();
-		
-		final Map<String, Object> header = new HashMap<String, Object>();
+		final MsgHeader header = new MsgHeader();
 		if (addheaderfields != null)
-			header.putAll(addheaderfields);
-		header.put(SENDER, component.getComponentIdentifier());
-		header.put(RECEIVER, receiver);
+			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
+				header.addProtectedProperty(entry.getKey(), entry.getValue());
+		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProtectedProperty(IMsgHeader.RECEIVER, receiver);
 		
-		if (receiver.getRoot().equals(platformid))
-		{
-			// Direct local delivery.
-			ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
-			final Object clonedmsg = SCloner.clone(message, cl);
-			
-			SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
-					
-					if (imf instanceof IInternalMessageFeature)
-					{
-						((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
-						return IFuture.DONE;
-					}
-					
-					return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
-				}
-			}).addResultListener(new DelegationResultListener<Void>(ret));
-		}
-		else
-		{
-			ISerializationServices serialserv = getSerializationServices(platformid);
-			byte[] body = serialserv.encode(header, component.getClassLoader(), message);
-			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
-			{
-				public void customResultAvailable(final byte[] body) throws Exception
-				{
-					sendToTransports(header, body).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
-		}
-		
-		return ret;
+		return sendMessage(header, message);
 	}
+	
 	
 	/**
 	 *  Send a message and wait for a reply.
@@ -187,11 +149,16 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		final Future<Object> ret = new Future<Object>();
 		final String convid = SUtil.createUniqueId(component.getComponentIdentifier().toString());
-		WaitingMessageWrapper wms = new WaitingMessageWrapper(convid, message);
 		if (awaitingmessages == null)
 			awaitingmessages = new HashMap<String, Future<Object>>();
 		awaitingmessages.put(convid, ret);
-		sendMessage(receiver, wms).addResultListener(new IResultListener<Void>()
+		
+		final MsgHeader header = new MsgHeader();
+		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProtectedProperty(IMsgHeader.RECEIVER, receiver);
+		header.addShadowProperty(CONVERSATION_ID, convid);
+		
+		sendMessage(header, message).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -227,27 +194,25 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param message	The reply message.
 	 *  
 	 */
-	public IFuture<Void> sendReply(IMessageId receivedmessageid, Object message)
+	public IFuture<Void> sendReply(IMsgHeader msgheader, Object message)
 	{
 //		if (!(receivedmessageid instanceof Map))
 //			return new Future<Void>(new IllegalArgumentException("Cannot reply, illegal message ID or null."));
 		
-		@SuppressWarnings("unchecked")
-		Map<String, Object> oldmsgheader = (Map<String, Object>) ((WaitingMessageWrapper) receivedmessageid).getUserMessage();
-		IComponentIdentifier rplyrec = (IComponentIdentifier) oldmsgheader.get(SENDER);
-		String convid = (String) ((WaitingMessageWrapper) receivedmessageid).getConversationId();
+		IComponentIdentifier rplyrec = (IComponentIdentifier) msgheader.getProperty(IMsgHeader.SENDER);
+		String convid = (String) msgheader.getProperty(CONVERSATION_ID);
 		if (rplyrec == null)
 			return new Future<Void>(new IllegalArgumentException("Cannot reply, reply receiver ID not found."));
 		if (convid == null)
 			return new Future<Void>(new IllegalArgumentException("Cannot reply, conversation ID not found."));
 		
-		Map<String, Object> header = new HashMap<String, Object>();
-		header.put(RECEIVER, rplyrec);
-		header.put(SENDER, component.getComponentIdentifier());
-		WaitingMessageWrapper wms = new WaitingMessageWrapper(convid, message);
-		wms.setReply(true);
+		MsgHeader header = new MsgHeader();
+		header.addProtectedProperty(IMsgHeader.RECEIVER, rplyrec);
+		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addShadowProperty(CONVERSATION_ID, convid);
+		header.addShadowProperty(IS_REPLY, Boolean.TRUE);
 		
-		return sendMessage(rplyrec, wms);
+		return sendMessage(header, message);
 	}
 	
 	/**
@@ -257,7 +222,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param encryptedbody The encrypted message body.
 	 *  @return Null, when done, exception if failed.
 	 */
-	public IFuture<Void> sendToTransports(final Map<String, Object> header, final byte[] encryptedbody)
+	public IFuture<Void> sendToTransports(final IMsgHeader header, final byte[] encryptedbody)
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Transport service is platform-level shared / no required proxy: manual decoupling
@@ -275,7 +240,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					public void exceptionOccurred(Exception exception)
 					{
 						// Flush cache, this may cause jitter due lack of synchronization, but should eventually recover.
-						IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+						IComponentIdentifier rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
 						getTransportCache(platformid).remove(rplat);
 						
 						getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<ITransportService>()
@@ -343,11 +308,11 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header The message header.
 	 *  @param bodydata The encrypted message that arrived.
 	 */
-	public void messageArrived(final Map<String, Object> header, byte[] bodydata)
+	public void messageArrived(final IMsgHeader header, byte[] bodydata)
 	{
 		if (header != null && bodydata != null)
 		{
-			getSecurityService().decryptAndAuth((IComponentIdentifier) header.get(SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
+			getSecurityService().decryptAndAuth((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
 				{
@@ -359,8 +324,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						// Only accept messages we trust.
 						if (secinf.isTrustedPlatform() || allowuntrusted)
 						{
-							Object body = deserializeMessage(header, result.getSecondEntity());
-							messageArrived(secinf, header, body);
+							Tuple2<Map<String, Object>, Object> bodytuple = deserializeMessage(header, result.getSecondEntity());
+							((MsgHeader) header).restoreEndToEndMap(bodytuple.getFirstEntity());
+							messageArrived(secinf, header, bodytuple.getSecondEntity());
 						}
 					}
 				};
@@ -380,25 +346,20 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header The message header.
 	 *  @param body The message that arrived.
 	 */
-	public void messageArrived(final IMsgSecurityInfos secinfos, final Map<String, Object> header, Object body)
+	public void messageArrived(final IMsgSecurityInfos secinfos, final IMsgHeader header, Object body)
 	{
-		if (body instanceof WaitingMessageWrapper)
+		String convid = (String) ((MsgHeader) header).getEndToEndProperty(CONVERSATION_ID);
+		if (convid != null)
 		{
-			final WaitingMessageWrapper wm = (WaitingMessageWrapper) body;
+			// send-reply message
 			
-			if (wm.isReply())
+			if (Boolean.TRUE.equals(((MsgHeader) header).getEndToEndProperty(IS_REPLY)))
 			{
-				Future<Object> fut = awaitingmessages.remove(wm.getConversationId());
+				Future<Object> fut = awaitingmessages.remove(convid);
 				if (fut != null)
-					fut.setResult(wm.getUserMessage());
+					fut.setResult(body);
 				return;
 			}
-			
-			body = wm.getUserMessage();
-			
-			wm.setUserMessage(null);
-			
-			header.put(MESSAGE_ID, wm);
 		}
 		
 		handleMessage(secinfos, header, body);
@@ -411,7 +372,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header Message header.
 	 * @param body
 	 */
-	protected void handleMessage(final IMsgSecurityInfos secinf, final Map<String, Object> header, final Object body)
+	protected void handleMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
 		boolean	handled	= false;
 		if(messagehandlers!=null)
@@ -440,19 +401,59 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		if (!handled)
 		{
-			// Switch header and message ID containment
-			WaitingMessageWrapper wm = (WaitingMessageWrapper) header.remove(MESSAGE_ID);
-			if (wm != null)
-				wm.setUserMessage(header);
-			processUnhandledMessage(secinf, wm, body);
+			processUnhandledMessage(secinf, header, body);
 		}
+	}
+	
+	protected IFuture<Void> sendMessage(final MsgHeader header, Object message)
+	{
+		final Future<Void> ret = new Future<Void>();
+		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
+		
+		if (receiver.getRoot().equals(platformid))
+		{
+			// Direct local delivery.
+			ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
+			final Object clonedmsg = SCloner.clone(message, cl);
+			
+			SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
+					
+					if (imf instanceof IInternalMessageFeature)
+					{
+						((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
+						return IFuture.DONE;
+					}
+					
+					return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
+				}
+			}).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else
+		{
+			ISerializationServices serialserv = getSerializationServices(platformid);
+			Tuple2<Map<String, Object>, Object> bodytuple = new Tuple2<Map<String, Object>, Object>(header.removeEndToEndMap(), message);
+			byte[] body = serialserv.encode(header, component.getClassLoader(), bodytuple);
+			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
+			{
+				public void customResultAvailable(final byte[] body) throws Exception
+				{
+					sendToTransports(header, body).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Called for all messages without matching message handlers.
 	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMessageId messageId, final Object body)
+	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
 	}
 	
@@ -463,9 +464,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param serializedmsg The serialized message.
 	 *  @return The deserialized message.
 	 */
-	protected Object deserializeMessage(Map<String, Object> header, byte[] serializedmsg)
+	@SuppressWarnings("unchecked")
+	protected Tuple2<Map<String, Object>, Object> deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
-		return getSerializationServices(platformid).decode(component.getClassLoader(), serializedmsg);
+		return (Tuple2<Map<String, Object>, Object>) getSerializationServices(platformid).decode(component.getClassLoader(), serializedmsg);
 	}
 	
 	/**
@@ -499,10 +501,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header The message header.
 	 *  @return A suitable transport service or exception if none is available.
 	 */
-	protected IFuture<ITransportService> getTransportService(Map<String, Object> header)
+	protected IFuture<ITransportService> getTransportService(IMsgHeader header)
 	{
 		final Future<ITransportService> ret = new Future<ITransportService>();
-		IComponentIdentifier rplat = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+		IComponentIdentifier rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
 		
 		Tuple2<ITransportService, Integer> tup = getTransportCache(platformid).get(rplat);
 		if (tup != null)
@@ -516,7 +518,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 			if (coll != null && coll.size() > 0)
 			{
-				final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.get(RECEIVER)).getRoot();
+				final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
 				final int[] counter = new int[] { coll.size() };
 				for (Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
 				{
@@ -656,94 +658,94 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  Message wrapper for messages awaiting a reply.
 	 *
 	 */
-	protected static class WaitingMessageWrapper implements IMessageId
-	{
-		/** The user message object */
-		protected Object usermessage;
-		
-		/** The conversation ID */
-		protected String convid;
-		
-		/** Flag if message is a reply. */
-		protected boolean reply;
-		
-		/**
-		 *  Creates the WaitingMessage. (Bean)
-		 */
-		public WaitingMessageWrapper()
-		{
-		}
-		
-		/**
-		 *  Creates the WaitingMessage.
-		 *  
-		 *  @param usermessage The user message.
-		 *  @param convid The conversation ID.
-		 */
-		public WaitingMessageWrapper(String convid, Object usermessage)
-		{
-			this.convid = convid;
-			this.usermessage = usermessage;
-		}
-		
-		/**
-		 *  Gets conversation ID.
-		 *  
-		 *  @return conversation ID.
-		 */
-		public String getConversationId()
-		{
-			return convid;
-		}
-		
-		/**
-		 *  Sets conversation ID.
-		 *  
-		 *  @param convid conversation ID.
-		 */
-		public void setConversationId(String convid)
-		{
-			this.convid = convid;
-		}
-		
-		/**
-		 *  Gets the user message.
-		 *  
-		 *  @return The user message.
-		 */
-		public Object getUserMessage()
-		{
-			return usermessage;
-		}
-		
-		/**
-		 *  Sets the user message.
-		 *  
-		 *  @param usermessage The user message.
-		 */
-		public void setUserMessage(Object usermessage)
-		{
-			this.usermessage = usermessage;
-		}
-		
-		/**
-		 *  Checks if the message is a reply.
-		 *  
-		 *  @return True, if message is a reply.
-		 */
-		public boolean isReply()
-		{
-			return reply;
-		}
-		
-		/**
-		 *  Sets if the message is a reply.
-		 *  
-		 *  @param reply Set true, if message is a reply.
-		 */
-		public void setReply(boolean reply)
-		{
-			this.reply = reply;
-		}
-	}
+//	protected static class WaitingMessageWrapper implements IMessageId
+//	{
+//		/** The user message object */
+//		protected Object usermessage;
+//		
+//		/** The conversation ID */
+//		protected String convid;
+//		
+//		/** Flag if message is a reply. */
+//		protected boolean reply;
+//		
+//		/**
+//		 *  Creates the WaitingMessage. (Bean)
+//		 */
+//		public WaitingMessageWrapper()
+//		{
+//		}
+//		
+//		/**
+//		 *  Creates the WaitingMessage.
+//		 *  
+//		 *  @param usermessage The user message.
+//		 *  @param convid The conversation ID.
+//		 */
+//		public WaitingMessageWrapper(String convid, Object usermessage)
+//		{
+//			this.convid = convid;
+//			this.usermessage = usermessage;
+//		}
+//		
+//		/**
+//		 *  Gets conversation ID.
+//		 *  
+//		 *  @return conversation ID.
+//		 */
+//		public String getConversationId()
+//		{
+//			return convid;
+//		}
+//		
+//		/**
+//		 *  Sets conversation ID.
+//		 *  
+//		 *  @param convid conversation ID.
+//		 */
+//		public void setConversationId(String convid)
+//		{
+//			this.convid = convid;
+//		}
+//		
+//		/**
+//		 *  Gets the user message.
+//		 *  
+//		 *  @return The user message.
+//		 */
+//		public Object getUserMessage()
+//		{
+//			return usermessage;
+//		}
+//		
+//		/**
+//		 *  Sets the user message.
+//		 *  
+//		 *  @param usermessage The user message.
+//		 */
+//		public void setUserMessage(Object usermessage)
+//		{
+//			this.usermessage = usermessage;
+//		}
+//		
+//		/**
+//		 *  Checks if the message is a reply.
+//		 *  
+//		 *  @return True, if message is a reply.
+//		 */
+//		public boolean isReply()
+//		{
+//			return reply;
+//		}
+//		
+//		/**
+//		 *  Sets if the message is a reply.
+//		 *  
+//		 *  @param reply Set true, if message is a reply.
+//		 */
+//		public void setReply(boolean reply)
+//		{
+//			this.reply = reply;
+//		}
+//	}
 }

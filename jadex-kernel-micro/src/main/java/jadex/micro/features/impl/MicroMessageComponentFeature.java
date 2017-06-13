@@ -4,7 +4,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.component.IMessageId;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -36,9 +36,9 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	 *  Called for all messages without matching message handlers.
 	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMessageId messageid, final Object body)
+	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
-		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, messageid, body, body != null ? body.getClass() : null});
+		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null});
 	}
 	
 	/**

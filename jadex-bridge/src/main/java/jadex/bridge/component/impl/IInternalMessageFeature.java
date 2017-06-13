@@ -1,7 +1,6 @@
 package jadex.bridge.component.impl;
 
-import java.util.Map;
-
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IFuture;
 
@@ -17,7 +16,7 @@ public interface IInternalMessageFeature
 	 *  @param encryptedbody The encrypted message body.
 	 *  @return Null, when done, exception if failed.
 	 */
-	public IFuture<Void> sendToTransports(Map<String, Object> header, byte[] encryptedbody);
+	public IFuture<Void> sendToTransports(IMsgHeader header, byte[] encryptedbody);
 	
 	/**
 	 *  Inform the component that a message has arrived.
@@ -25,7 +24,7 @@ public interface IInternalMessageFeature
 	 *  @param header The message header.
 	 *  @param bodydata The encrypted message that arrived.
 	 */
-	public void messageArrived(Map<String, Object> header, byte[] encryptedbody);
+	public void messageArrived(IMsgHeader header, byte[] encryptedbody);
 	
 	/**
 	 *  Inform the component that a message has arrived.
@@ -34,5 +33,5 @@ public interface IInternalMessageFeature
 	 *  @param header The message header.
 	 *  @param body The message that arrived.
 	 */
-	public void messageArrived(IMsgSecurityInfos secinfos, Map<String, Object> header, Object body);
+	public void messageArrived(IMsgSecurityInfos secinfos, IMsgHeader header, Object body);
 }

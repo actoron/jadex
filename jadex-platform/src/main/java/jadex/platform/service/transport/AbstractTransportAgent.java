@@ -17,6 +17,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -150,8 +151,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						if(tup.getSecondEntity() != null)
 						{
 							// Then decode header and deliver to receiver agent.
-							final Map<String, Object> header = (Map<String, Object>)codec.decode(agent.getClassLoader(), tup.getSecondEntity());
-							final IComponentIdentifier rec = (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
+							final IMsgHeader header = (IMsgHeader)codec.decode(agent.getClassLoader(), tup.getSecondEntity());
+							final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 
 							IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
 							cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
@@ -330,7 +331,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param header Message header.
 	 * @return Transport priority, when ready
 	 */
-	public IFuture<Integer> isReady(Map<String, Object> header)
+	public IFuture<Integer> isReady(IMsgHeader header)
 	{
 		VirtualConnection handler = getVirtualConnection(getTarget(header));
 		if(handler != null)
@@ -351,7 +352,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param body Message body.
 	 * @return Done, when sent, failure otherwise.
 	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> header, final byte[] body)
+	public IFuture<Void> sendMessage(final IMsgHeader header, final byte[] body)
 	{
 		VirtualConnection handler = getVirtualConnection(getTarget(header));
 		if(handler == null || handler.getConnection() == null)
@@ -423,7 +424,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * Create a connection to a given platform. Tries all available addresses in
 	 * parallel. Fails when no connection can be established.
 	 */
-	protected IFuture<Integer> createConnections(final Map<String, Object> header)
+	protected IFuture<Integer> createConnections(final IMsgHeader header)
 	{
 		final String[] addresses = getAddresses(header);
 		if(addresses != null && addresses.length > 0)
@@ -561,10 +562,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/**
 	 * Get the target platform for a message.
 	 */
-	protected IComponentIdentifier getTarget(Map<String, Object> header)
+	protected IComponentIdentifier getTarget(IMsgHeader header)
 	{
 		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-		IComponentIdentifier rec = (IComponentIdentifier)header.get(MessageComponentFeature.RECEIVER);
+		IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 		assert rec != null; // Message feature should disallow sending without
 							// receiver.
 		return rec.getRoot();
@@ -576,7 +577,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param The message header.
 	 * @return The addresses, if any.
 	 */
-	protected String[] getAddresses(Map<String, Object> header)
+	protected String[] getAddresses(IMsgHeader header)
 	{
 		IComponentIdentifier target = getTarget(header);
 		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);

@@ -155,6 +155,8 @@ public class JadexBinarySerializer implements ISerializer
 		"jadex.bridge.service.IService",
 		"jadex.bridge.component.IMessageFeature",
 		"java.util.HashSet",
+		"jadex.commons.Tuple2",
+		"jadex.bridge.component.impl.MsgHeader",
 		"jadex.bridge.component.IExecutionFeature",
 		"jadex.bridge.component.IPropertiesFeature",
 		"jadex.bridge.modelinfo.UnparsedExpression",

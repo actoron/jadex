@@ -3,6 +3,7 @@ package jadex.bridge.service.types.serialization;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -21,7 +22,7 @@ public interface ISerializationServices
 	 *  @param obj Object to be encoded.
 	 *  @return Encoded object.
 	 */
-	public byte[] encode(Map<String, Object> header, ClassLoader cl, Object obj);
+	public byte[] encode(IMsgHeader header, ClassLoader cl, Object obj);
 	
 	/**
 	 *  Decodes/deserializes an object.

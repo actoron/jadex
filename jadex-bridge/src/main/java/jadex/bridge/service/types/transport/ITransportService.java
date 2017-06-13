@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.transport;
 
-import java.util.Map;
-
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
@@ -18,7 +17,7 @@ public interface ITransportService
 	 *  @param header Message header.
 	 *  @return Transport priority, when ready
 	 */
-	public IFuture<Integer> isReady(Map<String, Object> header);
+	public IFuture<Integer> isReady(IMsgHeader header);
 	
 	/**
 	 *  Send a message.
@@ -27,5 +26,5 @@ public interface ITransportService
 	 *  @param body Message body.
 	 *  @return Done, when sent, failure otherwise.
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> header, byte[] body);
+	public IFuture<Void> sendMessage(IMsgHeader header, byte[] body);
 }

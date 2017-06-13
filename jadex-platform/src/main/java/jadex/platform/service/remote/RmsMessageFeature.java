@@ -5,10 +5,17 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.commons.Tuple2;
+import jadex.micro.features.impl.MicroMessageComponentFeature;
 
-public class RmsMessageFeature extends MessageComponentFeature
+/**
+ *  Message feature of the RMS.
+ *
+ */
+public class RmsMessageFeature extends MicroMessageComponentFeature
 {
 	/**
 	 *  Create the feature.
@@ -25,10 +32,12 @@ public class RmsMessageFeature extends MessageComponentFeature
 	 *  @param serializedmsg The serialized message.
 	 *  @return The deserialized message.
 	 */
-	protected Object deserializeMessage(Map<String, Object> header, byte[] serializedmsg)
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Tuple2<Map<String, Object>, Object> deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
-		IComponentIdentifier callreceiver = (IComponentIdentifier) header.get(RemoteServiceManagementAgent.CALL_RECEIVER);
+		IComponentIdentifier callreceiver = (IComponentIdentifier) ((MsgHeader) header).getEndToEndProperty(RemoteServiceManagementAgent.CALL_RECEIVER);
 		ClassLoader cl = callreceiver == null ? component.getClassLoader() : SComponentManagementService.getLocalClassLoader(callreceiver);		
-		return getSerializationServices(platformid).decode(cl, serializedmsg);
+		return  (Tuple2<Map<String, Object>, Object>) getSerializationServices(platformid).decode(cl, serializedmsg);
 	}
 }

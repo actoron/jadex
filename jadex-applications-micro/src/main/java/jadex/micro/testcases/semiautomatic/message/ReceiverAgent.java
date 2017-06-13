@@ -1,7 +1,7 @@
 package jadex.micro.testcases.semiautomatic.message;
 
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.component.IMessageId;
+import jadex.bridge.component.IMsgHeader;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
 
@@ -15,10 +15,10 @@ public class ReceiverAgent
 	 *  Wait for the message and reply.
 	 */
 	@AgentMessageArrived
-	protected void	received(String message, IMessageFeature mf, IMessageId id)
+	protected void	received(String message, IMessageFeature mf, IMsgHeader header)
 	{
 		System.out.println("Receiver received: "+message);
 		
-		mf.sendReply(id, "World!");
+		mf.sendReply(header, "World!");
 	}
 }
