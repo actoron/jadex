@@ -3,6 +3,7 @@ package jadex.platform.service.message.transport.codecs;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -52,10 +53,10 @@ public class GZIPCodec extends AbstractCodec
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public byte[] decode(Object bytes)
-	{
-		return decodeBytes((ByteArrayInputStream)bytes);
-	}
+//	public byte[] decode(Object bytes)
+//	{
+//		return decodeBytes((ByteArrayInputStream)bytes);
+//	}
 	
 	/**
 	 *  Decode bytes.
@@ -79,7 +80,6 @@ public class GZIPCodec extends AbstractCodec
 		try
 		{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			baos.write(SUtil.intToBytes(val.length));
 			GZIPOutputStream gzos = new GZIPOutputStream(baos);
 			gzos.write(val);
 			gzos.close();
@@ -113,18 +113,9 @@ public class GZIPCodec extends AbstractCodec
 		byte[] ret = null;
 		try
 		{
-			byte[] buf = new byte[4];
-			int	read;
-			int count	= 0;
-			while(count<4 && (read=bais.read(buf, count, 4-count))!=-1)
-			{
-				count	+= read;
-			}
-			
-			int len = SUtil.bytesToInt(buf);
-			ret = new byte[len];
 			GZIPInputStream gzis = new GZIPInputStream(bais);
-			SUtil.readStream(ret, 0, -1, gzis);
+			ret = SUtil.readStream(gzis);
+			gzis.close();
 		}
 		catch(Exception e) 
 		{

@@ -32,12 +32,13 @@ public class MsgHeader implements IMsgHeader
 	 */
 	public Object getProperty(String propertyname)
 	{
-		Object ret = getEndToEndProperty(propertyname);
+		if (endtoendmap != null && endtoendmap.containsKey(propertyname))
+			return endtoendmap.get(propertyname);
 		
-		if (ret == null && linktolinkmap != null)
-			ret = linktolinkmap.get(propertyname);
+		if (linktolinkmap != null && linktolinkmap.containsKey(propertyname))
+			return linktolinkmap.get(propertyname);
 		
-		return ret;
+		return null;
 	}
 	
 	/**

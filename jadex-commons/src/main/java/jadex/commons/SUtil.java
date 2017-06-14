@@ -135,6 +135,9 @@ public class SUtil
 	/** UTF-8 charset. */
 	public static final Charset UTF8 = Charset.forName("UTF-8");
 	
+	/** ISO-8859-1 charset. */
+	public static final Charset ISO8859_1 = Charset.forName("ISO-8859-1");
+	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
 

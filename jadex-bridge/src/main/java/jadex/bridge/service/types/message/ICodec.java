@@ -27,14 +27,6 @@ public interface ICodec
 	 *  @param bytes The value bytes as byte array or input stream.
 	 *  @return The decoded object or byte array (for intermediate codecs).
 	 */
-//	public Object decode(byte[] bytes, ClassLoader classloader);
-	public byte[] decode(Object bytes);
-	
-	/**
-	 *  Decode data with the codec.
-	 *  @param bytes The value bytes as byte array or input stream.
-	 *  @return The decoded object or byte array (for intermediate codecs).
-	 */
 	public byte[] decode(byte[] bytes);
 	
 	/**
@@ -42,6 +34,5 @@ public interface ICodec
 	 *  @param bytes The value bytes as byte array or input stream.
 	 *  @return The decoded object or byte array (for intermediate codecs).
 	 */
-//	public Object decode(byte[] bytes, ClassLoader classloader);
 	public byte[] decode(byte[] bytes, int offset, int length);
 }

@@ -104,7 +104,11 @@ public class SerializationServices implements ISerializationServices
 		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
 		ISerializer serial = getSendSerializer(receiver);
 		byte[] enc = serial.encode(obj, cl, getPreprocessors());
+		
 		ICodec[] codecs = getSendCodecs(receiver);
+		if (header == obj)
+			codecs = null;
+		
 		int codecsize = 0;
 		if (codecs != null)
 		{
@@ -124,6 +128,7 @@ public class SerializationServices implements ISerializationServices
 			for (int i = 0; i < codecsize; ++i)
 				SUtil.intIntoBytes(codecs[i].getCodecId(), ret, (i<<2) + 8);
 		}
+		
 		return ret;
 	}
 	
@@ -177,6 +182,8 @@ public class SerializationServices implements ISerializationServices
 			}
 		}
 		
+		if (ret == null)
+			System.out.println("FDSODFP");
 		return ret;
 	}
 	

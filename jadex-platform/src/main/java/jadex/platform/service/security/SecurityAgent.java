@@ -12,12 +12,18 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
@@ -31,6 +37,8 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -54,10 +62,11 @@ import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 	@Argument(name="virtualnames", clazz=String[].class),
 	@Argument(name="validityduration", clazz=long.class)
 })
-@ProvidedServices(@ProvidedService(type=ISecurityService.class))
-//@ProvidedServices(@ProvidedService(type=ISecurityService.class, implementation=@Implementation(proxytype=Implementation.PROXYTYPE_RAW)))
+@Service
+//@ProvidedServices(@ProvidedService(type=ISecurityService.class))
+@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
-public class SecurityAgent implements ISecurityService
+public class SecurityAgent implements ISecurityService, IInternalService
 {
 	/** Header property for security messages. */
 	protected static final String SECURITY_MESSAGE = "__securitymessage__";
@@ -87,14 +96,8 @@ public class SecurityAgent implements ISecurityService
 	/** CryptoSuites that are expiring with expiration time. */
 	protected Map<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
 	
-	/** The default authentication suite. */
-//	protected IAuthenticationSuite defaultauthenticationsuite;
-	
-	/** Available authentication suites. */
-//	protected Map<Integer, IAuthenticationSuite> authenticationsuites;
-	
 	/**
-	 *  Initializiation.
+	 *  Initialization.
 	 */
 	@AgentCreated
 	public IFuture<Void> start()
@@ -121,10 +124,6 @@ public class SecurityAgent implements ISecurityService
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
 		currentcryptosuites = new HashMap<String, ICryptoSuite>();
 		expiringcryptosuites = new HashMap<String, Tuple2<ICryptoSuite,Long>>();
-		
-//		defaultauthenticationsuite = new Blake2bX509AuthenticationSuite();
-//		authenticationsuites = new HashMap<Integer, IAuthenticationSuite>();
-//		authenticationsuites.put(defaultauthenticationsuite.getId(), defaultauthenticationsuite);
 		
 		String[] cryptsuites = (String[]) argfeat.getArguments().get("cryptosuites");
 		if (cryptsuites == null)
@@ -408,7 +407,6 @@ public class SecurityAgent implements ISecurityService
 		return Boolean.TRUE.equals(header.getProperty(SECURITY_MESSAGE));
 	}
 	
-	
 	//-------- Message Handler -------
 	
 	/**
@@ -571,5 +569,62 @@ public class SecurityAgent implements ISecurityService
 				}
 			}
 		}
+	}
+	
+	//---- IInternalService bullshit
+	
+	private IServiceIdentifier sid;
+	
+	/**
+	 *  Get the service identifier.
+	 *  @return The service identifier.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return sid;
+	}
+	
+	/**
+	 *  Test if the service is valid.
+	 *  @return True, if service can be used.
+	 */
+	public IFuture<Boolean> isValid()
+	{
+		return new Future<Boolean>(true);
+	}
+		
+	/**
+	 *  Get the map of properties (considered as constant).
+	 *  @return The service property map (if any).
+	 */
+	public Map<String, Object> getPropertyMap()
+	{
+		return new HashMap<String, Object>();
+	}
+	
+	/**
+	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
+	 */
+	public IFuture<Void>	startService() {return IFuture.DONE;}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @return A future that is done when the service has completed its shutdown.  
+	 */
+	public IFuture<Void>	shutdownService() {return IFuture.DONE;}
+	
+	/**
+	 *  Sets the access for the component.
+	 *  @param access Component access.
+	 */
+	public IFuture<Void> setComponentAccess(@Reference IInternalAccess access) {return IFuture.DONE;}
+	
+	/**
+	 *  Set the service identifier.
+	 */
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	{
+		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
 	}
 }

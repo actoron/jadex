@@ -325,7 +325,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						if (secinf.isTrustedPlatform() || allowuntrusted)
 						{
 							Tuple2<Map<String, Object>, Object> bodytuple = deserializeMessage(header, result.getSecondEntity());
-							((MsgHeader) header).restoreEndToEndMap(bodytuple.getFirstEntity());
+							if (header != null)
+							{
+								((MsgHeader) header).restoreEndToEndMap(bodytuple.getFirstEntity());
+							}
 							messageArrived(secinf, header, bodytuple.getSecondEntity());
 						}
 					}
@@ -444,6 +447,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			ISerializationServices serialserv = getSerializationServices(platformid);
 			Tuple2<Map<String, Object>, Object> bodytuple = new Tuple2<Map<String, Object>, Object>(header.removeEndToEndMap(), message);
 			byte[] body = serialserv.encode(header, component.getClassLoader(), bodytuple);
+			
 			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 			{
 				public void customResultAvailable(final byte[] body) throws Exception
