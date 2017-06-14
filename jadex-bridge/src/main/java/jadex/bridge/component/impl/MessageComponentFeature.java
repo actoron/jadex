@@ -405,6 +405,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 	}
 	
+	/**
+	 *  Send the message with a prepared header.
+	 *  
+	 *  @param header The header.
+	 *  @param message The message.
+	 *  @return Null, when sent.
+	 */
 	protected IFuture<Void> sendMessage(final MsgHeader header, Object message)
 	{
 		final Future<Void> ret = new Future<Void>();
