@@ -19,7 +19,7 @@ public class RemoteMessagingTest
 	/**
 	 *  Start two agents on separate platforms and exchange a request/reply.
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
 		// Start first platform with receiver.
 		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
@@ -51,6 +51,10 @@ public class RemoteMessagingTest
 //		// Add addresses of second platform to first
 //		tab1.addPlatformAddresses(new ComponentIdentifier(access2.getComponentIdentifier().getName(),
 //			tab2.getPlatformAddresses(access2.getComponentIdentifier())));
+		
+		// To start profiling after platform startup.
+		System.out.println("Press [ANY] key to start...");
+		System.in.read();
 		
 		// Start sender with receiver CID on remote platform.
 //		cms.createComponent(SenderAgent.class.getName()+".class",
