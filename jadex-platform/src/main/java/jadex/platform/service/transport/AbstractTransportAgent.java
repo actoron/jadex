@@ -564,10 +564,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected IComponentIdentifier getTarget(IMsgHeader header)
 	{
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
 		IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-		assert rec != null; // Message feature should disallow sending without
-							// receiver.
+		assert rec != null; // Message feature should disallow sending without receiver.
 		return rec.getRoot();
 	}
 	

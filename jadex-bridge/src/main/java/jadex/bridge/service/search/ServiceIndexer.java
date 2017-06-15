@@ -1,6 +1,7 @@
 package jadex.bridge.service.search;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,7 +81,7 @@ public class ServiceIndexer<T>
 			
 			if (servicesets != null)
 			{
-				servicesets.sort(new Comparator<Set<T>>()
+				Collections.sort(servicesets, new Comparator<Set<T>>()
 				{
 					public int compare(Set<T> o1, Set<T> o2)
 					{
