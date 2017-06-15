@@ -22,6 +22,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
@@ -43,6 +44,7 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.commons.future.UnlimitedIntermediateDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 /**
@@ -168,26 +170,135 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
-	 * 
+	 *  Adapt the existing queries to a new superpeer, i.e. remove from old and add to new.
 	 */
-	protected void adaptQueriesToNewSuperpeer(IComponentIdentifier oldsp, IComponentIdentifier newsp)
+	protected IFuture<Void> adaptQueriesToNewSuperpeer(final IComponentIdentifier oldsp, final IComponentIdentifier newsp)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(oldsp!=newsp && newsp!=null)
 		{
-			Iterator<ServiceQueryInfo<Object>> it = (Iterator<ServiceQueryInfo<Object>>)queries.getAllQueries();
-			while(it.hasNext())
+			// get all queries in which the superpeer was set
+			final Set<ServiceQueryInfo<?>> aqs = queries.getQueries(new IFilter<ServiceQueryInfo<?>>()
 			{
-				ServiceQueryInfo<Object> sqi = it.next();
-				//xcgdfh
+				public boolean filter(ServiceQueryInfo<?> query) 
+				{
+					return query.getSuperpeer()!=null;
+				}
+			});
+			
+			final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
+			if(rms!=null)
+			{
+				final Future<Void> remfut = new Future<Void>(); 
+				final Future<Void> addfut = new Future<Void>(); 
+				
+				if(oldsp!=null)
+				{
+					rms.getExternalAccessProxy(oldsp).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(remfut)
+					{
+						public void customResultAvailable(IExternalAccess result) throws Exception
+						{
+							try
+							{
+								result.scheduleStep(new IComponentStep<Void>()
+								{
+									@Classname("removeQueriesOnSuperpeer")
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+										
+										FutureBarrier<Void> bar = new FutureBarrier<Void>();
+										for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
+										{
+											bar.addFuture(reg.removeQuery((ServiceQuery)it.next().getQuery()));
+										}
+										
+										return bar.waitFor();
+									}
+								}).addResultListener(new DelegationResultListener<Void>(remfut));
+							}
+							catch(Exception e)
+							{
+								ret.setException(e);
+							}
+						}
+					});
+				}
+				else
+				{
+					remfut.setResult(null);
+				}
+				
+				rms.getExternalAccessProxy(newsp).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(addfut)
+				{
+					public void customResultAvailable(IExternalAccess result) throws Exception
+					{
+						try
+						{
+							result.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("addQueriesOnSuperpeer")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+									
+									FutureBarrier<Void> bar = new FutureBarrier<Void>();
+									for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
+									{
+										bar.addFuture(reg.addQuery((ServiceQuery)it.next().getQuery()));
+									}
+									
+									return bar.waitFor();
+								}
+							}).addResultListener(new DelegationResultListener<Void>(addfut));
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
+						}
+					}
+				});
+				
+				FutureBarrier<Void> bar = new FutureBarrier<Void>();
+				bar.addFuture(addfut);
+				bar.addFuture(remfut);
+				bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						// Change the superpeer to the new
+						for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
+						{
+							it.next().setSuperpeer(newsp);
+						}
+					}
+				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("RMS not found"));
 			}
 		}
+		else
+		{
+			if(newsp==null)
+			{
+				ret.setException(new RuntimeException("New super peer must not null"));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
-	 * 
-	 * @param spcid
-	 * @param sqi
-	 * @return
+	 *  Add a query on another platorm (superpeer).
+	 *  @param spcid The platform id.
+	 *  @param sqi The query.
 	 */
 	protected <T> ISubscriptionIntermediateFuture<T> addQueryOnPlatform(IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
 	{
@@ -653,8 +764,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
-		final UnlimitedIntermediateDelegationResultListener<T> lis = new UnlimitedIntermediateDelegationResultListener<T>(ret);
+//		final UnlimitedIntermediateDelegationResultListener<T> lis = new UnlimitedIntermediateDelegationResultListener<T>(ret);
 		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
@@ -664,7 +774,6 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			// Always add query locally to get local changes without superpeer roundtrip
 			final ServiceQueryInfo<T> sqi = addQueryByAskMe(query);
-			sqi.getFuture().addIntermediateResultListener(lis);
 
 			// When this node is not superpeer and the search scope is global
 			if(!isSuperpeer() && !RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
@@ -681,9 +790,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					// else need to search by asking all other peer
 					fut = addQueryByAskAll(query);
 				}
-				fut.addIntermediateResultListener(lis);
+				sqi.setRemoteFuture(fut);
 			}
 		}
+		
+		ret.addResultListener(new IntermediateDelegationResultListener<T>(ret));
 		
 		return ret;
 	}
@@ -724,6 +835,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.writeLock().unlock();
 		}
 		
+		// Check initial services and notify the query
 		if(sers!=null)
 		{
 			IAsyncFilter<T> filter = new IAsyncFilter<T>()
@@ -913,9 +1025,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			qinfo.getFuture().setFinished();
 			
 			if(qinfo.getSuperpeer()!=null)
+			{
 				removeQueryFromSuperpeer(qinfo).addResultListener(new DelegationResultListener<Void>(ret));
+			}
 			else
+			{
 				ret.setResult(null);
+			}
 		}
 		else
 		{
@@ -2027,43 +2143,43 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}, delay);
 	}
 	
-	/**
-	 *  Listener that forwards only results and ignores finished / exception.
-	 */
-	public static class UnlimitedIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
-	{
-		/** The delegate future. */
-		protected IntermediateFuture<E> delegate;
-		
-		public UnlimitedIntermediateDelegationResultListener(IntermediateFuture<E> delegate)
-		{
-			this.delegate = delegate;
-		}
-		
-		public void intermediateResultAvailable(E result)
-		{
-			delegate.addIntermediateResultIfUndone(result);
-		}
-
-		public void finished()
-		{
-			// the query is not finished after the status quo is delivered
-		}
-
-		public void resultAvailable(Collection<E> results)
-		{
-			for(E result: results)
-			{
-				intermediateResultAvailable(result);
-			}
-			// the query is not finished after the status quo is delivered
-		}
-		
-		public void exceptionOccurred(Exception exception)
-		{
-			// the query is not finished after the status quo is delivered
-		}
-	}
+//	/**
+//	 *  Listener that forwards only results and ignores finished / exception.
+//	 */
+//	public static class UnlimitedIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
+//	{
+//		/** The delegate future. */
+//		protected IntermediateFuture<E> delegate;
+//		
+//		public UnlimitedIntermediateDelegationResultListener(IntermediateFuture<E> delegate)
+//		{
+//			this.delegate = delegate;
+//		}
+//		
+//		public void intermediateResultAvailable(E result)
+//		{
+//			delegate.addIntermediateResultIfUndone(result);
+//		}
+//
+//		public void finished()
+//		{
+//			// the query is not finished after the status quo is delivered
+//		}
+//
+//		public void resultAvailable(Collection<E> results)
+//		{
+//			for(E result: results)
+//			{
+//				intermediateResultAvailable(result);
+//			}
+//			// the query is not finished after the status quo is delivered
+//		}
+//		
+//		public void exceptionOccurred(Exception exception)
+//		{
+//			// the query is not finished after the status quo is delivered
+//		}
+//	}
 	
 	/**
 	 *  Async filter for checking queries in one go.

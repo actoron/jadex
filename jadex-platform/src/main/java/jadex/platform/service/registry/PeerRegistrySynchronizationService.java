@@ -22,7 +22,6 @@ import jadex.commons.future.IResultListener;
 
 /**
  *  Service for normal peers to send local changes to a selected superpeer.
- *  
  */
 @Service
 public class PeerRegistrySynchronizationService implements IPeerRegistrySynchronizationService
@@ -107,6 +106,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		}
 		else
 		{
+			// If superpeerservice==null force a new search
 			getRegistry().getSuperpeer(spregser==null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, ISuperpeerRegistrySynchronizationService>(ret)
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)

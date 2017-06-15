@@ -1,7 +1,9 @@
 package jadex.bridge.service.search;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.UnlimitedIntermediateDelegationResultListener;
 
 /**
  *  Info with query and result future.
@@ -11,8 +13,9 @@ public class ServiceQueryInfo<T>
 	/** The query. */
 	protected ServiceQuery<T> query;
 	
-	/** The future. */
+	/** The futures. */
 	protected TerminableIntermediateFuture<T> future;
+	protected ISubscriptionIntermediateFuture<T> remotefuture;
 	
 	/** The superpeer on which this query was (potentially) added. */
 	protected IComponentIdentifier superpeer;
@@ -62,6 +65,28 @@ public class ServiceQueryInfo<T>
 		this.future = future;
 	}
 	
+	/**
+	 *  Get the remotefuture.
+	 *  @return the remotefuture
+	 */
+	public ISubscriptionIntermediateFuture<T> getRemoteFuture()
+	{
+		return remotefuture;
+	}
+
+	/**
+	 *  Set the remotefuture.
+	 *  @param remotefuture The remotefuture to set
+	 */
+	public void setRemoteFuture(ISubscriptionIntermediateFuture<T> remotefuture)
+	{
+		if(this.remotefuture!=null)
+			remotefuture.terminate();
+		
+		this.remotefuture = remotefuture;
+		remotefuture.addResultListener(new UnlimitedIntermediateDelegationResultListener<T>(future));
+	}
+
 	/**
 	 *  Get the superpeer.
 	 *  @return the superpeer

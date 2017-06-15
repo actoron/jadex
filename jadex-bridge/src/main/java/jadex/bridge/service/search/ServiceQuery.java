@@ -1,15 +1,11 @@
 package jadex.bridge.service.search;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
@@ -20,7 +16,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Service query definition.
  */
 public class ServiceQuery<T>
 {
@@ -179,6 +175,9 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
 	{
+		if(owner==null)
+			throw new IllegalArgumentException("Owner must not null");
+		
 		this.servicetype = servicetype;
 		this.scope = scope;
 		this.provider = provider;
@@ -186,7 +185,6 @@ public class ServiceQuery<T>
 		this.filter = filter;
 		this.returntype = returntype;
 	}
-	
 	
 	/**
 	 *  Shallow copy constructor.
