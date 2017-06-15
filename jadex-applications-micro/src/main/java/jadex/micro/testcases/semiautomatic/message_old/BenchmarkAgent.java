@@ -1,6 +1,8 @@
 package jadex.micro.testcases.semiautomatic.message_old;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -34,6 +36,7 @@ public class BenchmarkAgent
 	protected void	run(IMessageFeature mf)
 	{
 		// Dry run.
+//		final List<String>	log	= new ArrayList<String>();
 		for(int i=0;i<count/10; i++)
 		{
 			mf.sendMessageAndWait(new HashMap<String, Object>(){{
@@ -46,10 +49,15 @@ public class BenchmarkAgent
 				public void handleMessage(Map<String, Object> msg, MessageType type)
 				{
 					// NOP
-//					System.out.println("Sender received: "+msg.get(SFipa.CONTENT));
+//					log.add("Sender received: "+msg.get(SFipa.CONTENT));
 				}
 			}).get();
+//			log.add("Sender and wait completed.");
 		}
+//		for(String entry: log)
+//		{
+//			System.out.println(entry);
+//		}
 
 		// Now testing.
 		long	start	= System.nanoTime();
