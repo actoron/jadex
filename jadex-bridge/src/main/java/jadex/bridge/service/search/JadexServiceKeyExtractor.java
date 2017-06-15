@@ -155,6 +155,10 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 						throw new NoSuchElementException();
 				}
 				
+				public void remove()
+				{
+					throw new UnsupportedOperationException();
+				}
 			};
 		}
 

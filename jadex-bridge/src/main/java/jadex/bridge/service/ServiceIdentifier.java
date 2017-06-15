@@ -205,14 +205,10 @@ public class ServiceIdentifier implements IServiceIdentifier
 		boolean ret = false;
 		if(iftype!=null)
 		{
-			Service[] sers = (Service[])iftype.getAnnotationsByType(Service.class);
-			for(Service ser: sers)
+			Service ser = iftype.getAnnotation(Service.class);
+			if(ser!=null && ser.system())
 			{
-				if(ser.system())
-				{
-					ret = true;
-					break;
-				}
+				ret = true;
 			}
 			
 //			Properties[] props = iftype.getAnnotationsByType(Properties.class);
