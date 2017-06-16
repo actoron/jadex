@@ -17,8 +17,8 @@ public class ReceiverAgent
 	@AgentMessageArrived
 	protected void	received(String message, IMessageFeature mf, IMsgHeader header)
 	{
-		System.out.println("Receiver received: "+message);
+//		System.out.println("Receiver received: "+message);
 		
-		mf.sendReply(header, "World!");
+		mf.sendReply(header, message+" World!");
 	}
 }

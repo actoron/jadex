@@ -1,6 +1,6 @@
 package jadex.micro.testcases.semiautomatic.message;
 
-import java.util.Collections;
+import java.util.HashMap;
 
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
@@ -26,10 +26,13 @@ public class LocalMessagingTest
 //		config.addComponent(SenderAgent.class, Collections.singletonMap(...));
 //		Starter.createPlatform(config).get();
 		
-		IExternalAccess	access	= Starter.createPlatform(config).get();
+		final IExternalAccess	access	= Starter.createPlatform(config).get();
 		IComponentManagementService	cms	= SServiceProvider.getService(access, IComponentManagementService.class).get();
-		cms.createComponent(SenderAgent.class.getName()+".class",
-			new CreationInfo(Collections.singletonMap("receiver",
-				(Object)new BasicComponentIdentifier("Receiver", access.getComponentIdentifier())))).get();
+		//cms.createComponent(SenderAgent.class.getName()+".class",
+		cms.createComponent(BenchmarkAgent.class.getName()+".class",
+			new CreationInfo(new HashMap<String, Object>(){{
+				put("receiver", (Object)new BasicComponentIdentifier("Receiver", access.getComponentIdentifier()));
+				put("count", 100000);
+			}})).get();
 	}
 }
