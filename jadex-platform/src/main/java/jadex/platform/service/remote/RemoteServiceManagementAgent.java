@@ -13,7 +13,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -467,5 +466,10 @@ public class RemoteServiceManagementAgent
 				}
 			});
 		}
+	}
+	
+	protected static class PingMessage
+	{
+		
 	}
 }

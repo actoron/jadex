@@ -61,7 +61,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	/** The authentication state. */
 	protected MsgSecurityInfos secinf;
 	
-	/** The ChaCha20 base state. */
+	/** The ChaCha20 key. */
 	protected int[] key = new int[8];
 	
 	/** The current message ID. */
@@ -161,6 +161,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			Curve448ExchangeMessage em = new Curve448ExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
 			em.setPublicKey(pubkey);
 			em.setChallenge(localauthchallenge);
+			em.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, sem.getSender().getRoot()));
 			em.setNetworkSigs(networksigs);
 			
 			agent.sendSecurityHandshakeMessage(sem.getSender(), em);
@@ -180,15 +181,22 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, incmsg.getNetworkSigs().keySet());
 			
+			boolean platformauth = verifyPlatformSignatures(incmsg.getPublicKey(), incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
+			
 			List<String> authnets = verifyNetworkSignatures(incmsg.getPublicKey(), incmsg.getNetworkSigs());
 			
 			secinf = new MsgSecurityInfos();
-			secinf.setTrustedPlatform(authnets.size() > 0);
+			secinf.setTrustedPlatform(authnets.size() > 0 || platformauth);
 			secinf.setAuthplatform(secinf.isTrustedPlatform());
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
 			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
+			
+			Curve448ExchangeMessage exmsg = new Curve448ExchangeMessage(agent.getComponentIdentifier(), incmsg.getConversationId());
+			exmsg.setNetworkSigs(networksigs);
+			exmsg.setPublicKey(pubkey);
+			exmsg.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, incmsg.getSender().getRoot()));
 			
 			// Delete handshake state
 			SSecurity.getSecureRandom().nextBytes(ephemeralprivkey);
@@ -196,10 +204,6 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			localauthchallenge = null;
 			remoteauthchallenge = null;
 			hashednetworks = null;
-			
-			Curve448ExchangeMessage exmsg = new Curve448ExchangeMessage(agent.getComponentIdentifier(), incmsg.getConversationId());
-			exmsg.setNetworkSigs(networksigs);
-			exmsg.setPublicKey(pubkey);
 			
 			agent.sendSecurityHandshakeMessage(incmsg.getSender(), exmsg);
 			
@@ -209,10 +213,12 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			Curve448ExchangeMessage incmsg = (Curve448ExchangeMessage) incomingmessage;
 			
+			boolean platformauth = verifyPlatformSignatures(incmsg.getPublicKey(), incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
+			
 			List<String> authnets = verifyNetworkSignatures(incmsg.getPublicKey(), incmsg.getNetworkSigs());
 			
 			secinf = new MsgSecurityInfos();
-			secinf.setTrustedPlatform(authnets.size() > 0);
+			secinf.setTrustedPlatform(authnets.size() > 0 || platformauth);
 			secinf.setAuthplatform(secinf.isTrustedPlatform());
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
@@ -272,11 +278,60 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	}
 	
 	/**
+	 *  Signs a key with platform secrets.
+	 *  
+	 *  @param key The key (public key).
+	 *  
+	 *  @return Tuple of signatures local/remote.
+	 */
+	protected Tuple2<byte[], byte[]> getPlatformSignatures(byte[] pubkey, SecurityAgent agent, IComponentIdentifier remoteid)
+	{
+		byte[] local = null;
+		AbstractAuthenticationSecret ps = agent.getPlatformSecret();
+		if (ps != null && ps.canSign())
+			local = signKey(remoteauthchallenge, pubkey, ps);
+		
+		byte[] remote = null;
+		ps = agent.getRemotePlatformSecret(remoteid);
+		if (ps != null && ps.canSign())
+			remote = signKey(remoteauthchallenge, pubkey, ps);
+		
+		if (local != null || remote != null)
+			return new Tuple2<byte[], byte[]>(local, remote);
+		
+		return null;
+	}
+	
+	/**
+	 *  Verifies platform signatures of a key.
+	 *  
+	 *  @param key The key.
+	 *  @param networksigs The signatures.
+	 *  @return List of network that authenticated the key.
+	 */
+	protected boolean verifyPlatformSignatures(byte[] key, Tuple2<byte[], byte[]> sigs, AbstractAuthenticationSecret localsecret)
+	{
+		boolean ret = false;
+		if (sigs != null)
+		{
+			if (sigs.getFirstEntity() != null)
+			{
+				ret = verifyKey(localauthchallenge, key, localsecret, sigs.getFirstEntity());
+			}
+			
+			if (!ret && sigs.getSecondEntity() != null)
+			{
+				ret = verifyKey(localauthchallenge, key, localsecret, sigs.getSecondEntity());
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Signs a key with network secrets.
 	 *  
 	 *  @param key The key (public key).
 	 *  @param remotehnets The hashed names of remote networks.
-	 *  @param salt Salt to use.
 	 *  
 	 *  @return Map hashed network name -> signature.
 	 */
@@ -661,10 +716,13 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected static class Curve448ExchangeMessage extends BasicSecurityMessage
 	{
 		/** Public key of the exchange. */
-		public byte[] publickey;
+		protected byte[] publickey;
+		
+		/** Signatures based on the local and remote platform access secrets. */
+		protected Tuple2<byte[], byte[]> platformsecretsigs;
 		
 		/** Network signatures of the public key. */
-		public Map<ByteArrayWrapper, byte[]> networksigs;
+		protected Map<ByteArrayWrapper, byte[]> networksigs;
 		
 		/** Challenge for the exchange authentication. */
 		protected byte[] challenge;
@@ -742,6 +800,26 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public void setNetworkSigs(Map<ByteArrayWrapper, byte[]> networksigs)
 		{
 			this.networksigs = networksigs;
+		}
+
+		/**
+		 *  Gets the platform secret signatures.
+		 *
+		 *  @return The platform secret signatures.
+		 */
+		public Tuple2<byte[], byte[]> getPlatformSecretSigs()
+		{
+			return platformsecretsigs;
+		}
+
+		/**
+		 *  Sets the platform secret signatures.
+		 *
+		 *  @param platformsecretsigs The platform secret signatures.
+		 */
+		public void setPlatformSecretSigs(Tuple2<byte[], byte[]> platformsecretsigs)
+		{
+			this.platformsecretsigs = platformsecretsigs;
 		}
 	}
 	

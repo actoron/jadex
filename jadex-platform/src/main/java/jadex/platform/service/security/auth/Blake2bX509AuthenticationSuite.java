@@ -31,6 +31,7 @@ import org.spongycastle.operator.DefaultAlgorithmNameFinder;
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.spongycastle.util.Pack;
+import org.spongycastle.util.encoders.Base64;
 import org.spongycastle.util.io.pem.PemObject;
 
 import jadex.commons.SUtil;

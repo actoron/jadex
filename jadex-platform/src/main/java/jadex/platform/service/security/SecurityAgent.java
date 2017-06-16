@@ -1,14 +1,13 @@
 package jadex.platform.service.security;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -21,11 +20,13 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -68,6 +69,9 @@ import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
 {
+	/** Properties id for the settings service. */
+	public static final String	PROPERTIES_ID	= "securityservice";
+	
 	/** Header property for security messages. */
 	protected static final String SECURITY_MESSAGE = "__securitymessage__";
 	
@@ -75,8 +79,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@Agent
 	protected IInternalAccess agent;
 	
-	/** Local platform authentication secrets. */
-	protected List<AbstractAuthenticationSecret> platformsecrets;
+	/** Local platform authentication secret. */
+	protected AbstractAuthenticationSecret platformsecret;
 	
 	/** Remote platform authentication secrets. */
 	protected Map<IComponentIdentifier, AbstractAuthenticationSecret> remoteplatformsecrets;
@@ -107,7 +111,60 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		IArgumentsResultsFeature argfeat = agent.getComponentFeature(IArgumentsResultsFeature.class);
 		
-		platformsecrets = new ArrayList<AbstractAuthenticationSecret>();
+		jadex.commons.Properties props = getSettingsService().getProperties(PROPERTIES_ID).get();
+//		props.addProperty(new Property("password", "aaaaaaaa-123"));
+		
+		boolean changedprops = false;
+		
+		if (props == null)
+		{
+			props = new jadex.commons.Properties();
+			props.addProperty(new Property("usepass", "true"));
+			props.addProperty(new Property("printpass", "true"));
+			changedprops = true;
+		}
+		
+		String secretstr = props.getStringProperty("password");
+		boolean printpass = props.getBooleanProperty("printpass");
+		boolean usepass = props.getBooleanProperty("usepass");
+		
+//		if (secretstr != null && secretstr.matches("[a-z0-9]{8,8}-[a-z0-9]{3,3}"))
+//		{
+//			// Die, old passwords, die, die, die!
+//			secretstr = null;
+//		}
+		
+		if (usepass && secretstr == null)
+		{
+			secretstr = SUtil.createShortRandomKey();
+			props.addProperty(new Property("password", secretstr));
+			changedprops = true;
+			System.out.println("Generated new platform access password: "+secretstr);
+			
+		}
+		
+		if (changedprops)
+		{
+			getSettingsService().setProperties(PROPERTIES_ID, props);
+			getSettingsService().saveProperties();
+		}
+		
+		try
+		{
+			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
+		}
+		catch (IllegalArgumentException e)
+		{
+			secretstr = "scrypt:" + secretstr;
+			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
+		}
+		
+		if (printpass && platformsecret != null)
+		{
+			secretstr = platformsecret.toString();
+			System.out.println("Platform access secret: "+secretstr);
+		}
+		
 		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
 		networks = new HashMap<String, AbstractAuthenticationSecret>();
 		try
@@ -330,6 +387,25 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		return networks;
 	}
 	
+	/**
+	 *  Gets the local platform secret.
+	 */
+	public AbstractAuthenticationSecret getPlatformSecret()
+	{
+		return platformsecret;
+	}
+	
+	/**
+	 *  Gets the secret of a remote platform if available.
+	 * 
+	 *  @param remoteid ID of the remote platform.
+	 *  @return Secret or null.
+	 */
+	public AbstractAuthenticationSecret getRemotePlatformSecret(IComponentIdentifier remoteid)
+	{
+		return remoteplatformsecrets.get(remoteid.getRoot());
+	}
+	
 	//-------- Utility functions -------
 	
 	/**
@@ -379,6 +455,22 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{	
 			}
 		});
+	}
+	
+	/**
+	 *  Get the settings service.
+	 */
+	public ISettingsService getSettingsService()
+	{
+		ISettingsService ret = null;
+		try
+		{
+			ret = SServiceProvider.getLocalService(agent, ISettingsService.class, Binding.SCOPE_PLATFORM);
+		}
+		catch (Exception e)
+		{
+		}
+		return ret;
 	}
 	
 	/**

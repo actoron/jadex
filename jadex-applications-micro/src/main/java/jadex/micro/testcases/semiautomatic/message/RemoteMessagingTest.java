@@ -10,6 +10,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
 /**
@@ -22,7 +23,7 @@ public class RemoteMessagingTest
 	 */
 	public static void main(String[] args)
 	{
-		String key = SUtil.createRandomNetworkKey();
+//		String key = SUtil.createRandomKey();
 		
 		// Start first platform with receiver.
 		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
@@ -31,8 +32,8 @@ public class RemoteMessagingTest
 		config1.setSecurity(true);
 		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 		config1.addComponent(ReceiverAgent.class);
-		config1.setNetworkName("remotemessagetest");
-		config1.setNetworkPass(key);
+//		config1.setNetworkName("remotemessagetest");
+//		config1.setNetworkPass(key);
 		IExternalAccess	access1	= Starter.createPlatform(config1).get();		
 		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(access1.getComponentIdentifier());
 //		System.out.println("TCP Addresses: " + Arrays.toString(tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp")));
@@ -43,8 +44,8 @@ public class RemoteMessagingTest
 //		config2.setDefaultTimeout(-1);
 		config2.setSecurity(true);
 		config2.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
-		config2.setNetworkName("remotemessagetest");
-		config2.setNetworkPass(key);
+//		config2.setNetworkName("remotemessagetest");
+//		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
 		IComponentManagementService	cms	= SServiceProvider.getService(access2, IComponentManagementService.class).get();
 

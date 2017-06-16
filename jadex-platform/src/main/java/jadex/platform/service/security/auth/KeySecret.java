@@ -40,7 +40,9 @@ public class KeySecret extends SharedSecret
 		String prefix = encodedkey.substring(0, ind);
 		if (!PREFIX.equals(prefix))
 			throw new IllegalArgumentException("Not a key secret: " + encodedkey);
-		this.key = Base64.decode(encodedkey.substring(ind + 1).getBytes(SUtil.UTF8));
+		
+		String keystr = encodedkey.substring(ind + 1);
+		this.key = Base64.decodeNoPadding(keystr.getBytes(SUtil.UTF8));
 		
 		if (key.length < MIN_KEY_LENGTH)
 			Logger.getLogger("sharedsecret").warning("Weak key detected: + " + key + ", please use at least " + MIN_KEY_LENGTH + " bytes.");
@@ -101,7 +103,7 @@ public class KeySecret extends SharedSecret
 	 */
 	public String toString()
 	{
-		return PREFIX + ":" + new String(Base64.encode(key), SUtil.UTF8);
+		return PREFIX + ":" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
 	}
 	
 	public static final KeySecret createRandom()
