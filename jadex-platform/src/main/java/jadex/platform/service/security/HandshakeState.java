@@ -16,7 +16,28 @@ public class HandshakeState
 	/** The crypto suite once initialized */
 	protected ICryptoSuite cryptosuite;
 	
-	/** Expiration time for the handshake */
+	/** Time when the handshake expires. */
+	protected long expirationtime;
+	
+	/**
+	 *  Sets the expiration time of the handshake.
+	 *  
+	 *  @param expirationtime The expiration time of the handshake.
+	 */
+	public void setExpirationTime(long expirationtime)
+	{
+		this.expirationtime = expirationtime;
+	}
+	
+	/**
+	 *  Gets the expiration time of the handshake.
+	 *  
+	 *  @return The expiration time of the handshake.
+	 */
+	public long getExpirationTime()
+	{
+		return expirationtime;
+	}
 	
 	/**
 	 *  Returns the result future.
@@ -33,7 +54,7 @@ public class HandshakeState
 	 *  
 	 *  @param resultfut The result future.
 	 */
-	public void setResultfut(Future<ICryptoSuite> resultfut)
+	public void setResultFuture(Future<ICryptoSuite> resultfut)
 	{
 		this.resultfut = resultfut;
 	}

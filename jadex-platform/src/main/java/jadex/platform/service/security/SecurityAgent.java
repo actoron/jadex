@@ -3,11 +3,12 @@ package jadex.platform.service.security;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -74,6 +75,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Header property for security messages. */
 	protected static final String SECURITY_MESSAGE = "__securitymessage__";
+	
+	/** Timeout used for internal expirations */
+	protected static final long TIMEOUT = 30000;
 	
 	/** Component access. */
 	@Agent
@@ -218,6 +222,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
+				doCleanup();
+				
 				final Future<byte[]> ret = new Future<byte[]>();
 				
 				if (isSecurityMessage(header))
@@ -249,8 +255,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
 							hstate = new HandshakeState();
+							hstate.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
 							hstate.setConversationId(convid);
-							hstate.setResultfut(new Future<ICryptoSuite>());
+							hstate.setResultFuture(new Future<ICryptoSuite>());
 							
 							initializingcryptosuites.put(rplat, hstate);
 							
@@ -295,6 +302,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public IFuture<Tuple2<IMsgSecurityInfos, byte[]>> execute(IInternalAccess ia)
 			{
+				doCleanup();
+				
 				final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
 				
 				if (content.length > 0 && content[0] == -1)
@@ -404,6 +413,33 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public AbstractAuthenticationSecret getRemotePlatformSecret(IComponentIdentifier remoteid)
 	{
 		return remoteplatformsecrets.get(remoteid.getRoot());
+	}
+	
+	// -------- Cleanup
+	
+	/**
+	 *  Cleans expired objects.
+	 */
+	protected void doCleanup()
+	{
+		long time = System.currentTimeMillis();
+		
+		for (Iterator<Map.Entry<String, HandshakeState>> it = initializingcryptosuites.entrySet().iterator(); it.hasNext(); )
+		{
+			Map.Entry<String, HandshakeState> entry = it.next();
+			if (time > entry.getValue().getExpirationTime())
+			{
+				entry.getValue().getResultFuture().setException(new TimeoutException("Handshake timed out with platform: " + entry.getKey()));
+				it.remove();
+			}
+		}
+		
+		for (Iterator<Map.Entry<String, Tuple2<ICryptoSuite, Long>>> it = expiringcryptosuites.entrySet().iterator(); it.hasNext(); )
+		{
+			Map.Entry<String, Tuple2<ICryptoSuite, Long>> entry = it.next();
+			if (time > entry.getValue().getSecondEntity())
+				it.remove();
+		}
 	}
 	
 	//-------- Utility functions -------
@@ -569,8 +605,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					return;
 				
 				state = new HandshakeState();
-				state.setResultfut(fut);
+				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
+				state.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
 				initializingcryptosuites.put(imsg.getSender().getRoot().toString(), state);
 				
 				
