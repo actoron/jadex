@@ -1,6 +1,7 @@
 package jadex.platform.service.security;
 
-import jadex.bridge.IComponentIdentifier;
+import java.util.Arrays;
+
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 
 /**
@@ -89,5 +90,11 @@ public class MsgSecurityInfos implements IMsgSecurityInfos
 		this.networks = networks;
 	}
 	
-	
+	/**
+	 *  Convert to string.
+	 */
+	public String toString()
+	{
+		return "Authenticated: " + authplatform + ", Trusted: " + trustedplatform + ", Networks: " + Arrays.toString(networks); 
+	}
 }
