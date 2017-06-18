@@ -3,6 +3,7 @@ package jadex.platform.service.transport.tcp;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.StandardSocketOptions;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -168,6 +169,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 					{
 						sc = SocketChannel.open();
 //						sc.socket().setSoTimeout(10);
+						sc.setOption(StandardSocketOptions.TCP_NODELAY, Boolean.TRUE);
 						sc.configureBlocking(false);
 						sc.register(selector, SelectionKey.OP_CONNECT, ret);
 						sc.connect(sock);
@@ -465,6 +467,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		{
 			// Accept the connection and make it non-blocking
 			sc = ssc.accept();
+			sc.setOption(StandardSocketOptions.TCP_NODELAY, Boolean.TRUE);
 			sc.configureBlocking(false);
 			
 			// Add empty channel info for unsolicited connections.
