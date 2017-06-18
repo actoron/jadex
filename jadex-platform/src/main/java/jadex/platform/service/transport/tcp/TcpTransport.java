@@ -7,6 +7,7 @@ import java.net.StandardSocketOptions;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -236,10 +237,17 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						// Convert message into buffers.
 						List<ByteBuffer>	buffers	= new ArrayList<ByteBuffer>();
 						
-						buffers.add(ByteBuffer.wrap(SUtil.intToBytes(header.length)));
-						buffers.add(ByteBuffer.wrap(header));
-						buffers.add(ByteBuffer.wrap(SUtil.intToBytes(body.length)));
-						buffers.add(ByteBuffer.wrap(body));
+//						buffers.add(ByteBuffer.wrap(SUtil.intToBytes(header.length)));
+//						buffers.add(ByteBuffer.wrap(header));
+//						buffers.add(ByteBuffer.wrap(SUtil.intToBytes(body.length)));
+//						buffers.add(ByteBuffer.wrap(body));
+						ByteBuffer buf = ByteBuffer.allocateDirect(8 + header.length + body.length);
+						buf.put(SUtil.intToBytes(header.length));
+						buf.put(header);
+						buf.put(SUtil.intToBytes(body.length));
+						buf.put(body);
+						buf.rewind();
+						buffers.add(buf);
 						
 						// Add buffers as new write task.
 						if(writetasks==null)
