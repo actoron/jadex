@@ -14,7 +14,7 @@ import jadex.platform.service.security.ICryptoSuite;
 public abstract class AbstractCryptoSuite implements ICryptoSuite
 {
 	/** Maximum windows size. */
-	protected static final int MAX_WINDOW = 100000;
+	protected static final int MAX_WINDOW = 10000;
 	
 	/** Time before a delayed message expires. */
 	protected long expirationdelay = StarterConfiguration.DEFAULT_LOCAL_TIMEOUT;

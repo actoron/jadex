@@ -7,13 +7,13 @@ import org.spongycastle.crypto.generators.SCrypt;
 import jadex.commons.SUtil;
 
 /**
- *  A secret password used for authentication using the scrypt KDF.
+ *  A secret password used for authentication.
  *
  */
-public class SCryptPasswordSecret extends SharedSecret
+public class PasswordSecret extends SharedSecret
 {
 	/** Prefix used to encode secret type as strings.*/
-	public static final String PREFIX = "scrypt";
+	public static final String PREFIX = "pw";
 	
 	/** Password length warning threshold. */
 	protected static final int MIN_PASSWORD_LENGTH = 12;
@@ -33,14 +33,14 @@ public class SCryptPasswordSecret extends SharedSecret
 	/**
 	 *  Creates the secret.
 	 */
-	public SCryptPasswordSecret()
+	public PasswordSecret()
 	{
 	}
 	
 	/**
 	 *  Creates the secret.
 	 */
-	public SCryptPasswordSecret(String encodedpassword)
+	public PasswordSecret(String encodedpassword)
 	{
 		int ind = encodedpassword.indexOf(':');
 		String prefix = encodedpassword.substring(0, ind);
@@ -77,11 +77,14 @@ public class SCryptPasswordSecret extends SharedSecret
 	 *  
 	 *  @param keysize The target key size in bytes to generate.
 	 *  @param salt Salt to use.
+	 *  @param df Used derivation function.
 	 *  @return Derived key.
 	 */
-	public byte[] deriveKey(int keysize, byte[] salt)
+	public byte[] deriveKey(int keysize, byte[] salt, int df)
 	{
-		return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, keysize);
+		if (df == 0)
+			return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, keysize);
+		throw new IllegalArgumentException("Unknown key derivation function: " + df);
 	}
 	
 	/** 

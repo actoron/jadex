@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 
 import org.spongycastle.crypto.digests.Blake2bDigest;
 
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
 import jadex.commons.security.SSecurity;
@@ -83,17 +82,22 @@ public class KeySecret extends SharedSecret
 	 *  
 	 *  @param keysize The target key size in bytes to generate.
 	 *  @param salt Salt to use.
+	 *  @param df Used derivation function.
 	 *  @return Derived key.
 	 */
-	public byte[] deriveKey(int keysize, byte[] salt)
+	public byte[] deriveKey(int keysize, byte[] salt, int df)
 	{
-		Blake2bDigest blake2b = new Blake2bDigest(keysize << 3);
-		byte[] dk = new byte[blake2b.getDigestSize()];
-		blake2b.update(salt, 0, salt.length);
-		blake2b.update(key, 0, key.length);
-		blake2b.doFinal(dk, 0);
-		
-		return dk;
+		if (df == 0)
+		{
+			Blake2bDigest blake2b = new Blake2bDigest(keysize << 3);
+			byte[] dk = new byte[blake2b.getDigestSize()];
+			blake2b.update(salt, 0, salt.length);
+			blake2b.update(key, 0, key.length);
+			blake2b.doFinal(dk, 0);
+			
+			return dk;
+		}
+		throw new IllegalArgumentException("Unknown key derivation function: " + df);
 	}
 	
 	/** 

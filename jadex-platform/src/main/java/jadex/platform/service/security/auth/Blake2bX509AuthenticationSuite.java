@@ -46,6 +46,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	/** Authentication Suite ID. */
 	protected static final int AUTH_SUITE_ID = 93482103;
 	
+	/** Key derivation function to use. */
+	protected static final int KDF_ID = 0;
+	
 	/** Size of the MAC. */
 	protected static final int MAC_SIZE = 64;
 	
@@ -88,15 +91,16 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{
 			SharedSecret ssecret = (SharedSecret) secret;
 			
-			byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+			byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt, KDF_ID);
 			
 			// Generate MAC used for authentication.
 			Blake2bDigest blake2b = new Blake2bDigest(dk);
-			ret = new byte[SALT_SIZE + MAC_SIZE + 4];
+			ret = new byte[SALT_SIZE + MAC_SIZE + 8];
 			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-			System.arraycopy(salt, 0, ret, 4, salt.length);
+			Pack.intToLittleEndian(KDF_ID, ret, 4);
+			System.arraycopy(salt, 0, ret, 8, salt.length);
 			blake2b.update(msghash, 0, msghash.length);
-			blake2b.doFinal(ret, salt.length + 4);
+			blake2b.doFinal(ret, salt.length + 8);
 		}
 		else if (secret instanceof AbstractX509PemSecret)
 		{
@@ -105,10 +109,10 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				throw new IllegalArgumentException("Secret cannot be used to sign: " + aps);
 			
 			byte[] sig = signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
-			ret = new byte[sig.length + SALT_SIZE + 4];
+			ret = new byte[sig.length + SALT_SIZE + 8];
 			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-			System.arraycopy(salt, 0, ret, 4, salt.length);
-			System.arraycopy(sig, 0, ret, 4 + salt.length, sig.length);
+			System.arraycopy(salt, 0, ret, 8, salt.length);
+			System.arraycopy(sig, 0, ret, 8 + salt.length, sig.length);
 		}
 		else
 		{
@@ -135,7 +139,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{
 			SharedSecret ssecret = (SharedSecret) secret;
 			
-			if (authtoken.length != SALT_SIZE + MAC_SIZE + 4)
+			if (authtoken.length != SALT_SIZE + MAC_SIZE + 8)
 				return false;
 			
 			if (Pack.littleEndianToInt(authtoken, 0) != AUTH_SUITE_ID)
@@ -143,17 +147,19 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			
 			// Decode token.
 			byte[] salt = new byte[SALT_SIZE];
-			System.arraycopy(authtoken, 4, salt, 0, salt.length);
+			System.arraycopy(authtoken, 8, salt, 0, salt.length);
 			
 			byte[] msghash = getMessageHash(msg, salt);
 			
 			if (secret instanceof SharedSecret)
 			{
 				byte[] mac = new byte[MAC_SIZE];
-				System.arraycopy(authtoken, SALT_SIZE + 4, mac, 0, mac.length);
+				System.arraycopy(authtoken, SALT_SIZE + 8, mac, 0, mac.length);
+				
+				int kdfid = Pack.littleEndianToInt(authtoken, 4);
 				
 				// Decrypt the random key.
-				byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+				byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt, kdfid);
 				
 				// Generate MAC
 				Blake2bDigest blake2b = new Blake2bDigest(dk);
@@ -165,8 +171,8 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			else if (secret instanceof AbstractX509PemSecret)
 			{
 				AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
-				byte[] sig = new byte[authtoken.length - 4 - salt.length];
-				System.arraycopy(authtoken, 4 + salt.length, sig, 0, sig.length);
+				byte[] sig = new byte[authtoken.length - 8 - salt.length];
+				System.arraycopy(authtoken, 8 + salt.length, sig, 0, sig.length);
 				
 				verifyWithPEM(msghash, sig, aps.openTrustAnchorCert());
 			}
@@ -450,9 +456,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		
 		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
-		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")));
+		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")));
 		System.out.println("toklen: " + token.length);
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")), token));
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new SCryptPasswordSecret(SUtil.createNetworkPassword("superdupersecret")), token));
+		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")), token));
+		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("superdupersecret")), token));
 	}
 }
