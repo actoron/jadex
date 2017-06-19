@@ -19,7 +19,7 @@ import jadex.platform.service.remote.RemoteReferenceModule;
 /**
  *  Default base class for remote commands.
  */
-public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implements IRemoteCommand
+public abstract class AbstractRemoteCommand	implements IRemoteCommand
 {
 	/** The receiver (for processing the command in rmipreprocessor, will not be transferred). */
 	protected IComponentIdentifier receiver;
@@ -57,53 +57,53 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	/**
 	 *  Preprocess command and replace if they are remote references.
 	 */
-	public IFuture<Void>	preprocessCommand(final IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-
-		// Hack needed for rmi preprocessor
-//		ITransportAddressService tas = SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//		tas.getTransportComponentIdentifier(target).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-//		{
-//			public void customResultAvailable(IComponentIdentifier result)
-//			{
-				receiver = target;
-				
-				component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener<ISecurityService>()
-				{
-					public void resultAvailable(ISecurityService sec)
-					{
-						sec.preprocessRequest(AbstractRemoteCommand.this, target)
-							.addResultListener(new DelegationResultListener<Void>(ret));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
-						{
-							ret.setResult(null);
-						}
-						else
-						{
-							ret.setException(exception);
-						}
-					}
-				});
-//			}
-//		});
-		
-		return ret;
-	}
+//	public IFuture<Void>	preprocessCommand(final IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
+//	{
+//		final Future<Void>	ret	= new Future<Void>();
+//
+//		// Hack needed for rmi preprocessor
+////		ITransportAddressService tas = SServiceProvider.getLocalService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+////		tas.getTransportComponentIdentifier(target).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+////		{
+////			public void customResultAvailable(IComponentIdentifier result)
+////			{
+//				receiver = target;
+//				
+//				component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new IResultListener<ISecurityService>()
+//				{
+//					public void resultAvailable(ISecurityService sec)
+//					{
+//						sec.preprocessRequest(AbstractRemoteCommand.this, target)
+//							.addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						if(exception instanceof ServiceNotFoundException)
+//						{
+//							ret.setResult(null);
+//						}
+//						else
+//						{
+//							ret.setException(exception);
+//						}
+//					}
+//				});
+////			}
+////		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Post-process a received command before execution
 	 *  for e.g. setting security level.
 	 */
-	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
-	{
-		return IFuture.DONE;
-	}
+//	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
+//	{
+//		return IFuture.DONE;
+//	}
 
 	/**
 	 *  Get the receiver (rms of other side).

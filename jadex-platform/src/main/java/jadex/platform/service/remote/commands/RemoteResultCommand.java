@@ -88,7 +88,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/**
 	 *  Preprocess command and replace if they are remote references.
 	 */
-	public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
+	/*public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		// Do not preprocess result commands in security service, as results are allowed by default.
@@ -111,7 +111,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		});
 		return ret;
 //		return IFuture.DONE;
-	}
+	}*/
 	
 	/**
 	 *  Execute the command.

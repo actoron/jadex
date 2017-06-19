@@ -10,9 +10,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -25,8 +25,8 @@ import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -38,7 +38,6 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -171,24 +170,41 @@ public class RemoteServiceManagementAgent
 	 *  @param mt The message type.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
+	public void messageArrived(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object msg)
 	{
 //		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
 //		System.out.println("RMS "+getComponentIdentifier()+" received message from "+msg.get(SFipa.SENDER)
 //			+": "+tmp.substring(0, Math.min(tmp.length(), 400)));
 		
 		// Handle pings for message awareness (hack that rms does this?)
-		if((SFipa.QUERY_IF.equals(msg.get(SFipa.PERFORMATIVE)) 
-			|| SFipa.QUERY_REF.equals(msg.get(SFipa.PERFORMATIVE))) 
-			&& "ping".equals(msg.get(SFipa.CONTENT)))
+//		if((SFipa.QUERY_IF.equals(msg.get(SFipa.PERFORMATIVE)) 
+//				|| SFipa.QUERY_REF.equals(msg.get(SFipa.PERFORMATIVE))) 
+//				&& "ping".equals(msg.get(SFipa.CONTENT)))
+//			{
+////				System.out.println("replying to ping from "+msg.get(SFipa.SENDER));
+////				Map rep = agent.getComponentFeature(IMessageFeature.class).createReply(msg, mt);
+//				Map rep = mt.createReply(msg);
+//				rep.put(SFipa.CONTENT, "alive");
+//				rep.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+//				agent.getComponentFeature(IMessageFeature.class).sendMessage(rep, mt);
+//				return;
+//			}
+		if (msg instanceof PingMessage && !((PingMessage)msg).isReply())
 		{
-//			System.out.println("replying to ping from "+msg.get(SFipa.SENDER));
-//			Map rep = agent.getComponentFeature(IMessageFeature.class).createReply(msg, mt);
-			Map rep = mt.createReply(msg);
-			rep.put(SFipa.CONTENT, "alive");
-			rep.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			agent.getComponentFeature(IMessageFeature.class).sendMessage(rep, mt);
+			System.out.println("replying to ping from "+header.getProperty(IMsgHeader.SENDER));
+			PingMessage rmsg = new PingMessage();
+			rmsg.setReply(true);
+			agent.getComponentFeature(IMessageFeature.class).sendReply(header, rmsg);
 			return;
+		}
+		else if (msg instanceof IRemoteCommand)
+		{
+			// Do configurable security handling here?
+			if (secinf.isTrustedPlatform())
+			{
+				IRemoteCommand com = (IRemoteCommand) msg;
+				com.execute(agent.getExternalAccess(), rms);
+			}
 		}
 		
 //		if(ServiceCall.getInvocation0()!=null)
@@ -196,7 +212,8 @@ public class RemoteServiceManagementAgent
 //			System.out.println("sdklugi: "+ServiceCall.getInvocation0());
 //		}
 		
-		final IResourceIdentifier[] rid = new IResourceIdentifier[1];
+		//old
+		/* final IResourceIdentifier[] rid = new IResourceIdentifier[1];
 		
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
@@ -465,11 +482,45 @@ public class RemoteServiceManagementAgent
 					}
 				}
 			});
-		}
+		}*/
 	}
 	
+	/**
+	 *  The ping message.
+	 *
+	 */
 	protected static class PingMessage
 	{
+		/** Flag if the message is a reply. */
+		protected boolean reply;
+		
+		/**
+		 *  Creates the message.
+		 */
+		public PingMessage()
+		{
+		}
+
+		/**
+		 *  Checks if message is reply.
+		 *
+		 *  @return The flag.
+		 */
+		public boolean isReply()
+		{
+			return reply;
+		}
+
+		/**
+		 *  Sets the message as reply.
+		 *
+		 *  @param reply The flag.
+		 */
+		public void setReply(boolean reply)
+		{
+			this.reply = reply;
+		}
+		
 		
 	}
 }

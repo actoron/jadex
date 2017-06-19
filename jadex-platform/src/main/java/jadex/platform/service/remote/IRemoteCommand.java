@@ -9,7 +9,7 @@ import jadex.commons.future.IIntermediateFuture;
  *  Remote command interface for commands that the 
  *  remote service management can execute.
  */
-public interface IRemoteCommand	extends IAuthorizable
+public interface IRemoteCommand
 {
 	/**
 	 *  Execute the command.

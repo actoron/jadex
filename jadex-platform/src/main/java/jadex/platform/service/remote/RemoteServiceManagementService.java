@@ -831,12 +831,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
 					Future<Void>	pre	= new Future<Void>(); 
-					if(content instanceof AbstractRemoteCommand)
-					{
-						((AbstractRemoteCommand)content).preprocessCommand(ia, rrm, receiver)
-							.addResultListener(new DelegationResultListener<Void>(pre));
-					}
-					else
+//					if(content instanceof AbstractRemoteCommand)
+//					{
+//						((AbstractRemoteCommand)content).preprocessCommand(ia, rrm, receiver)
+//							.addResultListener(new DelegationResultListener<Void>(pre));
+//					}
+//					else
 					{
 						pre.setResult(null);
 					}

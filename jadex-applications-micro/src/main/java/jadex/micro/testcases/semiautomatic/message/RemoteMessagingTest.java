@@ -35,7 +35,7 @@ public class RemoteMessagingTest
 //		config1.setNetworkName("remotemessagetest");
 //		config1.setNetworkPass(key);
 		IExternalAccess	access1	= Starter.createPlatform(config1).get();		
-		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(access1.getComponentIdentifier());
+//		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(access1.getComponentIdentifier());
 //		System.out.println("TCP Addresses: " + Arrays.toString(tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp")));
 		
 		// Start second platform
@@ -50,9 +50,9 @@ public class RemoteMessagingTest
 		IComponentManagementService	cms	= SServiceProvider.getService(access2, IComponentManagementService.class).get();
 
 		// Add addresses of first platform to second
-		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());
-		tab2.addPlatformAddresses(access1.getComponentIdentifier(), "tcp",
-			tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp"));
+//		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());
+//		tab2.addPlatformAddresses(access1.getComponentIdentifier(), "tcp",
+//			tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp"));
 		
 		// Add addresses of second platform to first
 //		tab1.addPlatformAddresses(access2.getComponentIdentifier(), "tcp",

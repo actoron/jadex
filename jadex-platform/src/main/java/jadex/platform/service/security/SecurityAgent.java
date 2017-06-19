@@ -45,6 +45,7 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.PasswordSecret;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
@@ -159,7 +160,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		catch (IllegalArgumentException e)
 		{
-			secretstr = "scrypt:" + secretstr;
+			secretstr = PasswordSecret.PREFIX + ":" + secretstr;
 			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
 		}
 		

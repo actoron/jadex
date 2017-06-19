@@ -577,9 +577,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected String[] getAddresses(IMsgHeader header)
 	{
-		IComponentIdentifier target = getTarget(header);
+		IComponentIdentifier target = getTarget(header).getRoot();
 		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
-		return book.getPlatformAddresses(target, impl.getProtocolName());
+		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
+		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
+		return ret;
 	}
 
 	// -------- helper classes --------

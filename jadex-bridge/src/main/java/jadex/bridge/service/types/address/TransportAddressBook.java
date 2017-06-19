@@ -1,13 +1,18 @@
 package jadex.bridge.service.types.address;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 
 /**
  *  Management of transport addresses, i.e. what a platform knows about communication to other platforms.
@@ -17,6 +22,15 @@ public class TransportAddressBook
 	/** The managed addresses: target platform -> (transport name -> transport addresses) */
 	protected Map<IComponentIdentifier, Map<String, List<String>>> addresses = new HashMap<IComponentIdentifier, Map<String, List<String>>>();
 	
+	/** The listeners. */
+	protected List<IChangeListener<IComponentIdentifier>> listeners;
+	
+	/** Creates the address book. */
+	public TransportAddressBook()
+	{
+		this.listeners = Collections.synchronizedList(new LinkedList<IChangeListener<IComponentIdentifier>>());
+	}
+	
 	/**
 	 *  Add addresses for a platform.
 	 *  @param platform	The component identifier of the platform.
@@ -25,6 +39,7 @@ public class TransportAddressBook
 	 */
 	public synchronized void addPlatformAddresses(IComponentIdentifier platform, String transport, String[] addresses)
 	{
+		System.out.println("New addr:" + platform + " " + Arrays.toString(addresses));
 		if(addresses!=null && addresses.length>0)
 		{
 			Map<String, List<String>>	platformaddresses	= this.addresses.get(platform.getRoot());
@@ -46,6 +61,8 @@ public class TransportAddressBook
 				laddresses.add(address);
 			}
 		}
+		
+		notifyListeners(platform.getRoot());
 	}
 	
 	/**
@@ -55,6 +72,7 @@ public class TransportAddressBook
 	public synchronized void removePlatformAddresses(IComponentIdentifier platform)
 	{
 		addresses.remove(platform.getRoot());
+		notifyListeners(platform.getRoot());
 	}
 	
 	/**
@@ -72,6 +90,55 @@ public class TransportAddressBook
 		}
 
 		return list!=null ? list.toArray(new String[list.size()]) : null;
+	}
+	
+	/**
+	 *  Gets all addresses of a specific platform.
+	 *  
+	 *  @param platform The platform.
+	 *  @return All known addresses of the platform.
+	 */
+	public synchronized Map<String, List<String>> getAllPlatformAddresses(IComponentIdentifier platform)
+	{
+		Map<String, List<String>> ret = addresses.get(platform);
+		if (ret != null)
+			ret = new HashMap<String, List<String>>(ret);
+		return ret;
+	}
+	
+	/**
+	 *  Adds a change listener.
+	 *  
+	 *  @param listener The change listener.
+	 */
+	public void addListener(IChangeListener<IComponentIdentifier> listener)
+	{
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Removes a change listener.
+	 *  
+	 *  @param listener The change listener.
+	 */
+	public void removeListener(IChangeListener<IComponentIdentifier> listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	/**
+	 *  Notifies the listeners.
+	 */
+	protected void notifyListeners(IComponentIdentifier affectedplatform)
+	{
+		synchronized (listeners)
+		{
+			System.out.println("Notify listeners: " + listeners.size() + " " + affectedplatform);
+			for (IChangeListener<IComponentIdentifier> listener : listeners)
+			{
+				listener.changeOccurred(new ChangeEvent<IComponentIdentifier>(affectedplatform));
+			}
+		}
 	}
 	
 //	/**

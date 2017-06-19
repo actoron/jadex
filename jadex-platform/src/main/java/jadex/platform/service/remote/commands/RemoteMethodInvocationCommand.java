@@ -116,7 +116,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	/**
 	 *  Preprocess command and replace if they are remote references.
 	 */
-	public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
+	/*public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
 		Future<Void>	ret	= new Future<Void>();
 		super.preprocessCommand(component, rrm, target)
@@ -145,13 +145,13 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			}
 		});
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Post-process a received command before execution
 	 *  for e.g. setting security level.
 	 */
-	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
+	/* public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -207,7 +207,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		}));
 		
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Execute the command.
