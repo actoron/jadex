@@ -208,9 +208,6 @@ public class TransportAddressAgent implements ITransportAddressService, IChangeL
 		if (info == null)
 			return;
 		
-		System.out.println("Writing info: " + info);
-		System.out.println("Writing info: " + info.size());
-		
 		byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
 		long deadline = leasetime + System.currentTimeMillis();
 		String outfilepath = ADDRESS_DIR + File.separator + new String(Base64.encodeNoPadding(pfid.toString().getBytes(SUtil.UTF8)), SUtil.UTF8) + "_" + String.valueOf(deadline) + ".addr";

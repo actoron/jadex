@@ -188,6 +188,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cryptsuites == null)
 		{
 			cryptsuites = new String[] { "jadex.platform.service.security.impl.Curve448ChaCha20Poly1305Suite" };
+//			cryptsuites = new String[] { "jadex.platform.service.security.impl.UnsafeNullCryptoSuite" };
 		}
 		allowedcryptosuites = new HashMap<String, Class<?>>();
 		for (String cryptsuite : cryptsuites)

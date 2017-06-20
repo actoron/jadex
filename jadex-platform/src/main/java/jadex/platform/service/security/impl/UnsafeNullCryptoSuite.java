@@ -1,7 +1,10 @@
 package jadex.platform.service.security.impl;
 
+import java.util.logging.Logger;
+
 import org.spongycastle.util.Pack;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.platform.service.security.ICryptoSuite;
 import jadex.platform.service.security.MsgSecurityInfos;
@@ -21,6 +24,11 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	
 	/** The security infos. */
 	protected MsgSecurityInfos secinf;
+	
+	public UnsafeNullCryptoSuite()
+	{
+		Logger.getLogger("security").warning("Unsafe crypto suite enabled: " + getClass().getName());
+	}
 	
 	/**
 	 *  Encrypts and signs the message for a receiver.
@@ -79,6 +87,32 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 		secinf.setTrustedPlatform(true);
 		secinf.setNetworks(agent.getNetworks().keySet().toArray(new String[agent.getNetworks().size()]));
 		
+		if (!(incomingmessage instanceof NullMessage))
+			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), new NullMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId()));
+		
 		return false;
+	}
+	
+	/**
+	 *  Null message handshake class.
+	 *  @author jander
+	 *
+	 */
+	protected static class NullMessage extends BasicSecurityMessage
+	{
+		/**
+		 *  Create message.
+		 */
+		public NullMessage()
+		{
+		}
+		
+		/**
+		 *  Create message.
+		 */
+		public NullMessage(IComponentIdentifier sender, String conversationid)
+		{
+			super(sender, conversationid);
+		}
 	}
 }
