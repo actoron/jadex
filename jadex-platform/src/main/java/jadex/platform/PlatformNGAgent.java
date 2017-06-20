@@ -37,7 +37,6 @@ import static jadex.base.IRootComponentConfiguration.NIOTCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.PERSIST;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.IRootComponentConfiguration.REGISTRY_SYNC;
 import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
 import static jadex.base.IRootComponentConfiguration.RELAYAWAONLY;
 import static jadex.base.IRootComponentConfiguration.RELAYSECURITY;
@@ -106,7 +105,6 @@ import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
-import jadex.platform.service.registry.RegistrySynchronizationAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
@@ -200,8 +198,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=SETTINGS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
-	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="false")
+	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true")
 })
 
 @ComponentTypes({
@@ -240,8 +237,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
-	@ComponentType(name="address", clazz=TransportAddressAgent.class),
-	@ComponentType(name="registrysync", clazz=RegistrySynchronizationAgent.class),
+	@ComponentType(name="address", clazz=TransportAddressAgent.class)
 })
 
 @ProvidedServices({
@@ -355,7 +351,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -435,7 +430,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })
