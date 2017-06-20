@@ -2081,19 +2081,6 @@ public class SUtil
 	}
 	
 	/**
-	 *  Creates a random shared key with minimally secure length.
-	 * 
-	 *  @return Random shared key with minimally secure length.
-	 */
-	public static final String createShortRandomKey()
-	{
-		byte[] rawkey = new byte[16]; // 128-bit key
-		SECURE_RANDOM.nextBytes(rawkey);
-		
-		return "key:" + new String (Base64.encodeNoPadding(rawkey), UTF8); // Remove dumb Base64 padding.
-	}
-	
-	/**
 	 *  Creates a random shared key.
 	 * 
 	 *  @return Random shared key.

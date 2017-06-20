@@ -40,7 +40,7 @@ public class StartScenario
 	{
 		final Future<IExternalAccess[]> ret = new Future<IExternalAccess[]>();
 		
-		String[] defargs = new String[]{"-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001", "-printpass", "false", "-networkname", "abc"};
+		String[] defargs = new String[]{"-logging", "true", "-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001", "-printpass", "false", "-networkname", "abc"};
 		
 		Starter.createPlatform(createArguments(defargs, libpaths))
 			.addResultListener(new DefaultResultListener<IExternalAccess>()

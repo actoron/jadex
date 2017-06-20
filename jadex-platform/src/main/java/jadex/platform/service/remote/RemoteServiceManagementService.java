@@ -21,7 +21,6 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.fipa.SFipa;
@@ -385,27 +384,27 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final ClassInfo service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
-	{
-		final Future<Collection<T>> ret = new Future<Collection<T>>();
-		
-		SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, Collection<T>>(ret)
-		{
-			public void customResultAvailable(ITransportAddressService tas)
-			{
-				tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Collection<T>>(ret)
-				{
-					public void customResultAvailable(ITransportComponentIdentifier tcid)
-					{
-						getServiceProxies(caller, tcid, service, scope, multiple, filter).addResultListener(new DelegationResultListener<Collection<T>>(ret));
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
+//	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final ClassInfo service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+//	{
+//		final Future<Collection<T>> ret = new Future<Collection<T>>();
+//		
+//		SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, Collection<T>>(ret)
+//		{
+//			public void customResultAvailable(ITransportAddressService tas)
+//			{
+//				tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Collection<T>>(ret)
+//				{
+//					public void customResultAvailable(ITransportComponentIdentifier tcid)
+//					{
+//						getServiceProxies(caller, tcid, service, scope, multiple, filter).addResultListener(new DelegationResultListener<Collection<T>>(ret));
+//					}
+//				});
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get all service proxies from a remote component.
@@ -416,7 +415,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final ITransportComponentIdentifier cid, final ClassInfo service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
+	public <T> IFuture<Collection<T>> getServiceProxies(final IComponentIdentifier caller, final IComponentIdentifier cid, final ClassInfo service, final String scope, final boolean multiple, final IAsyncFilter<T> filter)
 	{
 //		final Future<T>	ret	= new Future<T>();
 //		
@@ -432,7 +431,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		
 //		return ret;
 		
-		final ITransportComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+		final ComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
 		final TerminableIntermediateDelegationFuture<T> future = new TerminableIntermediateDelegationFuture<T>()
@@ -570,34 +569,34 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture<IExternalAccess> getExternalAccessProxy(final IComponentIdentifier cid)
-	{
-		if(cid instanceof ITransportComponentIdentifier)
-		{
-			return getExternalAccessProxy((ITransportComponentIdentifier)cid);
-		}
-		else
-		{
-			final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-			
-			SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
-			{
-				public void customResultAvailable(ITransportAddressService tas)
-				{
-					tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IExternalAccess>(ret)
-					{
-						public void customResultAvailable(ITransportComponentIdentifier tcid)
-						{
-							getExternalAccessProxy(tcid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-						}
-					});
-				}
-			});
-			
-			return ret;
-		}
-	}
+//	public IFuture<IExternalAccess> getExternalAccessProxy(final IComponentIdentifier cid)
+//	{
+//		if(cid instanceof ITransportComponentIdentifier)
+//		{
+//			return getExternalAccessProxy((ITransportComponentIdentifier)cid);
+//		}
+//		else
+//		{
+//			final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+//			
+//			SServiceProvider.getService(component, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
+//			{
+//				public void customResultAvailable(ITransportAddressService tas)
+//				{
+//					tas.getTransportComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IExternalAccess>(ret)
+//					{
+//						public void customResultAvailable(ITransportComponentIdentifier tcid)
+//						{
+//							getExternalAccessProxy(tcid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+//						}
+//					});
+//				}
+//			});
+//			
+//			return ret;
+//		}
+//	}
 	
 	/**
 	 *  Get an external access proxy from a remote component.
@@ -605,7 +604,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture<IExternalAccess> getExternalAccessProxy(final ITransportComponentIdentifier cid)
+	public IFuture<IExternalAccess> getExternalAccessProxy(final IComponentIdentifier cid)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
@@ -622,7 +621,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //					{
 						// Hack! create remote rms cid with "rms" assumption.
 //						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
-						ITransportComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
+						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						

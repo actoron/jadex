@@ -1,8 +1,7 @@
 package jadex.commons.security.random;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import org.spongycastle.crypto.engines.ChaChaEngine;
 import org.spongycastle.util.Pack;
@@ -15,13 +14,19 @@ public class ChaCha20Random extends SecureRandom
 	/** ID */
 	private static final long serialVersionUID = 0xBD611DFD65C5ABB2L;
 	
+	private static final long BLOCK_COUNT_START = Long.MIN_VALUE + 1024;
+	
 	/** Seeding source, use SSecurity. */
 	protected SecureRandom seedrandom;
 	
-//	protected ChaChaBlockGenerator blockgen = new ChaChaBlockGenerator();
+//	/** ChaCha state */
+//	protected int[] state = new int[16];
 	
-	/** ChaCha state */
-	protected int[] state = new int[16];
+	/** ChaCha base state */
+	protected int[] basestate = new int[10];
+	
+	/** Current block count. */
+	protected long blockcount = BLOCK_COUNT_START;
 	
 	/** The output block. */
 	protected byte[] outputblock = new byte[64];
@@ -73,7 +78,10 @@ public class ChaCha20Random extends SecureRandom
 	
 	protected void nextBlock()
 	{
-		if (state[12] < 0)
+//		if (state[12] < 0)
+//			reseed();
+		
+		if (blockcount < BLOCK_COUNT_START)
 			reseed();
 		
 		nextBlock(outputblock);
@@ -83,9 +91,10 @@ public class ChaCha20Random extends SecureRandom
 	
 	public void reseed()
 	{
-		byte[] seedstate = new byte[48];
+		byte[] seedstate = new byte[40];
 		seedrandom.nextBytes(seedstate);
-		initState(seedstate);
+		Pack.littleEndianToInt(seedstate, 0, basestate);
+		blockcount = BLOCK_COUNT_START;
 	}
 	
 	/**
@@ -93,7 +102,7 @@ public class ChaCha20Random extends SecureRandom
 	 *  
 	 *  @param rndstate The state, key followed by block count and nonce, block count is zeroed before use.
 	 */
-	public void initState(byte[] rndstate)
+	/*public void initState(byte[] rndstate)
 	{
 		int i = 0;
 		state[i]   = 0x61707865;
@@ -123,7 +132,7 @@ public class ChaCha20Random extends SecureRandom
 		
 		// Vector 2
 //		state[13] = 0x00000000;
-	}
+	}*/
 	
 	/**
 	 *  Generate next block (64 bytes).
@@ -134,27 +143,40 @@ public class ChaCha20Random extends SecureRandom
 	{
 		assert outputblock.length == 64;
 		
-		++state[12];
-		int[] output = new int[16];
-		System.arraycopy(state, 0, output, 0, state.length);
-		ChaChaEngine.chachaCore(20, output, output);
-		Pack.intToLittleEndian(output, outputblock, 0);
+		int[] state = new int[16];
+		state[0]   = 0x61707865;
+		state[1] = 0x3320646e;
+		state[2] = 0x79622d32;
+		state[3] = 0x6b206574;
+		System.arraycopy(basestate, 0, state, 4, 8);
+		state[12] = (int) blockcount;
+		state[13] = (int) (blockcount >>> 32);
+		state[14] = basestate[8];
+		state[15] = basestate[9];
+		++blockcount;
+		
+		ChaChaEngine.chachaCore(20, state, state);
+		Pack.intToLittleEndian(state, outputblock, 0);
 	}
 	
-//	public static void main(String[] args)
-//	{
-//		byte[] out = new byte[64];
-//		ChaCha20Random r = new ChaCha20Random();
-//		r.nextBytes(out);
+	public static void main(String[] args)
+	{
+		byte[] out = new byte[64];
+		ChaCha20Random r = new ChaCha20Random();
+		
+		long ts = System.currentTimeMillis();
+		for (int i = 0; i < 30000000; ++i)
+			r.nextBytes(out);
+		System.out.println(System.currentTimeMillis() - ts);
+		
+		char[] hexArray = "0123456789ABCDEF".toCharArray();
+		char[] hexChars = new char[out.length * 2];
+	    for ( int j = 0; j < out.length; j++ ) {
+	        int v = out[j] & 0xFF;
+	        hexChars[j * 2] = hexArray[v >>> 4];
+	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+	    }
 //		
-//		char[] hexArray = "0123456789ABCDEF".toCharArray();
-//		char[] hexChars = new char[out.length * 2];
-//	    for ( int j = 0; j < out.length; j++ ) {
-//	        int v = out[j] & 0xFF;
-//	        hexChars[j * 2] = hexArray[v >>> 4];
-//	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-//	    }
-//		
-//	    System.out.println(new String(hexChars));
-//	}
+	    System.out.println(new String(hexChars));
+	}
 }

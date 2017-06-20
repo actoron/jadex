@@ -141,7 +141,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		if (usepass && secretstr == null)
 		{
-			secretstr = SUtil.createShortRandomKey();
+			secretstr = SUtil.createRandomKey();
 			props.addProperty(new Property("password", secretstr));
 			changedprops = true;
 			System.out.println("Generated new platform access password: "+secretstr);
