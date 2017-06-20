@@ -170,7 +170,9 @@ public class TcpTransport	implements ITransport<SocketChannel>
 					{
 						sc = SocketChannel.open();
 //						sc.socket().setSoTimeout(10);
-						sc.setOption(StandardSocketOptions.TCP_NODELAY, Boolean.TRUE);
+//						Java 1.7
+//						sc.setOption(StandardSocketOptions.TCP_NODELAY, Boolean.TRUE);
+						sc.socket().setTcpNoDelay(true);
 						sc.configureBlocking(false);
 						sc.register(selector, SelectionKey.OP_CONNECT, ret);
 						sc.connect(sock);
@@ -475,7 +477,9 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		{
 			// Accept the connection and make it non-blocking
 			sc = ssc.accept();
-			sc.setOption(StandardSocketOptions.TCP_NODELAY, Boolean.TRUE);
+//			Java 1.7
+//			sc.setOption(StandardSocketOptions.TCP_NODELAY, Boolean.TRUE);
+			sc.socket().setTcpNoDelay(true);
 			sc.configureBlocking(false);
 			
 			// Add empty channel info for unsolicited connections.

@@ -149,10 +149,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		if (changedprops)
-		{
 			getSettingsService().setProperties(PROPERTIES_ID, props);
-			getSettingsService().saveProperties();
-		}
 		
 		try
 		{
