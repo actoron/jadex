@@ -44,7 +44,7 @@ import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 @ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
 	implementation=@Implementation(expression="$pojoagent")))
 @Service
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarenessService
 {
 	//-------- attributes --------

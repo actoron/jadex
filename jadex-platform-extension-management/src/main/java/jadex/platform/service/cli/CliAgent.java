@@ -69,7 +69,7 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices(
 	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 )
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 public class CliAgent implements ICliService, IInternalCliService
 {
 	//-------- attributes --------

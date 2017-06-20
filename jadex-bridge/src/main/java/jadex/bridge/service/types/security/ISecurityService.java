@@ -1,9 +1,8 @@
 package jadex.bridge.service.types.security;
 
-import java.util.Map;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.commons.Tuple2;

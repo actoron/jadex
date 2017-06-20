@@ -1,5 +1,6 @@
 package jadex.platform.service.marshal;
 
+
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.micro.annotation.Agent;
@@ -14,7 +15,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @ProvidedServices(@ProvidedService(type=IMarshalService.class, 
 	implementation=@Implementation(value=MarshalService.class, proxytype=Implementation.PROXYTYPE_RAW)))
-@Properties(value=@NameValue(name="system", value="true"))
+//@Properties(value=@NameValue(name="system", value="true"))
 public class MarshalAgent
 {
 }

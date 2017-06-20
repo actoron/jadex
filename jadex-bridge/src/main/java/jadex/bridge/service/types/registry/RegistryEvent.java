@@ -1,15 +1,9 @@
 package jadex.bridge.service.types.registry;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Registry event for notifications from the registry.
@@ -33,12 +27,23 @@ public class RegistryEvent implements IRegistryEvent
 	/** The time limit. */
 	protected long timelimit;
 	
+	/** Flag if is delta (or full) registry content. */
+	protected boolean delta;
+	
 	/**
 	 *  Create a new registry event.
 	 */
 	public RegistryEvent()
 	{
-		this.timestamp = System.currentTimeMillis();
+		this(true);
+	}
+	
+	/**
+	 *  Create a new registry event.
+	 */
+	public RegistryEvent(boolean delta)
+	{
+		this(null, null, 50, 5000, delta);
 	}
 	
 	/**
@@ -46,11 +51,12 @@ public class RegistryEvent implements IRegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit)
+	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta)
 	{
 		this.eventslimit = eventslimit;
 		this.timelimit = timelimit;
 		this.timestamp = System.currentTimeMillis();
+		this.delta = delta;
 		setAddedServices(addedservices);
 		setRemovedServices(removedservices);
 	}
@@ -128,28 +134,33 @@ public class RegistryEvent implements IRegistryEvent
 	}
 	
 	/**
+	 *  Get the delta.
+	 *  @return the delta
+	 */
+	public boolean isDelta()
+	{
+		return delta;
+	}
+
+	/**
+	 *  Set the delta.
+	 *  @param delta The delta to set
+	 */
+	public void setDelta(boolean delta)
+	{
+		this.delta = delta;
+	}
+
+	/**
 	 * Returns the number of elements added to this event.
 	 */
 	public int size()
 	{
-		int	size = addedservices.size();
-		size += removedservices.size();
-//		if(addedservices!=null)
-//		{
-//			for(Map.Entry<ClassInfo, Set<IService>> entry: addedservices.entrySet())
-//			{
-//				Collection<IService> coll = entry.getValue();
-//				size += (coll != null ? coll.size() : 0);
-//			}
-//		}
-//		if(removedservices!=null)
-//		{
-//			for(Map.Entry<ClassInfo, Set<IService>> entry: removedservices.entrySet())
-//			{
-//				Collection<IService> coll = entry.getValue();
-//				size += (coll != null ? coll.size() : 0);
-//			}
-//		}
+		int	size = 0;
+		if(addedservices!=null)
+			addedservices.size();
+		if(removedservices!=null)
+			size += removedservices.size();
 		return size;
 	}
 	

@@ -161,8 +161,9 @@ public class ServiceIndexer<T>
 	 */
 	public Set<T> getAllServices()
 	{
-		return services;
+		return new LinkedHashSet<T>(services);
 	}
+	
 	
 	public void addService(T service)
 	{

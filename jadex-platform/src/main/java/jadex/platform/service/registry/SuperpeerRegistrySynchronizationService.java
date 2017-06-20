@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -21,21 +20,21 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.registry.IRegistryEvent;
-import jadex.bridge.service.types.registry.IRegistrySynchronizationService;
+import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.RegistryEvent;
+import jadex.bridge.service.types.registry.RegistryUpdateEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.IAsyncFilter;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.collection.ILeaseTimeSet;
+import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.collection.LeaseTimeSet;
+import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -43,12 +42,15 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.annotation.Binding;
 
 /**
  *  Registry service for synchronization with remote platforms. 
+ *  
+ *  Has two behaviors:
+ *  a) allows others to subscribe and sends updates according to local service registry
+ *  b) uses awareness to detect new platform and searches the IRegistrySynchronizationService for them. Subscribes at those.
  */
-public class RegistrySynchronizationService implements IRegistrySynchronizationService
+public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegistrySynchronizationService
 {
 	/** The component. */
 	@ServiceComponent
@@ -57,72 +59,45 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	/** The subscriptions of other platforms (platform cid -> subscription info). */
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
-	/** The platforms this registry has subscribed to. */
+	/** The platforms this registry has subscribed to. The other will send registry updates to me. */
 	protected ILeaseTimeSet<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
+
+	/** The client platforms that are managed by this super-peer. */
+	protected LeaseTimeMap<IComponentIdentifier, ClientInfo> clients; 
 	
+//	/** The max number of events to collect before sending a bunch event. */
+//	protected int eventslimit;
+//	
+//	/** The timelimit for sending events even when only few have arrived. */
+//	protected long timelimit;
+
+	/** Local registry observer. */
+	protected LocalRegistryObserver lrobs;
 	
-	/** The current registry event (is accumulated). */
-	protected RegistryEvent registryevent;
-	
-	/** The max number of events to collect before sending a bunch event. */
-	protected int eventslimit;
-	
-	/** The timelimit for sending events even when only few have arrived. */
-	protected long timelimit;
-	
-	protected ISubscriptionIntermediateFuture<ServiceEvent<IService>> localregsub;
-			
 	/**
 	 *  Start of the service.
 	 */
 	@ServiceStart
 	public void init()
 	{
+//		this.eventslimit = 50;
+//		this.timelimit = 5000;
+		
 		// Subscribe to changes of the local registry to inform other platforms
-		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>(ServiceEvent.CLASSINFO, (ClassInfo) null, Binding.SCOPE_PLATFORM, (IAsyncFilter) null, null, component.getComponentIdentifier());
-		localregsub = ServiceRegistry.getRegistry(component).addQuery(query);
-		localregsub.addIntermediateResultListener(new IIntermediateResultListener<ServiceEvent<IService>>()
+		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component))//, eventslimit, timelimit)
 		{
-			public void intermediateResultAvailable(ServiceEvent<IService> event)
+			public void notifyObservers(RegistryEvent event)
 			{
-				if(registryevent==null)
-					registryevent= new RegistryEvent();
-				
-				if(event.getType() == ServiceEvent.SERVICE_ADDED)
+				if(subscriptions!=null)
 				{
-					registryevent.addAddedService(event.getService());
+					for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
+					{
+						fut.addIntermediateResult(event);
+					}
 				}
-				else if(event.getType() == ServiceEvent.SERVICE_REMOVED)
-				{
-					registryevent.addRemovedService(event.getService());
-				}
-				
-				if(registryevent.isDue())
-					notifySubscribers();
 			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-
-			public void resultAvailable(Collection<ServiceEvent<IService>> result)
-			{
-			}
-
-			public void finished()
-			{
-			}
-		});
-		
-//		IServiceRegistry reg = getRegistry().getSubregistry(component.getComponentIdentifier());
-//		if(reg==null)
-//			throw new IllegalArgumentException("Registry synchronization requires multi service registy to store results");
-//		reg.addEventListener(this);
-		
-		this.eventslimit = 50;
-		this.timelimit = 5000;
-		this.registryevent = new RegistryEvent();
+		};
 		
 		// Subscribe to awareness service to get informed when new platforms are discovered
 		// todo: does not work without awareness
@@ -195,20 +170,6 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 				}
 			});
 		}
-		
-		// Set up event notification timer
-		
-		component.getComponentFeature(IExecutionFeature.class).waitForDelay(timelimit, new IComponentStep<Void>()
-		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				if(registryevent!=null && registryevent.isDue())
-					notifySubscribers();
-				component.getComponentFeature(IExecutionFeature.class).waitForDelay(timelimit, this, true);
-				return IFuture.DONE;
-			}
-		}, true);
 	}
 	
 	/**
@@ -228,15 +189,16 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		{
 			addKnownPlatform(cid);
 			
-			SServiceProvider.waitForService(component, new IResultCommand<IFuture<IRegistrySynchronizationService>, Void>()
+			// Try to get IRegistrySynchronizationService from newly found platform
+			SServiceProvider.waitForService(component, new IResultCommand<IFuture<ISuperpeerRegistrySynchronizationService>, Void>()
 			{
-				public IFuture<IRegistrySynchronizationService> execute(Void args)
+				public IFuture<ISuperpeerRegistrySynchronizationService> execute(Void args)
 				{
-					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, IRegistrySynchronizationService.class, false);
+					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
 				}
-			}, 3, 10000).addResultListener(new IResultListener<IRegistrySynchronizationService>()
+			}, 3, 10000).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 			{
-				public void resultAvailable(IRegistrySynchronizationService regser)
+				public void resultAvailable(ISuperpeerRegistrySynchronizationService regser)
 				{
 					// Subscribe to the new remote registry
 					
@@ -255,31 +217,13 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 //								System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode()
 //									+" at: "+System.currentTimeMillis()+"(I am: "+component.getComponentIdentifier()+")");
 							
-							IServiceRegistry reg = getRegistry();
+							// Update meta-data (lease time removal) and content in registry
 							
+							// Update the platform subscription info (the other platform will be removed if idle too long)
 							info.setTimestamp(System.currentTimeMillis());
 							subscribedto.update(info);
 							
-							// Only add if registry is multi type
-							Set<IService> added = event.getAddedServices();
-							if(added!=null)
-							{
-								for(IService ser: added)
-								{
-//									System.out.println("added ser: "+ser);
-									reg.addService(ser);
-								}
-							}
-							
-							Set<IService> removed = event.getRemovedServices();
-							if(removed!=null)
-							{
-								for(IService ser: removed)
-								{
-//									System.out.println("removed ser: "+ser);
-									reg.removeService(ser);
-								}
-							}
+							handleRegistryEvent(event);
 						}
 						
 						public void resultAvailable(Collection<IRegistryEvent> result)
@@ -323,25 +267,34 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	}
 		
 	/**
-	 *  Listener method called on changes of the local registry.
+	 *  Handle the update event of a registry.
+	 *  @param event The event.
 	 */
-//	public void registryChanged(RegistryListenerEvent event)
-//	{
-//		if(registryevent==null)
-//			registryevent= new RegistryEvent();
-//		
-//		if(event.getType().equals(RegistryListenerEvent.Type.ADDED))
-//		{
-//			registryevent.addAddedService(event.getClassInfo(), event.getService());
-//		}
-//		else if(event.getType().equals(RegistryListenerEvent.Type.REMOVED))
-//		{
-//			registryevent.addRemovedService(event.getClassInfo(), event.getService());
-//		}
-//		
-//		if(registryevent.isDue())
-//			notifySubscribers();
-//	}
+	protected void handleRegistryEvent(IRegistryEvent event)
+	{
+		IServiceRegistry reg = getRegistry();
+		
+		// Only add if registry is multi type
+		Set<IService> added = event.getAddedServices();
+		if(added!=null)
+		{
+			for(IService ser: added)
+			{
+//				System.out.println("added ser: "+ser);
+				reg.addService(ser);
+			}
+		}
+		
+		Set<IService> removed = event.getRemovedServices();
+		if(removed!=null)
+		{
+			for(IService ser: removed)
+			{
+//				System.out.println("removed ser: "+ser);
+				reg.removeService(ser);
+			}
+		}
+	}
 	
 	/**
 	 *  Called on shutdown.
@@ -350,13 +303,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	public void destroy()
 	{
 		// Remove listener on local registry
-		
-//		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
-//		reg.getSubregistry(component.getComponentIdentifier()).removeEventListener(this);
-		localregsub.terminate();
+		lrobs.terminate();
 		
 		// Remove this platform from all subscriptions on other platforms
-		
 		if(subscribedto!=null)
 		{
 //			ISubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscribedto.toArray(new ISubscriptionIntermediateFuture[subscribedto.size()]);
@@ -368,7 +317,6 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		}
 		
 		// Finish subscriptions of other platforms 
-	
 		if(subscriptions!=null)
 		{
 			SubscriptionIntermediateFuture<IRegistryEvent>[] evs = subscriptions.values().toArray(new SubscriptionIntermediateFuture[subscriptions.size()]);
@@ -377,22 +325,6 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 				fut.setFinished();
 			}
 		}
-	}
-	
-	/**
-	 *  Notify all subscribed platforms that an event has occurred.
-	 */
-	protected void notifySubscribers()
-	{
-		if(subscriptions!=null)
-		{
-			for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
-			{
-				fut.addIntermediateResult(registryevent);
-			}
-			//registryevent = null;
-		}
-		registryevent = new RegistryEvent();
 	}
 	
 	/**
@@ -428,16 +360,45 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		addSubscription(cid, ret);
 		
 		// Forward current state initially
-		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
-		ServiceQuery<IService> query = new ServiceQuery<IService>((ClassInfo) null, Binding.SCOPE_PLATFORM, null, component.getComponentIdentifier());
-		RegistryEvent event = new RegistryEvent(new HashSet<IService>(reg.searchServicesSync(query)), null, eventslimit, timelimit);
-		ret.addIntermediateResult(event);
-//		IServiceRegistry subreg = reg.getSubregistry(component.getComponentIdentifier());
-//		if(subreg!=null)
-//		{
-//			RegistryEvent event = new RegistryEvent(subreg.getServiceMap(), null, eventslimit, timelimit);
-//			ret.addIntermediateResult(event);
-//		}
+		ret.addIntermediateResult(lrobs.getCurrentStateEvent());
+		
+		return ret;
+	}
+	
+	/**
+	 *  Update the data of a new or already known client platform on the super-peer.
+	 *  This is used by clients to let the super-peer know local changes.
+	 *  (This is similar to a reverse subscription. The response tells the client
+	 *  how long the lease time is and is the client was removed).
+	 */
+	public IFuture<RegistryUpdateEvent> updateClientData(IRegistryEvent event)
+	{
+		Future<RegistryUpdateEvent> ret = new Future<RegistryUpdateEvent>();
+		
+		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
+
+		if(clients==null)
+		{
+			clients = new LeaseTimeMap<IComponentIdentifier, ClientInfo>((long)(2.2*lrobs.getTimeLimit()), new ICommand<IComponentIdentifier>()
+			{
+				public void execute(IComponentIdentifier cid) 
+				{
+					System.out.println("Removed peer: "+cid);
+					getRegistry().removeServices(cid);
+				}
+			}, false, true, new AgentDelayRunner(component), false);
+			
+		}
+		
+		ClientInfo ci = clients.get(cid);
+		
+		if(ci==null)
+			ci = new ClientInfo(cid);
+		clients.put(cid, ci);
+		
+		System.out.println("Client update request from: "+cid);
+		
+		handleRegistryEvent(event);
 		
 		return ret;
 	}
@@ -495,7 +456,7 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	{
 		if(subscribedto==null)
 		{
-			subscribedto = LeaseTimeSet.createLeaseTimeCollection((long)(2.2*timelimit), new ICommand<SubscriptionInfo>()
+			subscribedto = LeaseTimeSet.createLeaseTimeCollection((long)(2.2*lrobs.getTimeLimit()), new ICommand<SubscriptionInfo>()
 			{
 				public void execute(SubscriptionInfo entry) 
 				{
@@ -563,13 +524,10 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 	}
 	
 	/**
-	 *  Info struct for subscriptions.
+	 *  Info struct for client (reverse subscriptions).
 	 */
-	public static class SubscriptionInfo
+	public static class ClientInfo
 	{
-		/** The subscription. */
-		protected ISubscriptionIntermediateFuture<IRegistryEvent> subscription;
-		
 		/** The component identifier of the platform. */
 		protected IComponentIdentifier platformid;
 	
@@ -579,28 +537,9 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 		/**
 		 * Create a new RegistrySynchronizationService.
 		 */
-		public SubscriptionInfo(IComponentIdentifier platformid, ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
+		public ClientInfo(IComponentIdentifier platformid)
 		{
 			this.platformid = platformid;
-			this.subscription = subscription;
-		}
-
-		/**
-		 *  Get the subscription.
-		 *  @return the subscription
-		 */
-		public ISubscriptionIntermediateFuture<IRegistryEvent> getSubscription()
-		{
-			return subscription;
-		}
-
-		/**
-		 *  Set the subscription.
-		 *  @param subscription The subscription to set
-		 */
-		public void setSubscription(ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
-		{
-			this.subscription = subscription;
 		}
 
 		/**
@@ -647,7 +586,41 @@ public class RegistrySynchronizationService implements IRegistrySynchronizationS
 //		{
 //			return System.currentTimeMillis()-timestamp>timelimit;
 //		}
+	}
+	
+	/**
+	 *  Info struct for subscriptions.
+	 */
+	public static class SubscriptionInfo extends ClientInfo
+	{
+		/** The subscription. */
+		protected ISubscriptionIntermediateFuture<IRegistryEvent> subscription;
 		
-		
+		/**
+		 * Create a new RegistrySynchronizationService.
+		 */
+		public SubscriptionInfo(IComponentIdentifier platformid, ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
+		{
+			super(platformid);
+			this.subscription = subscription;
+		}
+
+		/**
+		 *  Get the subscription.
+		 *  @return the subscription
+		 */
+		public ISubscriptionIntermediateFuture<IRegistryEvent> getSubscription()
+		{
+			return subscription;
+		}
+
+		/**
+		 *  Set the subscription.
+		 *  @param subscription The subscription to set
+		 */
+		public void setSubscription(ISubscriptionIntermediateFuture<IRegistryEvent> subscription)
+		{
+			this.subscription = subscription;
+		}
 	}
 }

@@ -27,7 +27,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.search.GlobalQueryServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -403,15 +402,15 @@ public class Starter
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
-					if(config.getRegistrySync())
-					{
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new ServiceRegistry());
-					}
-					else
-					{
+//					if(config.getRegistrySync())
+//					{
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new ServiceRegistry(cid, 5000));
+//					}
+//					else
+//					{
 						// ServiceRegistry cannot handle backport for polling in case of global queries
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServiceRegistry(5000)); 
-					}
+//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServ); 
+//					}
 					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
 					

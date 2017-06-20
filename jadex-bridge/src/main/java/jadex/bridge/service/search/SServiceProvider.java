@@ -90,7 +90,7 @@ public class SServiceProvider
 	public static <T> T getLocalService(IComponentIdentifier component, final Class<T> type, final String scope, final IFilter<T> filter)
 	{
 //		return ServiceRegistry.getRegistry(component.getRoot()).searchService(new ClassInfo(type), component, scope, filter);
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component, filter);
 		return ServiceRegistry.getRegistry(component.getRoot()).searchServiceSync(query);
 	}
 	
@@ -206,7 +206,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
@@ -224,7 +224,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		return proxy && ret!=null? createRequiredProxy(component, ret, type): ret;
 	}
@@ -240,13 +240,13 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), new IFilter<T>() 
 		{
 			public boolean filter(T obj) 
 			{
 				return ((IService)obj).getServiceIdentifier().getProviderId().equals(target);
 			}
-		}, null, component.getComponentIdentifier());
+		});
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
@@ -286,7 +286,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, filter, null, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), filter);
 		Collection<T> ret = ServiceRegistry.getRegistry(component).searchServicesSync(query);
 		
 		// Fixing the bug by changing createRequiredProxy -> createRequiredProxies leads to not compiling the main class
@@ -453,7 +453,7 @@ public class SServiceProvider
 			
 			public void customResultAvailable(Void result)
 			{
-				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
 				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));;
 				
@@ -771,7 +771,7 @@ public class SServiceProvider
 			{
 				if(!(filter instanceof IAsyncFilter) && !RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 				{
-					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
 					Collection<T> sers = ServiceRegistry.getRegistry(component).searchServicesSync(query);
 					if(proxy)
 						sers = createRequiredProxies(component, sers, type);
@@ -779,7 +779,7 @@ public class SServiceProvider
 				}
 				else
 				{
-					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
 					IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret);
 					ServiceRegistry.getRegistry(component).searchServicesAsync(query).addIntermediateResultListener(new IntermediateComponentResultListener<T>(lis, component));
 				}
@@ -1486,7 +1486,7 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(IComponentIdentifier component, final ClassInfo type, final String scope, final IFilter<T> filter)
 	{
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component, filter, null);
 		return ServiceRegistry.getRegistry(component.getRoot()).searchServiceSync(query);
 //		return SynchronizedServiceRegistry.getRegistry(component.getRoot()).searchService(type, component, scope, filter);
 	}
@@ -1603,7 +1603,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 //		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
 		if(ret==null)
@@ -1622,7 +1622,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 //		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), scope, filter);
 		return proxy && ret!=null? createRequiredProxy(component, ret, type): ret;
@@ -1639,7 +1639,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, (IFilter<T>) null, target, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, target, component.getComponentIdentifier(), null, null);
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 //		T ret = SynchronizedServiceRegistry.getRegistry(component).searchService(type, component.getComponentIdentifier(), RequiredServiceInfo.SCOPE_PLATFORM, new IFilter<T>() 
 //		{
@@ -1686,7 +1686,7 @@ public class SServiceProvider
 	{
 		checkThreadAccess(component, proxy);
 
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 		Collection<T> ret = ServiceRegistry.getRegistry(component).searchServicesSync(query);
 //		Collection<T> ret = SynchronizedServiceRegistry.getRegistry(component).searchServices(type, component.getComponentIdentifier(), scope, filter);
 		
@@ -1826,7 +1826,7 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
-				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));
 //				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
@@ -1990,7 +1990,7 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
-				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, component.getComponentIdentifier());
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 				IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new IntermediateDelegationResultListener<T>(ret);
 				ServiceRegistry.getRegistry(component).searchServicesAsync(query).addResultListener(new IntermediateComponentResultListener<T>(lis, component));
 //				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
@@ -2245,7 +2245,7 @@ public class SServiceProvider
 	 */
 	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IComponentIdentifier cid, Class<T> type, String scope, IAsyncFilter<T> filter)
 	{
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, null, cid);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, cid, filter);
 		
 		return ServiceRegistry.getRegistry(cid).addQuery(query);
 //		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, cid);

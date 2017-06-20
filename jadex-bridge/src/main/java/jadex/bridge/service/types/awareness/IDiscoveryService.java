@@ -1,8 +1,11 @@
 package jadex.bridge.service.types.awareness;
 
+import jadex.bridge.service.annotation.Service;
+
 /**
  *  Service interface for discovering other platforms.
  */
+@Service(system=true)
 public interface IDiscoveryService
 {
 	/**

@@ -59,7 +59,6 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	/** The provider id. */
 	protected IComponentIdentifier providerid;
 	
-	
 	protected Class<?> type;
 	
 	protected Class<?> impltype;
@@ -387,14 +386,14 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		Future<Void> ret = new Future<Void>();
 		
 		boolean ex = false;
-			if(started)
-			{
-				ex = true;
-			}
-			else
-			{
-				started = true;
-			}
+		if(started)
+		{
+			ex = true;
+		}
+		else
+		{
+			started = true;
+		}
 
 		if(ex)
 		{

@@ -2,11 +2,13 @@ package jadex.bridge.service.types.address;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
  *  Service that manages the platform transport addresses.
  */
+@Service(system=true)
 public interface ITransportAddressService
 {
 	/**

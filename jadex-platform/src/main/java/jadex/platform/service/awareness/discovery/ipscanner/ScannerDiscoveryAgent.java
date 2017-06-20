@@ -34,7 +34,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 	@Argument(name="scanfactor", clazz=long.class, defaultvalue="1", description="The delay between scanning as factor of delay time, e.g. 1=10000, 2=20000."),
 	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once).")
 })
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 @Agent
 public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {

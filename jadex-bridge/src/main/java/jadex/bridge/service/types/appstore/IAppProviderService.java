@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.appstore;
 
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**

@@ -1,69 +1,69 @@
 package jadex.platform;
 
-import static jadex.base.RootComponentConfiguration.ADDRESS;
-import static jadex.base.RootComponentConfiguration.ASYNCEXECUTION;
-import static jadex.base.RootComponentConfiguration.AWADELAY;
-import static jadex.base.RootComponentConfiguration.AWAFAST;
-import static jadex.base.RootComponentConfiguration.AWAEXCLUDES;
-import static jadex.base.RootComponentConfiguration.AWAINCLUDES;
-import static jadex.base.RootComponentConfiguration.AWAMECHANISMS;
-import static jadex.base.RootComponentConfiguration.AWARENESS;
-import static jadex.base.RootComponentConfiguration.BASECLASSLOADER;
-import static jadex.base.RootComponentConfiguration.BINARYMESSAGES;
-import static jadex.base.RootComponentConfiguration.CHAT;
-import static jadex.base.RootComponentConfiguration.CLI;
-import static jadex.base.RootComponentConfiguration.CLICONSOLE;
-import static jadex.base.RootComponentConfiguration.CLOCK;
-import static jadex.base.RootComponentConfiguration.CONTEXT;
-import static jadex.base.RootComponentConfiguration.CONTEXTSERVICECLASS;
-import static jadex.base.RootComponentConfiguration.DF;
-import static jadex.base.RootComponentConfiguration.REGISTRY_SYNC;
-import static jadex.base.RootComponentConfiguration.FILETRANSFER;
-import static jadex.base.RootComponentConfiguration.GUI;
-import static jadex.base.RootComponentConfiguration.JCCPLATFORMS;
-import static jadex.base.RootComponentConfiguration.KERNELS;
-import static jadex.base.RootComponentConfiguration.LIBPATH;
-import static jadex.base.RootComponentConfiguration.LIBRARY;
-import static jadex.base.RootComponentConfiguration.LOCALTRANSPORT;
-import static jadex.base.RootComponentConfiguration.LOGGING;
-import static jadex.base.RootComponentConfiguration.LOGGING_LEVEL;
-import static jadex.base.RootComponentConfiguration.MARSHAL;
-import static jadex.base.RootComponentConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.RootComponentConfiguration.MESSAGE;
-import static jadex.base.RootComponentConfiguration.MONITORINGCOMP;
-import static jadex.base.RootComponentConfiguration.NETWORKNAME;
-import static jadex.base.RootComponentConfiguration.NETWORKPASS;
-import static jadex.base.RootComponentConfiguration.NIOTCPPORT;
-import static jadex.base.RootComponentConfiguration.NIOTCPTRANSPORT;
-import static jadex.base.RootComponentConfiguration.PERSIST;
-import static jadex.base.RootComponentConfiguration.PRINTPASS;
-import static jadex.base.RootComponentConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.RootComponentConfiguration.RELAYADDRESS;
-import static jadex.base.RootComponentConfiguration.RELAYAWAONLY;
-import static jadex.base.RootComponentConfiguration.RELAYSECURITY;
-import static jadex.base.RootComponentConfiguration.RELAYTRANSPORT;
-import static jadex.base.RootComponentConfiguration.RSPUBLISH;
-import static jadex.base.RootComponentConfiguration.RSPUBLISHCOMPONENT;
-import static jadex.base.RootComponentConfiguration.SAVEONEXIT;
-import static jadex.base.RootComponentConfiguration.SECURITY;
-import static jadex.base.RootComponentConfiguration.SENSORS;
-import static jadex.base.RootComponentConfiguration.SETTINGS;
-import static jadex.base.RootComponentConfiguration.SIMUL;
-import static jadex.base.RootComponentConfiguration.SIMULATION;
-import static jadex.base.RootComponentConfiguration.SSLTCPPORT;
-import static jadex.base.RootComponentConfiguration.SSLTCPTRANSPORT;
-import static jadex.base.RootComponentConfiguration.STRICTCOM;
-import static jadex.base.RootComponentConfiguration.TCPPORT;
-import static jadex.base.RootComponentConfiguration.TCPTRANSPORT;
-import static jadex.base.RootComponentConfiguration.THREADPOOLCLASS;
-import static jadex.base.RootComponentConfiguration.THREADPOOLDEFER;
-import static jadex.base.RootComponentConfiguration.TRUSTEDLAN;
-import static jadex.base.RootComponentConfiguration.UNIQUEIDS;
-import static jadex.base.RootComponentConfiguration.USEPASS;
-import static jadex.base.RootComponentConfiguration.VALIDITYDURATION;
-import static jadex.base.RootComponentConfiguration.VIRTUALNAMES;
-import static jadex.base.RootComponentConfiguration.WELCOME;
-import static jadex.base.RootComponentConfiguration.WSPUBLISH;
+import static jadex.base.IRootComponentConfiguration.ADDRESS;
+import static jadex.base.IRootComponentConfiguration.ASYNCEXECUTION;
+import static jadex.base.IRootComponentConfiguration.AWADELAY;
+import static jadex.base.IRootComponentConfiguration.AWAEXCLUDES;
+import static jadex.base.IRootComponentConfiguration.AWAFAST;
+import static jadex.base.IRootComponentConfiguration.AWAINCLUDES;
+import static jadex.base.IRootComponentConfiguration.AWAMECHANISMS;
+import static jadex.base.IRootComponentConfiguration.AWARENESS;
+import static jadex.base.IRootComponentConfiguration.BASECLASSLOADER;
+import static jadex.base.IRootComponentConfiguration.BINARYMESSAGES;
+import static jadex.base.IRootComponentConfiguration.CHAT;
+import static jadex.base.IRootComponentConfiguration.CLI;
+import static jadex.base.IRootComponentConfiguration.CLICONSOLE;
+import static jadex.base.IRootComponentConfiguration.CLOCK;
+import static jadex.base.IRootComponentConfiguration.CONTEXT;
+import static jadex.base.IRootComponentConfiguration.CONTEXTSERVICECLASS;
+import static jadex.base.IRootComponentConfiguration.DF;
+import static jadex.base.IRootComponentConfiguration.FILETRANSFER;
+import static jadex.base.IRootComponentConfiguration.GUI;
+import static jadex.base.IRootComponentConfiguration.JCCPLATFORMS;
+import static jadex.base.IRootComponentConfiguration.KERNELS;
+import static jadex.base.IRootComponentConfiguration.LIBPATH;
+import static jadex.base.IRootComponentConfiguration.LIBRARY;
+import static jadex.base.IRootComponentConfiguration.LOCALTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.LOGGING;
+import static jadex.base.IRootComponentConfiguration.LOGGING_LEVEL;
+import static jadex.base.IRootComponentConfiguration.MARSHAL;
+import static jadex.base.IRootComponentConfiguration.MAVEN_DEPENDENCIES;
+import static jadex.base.IRootComponentConfiguration.MESSAGE;
+import static jadex.base.IRootComponentConfiguration.MONITORINGCOMP;
+import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
+import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
+import static jadex.base.IRootComponentConfiguration.NIOTCPPORT;
+import static jadex.base.IRootComponentConfiguration.NIOTCPTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.PERSIST;
+import static jadex.base.IRootComponentConfiguration.PRINTPASS;
+import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
+import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
+import static jadex.base.IRootComponentConfiguration.RELAYAWAONLY;
+import static jadex.base.IRootComponentConfiguration.RELAYSECURITY;
+import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
+import static jadex.base.IRootComponentConfiguration.RSPUBLISHCOMPONENT;
+import static jadex.base.IRootComponentConfiguration.SAVEONEXIT;
+import static jadex.base.IRootComponentConfiguration.SECURITY;
+import static jadex.base.IRootComponentConfiguration.SENSORS;
+import static jadex.base.IRootComponentConfiguration.SETTINGS;
+import static jadex.base.IRootComponentConfiguration.SIMUL;
+import static jadex.base.IRootComponentConfiguration.SIMULATION;
+import static jadex.base.IRootComponentConfiguration.SSLTCPPORT;
+import static jadex.base.IRootComponentConfiguration.SSLTCPTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.STRICTCOM;
+import static jadex.base.IRootComponentConfiguration.SUPERPEER;
+import static jadex.base.IRootComponentConfiguration.TCPPORT;
+import static jadex.base.IRootComponentConfiguration.TCPTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.THREADPOOLCLASS;
+import static jadex.base.IRootComponentConfiguration.THREADPOOLDEFER;
+import static jadex.base.IRootComponentConfiguration.TRUSTEDLAN;
+import static jadex.base.IRootComponentConfiguration.UNIQUEIDS;
+import static jadex.base.IRootComponentConfiguration.USEPASS;
+import static jadex.base.IRootComponentConfiguration.VALIDITYDURATION;
+import static jadex.base.IRootComponentConfiguration.VIRTUALNAMES;
+import static jadex.base.IRootComponentConfiguration.WELCOME;
+import static jadex.base.IRootComponentConfiguration.WSPUBLISH;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -107,7 +107,8 @@ import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.message.MessageAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
-import jadex.platform.service.registry.RegistrySynchronizationAgent;
+import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
+import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
@@ -202,7 +203,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=REGISTRY_SYNC, clazz=boolean.class, defaultvalue="false")
+	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -242,7 +243,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
-	@ComponentType(name="registrysync", clazz=RegistrySynchronizationAgent.class),
+	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
+	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class)
 })
 
 @ProvidedServices({
@@ -356,7 +358,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -436,7 +439,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysync", type="registrysync", daemon=Boolean3.TRUE , number="$args.registrysync? 1 : 0"),
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })

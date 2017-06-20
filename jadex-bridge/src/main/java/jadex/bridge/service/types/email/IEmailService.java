@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.email;
 
 import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -8,6 +9,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 /**
  *  The email service allows for sending and receiving emails.
  */
+@Service(system=true)
 public interface IEmailService
 {
 	/**

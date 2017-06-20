@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.component.IExecutionFeature;
+
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -31,7 +32,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55670", description="The port used for finding other agents.")
 })
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 @Agent
 @Service
 public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent

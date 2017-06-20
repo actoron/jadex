@@ -1,16 +1,14 @@
 package jadex.bridge.service.search;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
@@ -18,7 +16,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Service query definition.
  */
 public class ServiceQuery<T>
 {
@@ -59,83 +57,133 @@ public class ServiceQuery<T>
 	{
 	}
 	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, (IFilter<T>) null, null, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(new ClassInfo(servicetype), scope, filter, provider, owner);
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+////		this(new ClassInfo(servicetype), scope, filter, provider, owner);this.returntype = servicetype;
+//		this.servicetype = new ClassInfo(servicetype);
+//		this.returntype = this.servicetype;
+//		// todo: what is the best place for this?
+//		this.scope = scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope;
+//		this.filter = filter;
+//		this.provider = provider;
+//		this.owner = owner;
+//		
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this.returntype = servicetype;
+//		this.servicetype = servicetype;
+//		this.scope = scope;
+//		this.filter = filter;
+//		this.provider = provider;
+//		this.owner = owner;
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(Class<T> returntype, Class<?> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(new ClassInfo(returntype), new ClassInfo(servicetype), scope, filter, provider, owner);
+//	}
+	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo returntype, ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this.returntype = returntype;
+//		this.servicetype = servicetype;
+//		this.scope = scope;
+//		this.filter = filter;
+//		this.provider = provider;
+//		this.owner = owner;
+//	}
+//	
+//	/**
+//	 *  Create a new service query.
+//	 */
+//	public ServiceQuery(ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, servicetype, scope, filter, provider, owner);
+////		this.returntype = servicetype;
+////		this.servicetype = servicetype;
+////		this.scope = scope;
+////		this.filter = filter;
+////		this.provider = provider;
+////		this.owner = owner;
+//	}
+	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
 	{
-		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+		this(servicetype, scope, provider, owner, filter, null);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, Class<?> returntype)
 	{
-		this(servicetype, scope, (IFilter<T>) null, provider, owner);
+		this(servicetype!=null? new ClassInfo(servicetype): null, scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope,
+			provider, owner, filter, returntype!=null? new ClassInfo(returntype): null);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
 	{
-		this(new ClassInfo(servicetype), scope, filter, provider, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(new ClassInfo(servicetype), scope, filter, provider, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this.returntype = servicetype;
+		if(owner==null)
+			throw new IllegalArgumentException("Owner must not null");
+		
 		this.servicetype = servicetype;
 		this.scope = scope;
-		this.filter = filter;
 		this.provider = provider;
 		this.owner = owner;
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> returntype, Class<?> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(new ClassInfo(returntype), new ClassInfo(servicetype), scope, filter, provider, owner);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this.returntype = servicetype;
-		this.servicetype = servicetype;
-		this.scope = scope;
 		this.filter = filter;
-		this.provider = provider;
-		this.owner = owner;
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo returntype, ClassInfo servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
 		this.returntype = returntype;
-		this.servicetype = servicetype;
-		this.scope = scope;
-		this.filter = filter;
-		this.provider = provider;
-		this.owner = owner;
 	}
 	
 	/**
@@ -307,16 +355,16 @@ public class ServiceQuery<T>
 	{
 		List<Tuple2<String, String[]>> ret = new ArrayList<Tuple2<String,String[]>>();
 		
-		if (platform != null)
+		if(platform != null)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
 		
-		if (provider != null)
+		if(provider != null)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
 		
-		if (servicetype != null)
+		if(servicetype != null)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
 		
-		if (servicetags != null && servicetags.length > 0)
+		if(servicetags != null && servicetags.length > 0)
 			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
 		
 		return ret;

@@ -9,10 +9,10 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFilter;
 
 /**
  *  Container for persistent service queries.
- *
  */
 public class QueryInfoContainer
 {
@@ -37,109 +37,101 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Adds a query info.
-	 *  
 	 *  @param queryinfo The query info.
 	 */
 	public void addQueryInfo(ServiceQueryInfo<?> queryinfo)
 	{
 		createQueryInfoSet(queryinfo.getQuery().getOwner(), queriesbyowner).add(queryinfo);
 		createQueryInfoSet(queryinfo.getQuery().getServiceType(), queriesbyservicetype).add(queryinfo);
-		if (ServiceEvent.CLASSINFO.equals(queryinfo.getQuery().getReturnType()))
+		if(ServiceEvent.CLASSINFO.equals(queryinfo.getQuery().getReturnType()))
 			createQueryInfoSet(queryinfo.getQuery().getServiceType(), eventqueriesbyservicetype).add(queryinfo);
 	}
 	
 	/**
 	 *  Removes a query info.
-	 *  
 	 *  @param queryinfo The query info.
 	 */
 	public void removeQueryInfo(ServiceQueryInfo<?> queryinfo)
 	{
 		Set<ServiceQueryInfo<?>> set = queriesbyowner.get(queryinfo.getQuery().getOwner());
-		if (set != null)
+		if(set != null)
 		{
 			set.remove(queryinfo);
-			if (set.size() == 0)
+			if(set.size() == 0)
 				queriesbyowner.remove(queryinfo.getQuery().getOwner());
 		}
 		
 		set = queriesbyservicetype.get(queryinfo.getQuery().getServiceType());
-		if (set != null)
+		if(set != null)
 		{
 			set.remove(queryinfo);
-			if (set.size() == 0)
+			if(set.size() == 0)
 				queriesbyservicetype.remove(queryinfo.getQuery().getServiceType());
 		}
 		
 		set = eventqueriesbyservicetype.get(queryinfo.getQuery().getServiceType());
-		if (set != null)
+		if(set != null)
 		{
 			set.remove(queryinfo);
-			if (set.size() == 0)
+			if(set.size() == 0)
 				eventqueriesbyservicetype.remove(queryinfo.getQuery().getServiceType());
 		}
 	}
 	
 	/**
 	 *  Removes a query.
-	 *  
 	 *  @param query The query.
 	 */
 	public ServiceQueryInfo<?> removeQuery(ServiceQuery<?> query)
 	{
 		Set<ServiceQueryInfo<?>> queries = queriesbyowner.get(query.getOwner());
-		if (queries != null)
+		
+		if(queries != null)
 		{
-			for (ServiceQueryInfo<?> qinfo : queries)
+			for(ServiceQueryInfo<?> qinfo : queries)
 			{
-				if (query.equals(qinfo.getQuery()))
+				if(query.equals(qinfo.getQuery()))
 				{
 					removeQueryInfo(qinfo);
 					return qinfo;
 				}
 			}
 		}
+		
 		return null;
 	}
 	
 	/**
 	 *  Removes all queries of an owner.
-	 *  
 	 *  @param owner Owner of the queries.
 	 *  @return Removed query infos.
 	 */
 	public Set<ServiceQueryInfo<?>> removeQueries(IComponentIdentifier owner)
 	{
 		Set<ServiceQueryInfo<?>> queries = queriesbyowner.remove(owner);
-		if (queries != null)
+		if(queries != null)
 		{
-			for (ServiceQueryInfo<?> qinfo : queries)
+			for(ServiceQueryInfo<?> qinfo : queries)
 				removeQueryInfo(qinfo);
 		}
 		return queries;
 	}
 	
 	/**
-	 *  Returns all queries.
-	 *  
+	 *  Returns all queries. Copies the results.
 	 *  @return All queries.
 	 */
 	public Set<ServiceQueryInfo<?>> getAllQueries()
 	{
 		Set<ServiceQueryInfo<?>> ret = new HashSet<ServiceQueryInfo<?>>();
-		Collection<Set<ServiceQueryInfo<?>>> coll = null;
-		if (queriesbyservicetype.size() < queriesbyowner.size())
-			coll = queriesbyservicetype.values();
-		else
-			coll = queriesbyowner.values();
-		for (Set<ServiceQueryInfo<?>> subset : coll)
+		Collection<Set<ServiceQueryInfo<?>>> coll = queriesbyowner.values();
+		for(Set<ServiceQueryInfo<?>> subset: coll)
 			ret.addAll(subset);
 		return ret;
 	}
 	
 	/**
 	 *  Returns all queries matching a specific service type.
-	 *  
 	 *  @param servicetype The service type.
 	 *  @return All queries matching a specific service type.
 	 */
@@ -157,7 +149,6 @@ public class QueryInfoContainer
 	
 	/**
 	 *  Returns all event queries matching a specific service type.
-	 *  
 	 *  @param servicetype The service type.
 	 *  @return All event queries matching a specific service type.
 	 */
@@ -165,17 +156,35 @@ public class QueryInfoContainer
 	{
 		Set<ServiceQueryInfo<?>> ret = new LinkedHashSet<ServiceQueryInfo<?>>();
 		Set<ServiceQueryInfo<?>> set = eventqueriesbyservicetype.get(null);
-		if (set != null)
+		if(set != null)
 			ret.addAll(set);
 		set = eventqueriesbyservicetype.get(servicetype);
-		if (set != null)
+		if(set != null)
 			ret.addAll(set);
 		return ret;
 	}
 	
 	/**
+	 *  Returns all queries. Copies the results.
+	 *  @return All queries.
+	 */
+	public Set<ServiceQueryInfo<?>> getQueries(IFilter<ServiceQueryInfo<?>> filter)
+	{
+		Set<ServiceQueryInfo<?>> ret = new HashSet<ServiceQueryInfo<?>>();
+		Collection<Set<ServiceQueryInfo<?>>> coll = queriesbyowner.values();
+		for(Set<ServiceQueryInfo<?>> subset : coll)
+		{
+			for(ServiceQueryInfo<?> query: subset)
+			{
+				if(filter==null || filter.filter(query))
+					ret.addAll(subset);
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Creates an query info set for a key if needed.
-	 *  
 	 *  @param key The key.
 	 *  @param map The map to use.
 	 *  @return Created or found set.

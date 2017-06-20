@@ -1,5 +1,6 @@
 package jadex.bdiv3;
 
+
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.micro.annotation.Agent;

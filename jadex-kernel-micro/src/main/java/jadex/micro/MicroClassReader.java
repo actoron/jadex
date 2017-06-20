@@ -1641,7 +1641,7 @@ public class MicroClassReader
 	{
 		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
+			bd.dynamic(), bd.scope().length()==0? null: bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
 			bd.proxytype(), bd.creationinfo().type().length()>0? createComponentInstanceInfo(bd.creationinfo()): null);
 	}
 	

@@ -38,7 +38,7 @@ public class SBDIModel
 			
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
 			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getScope(), psi.getPublish(), psi.getProperties());
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getScope(), psi.getPublish(), psi.getProperties(), psi.isSystemService());
 				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())

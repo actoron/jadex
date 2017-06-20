@@ -1,5 +1,6 @@
 package jadex.platform.service.chat;
 
+
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -31,7 +32,7 @@ import jadex.micro.annotation.RequiredServices;
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
 @Agent
-@Properties(@NameValue(name="system", value="\"system\".equals($config)"))
+//@Properties(@NameValue(name="system", value="\"system\".equals($config)"))
 @Configurations({@Configuration(name="system"), @Configuration(name="user")})
 public class ChatAgent
 {

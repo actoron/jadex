@@ -8,6 +8,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -17,6 +18,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
  *  The interface for the message service. It is responsible for
  *  managing the transports and sending/delivering messages.
  */
+@Service(system=true)
 public interface IMessageService extends IService
 {
 	/**

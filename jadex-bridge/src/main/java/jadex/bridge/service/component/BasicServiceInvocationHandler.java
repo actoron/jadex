@@ -198,8 +198,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
 		
-//		if(method.getName().indexOf("addB")!=-1)
-//			System.out.println("call method add");
+//		if(method.getName().indexOf("start")!=-1 && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
+//			System.out.println("call method start");
+		if(method.getName().indexOf("updateClientData")!=-1 && args[0]==null)// && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
+			System.out.println("call method init");
 		
 //		ServiceInvocationContext sicon = null;
 		
@@ -249,9 +251,18 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					{
 //						if(sic.getMethod().getName().indexOf("test")!=-1)
 //							System.out.println("connect: "+sic.getMethod().getName());
-//						if(method.getName().indexOf("calculate")!=-1)
-//							System.out.println("connect: "+proxy+" "+sic);
-						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+//						if(method.getName().indexOf("start")!=-1 && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
+//							System.out.println("call method start end");
+//						if(method.getName().indexOf("init")!=-1 && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
+//							System.out.println("call method init");
+						try
+						{
+							FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				});
 			}

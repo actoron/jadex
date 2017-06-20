@@ -239,7 +239,7 @@ public class HttpReceiver
 			{
 //				IAwarenessManagementService awa	= SynchronizedServiceRegistry.getRegistry(ia)
 //					.searchService(new ClassInfo(IAwarenessManagementService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
-				ServiceQuery<IAwarenessManagementService> query = new ServiceQuery<IAwarenessManagementService>(IAwarenessManagementService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier());
+				ServiceQuery<IAwarenessManagementService> query = new ServiceQuery<IAwarenessManagementService>(IAwarenessManagementService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier(), null);
 				IAwarenessManagementService awa	= ServiceRegistry.getRegistry(ia).searchService(query, true);
 				if(awa!=null)
 				{

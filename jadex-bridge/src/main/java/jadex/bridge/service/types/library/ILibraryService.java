@@ -11,6 +11,7 @@ import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
@@ -18,6 +19,7 @@ import jadex.commons.future.IFuture;
  *  Interface for the Library Service. It provides a platform service
  *  for dynamic loading and unloading of classes, libraries and resources.
  */
+@Service(system=true)
 @GuiClassName("jadex.tools.libtool.LibServiceBrowser")
 public interface ILibraryService
 {

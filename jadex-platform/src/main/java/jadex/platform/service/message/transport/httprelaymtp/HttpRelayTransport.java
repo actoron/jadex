@@ -361,7 +361,7 @@ public class HttpRelayTransport implements ITransport
 							{
 								public void resultAvailable(Void result)
 								{
-									ServiceQuery<IRelayAwarenessService> query = new ServiceQuery<IRelayAwarenessService>(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier());
+									ServiceQuery<IRelayAwarenessService> query = new ServiceQuery<IRelayAwarenessService>(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier(), null);
 									IRelayAwarenessService ras	= ServiceRegistry.getRegistry(ia).searchService(query, true);
 //									IRelayAwarenessService ras	= SynchronizedServiceRegistry.getRegistry(ia)
 //										.searchService(new ClassInfo(IRelayAwarenessService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
