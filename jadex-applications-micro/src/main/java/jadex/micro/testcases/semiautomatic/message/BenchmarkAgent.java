@@ -18,7 +18,7 @@ public class BenchmarkAgent
 	
 	/** The number of messages. */
 	@AgentArgument
-	protected int	count	= 1000;
+	protected int	count	= 10000;
 	
 	/**
 	 *  Send the message and wait for the result.

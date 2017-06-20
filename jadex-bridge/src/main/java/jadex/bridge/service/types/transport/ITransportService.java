@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.transport;
 
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
@@ -26,5 +27,5 @@ public interface ITransportService
 	 *  @param body Message body.
 	 *  @return Done, when sent, failure otherwise.
 	 */
-	public IFuture<Void> sendMessage(IMsgHeader header, byte[] body);
+	public IFuture<Void> sendMessage(@Reference IMsgHeader header, @Reference byte[] body);
 }

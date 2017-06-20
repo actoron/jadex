@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -228,31 +227,31 @@ public class FutureFunctionality
 	{
 		Future<?> ret = null;
 		
-		if(SReflect.isSupertype(ITuple2Future.class, clazz))
+		if(ITuple2Future.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingTupleFuture(func);
 		}
-		else if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
+		else if(IPullSubscriptionIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingPullSubscriptionIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(IPullIntermediateFuture.class, clazz))
+		else if(IPullIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingPullIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, clazz))
+		else if(ISubscriptionIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingSubscriptionIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, clazz))
+		else if(ITerminableIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingTerminableIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(ITerminableFuture.class, clazz))
+		else if(ITerminableFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingTerminableDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(IIntermediateFuture.class, clazz))
+		else if(IIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret	= new DelegatingIntermediateFuture(func);
 		}

@@ -574,7 +574,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	protected ISecurityService getSecurityService()
 	{
 		if (secservice == null)
-			secservice = SServiceProvider.getLocalService(component, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			secservice = SServiceProvider.getLocalService(component, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 		return secservice;
 	}
 	
