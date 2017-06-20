@@ -99,6 +99,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * connection candidate object). Used also for messageReceived().
 	 */
 	protected Map<Con, ConnectionCandidate>					candidates;
+	
+	/** The security service (cached for speed). */
+	protected ISecurityService	secser;
+	
+	/** The cms (cached for speed). */
+	protected IComponentManagementService	cms;
 
 	// -------- abstract methods to be provided by concrete transport --------
 
@@ -142,7 +148,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			else
 			{
 				// First decrypt.
-				ISecurityService secser = SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM);
 				secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
 				{
 					@Override
@@ -154,7 +159,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							final IMsgHeader header = (IMsgHeader)codec.decode(agent.getClassLoader(), tup.getSecondEntity());
 							final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 
-							IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
 							cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
 							{
 								@Override
@@ -266,6 +270,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected void init() throws Exception
 	{
 		this.codec = MessageComponentFeature.getSerializationServices(agent.getComponentIdentifier().getRoot());
+		this.secser	= SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM, false);
+		this.cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
 		this.impl = createTransportImpl();
 		impl.init(this);
 
