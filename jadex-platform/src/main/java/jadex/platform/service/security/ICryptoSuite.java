@@ -29,6 +29,13 @@ public interface ICryptoSuite
 	public IMsgSecurityInfos getSecurityInfos();
 	
 	/**
+	 *  Returns if the suite is expiring and should be replaced.
+	 *  
+	 *  @return True, if the suite is expiring and should be replaced.
+	 */
+	public boolean isExpiring();
+	
+	/**
 	 *  Handles handshake messages.
 	 *  
 	 *  @param agent The security agent object.

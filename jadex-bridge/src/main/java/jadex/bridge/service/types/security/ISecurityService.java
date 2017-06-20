@@ -2,9 +2,9 @@ package jadex.bridge.service.types.security;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
@@ -33,7 +33,7 @@ public interface ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public IFuture<byte[]> encryptAndSign(IMsgHeader header, byte[] content);
+	public @Reference IFuture<byte[]> encryptAndSign(IMsgHeader header, byte[] content);
 //	public @Reference IFuture<byte[]> encryptAndSign(@Reference Map<String, Object> header, @Reference byte[] content);
 	
 	/**

@@ -1,10 +1,9 @@
 package jadex.platform.service.security.impl;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import jadex.base.StarterConfiguration;
 import jadex.platform.service.security.ICryptoSuite;
 
 /**
@@ -14,42 +13,34 @@ import jadex.platform.service.security.ICryptoSuite;
 public abstract class AbstractCryptoSuite implements ICryptoSuite
 {
 	/** Maximum windows size. */
-	protected static final int MAX_WINDOW = 10000;
+	protected static final int MAX_WINDOW = 8192;
 	
-	/** Time before a delayed message expires. */
-	protected long expirationdelay = StarterConfiguration.DEFAULT_LOCAL_TIMEOUT;
-	
-	protected long nextcheck = System.currentTimeMillis() + expirationdelay;
+	/** The start value of the message id count. */
+	protected static final long MSG_ID_START = Long.MIN_VALUE + Integer.MAX_VALUE;
 	
 	/** Highest ID received */
-	protected long highid;
+	protected long highid = MSG_ID_START;
 	
 	/** Lowest ID received */
-	protected long lowid;
+	protected long lowid = MSG_ID_START;
 	
 	/** Missing IDs with expiration time. (Id, Expiration Time)*/
-	protected Map<Long, Long> missingids = new LinkedHashMap<Long, Long>();
+	protected Set<Long> missingids = new LinkedHashSet<Long>();
 	
 	/** Checks if a message ID is valid */
-	protected boolean isValid(long msgid)
+	protected synchronized boolean isValid(long msgid)
 	{
 		boolean ret = false;
 		
-		if (System.currentTimeMillis() > nextcheck || (msgid - (lowid + MAX_WINDOW) >= 0))
+		if (highid - lowid >= MAX_WINDOW)
 		{
-			lowid = highid;
-			for (Iterator<Map.Entry<Long, Long>> it = missingids.entrySet().iterator(); it.hasNext(); )
+			lowid += (highid - lowid) >>> 1;
+			for (Iterator<Long> it = missingids.iterator(); it.hasNext(); )
 			{
-				Map.Entry<Long, Long> entry = it.next();
-				long time = System.currentTimeMillis();
-				if (entry.getValue() < time)
+				long id = it.next();
+				if (id - lowid < 0)
 					it.remove();
-				else if (lowid - entry.getKey() > 0)
-				{
-					lowid = entry.getKey();
-				}
 			}
-			nextcheck = System.currentTimeMillis() + expirationdelay;
 		}
 		
 		if (msgid - lowid >= 0 && ((lowid + MAX_WINDOW) - msgid > 0))
@@ -62,15 +53,13 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 			else if (msgid - highid > 0)
 			{
 				for (long id = highid; id - msgid < 0; ++id)
-					missingids.put(id, System.currentTimeMillis() + expirationdelay);
+					missingids.add(id);
 				highid = msgid + 1;
 				ret = true;
 			}
 			else
 			{
-				Long exp = missingids.remove(msgid);
-				if (exp != null)
-					ret = true;
+				ret = missingids.remove(msgid);
 			}
 		}
 		

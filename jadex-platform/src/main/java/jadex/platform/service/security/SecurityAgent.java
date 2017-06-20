@@ -1,6 +1,7 @@
 package jadex.platform.service.security;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
@@ -105,6 +107,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** CryptoSuites that are expiring with expiration time. */
 	protected Map<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
 	
+	/** Task for cleanup duties. */
+	protected volatile IFuture<Void> cleanuptask;
+	
 	/**
 	 *  Initialization.
 	 */
@@ -181,7 +186,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
-		currentcryptosuites = new HashMap<String, ICryptoSuite>();
+		currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
 		expiringcryptosuites = new HashMap<String, Tuple2<ICryptoSuite,Long>>();
 		
 		String[] cryptsuites = (String[]) argfeat.getArguments().get("cryptosuites");
@@ -217,6 +222,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<byte[]> encryptAndSign(final IMsgHeader header, final byte[] content)
 	{
+		checkCleanup();
+		
+		String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
+		final ICryptoSuite cs = currentcryptosuites.get(rplat);
+		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
+			return new Future<byte[]>(cs.encryptAndSign(content));
+		
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
@@ -236,6 +248,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
 					ICryptoSuite cs = currentcryptosuites.get(rplat);
+					
+					if (cs != null && cs.isExpiring())
+					{
+						expiringcryptosuites.put(rplat, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + TIMEOUT));
+						currentcryptosuites.remove(rplat);
+						cs = null;
+					}
+					
 					if (cs != null)
 					{
 						try
@@ -297,6 +317,17 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
 	{
+		checkCleanup();
+		
+		String splat = sender.getRoot().toString();
+		ICryptoSuite cs = currentcryptosuites.get(splat);
+		if (cs != null && content.length > 0 && content[0] != -1)
+		{
+			byte[] cleartext = cs.decryptAndAuth(content);
+			if (cleartext != null)
+				return new Future<Tuple2<IMsgSecurityInfos,byte[]>>(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+		}
+		
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Tuple2<IMsgSecurityInfos,byte[]>>()
 		{
 			public IFuture<Tuple2<IMsgSecurityInfos, byte[]>> execute(IInternalAccess ia)
@@ -415,6 +446,34 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	// -------- Cleanup
+	
+	protected void checkCleanup()
+	{
+		if (cleanuptask == null)
+		{
+			synchronized (this)
+			{
+				if (cleanuptask == null)
+				{
+					cleanuptask = agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(TIMEOUT << 1, new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									doCleanup();
+									cleanuptask = null;
+									return IFuture.DONE;
+								}
+							});
+						}
+					});
+				}
+			}
+		}
+	}
 	
 	/**
 	 *  Cleans expired objects.
@@ -571,15 +630,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
 				System.out.println("Got initial handshake: " + imsg.getConversationId());
+				IComponentIdentifier rplat = imsg.getSender().getRoot();
+				
+				
 				
 				final Future<ICryptoSuite> fut = new Future<ICryptoSuite>();
 				
-				HandshakeState state = initializingcryptosuites.remove(imsg.getSender().getRoot().toString());
+				HandshakeState state = initializingcryptosuites.remove(rplat.toString());
 				
 				// Check if handshake is already happening. 
 				if (state != null)
 				{
-					if (getComponentIdentifier().getRoot().toString().compareTo(imsg.getSender().getRoot().toString()) < 0)
+					if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
 						fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
 					else
 						return;
@@ -607,8 +669,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
 				state.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
-				initializingcryptosuites.put(imsg.getSender().getRoot().toString(), state);
+				initializingcryptosuites.put(rplat.toString(), state);
 				
+				ICryptoSuite oldcs = currentcryptosuites.remove(rplat.toString());
+				if (oldcs != null)
+				{
+					expiringcryptosuites.put(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + TIMEOUT));
+				}
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite);
 				

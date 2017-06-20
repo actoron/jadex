@@ -14,6 +14,7 @@ public class ChaCha20Random extends SecureRandom
 	/** ID */
 	private static final long serialVersionUID = 0xBD611DFD65C5ABB2L;
 	
+	/** The start value of the block count. */
 	private static final long BLOCK_COUNT_START = Long.MIN_VALUE + 1024;
 	
 	/** Seeding source, use SSecurity. */
