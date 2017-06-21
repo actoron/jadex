@@ -54,7 +54,7 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Set<T>>
 	 *  Perform the search.
 	 */
 	@Override
-	public IFuture<Set<T>> execute(IInternalAccess access, IMsgSecurityInfos secinf)
+	public IFuture<Set<T>> execute(IInternalAccess access, Future<Set<T>> future, IMsgSecurityInfos secinf)
 	{
 		return new Future<Set<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query));
 	}

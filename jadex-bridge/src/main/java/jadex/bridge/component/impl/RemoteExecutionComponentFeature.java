@@ -1,36 +1,116 @@
 package jadex.bridge.component.impl;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.TerminableFuture;
 
 /**
  *  Feature for securely sending and handling remote execution commands.
  */
 public class RemoteExecutionComponentFeature extends AbstractComponentFeature implements IRemoteExecutionFeature
 {
+	/** ID of the remote execution command in progress. */
+	protected static final String RX_ID = "__rx_id__";
+	
 	/** Commands safe to use with untrusted clients. */
-	protected static final Set<Class<?>> safecommands	= Collections.unmodifiableSet(new HashSet<Class<?>>()
+	protected static final Set<Class<?>> SAFE_COMMANDS	= Collections.unmodifiableSet(new HashSet<Class<?>>()
 	{{
 		
 	}});
+	
+	/** The component. */
+	protected IInternalAccess component;
+	
+	protected Map<String, IFuture<?>> commands;
 	
 	/**
 	 *  Create the feature.
 	 */
 	public RemoteExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
+		this.component = component;
 		component.getComponentFeature(IMessageFeature.class).addMessageHandler(new RxHandler());
 	}
 	
+	
+	/**
+	 *  Execute a command on a remote agent.
+	 *  @param target	The component to send the command to.
+	 *  @param command	The command to be executed.
+	 *  @return	The result(s) of the command, if any.
+	 */
+	public <T> IFuture<T>	execute(IComponentIdentifier target, IRemoteCommand<T> command)
+	{
+		Class<?> returntype;
+		try
+		{
+			returntype = command.getClass().getMethod("execute", IInternalAccess.class, Future.class, IMsgSecurityInfos.class).getReturnType();
+		}
+		catch (Exception e)
+		{
+			return new Future<T>(e);
+		}
+		
+		@SuppressWarnings("unchecked")
+		Future<T> ret = (Future<T>) SFuture.getFuture(returntype);
+		final String rxid = SUtil.createUniqueId("");
+		commands.put(rxid, ret);
+		
+		sendRxMessage(target, rxid, command).addResultListener(new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				@SuppressWarnings("unchecked")
+				Future<T> ret = (Future<T>) commands.remove(rxid);
+				if (ret != null)
+					ret.setExceptionIfUndone(exception);
+			}
+			
+			public void resultAvailable(Void result)
+			{
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Sends RX message.
+	 *  
+	 *  @param receiver The receiver.
+	 *  @param rxid The remote execution ID.
+	 *  @param msg The message.
+	 *  
+	 *  @return Null, when sent.
+	 */
+	protected IFuture<Void> sendRxMessage(IComponentIdentifier receiver, String rxid, Object msg)
+	{
+		Map<String, Object> header = new HashMap<String, Object>();
+		header.put(RX_ID, rxid);
+		return component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
+	}
 	
 	protected class RxHandler implements IMessageHandler
 	{
@@ -40,8 +120,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 */
 		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
-//			((MsgHeader) header)
-			return false;
+			boolean ret = false;
+			if (msg instanceof IRemoteCommand && header.getProperty(RX_ID) instanceof String)
+			{
+				if (secinfos.isTrustedPlatform() ||
+					(secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass())))
+					ret = true;
+			}
+			return ret;
 		}
 		
 		/**
@@ -58,8 +144,87 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 *  @param header The header.
 		 *  @param msg The message.
 		 */
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
+			
+			{
+				final String rxid = (String) header.getProperty(RX_ID) ;
+				if (commands == null || commands.get(rxid) == null)
+				{
+					IFuture<?> retfut = ((IRemoteCommand<?>) msg).execute(component, null, secinfos);
+					commands.put(rxid, retfut);
+					
+					final IComponentIdentifier remote = (IComponentIdentifier) header.getProperty(IMsgHeader.SENDER);
+					
+					retfut.addResultListener(new IIntermediateFutureCommandResultListener()
+					{
+						public void intermediateResultAvailable(Object result)
+						{
+//							System.out.println("inter: "+result);
+//							ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), result, callid, 
+//								returnisref, methodname, false, getNFProps(true), (IFuture<?>)res, cnt++));
+						}
+						
+						public void finished()
+						{
+//							System.out.println("fin");
+//							ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), null, callid, 
+//								returnisref, methodname, true, getNFProps(false), (IFuture<?>)res, cnt));
+//							ret.setFinished();
+//							rsms.removeProcessingCall(callid);
+						}
+						
+						public void resultAvailable(Object result)
+						{
+//							System.out.println("ra");
+//							ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
+//								returnisref, methodname, getNFProps(false)));
+//							ret.setFinished();
+//							rsms.removeProcessingCall(callid);
+						}
+						
+						public void resultAvailable(Collection result)
+						{
+//							System.out.println("ra");
+//							ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
+//								returnisref, methodname, getNFProps(false)));
+//							ret.setFinished();
+//							rsms.removeProcessingCall(callid);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+//							System.out.println("ex: "+exception);
+//							ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), null, exception, callid, 
+//								false, methodname, getNFProps(false)));
+//							ret.setFinished();
+//							rsms.removeProcessingCall(callid);
+						}
+						
+						public void commandAvailable(Object command)
+						{
+							sendRxMessage(remote, rxid, command).addResultListener(new IResultListener<Void>()
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									IFuture<?> fut = commands.remove(rxid);
+									if (fut instanceof TerminableFuture)
+										((TerminableFuture) fut).terminate();
+								}
+								
+								public void resultAvailable(Void result)
+								{
+								}
+							});
+						}
+					});
+				}
+				else
+				{
+					
+				}
+			}
 		}
 	}
 }
