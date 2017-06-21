@@ -235,7 +235,7 @@ public abstract class AbstractRawTransportAgent<Con> implements ITransportServic
 	public void connectionClosed(Con con, Exception e)
 	{
 		ConnectionCandidate cand = getConnectionCandidate(con);
-		assert cand != null;
+		assert cand != null : e;
 		removeConnectionCandidate(cand, e);
 	}
 

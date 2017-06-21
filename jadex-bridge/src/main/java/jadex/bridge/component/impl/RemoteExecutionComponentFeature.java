@@ -12,9 +12,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.ResultCommand;
@@ -33,6 +35,12 @@ import jadex.commons.future.TerminableFuture;
  */
 public class RemoteExecutionComponentFeature extends AbstractComponentFeature implements IRemoteExecutionFeature
 {
+	//-------- constants ---------
+	
+	/** The factory. */
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
+		IRemoteExecutionFeature.class, RemoteExecutionComponentFeature.class);
+	
 	/** ID of the remote execution command in progress. */
 	protected static final String RX_ID = "__rx_id__";
 	
@@ -42,9 +50,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		
 	}});
 	
-	/** The component. */
-	protected IInternalAccess component;
-	
 	protected Map<String, IFuture<?>> commands;
 	
 	/**
@@ -52,8 +57,17 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 */
 	public RemoteExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
-		this.component = component;
-		component.getComponentFeature(IMessageFeature.class).addMessageHandler(new RxHandler());
+		super(component, cinfo);
+	}
+	
+	/**
+	 *  Initialize the feature.
+	 */
+	@Override
+	public IFuture<Void> init()
+	{
+		getComponent().getComponentFeature(IMessageFeature.class).addMessageHandler(new RxHandler());
+		return super.init();
 	}
 	
 	
@@ -93,6 +107,10 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		});
 		
 		final String rxid = SUtil.createUniqueId("");
+		if(commands==null)
+		{
+			commands	= new HashMap<String, IFuture<?>>();
+		}
 		commands.put(rxid, ret);
 		
 		sendRxMessage(target, rxid, command).addResultListener(new IResultListener<Void>()
