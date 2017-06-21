@@ -322,7 +322,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
 						// Only accept messages we trust.
-						if (secinf.isTrustedPlatform() || allowuntrusted)
+						if (secinf.isAuthenticatedPlatform() || allowuntrusted)
 						{
 							Tuple2<Map<String, Object>, Object> bodytuple = deserializeMessage(header, result.getSecondEntity());
 							if (header != null)

@@ -193,13 +193,13 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, incmsg.getNetworkSigs().keySet());
 			
-			boolean platformauth = verifyPlatformSignatures(incmsg.getPublicKey(), incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
+			boolean platformtrusted = verifyPlatformSignatures(incmsg.getPublicKey(), incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
 			
 			List<String> authnets = verifyNetworkSignatures(incmsg.getPublicKey(), incmsg.getNetworkSigs());
 			
 			secinf = new MsgSecurityInfos();
-			secinf.setTrustedPlatform(authnets.size() > 0 || platformauth);
-			secinf.setAuthplatform(secinf.isTrustedPlatform());
+			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformtrusted);
+			secinf.setTrustedPlatform(platformtrusted);
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
@@ -225,13 +225,13 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			Curve448ExchangeMessage incmsg = (Curve448ExchangeMessage) incomingmessage;
 			
-			boolean platformauth = verifyPlatformSignatures(incmsg.getPublicKey(), incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
+			boolean platformtrusted = verifyPlatformSignatures(incmsg.getPublicKey(), incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
 			
 			List<String> authnets = verifyNetworkSignatures(incmsg.getPublicKey(), incmsg.getNetworkSigs());
 			
 			secinf = new MsgSecurityInfos();
-			secinf.setTrustedPlatform(authnets.size() > 0 || platformauth);
-			secinf.setAuthplatform(secinf.isTrustedPlatform());
+			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformtrusted);
+			secinf.setTrustedPlatform(platformtrusted);
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
