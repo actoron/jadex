@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,16 +18,17 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 public class RemoteExecutionComponentFeature extends AbstractComponentFeature implements IRemoteExecutionFeature
 {
 	/** Commands safe to use with untrusted clients. */
-	protected Set<Class<?>> safecommands;
+	protected static final Set<Class<?>> safecommands	= Collections.unmodifiableSet(new HashSet<Class<?>>()
+	{{
+		
+	}});
 	
 	/**
 	 *  Create the feature.
 	 */
 	public RemoteExecutionComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
-		safecommands = new HashSet<Class<?>>();
-		
-//		component.getComponentFeature(IMessageFeature.class).addMessageHandler(handler);
+		component.getComponentFeature(IMessageFeature.class).addMessageHandler(new RxHandler());
 	}
 	
 	
