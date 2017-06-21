@@ -1,5 +1,7 @@
 package jadex.micro.testcases.semiautomatic.message;
 
+import java.io.IOException;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.micro.annotation.Agent;
@@ -30,6 +32,16 @@ public class BenchmarkAgent
 		for(int i=0;i<count/100; i++)
 		{
 			mf.sendMessageAndWait(receiver, "Hello?").get();
+		}
+		
+		// To start profiling after setup.
+		try
+		{
+			System.out.println("Press [ANY] key to start...");
+			System.in.read();
+		}
+		catch(IOException e)
+		{
 		}
 
 		// Now testing.

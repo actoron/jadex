@@ -58,10 +58,6 @@ public class RemoteMessagingTest
 //		tab1.addPlatformAddresses(access2.getComponentIdentifier(), "tcp",
 //				tab2.getPlatformAddresses(access2.getComponentIdentifier(), "tcp"));
 		
-		// To start profiling after platform startup.
-		System.out.println("Press [ANY] key to start...");
-		System.in.read();
-		
 		// Start sender with receiver CID on remote platform.
 //		cms.createComponent(SenderAgent.class.getName()+".class",
 		cms.createComponent(BenchmarkAgent.class.getName()+".class",
