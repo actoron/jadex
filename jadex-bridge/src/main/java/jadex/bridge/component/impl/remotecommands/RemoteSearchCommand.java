@@ -4,6 +4,7 @@ import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -56,6 +57,17 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Set<T>>
 	@Override
 	public IFuture<Set<T>> execute(IInternalAccess access, Future<Set<T>> future, IMsgSecurityInfos secinf)
 	{
-		return new Future<Set<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query));
+		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
+		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
+		String	seclevel	= secreq!=null ? secreq.value() : null;
+		
+		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticatedPlatform())
+		{
+			return new Future<Set<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query));
+		}
+		else
+		{
+			return new Future<Set<T>>(new SecurityException("Not allowed to search for type "+type));
+		}
 	}
 }
