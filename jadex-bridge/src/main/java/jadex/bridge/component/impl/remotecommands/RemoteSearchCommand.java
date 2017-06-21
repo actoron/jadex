@@ -55,7 +55,7 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Set<T>>
 	 *  Perform the search.
 	 */
 	@Override
-	public IFuture<Set<T>> execute(IInternalAccess access, Future<Set<T>> future, IMsgSecurityInfos secinf)
+	public IFuture<Set<T>> execute(IInternalAccess access, IFuture<Set<T>> future, IMsgSecurityInfos secinf)
 	{
 		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
 		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;

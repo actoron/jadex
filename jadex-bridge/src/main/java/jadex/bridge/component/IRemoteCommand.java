@@ -17,5 +17,5 @@ public interface IRemoteCommand<T>
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 *  @return A return value to be sent back.
 	 */
-	public IFuture<T>	execute(IInternalAccess access, Future<T> future, IMsgSecurityInfos secinf);
+	public IFuture<T>	execute(IInternalAccess access, IFuture<T> future, IMsgSecurityInfos secinf);
 }
