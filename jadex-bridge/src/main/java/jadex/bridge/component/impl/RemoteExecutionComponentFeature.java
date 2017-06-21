@@ -82,7 +82,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		Class<?> returntype;
 		try
 		{
-			returntype = command.getClass().getMethod("execute", IInternalAccess.class, Future.class, IMsgSecurityInfos.class).getReturnType();
+			returntype = command.getClass().getMethod("execute", IInternalAccess.class, IFuture.class, IMsgSecurityInfos.class).getReturnType();
 		}
 		catch (Exception e)
 		{

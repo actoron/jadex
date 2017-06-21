@@ -47,10 +47,10 @@ public class ResultCommand<T> implements IRemoteCommand<T>
 	 */
 	public IFuture<T> execute(IInternalAccess access, IFuture<T> future, IMsgSecurityInfos secinf)
 	{
-		if (result != null)
-			((Future<T>) future).setResult(result);
-		else
+		if (exception!=null)
 			((Future<T>) future).setException(exception);
+		else
+			((Future<T>) future).setResult(result);
 		return future;
 	}
 	

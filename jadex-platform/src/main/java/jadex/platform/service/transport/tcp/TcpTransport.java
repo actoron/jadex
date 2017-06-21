@@ -314,7 +314,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		if(sc instanceof SocketChannel)
 		{
 			// Connection closed: abort all open write tasks.
-			List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>)this.writetasks.get(sc);
+			List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>)(this.writetasks!=null ? this.writetasks.get(sc) : null);
 			if(queue!=null)
 			{
 				for(Iterator<Tuple2<ByteBuffer, Future<Void>>> it=queue.iterator(); it.hasNext(); )
