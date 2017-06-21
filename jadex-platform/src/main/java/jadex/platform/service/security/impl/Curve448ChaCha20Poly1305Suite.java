@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.spongycastle.crypto.digests.Blake2bDigest;
 import org.spongycastle.crypto.engines.ChaChaEngine;
@@ -34,6 +35,7 @@ import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
  */
 public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 {
+	/** Constant of 5 for Curve448. */
 	protected static final byte[] CURVE448_CONST_5 = new byte[56];
 	static
 	{
@@ -65,7 +67,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected int[] key = new int[8];
 	
 	/** The current message ID. */
-	protected long msgid = 0;
+	protected AtomicLong msgid = new AtomicLong(AbstractCryptoSuite.MSG_ID_START);
 	
 	/** Prefix used for the ChaCha20 nonce. */
 	protected int nonceprefix;
@@ -86,7 +88,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 */
 	public byte[] encryptAndSign(byte[] content)
 	{
-		return chacha20Poly1305Enc(content, key, nonceprefix, msgid++);
+		return chacha20Poly1305Enc(content, key, nonceprefix, msgid.getAndIncrement());
 	}
 	
 	/**
@@ -112,6 +114,16 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 	public IMsgSecurityInfos getSecurityInfos()
 	{
 		return secinf;
+	}
+	
+	/**
+	 *  Returns if the suite is expiring and should be replaced.
+	 *  
+	 *  @return True, if the suite is expiring and should be replaced.
+	 */
+	public boolean isExpiring()
+	{
+		return msgid.get() < AbstractCryptoSuite.MSG_ID_START;
 	}
 	
 	/**
@@ -273,7 +285,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		}
 		key = null;
 		nonceprefix = 0;
-		msgid = 0;
+//		msgid = 0;
+		msgid.set(0);
 		secinf = null;
 	}
 	
@@ -631,8 +644,8 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractCryptoSuite
 		System.arraycopy(key, 0, state, 4, key.length);
 		state[12] = blockcount;
 		state[13] = nonceprefix;
-		state[14] = (int) msgid;
-		state[15] = (int)(msgid >>> 32);
+		state[14] = (int)(msgid >>> 32);
+		state[15] = (int) msgid;
 	}
 	
 	/**

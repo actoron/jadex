@@ -370,7 +370,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			final Future<Void> ret = new Future<Void>();
 			byte[] bheader = codec.encode(header, agent.getClassLoader(), header);
 
-			ISecurityService secser = SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM);
+//			ISecurityService secser = SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM, false);
 			secser.encryptAndSign(header, bheader).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)
 			{
 				@Override

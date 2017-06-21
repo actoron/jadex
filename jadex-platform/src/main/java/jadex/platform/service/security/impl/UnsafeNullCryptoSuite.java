@@ -72,6 +72,16 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	}
 	
 	/**
+	 *  Returns if the suite is expiring and should be replaced.
+	 *  
+	 *  @return True, if the suite is expiring and should be replaced.
+	 */
+	public boolean isExpiring()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Handles handshake messages.
 	 *  
 	 *  @param agent The security agent object.
