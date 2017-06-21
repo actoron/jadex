@@ -149,9 +149,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					{
 						for(IProxyAgentService ser: sers)
 						{
-							ser.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
+							ser.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
 							{
-								public void resultAvailable(ITransportComponentIdentifier rcid)
+								public void resultAvailable(IComponentIdentifier rcid)
 								{
 									newPlatformFound(rcid);
 								}
