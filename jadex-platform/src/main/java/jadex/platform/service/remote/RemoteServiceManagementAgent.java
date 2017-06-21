@@ -167,7 +167,7 @@ public class RemoteServiceManagementAgent
 		else if (msg instanceof IRemoteCommand)
 		{
 			// Do configurable security handling here?
-			if (secinf.isTrustedPlatform())
+			if (secinf.isAuthenticatedPlatform())
 			{
 				IRemoteCommand com = (IRemoteCommand) msg;
 				com.execute(agent.getExternalAccess(), rms);

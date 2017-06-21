@@ -115,7 +115,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		final MsgHeader header = new MsgHeader();
 		if (addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
-				header.addProtectedProperty(entry.getKey(), entry.getValue());
+				header.addShadowProperty(entry.getKey(), entry.getValue());
 		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
 		header.addProtectedProperty(IMsgHeader.RECEIVER, receiver);
 		
@@ -322,7 +322,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
 						// Only accept messages we trust.
-						if (secinf.isTrustedPlatform() || allowuntrusted)
+						if (secinf.isAuthenticatedPlatform() || allowuntrusted)
 						{
 							Tuple2<Map<String, Object>, Object> bodytuple = deserializeMessage(header, result.getSecondEntity());
 							if (header != null)

@@ -43,7 +43,7 @@ public class MsgSecurityInfos implements IMsgSecurityInfos
 	 *
 	 *  @param authplatform True if authenticated.
 	 */
-	public void setAuthplatform(boolean authplatform)
+	public void setAuthenticatedPlatform(boolean authplatform)
 	{
 		this.authplatform = authplatform;
 	}
