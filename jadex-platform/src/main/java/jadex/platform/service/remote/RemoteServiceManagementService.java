@@ -32,7 +32,6 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
