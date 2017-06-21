@@ -1,7 +1,6 @@
 package jadex.platform.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.Alias;
@@ -15,7 +14,7 @@ public class RemoteReference //implements Comparable
 	//-------- attributes --------
 	
 	/** The rms. */
-	protected ITransportComponentIdentifier rms;
+	protected IComponentIdentifier rms;
 	
 	/** The target identifier (sid, cid, or tid). */
 	protected Object targetid;
@@ -35,7 +34,7 @@ public class RemoteReference //implements Comparable
 	/**
 	 *  Create a new remote reference.
 	 */
-	public RemoteReference(ITransportComponentIdentifier rms, Object targetid)
+	public RemoteReference(IComponentIdentifier rms, Object targetid)
 	{
 		this.rms = rms;
 		this.targetid = targetid;
@@ -50,7 +49,7 @@ public class RemoteReference //implements Comparable
 	 *  Get the rms.
 	 *  @return the rms.
 	 */
-	public ITransportComponentIdentifier getRemoteManagementServiceIdentifier()
+	public IComponentIdentifier getRemoteManagementServiceIdentifier()
 	{
 		return rms;
 	}
@@ -59,7 +58,7 @@ public class RemoteReference //implements Comparable
 	 *  Set the rms.
 	 *  @param rms The rms to set.
 	 */
-	public void setRemoteManagementServiceIdentifier(ITransportComponentIdentifier rms)
+	public void setRemoteManagementServiceIdentifier(IComponentIdentifier rms)
 	{
 		this.rms = rms;
 	}
