@@ -11,11 +11,9 @@ import jadex.bridge.component.IMsgHeader;
  */
 public class MsgHeader implements IMsgHeader
 {
-	/** Map containing the link-level security properties. */
-	protected Map<String, Object> linktolinkmap;
 	
-	/** Map containing the end-to-end-level security properties. */
-	protected Map<String, Object> endtoendmap;
+	/** Map containing properties. */
+	protected Map<String, Object> properties;
 	
 	/**
 	 *  Creates the header.
@@ -32,114 +30,39 @@ public class MsgHeader implements IMsgHeader
 	 */
 	public Object getProperty(String propertyname)
 	{
-		if (endtoendmap != null && endtoendmap.containsKey(propertyname))
-			return endtoendmap.get(propertyname);
-		
-		if (linktolinkmap != null && linktolinkmap.containsKey(propertyname))
-			return linktolinkmap.get(propertyname);
-		
-		return null;
-	}
-	
-	/**
-	 *  Gets a property stored in the end-to-end header.
-	 *  
-	 *  @param propertyname The name of the property.
-	 *  @return Property value.
-	 */
-	public Object getEndToEndProperty(String propertyname)
-	{
-		Object ret = null;
-		
-		if (endtoendmap != null)
-			ret = endtoendmap.get(propertyname);
-		
-		return ret;
+		return properties.get(propertyname);
 	}
 
 	/**
-	 *  Gets the link-to-link map.
+	 *  Gets the properties.
 	 *
-	 *  @return The link-to-link map.
+	 *  @return The properties map.
 	 */
-	public Map<String, Object> getLinkToLinkMap()
+	public Map<String, Object> getProperties()
 	{
-		return linktolinkmap;
+		return properties;
 	}
 
 	/**
-	 *  Sets the link-to-link map.
+	 *  Sets the properties.
 	 *
-	 *  @param linktolinkmap The link-to-link map.
+	 *  @param properties The properties map.
 	 */
-	public void setLinkToLinkMap(Map<String, Object> linktolinkmap)
+	public void setProperties(Map<String, Object> properties)
 	{
-		this.linktolinkmap = linktolinkmap;
+		this.properties = properties;
 	}
 	
 	/**
-	 *  Adds an openly-available and modifiable header property to the header.
+	 *  Adds a header property to the header.
 	 *  
 	 *  @param propname The property name.
 	 *  @param propval The property value.
 	 */
-	public void addOpenProperty(String propname, Object propval)
+	public void addProperty(String propname, Object propval)
 	{
-		if (linktolinkmap == null)
-			linktolinkmap = new HashMap<String, Object>();
-		linktolinkmap.put(propname, propval);
-	}
-	
-	/**
-	 *  Adds an openly-available header property to the header
-	 *  that is protected against modification with regard to the receiver.
-	 *  
-	 *  @param propname The property name.
-	 *  @param propval The property value.
-	 */
-	public void addProtectedProperty(String propname, Object propval)
-	{
-		if (linktolinkmap == null)
-			linktolinkmap = new HashMap<String, Object>();
-		linktolinkmap.put(propname, propval);
-		
-		if (endtoendmap == null)
-			endtoendmap = new HashMap<String, Object>();
-		endtoendmap.put(propname, propval);
-	}
-	
-	/**
-	 *  Adds a header property that is only visible by the receiver to the header.
-	 *  
-	 *  @param propname The property name.
-	 *  @param propval The property value.
-	 */
-	public void addShadowProperty(String propname, Object propval)
-	{
-		if (endtoendmap == null)
-			endtoendmap = new HashMap<String, Object>();
-		endtoendmap.put(propname, propval);
-	}
-	
-	/**
-	 *  Removes the end-to-end map from the header.
-	 *  
-	 *  @return The end-to-end map.
-	 */
-	public Map<String, Object> removeEndToEndMap()
-	{
-		Map<String, Object> ret = endtoendmap;
-		endtoendmap = null;
-		return ret;
-	}
-	
-	/**
-	 *  Restores the end-to-end map to the header.
-	 *  
-	 *  @param endtoendmap The end-to-end map.
-	 */
-	public void restoreEndToEndMap(Map<String, Object> endtoendmap)
-	{
-		this.endtoendmap = endtoendmap;
+		if (properties == null)
+			properties = new HashMap<String, Object>();
+		properties.put(propname, propval);
 	}
 }

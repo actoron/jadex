@@ -115,9 +115,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		final MsgHeader header = new MsgHeader();
 		if (addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
-				header.addShadowProperty(entry.getKey(), entry.getValue());
-		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
-		header.addProtectedProperty(IMsgHeader.RECEIVER, receiver);
+				header.addProperty(entry.getKey(), entry.getValue());
+		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProperty(IMsgHeader.RECEIVER, receiver);
 		
 		return sendMessage(header, message);
 	}
@@ -154,9 +154,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		awaitingmessages.put(convid, ret);
 		
 		final MsgHeader header = new MsgHeader();
-		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
-		header.addProtectedProperty(IMsgHeader.RECEIVER, receiver);
-		header.addShadowProperty(CONVERSATION_ID, convid);
+		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProperty(IMsgHeader.RECEIVER, receiver);
+		header.addProperty(CONVERSATION_ID, convid);
 		
 		sendMessage(header, message).addResultListener(new IResultListener<Void>()
 		{
@@ -207,10 +207,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			return new Future<Void>(new IllegalArgumentException("Cannot reply, conversation ID not found."));
 		
 		MsgHeader header = new MsgHeader();
-		header.addProtectedProperty(IMsgHeader.RECEIVER, rplyrec);
-		header.addProtectedProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
-		header.addShadowProperty(CONVERSATION_ID, convid);
-		header.addShadowProperty(IS_REPLY, Boolean.TRUE);
+		header.addProperty(IMsgHeader.RECEIVER, rplyrec);
+		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProperty(CONVERSATION_ID, convid);
+		header.addProperty(IS_REPLY, Boolean.TRUE);
 		
 		return sendMessage(header, message);
 	}
@@ -324,12 +324,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						// Only accept messages we trust.
 						if (secinf.isAuthenticatedPlatform() || allowuntrusted)
 						{
-							Tuple2<Map<String, Object>, Object> bodytuple = deserializeMessage(header, result.getSecondEntity());
-							if (header != null)
-							{
-								((MsgHeader) header).restoreEndToEndMap(bodytuple.getFirstEntity());
-							}
-							messageArrived(secinf, header, bodytuple.getSecondEntity());
+							Object message = deserializeMessage(header, result.getSecondEntity());
+							messageArrived(secinf, header, message);
 						}
 					}
 				};
@@ -351,12 +347,12 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void messageArrived(final IMsgSecurityInfos secinfos, final IMsgHeader header, Object body)
 	{
-		String convid = (String) ((MsgHeader) header).getEndToEndProperty(CONVERSATION_ID);
+		String convid = (String) ((MsgHeader) header).getProperty(CONVERSATION_ID);
 		if (convid != null)
 		{
 			// send-reply message
 			
-			if (Boolean.TRUE.equals(((MsgHeader) header).getEndToEndProperty(IS_REPLY)))
+			if (Boolean.TRUE.equals(((MsgHeader) header).getProperty(IS_REPLY)))
 			{
 				Future<Object> fut = awaitingmessages.remove(convid);
 				if (fut != null)
@@ -445,8 +441,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		else
 		{
 			ISerializationServices serialserv = getSerializationServices(platformid);
-			Tuple2<Map<String, Object>, Object> bodytuple = new Tuple2<Map<String, Object>, Object>(header.removeEndToEndMap(), message);
-			byte[] body = serialserv.encode(header, component.getClassLoader(), bodytuple);
+			byte[] body = serialserv.encode(header, component.getClassLoader(), message);
 			
 			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 			{
@@ -475,10 +470,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param serializedmsg The serialized message.
 	 *  @return The deserialized message.
 	 */
-	@SuppressWarnings("unchecked")
-	protected Tuple2<Map<String, Object>, Object> deserializeMessage(IMsgHeader header, byte[] serializedmsg)
+	protected Object deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
-		return (Tuple2<Map<String, Object>, Object>) getSerializationServices(platformid).decode(component.getClassLoader(), serializedmsg);
+		return getSerializationServices(platformid).decode(component.getClassLoader(), serializedmsg);
 	}
 	
 	/**

@@ -19,4 +19,12 @@ public interface IMsgHeader
 	 * @return
 	 */
 	public Object getProperty(String propertyname);
+	
+	/**
+	 *  Adds a header property to the header.
+	 *  
+	 *  @param propname The property name.
+	 *  @param propval The property value.
+	 */
+	public void addProperty(String propname, Object propval);
 }
