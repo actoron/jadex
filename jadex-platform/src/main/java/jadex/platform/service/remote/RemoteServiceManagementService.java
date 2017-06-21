@@ -1,6 +1,5 @@
 package jadex.platform.service.remote;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,9 +16,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
@@ -27,12 +24,9 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -40,8 +34,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
-import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
-import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
@@ -57,13 +49,6 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.traverser.IRootObjectContext;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
-import jadex.commons.transformation.traverser.Traverser.MODE;
-import jadex.platform.service.message.MessageService;
-import jadex.platform.service.message.streams.InputConnection;
-import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
@@ -129,8 +114,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The marshal service. */
 	protected IMarshalService marshal;
 	
-	/** The message service. */
-	protected IMessageService msgservice;
+//	/** The message service. */
+//	protected IMessageService msgservice;
 	
 	/** The rms identifier. */
 //	protected ITransportComponentIdentifier rms;
@@ -147,7 +132,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Create a new remote service management service.
 	 */
 	public RemoteServiceManagementService(IExternalAccess component, 
-		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice, TransportAddressBook addresses)//, boolean binarymode)
+		ILibraryService libservice, final IMarshalService marshal/*, final IMessageService msgservice*/, TransportAddressBook addresses)//, boolean binarymode)
 	{
 		super(component.getComponentIdentifier(), IRemoteServiceManagementService.class, null);
 
@@ -160,7 +145,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.terminationcommands = new LRU<String, List<Runnable>>(1000);
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
-		this.msgservice = msgservice;
+//		this.msgservice = msgservice;
 		this.addresses = addresses;
 	}
 	

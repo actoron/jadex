@@ -48,7 +48,7 @@ import jadex.platform.service.remote.replacements.GetComponentFeatureMethodRepla
 	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
 })
 @Agent
-@Features(@Feature(clazz=RmsMessageFeature.class, type=IMessageFeature.class, replace=true))
+@Features(additional=true, value={@Feature(clazz=RmsMessageFeature.class, type=IMessageFeature.class)})
 @Properties(@NameValue(name="system", value="true"))
 public class RemoteServiceManagementAgent
 {
@@ -90,11 +90,11 @@ public class RemoteServiceManagementAgent
 		
 		final ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 		final IMarshalService marshalservice = SServiceProvider.getLocalService(agent, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
-		final IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+//		final IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 //		boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
 		
 		TransportAddressBook addresses = TransportAddressBook.getAddressBook(agent);
-		rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
+		rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice/*, msgservice*/, addresses);//, binarymode);
 //		IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 //		msgser.addPreprocessors(rms.getPreprocessors().toArray(new ITraverseProcessor[0])).get();
 //		msgser.addPostprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();

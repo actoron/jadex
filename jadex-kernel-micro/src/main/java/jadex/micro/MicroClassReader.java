@@ -375,7 +375,7 @@ public class MicroClassReader
 			// Is a little hack because getAllImports() of ModelInfo add package again.
 //			Set<String> imports = (Set)getOrCreateSet("imports", toset);
 			
-			// Take all, duplicates are eleminated
+			// Take all, duplicates are eliminated
 			if(!featdone && isAnnotationPresent(cma, Features.class, cl))
 			{
 				Features fs = getAnnotation(cma, Features.class, cl);

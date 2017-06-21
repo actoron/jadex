@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -302,7 +303,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 */
 	protected void closeConnection(SelectionKey key, Exception e)
 	{
-		SocketChannel	sc	= (SocketChannel)key.channel();
+		SelectableChannel	sc	= key.channel();
 		
 //		if(e!=null)
 //		{
@@ -316,24 +317,27 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		}
 		catch(Exception ex){}
 		
-		// Connection closed: abort all open write tasks.
-		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
-		if(queue!=null)
+		if(sc instanceof SocketChannel)
 		{
-			for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
+			// Connection closed: abort all open write tasks.
+			List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
+			if(queue!=null)
 			{
-				Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
-				Future<Void>	fut	= task.getSecondEntity();
-				fut.setException(e!=null ? e : new RuntimeException("Channel closed."));
-				it.remove();
+				for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
+				{
+					Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
+					Future<Void>	fut	= task.getSecondEntity();
+					fut.setException(e!=null ? e : new RuntimeException("Channel closed."));
+					it.remove();
+				}
+				writetasks.remove(sc);
 			}
-			writetasks.remove(sc);
+	
+			key.attach(null);
+			key.cancel();
+			
+			handler.connectionClosed((SocketChannel)sc, e);
 		}
-
-		key.attach(null);
-		key.cancel();
-		
-		handler.connectionClosed(sc, e);
 	}
 	
 

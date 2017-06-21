@@ -10,6 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import jadex.base.IRootComponentConfiguration.AWAMECHANISM;
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,6 +23,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -64,13 +67,22 @@ public class ServiceCallTestNFClearTest
 
 		String pid = SUtil.createUniqueId(name.getMethodName(), 3) + "-*";
 
-		platform1 = Starter.createPlatform(
-			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false", "-logging", "false"}).get(timeout);
+		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
+		config.setLogging(true);
+		config.setDefaultTimeout(-1);
+		config.setPlatformName(pid);
+		config.setSaveOnExit(false);
+		config.setAutoShutdown(false);
+		config.setSecurity(true);
+		config.setAwaMechanisms(AWAMECHANISM.local);
+		config.setAwareness(true);
+		config.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 
-		platform2 = Starter.createPlatform(
-			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false", "-logging", "false"}).get(timeout);
+		platform1 = Starter.createPlatform(config).get(timeout);
 
-		createProxies(platform1, platform2);
+		platform2 = Starter.createPlatform(config).get(timeout);
+
+//		createProxies(platform1, platform2);
 
 		CallAccess.resetNextInvocation();
 	}
@@ -330,7 +342,13 @@ public class ServiceCallTestNFClearTest
 		{
 			for(int j = 0; j < platforms.length; j++)
 			{
-				Starter.createProxy(platforms[i], platforms[j]).get(timeout);
+				// Add addresses of first platform to second
+				TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(platforms[i].getComponentIdentifier());
+				TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(platforms[j].getComponentIdentifier());
+				tab2.addPlatformAddresses(platforms[i].getComponentIdentifier(), "tcp",
+					tab1.getPlatformAddresses(platforms[i].getComponentIdentifier(), "tcp"));
+				
+//				Starter.createProxy(platforms[i], platforms[j]).get(timeout);
 			}
 		}
 	}
