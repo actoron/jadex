@@ -1,42 +1,20 @@
 package jadex.platform.service.remote;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.ContentException;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -47,8 +25,6 @@ import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Properties;
-import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
-import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
@@ -96,8 +72,6 @@ public class RemoteServiceManagementAgent
 	@AgentCreated
 	public IFuture<Void>	agentCreated()
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		
 		// Register communication classes that have aliases.
 		STransformation.registerClass(ProxyInfo.class);
 		STransformation.registerClass(ProxyReference.class);
@@ -119,21 +93,14 @@ public class RemoteServiceManagementAgent
 		final IMessageService msgservice = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 //		boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
 		
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
-		{
-			public void customResultAvailable(TransportAddressBook addresses)
-			{
-				rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
-//				IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//				msgser.addPreprocessors(rms.getPreprocessors().toArray(new ITraverseProcessor[0])).get();
-//				msgser.addPostprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
-				agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-				ret.setResult(null);
-			}
-		});
+		TransportAddressBook addresses = TransportAddressBook.getAddressBook(agent);
+		rms = new RemoteServiceManagementService(agent.getExternalAccess(), libservice, marshalservice, msgservice, addresses);//, binarymode);
+//		IMessageService msgser = SServiceProvider.getLocalService(agent.getComponentIdentifier(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		msgser.addPreprocessors(rms.getPreprocessors().toArray(new ITraverseProcessor[0])).get();
+//		msgser.addPostprocessors(rms.getPostprocessors().toArray(new ITraverseProcessor[0])).get();
+		agent.getComponentFeature(IProvidedServicesFeature.class).addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 		
-		return ret;
+		return IFuture.DONE;
 	}
 	
 //	/**

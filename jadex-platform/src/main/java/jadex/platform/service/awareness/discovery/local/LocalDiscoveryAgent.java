@@ -4,25 +4,28 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.Base64;
+import jadex.commons.Boolean3;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.IFuture;
@@ -33,7 +36,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -41,7 +43,7 @@ import jadex.micro.annotation.RequiredServices;
  *  Agent providing local discovery using the file system.
  *
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 @RequiredServices(
 {
@@ -54,10 +56,10 @@ import jadex.micro.annotation.RequiredServices;
 	@Argument(name="leasetime", clazz=Long.class, defaultvalue="30000L")
 })
 //@Properties(@NameValue(name="system", value="true"))
-public class LocalDiscoveryAgent implements IDiscoveryService
+public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<IComponentIdentifier>
 {
 	/** The discovery directory. */
-	protected static final File DISCOVERY_DIR = new File(System.getProperty("java.io.tmpdir") + File.separator + "jadexlocaldiscovery");
+	protected static final File DISCOVERY_DIR = new File(System.getProperty("java.io.tmpdir") + File.separator + ".jadex" + File.separator + "discovery");
 	
 	/** Access to agent. */
 	@Agent
@@ -77,9 +79,10 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		System.out.println("Strated LocalDisc");
 		if(!DISCOVERY_DIR.exists())
 		{
-			DISCOVERY_DIR.mkdir();
+			DISCOVERY_DIR.mkdirs();
 		}
 		
 		if(!(DISCOVERY_DIR.isDirectory() && DISCOVERY_DIR.canRead() && DISCOVERY_DIR.canWrite()))
@@ -193,7 +196,20 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				watchservice = null;
 			}
 		}
+		
+		TransportAddressBook.getAddressBook(agent).addListener(this);
+		
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Notifies a change occurred.
+	 */
+	public void changeOccurred(ChangeEvent<IComponentIdentifier> event)
+	{
+		System.out.println("Change occured: " + event.getSource());
+		if (agent.getComponentIdentifier().getRoot().equals(event.getSource()))
+			postInfo();
 	}
 	
 	/**
@@ -244,16 +260,20 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //		IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
 //		IMessageService cms = fut.get();
 //		IMessageService	cms	= SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		
 //		IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
-		IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
-		ITransportComponentIdentifier root = fut2.get();
+//		IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
+//		ITransportComponentIdentifier root = fut2.get();
+		IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
+		Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
 		long leasetime = (Long) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
-		AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
+		AwarenessInfo info = new AwarenessInfo(root, addr, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 		byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
 		long deadline = leasetime + System.currentTimeMillis();
-		String outfilepath = DISCOVERY_DIR + File.separator + agent.getComponentIdentifier().getRoot().getLocalName() + "_" + String.valueOf(deadline) + ".awa";
+		String outfilepath = DISCOVERY_DIR + File.separator; 
+		outfilepath += new String(Base64.encodeNoPadding(agent.getComponentIdentifier().getRoot().getLocalName().getBytes(SUtil.UTF8)), SUtil.UTF8);
+		outfilepath += "_" + String.valueOf(deadline) + ".awa";
 		File outfile = new File(outfilepath);
 		FileOutputStream fos = null;
 		try

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
@@ -22,7 +21,7 @@ public class DiscoveryInfo
 	//-------- attributes --------
 	
 	/** The component identifier of the remote component. */
-	protected ITransportComponentIdentifier cid;
+	protected IComponentIdentifier cid;
 	
 	/** Component id of local proxy (if any). */
 	protected IFuture<IComponentIdentifier> proxy;
@@ -55,7 +54,7 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(ITransportComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
+	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
 			boolean remoteexcluded, Map<String, String> properties)
 	{
 		this.cid = cid;
@@ -72,7 +71,7 @@ public class DiscoveryInfo
 	 *  Get the component identifier.
 	 *  @return the component identifier.
 	 */
-	public ITransportComponentIdentifier getComponentIdentifier()
+	public IComponentIdentifier getComponentIdentifier()
 	{
 		return cid;
 	}
@@ -81,7 +80,7 @@ public class DiscoveryInfo
 	 *  Set the component identifier.
 	 *  @param component identifier The component identifier to set.
 	 */
-	public void setComponentIdentifier(ITransportComponentIdentifier componentIdentifier)
+	public void setComponentIdentifier(IComponentIdentifier componentIdentifier)
 	{
 		this.cid = componentIdentifier;
 	}

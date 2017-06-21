@@ -18,16 +18,13 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -40,7 +37,6 @@ import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -65,7 +61,6 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -151,7 +146,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	protected Timer	timer;
 	
 	/** The root component id. */
-	protected ITransportComponentIdentifier root;
+	protected IComponentIdentifier root;
 	
 	/** The includes list. */
 	protected List<String>	includes;
@@ -184,82 +179,76 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 
 		initArguments();
 		
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		tas.getTransportAddresses().addResultListener(new ExceptionDelegationResultListener<TransportAddressBook, Void>(ret)
+		AwarenessManagementAgent.this.addresses = addresses;
+//		AwarenessManagementAgent.this.root	= addresses.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
+		AwarenessManagementAgent.this.root = agent.getComponentIdentifier().getRoot();
+		
+		IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
+		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
-			public void customResultAvailable(TransportAddressBook addresses)
+			public void resultAvailable(ISettingsService settings)
 			{
-				AwarenessManagementAgent.this.addresses = addresses;
-				AwarenessManagementAgent.this.root	= addresses.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
-				
-				IFuture<ISettingsService>	setfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("settings");
-				setfut.addResultListener(new IResultListener<ISettingsService>()
+				settings.registerPropertiesProvider(agent.getComponentIdentifier().getName(), AwarenessManagementAgent.this)
+					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void resultAvailable(ISettingsService settings)
+					public void customResultAvailable(Void result)
 					{
-						settings.registerPropertiesProvider(agent.getComponentIdentifier().getName(), AwarenessManagementAgent.this)
-							.addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void customResultAvailable(Void result)
-							{
-								proceed();
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// No settings service: ignore.
 						proceed();
 					}
-					
-					protected void	proceed()
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				proceed();
+			}
+			
+			protected void	proceed()
+			{
+				final String mechas = (String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("mechanisms");
+				if(mechas!=null)
+				{
+					IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
-						final String mechas = (String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("mechanisms");
-						if(mechas!=null)
+						public void customResultAvailable(IComponentManagementService cms)
 						{
-							IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-							cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+							AwarenessManagementAgent.this.cms = cms;
+							StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
+							CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
+								false, new DelegationResultListener<Void>(ret)
 							{
-								public void customResultAvailable(IComponentManagementService cms)
+								public void customResultAvailable(Void result)
 								{
-									AwarenessManagementAgent.this.cms = cms;
-									StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
-									CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
-										false, new DelegationResultListener<Void>(ret)
-									{
-										public void customResultAvailable(Void result)
-										{
-											ret.setResult(null);
-										}
-									});
-									
-									CreationInfo info = new CreationInfo(agent.getComponentIdentifier());
-									info.setConfiguration(agent.getConfiguration());
-									Map<String, Object> args = new HashMap<String, Object>();
-									args.put("delay", Long.valueOf(getDelay()));
-									args.put("fast", Boolean.valueOf(isFastAwareness()));
-									args.put("includes", getIncludes());
-									args.put("excludes", getExcludes());
-									info.setArguments(args);
-									
-//									System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
-									
-									while(stok.hasMoreTokens())
-									{
-			//							System.out.println("mecha: "+mechas[i]);
-										String	mech	= stok.nextToken().toLowerCase();
-										cms.createComponent(mech, mech, info, null).addResultListener(lis);
-									}
+									ret.setResult(null);
 								}
 							});
+							
+							CreationInfo info = new CreationInfo(agent.getComponentIdentifier());
+							info.setConfiguration(agent.getConfiguration());
+							Map<String, Object> args = new HashMap<String, Object>();
+							args.put("delay", Long.valueOf(getDelay()));
+							args.put("fast", Boolean.valueOf(isFastAwareness()));
+							args.put("includes", getIncludes());
+							args.put("excludes", getExcludes());
+							info.setArguments(args);
+							
+//							System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+							
+							while(stok.hasMoreTokens())
+							{
+	//							System.out.println("mecha: "+mechas[i]);
+								String	mech	= stok.nextToken().toLowerCase();
+								cms.createComponent(mech, mech, info, null).addResultListener(lis);
+							}
 						}
-						else
-						{
-							ret.setResult(null);
-						}
-					}
-				});
+					});
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 			}
 		});
 		
@@ -348,11 +337,22 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info)
 	{
+		System.out.println("new info " + info);
 		// Return if inital discovery.
 		boolean ret = false;
 		
+		boolean	changedaddrs	= false;	// Should an existing proxy be updated with new addresses?
 		// Announce new platform addresses
-		addresses.addPlatformAddresses(info.getSender());
+//		Map<String, String[]> addr = info.getAddresses();
+//		for (Map.Entry<String, String[]> entry : addr.entrySet())
+//		{
+//			addresses.addPlatformAddresses(info.getSender().getRoot(), entry.getKey(), entry.getValue());
+//		}
+		System.out.println(agent.getComponentIdentifier().toString() + " merging " + info.getAddresses() + " " + info.getSender());
+		changedaddrs = TransportAddressBook.getAddressBook(agent).mergePlatformAddresses(info.getSender().getRoot(), info.getAddresses());
+		System.out.println("Merged: " + changedaddrs);
+		
+//		addresses.addPlatformAddresses(info.getSender());
 //		tas.addPlatformAddresses(info.getSender());
 		
 		// Fix broken awareness infos for backwards compatibility.
@@ -363,11 +363,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 //		System.out.println("received: "+agent.getComponentIdentifier()+" "+info.getSender());
 //		System.out.println("received: "+info.getSender());
 		
-		ITransportComponentIdentifier sender = info.getSender();
+		IComponentIdentifier sender = info.getSender();
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
 //			boolean	initial	= false;	// Initial discovery of component.
 		DiscoveryInfo dif;
-		boolean	changedaddrs	= false;	// Should an existing proxy be updated with new addresses?
 		
 		dif = (DiscoveryInfo)discovered.get(sender);
 		if(info.getProperties()==null)
@@ -399,7 +398,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			}
 			else
 			{
-				changedaddrs = !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
+//				changedaddrs = !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
+				
 				dif.setComponentIdentifier(sender);
 				
 				if(awamech!=null)
@@ -459,7 +459,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			// Update proxy to reflect new addresses.
 			else if(changedaddrs && dif.getProxy()!=null)
 			{
-				final ITransportComponentIdentifier	remote	= dif.getComponentIdentifier();
+				final IComponentIdentifier	remote	= dif.getComponentIdentifier();
 				dif.getProxy().addResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier cid)
@@ -1004,7 +1004,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 *  @param excludes	The list of excludes.
 	 *  @return true when a proxy should be created.
 	 */
-	public static boolean	isIncluded(ITransportComponentIdentifier cid, String[] includes, String[] excludes)
+	public static boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
 	{
 		boolean	included	= includes.length==0;
 		String[]	cidnames	= null;
@@ -1015,7 +1015,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			if(includes[i]!=null)
 			{
 				if(cidnames==null)
-					cidnames	= extractNames(cid);
+					cidnames = new String[] {cid.toString()};
+//					cidnames	= extractNames(cid);
 				for(int j=0; !included && j<cidnames.length; j++)
 				{
 					included	= cidnames[j].startsWith(includes[i]);
@@ -1029,7 +1030,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			if(excludes[i]!=null)
 			{
 				if(cidnames==null)
-					cidnames	= extractNames(cid);
+					cidnames = new String[] {cid.toString()};
+//					cidnames	= extractNames(cid);
 				for(int j=0; included && j<cidnames.length; j++)
 				{
 					included	= !cidnames[j].startsWith(excludes[i]);
@@ -1043,50 +1045,50 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	/**
 	 *  Extract names for matching to includes/excludes list.
 	 */
-	protected static String[]	extractNames(ITransportComponentIdentifier cid)
-	{
-		Set<String>	ret	= new LinkedHashSet<String>();
-		ret.add(cid.getName());
-		String[]	addrs	= cid.getAddresses();
-		for(int i=0; i<addrs.length; i++)
-		{
-			int	prot	= addrs[i].indexOf("://");
-			if(prot!=-1)
-			{
-				int	slash	= addrs[i].indexOf('/', prot+3);
-				if(slash!=-1)
-				{
-					int	port	= addrs[i].lastIndexOf(':', slash);
-					if(port!=-1 && port>prot+3)
-					{
-						ret.add(addrs[i].substring(prot+3, port));
-					}
-					else
-					{
-						ret.add(addrs[i].substring(prot+3, slash));
-					}
-				}
-				else
-				{
-					int	port	= addrs[i].lastIndexOf(':');
-					if(port!=-1 && port>prot+3)
-					{
-						ret.add(addrs[i].substring(prot+3, port));
-					}
-					else
-					{
-						ret.add(addrs[i].substring(prot+3));
-					}
-				}
-			}
-			else
-			{
-				System.out.println("Warning: Unknown address scheme "+addrs[i]);
-			}
-		}
-//		System.out.println("cidnames: "+ret);
-		return (String[])ret.toArray(new String[ret.size()]);
-	}
+//	protected static String[]	extractNames(IComponentIdentifier cid)
+//	{
+//		Set<String>	ret	= new LinkedHashSet<String>();
+//		ret.add(cid.getName());
+//		String[]	addrs	= cid.getAddresses();
+//		for(int i=0; i<addrs.length; i++)
+//		{
+//			int	prot	= addrs[i].indexOf("://");
+//			if(prot!=-1)
+//			{
+//				int	slash	= addrs[i].indexOf('/', prot+3);
+//				if(slash!=-1)
+//				{
+//					int	port	= addrs[i].lastIndexOf(':', slash);
+//					if(port!=-1 && port>prot+3)
+//					{
+//						ret.add(addrs[i].substring(prot+3, port));
+//					}
+//					else
+//					{
+//						ret.add(addrs[i].substring(prot+3, slash));
+//					}
+//				}
+//				else
+//				{
+//					int	port	= addrs[i].lastIndexOf(':');
+//					if(port!=-1 && port>prot+3)
+//					{
+//						ret.add(addrs[i].substring(prot+3, port));
+//					}
+//					else
+//					{
+//						ret.add(addrs[i].substring(prot+3));
+//					}
+//				}
+//			}
+//			else
+//			{
+//				System.out.println("Warning: Unknown address scheme "+addrs[i]);
+//			}
+//		}
+////		System.out.println("cidnames: "+ret);
+//		return (String[])ret.toArray(new String[ret.size()]);
+//	}
 	
 	/**
 	 *  Get the current time.

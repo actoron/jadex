@@ -2,9 +2,9 @@ package jadex.platform.service.remote;
 
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
@@ -15,10 +15,8 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -38,7 +36,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
  */
 @Description("This agent represents a proxy for a remote component.")
-@Arguments(@Argument(name="component", clazz=ITransportComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
+@Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
 @ProvidedServices(@ProvidedService(type=IProxyAgentService.class))
 @NFProperties(@NFProperty(ProxyLatencyProperty.class))
 @Service
@@ -56,7 +54,7 @@ public class ProxyAgent	implements IProxyAgentService
 	
 	/**  The remote component identifier. */
 	@AgentArgument("component")
-	protected ITransportComponentIdentifier	rcid;
+	protected IComponentIdentifier	rcid;
 	
 	/** The remote cms. */
 	protected IComponentManagementService rcms;
@@ -170,17 +168,17 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  Get the component identifier of the remote platform.
 	 */
-	public IFuture<ITransportComponentIdentifier>	getRemoteComponentIdentifier()
+	public IFuture<IComponentIdentifier>	getRemoteComponentIdentifier()
 	{
 //		return new Future<IComponentIdentifier>(((RemoteServiceContainer)getServiceContainer()).getRemoteComponentIdentifier());
-		return new Future<ITransportComponentIdentifier>(rcid);
+		return new Future<IComponentIdentifier>(rcid);
 	}
 
 	/**
 	 *  Set or update the component identifier of the remote platform,
 	 *  i.e., top reflect new transport addresses.
 	 */
-	public IFuture<Void>	setRemoteComponentIdentifier(ITransportComponentIdentifier cid)
+	public IFuture<Void>	setRemoteComponentIdentifier(IComponentIdentifier cid)
 	{
 //		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
 		rcid = cid;

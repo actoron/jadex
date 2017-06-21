@@ -3,7 +3,7 @@ package jadex.bridge.service.types.awareness;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.VersionInfo;
 import jadex.commons.SUtil;
 
@@ -47,7 +47,10 @@ public class AwarenessInfo
 	//-------- attributes --------
 	
 	/** The sending component's identifier. */
-	protected ITransportComponentIdentifier	sender;
+	protected IComponentIdentifier	sender;
+	
+	/** Addresses of the sender, transport, addresses. */
+	protected Map<String, String[]> addresses;
 
 	/** The component state. */
 	protected String state;
@@ -87,10 +90,11 @@ public class AwarenessInfo
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(ITransportComponentIdentifier sender, String state, long delay, 
+	public AwarenessInfo(IComponentIdentifier sender, Map<String, String[]> addresses, String state, long delay, 
 		String[] includes, String[] excludes, String masterid, String mechsrc)
 	{
 		this.sender = sender;
+		this.addresses = addresses;
 		this.state = state;
 		this.delay = delay;
 		this.includes	= includes!=null? includes.clone(): null;
@@ -116,7 +120,7 @@ public class AwarenessInfo
 	 *  Get the sender.
 	 *  @return the sender.
 	 */
-	public ITransportComponentIdentifier getSender()
+	public IComponentIdentifier getSender()
 	{
 		return sender;
 	}
@@ -125,11 +129,31 @@ public class AwarenessInfo
 	 *  Set the sender.
 	 *  @param sender The sender to set.
 	 */
-	public void setSender(ITransportComponentIdentifier sender)
+	public void setSender(IComponentIdentifier sender)
 	{
 		this.sender = sender;
 	}
 	
+	/**
+	 *  Gets the addresses.
+	 *
+	 *  @return The addresses.
+	 */
+	public Map<String, String[]> getAddresses()
+	{
+		return addresses;
+	}
+
+	/**
+	 *  Sets the addresses.
+	 *
+	 *  @param addresses The addresses.
+	 */
+	public void setAddresses(Map<String, String[]> addresses)
+	{
+		this.addresses = addresses;
+	}
+
 	/**
 	 *  Get the state.
 	 *  @return the state.

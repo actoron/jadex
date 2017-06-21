@@ -2,6 +2,7 @@ package jadex.micro.testcases.semiautomatic.message;
 
 import java.util.Collections;
 
+import jadex.base.IRootComponentConfiguration.AWAMECHANISM;
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -30,6 +31,8 @@ public class RemoteMessagingTest
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
 		config1.setSecurity(true);
+		config1.setAwaMechanisms(AWAMECHANISM.local);
+		config1.setAwareness(true);
 		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 		config1.addComponent(ReceiverAgent.class);
 //		config1.setNetworkName("remotemessagetest");
@@ -43,6 +46,8 @@ public class RemoteMessagingTest
 //		config2.setLogging(true);
 //		config2.setDefaultTimeout(-1);
 		config2.setSecurity(true);
+		config2.setAwaMechanisms(AWAMECHANISM.local);
+		config2.setAwareness(true);
 		config2.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);

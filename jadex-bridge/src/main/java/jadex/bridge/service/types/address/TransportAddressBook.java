@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
@@ -98,11 +100,63 @@ public class TransportAddressBook
 	 *  @param platform The platform.
 	 *  @return All known addresses of the platform.
 	 */
-	public synchronized Map<String, List<String>> getAllPlatformAddresses(IComponentIdentifier platform)
+	public synchronized Map<String, String[]> getAllPlatformAddresses(IComponentIdentifier platform)
 	{
-		Map<String, List<String>> ret = addresses.get(platform);
-		if (ret != null)
-			ret = new HashMap<String, List<String>>(ret);
+		Map<String, List<String>> addr = addresses.get(platform);
+		Map<String, String[]> ret = new HashMap<String, String[]>();
+		if (addr != null)
+		{
+			for (Map.Entry<String, List<String>> entry : addr.entrySet())
+			{
+				String[] addresses = entry.getValue().toArray(new String[entry.getValue().size()]);
+				ret.put(entry.getKey(), addresses);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Sets all addresses of a specific platform.
+	 *  
+	 *  @param platform The platform.
+	 *  @param addr All known addresses of the platform.
+	 *  @return True, if addresses were added.
+	 */
+	public synchronized boolean mergePlatformAddresses(IComponentIdentifier platform, Map<String, String[]> addr)
+	{
+		boolean ret = false;
+		Map<String, List<String>> bookaddr = addresses.get(platform);
+		if (addr != null)
+		{
+			if (bookaddr == null)
+			{
+				bookaddr = new HashMap<String, List<String>>();
+				addresses.put(platform, bookaddr);
+				ret = true;
+			}
+			
+			for (Map.Entry<String, String[]> entry : addr.entrySet())
+			{
+				List<String> bookentries = bookaddr.get(entry.getKey());
+				if (bookentries == null)
+				{
+					bookaddr.put(entry.getKey(), new ArrayList<String>(Arrays.asList(entry.getValue())));
+					ret = true;
+				}
+				else
+				{
+					Set<String> known = new HashSet<String>(bookentries);
+					for (String singleaddr : entry.getValue())
+					{
+						if (!known.contains(singleaddr))
+						{
+							bookentries.add(singleaddr);
+							ret = true;
+						}
+					}
+				}
+			}
+		}
 		return ret;
 	}
 	

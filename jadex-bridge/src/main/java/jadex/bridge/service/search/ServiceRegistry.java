@@ -19,7 +19,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
@@ -1952,7 +1951,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //			System.out.println("LOCAL:" + ((IService) rms).getServiceIdentifier().getProviderId().getRoot() + " SERS: " + sers);
 			if(sers!=null && sers.size()>0)
 			{
-				FutureBarrier<ITransportComponentIdentifier> bar = new FutureBarrier<ITransportComponentIdentifier>();
+				FutureBarrier<IComponentIdentifier> bar = new FutureBarrier<IComponentIdentifier>();
 				for(IService ser: sers)
 				{					
 					IProxyAgentService pas = (IProxyAgentService)ser;
@@ -1960,9 +1959,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					bar.addFuture(pas.getRemoteComponentIdentifier());
 //					System.out.println("PROVID: " + ser.getServiceIdentifier().getProviderId());
 				}
-				bar.waitForResultsIgnoreFailures(null).addResultListener(new IResultListener<Collection<ITransportComponentIdentifier>>()
+				bar.waitForResultsIgnoreFailures(null).addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
 				{
-					public void resultAvailable(Collection<ITransportComponentIdentifier> result)
+					public void resultAvailable(Collection<IComponentIdentifier> result)
 					{
 						if(result != null)
 							result.remove(((IService)rms).getServiceIdentifier().getProviderId().getRoot());
@@ -1970,7 +1969,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 						if(result != null && result.size() > 0)
 						{
 							FutureBarrier<Void> finishedbar = new FutureBarrier<Void>();
-							for(ITransportComponentIdentifier platid : result)
+							for(IComponentIdentifier platid : result)
 							{
 								final Future<Set<T>> remotesearch = new Future<Set<T>>();
 								final ServiceQuery<T> remotequery = new ServiceQuery<T>(query);

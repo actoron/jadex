@@ -96,7 +96,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.sensor.SensorHolderAgent;
-import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
@@ -216,7 +215,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
 //	@ComponentType(name="rms", clazz=RemoteServiceManagementAgent.class), //filename="jadex/platform/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
-//	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
+	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
 	@ComponentType(name="rspublish", filename="%{$args.rspublishcomponent}"),
 //	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/ExternalRSPublishAgent.class"),
@@ -237,7 +236,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
-	@ComponentType(name="address", clazz=TransportAddressAgent.class)
+//	@ComponentType(name="address", clazz=TransportAddressAgent.class)
 })
 
 @ProvidedServices({
@@ -302,7 +301,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		
-		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
+//		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
 			@NameValue(name="usepass", value="$args.usepass"),
@@ -332,13 +331,13 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
 //		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
-//		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-//			arguments={
-//				@NameValue(name="mechanisms", value="$args.awamechanisms"),
-//				@NameValue(name="delay", value="$args.awadelay"),
-//				@NameValue(name="fast", value="$args.awafast"),
-//				@NameValue(name="includes", value="$args.awaincludes"),
-//				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+			arguments={
+				@NameValue(name="mechanisms", value="$args.awamechanisms"),
+				@NameValue(name="delay", value="$args.awadelay"),
+				@NameValue(name="fast", value="$args.awafast"),
+				@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={
@@ -384,7 +383,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		
-		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
+//		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
 			@NameValue(name="usepass", value="$args.usepass"),
@@ -414,11 +413,11 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
 //		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
-//		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-//			arguments={
-//				@NameValue(name="mechanisms", value="$args.awamechanisms"),
-//				@NameValue(name="includes", value="$args.awaincludes"),
-//				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+			arguments={
+				@NameValue(name="mechanisms", value="$args.awamechanisms"),
+				@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={
