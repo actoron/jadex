@@ -10,6 +10,7 @@ import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -19,7 +20,6 @@ import jadex.bridge.service.types.serialization.IRemoteReferenceManagement;
 import jadex.bridge.service.types.serialization.IRemoteReferenceModule;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.Traverser;
@@ -438,8 +438,7 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
-					@SuppressWarnings("unchecked")
-					IMsgHeader	header	= (IMsgHeader)((IUserContextContainer)context).getUserContext();
+					MsgHeader	header	= (MsgHeader)((IUserContextContainer)context).getUserContext();
 					IComponentIdentifier receiver = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 					Object ret = rrm.getProxyReference(object, receiver, targetcl);
 					return ret;
