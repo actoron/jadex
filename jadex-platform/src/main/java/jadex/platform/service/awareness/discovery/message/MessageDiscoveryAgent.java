@@ -110,7 +110,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	
 	/**
 	 *  Announce a potentially new component identifier.
-	 *  @param cid The component identifier.
+	 *  @param platform The component identifier.
 	 */
 	public IFuture<Void> announceComponentIdentifier(ITransportComponentIdentifier ccid)
 	{

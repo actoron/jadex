@@ -1,8 +1,10 @@
 package jadex.bridge.component.impl;
 
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 
@@ -13,10 +15,19 @@ import jadex.commons.future.IFuture;
 public interface IInternalRemoteExecutionFeature
 {
 	/**
-	 *  Execute a command on a remote agent.
+	 *  Execute a service search on a remote agent.
 	 *  @param target	The component to send the command to.
-	 *  @param command	The command to be executed.
-	 *  @return	The result(s) of the command, if any.
+	 *  @param query	The search query
+	 *  @return	The result(s) of the query, if any.
 	 */
 	public <T> IFuture<Set<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query);
+	
+	/**
+	 *  Invoke a method on a remote object.
+	 *  @param ref	The target reference.
+	 *  @param method	The method to be executed.
+	 *  @param args	The arguments.
+	 *  @return	The result(s) of the method invocation, if any. Connects any futures involved.
+	 */
+	public Object	executeRemoteMethod(RemoteReference ref, Method method, Object[] args);
 }

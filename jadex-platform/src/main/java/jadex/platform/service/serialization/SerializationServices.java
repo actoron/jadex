@@ -11,13 +11,12 @@ import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.MsgHeader;
+import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
-import jadex.bridge.service.types.serialization.IRemoteReferenceManagement;
-import jadex.bridge.service.types.serialization.IRemoteReferenceModule;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -30,8 +29,6 @@ import jadex.platform.service.message.transport.codecs.SnappyCodec;
 import jadex.platform.service.message.transport.codecs.XZCodec;
 import jadex.platform.service.message.transport.serializers.JadexBinarySerializer;
 import jadex.platform.service.message.transport.serializers.JadexJsonSerializer;
-import jadex.platform.service.remote.ProxyReference;
-import jadex.platform.service.remote.RemoteReferenceModule;
 
 /**
  *  Functionality for managing serialization.
@@ -39,11 +36,8 @@ import jadex.platform.service.remote.RemoteReferenceModule;
  */
 public class SerializationServices implements ISerializationServices
 {
-	/** The remote reference management. */
-	protected RemoteReferenceManagement rrmanagement;
-	
 	/** The remote reference module */
-	protected IRemoteReferenceModule rrm;
+	protected RemoteReferenceModule rrm;
 	
 	/** Serializer used for sending. */
 	protected ISerializer sendserializer;
@@ -66,7 +60,7 @@ public class SerializationServices implements ISerializationServices
 	/** Creates the management. */
 	public SerializationServices()
 	{
-		rrmanagement = new RemoteReferenceManagement();
+		rrm	= new RemoteReferenceModule();
 		serializers = new HashMap<Integer, ISerializer>();
 		ISerializer serial = new JadexBinarySerializer();
 		serializers.put(serial.getSerializerId(), serial);
@@ -184,36 +178,6 @@ public class SerializationServices implements ISerializationServices
 		if (ret == null)
 			System.out.println("FDSODFP");
 		return ret;
-	}
-	
-	/**
-	 *  Gets the remote reference management.
-	 *
-	 *  @return The remote reference management.
-	 */
-	public IRemoteReferenceManagement getRemoteReferenceManagement()
-	{
-		return rrmanagement;
-	}
-
-	/**
-	 *  Gets the remote reference module.
-	 *
-	 *  @return The remote reference module.
-	 */
-	public IRemoteReferenceModule getRemoteReferenceModule()
-	{
-		return rrm;
-	}
-
-	/**
-	 *  Sets the remote reference module.
-	 *
-	 *  @param rrm The remote reference module.
-	 */
-	public void setRemoteReferenceModule(IRemoteReferenceModule rrm)
-	{
-		this.rrm = rrm;
 	}
 	
 	/**
@@ -431,7 +395,7 @@ public class SerializationServices implements ISerializationServices
 			{
 //				if(marshal.isRemoteReference(object))
 //					System.out.println("rr: "+object);
-				return rrmanagement.isRemoteReference(object);
+				return rrm.isRemoteReference(object);
 			}
 			
 			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)

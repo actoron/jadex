@@ -386,14 +386,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				else if (handler.isHandling(secinf, header, body))
 				{
 					handled	= true;
-					component.getComponentFeature0(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
+//					component.getComponentFeature0(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+//					{
+//						public IFuture<Void> execute(IInternalAccess ia)
+//						{
 							handler.handleMessage(secinf, header, body);
-							return IFuture.DONE;
-						}
-					});
+//							return IFuture.DONE;
+//						}
+//					});
 				}
 			}
 		}

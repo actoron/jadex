@@ -472,7 +472,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	
 	/**
 	 *  Remove an existing subscription.
-	 *  @param cid The component id to remove.
+	 *  @param platform The component id to remove.
 	 */
 	protected void removeSubscribedTo(SubscriptionInfo info)
 	{

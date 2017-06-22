@@ -107,7 +107,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean isSuperpeer()
 	{
-		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
+		return false;
+//		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
 	}
 	
 //	/**
@@ -400,37 +401,37 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public IComponentIdentifier getSuperpeerSync()
 	{
-		long ct = System.currentTimeMillis();
-		if(superpeer==null && searchtime<ct)
-		{
-			synchronized(this)
-			{
-				if(superpeer==null && searchtime<ct)
-				{
-					// Ensure that a delay is waited between searches
-					searchtime = ct+delay;
-					searchSuperpeer().addResultListener(new IResultListener<IComponentIdentifier>()
-					{
-						public void resultAvailable(IComponentIdentifier result)
-						{
-							System.out.println("Found superpeer: "+result);
-							superpeer = result;
-							
-							// initiating 
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							System.out.println("No superpeer found");
-						}
-					});
-				}
-				else
-				{
-					System.out.println("No superpeer search: "+searchtime+" "+ct);
-				}
-			}
-		}
+//		long ct = System.currentTimeMillis();
+//		if(superpeer==null && searchtime<ct)
+//		{
+//			synchronized(this)
+//			{
+//				if(superpeer==null && searchtime<ct)
+//				{
+//					// Ensure that a delay is waited between searches
+//					searchtime = ct+delay;
+//					searchSuperpeer().addResultListener(new IResultListener<IComponentIdentifier>()
+//					{
+//						public void resultAvailable(IComponentIdentifier result)
+//						{
+//							System.out.println("Found superpeer: "+result);
+//							superpeer = result;
+//							
+//							// initiating 
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							System.out.println("No superpeer found");
+//						}
+//					});
+//				}
+//				else
+//				{
+//					System.out.println("No superpeer search: "+searchtime+" "+ct);
+//				}
+//			}
+//		}
 			
 		return superpeer;
 	}
@@ -1992,7 +1993,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
 													.executeRemoteSearch(platid, query);
 											}
-										}).addResultListener(new DelegationResultListener<Set<T>>(remotesearch));
+										}).addResultListener(new DelegationResultListener<Set<T>>(remotesearch)
+										{
+											@Override
+											public void customResultAvailable(Set<T> result)
+											{
+												System.out.println("Remote results: "+result);
+												super.customResultAvailable(result);
+											}
+										});
 									}
 									catch(Exception e)
 									{

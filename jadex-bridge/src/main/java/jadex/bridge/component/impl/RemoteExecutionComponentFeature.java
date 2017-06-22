@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.component.impl.remotecommands.ResultCommand;
 import jadex.bridge.service.search.ServiceQuery;
@@ -141,7 +144,18 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		return execute(target, new RemoteSearchCommand<T>(query));
 	}
 
-	
+	/**
+	 *  Invoke a method on a remote object.
+	 *  @param ref	The target reference.
+	 *  @param method	The method to be executed.
+	 *  @param args	The arguments.
+	 *  @return	The result(s) of the method invocation, if any. Connects any futures involved.
+	 */
+	public Object	executeRemoteMethod(RemoteReference ref, Method method, Object[] args)
+	{
+		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand(ref.getTargetIdentifier(), method, args));
+	}
+
 	/**
 	 *  Sends RX message.
 	 *  
@@ -167,7 +181,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
 			boolean ret = false;
-			if (msg instanceof IRemoteCommand && header.getProperty(RX_ID) instanceof String)
+			if( (msg instanceof IRemoteCommand || msg instanceof IRemoteConversationCommand) && header.getProperty(RX_ID) instanceof String)
 			{
 				if (secinfos.isTrustedPlatform() ||
 					(secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass())))
@@ -209,14 +223,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				{
 					public void intermediateResultAvailable(Object result)
 					{
-//							System.out.println("inter: "+result);
+							System.out.println("inter: "+result);
 //							ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), result, callid, 
 //								returnisref, methodname, false, getNFProps(true), (IFuture<?>)res, cnt++));
 					}
 					
 					public void finished()
 					{
-//							System.out.println("fin");
+							System.out.println("fin");
 //							ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), null, callid, 
 //								returnisref, methodname, true, getNFProps(false), (IFuture<?>)res, cnt));
 //							ret.setFinished();
@@ -227,12 +241,24 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					{
 						commands.remove(rxid);
 						ResultCommand<?> rc = new ResultCommand(result);
-						sendRxMessage(remote, rxid, rc);
+						sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
+						{
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+							}
+							
+							@Override
+							public void resultAvailable(Void result)
+							{
+							}
+						});
 					}
 					
 					public void resultAvailable(Collection result)
 					{
-//							System.out.println("ra");
+							System.out.println("ra: "+result);
 //							ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
 //								returnisref, methodname, getNFProps(false)));
 //							ret.setFinished();

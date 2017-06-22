@@ -2219,7 +2219,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  Find the class loader for a new (local) component.
 	 *  Use parent component class loader for local parents
 	 *  and current platform class loader for remote or no parents.
-	 *  @param cid	The component id.
+	 *  @param platform	The component id.
 	 *  @return	The class loader.
 	 */
 	protected IFuture<IResourceIdentifier>	getResourceIdentifier(final CreationInfo ci)
@@ -2312,7 +2312,7 @@ public class ComponentManagementService implements IComponentManagementService
 	
 	/**
 	 *  Get the parent component of a component.
-	 *  @param cid The component identifier.
+	 *  @param platform The component identifier.
 	 *  @return The parent component identifier.
 	 */
 	public IComponentIdentifier getParentIdentifier(CreationInfo ci)
