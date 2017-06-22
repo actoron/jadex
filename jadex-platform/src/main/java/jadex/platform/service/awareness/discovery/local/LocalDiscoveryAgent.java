@@ -79,7 +79,6 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		System.out.println("Strated LocalDisc");
 		if(!DISCOVERY_DIR.exists())
 		{
 			DISCOVERY_DIR.mkdirs();

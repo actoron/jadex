@@ -21,6 +21,7 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.platform.service.message.transport.codecs.GZIPCodec;
@@ -438,7 +439,7 @@ public class SerializationServices implements ISerializationServices
 				try
 				{
 					@SuppressWarnings("unchecked")
-					Map<String, Object>	header	= (Map<String, Object>)((IEncodingContext)context).getUserContext();
+					Map<String, Object>	header	= (Map<String, Object>)((IUserContextContainer)context).getUserContext();
 					IComponentIdentifier receiver = (IComponentIdentifier)header.get(IMsgHeader.RECEIVER);
 					Object ret = rrm.getProxyReference(object, receiver, targetcl);
 					return ret;

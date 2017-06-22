@@ -1,33 +1,18 @@
 package jadex.platform.service.security.auth;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.ContentVerifier;
-import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.util.Pack;
 import org.bouncycastle.util.io.pem.PemObject;
 
@@ -105,7 +90,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			if (!aps.canSign())
 				throw new IllegalArgumentException("Secret cannot be used to sign: " + aps);
 			
-			byte[] sig = signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
+			byte[] sig = SSecurity.signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
 			ret = new byte[sig.length + SALT_SIZE + 8];
 			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
 			System.arraycopy(salt, 0, ret, 8, salt.length);
@@ -171,7 +156,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				byte[] sig = new byte[authtoken.length - 8 - salt.length];
 				System.arraycopy(authtoken, 8 + salt.length, sig, 0, sig.length);
 				
-				verifyWithPEM(msghash, sig, aps.openTrustAnchorCert());
+				SSecurity.verifyWithPEM(msghash, sig, aps.openTrustAnchorCert());
 			}
 			else
 			{
@@ -183,167 +168,6 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Sign using a PEM-encoded X.509 certificate/key.
-	 * 
-	 *  @param msghash The message hash.
-	 *  @param pemcert The PEM certificate.
-	 *  @param pemkey The PEM key.
-	 *  @return Signature.
-	 */
-	protected static final byte[] signWithPEM(byte[] msghash, InputStream pemcert, InputStream pemkey)
-	{
-		byte[] ret = null;
-		try
-		{
-			byte[] certdata = SUtil.readStream(pemcert);
-			pemcert.close();
-			PEMParser pemparser = new PEMParser(new InputStreamReader(new ByteArrayInputStream(certdata), SUtil.UTF8));
-			X509CertificateHolder cert = new X509CertificateHolder(pemparser.readPemObject().getContent());
-			pemparser.close();
-			
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			GZIPOutputStream gos = new GZIPOutputStream(baos);
-			gos.write(certdata);
-			gos.close();
-			certdata = baos.toByteArray();
-			
-			pemparser = new PEMParser(new InputStreamReader(pemkey, SUtil.UTF8));
-			JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
-			Object o = null;
-			do
-			{
-				o = pemparser.readObject();
-			}
-			while (!(o instanceof PEMKeyPair) && o != null);
-			PrivateKey privatekey = jpkc.getPrivateKey(((PEMKeyPair) o).getPrivateKeyInfo());
-			pemparser.close();
-			
-			DefaultAlgorithmNameFinder algfinder = new DefaultAlgorithmNameFinder();
-			JcaContentSignerBuilder signerbuilder = new JcaContentSignerBuilder(algfinder.getAlgorithmName(cert.getSignatureAlgorithm()));
-			ContentSigner signer = signerbuilder.build(privatekey);
-			signer.getOutputStream().write(msghash);
-			signer.getOutputStream().close();
-			
-			byte[] sig = signer.getSignature();
-			
-			ret = SUtil.mergeData(certdata, sig);
-		}
-		catch (Exception e)
-		{
-			Logger.getLogger("authentication").info("Signature creation failed: " + e.toString());
-		}
-		finally
-		{
-			try
-			{
-				pemcert.close();
-			}
-			catch (Exception e)
-			{
-			}
-			
-			try
-			{
-				pemkey.close();
-			}
-			catch (Exception e)
-			{
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Verify using a PEM-encoded X.509 certificate/key.
-	 * 
-	 *  @param msghash The message hash.
-	 *  @param token The authentication token.
-	 *  @param trustedpemcert The PEM certificate trust anchor.
-	 *  @return True, if the certificate chain and signature is valid.
-	 */
-	protected static final boolean verifyWithPEM(byte[] msghash, byte[] token, InputStream trustedpemcert)
-	{
-		try
-		{
-			Date now = new Date();
-			PEMParser pemparser = new PEMParser(new InputStreamReader(trustedpemcert, SUtil.UTF8));
-			PemObject object = pemparser.readPemObject();
-			X509CertificateHolder trustedcrtholder = new X509CertificateHolder(((PemObject) object).getContent());
-			pemparser.close();
-			if (!trustedcrtholder.isValidOn(now))
-				return false;
-			
-			List<byte[]> splitdata = SUtil.splitData(token);
-			if (splitdata.size() != 2)
-				return false;
-			
-			byte[] certdata = splitdata.get(0);
-			ByteArrayInputStream bais = new ByteArrayInputStream(certdata);
-			GZIPInputStream gis = new GZIPInputStream(bais);
-			certdata = SUtil.readStream(gis);
-			byte[] sig = splitdata.get(1);
-			
-			pemparser = new PEMParser(new InputStreamReader(new ByteArrayInputStream(certdata), SUtil.UTF8));
-			List<X509CertificateHolder> certchain = new ArrayList<X509CertificateHolder>();
-			object = pemparser.readPemObject();
-			while (object != null)
-			{
-				X509CertificateHolder crtholder = new X509CertificateHolder(((PemObject) object).getContent());
-				certchain.add(crtholder);
-				object = pemparser.readPemObject();
-			}
-			pemparser.close();
-			pemparser = null;
-			
-			// Verify certificate chain
-			JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
-			for (int i = 0; i < certchain.size() - 1; ++i)
-			{
-				X509CertificateHolder signedcert = certchain.get(i);
-				X509CertificateHolder signercert = certchain.get(i + 1);
-				if (!signedcert.isValidOn(now) || !signercert.isValidOn(now))
-					return false;
-				
-				BasicConstraints bc = BasicConstraints.fromExtensions(signercert.getExtensions());
-				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
-					return false;
-				
-				if (!signedcert.isSignatureValid(jcvpb.build(signercert)))
-					return false;
-			}
-			
-			// Verify the last chain link is signed by trust anchor.
-			if (!certchain.get(certchain.size() - 1).isSignatureValid(jcvpb.build(trustedcrtholder)))
-				return false;
-			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
-			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
-				return false;
-			
-			// Verify signature
-			ContentVerifier cv = jcvpb.build(certchain.get(0)).get(certchain.get(0).getSignatureAlgorithm());
-			cv.getOutputStream().write(msghash);
-			cv.getOutputStream().close();
-			return cv.verify(sig);
-		}
-		catch (Exception e)
-		{
-			Logger.getLogger("authentication").info("Verification failed: " + e.toString());
-		}
-		finally
-		{
-			try
-			{
-				trustedpemcert.close();
-			}
-			catch (Exception e)
-			{
-			}
-		}
-		return false;
 	}
 	
 	/**
@@ -368,8 +192,8 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	public static void main(String[] args) throws Exception
 	{
 		String home = System.getProperty("user.home") + File.separator;
-		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "rsa.pem"), new FileInputStream(home + "rsa.key"));
-		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "rootCA.pem")));
+		byte[] tsig = SSecurity.signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "rsa.pem"), new FileInputStream(home + "rsa.key"));
+		System.out.println("VerifyTest: " + SSecurity.verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "rootCA.pem")));
 //		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "test.pem"), new FileInputStream(home + "test.key"));
 //		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "trusted.pem")));
 		System.out.println("TSIGLEN " + tsig.length);
