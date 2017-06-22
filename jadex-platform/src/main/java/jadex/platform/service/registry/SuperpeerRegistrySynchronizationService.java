@@ -384,7 +384,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				public void execute(IComponentIdentifier cid) 
 				{
 					System.out.println("Removed peer: "+cid);
+					
+					// Remove services and queries of client
 					getRegistry().removeServices(cid);
+					getRegistry().removeQueriesFromPlatform(cid);
 				}
 			}, false, true, new AgentDelayRunner(component), false);
 			
@@ -462,7 +465,11 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				{
 					System.out.println("Remove subscription of: "+entry.getPlatformId());
 //					getRegistry().removeSubregistry(entry.getPlatformId());
+					
+					// Remove services of other superpeer
 					getRegistry().removeServices(entry.getPlatformId());
+					// Necessary?! Should not have queries of other superpeers
+					getRegistry().removeQueriesFromPlatform(entry.getPlatformId()); 
 				}
 			}, new AgentDelayRunner(component), false, null);
 		}

@@ -150,6 +150,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 							public void customResultAvailable(IComponentIdentifier result)
 							{
 								superpeer = result;
+								addQueriesToNewSuperpeer();
 								super.customResultAvailable(result);
 							}
 						});
@@ -170,13 +171,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
-	 *  Adapt the existing queries to a new superpeer, i.e. remove from old and add to new.
+	 *  Adapt the existing queries to a new superpeer.
+	 *  (Needs not to remove from old superpeer to to lease time cleanup).
 	 */
-	protected IFuture<Void> adaptQueriesToNewSuperpeer(final IComponentIdentifier oldsp, final IComponentIdentifier newsp)
+	protected void addQueriesToNewSuperpeer()
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(oldsp!=newsp && newsp!=null)
+		if(superpeer!=null)
 		{
 			// get all queries in which the superpeer was set
 			final Set<ServiceQueryInfo<?>> aqs = queries.getQueries(new IFilter<ServiceQueryInfo<?>>()
@@ -187,112 +187,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				}
 			});
 			
-			final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-			if(rms!=null)
+			for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
 			{
-				final Future<Void> remfut = new Future<Void>(); 
-				final Future<Void> addfut = new Future<Void>(); 
-				
-				if(oldsp!=null)
-				{
-					rms.getExternalAccessProxy(oldsp).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(remfut)
-					{
-						public void customResultAvailable(IExternalAccess result) throws Exception
-						{
-							try
-							{
-								result.scheduleStep(new IComponentStep<Void>()
-								{
-									@Classname("removeQueriesOnSuperpeer")
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-										
-										FutureBarrier<Void> bar = new FutureBarrier<Void>();
-										for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
-										{
-											bar.addFuture(reg.removeQuery((ServiceQuery)it.next().getQuery()));
-										}
-										
-										return bar.waitFor();
-									}
-								}).addResultListener(new DelegationResultListener<Void>(remfut));
-							}
-							catch(Exception e)
-							{
-								ret.setException(e);
-							}
-						}
-					});
-				}
-				else
-				{
-					remfut.setResult(null);
-				}
-				
-				rms.getExternalAccessProxy(newsp).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(addfut)
-				{
-					public void customResultAvailable(IExternalAccess result) throws Exception
-					{
-						try
-						{
-							result.scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("addQueriesOnSuperpeer")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-									
-									FutureBarrier<Void> bar = new FutureBarrier<Void>();
-									for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
-									{
-										bar.addFuture(reg.addQuery((ServiceQuery)it.next().getQuery()));
-									}
-									
-									return bar.waitFor();
-								}
-							}).addResultListener(new DelegationResultListener<Void>(addfut));
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-					}
-				});
-				
-				FutureBarrier<Void> bar = new FutureBarrier<Void>();
-				bar.addFuture(addfut);
-				bar.addFuture(remfut);
-				bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						// Change the superpeer to the new
-						for(Iterator<ServiceQueryInfo<?>> it = aqs.iterator(); it.hasNext();)
-						{
-							it.next().setSuperpeer(newsp);
-						}
-					}
-				});
-			}
-			else
-			{
-				ret.setException(new RuntimeException("RMS not found"));
+				ServiceQueryInfo<?> query = it.next();
+				ISubscriptionIntermediateFuture<?> rfut = addQueryOnPlatform(superpeer, query);
+				query.setRemoteFuture((ISubscriptionIntermediateFuture)rfut);	
 			}
 		}
-		else
-		{
-			if(newsp==null)
-			{
-				ret.setException(new RuntimeException("New super peer must not null"));
-			}
-			else
-			{
-				ret.setResult(null);
-			}
-		}
-		
-		return ret;
 	}
 	
 	/**
@@ -413,7 +314,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 						{
 							System.out.println("Found superpeer: "+result);
 							superpeer = result;
-							
+							addQueriesToNewSuperpeer();
 							// initiating 
 						}
 						
@@ -684,6 +585,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Get all services.
+	 *  @return All services (copy).
+	 */
+	public Set<IService> getAllServices()
+	{
+		return indexer.getAllServices();
+	}
+	
+	/**
 	 *  Search for services.
 	 */
 	// read
@@ -764,7 +674,6 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-//		final UnlimitedIntermediateDelegationResultListener<T> lis = new UnlimitedIntermediateDelegationResultListener<T>(ret);
 		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
@@ -1108,6 +1017,64 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		
 		if(qinfos != null)
+		{
+			FutureBarrier<Void> bar = new FutureBarrier<Void>();
+			
+			for(ServiceQueryInfo<?> qinfo : qinfos)
+			{
+				qinfo.getFuture().setFinished();
+				
+				if(qinfo.getSuperpeer()!=null)
+					bar.addFuture(removeQueryFromSuperpeer(qinfo));
+			}
+			
+			bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove all service queries of a specific platform from the registry.
+	 *  @param platform The platform from which the query owner comes.
+	 */
+	// write
+	public IFuture<Void> removeQueriesFromPlatform(IComponentIdentifier platform)
+	{
+		Future<Void> ret = new Future<Void>();
+		
+		rwlock.writeLock().lock();
+		Set<ServiceQueryInfo<?>> qinfos = new HashSet<ServiceQueryInfo<?>>();
+		try
+		{
+			// todo: Should use index to find all services of a platform
+			Set<ServiceQueryInfo<?>> allqs = queries.getAllQueries();
+			if(allqs != null)
+			{
+				for(ServiceQueryInfo<?> qinfo : allqs)
+				{
+					if(qinfo.getQuery().getOwner().getRoot().equals(platform))
+					{
+						queries.removeQuery(qinfo.getQuery());
+						qinfos.add(qinfo);
+					}
+				}
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		if(!qinfos.isEmpty())
 		{
 			FutureBarrier<Void> bar = new FutureBarrier<Void>();
 			

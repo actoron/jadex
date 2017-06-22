@@ -290,6 +290,28 @@ public class ClassInfo
 		return ret;
 	}
 	
+	/**
+	 *  Get class info in class name notation, i.e. String 
+	 */
+	public String getClassNameOnly()
+	{
+		String ret = null;
+		if(getTypeName()!=null)
+		{
+			String fn = getTypeName();
+			int idx = fn.lastIndexOf(".");
+			if(idx!=-1)
+			{
+				ret = fn.substring(idx+1);
+			}
+			else
+			{
+				ret = fn;
+			}
+		}
+		return ret;
+	}
+	
 //	/**
 //	 *  Main for testing
 //	 */

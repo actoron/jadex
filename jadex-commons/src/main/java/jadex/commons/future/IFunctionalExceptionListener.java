@@ -7,7 +7,6 @@ package jadex.commons.future;
 // @FunctionalInterface // this is a functional interface in java 8
 public interface IFunctionalExceptionListener
 {
-	
 	/**
 	 *  Called when an exception occurred.
 	 *  @param exception The exception.

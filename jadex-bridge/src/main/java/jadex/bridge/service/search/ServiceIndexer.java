@@ -14,6 +14,9 @@ import java.util.Set;
 //import jadex.bridge.service.IService;
 import jadex.commons.Tuple2;
 
+/**
+ *  Indexer for services.
+ */
 public class ServiceIndexer<T>
 {
 	/** Cutoff value for building index set intersections. */
@@ -28,6 +31,9 @@ public class ServiceIndexer<T>
 	/** The index of published services. */
 	protected Map<String, Map<String, Set<T>>> indexedservices = new HashMap<String, Map<String, Set<T>>>();
 	
+	/**
+	 *  Create a new ServiceIndexer.
+	 */
 	public ServiceIndexer(IKeyExtractor keyextractor, String... indextypes)
 	{
 		this.keyextractor = keyextractor;

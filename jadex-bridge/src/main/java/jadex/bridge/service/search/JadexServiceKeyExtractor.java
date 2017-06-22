@@ -14,6 +14,9 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 
+/**
+ *  Responsible for extracting values.
+ */
 public class JadexServiceKeyExtractor implements IKeyExtractor
 {
 	/** Key type for the service interface. */
