@@ -3,9 +3,11 @@ description 'Common security support classes.'
 dependencies
 {
 	compile project(':jadex-commons')
-	compile 'com.madgag.spongycastle:core:1.54.0.0'
-	compile 'com.madgag.spongycastle:prov:1.54.0.0'
-	compile 'com.madgag.spongycastle:pkix:1.54.0.0'
+//	compile 'com.madgag.spongycastle:core:1.54.0.0'
+//	compile 'com.madgag.spongycastle:prov:1.54.0.0'
+//	compile 'com.madgag.spongycastle:pkix:1.54.0.0'
+	compile 'org.bouncycastle:bcprov-jdk15on:1.57'
+	compile 'org.bouncycastle:bcpkix-jdk15on:1.57'
 	compile 'net.java.dev.jna:jna:4.4.0'
 	compile 'net.java.dev.jna:jna-platform:4.4.0'
 }

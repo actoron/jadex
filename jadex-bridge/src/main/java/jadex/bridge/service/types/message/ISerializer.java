@@ -27,7 +27,7 @@ public interface ISerializer
 	 *  @param preproc The encoding preprocessors.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs);
+	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext);
 	
 	/**
 	 *  Decode data with the serializer.
@@ -35,13 +35,13 @@ public interface ISerializer
 	 *  @return The decoded object.
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader);
-	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep);
+	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext);
 	
 	/**
 	 *  Decode an object.
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep);
+	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext);
 	
 }

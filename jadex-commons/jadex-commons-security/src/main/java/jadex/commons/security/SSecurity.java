@@ -32,15 +32,15 @@ import java.util.List;
 import javax.crypto.interfaces.DHKey;
 import javax.security.auth.x500.X500Principal;
 
-import org.spongycastle.crypto.Mac;
-import org.spongycastle.crypto.digests.SHA512Digest;
-import org.spongycastle.crypto.engines.AESFastEngine;
-import org.spongycastle.crypto.macs.HMac;
-import org.spongycastle.crypto.prng.EntropySource;
-import org.spongycastle.crypto.prng.EntropySourceProvider;
-import org.spongycastle.crypto.prng.SP800SecureRandomBuilder;
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.x509.X509V1CertificateGenerator;
+import org.bouncycastle.crypto.Mac;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.prng.EntropySource;
+import org.bouncycastle.crypto.prng.EntropySourceProvider;
+import org.bouncycastle.crypto.prng.SP800SecureRandomBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.x509.X509V1CertificateGenerator;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
@@ -194,7 +194,7 @@ public class SSecurity
 		List<SecureRandom> prngs = new ArrayList<SecureRandom>();
 		
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
-		AESFastEngine eng = new AESFastEngine();
+		AESEngine eng = new AESEngine();
 		prngs.add(builder.buildCTR(eng, 256, nonceprovider.get(256).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		

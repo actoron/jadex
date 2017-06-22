@@ -36,8 +36,8 @@ public class RmsMessageFeature extends MicroMessageComponentFeature
 	@SuppressWarnings("unchecked")
 	protected Tuple2<Map<String, Object>, Object> deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
-		IComponentIdentifier callreceiver = (IComponentIdentifier) ((MsgHeader) header).getEndToEndProperty(RemoteServiceManagementAgent.CALL_RECEIVER);
+		IComponentIdentifier callreceiver = (IComponentIdentifier) ((MsgHeader) header).getProperty(RemoteServiceManagementAgent.CALL_RECEIVER);
 		ClassLoader cl = callreceiver == null ? component.getClassLoader() : SComponentManagementService.getLocalClassLoader(callreceiver);		
-		return  (Tuple2<Map<String, Object>, Object>) getSerializationServices(platformid).decode(cl, serializedmsg);
+		return  (Tuple2<Map<String, Object>, Object>) getSerializationServices(platformid).decode(header, cl, serializedmsg);
 	}
 }

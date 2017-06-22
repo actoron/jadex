@@ -30,6 +30,8 @@ public class JsonWriteContext implements IRootObjectContext
 	
 	protected Object currentinputobject;
 	
+	protected Object usercontext;
+	
 	/**
 	 *  Get the rootobject.
 	 *  @return the rootobject.
@@ -200,6 +202,24 @@ public class JsonWriteContext implements IRootObjectContext
 	public boolean isWriteId() 
 	{
 		return writeid;
+	}
+	
+	/**
+	 *  Returns the user context.
+	 *  @return The user context.
+	 */
+	public Object getUserContext()
+	{
+		return usercontext;
+	}
+	
+	/**
+	 *  Sets the user context.
+	 *  @param usercontext The user context.
+	 */
+	public void setUserContext(Object usercontext)
+	{
+		this.usercontext = usercontext;
 	}
 
 	/**

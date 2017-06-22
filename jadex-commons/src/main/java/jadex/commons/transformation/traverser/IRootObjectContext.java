@@ -4,7 +4,7 @@ package jadex.commons.transformation.traverser;
  *  Context containing the origina root object.
  *
  */
-public interface IRootObjectContext
+public interface IRootObjectContext extends IUserContextContainer
 {
 	/**
 	 *  Get the rootobject.

@@ -242,10 +242,10 @@ public class JadexBinarySerializer implements ISerializer
 	 *  @param preproc The encoding preprocessors.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs)
+	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, null, classloader, CONFIG);
+		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, usercontext, classloader, CONFIG);
 		
 		byte[] ret = baos.toByteArray();
 		
@@ -261,7 +261,7 @@ public class JadexBinarySerializer implements ISerializer
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep)
+	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		if(DEBUG)
 		{
@@ -280,8 +280,18 @@ public class JadexBinarySerializer implements ISerializer
 	 */
 	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep)
 	{
+		return decode(is, classloader, postprocs, rep, null);
+	}
+	
+	/**
+	 *  Decode an object.
+	 *  @return The decoded object.
+	 *  @throws IOException
+	 */
+	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
+	{
 		
-		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, null, classloader, null, CONFIG);
+		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, CONFIG);
 		
 		try
 		{

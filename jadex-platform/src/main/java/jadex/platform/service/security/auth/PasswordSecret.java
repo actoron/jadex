@@ -2,7 +2,7 @@ package jadex.platform.service.security.auth;
 
 import java.util.logging.Logger;
 
-import org.spongycastle.crypto.generators.SCrypt;
+import org.bouncycastle.crypto.generators.SCrypt;
 
 import jadex.commons.SUtil;
 

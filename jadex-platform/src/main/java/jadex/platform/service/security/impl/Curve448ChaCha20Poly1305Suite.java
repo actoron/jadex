@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.spongycastle.crypto.digests.Blake2bDigest;
-import org.spongycastle.crypto.engines.ChaChaEngine;
-import org.spongycastle.crypto.generators.Poly1305KeyGenerator;
-import org.spongycastle.crypto.macs.Poly1305;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.util.Pack;
+import org.bouncycastle.crypto.digests.Blake2bDigest;
+import org.bouncycastle.crypto.engines.ChaChaEngine;
+import org.bouncycastle.crypto.generators.Poly1305KeyGenerator;
+import org.bouncycastle.crypto.macs.Poly1305;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.util.Pack;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;

@@ -2,7 +2,7 @@ package jadex.platform.service.security.impl;
 
 import java.util.logging.Logger;
 
-import org.spongycastle.util.Pack;
+import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -93,7 +93,7 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage)
 	{
 		secinf = new MsgSecurityInfos();
-		secinf.setAuthplatform(true);
+		secinf.setAuthenticatedPlatform(true);
 		secinf.setTrustedPlatform(true);
 		secinf.setNetworks(agent.getNetworks().keySet().toArray(new String[agent.getNetworks().size()]));
 		

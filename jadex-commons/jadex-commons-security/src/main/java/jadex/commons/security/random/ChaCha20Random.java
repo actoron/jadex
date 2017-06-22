@@ -1,10 +1,9 @@
 package jadex.commons.security.random;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 
-import org.spongycastle.crypto.engines.ChaChaEngine;
-import org.spongycastle.util.Pack;
+import org.bouncycastle.crypto.engines.ChaChaEngine;
+import org.bouncycastle.util.Pack;
 
 import jadex.commons.SUtil;
 import jadex.commons.security.SSecurity;

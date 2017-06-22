@@ -262,8 +262,17 @@ public class JsonTraverser extends Traverser
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors)
 	{
+		return objectToByteArray(val, classloader, enc, writeclass, writeid, excludes, conversionprocessors, conversionprocessors, null);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, String enc, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Object usercontext)
+	{
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
+		wr.setUserContext(usercontext);
 		
 		try
 		{
@@ -396,9 +405,20 @@ public class JsonTraverser extends Traverser
 	 */
 	public static <T> T objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc, Class<T> clazz,  List<ITraverseProcessor> procs, List<ITraverseProcessor> postprocs)
 	{
+		return objectFromByteArray(val, classloader, rep, enc, clazz, procs, postprocs, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep, String enc, Class<T> clazz,  List<ITraverseProcessor> procs, List<ITraverseProcessor> postprocs, Object usercontext)
+	{
 		try
 		{
-			return objectFromString(enc==null? new String(val, SUtil.UTF8): new String(val, enc), classloader, rep, clazz, procs, postprocs);
+			return objectFromString(enc==null? new String(val, SUtil.UTF8): new String(val, enc), classloader, rep, clazz, procs, postprocs, usercontext);
 		}
 		catch(UnsupportedEncodingException e)
 		{
@@ -448,6 +468,18 @@ public class JsonTraverser extends Traverser
 	@SuppressWarnings("unchecked")
 	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors, List<ITraverseProcessor> postprocessors)
 	{
+		return objectFromString(val, classloader, rep, clazz, processors, postprocessors, null);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors, List<ITraverseProcessor> postprocessors, Object usercontext)
+	{
 		rep = rep==null? DefaultErrorReporter.DEFAULT_ERROR_REPORTER: rep;
 		
 		try
@@ -455,6 +487,7 @@ public class JsonTraverser extends Traverser
 			JsonValue value = Json.parse(val);
 			JsonTraverser traverser = getReadTraverser();
 			JsonReadContext rc = new JsonReadContext();
+			rc.setUserContext(usercontext);
 			Object ret = traverser.traverse(value, clazz, postprocessors, processors!=null? processors: readprocs, Traverser.MODE.POSTPROCESS, classloader, rc);
 //			Object ret = traverser.traverse(value, clazz, null, processors!=null? processors: readprocs, postprocessors, classloader, rc);
 	//		System.out.println("rc: "+rc.knownobjects);

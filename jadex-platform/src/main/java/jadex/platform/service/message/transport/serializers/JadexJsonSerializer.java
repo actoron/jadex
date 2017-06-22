@@ -70,9 +70,9 @@ public class JadexJsonSerializer implements ISerializer
 	 *  @param preproc The encoding preprocessors.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs)
+	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext)
 	{
-		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, true, true, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs);
+		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, true, true, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext);
 		
 		if(DEBUG)
 		{
@@ -86,13 +86,13 @@ public class JadexJsonSerializer implements ISerializer
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep)
+	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		if(DEBUG)
 		{
 			System.out.println("decode message: "+(new String((byte[])bytes, SUtil.UTF8)));
 		}
-		return JsonTraverser.objectFromByteArray(bytes, classloader, rep, null, null, readprocs, postprocs!=null?Arrays.asList(postprocs):null);
+		return JsonTraverser.objectFromByteArray(bytes, classloader, rep, null, null, readprocs, postprocs!=null?Arrays.asList(postprocs):null, usercontext);
 	}
 	
 	/**
@@ -100,7 +100,7 @@ public class JadexJsonSerializer implements ISerializer
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep)
+	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		
 		byte[] bytes = null;
@@ -122,7 +122,7 @@ public class JadexJsonSerializer implements ISerializer
 		}
 		
 		
-		return decode(bytes, classloader, postprocs, rep);
+		return decode(bytes, classloader, postprocs, rep, usercontext);
 	}
 	
 	protected static class JsonByteArrayWriteProcessor implements ITraverseProcessor

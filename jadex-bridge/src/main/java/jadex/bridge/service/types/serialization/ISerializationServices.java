@@ -32,7 +32,7 @@ public interface ISerializationServices
 	 *  @return Object to be encoded.
 	 *  
 	 */
-	public Object decode(ClassLoader cl, byte[] enc);
+	public Object decode(IMsgHeader header, ClassLoader cl, byte[] enc);
 	
 	/**
 	 *  Gets the remote reference management.

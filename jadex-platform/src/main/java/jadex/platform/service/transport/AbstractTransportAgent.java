@@ -156,7 +156,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						if(tup.getSecondEntity() != null)
 						{
 							// Then decode header and deliver to receiver agent.
-							final IMsgHeader header = (IMsgHeader)codec.decode(agent.getClassLoader(), tup.getSecondEntity());
+							final IMsgHeader header = (IMsgHeader)codec.decode(null, agent.getClassLoader(), tup.getSecondEntity());
 							final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 
 							cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()

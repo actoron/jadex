@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import jadex.commons.transformation.traverser.IUserContextContainer;
+
 /**
  * 
  */
-public class JsonReadContext
+public class JsonReadContext implements IUserContextContainer
 {
 	/** Already known objects */
 //	protected Map<Integer, Object> idobjects = new HashMap<Integer, Object>();
@@ -15,6 +17,8 @@ public class JsonReadContext
 	protected Map<Integer, Object> idobjects = new HashMap<Integer, Object>();
 	
 	protected LinkedList<Integer> idstack = new LinkedList<Integer>();
+	
+	protected Object usercontext;
 	
 //	/** Flag if next object should be ignored in known objects. */
 //	public boolean ignorenext;
@@ -68,6 +72,24 @@ public class JsonReadContext
 	public void setKnownObject(int num, Object obj)
 	{
 		idobjects.put(num, obj);
+	}
+	
+	/**
+	 *  Returns the user context.
+	 *  @return The user context.
+	 */
+	public Object getUserContext()
+	{
+		return usercontext;
+	}
+	
+	/**
+	 *  Sets the user context.
+	 *  @param usercontext The user context.
+	 */
+	public void setUserContext(Object usercontext)
+	{
+		this.usercontext = usercontext;
 	}
 
 //	/**

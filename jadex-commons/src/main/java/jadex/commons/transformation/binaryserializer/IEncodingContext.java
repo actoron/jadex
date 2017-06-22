@@ -25,12 +25,6 @@ public interface IEncodingContext extends IRootObjectContext
 	public ClassLoader getClassLoader();
 	
 	/**
-	 *  Returns the user context.
-	 *  @return The user context.
-	 */
-	public Object getUserContext();
-	
-	/**
 	 *  Returns the non-inner class cache.
 	 *  @return The non-inner class cache.
 	 */

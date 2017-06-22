@@ -472,7 +472,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected Object deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
-		return getSerializationServices(platformid).decode(component.getClassLoader(), serializedmsg);
+		return getSerializationServices(platformid).decode(header, component.getClassLoader(), serializedmsg);
 	}
 	
 	/**

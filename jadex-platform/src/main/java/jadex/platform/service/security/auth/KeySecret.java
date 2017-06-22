@@ -2,7 +2,7 @@ package jadex.platform.service.security.auth;
 
 import java.util.logging.Logger;
 
-import org.spongycastle.crypto.digests.Blake2bDigest;
+import org.bouncycastle.crypto.digests.Blake2bDigest;
 
 import jadex.commons.Base64;
 import jadex.commons.SUtil;

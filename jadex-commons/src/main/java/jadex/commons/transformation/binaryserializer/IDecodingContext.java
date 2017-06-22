@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.IUserContextContainer;
 
 /**
  *  Decoding context interface.
  *
  */
-public interface IDecodingContext
+public interface IDecodingContext extends IUserContextContainer
 {
 	/**
 	 *  Gets the current class name.

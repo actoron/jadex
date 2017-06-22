@@ -10,7 +10,6 @@ import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
@@ -103,7 +102,7 @@ public class SerializationServices implements ISerializationServices
 	{
 		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
 		ISerializer serial = getSendSerializer(receiver);
-		byte[] enc = serial.encode(obj, cl, getPreprocessors());
+		byte[] enc = serial.encode(obj, cl, getPreprocessors(), header);
 		
 		ICodec[] codecs = getSendCodecs(receiver);
 		if (header == obj)
@@ -137,10 +136,11 @@ public class SerializationServices implements ISerializationServices
 	 *  
 	 *  @param cl The classloader used for decoding.
 	 *  @param enc Encoded object.
+	 *  @param header The header object if available, null otherwise.
 	 *  @return Object to be encoded.
 	 *  
 	 */
-	public Object decode(ClassLoader cl, byte[] enc)
+	public Object decode(IMsgHeader header, ClassLoader cl, byte[] enc)
 	{
 		Object ret = null;
 		
@@ -173,7 +173,7 @@ public class SerializationServices implements ISerializationServices
 					}
 					
 					ISerializer serial = getSerializers().get(SUtil.bytesToInt(enc, 2));
-					ret = serial.decode(raw, cl, getPostprocessors(), null);
+					ret = serial.decode(raw, cl, getPostprocessors(), null, header);
 				}
 			}
 			catch (IndexOutOfBoundsException e)
