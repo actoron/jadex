@@ -439,8 +439,8 @@ public class SerializationServices implements ISerializationServices
 				try
 				{
 					@SuppressWarnings("unchecked")
-					Map<String, Object>	header	= (Map<String, Object>)((IUserContextContainer)context).getUserContext();
-					IComponentIdentifier receiver = (IComponentIdentifier)header.get(IMsgHeader.RECEIVER);
+					IMsgHeader	header	= (IMsgHeader)((IUserContextContainer)context).getUserContext();
+					IComponentIdentifier receiver = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 					Object ret = rrm.getProxyReference(object, receiver, targetcl);
 					return ret;
 //					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
