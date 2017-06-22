@@ -10,7 +10,6 @@ import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -20,7 +19,7 @@ import jadex.bridge.service.types.serialization.IRemoteReferenceManagement;
 import jadex.bridge.service.types.serialization.IRemoteReferenceModule;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.traverser.IRootObjectContext;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
@@ -32,7 +31,6 @@ import jadex.platform.service.message.transport.serializers.JadexBinarySerialize
 import jadex.platform.service.message.transport.serializers.JadexJsonSerializer;
 import jadex.platform.service.remote.ProxyReference;
 import jadex.platform.service.remote.RemoteReferenceModule;
-import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 
 /**
  *  Functionality for managing serialization.
@@ -439,7 +437,9 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
-					IComponentIdentifier receiver = getRCFromContext(context).getReceiver();
+					@SuppressWarnings("unchecked")
+					Map<String, Object>	header	= (Map<String, Object>)((IEncodingContext)context).getUserContext();
+					IComponentIdentifier receiver = (IComponentIdentifier)header.get(IMsgHeader.RECEIVER);
 					Object ret = rrm.getProxyReference(object, receiver, targetcl);
 					return ret;
 //					return rrm.getProxyReference(object, receiver, ((IEncodingContext)context).getClassLoader());
@@ -518,13 +518,6 @@ public class SerializationServices implements ISerializationServices
 	{
 		// prefixsize[2] | serializerid[4] | codeccount[2] | codecid[4]...
 		return 8 + (codeccount << 4);
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected static AbstractRemoteCommand getRCFromContext(Object ec)
-	{
-		return ((AbstractRemoteCommand)((Map<String, Object>)((IRootObjectContext)ec).getRootObject()).get(SFipa.CONTENT));
-//		return ((AbstractRemoteCommand)((MessageEnvelope)((IEncodingContext)ec).getRootObject()).getMessage().get(SFipa.CONTENT));
 	}
 	
 	/**

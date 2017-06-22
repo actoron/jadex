@@ -1,13 +1,13 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IRemoteCommand;
+import jadex.bridge.component.impl.IRemoteConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /** Command for results. */
-public class ResultCommand<T> implements IRemoteCommand<T>
+public class ResultCommand<T> implements IRemoteConversationCommand<T>
 {
 	/** The result. */
 	protected T result;
@@ -41,17 +41,15 @@ public class ResultCommand<T> implements IRemoteCommand<T>
 	/**
 	 *  Execute a command.
 	 *  @param access The agent to run the command on.
-	 *  @param future Future of the active command.
+	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
-	 *  @return A return value to be sent back.
 	 */
-	public IFuture<T> execute(IInternalAccess access, IFuture<T> future, IMsgSecurityInfos secinf)
+	public void	execute(IInternalAccess access, IFuture<T> future, IMsgSecurityInfos secinf)
 	{
 		if (exception!=null)
 			((Future<T>) future).setException(exception);
 		else
 			((Future<T>) future).setResult(result);
-		return future;
 	}
 	
 	/**

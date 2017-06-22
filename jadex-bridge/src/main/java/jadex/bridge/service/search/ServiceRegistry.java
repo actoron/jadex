@@ -20,6 +20,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -1988,8 +1989,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 										{
 											public IFuture<Set<T>> execute(IInternalAccess ia)
 											{
-												return ia.getComponentFeature(IRemoteExecutionFeature.class)
-													.execute(platid, new RemoteSearchCommand<T>(query));
+												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
+													.executeRemoteSearch(platid, query);
 											}
 										}).addResultListener(new DelegationResultListener<Set<T>>(remotesearch));
 									}
