@@ -384,15 +384,15 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				ComponentIdentifier.getTransportIdentifier(exta)
-					.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
-                {
-                    public void customResultAvailable(ITransportComponentIdentifier cid)
-                    {
-						createComponent(filename, null, config, cid, reslis)
+//				ComponentIdentifier.getTransportIdentifier(exta)
+//					.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+//                {
+//                    public void customResultAvailable(ITransportComponentIdentifier cid)
+//                    {
+						createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-                    }
-                });
+//                    }
+//                });
 			}
 		});
 		

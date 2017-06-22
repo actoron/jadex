@@ -1,12 +1,12 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
@@ -101,18 +101,46 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 	public IFuture<Object>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
 		Object	ret	= null;
-		Method	m	= method.getMethod(access.getClassLoader());
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			if(sid.getProviderId().equals(access.getComponentIdentifier()))
 			{
-				
+				try
+				{
+					Method	m	= method.getMethod(access.getClassLoader());
+					Object	service	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+					ret	= m.invoke(service, args);
+				}
+				catch(Exception e)
+				{
+					ret	= new Future<Object>(e);
+				}				
+			}
+			else
+			{
+				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getComponentIdentifier()+", "+sid));
 			}
 		}
 		else if(target instanceof IComponentIdentifier)
 		{
-			
+			IComponentIdentifier	cid	= (IComponentIdentifier)target;
+			if(cid.equals(access.getComponentIdentifier()))
+			{
+				try
+				{
+					Method	m	= method.getMethod(access.getClassLoader());
+					ret	= m.invoke(access.getExternalAccess(), args);
+				}
+				catch(Exception e)
+				{
+					ret	= new Future<Object>(e);
+				}
+			}
+			else
+			{
+				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getComponentIdentifier()+", "+cid));
+			}			
 		}
 		
 		@SuppressWarnings("unchecked")
