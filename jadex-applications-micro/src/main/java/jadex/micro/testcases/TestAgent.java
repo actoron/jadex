@@ -235,7 +235,8 @@ public abstract class TestAgent
 							"-gui", "false",
 							"-cli", "false",
 							"-simulation", "false",
-							"-printpass", "false"
+							"-printpass", "false",
+							"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class",
 //							"-logging", "true",
 ////							"-relaytransport", "false",
 //							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)

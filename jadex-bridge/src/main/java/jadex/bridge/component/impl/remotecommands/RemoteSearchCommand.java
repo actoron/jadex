@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -11,6 +12,8 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 
 /**
  *  Search for remote services.
@@ -65,6 +68,12 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 		
 		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticatedPlatform())
 		{
+			// No recursive global search -> change global scope to default.
+			if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+			{
+				query.setScope(null);
+			}
+			
 			if(query.getFilter() instanceof IAsyncFilter)
 			{
 				ret	= ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesAsync(query);
