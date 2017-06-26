@@ -12,8 +12,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Search for remote services.
@@ -89,5 +88,18 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 		}
 		
 		return ret;
+	}
+	
+
+	/**
+	 *  Get the return type.
+	 *  @return A class representing a future interface for mapping the result of the command.
+	 */
+	@SuppressWarnings("unchecked")
+	public Class<? extends IFuture<Collection<T>>>	getReturnType()
+	{
+		return query.getFilter() instanceof IAsyncFilter
+			? (Class<? extends IFuture<Collection<T>>>) ISubscriptionIntermediateFuture.class
+			: (Class<? extends IFuture<Collection<T>>>) IFuture.class;
 	}
 }

@@ -18,17 +18,17 @@ import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
+import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
-import jadex.bridge.component.impl.remotecommands.ResultCommand;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.TerminableFuture;
@@ -82,32 +82,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 */
 	public <T> IFuture<T>	execute(IComponentIdentifier target, IRemoteCommand<T> command)
 	{
-		Class<?> returntype;
-		try
-		{
-			returntype = command.getClass().getMethod("execute", IInternalAccess.class, IMsgSecurityInfos.class).getReturnType();
-		}
-		catch (Exception e)
-		{
-			return new Future<T>(e);
-		}
-		
 		@SuppressWarnings("unchecked")
-		Future<T> ret = (Future<T>) SFuture.getFuture(returntype);
-		ret.addResultListener(new IFutureCommandResultListener<T>()
-		{
-			public void resultAvailable(T result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-			
-			public void commandAvailable(Object command)
-			{
-			}
-		});
+		Future<T> ret = (Future<T>) SFuture.getFuture(command.getReturnType());
 		
 		final String rxid = SUtil.createUniqueId("");
 		if(commands==null)
@@ -224,24 +200,21 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				{
 					public void intermediateResultAvailable(Object result)
 					{
-							System.out.println("inter: "+result);
-//							ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), result, callid, 
-//								returnisref, methodname, false, getNFProps(true), (IFuture<?>)res, cnt++));
+						RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result);
+						sendRxMessage(remote, rxid, rc);
 					}
 					
 					public void finished()
 					{
-							System.out.println("fin");
-//							ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, getSender(), null, callid, 
-//								returnisref, methodname, true, getNFProps(false), (IFuture<?>)res, cnt));
-//							ret.setFinished();
-//							rsms.removeProcessingCall(callid);
+						commands.remove(rxid);
+						RemoteFinishedCommand<?> rc = new RemoteFinishedCommand();
+						sendRxMessage(remote, rxid, rc);
 					}
 					
 					public void resultAvailable(Object result)
 					{
 						commands.remove(rxid);
-						ResultCommand<?> rc = new ResultCommand(result);
+						RemoteResultCommand<?> rc = new RemoteResultCommand(result);
 						sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
 						{
 							@Override
@@ -259,17 +232,13 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					
 					public void resultAvailable(Collection result)
 					{
-							System.out.println("ra: "+result);
-//							ret.addIntermediateResult(new RemoteResultCommand(rec, getSender(), result, null, callid, 
-//								returnisref, methodname, getNFProps(false)));
-//							ret.setFinished();
-//							rsms.removeProcessingCall(callid);
+						resultAvailable(result);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						commands.remove(rxid);
-						ResultCommand<?> rc = new ResultCommand(exception);
+						RemoteResultCommand<?> rc = new RemoteResultCommand(exception);
 						sendRxMessage(remote, rxid, rc);
 					}
 					

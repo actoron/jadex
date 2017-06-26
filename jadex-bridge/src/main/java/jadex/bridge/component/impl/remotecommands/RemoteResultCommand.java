@@ -6,8 +6,10 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-/** Command for results. */
-public class ResultCommand<T> implements IRemoteConversationCommand<T>
+/**
+ * Command for results.
+ */
+public class RemoteResultCommand<T> implements IRemoteConversationCommand<T>
 {
 	/** The result. */
 	protected T result;
@@ -18,14 +20,14 @@ public class ResultCommand<T> implements IRemoteConversationCommand<T>
 	/**
 	 *  Create the command.
 	 */
-	public ResultCommand()
+	public RemoteResultCommand()
 	{
 	}
 	
 	/**
 	 *  Create the command.
 	 */
-	public ResultCommand(T result)
+	public RemoteResultCommand(T result)
 	{
 		this.result = result;
 	}
@@ -33,7 +35,7 @@ public class ResultCommand<T> implements IRemoteConversationCommand<T>
 	/**
 	 *  Create the command.
 	 */
-	public ResultCommand(Exception exception)
+	public RemoteResultCommand(Exception exception)
 	{
 		this.exception = exception;
 	}

@@ -147,4 +147,17 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 		IFuture<Object>	fret	= ret instanceof IFuture<?> ? (IFuture<Object>)ret : new Future<Object>(ret);
 		return fret;
 	}
+	
+	/**
+	 *  Get the return type.
+	 *  @return A class representing a future interface for mapping the result of the command.
+	 */
+	@SuppressWarnings("unchecked")
+	public Class<? extends IFuture<Object>>	getReturnType()
+	{
+		assert method.getMethod(null)!=null: "Should be used only locally, before sending";
+		return (Class<IFuture<Object>>)(IFuture.class.isAssignableFrom(method.getMethod(null).getReturnType())
+			? (Class<IFuture<Object>>)method.getMethod(null).getReturnType()
+			: IFuture.class);
+	}
 }
