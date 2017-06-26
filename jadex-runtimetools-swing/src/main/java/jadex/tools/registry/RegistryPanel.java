@@ -1,10 +1,14 @@
 package jadex.tools.registry;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.security.MessageDigest;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,15 +23,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
-import jadex.base.gui.jtable.ComponentIdentifiersRenderer;
 import jadex.base.gui.jtable.ServiceIdentifierRenderer;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
@@ -38,10 +41,7 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.gui.jtable.ClassInfoRenderer;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.commons.gui.jtable.ResizeableTableHeader;
-import jadex.commons.gui.jtable.SorterFilterTableModel;
 import jadex.commons.gui.jtable.TableSorter;
-import jadex.commons.gui.jtable.VisibilityTableColumnModel;
 
 /**
  *  Panel to view the registry.
@@ -75,14 +75,22 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		dismodel = new RegistryTableModel();
 //		SorterFilterTableModel tm = new SorterFilterTableModel(dismodel);
 		TableSorter sorter = new TableSorter(dismodel);
-		jtdis = new JTable(sorter);
+		jtdis = new JTable(sorter)
+		{
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) 
+			{    
+				Component c = super.prepareRenderer(renderer, row, column);
+				c.setBackground(dismodel.getRowColour(row)); 
+				return c;
+			}
+		};
 		
 //		VisibilityTableColumnModel colmodel = new VisibilityTableColumnModel();
 //		jtdis.setColumnModel(colmodel);
 //		jtdis.createDefaultColumnsFromModel();
 //        ResizeableTableHeader header = new ResizeableTableHeader(colmodel);
 //        header.setIncludeHeaderWidth(true);
-//        jtdis.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//		jtdis.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        jtdis.setTableHeader(header); 
 		
 		sorter.setTableHeader(jtdis.getTableHeader());
@@ -104,10 +112,36 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				updateRegistryInfos(jtdis);
 			}
 		});
+		timer.start();
 		
 		panel.add(preginfos, BorderLayout.CENTER);
 		
+		final float[] perc = new float[]{6.0f, 23.5f, 23.5f, 23.5f, 23.5f};
+		
+		panel.addComponentListener(new ComponentAdapter()
+		{
+			public void componentResized(ComponentEvent e) 
+			{
+				resizeColumns(perc);
+		    }
+		});
+		
+		resizeColumns(perc);
+		
 		return panel;
+	}
+
+	/**
+	 *  Resize the table columns.
+	 */
+	protected void resizeColumns(float[] perc) 
+	{
+	    int width = jtdis.getWidth();
+	    TableColumnModel cm = jtdis.getColumnModel();
+	    for(int i=0; i<cm.getColumnCount(); i++) 
+	    {
+	        cm.getColumn(i).setPreferredWidth(Math.round(perc[i] * width));
+	    }
 	}
 	
 	/**
@@ -116,6 +150,8 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	protected void updateRegistryInfos(final JTable jtdis)
 	{
 		Set<IService> alls = getRegistry().getAllServices();
+		
+		System.out.println("refresh: "+alls.size());
 		
 		int sel = jtdis.getSelectedRow();
 		List<IService> reginfos = dismodel.getList();
@@ -248,5 +284,20 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			return ret;
 		}	
+		
+		public Color getRowColour(int row) 
+		{
+			try
+			{
+				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 3);
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				byte[] dig = md.digest(cid.getName().getBytes());
+				return new Color(dig[0] & 0xFF, dig[1] & 0xFF, dig[2] & 0xFF, dig[3] & 0xFF);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 	};
 }

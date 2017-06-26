@@ -19,8 +19,8 @@ public class RegistryComponentPlugin extends AbstractComponentPlugin
 
 	static
 	{
-		icons.put("registry", SGUI.makeIcon(RegistryComponentPlugin.class, "/jadex/tools/common/images/awareness.png"));
-		icons.put("registry_sel", SGUI.makeIcon(RegistryComponentPlugin.class, "/jadex/tools/common/images/awareness_sel.png"));
+		icons.put("registry", SGUI.makeIcon(RegistryComponentPlugin.class, "/jadex/base/gui/images/registry.png"));
+		icons.put("registry_sel", SGUI.makeIcon(RegistryComponentPlugin.class, "/jadex/base/gui/images/registry_sel.png"));
 	}
 
 	//-------- methods --------
