@@ -1,6 +1,12 @@
 package jadex.platform;
 
 import static jadex.base.IRootComponentConfiguration.ADDRESS;
+import static jadex.base.IRootComponentConfiguration.AWARENESS;
+import static jadex.base.IRootComponentConfiguration.AWAMECHANISMS;
+import static jadex.base.IRootComponentConfiguration.AWAINCLUDES;
+import static jadex.base.IRootComponentConfiguration.AWAFAST;
+import static jadex.base.IRootComponentConfiguration.AWADELAY;
+import static jadex.base.IRootComponentConfiguration.AWAEXCLUDES;
 import static jadex.base.IRootComponentConfiguration.ASYNCEXECUTION;
 import static jadex.base.IRootComponentConfiguration.BASECLASSLOADER;
 import static jadex.base.IRootComponentConfiguration.BINARYMESSAGES;
@@ -132,12 +138,13 @@ import jadex.platform.service.simulation.SimulationAgent;
 
 	@Argument(name=CHAT, clazz=boolean.class, defaultvalue="true"),
 	
-//	@Argument(name=AWARENESS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=AWARENESS, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
-//	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
-//	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
-//	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
-//	@Argument(name=AWAFAST, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Local\""),
+	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
+	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWAFAST, clazz=boolean.class, defaultvalue="false"),
 
 	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
