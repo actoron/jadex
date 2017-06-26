@@ -67,7 +67,7 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  The agent created method.
 	 */
-	@AgentCreated
+//	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();

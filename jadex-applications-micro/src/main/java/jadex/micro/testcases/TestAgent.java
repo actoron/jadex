@@ -10,17 +10,16 @@ import jadex.base.RootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -412,6 +411,12 @@ public abstract class TestAgent
 			{
 				if(manualremove)
 					platforms.remove(exta);
+				
+				// Add addresses of new platform to current
+				TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
+				TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(exta.getComponentIdentifier());
+				tab1.addPlatformAddresses(exta.getComponentIdentifier(), "tcp",
+					tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
 				
 				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 				{
