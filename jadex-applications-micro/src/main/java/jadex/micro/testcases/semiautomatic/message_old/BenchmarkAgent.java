@@ -25,7 +25,7 @@ public class BenchmarkAgent
 	
 	/** The number of messages. */
 	@AgentArgument
-	protected int	count	= 1000;
+	protected int	count	= 10000;
 	
 	/**
 	 *  Send the message and wait for the result.
@@ -56,6 +56,16 @@ public class BenchmarkAgent
 //		{
 //			System.out.println(entry);
 //		}
+		
+		// To start profiling after platform startup.
+		System.out.println("Press [ANY] key to start...");
+		try
+		{
+			System.in.read();
+		}
+		catch(Exception e)
+		{
+		}
 
 		// Now testing.
 		long	start	= System.nanoTime();
