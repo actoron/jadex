@@ -111,10 +111,6 @@ public class NHChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 		
 		byte[] shared1 = na1.calculateAgreement(ep2.getPublicKey());
 		
-//		ka = new NHAgreement();
-//		ka.init(epkeypair2.getPrivate());
-//		byte[] shared2 = ka.calculateAgreement(new NHPublicKeyParameters(exkeypair1));
-		
 		System.out.println(Arrays.toString(shared1));
 		System.out.println(Arrays.toString(shared2));
 	}

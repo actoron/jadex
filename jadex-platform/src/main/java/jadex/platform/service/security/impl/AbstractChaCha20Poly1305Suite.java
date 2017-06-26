@@ -51,6 +51,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	/** Next step in the handshake protocol. */
 	protected int nextstep;
 	
+	/** Hashed network names reverse lookup */
 	protected Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
 	
 	// -------------- Operational state -----------------

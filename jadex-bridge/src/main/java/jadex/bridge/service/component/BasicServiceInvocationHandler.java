@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -25,7 +26,9 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceInvalidException;
+import jadex.bridge.service.annotation.CheckIndex;
+import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.annotation.CheckState;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -38,20 +41,16 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.component.interceptors.MonitoringInterceptor;
 import jadex.bridge.service.component.interceptors.NFRequiredServicePropertyProviderInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
-import jadex.bridge.service.component.interceptors.ValidationInterceptor;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -677,15 +676,47 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 //			if(monitoring)
-				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
-			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
-			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor(ia));
-			if(!(service instanceof IService))
+//				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
+//			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
+			
+			if(service instanceof IService)
+			{
+				IService serv = (IService) service;
+				Class<?> clazz = serv.getServiceIdentifier().getServiceType().getType(ia.getClassLoader());
+				
+				boolean addhandler = false;
+				try
+				{
+					Method[] ms = SReflect.getAllMethods(clazz);
+					
+					formethod:
+					for (Method m : ms)
+					{
+						Annotation[] as = m.getAnnotations();
+						for (Annotation anno : as)
+							if (anno instanceof CheckNotNull 
+								|| anno instanceof CheckState
+								|| anno instanceof CheckIndex)
+							{
+								addhandler = true;
+								break formethod;
+							}
+					}
+				}
+				catch (Exception e)
+				{
+				}
+				
+				if (addhandler)
+					handler.addFirstServiceInterceptor(new PrePostConditionInterceptor(ia));
+			}
+			else
 			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor());
 			}
+			
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
-			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
+//			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, Starter.isParameterCopy(sid.getProviderId()), false));

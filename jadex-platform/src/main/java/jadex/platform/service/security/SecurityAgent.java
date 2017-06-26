@@ -1,12 +1,10 @@
 package jadex.platform.service.security;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import jadex.bridge.BasicComponentIdentifier;
@@ -52,6 +50,9 @@ import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
+import jadex.platform.service.security.impl.Curve448ChaCha20Poly1305Suite;
+import jadex.platform.service.security.impl.NHChaCha20Poly1305Suite;
+import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 
 /**
  *  Agent that provides the security service.
@@ -138,12 +139,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		boolean printpass = props.getBooleanProperty("printpass");
 		boolean usepass = props.getBooleanProperty("usepass");
 		
-//		if (secretstr != null && secretstr.matches("[a-z0-9]{8,8}-[a-z0-9]{3,3}"))
-//		{
-//			// Die, old passwords, die, die, die!
-//			secretstr = null;
-//		}
-		
 		if (usepass && secretstr == null)
 		{
 			secretstr = SUtil.createRandomKey();
@@ -184,7 +179,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		catch (Exception e)
 		{
 		}
-		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
 		currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
 		expiringcryptosuites = new HashMap<String, Tuple2<ICryptoSuite,Long>>();
@@ -192,11 +186,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String[] cryptsuites = (String[]) argfeat.getArguments().get("cryptosuites");
 		if (cryptsuites == null)
 		{
-			cryptsuites = new String[] { "jadex.platform.service.security.impl.Curve448ChaCha20Poly1305Suite" };
-//			cryptsuites = new String[] { "jadex.platform.service.security.impl.NHChaCha20Poly1305Suite" };
-//			cryptsuites = new String[] { "jadex.platform.service.security.impl.UnsafeNullCryptoSuite" };
+			cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
+//			cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName(),
+//										 Curve448ChaCha20Poly1305Suite.class.getCanonicalName(),
+//										 NHChaCha20Poly1305Suite.class.getCanonicalName() };
 		}
-		allowedcryptosuites = new HashMap<String, Class<?>>();
+		allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
 		for (String cryptsuite : cryptsuites)
 		{
 			try
@@ -209,8 +204,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return new Future<Void>(e);
 			}
 		}
-		agent.getComponentFeature0(IMessageFeature.class).setAllowUntrusted(true);
-		agent.getComponentFeature0(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
+		agent.getComponentFeature(IMessageFeature.class).setAllowUntrusted(true);
+		agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
 		return IFuture.DONE;
 	}
 	
@@ -630,10 +625,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			if (msg instanceof InitialHandshakeMessage)
 			{
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
-				System.out.println("Got initial handshake: " + imsg.getConversationId());
 				IComponentIdentifier rplat = imsg.getSender().getRoot();
-				
-				
 				
 				final Future<ICryptoSuite> fut = new Future<ICryptoSuite>();
 				
@@ -651,15 +643,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (imsg.getCryptoSuites() == null || imsg.getCryptoSuites().length < 1)
 					return;
 				
-				Set<String> offeredsuites = new HashSet<String>(Arrays.asList(imsg.getCryptoSuites()));
+				String[] offeredsuites = imsg.getCryptoSuites();
 				
 				String chosensuite = null;
-				for (String suite : allowedcryptosuites.keySet())
+				if (offeredsuites != null)
 				{
-					if (offeredsuites.contains(suite))
+					for (String suite : offeredsuites)
 					{
-						chosensuite = suite;
-						break;
+						if (allowedcryptosuites.containsKey(suite))
+						{
+							chosensuite = suite;
+							break;
+						}
 					}
 				}
 				
@@ -719,6 +714,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					if (convid != null && convid.equals(fm.getConversationId()))
 					{
 						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite());
+						System.out.println("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)
 						{
