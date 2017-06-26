@@ -21,5 +21,5 @@ public interface IRemoteCommand<T>
 	 *  Get the return type.
 	 *  @return A class representing a future interface for mapping the result of the command.
 	 */
-	public Class<? extends IFuture<T>>	getReturnType();
+	public Class<? extends IFuture<T>>	getReturnType(IInternalAccess access);
 }

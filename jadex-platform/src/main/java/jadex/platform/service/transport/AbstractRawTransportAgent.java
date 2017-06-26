@@ -596,7 +596,7 @@ public abstract class AbstractRawTransportAgent<Con> implements ITransportServic
 		IComponentIdentifier target = getTarget(header).getRoot();
 		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
 		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
-		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
+//		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
 		return ret;
 	}
 

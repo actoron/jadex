@@ -12,7 +12,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 /**
  *  Search for remote services.
@@ -67,10 +67,14 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 		
 		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticatedPlatform())
 		{
-			// No recursive global search -> change global scope to default.
-			if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+			// No recursive global search -> change global scope to platform, and owner to local platform.
+			if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
 			{
-				query.setScope(null);
+				if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
+				{
+					query.setOwner(access.getComponentIdentifier().getRoot());
+				}
+				query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 			}
 			
 			if(query.getFilter() instanceof IAsyncFilter)
@@ -96,10 +100,10 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 	 *  @return A class representing a future interface for mapping the result of the command.
 	 */
 	@SuppressWarnings("unchecked")
-	public Class<? extends IFuture<Collection<T>>>	getReturnType()
+	public Class<? extends IFuture<Collection<T>>>	getReturnType(IInternalAccess access)
 	{
 		return query.getFilter() instanceof IAsyncFilter
-			? (Class<? extends IFuture<Collection<T>>>) ISubscriptionIntermediateFuture.class
+			? (Class<? extends IFuture<Collection<T>>>) IIntermediateFuture.class	// TODO: subscription for persistent queries?
 			: (Class<? extends IFuture<Collection<T>>>) IFuture.class;
 	}
 }

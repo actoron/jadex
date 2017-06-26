@@ -153,11 +153,10 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 	 *  @return A class representing a future interface for mapping the result of the command.
 	 */
 	@SuppressWarnings("unchecked")
-	public Class<? extends IFuture<Object>>	getReturnType()
+	public Class<? extends IFuture<Object>>	getReturnType(IInternalAccess access)
 	{
-		assert method.getMethod(null)!=null: "Should be used only locally, before sending";
-		return (Class<IFuture<Object>>)(IFuture.class.isAssignableFrom(method.getMethod(null).getReturnType())
-			? (Class<IFuture<Object>>)method.getMethod(null).getReturnType()
+		return (Class<IFuture<Object>>)(IFuture.class.isAssignableFrom(method.getMethod(access.getClassLoader()).getReturnType())
+			? (Class<IFuture<Object>>)method.getMethod(access.getClassLoader()).getReturnType()
 			: IFuture.class);
 	}
 }

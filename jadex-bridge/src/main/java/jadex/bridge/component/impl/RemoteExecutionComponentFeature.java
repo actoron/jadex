@@ -83,7 +83,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	public <T> IFuture<T>	execute(IComponentIdentifier target, IRemoteCommand<T> command)
 	{
 		@SuppressWarnings("unchecked")
-		Future<T> ret = (Future<T>) SFuture.getFuture(command.getReturnType());
+		Future<T> ret = (Future<T>) SFuture.getFuture(command.getReturnType(getComponent()));
 		
 		final String rxid = SUtil.createUniqueId("");
 		if(commands==null)
