@@ -23,9 +23,9 @@ import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
@@ -205,10 +205,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-		final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-		if(rms!=null)
+		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+		if(cms!=null)
 		{
-			rms.getExternalAccessProxy(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
+			cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result) throws Exception
 				{
@@ -254,10 +254,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-		if(rms!=null)
+		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+		if(cms!=null)
 		{
-			rms.getExternalAccessProxy(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result) throws Exception
 				{
@@ -802,10 +802,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			if(getSuperpeerSync()!=null)
 			{
-				final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-				if(rms!=null)
+				final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+				if(cms!=null)
 				{
-					rms.getExternalAccessProxy(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
+					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
 					{
 						public void customResultAvailable(IExternalAccess result) throws Exception
 						{
@@ -959,10 +959,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 		if(qinfo.getSuperpeer()!=null)
 		{
-			final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-			if(rms!=null)
+			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+			if(cms!=null)
 			{
-				rms.getExternalAccessProxy(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
 					public void customResultAvailable(IExternalAccess result) throws Exception
 					{
@@ -1616,10 +1616,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
-			final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-			if(rms!=null)
+			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+			if(cms!=null)
 			{
-				rms.getExternalAccessProxy(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
+				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
 				{
 					public void customResultAvailable(IExternalAccess result) throws Exception
 					{
@@ -1815,10 +1815,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
-			final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-			if(rms!=null)
+			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+			if(cms!=null)
 			{
-				rms.getExternalAccessProxy(spcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				cms.getExternalAccess(spcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess result) throws Exception
 					{
@@ -1911,8 +1911,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected <T> ISubscriptionIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		final IRemoteServiceManagementService rms = getLocalServiceByClass(new ClassInfo(IRemoteServiceManagementService.class));
-		if(rms!=null)
+		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+		if(cms!=null)
 		{
 			// Get all proxy agents (represent other platforms)
 			Collection<IService> sers = getLocalServicesByClass(new ClassInfo(IProxyAgentService.class));
@@ -1932,7 +1932,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					public void resultAvailable(Collection<ITransportComponentIdentifier> result)
 					{
 						if(result != null)
-							result.remove(((IService)rms).getServiceIdentifier().getProviderId().getRoot());
+							result.remove(((IService)cms).getServiceIdentifier().getProviderId().getRoot());
 						
 						if(result != null && result.size() > 0)
 						{
@@ -1944,7 +1944,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								// Disable filter, we do that locally.
 								remotequery.setFilter(null);
 								
-								rms.getExternalAccessProxy(platid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Set<T>>(remotesearch)
+								cms.getExternalAccess(platid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Set<T>>(remotesearch)
 								{
 									public void customResultAvailable(IExternalAccess result) throws Exception
 									{
