@@ -1,12 +1,19 @@
 package jadex.micro.servicecall;
 
+import java.util.Collections;
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
+import jadex.base.IRootComponentConfiguration.AWAMECHANISM;
 import jadex.base.test.TestReport;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -206,5 +213,68 @@ public class ServiceCallAgent	extends TestAgent
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Start two agents on separate platforms and exchange a request/reply.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+//		String key = SUtil.createRandomKey();
+		
+		// Start first platform with receiver.
+		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+		config1.setAwaMechanisms(AWAMECHANISM.local);
+		config1.setAwareness(true);
+		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+//		config1.addComponent(ReceiverAgent.class);
+//		config1.setNetworkName("remotemessagetest");
+//		config1.setNetworkPass(key);
+		IExternalAccess	access1	= Starter.createPlatform(config1).get();		
+//		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(access1.getComponentIdentifier());
+//		System.out.println("TCP Addresses: " + Arrays.toString(tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp")));
+		
+		// Start second platform
+//		PlatformConfiguration	config2	= PlatformConfiguration.getMinimal();
+//		config2.setLogging(true);
+//		config2.setDefaultTimeout(-1);
+//		config2.setSecurity(true);
+//		config2.setAwaMechanisms(AWAMECHANISM.local);
+//		config2.setAwareness(true);
+//		config2.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+//		config2.setNetworkName("remotemessagetest");
+//		config2.setNetworkPass(key);
+//		IExternalAccess	access2	= Starter.createPlatform(config2).get();
+		final IComponentManagementService	cms	= SServiceProvider.getService(access1, IComponentManagementService.class).get();
+
+		// Add addresses of first platform to second
+//		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());
+//		tab2.addPlatformAddresses(access1.getComponentIdentifier(), "tcp",
+//			tab1.getPlatformAddresses(access1.getComponentIdentifier(), "tcp"));
+		
+		// Add addresses of second platform to first
+//		tab1.addPlatformAddresses(access2.getComponentIdentifier(), "tcp",
+//				tab2.getPlatformAddresses(access2.getComponentIdentifier(), "tcp"));
+		
+		// Start sender with receiver CID on remote platform.
+//		cms.createComponent(SenderAgent.class.getName()+".class",
+		IComponentIdentifier cid = cms.createComponent(ServiceCallAgent.class.getName()+".class",
+			new CreationInfo(Collections.singletonMap("receiver",
+				(Object)new BasicComponentIdentifier("Receiver", access1.getComponentIdentifier())))).getFirstResult();
+		
+		IExternalAccess ea = cms.getExternalAccess(cid).get();
+		
+		ea.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ServiceCallAgent agent = (ServiceCallAgent) ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+//				agent.test(cms, false);
+				return IFuture.DONE;
+			}
+		});
 	}
 }
