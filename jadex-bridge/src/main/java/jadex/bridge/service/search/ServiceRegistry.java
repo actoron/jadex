@@ -21,7 +21,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
-import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -1969,7 +1968,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 						FutureBarrier<Void> finishedbar = new FutureBarrier<Void>();
 						for(final IComponentIdentifier platid : result)
 						{
-							final Future<Set<T>> remotesearch = new Future<Set<T>>();
+							final Future<Collection<T>> remotesearch = new Future<Collection<T>>();
 							final ServiceQuery<T> remotequery = new ServiceQuery<T>(query);
 							// Disable filter, we do that locally.
 							remotequery.setFilter(null);
@@ -1980,23 +1979,23 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								origin	= cid;
 							}
 							IComponentManagementService	cms	= getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-							cms.getExternalAccess(origin).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Set<T>>(remotesearch)
+							cms.getExternalAccess(origin).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(remotesearch)
 							{
 								public void customResultAvailable(IExternalAccess result) throws Exception
 								{
 									try
 									{
-										result.scheduleStep(new IComponentStep<Set<T>>()
+										result.scheduleStep(new IComponentStep<Collection<T>>()
 										{
-											public IFuture<Set<T>> execute(IInternalAccess ia)
+											public IFuture<Collection<T>> execute(IInternalAccess ia)
 											{
 												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
 													.executeRemoteSearch(platid, query);
 											}
-										}).addResultListener(new DelegationResultListener<Set<T>>(remotesearch)
+										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch)
 										{
 											@Override
-											public void customResultAvailable(Set<T> result)
+											public void customResultAvailable(Collection<T> result)
 											{
 												System.out.println("Remote results: "+result);
 												super.customResultAvailable(result);
@@ -2012,10 +2011,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 							
 							final Future<Void> remotefin = new Future<Void>();
 							
-							remotesearch.addResultListener(new IResultListener<Set<T>>()
+							remotesearch.addResultListener(new IResultListener<Collection<T>>()
 							{
 								@SuppressWarnings("unchecked")
-								public void resultAvailable(Set<T> result)
+								public void resultAvailable(Collection<T> result)
 								{
 									if (result != null)
 									{

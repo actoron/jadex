@@ -2202,6 +2202,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				if(cid.getName().toLowerCase().indexOf("directservice")!=-1
 					|| cid.getName().toLowerCase().indexOf("rawservice")!=-1
 					|| cid.getName().toLowerCase().indexOf("decoupledservice")!=-1)

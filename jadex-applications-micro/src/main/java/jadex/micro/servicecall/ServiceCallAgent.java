@@ -4,7 +4,6 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;

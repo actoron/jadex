@@ -139,7 +139,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  @param command	The command to be executed.
 	 *  @return	The result(s) of the command, if any.
 	 */
-	public <T> IFuture<Set<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
+	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
 	{
 		return execute(target, new RemoteSearchCommand<T>(query));
 	}
