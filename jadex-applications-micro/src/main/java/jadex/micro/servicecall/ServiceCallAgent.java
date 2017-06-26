@@ -2,6 +2,8 @@ package jadex.micro.servicecall;
 
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -205,5 +207,22 @@ public class ServiceCallAgent	extends TestAgent
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Start two agents on separate platforms and exchange a request/reply.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+//		config1.setAwaMechanisms(AWAMECHANISM.local);
+//		config1.setAwareness(true);
+		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config1.addComponent(ServiceCallAgent.class);
+		Starter.createPlatform(config1).get();
 	}
 }
