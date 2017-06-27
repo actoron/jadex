@@ -41,7 +41,7 @@ public class TransportAddressBook
 	 */
 	public synchronized void addPlatformAddresses(IComponentIdentifier platform, String transport, String[] addresses)
 	{
-		System.out.println("New addr:" + platform + " " + Arrays.toString(addresses));
+//		System.out.println("New addr:" + platform + " " + Arrays.toString(addresses));
 		if(addresses!=null && addresses.length>0)
 		{
 			Map<String, List<String>>	platformaddresses	= this.addresses.get(platform.getRoot());
@@ -187,7 +187,7 @@ public class TransportAddressBook
 	{
 		synchronized (listeners)
 		{
-			System.out.println("Notify listeners: " + listeners.size() + " " + affectedplatform);
+//			System.out.println("Notify listeners: " + listeners.size() + " " + affectedplatform);
 			for (IChangeListener<IComponentIdentifier> listener : listeners)
 			{
 				listener.changeOccurred(new ChangeEvent<IComponentIdentifier>(affectedplatform));

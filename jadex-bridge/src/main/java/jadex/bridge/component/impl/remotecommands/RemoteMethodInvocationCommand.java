@@ -104,7 +104,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 	@Override
 	public IFuture<Object>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
-		System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
+//		System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
 		
 		Object	ret	= null;
 		if(target instanceof IServiceIdentifier)

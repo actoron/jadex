@@ -60,7 +60,7 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 	@Override
 	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
-		System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query.getServiceType());
+//		System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query.getServiceType());
 		
 		final IFuture<Collection<T>>	ret;
 		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;

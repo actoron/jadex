@@ -1992,15 +1992,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
 													.executeRemoteSearch(platid, query);
 											}
-										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch)
-										{
-											@Override
-											public void customResultAvailable(Collection<T> result)
-											{
-												System.out.println("Remote results: "+result);
-												super.customResultAvailable(result);
-											}
-										});
+										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch));
+//										{
+//											@Override
+//											public void customResultAvailable(Collection<T> result)
+//											{
+//												System.out.println("Remote results: "+result);
+//												super.customResultAvailable(result);
+//											}
+//										});
 									}
 									catch(Exception e)
 									{

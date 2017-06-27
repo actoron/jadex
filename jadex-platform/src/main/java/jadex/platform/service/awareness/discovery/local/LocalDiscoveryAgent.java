@@ -197,7 +197,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				// Use polling as fallback.
 				watchservice = null;
 			}
