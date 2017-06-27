@@ -5,11 +5,9 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.message.IMessageService;
@@ -87,14 +85,14 @@ public class Initiator2Agent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-                {
-                    public void customResultAvailable(ITransportComponentIdentifier result)
-                    { 
-                    	performTest(result, testno)
+//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+//                {
+//                    public void customResultAvailable(ITransportComponentIdentifier result)
+//                    { 
+                    	performTest(platform.getComponentIdentifier(), testno)
                     		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-                    }
-                });
+//                    }
+//                });
 			}
 		}));
 		

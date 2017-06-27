@@ -4,14 +4,11 @@ import java.util.Collection;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -67,35 +64,35 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
-		{
-			public void customResultAvailable(final ISecurityService sec)
-			{
-				sec.addVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix())
-					.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
+//		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
+//		{
+//			public void customResultAvailable(final ISecurityService sec)
+//			{
+//				sec.addVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix())
+//					.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
 						performTest(agent.getComponentIdentifier().getRoot(), testno)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
 							public void customResultAvailable(final TestReport result)
 							{
-								sec.removeVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix()).
-									addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
-								{
-									public void customResultAvailable(Void v) throws Exception
-									{
+//								sec.removeVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix()).
+//									addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+//								{
+//									public void customResultAvailable(Void v) throws Exception
+//									{
 										ret.setResult(result);
-									}
-								});
+//									}
+//								});
 							}
 						}));
-					}
-				});
-			}
-		});
+//					}
+//				});
+//			}
+//		});
 		
 		return ret;
 	}
@@ -114,14 +111,14 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(IExternalAccess platform)
 			{
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-                {
-                    public void customResultAvailable(ITransportComponentIdentifier cid)
-                    { 
-						performTest(cid, testno)
+//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+//                {
+//                    public void customResultAvailable(ITransportComponentIdentifier cid)
+//                    { 
+						performTest(platform.getComponentIdentifier(), testno)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-        			}
-        		});
+//        			}
+//        		});
 			}
 		}));
 		

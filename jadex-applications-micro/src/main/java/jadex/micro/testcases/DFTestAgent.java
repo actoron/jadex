@@ -197,7 +197,7 @@ public class DFTestAgent
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(agent.getComponentIdentifier(), hlefMessage);
 		
 		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{

@@ -2,6 +2,7 @@ package jadex.web.examples.hellobdiv3;
 
 import jadex.bdiv3.IBDIAgent;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -9,7 +10,7 @@ import jadex.micro.annotation.Agent;
 /**
  *  Say hello agent.
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 public abstract class SayHelloBDI implements ISayHelloService, IBDIAgent
 {

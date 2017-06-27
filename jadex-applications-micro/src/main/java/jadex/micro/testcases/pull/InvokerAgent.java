@@ -7,12 +7,10 @@ import java.util.List;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -182,16 +180,16 @@ public class InvokerAgent
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
-					{
-						public void customResultAvailable(final ITransportComponentIdentifier result) 
-						{
-							performTestA(result, testno, delay, max)
+//					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
+//					{
+//						public void customResultAvailable(final ITransportComponentIdentifier result) 
+//						{
+							performTestA(platform.getComponentIdentifier(), testno, delay, max)
 								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
 								public void customResultAvailable(final TestReport result1)
 								{
-									performTestB(result, testno+1, delay, max)
+									performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
 										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
 										public void customResultAvailable(final TestReport result2)
@@ -209,8 +207,8 @@ public class InvokerAgent
 									}));
 								}
 							}));
-						}
-					});
+//						}
+//					});
 				}
 			}));
 		}

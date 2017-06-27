@@ -8,12 +8,13 @@ import javax.swing.undo.CannotUndoException;
 
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 
 /**
  * 
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 public class ProviderAgent implements ISynchronousExampleService
 {

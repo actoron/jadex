@@ -5,10 +5,8 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
@@ -109,17 +107,17 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				// Hack: announce platform immediately
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-				{
-					public void customResultAvailable(final ITransportComponentIdentifier result) 
-					{
+//				// Hack: announce platform immediately
+//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+//				{
+//					public void customResultAvailable(final ITransportComponentIdentifier result) 
+//					{
 						IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 						fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
 							{
-								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{result.getRoot()}));
+								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier()}));
 								cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
 									new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
 		//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
@@ -140,8 +138,8 @@ public class InitiatorAgent extends TestAgent
 								});
 							}
 						});
-					}
-				});
+//					}
+//				});
 			}
 		}));
 		

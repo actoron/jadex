@@ -5,12 +5,10 @@ import java.util.Collection;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -161,11 +159,11 @@ public class InvokerAgent
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-					{
-						public void customResultAvailable(ITransportComponentIdentifier result) 
-						{
-							performTest(result, testno, delay, max)
+//					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+//					{
+//						public void customResultAvailable(ITransportComponentIdentifier result) 
+//						{
+							performTest(platform.getComponentIdentifier(), testno, delay, max)
 								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 							{
 								public void customResultAvailable(final TestReport result)
@@ -181,8 +179,8 @@ public class InvokerAgent
 									ret.setResult(result);
 								}
 							}));
-						}
-					});
+//						}
+//					});
 				}
 			}));
 		}
