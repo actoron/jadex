@@ -1061,7 +1061,10 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getTaggedService(final IInternalAccess component, Class<T> type, String scope, final String... tags)
 	{
-		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		query.setServiceTags(tags);
+		return ServiceRegistry.getRegistry(component).searchServiceAsync(query);
+//		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
 	}
 	
 	/**
@@ -1071,14 +1074,18 @@ public class SServiceProvider
 	 */
 	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(IExternalAccess component, final Class<T> type, final String scope, final String... tags)
 	{
-		return (ITerminableIntermediateFuture<T>)component.scheduleStep(new ImmediateComponentStep<Collection<T>>()
-		{
-			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
-			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
-			{
-				return getTaggedServices(ia, type, scope, tags);
-			}
-		});
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		query.setServiceTags(tags);
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).searchServicesAsync(query);
+		
+//		return (ITerminableIntermediateFuture<T>)component.scheduleStep(new ImmediateComponentStep<Collection<T>>()
+//		{
+//			@Classname("getServices(IExternalAccess provider, final Class<T> type, final String scope, final String... args)")
+//			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
+//			{
+//				return getTaggedServices(ia, type, scope, tags);
+//			}
+//		});
 	}
 	
 	/**
@@ -1091,7 +1098,10 @@ public class SServiceProvider
 	 */
 	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(final IInternalAccess component, Class<T> type, String scope, final String... tags)
 	{
-		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		query.setServiceTags(tags);
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).searchServicesAsync(query);
+//		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
 	}
 	
 	//-------- other methods --------
@@ -2182,7 +2192,10 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getTaggedService(final IInternalAccess component, ClassInfo type, String scope, final String... tags)
 	{
-		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		query.setServiceTags(tags);
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).searchServiceAsync(query);
+//		return getService(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
 	}
 	
 	/**
@@ -2212,7 +2225,10 @@ public class SServiceProvider
 	 */
 	public static <T> ITerminableIntermediateFuture<T> getTaggedServices(final IInternalAccess component, ClassInfo type, String scope, final String... tags)
 	{
-		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		query.setServiceTags(tags);
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).searchServicesAsync(query);
+//		return getServices(component, type, scope, new TagFilter<T>(component.getExternalAccess(), tags));
 	}
 	
 	/**

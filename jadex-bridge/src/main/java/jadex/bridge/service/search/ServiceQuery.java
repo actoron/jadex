@@ -173,6 +173,14 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
+	{
+		this(servicetype, scope, provider, owner, filter, servicetype);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
 	{
 		if(owner==null)
@@ -289,7 +297,27 @@ public class ServiceQuery<T>
 	{
 		this.filter = filter;
 	}
-
+	
+	/**
+	 *  Gets the service tags.
+	 *  
+	 *  @return The service tags. 
+	 */
+	public String[] getServiceTags()
+	{
+		return servicetags;
+	}
+	
+	/**
+	 *  Sets the service tags.
+	 *  
+	 *  @param servicetags The service tags. 
+	 */
+	public void setServiceTags(String[] servicetags)
+	{
+		this.servicetags = servicetags;
+	}
+	
 	/**
 	 *  Get the provider.
 	 *  @return The provider
