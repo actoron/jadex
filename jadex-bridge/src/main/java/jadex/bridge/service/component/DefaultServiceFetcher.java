@@ -29,6 +29,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.TagFilter;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ComposedRemoteFilter;
@@ -102,18 +103,19 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
-		if(info.getTags()!=null && info.getTags().size()>0)
-		{
-			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
-			if(filter==null)
-			{
-				filter = tf;
-			}
-			else
-			{
-				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
-			}
-		}
+//		if(info.getTags()!=null && info.getTags().size()>0)
+//		{
+//			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
+//			if(filter==null)
+//			{
+//				filter = tf;
+//			}
+//			else
+//			{
+//				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
+//			}
+//		}
+		final String[] tags = info.getTags() == null? null : info.getTags().toArray(new String[0]);
 		final IAsyncFilter<T> ffilter = filter;
 		
 //		System.out.println(info.getType().getTypeName().toString());
@@ -142,7 +144,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
+//								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
+								IFuture<T> fut = SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags);
 								fut.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
 							}
 //							public void exceptionOccurred(Exception exception)
@@ -163,7 +166,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								if(coll!=null && coll.size()>0)
 								{
 									IExternalAccess ea = coll.iterator().next();
-									SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+//									SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+									SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags)
 										.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
 								}
 								else
@@ -176,7 +180,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
-						SServiceProvider.getService(ia, type, binding.getScope(), ffilter, false)
+						SServiceProvider.getTaggedService(ia, type, binding.getScope(), ffilter, false)
 							.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding)
 						{
 //							public void customResultAvailable(Object result)
@@ -229,18 +233,19 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
-		if(info.getTags()!=null && info.getTags().size()>0)
-		{
-			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
-			if(filter==null)
-			{
-				filter = tf;
-			}
-			else
-			{
-				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
-			}
-		}
+//		if(info.getTags()!=null && info.getTags().size()>0)
+//		{
+//			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
+//			if(filter==null)
+//			{
+//				filter = tf;
+//			}
+//			else
+//			{
+//				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
+//			}
+//		}
+		final String[] tags = info.getTags() == null? null : info.getTags().toArray(new String[0]);
 		final IAsyncFilter<T> ffilter = filter;
 		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
@@ -268,7 +273,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
+								IFuture<Collection<T>> fut = SServiceProvider.getTaggedServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags);
+//								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
 //								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL);
 								fut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding));
 							}
