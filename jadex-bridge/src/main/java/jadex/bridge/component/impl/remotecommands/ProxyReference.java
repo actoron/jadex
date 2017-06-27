@@ -37,6 +37,7 @@ public class ProxyReference
 	{
 		this.pi = pi;
 		this.rr = rr;
+		System.out.println("ProxyReference: "+getRemoteReference().getRemoteComponent()+" "+getRemoteReference().getTargetIdentifier());
 	}
 
 	//-------- methods --------

@@ -59,7 +59,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 	{
 		this.comp	= comp;
 		this.pr = pr;
-//		System.out.println("handler: "+pi.getServiceIdentifier().getServiceType()+" "+pi.getCache());
+//		System.out.println("handler: "+pr.getRemoteReference().getRemoteComponent()+" "+pr.getRemoteReference().getTargetIdentifier());
 	}
 	
 	//-------- methods --------

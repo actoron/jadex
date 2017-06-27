@@ -40,7 +40,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -62,7 +61,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.ResourceInfo;
@@ -91,7 +89,6 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.micro.annotation.Properties;
 
 /**
  *  Abstract default implementation of component management service.
@@ -2115,7 +2112,8 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(isRemoteComponent(cid))
 		{
-//			System.out.println("getExternalAccess: remote");
+//			ServiceCall	sc	= ServiceCall.getCurrentInvocation();
+//			System.out.println("getExternalAccess: remote "+sc);
 			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
 			{

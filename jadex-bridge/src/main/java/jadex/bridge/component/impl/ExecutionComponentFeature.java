@@ -1328,7 +1328,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						});
 					}
 					else
-					{	
+					{
 						stepfut.addResultListener(new DelegationResultListener(step.getFuture())
 						{
 							public void customResultAvailable(Object result)

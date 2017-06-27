@@ -41,6 +41,10 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 	 */
 	public RemoteMethodInvocationCommand(Object target, Method method, Object[] args)
 	{
+//		if(method.getName().indexOf("Step")!=-1)
+//		{
+//			System.out.println("sril");
+//		}
 		this.target	= target;
 		this.method	= new MethodInfo(method);
 		this.args	= args;
@@ -100,6 +104,8 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 	@Override
 	public IFuture<Object>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
+		System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
+		
 		Object	ret	= null;
 		if(target instanceof IServiceIdentifier)
 		{
