@@ -233,6 +233,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
+		if (info.getTags() != null && info.getTags().size()>0)
+			throw new RuntimeException("Multi service injection with tags broken.");
+		
 //		if(info.getTags()!=null && info.getTags().size()>0)
 //		{
 //			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
