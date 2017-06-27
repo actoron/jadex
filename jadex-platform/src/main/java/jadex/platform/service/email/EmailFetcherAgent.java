@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.email.Email;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -15,7 +16,7 @@ import jadex.micro.annotation.Agent;
 /**
  *  Agent that is responsible for fetching mails for one subscription.
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 public class EmailFetcherAgent implements IEmailFetcherService
 {
