@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -134,10 +134,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 				Class<?> wekindsclazz = Class.forName("java.nio.file.WatchEvent$Kind", true, agent.getClassLoader());
 				Class<?> standardwatcheventkindsclazz = Class.forName("java.nio.file.StandardWatchEventKinds", true, agent.getClassLoader());
 				Object entrycreate = standardwatcheventkindsclazz.getField("ENTRY_CREATE").get(null);
+				Object entrymodify = standardwatcheventkindsclazz.getField("ENTRY_MODIFY").get(null);
 				
 				// Register WatchService on path.
-				Object kindsarray = Array.newInstance(wekindsclazz, 1);
+				Object kindsarray = Array.newInstance(wekindsclazz, 2);
 				Array.set(kindsarray, 0, entrycreate);
+				Array.set(kindsarray, 1, entrymodify);
 				Method registermethod = pathclazz.getMethod("register", new Class<?>[] { wsclazz, kindsarray.getClass() });
 				registermethod.invoke(path, new Object[]{watchservice, kindsarray});
 				
@@ -152,33 +154,38 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 						final Exception[] ex = new Exception[1];
 						try
 						{
-							Method pollmethod = wsclazz.getMethod("poll", (Class<?>[])new Class[]{long.class, TimeUnit.class});
+							Class<?> wkclazz = Class.forName("java.nio.file.WatchKey");
+							Method polleventsmethod = wkclazz.getMethod("pollEvents", (Class<?>[]) null);
+							Method resetmethod = wkclazz.getMethod("reset", (Class<?>[]) null);
+							Method takemethod = wsclazz.getMethod("take", (Class<?>[])null);
 							while(ex[0]==null)
 							{
-								final Object val = pollmethod.invoke(watchservice, (Object[])new Object[]{5l, TimeUnit.SECONDS});
-								// Test if agent is alive in intervals and end thread otherwise
-//								System.out.println("pollend: "+val);
-								ea.scheduleStep(new IComponentStep<Void>()
+								final Object val = takemethod.invoke(watchservice, (Object[])null);
+								if (val!=null)
 								{
-									public IFuture<Void> execute(IInternalAccess ia)
+									polleventsmethod.invoke(val, (Object[]) null);
+									resetmethod.invoke(val, (Object[]) null);
+									// Test if agent is alive in intervals and end thread otherwise
+	//								System.out.println("pollend: "+val);
+									ea.scheduleStep(new IComponentStep<Void>()
 									{
-//										System.out.println("poll in agent: "+val);
-										// only scan if call was due to new watchkey
-										if(val!=null)
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
 											scan();
-										return IFuture.DONE;
-									}
-								}).addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
+											return IFuture.DONE;
+										}
+									}).addResultListener(new IResultListener<Void>()
 									{
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										ex[0] = exception;
-									}
-								});
+										public void resultAvailable(Void result)
+										{
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											ex[0] = exception;
+										}
+									});
+								}
 							}
 						}
 						catch (Exception e)
@@ -190,7 +197,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 			}
 			catch (Exception e)
 			{
-//				e.printStackTrace();
+				e.printStackTrace();
 				// Use polling as fallback.
 				watchservice = null;
 			}
@@ -206,7 +213,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 	 */
 	public void changeOccurred(ChangeEvent<IComponentIdentifier> event)
 	{
-		System.out.println("Change occured: " + event.getSource());
+//		System.out.println("Change occured: " + agent + " " + event.getSource());
 		if (agent.getComponentIdentifier().getRoot().equals(event.getSource()))
 			postInfo();
 	}
@@ -266,6 +273,15 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 //		ITransportComponentIdentifier root = fut2.get();
 		IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
 		Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
+//		System.out.println("=====" + agent + "======");
+//		for (Map.Entry<String, String[]> entry : addr.entrySet())
+//		{
+//			for (String a : entry.getValue())
+//			{
+//				System.out.println("POST " + agent + " " + entry.getKey() + " : " + a);
+//			}
+//		}
+//		System.out.println("=====" + agent + "======");
 		long leasetime = (Long) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
 		AwarenessInfo info = new AwarenessInfo(root, addr, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 		byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
@@ -310,6 +326,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 	protected void scan()
 	{
 		File[] files = DISCOVERY_DIR.listFiles();
+//		System.out.println("FILES of " + agent + ": " + Arrays.toString(files));
 		for (File file : files)
 		{
 			if (file.getAbsolutePath().endsWith(".awa"))

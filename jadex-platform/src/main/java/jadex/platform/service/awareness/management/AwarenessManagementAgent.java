@@ -350,7 +350,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 //		}
 		System.out.println(agent.getComponentIdentifier().toString() + " merging " + info.getAddresses() + " " + info.getSender());
 		changedaddrs = TransportAddressBook.getAddressBook(agent).mergePlatformAddresses(info.getSender().getRoot(), info.getAddresses());
-		System.out.println("Merged: " + changedaddrs);
+		System.out.println("MERGED " + agent + " THIS: " + info.getSender().getRoot() + " " + info.getAddresses());
+		System.out.println("Merged: " + changedaddrs + " " + agent);
 		
 //		addresses.addPlatformAddresses(info.getSender());
 //		tas.addPlatformAddresses(info.getSender());

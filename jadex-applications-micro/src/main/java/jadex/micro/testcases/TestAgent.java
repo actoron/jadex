@@ -231,7 +231,7 @@ public abstract class TestAgent
 							"-saveonexit", "false",
 							"-welcome", "false",
 							"-autoshutdown", "false",
-							"-awareness", "false",
+							"-awareness", "true",
 							"-gui", "false",
 							"-cli", "false",
 							"-simulation", "false",
