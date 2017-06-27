@@ -51,6 +51,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -89,6 +90,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.micro.annotation.Binding;
 
 /**
  *  Abstract default implementation of component management service.
@@ -3278,15 +3280,20 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<IComponentManagementService>	getRemoteCMS(final IComponentIdentifier cid)
 	{
 		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
-		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
-		{
-			public void customResultAvailable(IRemoteServiceManagementService rms)
-			{
-				IFuture<IComponentManagementService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), cid, new ClassInfo(IComponentManagementService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
-				fut.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
-			}
-		}));
+		
+		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
+		sq.setPlatform(cid.getRoot());
+		return ServiceRegistry.getRegistry(agent).searchServiceAsync(sq);
+		
+//		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
+//		{
+//			public void customResultAvailable(IRemoteServiceManagementService rms)
+//			{
+//				IFuture<IComponentManagementService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), cid, new ClassInfo(IComponentManagementService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+//				fut.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
+//			}
+//		}));
 		
 //		ret.addResultListener(new IResultListener<IComponentManagementService>() 
 //		{
@@ -3300,7 +3307,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			}
 //		});
 		
-		return ret;
+//		return ret;
 	}
 	
 //	/**
