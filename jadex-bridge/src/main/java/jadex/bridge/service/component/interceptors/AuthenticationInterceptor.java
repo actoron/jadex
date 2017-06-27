@@ -85,26 +85,26 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(send)
-		{
-			createAuthentication(context).addResultListener(new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result)
-				{
-					context.invoke().addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
-		}
-		else
-		{
-			checkAuthentication(context).addResultListener(new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result)
-				{
-					context.invoke().addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
-		}
+//		if(send)
+//		{
+//			createAuthentication(context).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					context.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			checkAuthentication(context).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					context.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
+//		}
 		
 		return ret;
 	}
@@ -112,7 +112,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	/**
 	 *  Check the authentication.
 	 */
-	protected IFuture<Void> createAuthentication(final ServiceInvocationContext context)
+	/*protected IFuture<Void> createAuthentication(final ServiceInvocationContext context)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -142,12 +142,12 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		});
 	
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Check the authentication.
 	 */
-	protected IFuture<Void> checkAuthentication(final ServiceInvocationContext context)
+	/*protected IFuture<Void> checkAuthentication(final ServiceInvocationContext context)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -229,12 +229,12 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Internal check method that calls verify on 
 	 */
-	protected IFuture<Void> internalCheck(ServiceInvocationContext context, final String callername, final byte[] signed)
+	/*protected IFuture<Void> internalCheck(ServiceInvocationContext context, final String callername, final byte[] signed)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -254,5 +254,5 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		});
 		
 		return ret;
-	}
+	}*/
 }
