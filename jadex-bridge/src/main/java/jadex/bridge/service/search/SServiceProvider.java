@@ -1070,7 +1070,7 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getTaggedService(final IInternalAccess component, Class<T> type, String scope, final String... tags)
 	{
-		return getTaggedService(component, type, scope, tags);
+		return getTaggedService(component, type, scope, null, tags);
 	}
 	
 	/**
