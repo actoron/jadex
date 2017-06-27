@@ -231,7 +231,7 @@ public abstract class TestAgent
 							"-saveonexit", "false",
 							"-welcome", "false",
 							"-autoshutdown", "false",
-							"-awareness", "true",
+							"-awareness", "false",
 							"-gui", "false",
 							"-cli", "false",
 							"-simulation", "false",
@@ -276,14 +276,6 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(IExternalAccess result)
 							{
-								try
-								{
-									Thread.sleep(5000);
-								}
-								catch(InterruptedException e)
-								{
-								}
-								
 								platforms.add(result);
 								super.customResultAvailable(result);
 							}
@@ -418,6 +410,7 @@ public abstract class TestAgent
 				TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(exta.getComponentIdentifier());
 				tab1.addPlatformAddresses(exta.getComponentIdentifier(), "tcp",
 					tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+//				System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
 				
 				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 				{

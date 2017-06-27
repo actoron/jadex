@@ -245,7 +245,7 @@ public abstract class AbstractRawTransportAgent<Con> implements ITransportServic
 	 * Agent initialization.
 	 */
 	@AgentCreated
-	protected void init() throws Exception
+	protected IFuture<Void>	init()
 	{
 		this.codec = MessageComponentFeature.getSerializationServices(agent.getComponentIdentifier().getRoot());
 		this.secser	= SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM, false);
@@ -257,10 +257,11 @@ public abstract class AbstractRawTransportAgent<Con> implements ITransportServic
 		// If port==0 -> any free port
 		if(port >= 0)
 		{
-			impl.openPort(port).addResultListener(new IResultListener<Integer>()
+			final Future<Void>	ret	= new Future<Void>();
+			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 			{
 				@Override
-				public void resultAvailable(Integer port)
+				public void customResultAvailable(Integer port)
 				{
 					try
 					{
@@ -282,19 +283,20 @@ public abstract class AbstractRawTransportAgent<Con> implements ITransportServic
 
 						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
+						ret.setResult(null);
 					}
 					catch(Exception e)
 					{
-						exceptionOccurred(e);
+						ret.setException(e);
 					}
 				}
-
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					agent.getLogger().warning("Problem opening port " + port + " for " + impl.getProtocolName() + " transport: " + exception);
-				}
 			});
+			
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
 		}
 	}
 

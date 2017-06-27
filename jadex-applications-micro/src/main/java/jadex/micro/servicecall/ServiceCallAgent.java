@@ -11,10 +11,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -43,7 +41,7 @@ public class ServiceCallAgent	extends TestAgent
 	//-------- constants --------
 	
 	/** Wait for key pressed between local and remote tests (for profiling). */
-	public static final boolean	WAIT	= false;
+	public static boolean	WAIT	= false;
 	
 	//-------- attributes --------
 	
@@ -158,15 +156,16 @@ public class ServiceCallAgent	extends TestAgent
 	{
 		final Future<Void> ret	= new Future<Void>();
 //		IFuture<IServiceCallService> fut = getServiceCallService(servicename, 0, 2, 3000);
-		IFuture<IServiceCallService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IServiceCallService>, Void>()
-		{
-			public IFuture<IServiceCallService> execute(Void args)
-			{
-				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+//		IFuture<IServiceCallService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IServiceCallService>, Void>()
+//		{
+//			public IFuture<IServiceCallService> execute(Void args)
+//			{
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
 //				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename, true, 
 //					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
-			}
-		}, 7, 1500);
+//			}
+//		}, 7, 1500);
+		IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{
@@ -227,6 +226,7 @@ public class ServiceCallAgent	extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						super.exceptionOccurred(exception);
 					}
 				};
@@ -235,6 +235,7 @@ public class ServiceCallAgent	extends TestAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
 		});

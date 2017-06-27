@@ -43,7 +43,6 @@ import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
@@ -81,10 +80,11 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-persist", "true", // for testing persistence
 //		"-niotcptransport", "false",
 //		"-tcptransport", "true",
+		"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class",
 //		"-deftimeout", "-1",
 		"-printpass", "false",
 		// Hack!!! include ssl transport if available
-		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
+//		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
 	};
 
 	//-------- attributes --------
