@@ -1,5 +1,6 @@
 package jadex.micro.servicecall;
 
+import java.io.IOException;
 import java.util.Map;
 
 import jadex.base.PlatformConfiguration;
@@ -39,6 +40,11 @@ import jadex.micro.testcases.TestAgent;
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
 public class ServiceCallAgent	extends TestAgent
 {
+	//-------- constants --------
+	
+	/** Wait for key pressed between local and remote tests (for profiling). */
+	public static final boolean	WAIT	= false;
+	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -179,13 +185,37 @@ public class ServiceCallAgent	extends TestAgent
 						
 						if(count==0)
 						{
+							// To start profiling after setup.
+							if(WAIT && "raw".equals(tag) && "raw".equals(servicename))
+							{
+								try
+								{
+									System.out.println("Press [RETURN] to start...");
+									while(System.in.read()!='\n');
+								}
+								catch(IOException e)
+								{
+								}
+							}
 							start = System.nanoTime();
 						}
 						
 						if(count==num)
 						{
 							long	end	= System.nanoTime();
-							System.out.println(servicename+" service call on "+service+" took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" nanos).");
+							System.out.println(servicename+" service call on "+tag+" service took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" nanos).");
+							// To stop profiling after finished.
+							if(WAIT && "decoupled".equals(tag) && "decoupled".equals(servicename))
+							{
+								try
+								{
+									System.out.println("Press [RETURN] to continue...");
+									while(System.in.read()!='\n');
+								}
+								catch(IOException e)
+								{
+								}
+							}
 							ret.setResult(null);
 						}
 						else
