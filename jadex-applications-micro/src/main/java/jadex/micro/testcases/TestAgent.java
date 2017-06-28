@@ -32,6 +32,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
@@ -292,7 +293,7 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename,
-		final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final IComponentIdentifier root, final  IResultListener<Map<String,Object>> reslis)
 	{
 		return createComponent(filename, null, null, root, reslis);
 	}
@@ -301,7 +302,7 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename, final Map<String, Object> args, 
-		final String config, final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final String config, final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
@@ -316,8 +317,9 @@ public abstract class TestAgent
 				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, agent.getModel().getResourceIdentifier());
 				ci.setArguments(args);
 				ci.setConfiguration(config);
-				cms.createComponent(null, filename, ci, reslis)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				ITuple2Future<IComponentIdentifier,Map<String,Object>> cmsfut = cms.createComponent(null, filename, ci);
+//				cms.createComponent(null, filename, ci, reslis)
+				cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
@@ -329,7 +331,7 @@ public abstract class TestAgent
 						exception.printStackTrace();
 						super.exceptionOccurred(exception);
 					}
-				});
+				}, reslis);
 			}
 		});
 		
@@ -358,7 +360,7 @@ public abstract class TestAgent
 	/**
 	 *  Setup a local test.
 	 */
-	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename,  IResultListener<Map<String,Object>> reslis)
 	{
 		return createComponent(filename, agent.getComponentIdentifier().getRoot(), reslis);
 	}
@@ -367,7 +369,7 @@ public abstract class TestAgent
 	 *  Setup a remote test.
 	 */
 	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
-		final IResultListener<Collection<Tuple2<String,Object>>> reslis, final boolean remove)
+		final  IResultListener<Map<String,Object>> reslis, final boolean remove)
 	{
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		

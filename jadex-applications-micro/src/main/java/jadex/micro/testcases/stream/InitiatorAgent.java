@@ -2,6 +2,7 @@ package jadex.micro.testcases.stream;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -124,8 +125,8 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		
-		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
 		createComponent("jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
@@ -156,7 +157,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
+	protected IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Map<String, Object>> resfut)
 	{
 		final long start = System.currentTimeMillis();
 		final long[] filesize = new long[1];
@@ -169,11 +170,12 @@ public class InitiatorAgent extends TestAgent
 			
 			final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
 			
-			resfut.addResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
+			resfut.addResultListener(new IResultListener<Map<String,Object>>()
 			{
-				public void resultAvailable(Collection<Tuple2<String, Object>> results)
+				public void resultAvailable(Map<String, Object> results)
 				{
-					Long fs = (Long)jadex.bridge.modelinfo.Argument.getResult(results, "filesize");
+//					Long fs = (Long)jadex.bridge.modelinfo.Argument.getResult(results, "filesize");
+					Long fs = (Long) results.get("filesize");
 					if(fs!=null)
 					{
 						if(fs.longValue()==filesize[0])
