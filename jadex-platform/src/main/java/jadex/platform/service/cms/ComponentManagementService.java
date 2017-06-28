@@ -2269,7 +2269,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.err.println("getExternalAccess() failed: "+SUtil.getExceptionStacktrace(exception));
+				System.err.println("getExternalAccess() failed: "+agent+", "+exception);//SUtil.getExceptionStacktrace(exception));
 			}
 		});
 		

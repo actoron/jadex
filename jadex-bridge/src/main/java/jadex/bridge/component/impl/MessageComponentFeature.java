@@ -42,8 +42,13 @@ import jadex.commons.transformation.traverser.SCloner;
  */
 public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature, IInternalMessageFeature
 {
+	//-------- constants ---------
+
 	/** Header marker for send-reply messages. */
 	public static final String SENDREPLY = "__sendreply__";
+	
+	/** Exception header property for error messages. */
+	public static final String	EXCEPTION	= "__exception__";
 	
 	//-------- attributes --------
 	

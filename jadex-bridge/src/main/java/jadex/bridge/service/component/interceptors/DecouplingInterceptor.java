@@ -15,7 +15,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IExecutionFeature;
@@ -24,6 +23,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.marshal.IMarshalService;
@@ -41,7 +41,6 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.SCloner;
-import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Invocation interceptor for executing a call on 
@@ -247,10 +246,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 		else
 		{
-//			if(sic.getMethod().getName().equals("getServiceProxies"))
-//				System.out.println("decouple: "+Thread.currentThread());
-//			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, rt))
-//				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
+//			if(sic.getMethod().getName().indexOf("getExternalAccess")!=-1
+//				&& sic.getArguments().size()>0
+//				&& sic.getArguments().get(0) instanceof IComponentIdentifier)
+//			{
+//				if(sic.getObject() instanceof ServiceInfo)
+//				{
+//					IComponentIdentifier	provider	= ((ServiceInfo)sic.getObject()).getManagementService().getServiceIdentifier().getProviderId();
+//					System.out.println("getExternalAccess: "+provider+", "+sic.getArguments());
+//				}
+//			}				
 			ea.scheduleStep(IExecutionFeature.STEP_PRIORITY_IMMEDIATE, new InvokeMethodStep(sic))
 				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}

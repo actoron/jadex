@@ -3,6 +3,7 @@ package jadex.platform.service.serialization;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -70,7 +71,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 	 *  Invoke a method.
 	 */
 	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-	{		
+	{
 		final ProxyInfo pi = pr.getProxyInfo();
 		
 		if(pi.isExcluded(method)) 

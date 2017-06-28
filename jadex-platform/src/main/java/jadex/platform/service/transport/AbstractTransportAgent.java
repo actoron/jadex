@@ -15,11 +15,16 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.component.impl.MsgHeader;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -27,7 +32,6 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
-import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -40,31 +44,29 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  * Base class for transports.
+ * Thread-safe implementation for using transports as raw service.
  * 
- * @param <Con> A custom object type to hold connection information as required
- *        by the concrete transport.
+ * @param <Con> A custom object type to hold connection information as required by the concrete transport.
  */
-@Agent(autoprovide = Boolean3.TRUE)
-public abstract class AbstractTransportAgent<Con> implements ITransportService, ITransportHandler<Con>
+@Agent
+@ProvidedServices(@ProvidedService(type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
+public abstract class AbstractTransportAgent<Con> implements ITransportService, IInternalService, ITransportHandler<Con>
 {
 	// -------- arguments --------
 
-	/**
-	 * The default priority, when choosing a transport to communicate with a
-	 * specific platform.
-	 */
+	/** The default priority, when choosing a transport to communicate with specific platform. */
 	@AgentArgument
-	protected int											priority		= 1000;
+	protected int	priority	= 1000;
 
-	/**
-	 * The port, the transport should listen to (&lt;0: don't listen, 0: choose
-	 * random port, >0: use given port).
-	 */
+	/** The port, the transport should listen to (&lt;0: don't listen, 0: choose random port, >0: use given port). */
 	@AgentArgument
-	protected int											port			= 0;
+	protected int	port	= 0;
 
 	/**
 	 * The keep-alive (group), i.e. an address, to which the transport should
@@ -74,19 +76,19 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	@AgentArgument
 	// TODO: not yet implemented... required e.g. for message relaying
-	protected String										keepalivegroup	= null;
+	protected String	keepalivegroup	= null;
 
 	// -------- internal attributes --------
 
 	/** The agent. */
 	@Agent
-	protected IInternalAccess								agent;
+	protected IInternalAccess	agent;
 
 	/** The encoder/decoder. */
-	protected ISerializationServices						codec;
+	protected ISerializationServices	codec;
 
 	/** The transport implementaion. */
-	protected ITransport<Con>								impl;
+	protected ITransport<Con>	impl;
 
 	/**
 	 * The connections currently in use (target platform -> virtual connection).
@@ -98,7 +100,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * The connections currently in handshake or in use (impl connection ->
 	 * connection candidate object). Used also for messageReceived().
 	 */
-	protected Map<Con, ConnectionCandidate>					candidates;
+	protected Map<Con, ConnectionCandidate>	candidates;
 	
 	/** The security service (cached for speed). */
 	protected ISecurityService	secser;
@@ -133,91 +135,92 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void messageReceived(final Con con, final byte[] header, final byte[] body)
 	{
-		if(agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		ConnectionCandidate cand = getConnectionCandidate(con);
+		final IComponentIdentifier source = cand.getTarget();
+
+		// First msg is CID from handshake.
+		if(source == null)
 		{
-			ConnectionCandidate cand = getConnectionCandidate(con);
-			final IComponentIdentifier source = cand.getTarget();
-
-			// First msg is CID from handshake.
-			if(source == null)
+			assert header.length == 0;
+			String name = new String(body, SUtil.UTF8);
+			cand.setTarget(new BasicComponentIdentifier(name));
+		}
+		else
+		{
+			// First decrypt.
+			secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
 			{
-				assert header.length == 0;
-				String name = new String(body, SUtil.UTF8);
-				cand.setTarget(new BasicComponentIdentifier(name));
-			}
-			else
-			{
-				// First decrypt.
-				secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
+				@Override
+				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
 				{
-					@Override
-					public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
+					if(tup.getSecondEntity() != null)
 					{
-						if(tup.getSecondEntity() != null)
-						{
-							// Then decode header and deliver to receiver agent.
-							final IMsgHeader header = (IMsgHeader)codec.decode(null, agent.getClassLoader(), tup.getSecondEntity());
-							final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
+						// Then decode header and deliver to receiver agent.
+						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent.getClassLoader(), tup.getSecondEntity());
+						final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 
-							cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
+						cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
+						{
+							@Override
+							public void resultAvailable(IExternalAccess exta)
 							{
-								@Override
-								public void resultAvailable(IExternalAccess exta)
+								exta.scheduleStep(new IComponentStep<Void>()
 								{
-									exta.scheduleStep(new IComponentStep<Void>()
+									@Override
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										IMessageFeature mf = ia.getComponentFeature0(IMessageFeature.class);
+										if(mf instanceof IInternalMessageFeature)
+										{
+											((IInternalMessageFeature)mf).messageArrived(header, body);
+										}
+										return IFuture.DONE;
+									}
+								}).addResultListener(new IResultListener<Void>()
+								{
+									@Override
+									public void resultAvailable(Void result)
+									{
+										// NOP
+									}
+
+									@Override
+									public void exceptionOccurred(Exception exception)
+									{
+										getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+									}
+								});
+							}
+
+							@Override
+							public void exceptionOccurred(final Exception exception)
+							{
+								getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+								
+								// For undeliverable conversation messages -> send error reply (only for non-error messages). 
+								if(header.getProperty(IMsgHeader.CONVERSATION_ID)!=null && header.getProperty(MessageComponentFeature.EXCEPTION)==null)
+								{
+									agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 									{
 										@Override
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IMessageFeature mf = ia.getComponentFeature0(IMessageFeature.class);
-											if(mf instanceof IInternalMessageFeature)
-											{
-												((IInternalMessageFeature)mf).messageArrived(header, body);
-											}
+											Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
+											addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
+											ia.getComponentFeature(IMessageFeature.class).sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields);
 											return IFuture.DONE;
-										}
-									}).addResultListener(new IResultListener<Void>()
-									{
-										@Override
-										public void resultAvailable(Void result)
-										{
-											// NOP
-										}
-
-										@Override
-										public void exceptionOccurred(Exception exception)
-										{
-											getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
 										}
 									});
 								}
-
-								@Override
-								public void exceptionOccurred(Exception exception)
-								{
-									getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
-								}
-							});
-						}
+							}
+						});
 					}
+				}
 
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						getLogger().warning("Could not deliver message from platform " + source + ": " + exception);
-					}
-				});
-			}
-		}
-		else
-		{
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-			{
 				@Override
-				public IFuture<Void> execute(IInternalAccess ia)
+				public void exceptionOccurred(Exception exception)
 				{
-					messageReceived(con, header, body);
-					return IFuture.DONE;
+					getLogger().warning("Could not deliver message from platform " + source + ": " + exception);
 				}
 			});
 		}
@@ -239,26 +242,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param con The connection.
 	 * @param e The exception, if any.
 	 */
-	public void connectionClosed(final Con con, final Exception e)
+	public void connectionClosed(Con con, Exception e)
 	{
-		if(agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
-		{
-			ConnectionCandidate cand = getConnectionCandidate(con);
-			assert cand != null;
-			removeConnectionCandidate(cand, e);
-		}
-		else
-		{
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-			{
-				@Override
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					connectionClosed(con, e);
-					return IFuture.DONE;
-				}
-			});
-		}
+		ConnectionCandidate cand = getConnectionCandidate(con);
+		assert cand != null : e;
+		removeConnectionCandidate(cand, e);
 	}
 
 	// -------- life cycle --------
@@ -267,7 +255,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * Agent initialization.
 	 */
 	@AgentCreated
-	protected void init() throws Exception
+	protected IFuture<Void>	init()
 	{
 		this.codec = MessageComponentFeature.getSerializationServices(agent.getComponentIdentifier().getRoot());
 		this.secser	= SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM, false);
@@ -279,10 +267,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		// If port==0 -> any free port
 		if(port >= 0)
 		{
-			impl.openPort(port).addResultListener(new IResultListener<Integer>()
+			final Future<Void>	ret	= new Future<Void>();
+			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 			{
 				@Override
-				public void resultAvailable(Integer port)
+				public void customResultAvailable(Integer port)
 				{
 					try
 					{
@@ -304,19 +293,20 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 
 						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
+						ret.setResult(null);
 					}
 					catch(Exception e)
 					{
-						exceptionOccurred(e);
+						ret.setException(e);
 					}
 				}
-
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					agent.getLogger().warning("Problem opening port " + port + " for " + impl.getProtocolName() + " transport: " + exception);
-				}
 			});
+			
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
 		}
 	}
 
@@ -337,19 +327,45 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param header Message header.
 	 * @return Transport priority, when ready
 	 */
-	public IFuture<Integer> isReady(IMsgHeader header)
+	public IFuture<Integer> isReady(final IMsgHeader header)
 	{
-		VirtualConnection handler = getVirtualConnection(getTarget(header));
-		if(handler != null)
+		IFuture<Integer>	ret	= null;
+		boolean	create	= false;
+		String[]	addresses	= null;
+		VirtualConnection	handler;
+		IComponentIdentifier	target	= getTarget(header);
+		
+		synchronized(this)
 		{
-			return handler.isReady();
+			handler = getVirtualConnection(target);
+			if(handler==null)
+			{
+				addresses = getAddresses(header);
+				if(addresses!=null && addresses.length>0)
+				{
+					handler	= createVirtualConnection(target);
+					create	= true;
+				}
+				else
+				{
+					ret	= new Future<Integer>(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
+				}
+			}
 		}
-		else
+		
+		if(ret==null)
 		{
-			return createConnections(header);
+			ret	= handler.isReady();
 		}
+		
+		if(create)
+		{
+			createConnections(handler, target, addresses);
+		}
+		
+		return ret;
 	}
-
+	
 	/**
 	 * Send a message. Fail fast implementation. Retry should be handled in
 	 * message feature.
@@ -370,38 +386,38 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			final Future<Void> ret = new Future<Void>();
 			byte[] bheader = codec.encode(header, agent.getClassLoader(), header);
 
-//			ISecurityService secser = SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM, false);
 			secser.encryptAndSign(header, bheader).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)
 			{
 				@Override
 				public void customResultAvailable(final byte[] ebheader) throws Exception
 				{
 					VirtualConnection handler = getVirtualConnection(getTarget(header));
-					if(handler == null || handler.getConnection() == null)
+					Con con	= handler.getConnection();
+					if(handler==null || con==null)
 					{
 						ret.setException(new RuntimeException("No connection to " + getTarget(header)));
 					}
 					else
 					{
-						trySend(handler, ebheader);
+						trySend(con, handler, ebheader);
 					}
 				}
 
-				protected void trySend(final VirtualConnection handler, final byte[] ebheader)
+				protected void trySend(final Con con, final VirtualConnection handler, final byte[] ebheader)
 				{
 					// Try with existing connection. When failed -> check if new
 					// connection available,
 					// e.g. if current connection terminated due to multiple
 					// open connections.
-					final Con con = handler.getConnection();
 					impl.sendMessage(con, ebheader, body).addResultListener(new DelegationResultListener<Void>(ret)
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							if(handler.getConnection() != null && handler.getConnection() != con)
+							Con con2	= handler.getConnection();
+							if(con2!=null && con2!=con)
 							{
-								trySend(handler, ebheader);
+								trySend(con2, handler, ebheader);
 							}
 							else
 							{
@@ -430,67 +446,111 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * Create a connection to a given platform. Tries all available addresses in
 	 * parallel. Fails when no connection can be established.
 	 */
-	protected IFuture<Integer> createConnections(final IMsgHeader header)
+	protected void	createConnections(final VirtualConnection handler, final IComponentIdentifier target, final String[] addresses)
 	{
-		final String[] addresses = getAddresses(header);
-		if(addresses != null && addresses.length > 0)
-		{
-			final VirtualConnection handler = createVirtualConnection(getTarget(header));
-			// Counter for failed connections to know when all are failed.
-			final int[] failed = new int[]{0};
+		// Counter for failed connections to know when all are failed.
+		final int[] failed = new int[]{0};
 
-			for(final String address : addresses)
+		for(final String address : addresses)
+		{
+			agent.getLogger().info("Attempting connection to " + target + " using address: " + address);
+			IFuture<Con> fcon = impl.createConnection(address, target);
+			fcon.addResultListener(new IResultListener<Con>()
 			{
-				agent.getLogger().info("Attempting connection to " + getTarget(header) + " using address: " + address);
-				IFuture<Con> fcon = impl.createConnection(address, getTarget(header));
-				fcon.addResultListener(new IResultListener<Con>()
+				@Override
+				public void resultAvailable(Con con)
 				{
-					@Override
-					public void resultAvailable(Con con)
+					createConnectionCandidate(con, true);
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().info("Failed connection to " + target + " using address: " + address + ": " + exception);
+
+					// All tries failed?
+					int cnt;
+					synchronized(this)
 					{
-						createConnectionCandidate(con, true);
+						cnt	= failed[0]++;
 					}
-
-					@Override
-					public void exceptionOccurred(Exception exception)
+					if(cnt == addresses.length)
 					{
-						agent.getLogger().info("Failed connection to " + getTarget(header) + " using address: " + address + ": " + exception);
-
-						// All tries failed?
-						if((failed[0]++) == addresses.length)
-						{
-							handler.fail(new RuntimeException("No connection to any address possible for " + impl.getProtocolName() + ": " + header + ", " + Arrays.toString(addresses)));
-						}
+						handler.fail(new RuntimeException("No connection to any address possible for " + impl.getProtocolName() + ": " + target + ", " + Arrays.toString(addresses)));
 					}
-				});
-			}
-
-			return handler.isReady();
-		}
-		else
-		{
-			return new Future<Integer>(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
+				}
+			});
 		}
 	}
 
 	// -------- connection management methods --------
-
-	/**
-	 * Get the connection handler, if any.
-	 */
-	protected VirtualConnection getVirtualConnection(IComponentIdentifier target)
-	{
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-		return virtuals != null ? virtuals.get(target) : null;
-	}
-
+	
 	/**
 	 * Get the connection handler, if any.
 	 */
 	protected ConnectionCandidate getConnectionCandidate(Con con)
 	{
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-		return candidates != null ? candidates.get(con) : null;
+		synchronized(this)
+		{
+			return candidates != null ? candidates.get(con) : null;
+		}
+	}
+	
+	/**
+	 * Create a connection candidate.
+	 */
+	protected void	createConnectionCandidate(final Con con, final boolean clientcon)
+	{
+		ConnectionCandidate cand = new ConnectionCandidate(con, clientcon);
+		synchronized(this)
+		{
+			if(candidates==null)
+			{
+				candidates = new HashMap<Con, ConnectionCandidate>();
+			}
+			ConnectionCandidate prev = candidates.put(con, cand);
+			assert prev == null;
+		}
+
+		// Start handshake by sending id.
+		agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
+		impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+	}
+	
+	/**
+	 * Remove a connection candidate.
+	 */
+	protected void removeConnectionCandidate(ConnectionCandidate cand, Exception e)
+	{
+		synchronized(this)
+		{
+			ConnectionCandidate prev = candidates.remove(cand.getConnection());
+			assert prev == cand;
+		}
+
+		if(cand.getTarget()!=null)
+		{
+//			handler.getAccess().getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
+			agent.getLogger().info("Closed connection " + cand.getConnection() + " to: "+cand.getTarget()+(e!=null? ", "+e:""));
+			VirtualConnection vircon = getVirtualConnection(cand.getTarget());
+			assert vircon!=null;
+			vircon.removeConnection(cand);
+		}
+		else
+		{
+			agent.getLogger().info("Closed connection: " + cand.getConnection()+(e!=null? ", "+e:""));
+		}
+	}
+	
+	/**
+	 * Get the connection handler, if any.
+	 */
+	protected VirtualConnection getVirtualConnection(IComponentIdentifier target)
+	{
+		synchronized(this)
+		{
+			return virtuals != null ? virtuals.get(target) : null;
+		}
 	}
 
 	/**
@@ -498,70 +558,32 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected VirtualConnection createVirtualConnection(IComponentIdentifier target)
 	{
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-		if(virtuals == null)
+		synchronized(this)
 		{
-			virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
-		}
-		VirtualConnection vircon = new VirtualConnection();
-		VirtualConnection prev = virtuals.put(target, vircon);
-		assert prev == null;
-		return vircon;
-	}
-
-	/**
-	 * Create a connection candidate.
-	 */
-	protected void	createConnectionCandidate(final Con con, final boolean clientcon)
-	{
-		if(agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
-		{
-			if(candidates == null)
+			if(virtuals == null)
 			{
-				candidates = new HashMap<Con, ConnectionCandidate>();
+				virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
 			}
-			ConnectionCandidate cand = new ConnectionCandidate(con, clientcon);
-			ConnectionCandidate prev = candidates.put(con, cand);
+			VirtualConnection vircon = new VirtualConnection();
+			VirtualConnection prev = virtuals.put(target, vircon);
 			assert prev == null;
-
-			// Start handshake by sending id.
-			agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
-			impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
-		}
-		else
-		{
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-			{
-				@Override
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					createConnectionCandidate(con, clientcon);
-					return IFuture.DONE;
-				}
-			});
+			return vircon;
 		}
 	}
-
+	
 	/**
-	 * Remove a connection candidate.
+	 *  Get or create a virtual connection.
 	 */
-	protected void removeConnectionCandidate(ConnectionCandidate cand, Exception e)
+	protected VirtualConnection getOrCreateVirtualConnection(IComponentIdentifier target)
 	{
-		assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-		ConnectionCandidate prev = candidates.remove(cand.getConnection());
-		assert prev == cand;
-
-		if(cand.getTarget() != null)
+		synchronized(this)
 		{
-//			handler.getAccess().getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
-			agent.getLogger().info("Closed connection " + cand.getConnection() + " to: "+cand.getTarget()+(e!=null? ", "+e:""));
-			VirtualConnection vircon = getVirtualConnection(cand.getTarget());
-			assert vircon != null;
-			vircon.removeConnection(cand);
-		}
-		else
-		{
-			agent.getLogger().info("Closed connection: " + cand.getConnection()+(e!=null? ", "+e:""));
+			VirtualConnection	ret	= getVirtualConnection(target);
+			if(ret==null)
+			{
+				ret	= createVirtualConnection(target);
+			}
+			return ret;
 		}
 	}
 
@@ -586,7 +608,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		IComponentIdentifier target = getTarget(header).getRoot();
 		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
 		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
-		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
+//		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
 		return ret;
 	}
 
@@ -649,10 +671,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		public void setTarget(IComponentIdentifier target)
 		{
-			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			assert this.target == null;
-
-			this.target = target;
+			synchronized(this)
+			{
+				assert this.target == null;
+				this.target = target;
+			}
 
 			VirtualConnection virt = getVirtualConnection(target);
 			if(virt == null)
@@ -668,11 +691,18 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		public void unprefer()
 		{
-			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			if(clientcon && !closing)
+			boolean	close	= false;
+			synchronized(this)
+			{
+				if(clientcon && !closing)
+				{
+					close	= true;
+					this.closing	= true;
+				}
+			}
+			if(close)
 			{
 				agent.getLogger().info("Closing duplicate connection " + con + " to: "+ getTarget());
-				this.closing = true;
 				impl.closeConnection(con);
 			}
 		}
@@ -718,7 +748,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		public Con getConnection()
 		{
-			return cons != null && !cons.isEmpty() ? cons.get(0).getConnection() : null;
+			synchronized(this)
+			{
+				return cons != null && !cons.isEmpty() ? cons.get(0).getConnection() : null;
+			}
 		}
 
 		/**
@@ -730,39 +763,60 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void addConnection(ConnectionCandidate cand)
 		{
-			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			assert this.cons == null || !this.cons.contains(cand);
-
-			if(cons == null)
+			ConnectionCandidate	unprefer	= null;
+			Future<Integer>	fut	= null;
+			boolean log	= false;
+			
+			synchronized(this)
 			{
-				cons = new ArrayList<ConnectionCandidate>();
+				assert this.cons==null || !this.cons.contains(cand);
+	
+				if(cons==null)
+				{
+					cons = new ArrayList<ConnectionCandidate>();
+				}
+	
+				// Is the new the preferred connection?
+				if(cons.isEmpty() || cons.get(0).compareTo(cand)<0)
+				{
+					cons.add(0, cand);
+					log	= true;	// tell logger to info handshake.
+					
+					// Inform listener, if any.
+					if(this.fut!=null)
+					{
+						fut	= this.fut;
+						this.fut = null;
+					}
+	
+					// Unprefer previous connection, if any
+					if(cons.size() > 1)
+					{
+						unprefer	= cons.get(1);
+					}
+				}
+	
+				// Keep connection but unprefer, to cause abort, if on client side.
+				else
+				{
+					cons.add(cand);
+					unprefer	= cand;
+				}
+			}
+			
+			if(log)
+			{
+				agent.getLogger().info("Completed handshake for connection " + cand.getConnection() + " to: "+ cand.getTarget());
 			}
 
-			// Is the new the preferred connection?
-			if(cons.isEmpty() || cons.get(0).compareTo(cand) < 0)
+			if(fut!=null)
 			{
-				cons.add(0, cand);
-				agent.getLogger().info("Completed handshake for  connection " + cand.getConnection() + " to: "+ cand.getTarget());
-
-				// Inform listener, if any.
-				if(fut != null)
-				{
-					fut.setResult(priority);
-					fut = null;
-				}
-
-				// Unprefer previous connection, if any
-				if(cons.size() > 1)
-				{
-					cons.get(1).unprefer();
-				}
+				fut.setResult(priority);
 			}
-
-			// Keep connection but unprefer, to cause abort on client side.
-			else
+			
+			if(unprefer!=null)
 			{
-				cons.add(cand);
-				cand.unprefer();
+				unprefer.unprefer();
 			}
 		}
 
@@ -773,10 +827,13 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void removeConnection(ConnectionCandidate cand)
 		{
-			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			assert this.cons != null && this.cons.contains(cand);
-
-			cons.remove(cand);
+			synchronized(this)
+			{
+				assert this.cons != null && this.cons.contains(cand);
+				cons.remove(cand);
+			}
+			
+			// TODO: remove virtual connection when last connection fails.
 		}
 
 		/**
@@ -784,18 +841,20 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected IFuture<Integer> isReady()
 		{
-			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			if((cons == null || cons.isEmpty()))
+			synchronized(this)
 			{
-				if(fut == null)
+				if(cons==null || cons.isEmpty())
 				{
-					fut = new Future<Integer>();
+					if(fut==null)
+					{
+						fut = new Future<Integer>();
+					}
+					return fut;
 				}
-				return fut;
-			}
-			else
-			{
-				return new Future<Integer>(priority);
+				else
+				{
+					return new Future<Integer>(priority);
+				}
 			}
 		}
 
@@ -805,12 +864,81 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void fail(Exception e)
 		{
-			assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-			if((cons == null || cons.isEmpty()) && fut != null)
+			Future<Integer>	fut	= null;
+
+			synchronized(this)
 			{
-				fut.setException(e);
-				fut = null;
+				// Only fail, when no backward connection in mean time.
+				if((cons==null || cons.isEmpty()) && this.fut!=null)
+				{
+					fut	= this.fut;
+					this.fut = null;
+				}
 			}
+			
+			if(fut!=null)
+			{
+				fut.setExceptionIfUndone(e);
+			}
+			
+			// TODO: remove failed virtual connection
 		}
+	}
+
+	//-------- IInternalService interface -------- 
+	
+	private IServiceIdentifier sid;
+	
+	/**
+	 *  Get the service identifier.
+	 *  @return The service identifier.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return sid;
+	}
+	
+	/**
+	 *  Test if the service is valid.
+	 *  @return True, if service can be used.
+	 */
+	public IFuture<Boolean> isValid()
+	{
+		return new Future<Boolean>(true);
+	}
+		
+	/**
+	 *  Get the map of properties (considered as constant).
+	 *  @return The service property map (if any).
+	 */
+	public Map<String, Object> getPropertyMap()
+	{
+		return new HashMap<String, Object>();
+	}
+	
+	/**
+	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
+	 */
+	public IFuture<Void>	startService() {return IFuture.DONE;}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @return A future that is done when the service has completed its shutdown.  
+	 */
+	public IFuture<Void>	shutdownService() {return IFuture.DONE;}
+	
+	/**
+	 *  Sets the access for the component.
+	 *  @param access Component access.
+	 */
+	public IFuture<Void> setComponentAccess(@Reference IInternalAccess access) {return IFuture.DONE;}
+	
+	/**
+	 *  Set the service identifier.
+	 */
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	{
+		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
 	}
 }

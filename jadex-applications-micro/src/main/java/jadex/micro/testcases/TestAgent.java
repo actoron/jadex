@@ -323,6 +323,7 @@ public abstract class TestAgent
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
+						System.out.println("created: "+result);
 						super.customResultAvailable(result);
 					}
 					

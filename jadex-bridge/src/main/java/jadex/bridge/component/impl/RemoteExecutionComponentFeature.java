@@ -39,10 +39,9 @@ import jadex.commons.future.TerminableFuture;
 public class RemoteExecutionComponentFeature extends AbstractComponentFeature implements IRemoteExecutionFeature, IInternalRemoteExecutionFeature
 {
 	//-------- constants ---------
-	
+
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(
-		IRemoteExecutionFeature.class, RemoteExecutionComponentFeature.class);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IRemoteExecutionFeature.class, RemoteExecutionComponentFeature.class);
 	
 	/** ID of the remote execution command in progress. */
 	protected static final String RX_ID = "__rx_id__";
@@ -185,14 +184,33 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
-			IFuture<?> retfut = commands == null ? null : commands.get(rxid);
-			if(retfut == null)
+			if(commands==null || !commands.containsKey(rxid))
 			{
 				IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;
-				retfut = cmd.execute(component, secinfos);
+				final IFuture<?> retfut = cmd.execute(component, secinfos);
 				if (commands == null)
 					commands = new HashMap<String, IFuture<?>>();
 				commands.put(rxid, retfut);
+				
+				final IResultListener<Void>	term;
+				if(retfut instanceof TerminableFuture)
+				{
+					term	= new IResultListener<Void>()
+					{
+						public void exceptionOccurred(Exception exception)
+						{
+							((TerminableFuture)retfut).terminate();
+						}
+						
+						public void resultAvailable(Void result)
+						{
+						}
+					};
+				}
+				else
+				{
+					term	= null;
+				}
 				
 				final IComponentIdentifier remote = (IComponentIdentifier) header.getProperty(IMsgHeader.SENDER);
 				
@@ -201,7 +219,11 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					public void intermediateResultAvailable(Object result)
 					{
 						RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result);
-						sendRxMessage(remote, rxid, rc);
+						IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
+						if(term!=null)
+						{
+							fut.addResultListener(term);
+						}
 					}
 					
 					public void finished()
@@ -244,26 +266,31 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					
 					public void commandAvailable(Object command)
 					{
-						sendRxMessage(remote, rxid, command).addResultListener(new IResultListener<Void>()
+						IFuture<Void>	fut	= sendRxMessage(remote, rxid, command);
+						if(term!=null)
 						{
-							public void exceptionOccurred(Exception exception)
-							{
-								IFuture<?> fut = commands.remove(rxid);
-								if (fut instanceof TerminableFuture)
-									((TerminableFuture) fut).terminate();
-							}
-							
-							public void resultAvailable(Void result)
-							{
-							}
-						});
+							fut.addResultListener(term);
+						}
 					}
 				});
 			}
+			else if(msg instanceof IRemoteConversationCommand)
+			{
+				IFuture<?> fut = commands.get(rxid);
+				IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
+				cmd.execute(component, (IFuture)fut, secinfos);
+			}
+			else if(header.getProperty(MessageComponentFeature.EXCEPTION)!=null)
+			{
+				IFuture<?> fut = commands.get(rxid);
+				if(fut instanceof TerminableFuture)
+				{
+					((TerminableFuture)fut).terminate((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
+				}
+			}
 			else
 			{
-				IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
-				cmd.execute(component, (IFuture)retfut, secinfos);
+				getComponent().getLogger().warning("Invalid remote execution message: "+header+", "+msg);
 			}
 		}
 	}

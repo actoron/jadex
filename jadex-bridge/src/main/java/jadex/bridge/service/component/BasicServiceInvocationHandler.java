@@ -194,9 +194,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		final long callid = this.callid.getAndIncrement();
 //		comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), true, proxy, method, args, callid, null);
 		
-//		if(method.getName().indexOf("getExternalAccess")!=-1)
-//			System.out.println("call method ex");
-		
 //		if(method.getName().indexOf("start")!=-1 && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
 //			System.out.println("call method start");
 		if(method.getName().indexOf("updateClientData")!=-1 && args[0]==null)// && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)

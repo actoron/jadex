@@ -98,14 +98,14 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-//		System.out.println("test: "+report.getDescription()+", "+BasicService.getLocalDefaultTimeout());
+		System.out.println("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
 		
 		waitForRealtimeDelay(Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("test1: "+report.getDescription());
+				System.out.println("test1: "+report.getDescription());
 				
 				if(!report.isSucceeded())
 				{
@@ -120,7 +120,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public void terminated(Exception reason)
 			{
-//				System.out.println("test2: "+report.getDescription());
+				System.out.println("test2: "+report.getDescription());
 				
 				if(report.getReason()==null)
 				{
@@ -139,7 +139,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("test3: "+report.getDescription());
+				System.out.println("test3: "+report.getDescription());
 				
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
@@ -168,7 +168,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 				&& reports.get(2).isFinished();
 		}
 
-//		System.out.println("test4: "+reports.size()+", "+finished);
+		System.out.println("test4: "+reports.size()+", "+finished);
 
 		if(finished)
 		{
