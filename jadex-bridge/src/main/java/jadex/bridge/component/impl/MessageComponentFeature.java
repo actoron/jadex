@@ -357,7 +357,11 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			Future<Object> fut = awaitingmessages != null ? awaitingmessages.remove(convid) : null;
 			if (fut != null)
 			{
-				fut.setResult(body);
+				Exception exception = (Exception) header.getProperty(EXCEPTION);
+				if (exception != null)
+					fut.setException(exception);
+				else
+					fut.setResult(body);
 				return;
 			}
 		}
