@@ -17,6 +17,7 @@ public class MicroTest	extends ComponentTestSuite
 	{
 		// Broken, please fix (cf. David Georg Reichelt)
 		"remotestepinservicecall",
+		"TimeProviderAgent",
 		
 		// Test-support agents
 		"BodyExceptionAgent",

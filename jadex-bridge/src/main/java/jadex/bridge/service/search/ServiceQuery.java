@@ -337,6 +337,24 @@ public class ServiceQuery<T>
 	}
 	
 	/**
+	 *  Get the platform.
+	 *  @return The platform
+	 */
+	public IComponentIdentifier getPlatform()
+	{
+		return platform;
+	}
+	
+	/**
+	 *  Get the platform.
+	 *  @param platform The platform
+	 */
+	public void setPlatform(IComponentIdentifier platform)
+	{
+		this.platform = platform;
+	}
+	
+	/**
 	 *  Get the owner.
 	 *  @return The owner
 	 */
