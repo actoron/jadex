@@ -8,6 +8,7 @@ import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.AgentMessageArrived;
 
 /**
@@ -38,7 +39,21 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	 */
 	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
-		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null});
+		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null})
+			.addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					// OK -> ignore
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					getComponent().getLogger().warning("Exception during message handling: "+exception);
+				}
+			});
 	}
 	
 	/**

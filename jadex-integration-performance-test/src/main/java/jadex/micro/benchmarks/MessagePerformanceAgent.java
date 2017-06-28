@@ -30,7 +30,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -368,7 +367,7 @@ public class MessagePerformanceAgent
 	 *  Called on message arrival.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg)
 	{
 		if(received == 0)
 		{

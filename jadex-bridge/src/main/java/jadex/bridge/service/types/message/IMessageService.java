@@ -5,9 +5,7 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
@@ -21,21 +19,21 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 @Service(system=true)
 public interface IMessageService extends IService
 {
-	/**
-	 *  Send a message.
-	 *  @param message The message as key value pairs.
-	 *  @param msgtype The message type.
-	 *  @param sender The sender component identifier.
-	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
-	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
-	 *  *  @param serializerid ID of the serializer for encoding the message.
-	 *  @param codecids The codecs to use for encoding (if different from default).
-	 *  @param nonfunc The non functional properties that need to be preserved.
-	 *  @return Future that indicates an exception when messages could not be delivered to components. 
-	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
-			final IComponentIdentifier osender, final IResourceIdentifier rid, 
-			final IComponentIdentifier realrec, final Byte serializerid, final byte[] codecids);//, Map<String, Object> nonfunc);
+//	/**
+//	 *  Send a message.
+//	 *  @param message The message as key value pairs.
+//	 *  @param msgtype The message type.
+//	 *  @param sender The sender component identifier.
+//	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
+//	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
+//	 *  *  @param serializerid ID of the serializer for encoding the message.
+//	 *  @param codecids The codecs to use for encoding (if different from default).
+//	 *  @param nonfunc The non functional properties that need to be preserved.
+//	 *  @return Future that indicates an exception when messages could not be delivered to components. 
+//	 */
+//	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
+//			final IComponentIdentifier osender, final IResourceIdentifier rid, 
+//			final IComponentIdentifier realrec, final Byte serializerid, final byte[] codecids);//, Map<String, Object> nonfunc);
 	
 //	/**
 //	 *  Deliver a message to some components.
@@ -129,14 +127,14 @@ public interface IMessageService extends IService
 	 */
 	public String[] getAddressSchemes();
 
-	// todo: remove these method or futurize the first
-	/**
-	 *  Get the message type.
-	 *  @param type The type name.
-	 *  @return The message type.
-	 */
-	@Excluded
-	public MessageType getMessageType(String type);
+//	// todo: remove these method or futurize the first
+//	/**
+//	 *  Get the message type.
+//	 *  @param type The type name.
+//	 *  @return The message type.
+//	 */
+//	@Excluded
+//	public MessageType getMessageType(String type);
 	
 	/**
 	 *  Get the serializers.

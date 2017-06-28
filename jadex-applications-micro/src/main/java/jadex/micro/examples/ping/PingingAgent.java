@@ -13,7 +13,6 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -123,16 +122,13 @@ public class PingingAgent
 	 *  Called when a message arrives.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg)
 	{
-		if(mt.equals(SFipa.FIPA_MESSAGE_TYPE))
+		String convid = (String)msg.get(SFipa.CONVERSATION_ID);
+		if(sent.remove(convid))
 		{
-			String convid = (String)msg.get(SFipa.CONVERSATION_ID);
-			if(sent.remove(convid))
-			{
-				dif = 0; // A received ping heals other outstanding pings.
-				sent.clear();
-			}
+			dif = 0; // A received ping heals other outstanding pings.
+			sent.clear();
 		}
 	}
 	

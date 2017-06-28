@@ -2,8 +2,6 @@ package jadex.bridge;
 
 import java.util.Map;
 
-import jadex.bridge.service.types.message.MessageType;
-
 
 /**
  *  Interface for external messages to be passed to a kernel component.
@@ -18,11 +16,11 @@ public interface IMessageAdapter
      */
 	public static final Class<?> TYPE = IMessageAdapter.class;
 	
-	/**
-	 *  Get the message type.
-	 *  @return The message type. 
-	 */
-	public MessageType getMessageType();
+//	/**
+//	 *  Get the message type.
+//	 *  @return The message type. 
+//	 */
+//	public MessageType getMessageType();
 	
 	/**
 	 *  Get the platform message.

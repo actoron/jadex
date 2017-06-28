@@ -111,14 +111,8 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(IExternalAccess platform)
 			{
-//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-//                {
-//                    public void customResultAvailable(ITransportComponentIdentifier cid)
-//                    { 
-						performTest(platform.getComponentIdentifier(), testno)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-//        			}
-//        		});
+				performTest(platform.getComponentIdentifier(), testno)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
