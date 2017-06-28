@@ -54,7 +54,7 @@ public class ServiceCallAgent	extends TestAgent
 	
 	/** The invocation count. */
 	@AgentArgument
-	protected int max	= 1000;
+	protected int max	= 500;
 	
 	//-------- methods --------
 	
@@ -67,15 +67,15 @@ public class ServiceCallAgent	extends TestAgent
 		
 //		System.out.println("Service call test on: "+agent.getComponentIdentifier());
 		
-		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 10000 : 1, local ? 3 : 1, local ? 3 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 20000 : 1, local ? 6 : 1, local ? 6 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				performTests(cms, DirectServiceAgent.class.getName()+".class", local ? 5 : 1, local ? 3 : 1, local ? 2 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				performTests(cms, DirectServiceAgent.class.getName()+".class", local ? 10 : 1, local ? 6 : 1, local ? 4 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performTests(cms, DecoupledServiceAgent.class.getName()+".class", local ? 1 : 1, local ? 2 : 1, local ? 1 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+						performTests(cms, DecoupledServiceAgent.class.getName()+".class", local ? 2 : 1, local ? 4 : 1, local ? 2 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{

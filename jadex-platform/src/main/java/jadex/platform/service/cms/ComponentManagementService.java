@@ -2269,14 +2269,7 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
-				if(cid.getName().toLowerCase().indexOf("directservice")!=-1
-					|| cid.getName().toLowerCase().indexOf("rawservice")!=-1
-					|| cid.getName().toLowerCase().indexOf("decoupledservice")!=-1)
-				{
-					System.out.println("getExternalAccess: "+agent.getComponentIdentifier()+", "+cid);
-//					getExternalAccess(cid);
-				}
+				System.err.println("getExternalAccess() failed: "+SUtil.getExceptionStacktrace(exception));
 			}
 		});
 		
