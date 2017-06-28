@@ -145,7 +145,7 @@ public class NHCurve448ChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Sui
 			Tuple2<ExchangePair, byte[]> tup = (Tuple2<ExchangePair, byte[]>) ephemeralkey;
 			SSecurity.getSecureRandom().nextBytes(tup.getSecondEntity());
 		}
-		else
+		else if (ephemeralkey instanceof Tuple3)
 		{
 			@SuppressWarnings("unchecked")
 			Tuple3<byte[], NHAgreement, byte[]> tup = (Tuple3<byte[], NHAgreement, byte[]>) ephemeralkey;
