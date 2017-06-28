@@ -2262,16 +2262,16 @@ public class ComponentManagementService implements IComponentManagementService
 			
 		}
 		
-		ret.addResultListener(new IResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(IExternalAccess result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				System.err.println("getExternalAccess() failed: "+agent+", "+exception);//SUtil.getExceptionStacktrace(exception));
-			}
-		});
+//		ret.addResultListener(new IResultListener<IExternalAccess>()
+//		{
+//			public void resultAvailable(IExternalAccess result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.err.println("getExternalAccess() failed: "+agent+", "+exception);//SUtil.getExceptionStacktrace(exception));
+//			}
+//		});
 		
 		return ret;
 	}

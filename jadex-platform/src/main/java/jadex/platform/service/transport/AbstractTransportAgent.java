@@ -21,6 +21,7 @@ import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.impl.MsgHeader;
+import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -158,7 +159,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						// Then decode header and deliver to receiver agent.
 						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent.getClassLoader(), tup.getSecondEntity());
 						final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-
+						
 						cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
 						{
 							@Override
@@ -198,7 +199,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 								getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
 								
 								// For undeliverable conversation messages -> send error reply (only for non-error messages). 
-								if(header.getProperty(IMsgHeader.CONVERSATION_ID)!=null && header.getProperty(MessageComponentFeature.EXCEPTION)==null)
+								if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)
+									&& header.getProperty(MessageComponentFeature.EXCEPTION)==null)
 								{
 									agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 									{
@@ -207,7 +209,23 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 										{
 											Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
 											addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
-											ia.getComponentFeature(IMessageFeature.class).sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields);
+											ia.getComponentFeature(IMessageFeature.class)
+												.sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields)
+												.addResultListener(new IResultListener<Void>()
+												{
+													@Override
+													public void exceptionOccurred(Exception exception)
+													{
+														getLogger().warning("Could send error message to " + header.getProperty(IMsgHeader.SENDER) + ": " + exception);
+													}
+													
+													@Override
+													public void resultAvailable(Void result)
+													{
+														// OK -> ignore
+//														System.out.println("Sent error message: "+header.getProperty(IMsgHeader.SENDER) + ", "+exception);
+													}
+												});
 											return IFuture.DONE;
 										}
 									});
