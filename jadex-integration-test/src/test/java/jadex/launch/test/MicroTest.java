@@ -17,7 +17,13 @@ public class MicroTest	extends ComponentTestSuite
 	{
 		// Broken, please fix (cf. David Georg Reichelt)
 		"remotestepinservicecall",
+		
+		// Hangs due to 5 sec repeat step in simulation
 		"TimeProviderAgent",
+		
+		// excluded until new authorization model conceived
+		"authenticate/Initiator",
+		"authenticate\\Initiator",
 		
 		// Test-support agents
 		"BodyExceptionAgent",
