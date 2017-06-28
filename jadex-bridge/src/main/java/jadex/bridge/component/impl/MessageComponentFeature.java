@@ -42,11 +42,8 @@ import jadex.commons.transformation.traverser.SCloner;
  */
 public class MessageComponentFeature extends AbstractComponentFeature implements IMessageFeature, IInternalMessageFeature
 {
-	/** Key for the conversation ID of reply messages. */
-	public static final String CONVERSATION_ID = "__sendreplyconvid";
-	
-	/** Header marker for the reply message. */
-	public static final String IS_REPLY = "__sendreplyisreply";
+	/** Header marker for send-reply messages. */
+	public static final String SENDREPLY = "__sendreply__";
 	
 	//-------- attributes --------
 	
@@ -156,7 +153,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		final MsgHeader header = new MsgHeader();
 		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
 		header.addProperty(IMsgHeader.RECEIVER, receiver);
-		header.addProperty(CONVERSATION_ID, convid);
+		header.addProperty(IMsgHeader.CONVERSATION_ID, convid);
+		header.addProperty(SENDREPLY, Boolean.TRUE);
 		
 		sendMessage(header, message).addResultListener(new IResultListener<Void>()
 		{
@@ -200,7 +198,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //			return new Future<Void>(new IllegalArgumentException("Cannot reply, illegal message ID or null."));
 		
 		IComponentIdentifier rplyrec = (IComponentIdentifier) msgheader.getProperty(IMsgHeader.SENDER);
-		String convid = (String) msgheader.getProperty(CONVERSATION_ID);
+		String convid = (String) msgheader.getProperty(IMsgHeader.CONVERSATION_ID);
 		if (rplyrec == null)
 			return new Future<Void>(new IllegalArgumentException("Cannot reply, reply receiver ID not found."));
 		if (convid == null)
@@ -209,8 +207,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		MsgHeader header = new MsgHeader();
 		header.addProperty(IMsgHeader.RECEIVER, rplyrec);
 		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
-		header.addProperty(CONVERSATION_ID, convid);
-		header.addProperty(IS_REPLY, Boolean.TRUE);
+		header.addProperty(IMsgHeader.CONVERSATION_ID, convid);
+		header.addProperty(SENDREPLY, Boolean.TRUE);
 		
 		return sendMessage(header, message);
 	}
@@ -347,16 +345,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void messageArrived(final IMsgSecurityInfos secinfos, final IMsgHeader header, Object body)
 	{
-		String convid = (String) ((MsgHeader) header).getProperty(CONVERSATION_ID);
-		if (convid != null)
+		if (Boolean.TRUE.equals(header.getProperty(SENDREPLY)))
 		{
-			// send-reply message
-			
-			if (Boolean.TRUE.equals(((MsgHeader) header).getProperty(IS_REPLY)))
+			// send-reply message, check if reply.
+			String convid = (String) header.getProperty(IMsgHeader.CONVERSATION_ID);
+			Future<Object> fut = awaitingmessages != null ? awaitingmessages.remove(convid) : null;
+			if (fut != null)
 			{
-				Future<Object> fut = awaitingmessages.remove(convid);
-				if (fut != null)
-					fut.setResult(body);
+				fut.setResult(body);
 				return;
 			}
 		}
