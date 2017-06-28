@@ -15,7 +15,6 @@ import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -437,7 +436,75 @@ public class ComponentManagementService implements IComponentManagementService
 					// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
 					// will deliver the platform (as this second call is performed by the cms itself)
 					
-					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
+					// Map remote subscription events to local result listener (avoids the need for listener as plain remote object)
+					rcms.createComponent(cinfo, name, modelname).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+					{
+						Collection<Tuple2<String, Object>>	results;
+						
+						@Override
+						public void intermediateResultAvailable(CMSStatusEvent result)
+						{
+							if(result instanceof CMSCreatedEvent)
+							{
+								inited.setResult(result.getComponentIdentifier());
+							}
+							else if(result instanceof CMSIntermediateResultEvent && resultlistener!=null)
+							{
+								CMSIntermediateResultEvent	ire	= (CMSIntermediateResultEvent)result;
+								Tuple2<String, Object>	res	= new Tuple2<String, Object>(ire.getName(), ire.getValue());
+								
+								if(resultlistener instanceof IIntermediateResultListener)
+								{
+									IIntermediateResultListener<Tuple2<String, Object>>	reslis	= (IIntermediateResultListener<Tuple2<String, Object>>)resultlistener;
+									reslis.intermediateResultAvailable(res);
+								}
+								else
+								{
+									if(results==null)
+									{
+										results	= new HashSet<Tuple2<String,Object>>();
+									}
+									
+									results.add(res);
+								}
+							}
+						}
+						
+						@Override
+						public void resultAvailable(Collection<CMSStatusEvent> result)
+						{
+							assert false: "Should not happen"; 
+						}
+						
+						@Override
+						public void finished()
+						{
+							if(resultlistener!=null)
+							{
+								if(resultlistener instanceof IIntermediateResultListener)
+								{
+									((IIntermediateResultListener<Tuple2<String, Object>>)resultlistener).finished();
+								}
+								else
+								{
+									if(results==null)
+									{
+										results	= Collections.emptySet();
+									}
+									resultlistener.resultAvailable(results);
+								}								
+							}
+						}
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							if(!inited.setExceptionIfUndone(exception) && resultlistener!=null)
+							{
+								resultlistener.exceptionOccurred(exception);
+							}
+						}
+					});
 				}
 			}));
 		}
