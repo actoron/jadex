@@ -1730,7 +1730,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		else
 		{
 			Set<IService> sers = getServices(query);
-			if (sers != null)
+			if(sers!=null && !sers.isEmpty())
 			{
 				final Iterator<IService> it = sers.iterator();
 				
