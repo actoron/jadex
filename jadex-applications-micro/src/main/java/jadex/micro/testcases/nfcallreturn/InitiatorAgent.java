@@ -2,6 +2,7 @@ package jadex.micro.testcases.nfcallreturn;
 
 import java.util.Map;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -11,6 +12,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -89,16 +91,37 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		
-		createPlatform(null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
+		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 		{
-			public void customResultAvailable(final IExternalAccess platform)
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-				performTests(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport[]>(ret)));
+				// Add addresses of new platform to current
+				TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
+				TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(exta.getComponentIdentifier());
+				tab1.addPlatformAddresses(exta.getComponentIdentifier(), "tcp",
+					tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+//				System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+				
+				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						// inverse proxy from remote to local.
+						Starter.createProxy(exta, agent.getExternalAccess())
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								performTests(exta.getComponentIdentifier(), testno, false)
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+										.createResultListener(new DelegationResultListener<TestReport[]>(ret)));
+							}
+						});
+					}
+				});
 			}
-		}));
-		
+		});
+
 		return ret;
 	}
 	
