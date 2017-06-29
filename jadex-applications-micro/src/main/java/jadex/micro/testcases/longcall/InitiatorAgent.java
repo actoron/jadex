@@ -17,9 +17,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddressBook;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -224,13 +222,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ITestService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<ITestService>, Void>()
-		{
-			public IFuture<ITestService> execute(Void args)
-			{
-				return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
-			}
-		}, 7, 1500);
+		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, Collection<TestReport>>(ret)
 		{
@@ -283,7 +275,7 @@ public class InitiatorAgent extends TestAgent
 //			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 1.0/30));
 
 			// hard code timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
+			ServiceCall.getOrCreateNextInvocation().setTimeout(100);
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);

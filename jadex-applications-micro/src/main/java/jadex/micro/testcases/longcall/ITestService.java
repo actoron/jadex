@@ -19,37 +19,37 @@ public interface ITestService
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
+	@Timeout(100)
 	public IFuture<Void> method1();
 	
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
+	@Timeout(100)
 	public ITerminableFuture<Void> method2();
 	
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
+	@Timeout(100)
 	public IIntermediateFuture<Void> method3();
 	
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
+	@Timeout(100)
 	public ISubscriptionIntermediateFuture<Void> method4();
 	
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
+	@Timeout(100)
 	public IPullIntermediateFuture<Void> method5();
 	
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
+	@Timeout(100)
 	public IPullSubscriptionIntermediateFuture<Void> method6();
 
 }
