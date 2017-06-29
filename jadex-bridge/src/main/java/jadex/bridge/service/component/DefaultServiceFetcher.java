@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,7 +22,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
-import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -30,9 +30,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.TagFilter;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -45,7 +44,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureFinishChecker;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -135,7 +133,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				// Test if already bound.
 				if(result==null)
 				{
-					// Search component.
+					// Search component per name.
 					if(binding.getComponentName()!=null)
 					{
 //						System.out.println("searching: "+binding.getComponentName());
@@ -233,8 +231,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
-		if (info.getTags() != null && info.getTags().size()>0)
-			throw new RuntimeException("Multi service injection with tags broken.");
+//		if (info.getTags() != null && info.getTags().size()>0)
+//			throw new RuntimeException("Multi service injection with tags broken.");
 		
 //		if(info.getTags()!=null && info.getTags().size()>0)
 //		{
@@ -324,7 +322,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 												final IExternalAccess ea = it.next();
 //												final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
 	
-												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+//												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+												SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags)
 													.addResultListener(new IResultListener<T>()
 												{
 													public void resultAvailable(final T result)
@@ -365,8 +364,17 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						// Search service using search specification.
 //						if(type.toString().indexOf("Test")!=-1)
 //							System.out.println("result: "+result);
-
-						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
+						
+						ServiceQuery<T> query = new ServiceQuery<T>();
+						query.setOwner(ia.getComponentIdentifier());
+						query.setServiceType(new ClassInfo(type));
+						query.setReturnType(query.getServiceType());
+						query.setScope(binding.getScope());
+						query.setAsyncFilter(ffilter);
+						query.setServiceTags(tags);
+						
+//						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
+						IIntermediateFuture<T>	ifut	= ServiceRegistry.getRegistry(ia.getComponentIdentifier().getRoot()).searchServicesAsync(query);
 						ifut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding)
 						{
 							public void exceptionOccurred(Exception exception)
