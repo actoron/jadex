@@ -944,10 +944,12 @@ public class RemoteReferenceModule
 		{
 //			System.out.println("interfaces of proxy: "+SUtil.arrayToString(pi.getTargetInterfaces()));
 			
-			Class<?>[] tmp = pr.getProxyInfo().getTargetInterfaces();
-			Class<?>[] interfaces = new Class[tmp.length+1];
-			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
-			interfaces[tmp.length] = IFinalize.class;
+			// TODO: support mapping of pojo services?
+//			Class<?>[] tmp = pr.getProxyInfo().getTargetInterfaces();
+//			Class<?>[] interfaces = new Class[tmp.length+1];
+//			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
+//			interfaces[tmp.length] = IFinalize.class;
+			Class<?>[]	interfaces	=  pr.getProxyInfo().getTargetInterfaces();
 			
 			// Which classloader to use for proxy creation?
 			// a) from sender: allows receiver to have all (also implementations) what sender has
