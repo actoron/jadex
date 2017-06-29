@@ -1,6 +1,5 @@
 package jadex.micro.testcases;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -25,7 +24,6 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -323,7 +321,6 @@ public abstract class TestAgent
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
-						System.out.println("created: "+result);
 						super.customResultAvailable(result);
 					}
 					

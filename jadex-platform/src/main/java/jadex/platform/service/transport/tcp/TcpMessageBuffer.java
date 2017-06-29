@@ -63,7 +63,6 @@ public class TcpMessageBuffer
 		// Transfer data from channel into the buffer.
 		if(sc.read(wb) == -1)
 		{
-			System.out.println("channel closed: "+sc);
 			throw new IOException("Channel closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
 		}
 		
