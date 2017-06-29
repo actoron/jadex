@@ -390,18 +390,24 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					getRegistry().removeQueriesFromPlatform(cid);
 				}
 			}, false, true, new AgentDelayRunner(component), false);
-			
 		}
 		
 		ClientInfo ci = clients.get(cid);
 		
+		boolean existed = true;
 		if(ci==null)
+		{
 			ci = new ClientInfo(cid);
+			existed = false;
+		}
 		clients.put(cid, ci);
 		
-		System.out.println("Client update request from: "+cid);
+		if(event.size()>0)
+			System.out.println("Client update request from: "+cid+" size:"+event.size()+" delta: "+event.isDelta());
 		
 		handleRegistryEvent(event);
+		
+		ret.setResult(new RegistryUpdateEvent(event.isDelta() && !existed, lrobs.getTimeLimit()));
 		
 		return ret;
 	}

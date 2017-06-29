@@ -158,7 +158,7 @@ public class RegistryEvent implements IRegistryEvent
 	{
 		int	size = 0;
 		if(addedservices!=null)
-			addedservices.size();
+			size += addedservices.size();
 		if(removedservices!=null)
 			size += removedservices.size();
 		return size;

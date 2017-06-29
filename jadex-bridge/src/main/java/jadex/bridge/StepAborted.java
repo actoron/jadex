@@ -5,4 +5,8 @@ package jadex.bridge;
  */
 public class StepAborted extends ThreadDeath 
 {
+	public StepAborted()
+	{
+		System.out.println("sdgsdrg");
+	}
 }

@@ -1,5 +1,6 @@
 package jadex.platform.service.registry;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
@@ -47,19 +48,20 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		{
 			public void notifyObservers(final RegistryEvent event)
 			{
-				final boolean first = spregser==null;
-				
-				getSuperpeerService(false).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
+//						System.out.println("localobs");
 						IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
 						{
 							public void resultAvailable(RegistryUpdateEvent spevent) 
 							{
 								if(spevent.isRemoved())
+								{
 									spser.updateClientData(lrobs.getCurrentStateEvent()).addResultListener(this);
-									
+									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+								}
 								// Calls notify observers at latest 
 								lrobs.setTimelimit((long)(spevent.getLeasetime()*0.9));
 							}
@@ -75,17 +77,17 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 							}
 						};
 						
-						IRegistryEvent ev = first? lrobs.getCurrentStateEvent(): event;
-						spser.updateClientData(ev).addResultListener(lis);
-						System.out.println("Send client update to superpeer: "+(first? "full": "delta")+" "+((IService)spregser).getServiceIdentifier().getProviderId());
+						spser.updateClientData(event).addResultListener(lis);
+						System.out.println("Send client delta update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						System.out.println("No superpeer found to send client data to");
 						// Not a problem because on first occurrence sends full data (removeds are lost)
 //						System.out.println("no superpeer found");
 					}
-				});
+				}, component));
 			}
 		};
 	}
@@ -107,7 +109,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		else
 		{
 			// If superpeerservice==null force a new search
-			getRegistry().getSuperpeer(spregser==null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, ISuperpeerRegistrySynchronizationService>(ret)
+			getRegistry().getSuperpeer(spregser==null).addResultListener(
+				new ComponentResultListener<IComponentIdentifier>(new ExceptionDelegationResultListener<IComponentIdentifier, ISuperpeerRegistrySynchronizationService>(ret)
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
@@ -121,7 +124,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						}
 					});
 				}
-			});
+			}, component));
 		}
 		
 		return ret;

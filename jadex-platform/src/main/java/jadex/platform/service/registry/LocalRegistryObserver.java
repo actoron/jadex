@@ -115,6 +115,7 @@ public abstract class LocalRegistryObserver
 			canceltimer.run();
 		
 		// Set up event notification timer
+		System.out.println("notify in: "+getTimeLimit());
 		canceltimer = timer.waitForDelay(getTimeLimit(), new Runnable()
 		{
 			public void run()

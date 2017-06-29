@@ -337,6 +337,9 @@ import jadex.platform.service.simulation.SimulationAgent;
 		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
+
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
@@ -358,8 +361,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -392,7 +393,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		
+				
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
@@ -422,6 +423,9 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
@@ -439,8 +443,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })

@@ -23,7 +23,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -518,7 +517,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		T ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
-			if (query.getFilter() instanceof IAsyncFilter)
+			if(query.getFilter() instanceof IAsyncFilter)
 				throw new IllegalArgumentException("Synchronous search call with asynchronous filter in query: " + query);
 			
 			Set<IService> sers = getServices(query);
@@ -1382,15 +1381,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
+		if(cid==null)
+			System.out.println("hhhhhhhhhhhhhhhhhhhh");
+		
 		if(!excluded && !isIncluded(cid, ser))
-		{
 			return ret;
-		}
 		
 		if(scope==null)
-		{
 			scope = RequiredServiceInfo.SCOPE_APPLICATION;
-		}
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{

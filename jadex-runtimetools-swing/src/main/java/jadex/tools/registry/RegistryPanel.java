@@ -41,14 +41,18 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
+import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ClassInfoRenderer;
@@ -70,7 +74,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	protected int timerdelay;
 	
 	/** The table model. */
-	protected RegistryTableModel dismodel;
+	protected RegistryTableModel regmodel;
 	
 	/** The textfield with superpeer. */
 	protected JTextField tfsuperpeer;
@@ -94,15 +98,16 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		
 		JPanel preginfos = new JPanel(new BorderLayout());
 		preginfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Registry Services "));
-		dismodel = new RegistryTableModel();
+		regmodel = new RegistryTableModel();
 //		SorterFilterTableModel tm = new SorterFilterTableModel(dismodel);
-		TableSorter sorter = new TableSorter(dismodel);
+		final TableSorter sorter = new TableSorter(regmodel);
 		jtreg = new JTable(sorter)
 		{
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) 
 			{    
+				row = sorter.modelIndex(row);
 				Component c = super.prepareRenderer(renderer, row, column);
-				c.setBackground(dismodel.getRowColour(row)); 
+				c.setBackground(regmodel.getRowColour(row)); 
 				return c;
 			}
 		};
@@ -173,21 +178,38 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	 */
 	protected void updateRegistryInfos()
 	{
-		Set<IService> alls = getRegistry().getAllServices();
-		
-		System.out.println("refresh: "+alls.size());
-		
-		int sel = jtreg.getSelectedRow();
-		List<IService> reginfos = dismodel.getList();
-		reginfos.clear();
-		for(Iterator<IService> it=alls.iterator(); it.hasNext(); )
+//		Set<IService> alls = getRegistry().getAllServices();
+		executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
 		{
-			reginfos.add(it.next());
-		}
-		
-		dismodel.fireTableDataChanged();
-		if(sel!=-1 && sel<alls.size())
-			((DefaultListSelectionModel)jtreg.getSelectionModel()).setSelectionInterval(sel, sel);
+			public Object execute(IServiceRegistry reg)
+			{
+				return reg.getAllServices();
+			}
+		}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
+		{
+			public void resultAvailable(Object result)
+			{
+				Set<IService> alls = (Set<IService>)result;
+//				System.out.println("refresh: "+alls.size());
+				
+				int sel = jtreg.getSelectedRow();
+				List<IService> reginfos = regmodel.getList();
+				reginfos.clear();
+				for(Iterator<IService> it=alls.iterator(); it.hasNext(); )
+				{
+					reginfos.add(it.next());
+				}
+				
+				regmodel.fireTableDataChanged();
+				if(sel!=-1 && sel<alls.size())
+					((DefaultListSelectionModel)jtreg.getSelectionModel()).setSelectionInterval(sel, sel);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		}));
 	}
 	
 	/**
@@ -195,43 +217,98 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	 */
 	protected void updateSuperpeerInfo()
 	{
-		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
-		if(sps!=null)
+//		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
+		
+		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
+		executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
 		{
-			tfsuperpeer.setText("self");
-		}
-		else
-		{
-			tfsuperpeer.setText("fetching ...");
-			getRegistry().getSuperpeer(false).addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+			public Object execute(IServiceRegistry reg)
 			{
-				public void resultAvailable(IComponentIdentifier cid)
+				return reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, fplat, null));
+			}
+		}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
+		{
+			public void resultAvailable(Object sps)
+			{
+				if(sps!=null)
 				{
-					tfsuperpeer.setText(cid.getName());
+					tfsuperpeer.setText("self");
 				}
-
-				public void exceptionOccurred(Exception exception)
+				else
 				{
-					if(exception instanceof ComponentNotFoundException)
+					tfsuperpeer.setText("fetching ...");
+					
+					executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
 					{
-						tfsuperpeer.setText("None");
-					}
-					else
+						public Object execute(IServiceRegistry reg)
+						{
+							return reg.getSuperpeer(false);
+						}
+					}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 					{
-						tfsuperpeer.setText("Error: "+exception.getMessage());
-					}
+						public void resultAvailable(Object result)
+						{
+							IComponentIdentifier cid = (IComponentIdentifier)result;
+							tfsuperpeer.setText(cid.getName());
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(exception instanceof ComponentNotFoundException)
+							{
+								tfsuperpeer.setText("None");
+							}
+							else
+							{
+								tfsuperpeer.setText("Error: "+exception.getMessage());
+							}
+						}
+					}));
 				}
-			}));
-		}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		}));
 	}
 	
+//	/**
+//	 *  Get the service registry.
+//	 *  @return The service registry.
+//	 */
+//	public IServiceRegistry getRegistry()
+//	{
+//		return ServiceRegistry.getRegistry(getActiveComponent().getComponentIdentifier());
+//	}
+	
 	/**
-	 *  Get the service registry.
-	 *  @return The service registry.
+	 * 
 	 */
-	public IServiceRegistry getRegistry()
+	public IFuture<Object> executeRegistryCommand(final IResultCommand<Object, IServiceRegistry> cmd)
 	{
-		return ServiceRegistry.getRegistry(getActiveComponent().getComponentIdentifier());
+		return getActiveComponent().scheduleStep(new IComponentStep<Object>()
+		{
+			public IFuture<Object> execute(IInternalAccess ia)
+			{
+				IFuture<Object> ret = null;
+				try
+				{
+					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+					Object res = cmd.execute(reg);
+					if(res instanceof IFuture)
+						ret = (IFuture<Object>)res;
+					else
+						ret = new Future<Object>(res);
+				}
+				catch(Exception e)
+				{
+					((Future<Object>)ret).setException(e);
+				}
+				return ret;
+			}
+		});
 	}
 	
 	class RegistryTableModel extends AbstractTableModel
@@ -346,17 +423,30 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		
 		public Color getRowColour(int row) 
 		{
+			Color ret = Color.WHITE;
 			try
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 3);
-				MessageDigest md = MessageDigest.getInstance("MD5");
-				byte[] dig = md.digest(cid.getName().getBytes());
-				return new Color(dig[0] & 0xFF, dig[1] & 0xFF, dig[2] & 0xFF, dig[3] & 0xFF);
+				
+				if(!cid.getRoot().equals(getActiveComponent().getComponentIdentifier()))
+				{
+					int cc = cid.hashCode();
+					float cc2 = ((float)cc)/Integer.MAX_VALUE;
+					float cv = (float)(cc2/2+0.5);
+//					ret = new Color((int)(cc2 * 0x1000000));
+					ret = new Color(cv,cv,cv);
+//					ret = new Color(dig[0] & 0xFF, dig[1] & 0xFF, dig[2] & 0xFF, dig[3] & 0xFF);
+					
+//					MessageDigest md = MessageDigest.getInstance("MD5");
+//					byte[] dig = md.digest(cid.getName().getBytes());
+//					ret = new Color(dig[0] & 0xFF, dig[1] & 0xFF, dig[2] & 0xFF, dig[3] & 0xFF);
+				}
 			}
 			catch(Exception e)
 			{
 				throw new RuntimeException(e);
 			}
+			return ret;
 		}
 	};
 }
