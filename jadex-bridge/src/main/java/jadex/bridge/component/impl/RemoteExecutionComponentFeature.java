@@ -200,7 +200,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("term2");
 							((ITerminableFuture)retfut).terminate();
 							commands.remove(rxid);
 						}
@@ -225,7 +224,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
 						if(term!=null)
 						{
-							System.out.println("term1");
 							fut.addResultListener(term);
 						}
 					}

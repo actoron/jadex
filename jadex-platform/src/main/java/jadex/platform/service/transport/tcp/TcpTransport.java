@@ -265,7 +265,6 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						
 						// Inform NIO that we want to write data.
 						key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-						System.out.println("Task added: "+sc);
 					}
 					else
 					{						
@@ -315,7 +314,10 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		{
 			sc.close();
 		}
-		catch(Exception ex){}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 		
 		if(sc instanceof SocketChannel)
 		{
@@ -504,6 +506,10 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 */
 	protected void	handleConnect(SelectionKey key)
 	{
+		// Remove attached future to pass result.
+		@SuppressWarnings("unchecked")
+		Future<SocketChannel>	fut	= (Future<SocketChannel>)key.attach(null);
+		
 		SocketChannel sc = (SocketChannel)key.channel();
 		try
 		{
@@ -513,12 +519,12 @@ public class TcpTransport	implements ITransport<SocketChannel>
 			// Initialize key to start reading.
 			key.interestOps(SelectionKey.OP_READ);
 
-			// Remove attachment and pass result.
-			Future<SocketChannel>	fut	= (Future<SocketChannel>)key.attach(null);
 			fut.setResult(sc);
 		}
 		catch(Exception e)
 		{
+			// Notify failure and close connection.
+			fut.setException(e);
 			closeConnection(key, e, false);
 		}
 	}
@@ -593,7 +599,6 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						// Buffer written: remove task and inform future, when no more buffers for this task.
 						queue.remove(task);
 						Future<Void>	fut	= task.getSecondEntity();
-						System.out.println("write succeeded: "+sc);
 						fut.setResult(null);
 					}
 				}

@@ -352,7 +352,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		String[]	addresses	= null;
 		VirtualConnection	handler;
 		IComponentIdentifier	target	= getTarget(header);
-		System.out.println("is ready: "+target);
 		
 		synchronized(this)
 		{
@@ -491,11 +490,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					int cnt;
 					synchronized(this)
 					{
-						cnt	= failed[0]++;
+						cnt	= ++failed[0];
 					}
 					if(cnt == addresses.length)
 					{
 						handler.fail(new RuntimeException("No connection to any address possible for " + impl.getProtocolName() + ": " + target + ", " + Arrays.toString(addresses)));
+						removeVirtualConnection(target, handler);
 					}
 				}
 			});
@@ -544,7 +544,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		synchronized(this)
 		{
 			ConnectionCandidate prev = candidates.remove(cand.getConnection());
-			assert prev == cand;
+			assert prev==cand;
 		}
 
 		if(cand.getTarget()!=null)
@@ -568,7 +568,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		synchronized(this)
 		{
-			return virtuals != null ? virtuals.get(target) : null;
+			return virtuals!=null ? virtuals.get(target) : null;
 		}
 	}
 
@@ -579,7 +579,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		synchronized(this)
 		{
-			if(virtuals == null)
+			if(virtuals==null)
 			{
 				virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
 			}
@@ -605,6 +605,23 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			return ret;
 		}
 	}
+	
+	/**
+	 *  Remove a virtual connection if it is still the current connection for the target.
+	 */
+	protected void	removeVirtualConnection(IComponentIdentifier target, VirtualConnection con)
+	{
+		synchronized(this)
+		{
+			VirtualConnection	vircon	= getVirtualConnection(target);
+			if(vircon==con)
+			{
+				virtuals.remove(target);
+			}
+		}
+	}
+
+
 
 	/**
 	 * Get the target platform for a message.
@@ -752,14 +769,15 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		// -------- attributes --------
 
-		/**
-		 * The future, if any, when isReady() was called but not yet confirmed.
-		 */
+		/** The future, if any, when isReady() was called but not yet confirmed. */
 		protected Future<Integer>			fut;
 
 		/** The available connection candidates. */
 		protected List<ConnectionCandidate>	cons;
-
+		
+		/** Flag, when the connection failed and should be removed. */
+		protected boolean failed;
+		
 		// -------- methods --------
 
 		/**
@@ -785,41 +803,49 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			ConnectionCandidate	unprefer	= null;
 			Future<Integer>	fut	= null;
 			boolean log	= false;
+			boolean	close	= false;
 			
 			synchronized(this)
 			{
 				assert this.cons==null || !this.cons.contains(cand);
-	
-				if(cons==null)
+				
+				if(failed)
 				{
-					cons = new ArrayList<ConnectionCandidate>();
+					close	= true;
 				}
-	
-				// Is the new the preferred connection?
-				if(cons.isEmpty() || cons.get(0).compareTo(cand)<0)
-				{
-					cons.add(0, cand);
-					log	= true;	// tell logger to info handshake.
-					
-					// Inform listener, if any.
-					if(this.fut!=null)
-					{
-						fut	= this.fut;
-						this.fut = null;
-					}
-	
-					// Unprefer previous connection, if any
-					if(cons.size() > 1)
-					{
-						unprefer	= cons.get(1);
-					}
-				}
-	
-				// Keep connection but unprefer, to cause abort, if on client side.
 				else
 				{
-					cons.add(cand);
-					unprefer	= cand;
+					if(cons==null)
+					{
+						cons = new ArrayList<ConnectionCandidate>();
+					}
+		
+					// Is the new the preferred connection?
+					if(cons.isEmpty() || cons.get(0).compareTo(cand)<0)
+					{
+						cons.add(0, cand);
+						log	= true;	// tell logger to info handshake.
+						
+						// Inform listener, if any.
+						if(this.fut!=null)
+						{
+							fut	= this.fut;
+							this.fut = null;
+						}
+		
+						// Unprefer previous connection, if any
+						if(cons.size() > 1)
+						{
+							unprefer	= cons.get(1);
+						}
+					}
+		
+					// Keep connection but unprefer, to cause abort, if on client side.
+					else
+					{
+						cons.add(cand);
+						unprefer	= cand;
+					}
 				}
 			}
 			
@@ -837,6 +863,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			{
 				unprefer.unprefer();
 			}
+			
+			if(close)
+			{
+				impl.closeConnection(cand.getConnection());
+			}
 		}
 
 		/**
@@ -850,9 +881,17 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			{
 				assert this.cons != null && this.cons.contains(cand);
 				cons.remove(cand);
+				if(cons.isEmpty())
+				{
+					failed	= true;
+				}
 			}
 			
-			// TODO: remove virtual connection when last connection fails.
+			if(failed)
+			{
+				fail(new RuntimeException("No more "+impl.getProtocolName()+" connections to "+cand.getTarget()));
+				removeVirtualConnection(cand.getTarget(), this);
+			}
 		}
 
 		/**
@@ -888,10 +927,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			synchronized(this)
 			{
 				// Only fail, when no backward connection in mean time.
-				if((cons==null || cons.isEmpty()) && this.fut!=null)
+				if(failed || (cons==null || cons.isEmpty()) && this.fut!=null)
 				{
 					fut	= this.fut;
 					this.fut = null;
+					this.failed	= true;
 				}
 			}
 			
@@ -899,8 +939,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			{
 				fut.setExceptionIfUndone(e);
 			}
-			
-			// TODO: remove failed virtual connection
 		}
 	}
 
