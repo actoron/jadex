@@ -183,8 +183,8 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
 	{
-		if(owner==null)
-			throw new IllegalArgumentException("Owner must not null");
+//		if(owner==null)
+//			throw new IllegalArgumentException("Owner must not null");
 		
 		this.servicetype = servicetype;
 		this.scope = scope;

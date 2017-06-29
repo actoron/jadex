@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -157,13 +158,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					}
 					else
 					{
-						ret.setException(new RuntimeException("No superpeer found."));
+						ret.setException(new ComponentNotFoundException("No superpeer found."));
 					}
 				}
 			}
 			else
 			{
-				ret.setException(new RuntimeException("No superpeer found."));
+				ret.setException(new ComponentNotFoundException("No superpeer found."));
 			}
 		}
 		

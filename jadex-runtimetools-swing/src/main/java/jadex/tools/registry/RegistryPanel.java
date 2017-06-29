@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -18,9 +21,11 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
@@ -34,11 +39,18 @@ import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.jtable.ServiceIdentifierRenderer;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ClassInfoRenderer;
 import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.commons.gui.jtable.TableSorter;
@@ -49,7 +61,7 @@ import jadex.commons.gui.jtable.TableSorter;
 public class RegistryPanel extends AbstractComponentViewerPanel
 {
 	/** The table of registry entries. */
-	protected JTable jtdis;
+	protected JTable jtreg;
 	
 	/** The timer. */
 	protected Timer timer;
@@ -59,6 +71,9 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	
 	/** The table model. */
 	protected RegistryTableModel dismodel;
+	
+	/** The textfield with superpeer. */
+	protected JTextField tfsuperpeer;
 	
 	/**
 	 *  Get the component.
@@ -70,12 +85,19 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		JPanel	panel	= new JPanel(new BorderLayout());//new GridBagLayout());
 		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Registry Information"));
 		
+		JLabel lsp = new JLabel("Superpeer: ");
+		tfsuperpeer = new JTextField();
+		tfsuperpeer.setEditable(false);
+		JPanel psp = new JPanel(new GridBagLayout());
+		psp.add(lsp, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+		psp.add(tfsuperpeer, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		
 		JPanel preginfos = new JPanel(new BorderLayout());
 		preginfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Registry Services "));
 		dismodel = new RegistryTableModel();
 //		SorterFilterTableModel tm = new SorterFilterTableModel(dismodel);
 		TableSorter sorter = new TableSorter(dismodel);
-		jtdis = new JTable(sorter)
+		jtreg = new JTable(sorter)
 		{
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) 
 			{    
@@ -93,27 +115,29 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		jtdis.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        jtdis.setTableHeader(header); 
 		
-		sorter.setTableHeader(jtdis.getTableHeader());
+		sorter.setTableHeader(jtreg.getTableHeader());
 
-        jtdis.setPreferredScrollableViewportSize(new Dimension(600, 120));
-		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		preginfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
-		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtdis.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
-		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
-		jtdis.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
-		jtdis.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
-		updateRegistryInfos(jtdis);
+        jtreg.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		jtreg.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		preginfos.add(BorderLayout.CENTER, new JScrollPane(jtreg));
+		jtreg.setDefaultRenderer(Date.class, new DateTimeRenderer());
+		jtreg.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtreg.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtreg.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
+		jtreg.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
+		updateRegistryInfos();
 		
 		timer = new Timer(timerdelay, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				updateRegistryInfos(jtdis);
+				updateRegistryInfos();
+				updateSuperpeerInfo();
 			}
 		});
 		timer.start();
 		
+		panel.add(psp, BorderLayout.NORTH);
 		panel.add(preginfos, BorderLayout.CENTER);
 		
 		final float[] perc = new float[]{6.0f, 23.5f, 23.5f, 23.5f, 23.5f};
@@ -136,8 +160,8 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	 */
 	protected void resizeColumns(float[] perc) 
 	{
-	    int width = jtdis.getWidth();
-	    TableColumnModel cm = jtdis.getColumnModel();
+	    int width = jtreg.getWidth();
+	    TableColumnModel cm = jtreg.getColumnModel();
 	    for(int i=0; i<cm.getColumnCount(); i++) 
 	    {
 	        cm.getColumn(i).setPreferredWidth(Math.round(perc[i] * width));
@@ -147,13 +171,13 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	/**
 	 *  Update the registry infos.
 	 */
-	protected void updateRegistryInfos(final JTable jtdis)
+	protected void updateRegistryInfos()
 	{
 		Set<IService> alls = getRegistry().getAllServices();
 		
 		System.out.println("refresh: "+alls.size());
 		
-		int sel = jtdis.getSelectedRow();
+		int sel = jtreg.getSelectedRow();
 		List<IService> reginfos = dismodel.getList();
 		reginfos.clear();
 		for(Iterator<IService> it=alls.iterator(); it.hasNext(); )
@@ -163,7 +187,42 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		
 		dismodel.fireTableDataChanged();
 		if(sel!=-1 && sel<alls.size())
-			((DefaultListSelectionModel)jtdis.getSelectionModel()).setSelectionInterval(sel, sel);
+			((DefaultListSelectionModel)jtreg.getSelectionModel()).setSelectionInterval(sel, sel);
+	}
+	
+	/**
+	 *  Update the superpeer field.
+	 */
+	protected void updateSuperpeerInfo()
+	{
+		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
+		if(sps!=null)
+		{
+			tfsuperpeer.setText("self");
+		}
+		else
+		{
+			tfsuperpeer.setText("fetching ...");
+			getRegistry().getSuperpeer(false).addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+			{
+				public void resultAvailable(IComponentIdentifier cid)
+				{
+					tfsuperpeer.setText(cid.getName());
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof ComponentNotFoundException)
+					{
+						tfsuperpeer.setText("None");
+					}
+					else
+					{
+						tfsuperpeer.setText("Error: "+exception.getMessage());
+					}
+				}
+			}));
+		}
 	}
 	
 	/**
