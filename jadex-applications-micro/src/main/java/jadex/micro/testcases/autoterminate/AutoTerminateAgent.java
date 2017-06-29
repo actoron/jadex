@@ -3,6 +3,7 @@ package jadex.micro.testcases.autoterminate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -21,6 +22,7 @@ import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.servicecall.ServiceCallAgent;
 import jadex.micro.testcases.TestAgent;
 
 /**
@@ -55,34 +57,34 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	{
 		ret	= new Future<Void>();
 		this.tc	= tc;
-		if(SReflect.isAndroid()) 
-		{
+//		if(SReflect.isAndroid()) 
+//		{
 			tc.setTestCount(1);
-		} 
-		else 
-		{
-			tc.setTestCount(3);
-		}
+//		} 
+//		else 
+//		{
+//			tc.setTestCount(3);
+//		}
 		
-		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-		{
-			public void customResultAvailable(IComponentIdentifier result)
-			{
-				if(!SReflect.isAndroid()) 
-				{
-					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
+//		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+//		{
+//			public void customResultAvailable(IComponentIdentifier result)
+//			{
+//				if(!SReflect.isAndroid()) 
+//				{
+//					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
+//						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+//					{
+//						public void customResultAvailable(IComponentIdentifier result)
+//						{
 							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
 							// keep future open -> is set in check finished.
-						}
-					});
-				}
-			}
-		});
+//						}
+//					});
+//				}
+//			}
+//		});
 		
 		return ret;
 	}
@@ -175,5 +177,23 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
 			ret.setResult(null);
 		}
+	}
+
+	
+	/**
+	 *  Starter for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+//		config1.setAwaMechanisms(AWAMECHANISM.local);
+//		config1.setAwareness(true);
+		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config1.addComponent(AutoTerminateAgent.class);
+		Starter.createPlatform(config1).get();
 	}
 }

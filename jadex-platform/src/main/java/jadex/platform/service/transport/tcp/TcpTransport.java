@@ -44,6 +44,9 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	/** Flag indicating the thread should be running (set to false for shutdown). */
 	protected boolean	running;
 	
+	/** Flag indicating the transport has been shut down.. */
+	protected boolean	shutdown;
+	
 	/** The NIO selector. */
 	protected Selector	selector;
 
@@ -73,11 +76,13 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		Selector	sel	= null;
 		synchronized(this)
 		{
+			assert !shutdown;
 			if(running)
 			{
 				sel	= selector;
 				this.running	= false;
 			}
+			this.shutdown	= true;
 		}
 		
 		if(sel!=null)
@@ -233,7 +238,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 				try
 				{
 					key = sc.keyFor(selector);
-					if(key!=null && key.isValid())
+					if(key!=null && key.isValid() && sc.isOpen())
 					{
 						// Convert message into buffer.
 						ByteBuffer buf = ByteBuffer.allocateDirect(8 + header.length + body.length);
@@ -260,11 +265,12 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						
 						// Inform NIO that we want to write data.
 						key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+						System.out.println("Task added: "+sc);
 					}
 					else
 					{						
 //						System.err.println("writetasks6: "+writetasks.get(con.getSocketChannel()));
-						ret.setException(new RuntimeException("key is null or invalid!? "+key));
+						ret.setException(new RuntimeException("Invalid connection: "+sc+", "+key));
 					}
 				}
 				catch(RuntimeException e)
@@ -277,8 +283,8 @@ public class TcpTransport	implements ITransport<SocketChannel>
 //					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
 //					e.printStackTrace();
 					
-					// Message encoding failed.
-					ret.setException(e);
+					// Set exception when failed before added to task list.
+					ret.setExceptionIfUndone(e);
 				}
 			}			
 		});
@@ -348,6 +354,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		Selector	selector	= null;
 		synchronized(this)
 		{
+			assert !shutdown;
 			if(!running)
 			{
 				start	= true;
@@ -585,7 +592,8 @@ public class TcpTransport	implements ITransport<SocketChannel>
 					{
 						// Buffer written: remove task and inform future, when no more buffers for this task.
 						queue.remove(task);
-						Future<Void>	fut	= task.getSecondEntity();	
+						Future<Void>	fut	= task.getSecondEntity();
+						System.out.println("write succeeded: "+sc);
 						fut.setResult(null);
 					}
 				}

@@ -244,7 +244,7 @@ public class ServiceCallAgent	extends TestAgent
 	}
 	
 	/**
-	 *  Start two agents on separate platforms and exchange a request/reply.
+	 *  Starter for testing.
 	 */
 	public static void main(String[] args) throws Exception
 	{

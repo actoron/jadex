@@ -352,6 +352,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		String[]	addresses	= null;
 		VirtualConnection	handler;
 		IComponentIdentifier	target	= getTarget(header);
+		System.out.println("is ready: "+target);
 		
 		synchronized(this)
 		{
