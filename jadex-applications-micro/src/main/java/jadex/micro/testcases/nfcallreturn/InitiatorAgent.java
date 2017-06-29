@@ -1,6 +1,5 @@
 package jadex.micro.testcases.nfcallreturn;
 
-import java.util.Collection;
 import java.util.Map;
 
 import jadex.base.test.TestReport;
@@ -12,7 +11,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -96,14 +94,8 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
-//				{
-//					public void customResultAvailable(ITransportComponentIdentifier result) 
-//					{
-						performTests(platform.getComponentIdentifier(), testno, false)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport[]>(ret)));
-//					}
-//				});
+				performTests(platform.getComponentIdentifier(), testno, false)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport[]>(ret)));
 			}
 		}));
 		
@@ -214,14 +206,14 @@ public class InitiatorAgent extends TestAgent
 		ServiceCall call = ServiceCall.getOrCreateNextInvocation();
 		call.setProperty("extra", "somval");
 		
-//		System.out.println("calling method: "+ServiceCall.getNextInvocation());
+		System.out.println("calling method: "+ServiceCall.getNextInvocation());
 		
 		ts.method("test1").addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				ServiceCall sc = ServiceCall.getLastInvocation();
-//				System.out.println("last invoc: "+sc);
+				System.out.println("last invoc: "+sc);
 				if("new".equals(sc.getProperty("new")))
 				{
 					tr.setSucceeded(true);
