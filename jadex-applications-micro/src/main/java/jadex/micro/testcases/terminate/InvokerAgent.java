@@ -14,6 +14,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
@@ -138,41 +139,55 @@ public class InvokerAgent
 		// Start platform
 		try
 		{
-			String url	= SUtil.getOutputDirsExpression("../jadex-applications-micro");	// Todo: support RID for all loaded models.
+			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro");	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false",
-	//			"-usepass", "false",
-				"-simulation", "false", "-printpass", "false"
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class"
 			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-//					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Collection<TestReport>>(ret)
-//	                {
-//	                    public void customResultAvailable(ITransportComponentIdentifier result)
-//	                    { 
-							performTest(platform.getComponentIdentifier(), testno, delay)
-								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
+					// Add addresses of new platform to current
+					TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
+					TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(platform.getComponentIdentifier());
+					tab1.addPlatformAddresses(platform.getComponentIdentifier(), "tcp",
+						tab2.getPlatformAddresses(platform.getComponentIdentifier(), "tcp"));
+//					System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+					
+					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							// inverse proxy from remote to local.
+							Starter.createProxy(platform, agent.getExternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 							{
-								public void customResultAvailable(final Collection<TestReport> result)
+								public void customResultAvailable(IComponentIdentifier result)
 								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
+									performTest(platform.getComponentIdentifier(), testno, delay)
+										.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
+									{
+										public void customResultAvailable(final Collection<TestReport> result)
+										{
+											platform.killComponent();
+					//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+					//						{
+					//							public void customResultAvailable(Map<String, Object> v)
+					//							{
+					//								ret.setResult(result);
+					//							}
+					//						});
+											ret.setResult(result);
+										}
+									});
 								}
 							});
-//	                    }
-//	                });
+						}
+					});
 				}
 			}));
 		}
@@ -195,7 +210,7 @@ public class InvokerAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
 		// Start service agent
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, root)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, agent.getComponentIdentifier())
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
