@@ -1772,7 +1772,7 @@ public class ComponentManagementService implements IComponentManagementService
 										}
 									}
 									
-									adapter.body().addResultListener(new IResultListener<Void>()
+									adapter.body().addResultListener(adapter.getInternalAccess().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 									{
 										public void resultAvailable(Void result)
 										{
@@ -1787,7 +1787,7 @@ public class ComponentManagementService implements IComponentManagementService
 												adapter.getInternalAccess().killComponent(exception);
 											}
 										}
-									});
+									}));
 								}
 									
 								// Killed after init but before init resume -> execute queued destroy.
