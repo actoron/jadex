@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -15,10 +17,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IResultCommand;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -138,22 +138,36 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		createPlatform(null/*new String[]{"-gui", "true", "-logging", "true"}*/).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
-			public void customResultAvailable(final IExternalAccess platform)
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Collection<TestReport>>(ret)
-//				{
-//					public void customResultAvailable(ITransportComponentIdentifier result) 
-//					{
-						performTests(platform.getComponentIdentifier(), testno, false)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
-//					}
-//				});
+				// Add addresses of new platform to current
+				TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
+				TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(exta.getComponentIdentifier());
+				tab1.addPlatformAddresses(exta.getComponentIdentifier(), "tcp",
+					tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+//				System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+				
+				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						// inverse proxy from remote to local.
+						Starter.createProxy(exta, agent.getExternalAccess())
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								performTests(exta.getComponentIdentifier(), testno, false)
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
+							}
+						});
+					}
+				});
 			}
-		}));
-		
+		});
+
 		return ret;
 	}
 	
@@ -208,35 +222,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-//		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
-		
-		IFuture<ITestService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<ITestService>, Void>()
-		{
-			public IFuture<ITestService> execute(Void args)
-			{
-				return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
-			}
-		}, 7, 1500);
-		
-//		fut.addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				System.out.println("res: "+result+" "+SUtil.arrayToString(result.getClass().getInterfaces()));
-//				try
-//				{
-//					ITestService ts = (ITestService)result;
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				exception.printStackTrace();
-//			}
-//		});
+		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, Collection<TestReport>>(ret)
 		{
@@ -251,7 +237,7 @@ public class InitiatorAgent extends TestAgent
 					call.setRealtime(Boolean.TRUE);
 				}				
 				
-//				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
+				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
 				
 				callMethod(ts, 1, ret).addResultListener(new IResultListener<Void>()
 				{
@@ -284,12 +270,12 @@ public class InitiatorAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
-//			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
+			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 //			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 1.0/30));
 
 			// hard code timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
+			ServiceCall.getOrCreateNextInvocation().setTimeout(100);
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);
@@ -304,7 +290,7 @@ public class InitiatorAgent extends TestAgent
 					
 					public void finished()
 					{
-//						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 						tr.setSucceeded(true);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -317,7 +303,7 @@ public class InitiatorAgent extends TestAgent
 					
 					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -347,7 +333,7 @@ public class InitiatorAgent extends TestAgent
 				{
 					public void resultAvailable(Object result)
 					{
-	//					System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 						tr.setSucceeded(true);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -387,5 +373,22 @@ public class InitiatorAgent extends TestAgent
 		}
 		
 		return res;
+	}
+
+	/**
+	 *  Starter for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+//		config1.setAwaMechanisms(AWAMECHANISM.local);
+//		config1.setAwareness(true);
+		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config1.addComponent(InitiatorAgent.class);
+		Starter.createPlatform(config1).get();
 	}
 }

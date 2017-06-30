@@ -22,6 +22,7 @@ import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
@@ -306,7 +307,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					
 					public void commandAvailable(Object command)
 					{
-						IFuture<Void>	fut	= sendRxMessage(remote, rxid, command);
+						IFuture<Void>	fut	= sendRxMessage(remote, rxid, new RemoteForwardCmdCommand(command));
 						if(term!=null)
 						{
 							fut.addResultListener(term);
