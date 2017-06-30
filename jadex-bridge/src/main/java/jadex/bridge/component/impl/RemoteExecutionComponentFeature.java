@@ -9,10 +9,13 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
@@ -27,6 +30,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
@@ -129,7 +133,41 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 */
 	public Object	executeRemoteMethod(RemoteReference ref, Method method, Object[] args)
 	{
-		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand(ref.getTargetIdentifier(), method, args));
+		Map<String, Object>	props	= new HashMap<String, Object>();
+		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
+		final Long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): null;
+		
+		Future<Object> ret = (Future<Object>) execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand(ref.getTargetIdentifier(), method, args));
+		
+		if (to != null)
+		{
+			final Future<Object> nret = new Future<Object>();
+			
+			getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					nret.setExceptionIfUndone(new TimeoutException("Timeout was: " + to));
+					return IFuture.DONE;
+				}
+			});
+			
+			ret.addResultListener(new IResultListener<Object>()
+			{
+				public void resultAvailable(Object result)
+				{
+					nret.setResultIfUndone(result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					nret.setExceptionIfUndone(exception);
+				}
+			});
+			ret = nret;
+		}
+		
+		return ret;
 	}
 
 	/**
