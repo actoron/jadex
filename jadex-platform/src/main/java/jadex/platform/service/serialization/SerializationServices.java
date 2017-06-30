@@ -407,8 +407,7 @@ public class SerializationServices implements ISerializationServices
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
-					throw new RuntimeException(e);
+					throw SUtil.throwUnchecked(e);
 				}
 			}
 		};

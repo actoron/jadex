@@ -445,16 +445,23 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		else
 		{
-			ISerializationServices serialserv = getSerializationServices(platformid);
-			byte[] body = serialserv.encode(header, component.getClassLoader(), message);
-			
-			getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
+			try
 			{
-				public void customResultAvailable(final byte[] body) throws Exception
+				ISerializationServices serialserv = getSerializationServices(platformid);
+				byte[] body = serialserv.encode(header, component.getClassLoader(), message);
+				getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 				{
-					sendToTransports(header, body).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
+					public void customResultAvailable(final byte[] body) throws Exception
+					{
+						sendToTransports(header, body).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				// Encode failed -> return exception
+				ret.setException(e);
+			}
 		}
 		
 		return ret;

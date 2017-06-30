@@ -53,7 +53,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.platform.service.marshal.MarshalService;
-import jadex.platform.service.remote.IFinalize;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
 /**

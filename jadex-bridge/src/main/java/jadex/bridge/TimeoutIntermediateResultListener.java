@@ -13,6 +13,14 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 	/**
 	 *  Create a new listener.
 	 */
+	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta)
+	{
+		this(timeout, exta, false, null, null);
+	}
+	
+	/**
+	 *  Create a new listener.
+	 */
 	public TimeoutIntermediateResultListener(final long timeout, IExternalAccess exta, final IIntermediateResultListener<E> listener)
 	{
 		this(timeout, exta, false, null, listener);
@@ -45,7 +53,7 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 		{
 			if(!notified)
 			{
-				notify = true;
+				notify = listener!=null;
 //				notified = true;
 //				cancel();
 				// reinit timer on every new result (also cancels old one)
@@ -79,7 +87,7 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 		{
 			if(!notified)
 			{
-				notify = true;
+				notify = listener!=null;
 				notified = true;
 				cancel();
 			}

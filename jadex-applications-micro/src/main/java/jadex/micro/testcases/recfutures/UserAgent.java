@@ -20,7 +20,6 @@ import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -260,49 +259,6 @@ public class UserAgent
 		{
 			ret.setException(e);
 		}
-		// Start platform
-		try
-		{
-			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro");	// Todo: support RID for all loaded models.
-	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false"
-			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
-			{
-				public void customResultAvailable(final IExternalAccess platform)
-				{
-//					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-//	                {
-//	                    public void customResultAvailable(ITransportComponentIdentifier result)
-//	                    { 
-							performTest(platform.getComponentIdentifier(), testno, delay, max)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
-							{
-								public void customResultAvailable(final TestReport result)
-								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
-								}
-							}));
-//	                    }
-//	                });
-				}
-			}));
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
 		
 		return ret;
 	}
@@ -373,9 +329,9 @@ public class UserAgent
 //								});
 								
 								IFuture<IIntermediateFuture<String>> futb = service.methodB();
-								futb.addResultListener(new DefaultResultListener<IIntermediateFuture<String>>()
+								futb.addResultListener(new ExceptionDelegationResultListener<IIntermediateFuture<String>, TestReport>(ret)
 								{
-									public void resultAvailable(IIntermediateFuture<String> fut2)
+									public void customResultAvailable(IIntermediateFuture<String> fut2)
 									{
 										System.out.println("received first: "+fut2);
 										

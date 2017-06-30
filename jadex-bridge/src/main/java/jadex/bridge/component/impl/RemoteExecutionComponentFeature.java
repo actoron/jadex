@@ -9,13 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
@@ -28,6 +27,8 @@ import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
+import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
@@ -132,7 +133,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  @param args	The arguments.
 	 *  @return	The result(s) of the method invocation, if any. Connects any futures involved.
 	 */
-	public Object	executeRemoteMethod(RemoteReference ref, Method method, Object[] args)
+	public Object	executeRemoteMethod(RemoteReference ref, final Method method, Object[] args)
 	{
 		Map<String, Object>	props	= new HashMap<String, Object>();
 		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
@@ -140,31 +141,30 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		
 		Future<Object> ret = (Future<Object>) execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand(ref.getTargetIdentifier(), method, args));
 		
-		if (to != null)
+		if(to!=null && to.longValue()!=Timeout.NONE)
 		{
-			final Future<Object> nret = new Future<Object>();
-			
-			getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
+			// TODO: Merge with DecouplingInterceptor code.
+			final Future<Object> nret	= FutureFunctionality.getDelegationFuture(ret, new FutureFunctionality(getComponent().getLogger())
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				@Override
+				public boolean isUndone(boolean undone)
 				{
-					nret.setExceptionIfUndone(new TimeoutException("Timeout was: " + to));
-					return IFuture.DONE;
+					return true;
 				}
 			});
 			
-			ret.addResultListener(new IResultListener<Object>()
+			@SuppressWarnings({"rawtypes", "unchecked"})
+			IResultListener<Object>	trl	= new TimeoutIntermediateResultListener(to.longValue(), getComponent().getExternalAccess(), true, method, null)
 			{
-				public void resultAvailable(Object result)
+				@Override
+				public void timeoutOccurred(TimeoutException te)
 				{
-					nret.setResultIfUndone(result);
+					nret.setException(te);
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					nret.setExceptionIfUndone(exception);
-				}
-			});
+			};
+			
+			ret.addResultListener(trl);
+			
 			ret = nret;
 		}
 		
@@ -283,12 +283,15 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							@Override
 							public void exceptionOccurred(Exception exception)
 							{
-								exception.printStackTrace();
+								// Serialization of result failed -> send back exception.
+								RemoteResultCommand<?> rc = new RemoteResultCommand(exception);
+								sendRxMessage(remote, rxid, rc);
 							}
 							
 							@Override
 							public void resultAvailable(Void result)
 							{
+								// OK -> ignore
 							}
 						});
 					}
