@@ -262,9 +262,15 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void connectionClosed(Con con, Exception e)
 	{
+//		System.out.println("Close connection called: " + System.identityHashCode(con) + " " + con + " " + e);
 		ConnectionCandidate cand = getConnectionCandidate(con);
-		assert cand != null : e;
-		removeConnectionCandidate(cand, e);
+		
+		// TODO: Check if cand can/may actually _be_ null
+		//		 at this point (multiple invocations from
+		//		 simultaneous read/write errors?)
+//		assert cand != null : e;		
+		if (cand != null)
+			removeConnectionCandidate(cand, e);
 	}
 
 	// -------- life cycle --------
