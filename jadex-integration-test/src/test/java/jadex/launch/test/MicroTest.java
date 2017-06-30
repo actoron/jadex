@@ -40,6 +40,10 @@ public class MicroTest	extends ComponentTestSuite
 		"ExternalAccessInvokerAgent",
 		
 		// Application sub agents
+		"message/Sender",
+		"message\\Sender",
+		"message/Benchmark",
+		"message\\Benchmark",
 		"messagequeue/User",
 		"messagequeue\\User",
 		"messagequeue/replicated/User",
