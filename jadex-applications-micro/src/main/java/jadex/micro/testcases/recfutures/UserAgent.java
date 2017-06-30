@@ -16,6 +16,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -200,6 +201,65 @@ public class UserAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
+		// Start platform
+		try
+		{
+			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro");	// Todo: support RID for all loaded models.
+	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+	//			"-logging_level", "java.util.logging.Level.INFO",
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class"
+			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+			{
+				public void customResultAvailable(final IExternalAccess platform)
+				{
+					// Add addresses of new platform to current
+					TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
+					TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(platform.getComponentIdentifier());
+					tab1.addPlatformAddresses(platform.getComponentIdentifier(), "tcp",
+						tab2.getPlatformAddresses(platform.getComponentIdentifier(), "tcp"));
+//					System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+					
+					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							// inverse proxy from remote to local.
+							Starter.createProxy(platform, agent.getExternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+							{
+								public void customResultAvailable(IComponentIdentifier result)
+								{
+									performTest(platform.getComponentIdentifier(), testno, delay, max)
+										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+									{
+										public void customResultAvailable(final TestReport result)
+										{
+											platform.killComponent();
+					//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+					//						{
+					//							public void customResultAvailable(Map<String, Object> v)
+					//							{
+					//								ret.setResult(result);
+					//							}
+					//						});
+											ret.setResult(result);
+										}
+									}));
+								}
+							});
+						}
+					});
+				}
+			}));
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		// Start platform
 		try
 		{

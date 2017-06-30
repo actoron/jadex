@@ -18,6 +18,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -169,46 +170,62 @@ public class InvokerAgent
 		// Start platform
 		try
 		{
-			String url	= SUtil.getOutputDirsExpression("../jadex-applications-micro");	// Todo: support RID for all loaded models.
+			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro");	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false"
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class"
 			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-//					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
-//					{
-//						public void customResultAvailable(final ITransportComponentIdentifier result) 
-//						{
-							performTestA(platform.getComponentIdentifier(), testno, delay, max)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+					// Add addresses of new platform to current
+					TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
+					TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(platform.getComponentIdentifier());
+					tab1.addPlatformAddresses(platform.getComponentIdentifier(), "tcp",
+						tab2.getPlatformAddresses(platform.getComponentIdentifier(), "tcp"));
+//					System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+					
+					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							// inverse proxy from remote to local.
+							Starter.createProxy(platform, agent.getExternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
 							{
-								public void customResultAvailable(final TestReport result1)
+								public void customResultAvailable(IComponentIdentifier result)
 								{
-									performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
+									performTestA(platform.getComponentIdentifier(), testno, delay, max)
 										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
-										public void customResultAvailable(final TestReport result2)
+										public void customResultAvailable(final TestReport result1)
 										{
-											platform.killComponent();
-				//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-				//							{
-				//								public void customResultAvailable(Map<String, Object> v)
-				//								{
-				//									ret.setResult(result);
-				//								}
-				//							});
-											ret.setResult(new TestReport[]{result1, result2});
+											performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
+												.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+											{
+												public void customResultAvailable(final TestReport result2)
+												{
+													platform.killComponent();
+						//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+						//							{
+						//								public void customResultAvailable(Map<String, Object> v)
+						//								{
+						//									ret.setResult(result);
+						//								}
+						//							});
+													ret.setResult(new TestReport[]{result1, result2});
+												}
+											}));
 										}
 									}));
 								}
-							}));
-//						}
-//					});
+							});
+						}
+					});
 				}
 			}));
 		}
