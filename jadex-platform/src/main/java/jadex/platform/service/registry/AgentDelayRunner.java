@@ -2,6 +2,7 @@ package jadex.platform.service.registry;
 
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IFuture;
@@ -57,8 +58,8 @@ public class AgentDelayRunner implements IDelayRunner
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				// todo make throw StepInvalidException
-				exception.printStackTrace();
+				if(!(exception instanceof StepInvalidException))
+					exception.printStackTrace();
 			}
 		});
 		

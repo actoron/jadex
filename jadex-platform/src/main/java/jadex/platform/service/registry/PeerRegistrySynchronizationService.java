@@ -78,7 +78,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						};
 						
 						spser.updateClientData(event).addResultListener(lis);
-						System.out.println("Send client delta update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+						if(event.size()>0)
+							System.out.println("Send client delta update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
 					}
 					
 					public void exceptionOccurred(Exception exception)

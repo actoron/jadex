@@ -1381,9 +1381,6 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		if(cid==null)
-			System.out.println("hhhhhhhhhhhhhhhhhhhh");
-		
 		if(!excluded && !isIncluded(cid, ser))
 			return ret;
 		
