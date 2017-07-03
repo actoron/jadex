@@ -7,6 +7,7 @@ import java.util.List;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -265,11 +266,7 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getExternalAccess(root).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
-				{
-					public void customResultAvailable(IExternalAccess exta)
-					{
-						SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 						{
 							public void customResultAvailable(final IClockService clock)
@@ -344,8 +341,6 @@ public class InvokerAgent
 								});
 							}
 						}));
-					}
-				});
 			}	
 		});
 		
