@@ -218,7 +218,7 @@ public class InvokerAgent
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				
-				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(rid), null)
+				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(root, rid), null)
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)

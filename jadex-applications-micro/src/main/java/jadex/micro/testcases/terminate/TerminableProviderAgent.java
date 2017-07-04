@@ -47,12 +47,12 @@ public class TerminableProviderAgent implements ITerminableService
 	 */
 	public ITerminableFuture<String> getResult(long delay)
 	{
-//		System.out.println(agent.getComponentIdentifier()+": getResult1 "+delay);
+		System.out.println(agent.getComponentIdentifier()+": getResult1 "+delay);
 		final TerminableFuture<String> ret = new TerminableFuture<String>(new TerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
-//				System.out.println(agent.getComponentIdentifier()+": getResult2 "+termfut);
+				System.out.println(agent.getComponentIdentifier()+": getResult2 "+termfut);
 				if(termfut!=null)
 				{
 					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
@@ -92,12 +92,12 @@ public class TerminableProviderAgent implements ITerminableService
 	 */
 	public ITerminableIntermediateFuture<String> getResults(final long delay, final int max)
 	{
-//		System.out.println("getResults");
+		System.out.println("getResults");
 		final TerminableIntermediateFuture<String> ret = new TerminableIntermediateFuture<String>(new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
-//				System.out.println("termination command called2: "+termfut);
+				System.out.println("termination command called2: "+termfut);
 				if(termfut!=null)
 				{
 					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())

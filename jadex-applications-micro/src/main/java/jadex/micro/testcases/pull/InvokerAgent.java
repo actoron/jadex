@@ -281,14 +281,14 @@ public class InvokerAgent
 								{	
 									public void customResultAvailable(final IComponentIdentifier cid)
 									{
-		//								System.out.println("cid is: "+cid);
+										System.out.println("cid is: "+cid);
 										SServiceProvider.getService(agent, cid, IPullResultService.class)
 											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 										{
 											public void customResultAvailable(IPullResultService service)
 											{
 												// Invoke service agent
-		//										System.out.println("Invoking");
+												System.out.println("Invoking");
 												IPullIntermediateFuture<String> fut = service.getResultsA(max);
 												
 												fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
@@ -302,7 +302,7 @@ public class InvokerAgent
 													}
 													public void finished()
 													{
-		//												System.out.println("finished: "+needed);
+														System.out.println("finished: ");
 														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 														if(res.size()==max)
 														{
@@ -331,10 +331,13 @@ public class InvokerAgent
 														ret.setResult(tr);
 													}
 												}));
-				//								System.out.println("Added listener");
+												System.out.println("Added listener");
 												
 												for(int i=0; i<max; i++)
+												{
+													System.out.println("pulling");
 													fut.pullIntermediateResult();
+												}
 											}		
 										}));
 									}
@@ -394,13 +397,14 @@ public class InvokerAgent
 								{	
 									public void customResultAvailable(final IComponentIdentifier cid)
 									{
-		//								System.out.println("cid is: "+cid);
+										System.out.println("cid is: "+cid);
 										SServiceProvider.getService(agent, cid, IPullResultService.class)
 											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 										{
 											public void customResultAvailable(IPullResultService service)
 											{
 												// Invoke service agent
+												System.out.println("Invoking B");
 												IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
 												
 												fut2.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
@@ -414,7 +418,7 @@ public class InvokerAgent
 													}
 													public void finished()
 													{
-		//												System.out.println("finished: "+needed);
+														System.out.println("finished: ");
 														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 														tr.setReason("Exception did not occur");
 														cms.destroyComponent(cid);
@@ -445,7 +449,7 @@ public class InvokerAgent
 														ret.setResult(tr);
 													}
 												}));
-				//								System.out.println("Added listener");
+												System.out.println("Added listener");
 												
 												fut2.pullIntermediateResult();
 												
