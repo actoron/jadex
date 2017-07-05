@@ -44,4 +44,20 @@ public interface ISecurityService
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
 	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
+	
+	/**
+	 *  Gets the secret of a platform if available.
+	 * 
+	 *  @param cid ID of the platform.
+	 *  @return Encoded secret or null.
+	 */
+	public IFuture<String> getEncodedPlatformSecret(IComponentIdentifier cid);
+	
+	/**
+	 *  Sets the secret of a platform.
+	 * 
+	 *  @param cid ID of the platform.
+	 *  @return Encoded secret or null.
+	 */
+	public IFuture<Void> setEncodedPlatformSecret(IComponentIdentifier cid, String secret);
 }

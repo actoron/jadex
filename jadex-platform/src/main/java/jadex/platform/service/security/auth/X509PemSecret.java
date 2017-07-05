@@ -1,16 +1,16 @@
 package jadex.platform.service.security.auth;
 
-import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
 /**
- *  Secret based on inline PEM-encoded X.509 certificates and key.
+ *  Secret based on PEM-encoded X.509 certificate files and key.
  *
  */
-public class X509PemFileSecret extends AbstractX509PemSecret
+public class X509PemSecret extends AbstractX509PemSecret
 {
 	/** Prefix used to encode secret type as strings. */
 	public static final String PREFIX = "pem";
@@ -24,18 +24,18 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	/** The local certificate key. */
 	protected String key;
 	
-	public X509PemFileSecret(String encodedstring)
+	public X509PemSecret(String encodedstring)
 	{
 		String basestring = encodedstring.substring(PREFIX.length() + 1);
 		String[] toks = basestring.split(":");
 		if (toks.length != 1 && toks.length != 3)
 			throw new IllegalArgumentException("Could not decode pem file string: " +encodedstring);
 		
-		cacert = new String(Base64.decodeNoPadding(toks[0].getBytes(SUtil.UTF8)), SUtil.UTF8);
+		cacert = toks[0];
 		if (toks.length > 1)
 		{
-			cert = new String(Base64.decodeNoPadding(toks[1].getBytes(SUtil.UTF8)), SUtil.UTF8);
-			key = new String(Base64.decodeNoPadding(toks[2].getBytes(SUtil.UTF8)), SUtil.UTF8);
+			cert = toks[1];
+			key = toks[2];
 		}
 	}
 	
@@ -46,7 +46,7 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 *  @param cert Path to the local certificate.
 	 *  @param key Path to the local certificate key.
 	 */
-	public X509PemFileSecret(String cacert, String cert, String key)
+	public X509PemSecret(String cacert, String cert, String key)
 	{
 		this.cacert = cacert;
 		this.cert = cert;
@@ -69,10 +69,14 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 */
 	public InputStream openTrustAnchorCert()
 	{
-		if (cacert == null)
-			throw new RuntimeException("CA Certificate not available:" + toString());
-		
-		return new ByteArrayInputStream(cacert.getBytes(SUtil.UTF8));
+		try
+		{
+			return new FileInputStream(cacert);
+		}
+		catch (FileNotFoundException e)
+		{
+			throw SUtil.convertToRuntimeException(e);
+		}
 	}
 	
 	/**
@@ -82,10 +86,14 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 */
 	public InputStream openCertificate()
 	{
-		if (cert == null)
-			throw new RuntimeException("Certificate not available:" + toString());
-		
-		return new ByteArrayInputStream(cert.getBytes(SUtil.UTF8));
+		try
+		{
+			return new FileInputStream(cert);
+		}
+		catch (FileNotFoundException e)
+		{
+			throw SUtil.convertToRuntimeException(e);
+		}
 	}
 	
 	/**
@@ -95,10 +103,14 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 */
 	public InputStream openPrivateKey()
 	{
-		if (key == null)
-			throw new RuntimeException("Key not available:" + toString());
-		
-		return new ByteArrayInputStream(key.getBytes(SUtil.UTF8));
+		try
+		{
+			return new FileInputStream(key);
+		}
+		catch (FileNotFoundException e)
+		{
+			throw SUtil.convertToRuntimeException(e);
+		}
 	}
 	
 	/**
@@ -106,11 +118,11 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 */
 	public String toString()
 	{
-		String ret = PREFIX + new String(Base64.encodeNoPadding(cacert.getBytes(SUtil.UTF8)), SUtil.UTF8);
+		String ret = PREFIX + cacert;
 		if (canSign())
 		{
-			ret += ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
-			ret += ":" + new String(Base64.encodeNoPadding(key.getBytes(SUtil.UTF8)), SUtil.UTF8);
+			ret += ":" + cert;
+			ret += ":" + key;
 		}
 		return ret;
 	}

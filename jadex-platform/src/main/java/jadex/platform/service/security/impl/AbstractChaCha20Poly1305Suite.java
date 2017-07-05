@@ -301,7 +301,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			local = signKey(remoteauthchallenge, pubkey, ps);
 		
 		byte[] remote = null;
-		ps = agent.getRemotePlatformSecret(remoteid);
+		ps = agent.getPlatformSecret(remoteid);
 		if (ps != null && ps.canSign())
 			remote = signKey(remoteauthchallenge, pubkey, ps);
 		

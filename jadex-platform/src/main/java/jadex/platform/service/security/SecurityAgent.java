@@ -50,8 +50,6 @@ import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
-import jadex.platform.service.security.impl.Curve448ChaCha20Poly1305Suite;
-import jadex.platform.service.security.impl.NHChaCha20Poly1305Suite;
 import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 
 /**
@@ -416,6 +414,50 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
+	 *  Gets the secret of a platform if available.
+	 * 
+	 *  @param cid ID of the platform.
+	 *  @return Encoded secret or null.
+	 */
+	public IFuture<String> getEncodedPlatformSecret(IComponentIdentifier cid)
+	{
+		AbstractAuthenticationSecret secret = getPlatformSecret(cid);
+		return new Future<String>(secret != null ? secret.toString() : null);
+	}
+	
+	/**
+	 *  Sets the secret of a platform.
+	 * 
+	 *  @param cid ID of the platform.
+	 *  @return Encoded secret or null.
+	 */
+	public IFuture<Void> setEncodedPlatformSecret(final IComponentIdentifier cid, final String secret)
+	{
+		return agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// TODO: Refresh?
+				if (cid == null)
+				{
+					remoteplatformsecrets.remove(cid);
+				}
+				else
+				{
+					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(secret);
+					
+					if (agent.getComponentIdentifier().getRoot().equals(cid))
+						platformsecret = authsec;
+					else
+						remoteplatformsecrets.put(cid, authsec);
+				}
+				return IFuture.DONE;
+			}
+		});
+		
+	}
+	
+	/**
 	 *  Get access to the stored virtual network configurations.
 	 * 
 	 *  @return The stored virtual network configurations.
@@ -434,14 +476,17 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
-	 *  Gets the secret of a remote platform if available.
+	 *  Gets the secret of a platform if available.
 	 * 
-	 *  @param remoteid ID of the remote platform.
+	 *  @param cid ID of the platform.
 	 *  @return Secret or null.
 	 */
-	public AbstractAuthenticationSecret getRemotePlatformSecret(IComponentIdentifier remoteid)
+	public AbstractAuthenticationSecret getPlatformSecret(IComponentIdentifier cid)
 	{
-		return remoteplatformsecrets.get(remoteid.getRoot());
+		cid = cid.getRoot();
+		if (cid.equals(agent.getComponentIdentifier().getRoot()))
+			return getPlatformSecret();
+		return remoteplatformsecrets.get(cid.getRoot());
 	}
 	
 	// -------- Cleanup

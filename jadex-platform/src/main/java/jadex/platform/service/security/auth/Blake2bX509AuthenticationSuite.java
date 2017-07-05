@@ -21,7 +21,6 @@ import org.bouncycastle.util.io.pem.PemObject;
 
 import jadex.commons.SUtil;
 import jadex.commons.security.SSecurity;
-import jadex.platform.service.security.impl.AbstractX509PemSecret;
 
 /**
  *  Symmetric authentication based on Blake2b MACs.
@@ -267,7 +266,6 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		
 		byte[] m = "Message".getBytes(SUtil.UTF8);
 		
 		byte[] secbytes = new byte[32];

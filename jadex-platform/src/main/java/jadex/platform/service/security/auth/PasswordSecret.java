@@ -44,14 +44,28 @@ public class PasswordSecret extends SharedSecret
 	 */
 	public PasswordSecret(String encodedpassword)
 	{
-		int ind = encodedpassword.indexOf(':');
-		String prefix = encodedpassword.substring(0, ind);
-		if (!PREFIX.startsWith(prefix))
-			throw new IllegalArgumentException("Not a password secret: " + encodedpassword);
-		this.password = encodedpassword.substring(ind + 1);
+		this(encodedpassword, true);
+	}
+	
+	/**
+	 *  Creates the secret.
+	 */
+	public PasswordSecret(String password, boolean encoded)
+	{
 		
-		if (password.length() < WARN_PASSWORD_LENGTH)
-			Logger.getLogger("sharedsecret").warning("Weak password detected: + " + password + ", please use at least " + WARN_PASSWORD_LENGTH + " random characters.");
+		
+		if (encoded)
+		{
+			int ind = password.indexOf(':');
+			String prefix = password.substring(0, ind);
+			
+			if (!PREFIX.startsWith(prefix))
+				throw new IllegalArgumentException("Not a password secret: " + password);
+			this.password = password.substring(ind + 1);
+		}
+		
+		if (this.password.length() < WARN_PASSWORD_LENGTH)
+			Logger.getLogger("sharedsecret").warning("Weak password detected: + " + this.password + ", please use at least " + WARN_PASSWORD_LENGTH + " random characters.");
 	}
 	
 	/**
