@@ -32,6 +32,7 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	public static final String KEY_TYPE_PLATFORM = "platform";
 	
 	public static final String[] SERVICE_KEY_TYPES;
+	
 	static
 	{
 		List<String> keytypes = new ArrayList<String>();

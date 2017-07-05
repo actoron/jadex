@@ -4,7 +4,6 @@ import java.util.Set;
 
 /**
  *  Interface denoting key extraction functionality for indexers.
- *
  */
 public interface IKeyExtractor
 {

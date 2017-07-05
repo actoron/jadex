@@ -61,23 +61,25 @@ public class ServiceIndexer<T>
 		{
 			List<Set<T>> servicesets = null;
 			int speccount = 0;
-			for (Iterator<Tuple2<String, String[]>> it = spec.iterator(); it.hasNext();)
+			for(Iterator<Tuple2<String, String[]>> it = spec.iterator(); it.hasNext();)
 			{
 				Tuple2<String, String[]> tup = it.next();
 				speccount += tup.getSecondEntity().length;
+				
+				// Fetch index service map per key
 				Map<String, Set<T>> index = indexedservices.get(tup.getFirstEntity());
-				if (index != null)
+				if(index != null)
 				{
 					it.remove();
 					
-					if (servicesets == null)
+					if(servicesets == null)
 						servicesets = new ArrayList<Set<T>>();
 					
-					for (String key : tup.getSecondEntity())
+					for(String key : tup.getSecondEntity())
 					{
 						Set<T> iset = index.get(key);
 						
-						if (iset == null || iset.isEmpty())
+						if(iset == null || iset.isEmpty())
 							return null;
 						
 						servicesets.add(iset);
@@ -85,44 +87,52 @@ public class ServiceIndexer<T>
 				}
 			}
 			
-			if (servicesets != null)
+			if(servicesets != null)
 			{
-				Collections.sort(servicesets, new Comparator<Set<T>>()
+				// Start with shortest collection
+				if(servicesets.size()>1)
 				{
-					public int compare(Set<T> o1, Set<T> o2)
+					Collections.sort(servicesets, new Comparator<Set<T>>()
 					{
-						return o1.size() - o2.size();
-					}
-				});
+						public int compare(Set<T> o1, Set<T> o2)
+						{
+							return o1.size() - o2.size();
+						}
+					});
+				}
 				
 				int i = 0;
-				for (i = 0; i < servicesets.size() && (ret == null || ret.size() < INTERSECT_CUTOFF); ++i)
+				for(i = 0; i < servicesets.size() && (ret == null || ret.size() < INTERSECT_CUTOFF); ++i)
 				{
-					if (ret == null)
+					if(ret == null)
+					{
 						ret = new LinkedHashSet<T>(servicesets.get(i));
+					}
 					else
 					{
 						Set<T> iset = servicesets.get(i);
-						for (Iterator<T> it = ret.iterator(); it.hasNext(); )
+						for(Iterator<T> it = ret.iterator(); it.hasNext(); )
 						{
 							T serv = it.next();
-							if (!iset.contains(serv))
+							if(!iset.contains(serv))
 								it.remove();
 						}
 					}
 				}
 				
-				if (ret != null && i == speccount)
+				// If all were used directly return intersection result
+				if(ret != null && i == speccount)
 					return ret;
 			}
 			
-			if (ret == null)
+			if(ret == null)
 				ret = new LinkedHashSet<T>(services);
 			
-			for (Iterator<T> it = ret.iterator(); it.hasNext(); )
+			// Otherwise use single matching
+			for(Iterator<T> it = ret.iterator(); it.hasNext(); )
 			{
 				T serv = it.next();
-				if (!match(spec, serv))
+				if(!match(spec, serv))
 					it.remove();
 			}
 		}
