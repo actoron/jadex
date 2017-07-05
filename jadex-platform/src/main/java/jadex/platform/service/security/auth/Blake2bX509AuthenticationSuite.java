@@ -3,6 +3,7 @@ package jadex.platform.service.security.auth;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroup;
+import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroups;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -28,9 +31,6 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	/** Authentication Suite ID. */
 	protected static final int AUTH_SUITE_ID = 93482103;
 	
-	/** Key derivation function to use. */
-	protected static final int KDF_ID = 0;
-	
 	/** Size of the MAC. */
 	protected static final int MAC_SIZE = 64;
 	
@@ -39,6 +39,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	
 	/** Size of the salt. */
 	protected static final int SALT_SIZE = 32;
+	
+	/** Schnorr group used for zero-knowledge password proof. */
+	protected static final JPAKEPrimeOrderGroup SCHNORR_GROUP = JPAKEPrimeOrderGroups.NIST_3072;
 	
 	/**
 	 *  Gets the authentication suite ID.
@@ -73,16 +76,47 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{
 			SharedSecret ssecret = (SharedSecret) secret;
 			
-			byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt, KDF_ID);
+			byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
 			
-			// Generate MAC used for authentication.
-			Blake2bDigest blake2b = new Blake2bDigest(dk);
-			ret = new byte[SALT_SIZE + MAC_SIZE + 8];
-			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-			Pack.intToLittleEndian(KDF_ID, ret, 4);
-			System.arraycopy(salt, 0, ret, 8, salt.length);
-			blake2b.update(msghash, 0, msghash.length);
-			blake2b.doFinal(ret, salt.length + 8);
+			if (ssecret instanceof PasswordSecret)
+			{
+				// Using Schnorr signature
+				
+				byte[] randsecbytes = new byte[64];
+				SSecurity.getSecureRandom().nextBytes(randsecbytes);
+				BigInteger randsec = new BigInteger(1, randsecbytes);
+				BigInteger randpub = SCHNORR_GROUP.getG().modPow(randsec, SCHNORR_GROUP.getP());
+				
+				byte[] challengebytes = new byte[64];
+				Blake2bDigest dig = new Blake2bDigest(512);
+				byte[] tmp = randpub.toByteArray();
+				dig.update(tmp, 0, tmp.length);
+				dig.update(msghash, 0, msghash.length);
+				dig.doFinal(challengebytes, 0);
+				BigInteger challenge = new BigInteger(1, challengebytes);
+				
+				BigInteger dkbi = new BigInteger(1, dk);
+				
+				BigInteger s = dkbi.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getQ());
+				
+				byte[] kdfparams = ((PasswordSecret) ssecret).getKdfParams();
+				
+				tmp = SUtil.mergeData(s.toByteArray(), randpub.toByteArray(), salt, kdfparams);
+				
+				ret = new byte[tmp.length + 4];
+				Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
+				System.arraycopy(tmp, 0, ret, 4, tmp.length);
+			}
+			else
+			{
+				// Generate MAC used for authentication.
+				Blake2bDigest blake2b = new Blake2bDigest(dk);
+				ret = new byte[SALT_SIZE + MAC_SIZE + 4];
+				Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
+				System.arraycopy(salt, 0, ret, 4, salt.length);
+				blake2b.update(msghash, 0, msghash.length);
+				blake2b.doFinal(ret, salt.length + 4);
+			}
 		}
 		else if (secret instanceof AbstractX509PemSecret)
 		{
@@ -91,10 +125,10 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				throw new IllegalArgumentException("Secret cannot be used to sign: " + aps);
 			
 			byte[] sig = SSecurity.signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
-			ret = new byte[sig.length + SALT_SIZE + 8];
+			ret = new byte[sig.length + SALT_SIZE + 4];
 			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-			System.arraycopy(salt, 0, ret, 8, salt.length);
-			System.arraycopy(sig, 0, ret, 8 + salt.length, sig.length);
+			System.arraycopy(salt, 0, ret, 4, salt.length);
+			System.arraycopy(sig, 0, ret, 4 + salt.length, sig.length);
 		}
 		else
 		{
@@ -121,40 +155,81 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{
 			SharedSecret ssecret = (SharedSecret) secret;
 			
-			if (authtoken.length != SALT_SIZE + MAC_SIZE + 8)
-				return false;
-			
 			if (Pack.littleEndianToInt(authtoken, 0) != AUTH_SUITE_ID)
 				return false;
 			
-			// Decode token.
-			byte[] salt = new byte[SALT_SIZE];
-			System.arraycopy(authtoken, 8, salt, 0, salt.length);
-			
-			byte[] msghash = getMessageHash(msg, salt);
-			
 			if (secret instanceof SharedSecret)
 			{
-				byte[] mac = new byte[MAC_SIZE];
-				System.arraycopy(authtoken, SALT_SIZE + 8, mac, 0, mac.length);
-				
-				int kdfid = Pack.littleEndianToInt(authtoken, 4);
-				
-				// Decrypt the random key.
-				byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt, kdfid);
-				
-				// Generate MAC
-				Blake2bDigest blake2b = new Blake2bDigest(dk);
-				byte[] gmac = new byte[MAC_SIZE];
-				blake2b.update(msghash, 0, msghash.length);
-				blake2b.doFinal(gmac, 0);
-				ret = Arrays.equals(gmac, mac);
+				if (secret instanceof PasswordSecret)
+				{
+					List<byte[]> authlist = SUtil.splitData(authtoken, 4, -1);
+					if (authlist.size() != 4)
+						return false;
+					
+					BigInteger s = new BigInteger(authlist.get(0));
+					BigInteger randpub = new BigInteger(authlist.get(1));
+					byte[] salt = authlist.get(2);
+					byte[] kdfparams = authlist.get(3);
+					
+					byte[] dk = ((PasswordSecret) ssecret).deriveKey(DERIVED_KEY_SIZE, salt, kdfparams);
+					
+					BigInteger sec = new BigInteger(1, dk);
+					BigInteger pub = SCHNORR_GROUP.getG().modPow(sec, SCHNORR_GROUP.getP());
+					
+					byte[] msghash = getMessageHash(msg, salt);
+					
+					byte[] challengebytes = new byte[64];
+					Blake2bDigest dig = new Blake2bDigest(512);
+					byte[] tmp = randpub.toByteArray();
+					dig.update(tmp, 0, tmp.length);
+					dig.update(msghash, 0, msghash.length);
+					dig.doFinal(challengebytes, 0);
+					BigInteger challenge = new BigInteger(1, challengebytes);
+					
+					BigInteger res0 = SCHNORR_GROUP.getG().modPow(s, SCHNORR_GROUP.getP());
+					BigInteger res1 = pub.modPow(challenge, SCHNORR_GROUP.getP()).multiply(randpub).mod(SCHNORR_GROUP.getP());
+					
+//					System.out.println("Schnorr res0:" + res0);
+//					System.out.println("Schnorr res1:" + res1);
+					
+					ret = res0.equals(res1);
+				}
+				else
+				{
+					if (authtoken.length != SALT_SIZE + MAC_SIZE + 4)
+						return false;
+					
+					// Decode token.
+					byte[] salt = new byte[SALT_SIZE];
+					System.arraycopy(authtoken, 4, salt, 0, salt.length);
+					
+					byte[] msghash = getMessageHash(msg, salt);
+					
+					byte[] mac = new byte[MAC_SIZE];
+					System.arraycopy(authtoken, SALT_SIZE + 4, mac, 0, mac.length);
+					
+					// Decrypt the random key.
+					byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+					
+					// Generate MAC
+					Blake2bDigest blake2b = new Blake2bDigest(dk);
+					byte[] gmac = new byte[MAC_SIZE];
+					blake2b.update(msghash, 0, msghash.length);
+					blake2b.doFinal(gmac, 0);
+					ret = Arrays.equals(gmac, mac);
+				}
 			}
 			else if (secret instanceof AbstractX509PemSecret)
 			{
+				// Decode token.
+				byte[] salt = new byte[SALT_SIZE];
+				System.arraycopy(authtoken, 4, salt, 0, salt.length);
+				
+				byte[] msghash = getMessageHash(msg, salt);
+				
 				AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
-				byte[] sig = new byte[authtoken.length - 8 - salt.length];
-				System.arraycopy(authtoken, 8 + salt.length, sig, 0, sig.length);
+				byte[] sig = new byte[authtoken.length - 4 - salt.length];
+				System.arraycopy(authtoken, 4 + salt.length, sig, 0, sig.length);
 				
 				SSecurity.verifyWithPEM(msghash, sig, aps.openTrustAnchorCert());
 			}
@@ -165,6 +240,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 		}
 		
 		return ret;
@@ -190,6 +266,42 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 *  Main
 	 */
 	public static void main(String[] args) throws Exception
+	{
+		
+		byte[] m = "Message".getBytes(SUtil.UTF8);
+		
+		byte[] secbytes = new byte[32];
+		SSecurity.getSecureRandom().nextBytes(secbytes);
+		BigInteger sec = new BigInteger(secbytes);
+		BigInteger pub = SCHNORR_GROUP.getG().modPow(sec, SCHNORR_GROUP.getP());
+		
+		byte[] randsecbytes = new byte[32];
+		SSecurity.getSecureRandom().nextBytes(randsecbytes);
+		BigInteger randsec = new BigInteger(randsecbytes);
+		BigInteger randpub = SCHNORR_GROUP.getG().modPow(randsec, SCHNORR_GROUP.getP());
+		
+		byte[] challengebytes = new byte[64];
+		Blake2bDigest dig = new Blake2bDigest(512);
+		byte[] tmp = randpub.toByteArray();
+		dig.update(tmp, 0, tmp.length);
+		dig.update(m, 0, m.length);
+		dig.doFinal(challengebytes, 0);
+		BigInteger challenge = new BigInteger(challengebytes);
+		
+		BigInteger s = sec.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getQ());
+		
+		// s,randpub
+		
+		
+		BigInteger res1 = SCHNORR_GROUP.getG().modPow(s, SCHNORR_GROUP.getP());
+		BigInteger res2 = pub.modPow(challenge, SCHNORR_GROUP.getP()).multiply(randpub).mod(SCHNORR_GROUP.getP());
+		
+		System.out.println(res1);
+		System.out.println(res2);
+		
+	}
+	
+	public static void mainx(String[] args) throws Exception
 	{
 		String home = System.getProperty("user.home") + File.separator;
 		byte[] tsig = SSecurity.signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "rsa.pem"), new FileInputStream(home + "rsa.key"));

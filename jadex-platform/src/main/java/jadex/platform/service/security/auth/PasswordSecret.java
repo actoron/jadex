@@ -3,8 +3,10 @@ package jadex.platform.service.security.auth;
 import java.util.logging.Logger;
 
 import org.bouncycastle.crypto.generators.SCrypt;
+import org.bouncycastle.util.Pack;
 
 import jadex.commons.SUtil;
+import jadex.commons.security.SSecurity;
 
 /**
  *  A secret password used for authentication.
@@ -16,16 +18,16 @@ public class PasswordSecret extends SharedSecret
 	public static final String PREFIX = "pw";
 	
 	/** Password length warning threshold. */
-	protected static final int MIN_PASSWORD_LENGTH = 12;
+	protected static final int WARN_PASSWORD_LENGTH = 12;
 	
 	/** SCrypt work factor / hardness for password strengthening. */
 	protected static final int SCRYPT_N = 16384;
 	
 	/** SCrypt block size. */
-	protected static final int SCRYPT_R = 8;
+	protected static final int SCRYPT_R = 16;
 	
 	/** SCrypt parallelization. */
-	protected static final int SCRYPT_P = 4;
+	protected static final int SCRYPT_P = 1;
 	
 	/** The password. */
 	protected String password;
@@ -48,8 +50,8 @@ public class PasswordSecret extends SharedSecret
 			throw new IllegalArgumentException("Not a password secret: " + encodedpassword);
 		this.password = encodedpassword.substring(ind + 1);
 		
-		if (password.length() < MIN_PASSWORD_LENGTH)
-			Logger.getLogger("sharedsecret").warning("Weak password detected: + " + password + ", please use at least " + MIN_PASSWORD_LENGTH + " random characters.");
+		if (password.length() < WARN_PASSWORD_LENGTH)
+			Logger.getLogger("sharedsecret").warning("Weak password detected: + " + password + ", please use at least " + WARN_PASSWORD_LENGTH + " random characters.");
 	}
 	
 	/**
@@ -73,18 +75,50 @@ public class PasswordSecret extends SharedSecret
 	}
 	
 	/**
+	 *  Gets the key derivation parameters.
+	 *  @return Key derivation parameters.
+	 */
+	public byte[] getKdfParams()
+	{
+		byte[] ret = new byte[16];
+		
+		Pack.intToLittleEndian(SCRYPT_N, ret, 4);
+		Pack.intToLittleEndian(SCRYPT_R, ret, 8);
+		Pack.intToLittleEndian(SCRYPT_P, ret, 12);
+		
+		return ret;
+	}
+	
+	/**
 	 *  Derives a key from the password with appropriate hardening.
 	 *  
 	 *  @param keysize The target key size in bytes to generate.
 	 *  @param salt Salt to use.
-	 *  @param df Used derivation function.
 	 *  @return Derived key.
 	 */
-	public byte[] deriveKey(int keysize, byte[] salt, int df)
+	public byte[] deriveKey(int keysize, byte[] salt)
 	{
-		if (df == 0)
-			return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, keysize);
-		throw new IllegalArgumentException("Unknown key derivation function: " + df);
+		return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, keysize);
+	}
+	
+	/**
+	 *  Derives a key from the password with appropriate hardening.
+	 *  
+	 *  @param keysize The target key size in bytes to generate.
+	 *  @param salt Salt to use.
+	 *  @param dfparams Key derivation parameters.
+	 *  @return Derived key.
+	 */
+	public byte[] deriveKey(int keysize, byte[] salt, byte[] dfparams)
+	{
+		if (dfparams.length != 16)
+			return null;
+		
+		int n = Pack.littleEndianToInt(dfparams, 4);
+		int r = Pack.littleEndianToInt(dfparams, 8);
+		int p = Pack.littleEndianToInt(dfparams, 12);
+		
+		return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, n, r, p, keysize);
 	}
 	
 	/** 
@@ -95,5 +129,16 @@ public class PasswordSecret extends SharedSecret
 	public String toString()
 	{
 		return PREFIX + ":" + password;
+	}
+	
+	public static void main(String[] args)
+	{
+		PasswordSecret pws = new PasswordSecret("pw:sdjfsd@#@FIsad90sj");
+		byte[] salt = new byte[32];
+		SSecurity.getSecureRandom().nextBytes(salt);
+		
+		long ts = System.currentTimeMillis();
+		pws.deriveKey(64, salt);
+		System.out.println(System.currentTimeMillis() - ts);
 	}
 }

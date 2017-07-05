@@ -85,19 +85,15 @@ public class KeySecret extends SharedSecret
 	 *  @param df Used derivation function.
 	 *  @return Derived key.
 	 */
-	public byte[] deriveKey(int keysize, byte[] salt, int df)
+	public byte[] deriveKey(int keysize, byte[] salt)
 	{
-		if (df == 0)
-		{
-			Blake2bDigest blake2b = new Blake2bDigest(keysize << 3);
-			byte[] dk = new byte[blake2b.getDigestSize()];
-			blake2b.update(salt, 0, salt.length);
-			blake2b.update(key, 0, key.length);
-			blake2b.doFinal(dk, 0);
-			
-			return dk;
-		}
-		throw new IllegalArgumentException("Unknown key derivation function: " + df);
+		Blake2bDigest blake2b = new Blake2bDigest(keysize << 3);
+		byte[] dk = new byte[blake2b.getDigestSize()];
+		blake2b.update(salt, 0, salt.length);
+		blake2b.update(key, 0, key.length);
+		blake2b.doFinal(dk, 0);
+		
+		return dk;
 	}
 	
 	/** 

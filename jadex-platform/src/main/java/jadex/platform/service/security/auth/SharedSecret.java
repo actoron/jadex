@@ -20,8 +20,7 @@ public abstract class SharedSecret extends AbstractAuthenticationSecret
 	 *  
 	 *  @param keysize The target key size in bytes to generate.
 	 *  @param salt Salt to use.
-	 *  @param df Used derivation function.
 	 *  @return Derived key.
 	 */
-	public abstract byte[] deriveKey(int keysize, byte[] salt, int df);
+	public abstract byte[] deriveKey(int keysize, byte[] salt);
 }

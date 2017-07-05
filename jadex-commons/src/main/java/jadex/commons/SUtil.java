@@ -3987,11 +3987,12 @@ public class SUtil
 		List<byte[]> ret = new ArrayList<byte[]>();
 		offset = offset < 0 ? 0 : offset;
 		length = length < 0 ? data.length - offset : length;
-		while (offset < length)
+		int endpos = offset + length;
+		while (offset < endpos)
 		{
 			int datalen = SUtil.bytesToInt(data, offset);
 			offset += 4;
-			if (offset + datalen > length)
+			if (offset + datalen > endpos)
 				throw new IllegalArgumentException("Invalid encoded data.");
 			byte[] datapart = new byte[datalen];
 			System.arraycopy(data, offset, datapart, 0, datalen);
