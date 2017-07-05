@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.security.MessageDigest;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,6 +19,7 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,19 +45,22 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ClassInfoRenderer;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.commons.gui.jtable.TableSorter;
 
 /**
  *  Panel to view the registry.
@@ -79,6 +82,9 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	/** The textfield with superpeer. */
 	protected JTextField tfsuperpeer;
 	
+	/** The make superpeer/peer button. */
+	protected JButton buswitchpeer;
+	
 	/**
 	 *  Get the component.
 	 */
@@ -92,35 +98,73 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		JLabel lsp = new JLabel("Superpeer: ");
 		tfsuperpeer = new JTextField();
 		tfsuperpeer.setEditable(false);
+		
+		buswitchpeer = new JButton("Switch");
+		buswitchpeer.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				buswitchpeer.setEnabled(false);
+				
+				SServiceProvider.getService(getActiveComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IComponentManagementService>()
+				{
+					public void resultAvailable(final IComponentManagementService cms)
+					{
+						SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+						{
+							public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
+							{
+								cms.destroyComponent(((IService)sps).getServiceIdentifier().getProviderId());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								SServiceProvider.getService(getActiveComponent(), IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
+								{
+									public void resultAvailable(IPeerRegistrySynchronizationService ps)
+									{
+										cms.destroyComponent(((IService)ps).getServiceIdentifier().getProviderId());
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								});
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+			}
+		});
+		
 		JPanel psp = new JPanel(new GridBagLayout());
 		psp.add(lsp, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		psp.add(tfsuperpeer, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		psp.add(buswitchpeer, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		
 		JPanel preginfos = new JPanel(new BorderLayout());
 		preginfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Registry Services "));
 		regmodel = new RegistryTableModel();
-//		SorterFilterTableModel tm = new SorterFilterTableModel(dismodel);
-		final TableSorter sorter = new TableSorter(regmodel);
-		jtreg = new JTable(sorter)
+		jtreg = new JTable(regmodel)
 		{
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) 
 			{    
-				row = sorter.modelIndex(row);
-				Component c = super.prepareRenderer(renderer, row, column);
-				c.setBackground(regmodel.getRowColour(row)); 
-				return c;
+                int modelidx = convertRowIndexToModel(row);
+                Component c = super.prepareRenderer(renderer, row, column);
+                c.setBackground(regmodel.getRowColor(modelidx));
+                return c;
 			}
 		};
+		jtreg.setAutoCreateRowSorter(true);
 		
-//		VisibilityTableColumnModel colmodel = new VisibilityTableColumnModel();
-//		jtdis.setColumnModel(colmodel);
-//		jtdis.createDefaultColumnsFromModel();
-//        ResizeableTableHeader header = new ResizeableTableHeader(colmodel);
-//        header.setIncludeHeaderWidth(true);
 //		jtdis.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        jtdis.setTableHeader(header); 
-		
-		sorter.setTableHeader(jtreg.getTableHeader());
 
         jtreg.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		jtreg.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -219,72 +263,53 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	{
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
-		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-		executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
+//		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
+		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
-			public Object execute(IServiceRegistry reg)
+			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
 			{
-				return reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, fplat, null));
-			}
-		}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
-		{
-			public void resultAvailable(Object sps)
-			{
-				if(sps!=null)
-				{
-					tfsuperpeer.setText("self");
-				}
-				else
-				{
-					tfsuperpeer.setText("fetching ...");
-					
-					executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
-					{
-						public Object execute(IServiceRegistry reg)
-						{
-							return reg.getSuperpeer(false);
-						}
-					}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
-					{
-						public void resultAvailable(Object result)
-						{
-							IComponentIdentifier cid = (IComponentIdentifier)result;
-							tfsuperpeer.setText(cid.getName());
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(exception instanceof ComponentNotFoundException)
-							{
-								tfsuperpeer.setText("None");
-							}
-							else
-							{
-								tfsuperpeer.setText("Error: "+exception.getMessage());
-							}
-						}
-					}));
-				}
+				tfsuperpeer.setText("self");
+				buswitchpeer.setEnabled(true);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				tfsuperpeer.setText("fetching ...");
+				
+				executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
+				{
+					public Object execute(IServiceRegistry reg)
+					{
+						return reg.getSuperpeer(false);
+					}
+				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
+				{
+					public void resultAvailable(Object result)
+					{
+						IComponentIdentifier cid = (IComponentIdentifier)result;
+						tfsuperpeer.setText(cid.getName());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ComponentNotFoundException || exception instanceof ServiceNotFoundException)
+						{
+							tfsuperpeer.setText("None");
+						}
+						else
+						{
+							tfsuperpeer.setText("Error: "+exception.getMessage());
+						}
+						buswitchpeer.setEnabled(true);
+					}
+				}));
 			}
-		}));
+		});
 	}
 	
-//	/**
-//	 *  Get the service registry.
-//	 *  @return The service registry.
-//	 */
-//	public IServiceRegistry getRegistry()
-//	{
-//		return ServiceRegistry.getRegistry(getActiveComponent().getComponentIdentifier());
-//	}
-	
 	/**
-	 * 
+	 *  Execute a registry command.
 	 */
 	public IFuture<Object> executeRegistryCommand(final IResultCommand<Object, IServiceRegistry> cmd)
 	{
@@ -421,7 +446,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			return ret;
 		}	
 		
-		public Color getRowColour(int row) 
+		public Color getRowColor(int row) 
 		{
 			Color ret = Color.WHITE;
 			try
@@ -430,11 +455,16 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				
 				if(!cid.getRoot().equals(getActiveComponent().getComponentIdentifier()))
 				{
-					int cc = cid.hashCode();
+					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;
-					float cv = (float)(cc2/2+0.5);
+//					float cv = (float)(cc2/2+0.5);
+					
+//					System.out.println(cid+" "+cc+" "+cc2+" "+cv);
+					
 //					ret = new Color((int)(cc2 * 0x1000000));
-					ret = new Color(cv,cv,cv);
+//					ret = new Color(cv,cv,cv);
+					ret = Color.getHSBColor(cc2, 0.2f, 0.9f);
+					
 //					ret = new Color(dig[0] & 0xFF, dig[1] & 0xFF, dig[2] & 0xFF, dig[3] & 0xFF);
 					
 //					MessageDigest md = MessageDigest.getInstance("MD5");

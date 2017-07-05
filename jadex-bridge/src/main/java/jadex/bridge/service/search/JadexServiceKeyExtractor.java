@@ -108,7 +108,7 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	/**
 	 *  Efficiently wrap a single value as a Set.
 	 */
-	private static class SetWrapper<T> implements Set<T>
+	public static class SetWrapper<T> implements Set<T>
 	{
 		private T wrappedobject;
 		

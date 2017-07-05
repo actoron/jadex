@@ -5529,9 +5529,41 @@ public class SUtil
 	 */
 	private static File findDirForProject(String project) {
 		File result = new File(project);
-		if (!result.exists()) {
+		if(!result.exists()) 
+		{
 			result = new File("../" + project);
 		}
 		return result;
+	}
+	
+	/**
+	 *  Generate a diffuse string hash.
+	 *  @param s The string.
+	 *  @return The hash.
+	 */
+	public static final int diffuseStringHash(String s) 
+	{ 
+		long state0 = 0; 
+		long state1 = 0; 
+		char[] chararr = s.toCharArray(); 
+		for(int i = 0; i < chararr.length; ++i) 
+		{ 
+			if ((i & 7) < 4) 
+			{
+				state0 ^= chararr[i] << ((i & 3) << 3); 
+			} 
+			else 
+			{ 
+				state1 ^= chararr[i] << (((i & 7) - 4) << 3); 
+			} 
+		}  
+		
+		for(int i = 0; i < 5; ++i) 
+		{ 
+			state0 = Long.rotateLeft(state0, 55) ^ state1 ^ (state1 << 14); 
+			state1 = Long.rotateLeft(state1, 36); 
+		}  
+		long result = state0 + state1;  
+		return (int) result; 
 	}
 }

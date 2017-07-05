@@ -1,5 +1,6 @@
 package jadex.platform.service.registry;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.StepInvalidException;
@@ -58,7 +59,8 @@ public class AgentDelayRunner implements IDelayRunner
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				if(!(exception instanceof StepInvalidException))
+				if(!(exception instanceof StepInvalidException)
+					&& !(exception instanceof ComponentTerminatedException))
 					exception.printStackTrace();
 			}
 		});

@@ -11,8 +11,8 @@ public interface IKeyExtractor
 	 *  Extracts keys from a service.
 	 *  
 	 *  @param keytype The type of key being extracted.
-	 *  @param service The service.
+	 *  @param value The value.
 	 *  @return The keys matching the type.
 	 */
-	public Set<String> getKeys(String keytype, Object service);
+	public Set<String> getKeys(String keytype, Object value);
 }
