@@ -378,15 +378,11 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getExternalAccess(root).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					public void customResultAvailable(final IClockService clock)
 					{
-						SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
-						{
-							public void customResultAvailable(final IClockService clock)
-							{
 								IResourceIdentifier	rid	= new ResourceIdentifier(
 									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		//						System.out.println("Using rid: "+rid);
@@ -464,8 +460,6 @@ public class InvokerAgent
 								});
 							}
 						}));
-					}
-				});
 			}	
 		});
 		

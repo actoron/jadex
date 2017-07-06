@@ -8,9 +8,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -24,17 +24,20 @@ import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
+import jadex.bridge.component.impl.remotecommands.RemotePullCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
-import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
@@ -83,14 +86,56 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  Execute a command on a remote agent.
 	 *  @param target	The component to send the command to.
 	 *  @param command	The command to be executed.
+	 *  @param clazz	The return type.
+	 *  @param timeout	Custom timeout or null for default.
 	 *  @return	The result(s) of the command, if any.
 	 */
-	public <T> IFuture<T>	execute(IComponentIdentifier target, IRemoteCommand<T> command)
+	public <T> IFuture<T>	execute(final IComponentIdentifier target, IRemoteCommand<T> command, Class<? extends IFuture<T>> clazz, Long timeout)
 	{
-		@SuppressWarnings("unchecked")
-		Future<T> ret = (Future<T>) SFuture.getFuture(command.getReturnType(getComponent()));
-		
 		final String rxid = SUtil.createUniqueId("");
+		
+		final long ftimeout	= timeout!=null ? timeout.longValue() : PlatformConfiguration.getRemoteDefaultTimeout(getComponent().getComponentIdentifier());
+		
+		// TODO: Merge with DecouplingInterceptor code.
+		@SuppressWarnings("unchecked")
+		final Future<T> ret	= (Future<T>)FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality(getComponent().getLogger())
+		{
+			@Override
+			public boolean isUndone(boolean undone)
+			{
+				// Always undone when (potentially) timeout exception.
+				return undone || ftimeout>=0;
+			}
+			
+			@Override
+			public void handleTerminated(Exception reason)
+			{
+				sendRxMessage(target, rxid, new RemoteTerminationCommand<T>(reason));
+			}
+			
+			@Override
+			public void handlePull()
+			{
+				sendRxMessage(target, rxid, new RemotePullCommand<T>());
+			}
+			
+			// TODO: send backward command
+		});
+		
+		if(ftimeout>=0)
+		{
+			@SuppressWarnings({"rawtypes", "unchecked"})
+			IResultListener<T>	trl	= new TimeoutIntermediateResultListener(ftimeout, getComponent().getExternalAccess(), true, command, null)
+			{
+				@Override
+				public void timeoutOccurred(TimeoutException te)
+				{
+					ret.setExceptionIfUndone(te);
+				}
+			};			
+			ret.addResultListener(trl);
+		}
+
 		if(commands==null)
 		{
 			commands	= new HashMap<String, IFuture<?>>();
@@ -123,7 +168,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 */
 	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
 	{
-		return execute(target, new RemoteSearchCommand<T>(query));
+		Long timeout	= null;	// TODO: custom search timeout?
+		@SuppressWarnings("unchecked")
+		Class<? extends IFuture<Collection<T>>>	clazz	= query.getFilter() instanceof IAsyncFilter
+			? (Class<? extends IFuture<Collection<T>>>) IIntermediateFuture.class	// TODO: subscription for persistent queries?
+			: (Class<? extends IFuture<Collection<T>>>) IFuture.class;
+		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
 	}
 
 	/**
@@ -133,42 +183,18 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  @param args	The arguments.
 	 *  @return	The result(s) of the method invocation, if any. Connects any futures involved.
 	 */
-	public Object	executeRemoteMethod(RemoteReference ref, final Method method, Object[] args)
+	public <T> IFuture<T>	executeRemoteMethod(RemoteReference ref, Method method, Object[] args)
 	{
 		Map<String, Object>	props	= new HashMap<String, Object>();
 		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
-		final Long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): null;
+		final Long timeout = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): null;
 		
-		Future<Object> ret = (Future<Object>) execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand(ref.getTargetIdentifier(), method, args));
+		@SuppressWarnings("unchecked")
+		Class<IFuture<T>>	clazz	= (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
+			? (Class<IFuture<T>>)method.getReturnType()
+			: IFuture.class);
 		
-		if(to!=null && to.longValue()!=Timeout.NONE)
-		{
-			// TODO: Merge with DecouplingInterceptor code.
-			final Future<Object> nret	= FutureFunctionality.getDelegationFuture(ret, new FutureFunctionality(getComponent().getLogger())
-			{
-				@Override
-				public boolean isUndone(boolean undone)
-				{
-					return true;
-				}
-			});
-			
-			@SuppressWarnings({"rawtypes", "unchecked"})
-			IResultListener<Object>	trl	= new TimeoutIntermediateResultListener(to.longValue(), getComponent().getExternalAccess(), true, method, null)
-			{
-				@Override
-				public void timeoutOccurred(TimeoutException te)
-				{
-					nret.setException(te);
-				}
-			};
-			
-			ret.addResultListener(trl);
-			
-			ret = nret;
-		}
-		
-		return ret;
+		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand<T>(ref.getTargetIdentifier(), method, args), clazz, timeout);
 	}
 
 	/**

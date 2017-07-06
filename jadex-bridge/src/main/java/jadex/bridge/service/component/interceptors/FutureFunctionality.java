@@ -157,6 +157,13 @@ public class FutureFunctionality
 	}
 	
 	/**
+	 *  Optionally augment pull behavior.
+	 */
+	public void	handlePull()
+	{
+	}
+	
+	/**
 	 * 
 	 */
 	public static <T> Future<T> getDelegationFuture(IFuture<T> orig, final FutureFunctionality func)
@@ -444,6 +451,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			@Override
 			public void execute(Void args)
 			{
+				func.handlePull();
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.pullIntermediateResult();
 			}
 		});
@@ -615,6 +623,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			@Override
 			public void execute(Void args)
 			{
+				func.handlePull();
 				DelegatingPullIntermediateDelegationFuture.super.pullIntermediateResult();
 			}
 		});

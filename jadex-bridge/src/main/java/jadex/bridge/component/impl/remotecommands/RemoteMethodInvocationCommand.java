@@ -15,7 +15,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Invoke a remote method.
  */
-public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
+public class RemoteMethodInvocationCommand<T> implements IRemoteCommand<T>
 {
 	//-------- attributes --------
 	
@@ -102,7 +102,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 	 *  Execute the method.
 	 */
 	@Override
-	public IFuture<Object>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
+	public IFuture<T>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
 //		System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
 		
@@ -150,19 +150,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand<Object>
 		}
 		
 		@SuppressWarnings("unchecked")
-		IFuture<Object>	fret	= ret instanceof IFuture<?> ? (IFuture<Object>)ret : new Future<Object>(ret);
+		IFuture<T>	fret	= ret instanceof IFuture<?> ? (IFuture<T>)ret : new Future<T>((T)ret);
 		return fret;
-	}
-	
-	/**
-	 *  Get the return type.
-	 *  @return A class representing a future interface for mapping the result of the command.
-	 */
-	@SuppressWarnings("unchecked")
-	public Class<? extends IFuture<Object>>	getReturnType(IInternalAccess access)
-	{
-		return (Class<IFuture<Object>>)(IFuture.class.isAssignableFrom(method.getMethod(access.getClassLoader()).getReturnType())
-			? (Class<IFuture<Object>>)method.getMethod(access.getClassLoader()).getReturnType()
-			: IFuture.class);
 	}
 }

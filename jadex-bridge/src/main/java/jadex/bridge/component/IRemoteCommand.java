@@ -16,10 +16,4 @@ public interface IRemoteCommand<T>
 	 *  @return A future for return value(s). May also be intermediate, subscription, etc.
 	 */
 	public IFuture<T>	execute(IInternalAccess access, IMsgSecurityInfos secinf);
-
-	/**
-	 *  Get the return type.
-	 *  @return A class representing a future interface for mapping the result of the command.
-	 */
-	public Class<? extends IFuture<T>>	getReturnType(IInternalAccess access);
 }
