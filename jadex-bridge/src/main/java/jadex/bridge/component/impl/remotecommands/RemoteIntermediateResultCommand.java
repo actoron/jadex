@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.IRemoteConversationCommand;
@@ -11,7 +12,7 @@ import jadex.commons.future.IntermediateFuture;
 /**
  * Command for intermediate results.
  */
-public class RemoteIntermediateResultCommand<T> implements IRemoteConversationCommand<Collection<T>>
+public class RemoteIntermediateResultCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteConversationCommand<Collection<T>>
 {
 	/** The result. */
 	protected T result;
@@ -26,8 +27,9 @@ public class RemoteIntermediateResultCommand<T> implements IRemoteConversationCo
 	/**
 	 *  Create the command.
 	 */
-	public RemoteIntermediateResultCommand(T result)
+	public RemoteIntermediateResultCommand(T result, Map<String, Object> nonfunc)
 	{
+		super(nonfunc);
 		this.result = result;
 	}
 	

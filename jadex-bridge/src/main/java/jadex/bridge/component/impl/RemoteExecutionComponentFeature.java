@@ -20,6 +20,7 @@ import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.impl.remotecommands.AbstractInternalRemoteCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
@@ -120,6 +121,27 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			}
 			
 			// TODO: send backward command
+			
+			// cleanup on finished:
+			
+			@Override
+			public void handleFinished(Collection<Object> results) throws Exception
+			{
+				commands.remove(rxid);
+			}
+			
+			@Override
+			public Object handleResult(Object result) throws Exception
+			{
+				commands.remove(rxid);
+				return result;
+			}
+			
+			@Override
+			public void handleException(Exception exception)
+			{
+				commands.remove(rxid);
+			}
 		});
 		
 		if(ftimeout>=0)
@@ -185,16 +207,16 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 */
 	public <T> IFuture<T>	executeRemoteMethod(RemoteReference ref, Method method, Object[] args)
 	{
-		Map<String, Object>	props	= new HashMap<String, Object>();
-		ServiceCall invoc = ServiceCall.getOrCreateNextInvocation(props);
-		final Long timeout = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): null;
+		ServiceCall invoc = ServiceCall.getNextInvocation();
+		Long timeout = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): null;
+		Map<String, Object>	nonfunc	= invoc!=null ? invoc.getProperties() : null;
 		
 		@SuppressWarnings("unchecked")
 		Class<IFuture<T>>	clazz	= (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
 			? (Class<IFuture<T>>)method.getReturnType()
 			: IFuture.class);
 		
-		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand<T>(ref.getTargetIdentifier(), method, args), clazz, timeout);
+		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand<T>(ref.getTargetIdentifier(), method, args, nonfunc), clazz, timeout);
 	}
 
 	/**
@@ -252,6 +274,19 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			if(msg instanceof IRemoteCommand)
 			{
 				IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;
+				ServiceCall	sc	= null;
+				if(cmd instanceof AbstractInternalRemoteCommand)
+				{
+					Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
+					if(nonfunc!=null)
+					{
+						IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
+						sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
+						IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+					}
+				}
+				final ServiceCall	fsc	= sc;
+				
 				final IFuture<?> retfut = cmd.execute(component, secinfos);
 				if (commands == null)
 					commands = new HashMap<String, IFuture<?>>();
@@ -285,7 +320,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				{
 					public void intermediateResultAvailable(Object result)
 					{
-						RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result);
+						RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
 						IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
 						if(term!=null)
 						{
@@ -296,21 +331,21 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					public void finished()
 					{
 						commands.remove(rxid);
-						RemoteFinishedCommand<?> rc = new RemoteFinishedCommand();
+						RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
 						sendRxMessage(remote, rxid, rc);
 					}
 					
 					public void resultAvailable(Object result)
 					{
 						commands.remove(rxid);
-						RemoteResultCommand<?> rc = new RemoteResultCommand(result);
+						RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
 						sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
 						{
 							@Override
 							public void exceptionOccurred(Exception exception)
 							{
 								// Serialization of result failed -> send back exception.
-								RemoteResultCommand<?> rc = new RemoteResultCommand(exception);
+								RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
 								sendRxMessage(remote, rxid, rc);
 							}
 							
@@ -330,7 +365,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					public void exceptionOccurred(Exception exception)
 					{
 						commands.remove(rxid);
-						RemoteResultCommand<?> rc = new RemoteResultCommand(exception);
+						RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
 						sendRxMessage(remote, rxid, rc);
 					}
 					
@@ -347,16 +382,37 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			else if(msg instanceof IRemoteConversationCommand)
 			{
 				IFuture<?> fut = commands.get(rxid);
-				IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
-				cmd.execute(component, (IFuture)fut, secinfos);
+				if(fut!=null)
+				{
+					IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
+					if(cmd instanceof AbstractInternalRemoteCommand)
+					{
+						Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
+						if(nonfunc!=null)
+						{
+							ServiceCall sc = ServiceCall.getLastInvocation();
+							ServiceCall sc1 = ServiceCall.getCurrentInvocation();
+							ServiceCall sc2 = ServiceCall.getNextInvocation();
+							for(String name: nonfunc.keySet())
+							{
+								sc.setProperty(name, nonfunc.get(name));
+							}
+						}
+					}
+					cmd.execute(component, (IFuture)fut, secinfos);
+				}
+				else
+				{
+					getComponent().getLogger().warning("Outdated remote command: "+msg);
+				}
 			}
 			else if(header.getProperty(MessageComponentFeature.EXCEPTION)!=null)
 			{
-				IFuture<?> fut = commands.get(rxid);
+				// Message could not be delivered -> remove the future (and terminate, if terminable)
+				IFuture<?> fut = commands.remove(rxid);
 				if(fut instanceof ITerminableFuture)
 				{
 					((ITerminableFuture)fut).terminate((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
-					commands.remove(rxid);
 				}
 			}
 			else

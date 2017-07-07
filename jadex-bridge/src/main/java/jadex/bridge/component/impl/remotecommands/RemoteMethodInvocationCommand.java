@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -15,7 +16,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Invoke a remote method.
  */
-public class RemoteMethodInvocationCommand<T> implements IRemoteCommand<T>
+public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteCommand<T>
 {
 	//-------- attributes --------
 	
@@ -39,12 +40,9 @@ public class RemoteMethodInvocationCommand<T> implements IRemoteCommand<T>
 	/**
 	 *  Create a remote method invocation command.
 	 */
-	public RemoteMethodInvocationCommand(Object target, Method method, Object[] args)
+	public RemoteMethodInvocationCommand(Object target, Method method, Object[] args, Map<String, Object> nonfunc)
 	{
-//		if(method.getName().indexOf("Step")!=-1)
-//		{
-//			System.out.println("sril");
-//		}
+		super(nonfunc);
 		this.target	= target;
 		this.method	= new MethodInfo(method);
 		this.args	= args;

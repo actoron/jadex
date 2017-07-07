@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.IRemoteConversationCommand;
@@ -11,13 +12,21 @@ import jadex.commons.future.IntermediateFuture;
 /**
  *  Command for finished intermediate futures.
  */
-public class RemoteFinishedCommand<T> implements IRemoteConversationCommand<Collection<T>>
+public class RemoteFinishedCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteConversationCommand<Collection<T>>
 {
 	/**
 	 *  Create the command.
 	 */
 	public RemoteFinishedCommand()
 	{
+	}
+	
+	/**
+	 *  Create the command.
+	 */
+	public RemoteFinishedCommand(Map<String, Object> nonfunc)
+	{
+		super(nonfunc);
 	}
 	
 	/**

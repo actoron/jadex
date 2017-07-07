@@ -150,6 +150,13 @@ public class FutureFunctionality
 	}
 	
 	/**
+	 *  Optionally augment exception behavior.
+	 */
+	public void	handleException(Exception exception)
+	{
+	}
+	
+	/**
 	 *  Optionally augment termination behavior.
 	 */
 	public void	handleTerminated(Exception reason)
@@ -372,6 +379,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -543,6 +551,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingPullIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -715,6 +724,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -870,6 +880,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingTerminableIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1020,6 +1031,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingTerminableDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1126,6 +1138,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingIntermediateFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1234,6 +1247,7 @@ class DelegatingFuture extends Future<Object>
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1316,6 +1330,7 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingTupleFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
