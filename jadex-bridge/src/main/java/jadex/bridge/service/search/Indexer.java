@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
-import jadex.bridge.sensor.service.TagProperty;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.search.JadexServiceKeyExtractor.SetWrapper;
+import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 
@@ -42,7 +39,7 @@ public class Indexer<T>
 	public Indexer(IKeyExtractor keyextractor, String... indextypes)
 	{
 		this.keyextractor = keyextractor;
-		for (String indextype: indextypes)
+		for(String indextype: indextypes)
 			indexedvalues.put(indextype, new HashMap<String, Set<T>>());
 	}
 	
@@ -142,7 +139,7 @@ public class Indexer<T>
 	}
 	
 	/**
-	 *  Get values per specification.
+	 *  Get values per specification (multivalues considered as OR match, when queries are the values).
 	 *  @param spec The key values (first element is key name and array are values)
 	 *  @return The values matching the spec.
 	 */
@@ -156,11 +153,9 @@ public class Indexer<T>
 		else
 		{
 			List<Set<T>> valuesets = null;
-			int speccount = 0;
 			for(Iterator<Tuple2<String, String[]>> it = spec.iterator(); it.hasNext();)
 			{
 				Tuple2<String, String[]> tup = it.next();
-				speccount += tup.getSecondEntity().length;
 				
 				// Fetch index service map per key
 				Map<String, Set<T>> index = indexedvalues.get(tup.getFirstEntity());
@@ -177,8 +172,8 @@ public class Indexer<T>
 							vals.addAll(iset);
 					}
 					
-					if(tup.getSecondEntity().length==1)
-						it.remove();
+//					if(tup.getSecondEntity().length==1)
+//						it.remove();
 
 					if(vals.isEmpty())
 						return null;
@@ -219,20 +214,12 @@ public class Indexer<T>
 						}
 					}
 				}
-				
-				// If all were used directly return intersection result
-				if(ret != null && i == speccount)
-					return ret;
 			}
 			
-			if(ret == null)
-				ret = new LinkedHashSet<T>(values);
-			
-			// Otherwise use single matching
 			for(Iterator<T> it = ret.iterator(); it.hasNext(); )
 			{
 				T val = it.next();
-				if(!match(spec, val))
+				if(!matchOr(spec, val))
 					it.remove();
 			}
 		}
@@ -261,7 +248,7 @@ public class Indexer<T>
 			for(T val: values)
 			{
 				Set<String> keys = keyextractor.getKeys(keytype, val);
-				if (keys != null && keys.contains(key))
+				if(keys != null && keys.contains(key))
 				{
 					if (ret == null)
 						ret = new LinkedHashSet<T>();
@@ -320,7 +307,7 @@ public class Indexer<T>
 	 *  Remove a value from the indexer.
 	 *  @param value The value.
 	 */
-	public void removeService(T value)
+	public void removeValue(T value)
 	{
 		if(!values.remove(value))
 			System.out.println("Could not remove value from indexer: "+value+", "+value.toString());
@@ -348,9 +335,9 @@ public class Indexer<T>
 	}
 	
 	/**
-	 *  Tests if the search specification matches a value.
+	 *  Tests if the search specification matches a value (spec=query).
 	 *  
-	 *  @param service The value.
+	 *  @param value The value.
 	 *  @return True, if the value matches.
 	 */
 	public boolean match(List<Tuple2<String, String[]>> spec, T value)
@@ -363,6 +350,7 @@ public class Indexer<T>
 			if(keys == null)
 				return false;
 			
+			// All tags of query must be contained in service
 			for(String tag: tup.getSecondEntity())
 			{
 				if(!keys.contains(tag))
@@ -370,6 +358,67 @@ public class Indexer<T>
 					return false;
 				}
 			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 *  Tests if the search specification matches a value.
+	 *  
+	 *  @param value The value.
+	 *  @return True, if the value matches.
+	 */
+	public boolean matchOr(List<Tuple2<String, String[]>> spec, T value)
+	{
+		Map<String, Set<String>> totest = new HashMap<String, Set<String>>();
+		for(Tuple2<String, String[]> tup: spec)
+		{
+			if(tup.getSecondEntity()!=null)
+			{
+				Set<String> vals = new HashSet<String>();
+				for(String val: tup.getSecondEntity())
+				{
+					vals.add(val);
+				}
+				totest.put(tup.getFirstEntity(), vals);
+			}
+		}
+		
+		// Get keys from value (query) here
+		for(String keyname: keyextractor.getKeyNames())
+		{
+			Set<String> vs = keyextractor.getKeys(keyname, value);
+			if(vs!=null && vs.size()>0)
+			{
+				Set<String> keys = totest.get(keyname);
+				
+				// All tags of query must be contained in service
+				for(String tag: vs)
+				{
+					if(keys==null || !keys.contains(tag))
+					{
+						return false;
+					}
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 *  Tests if the search specification matches a value.
+	 *  
+	 *  @param service The value.
+	 *  @return True, if the value matches.
+	 */
+	public boolean extractValues(List<Tuple2<String, String[]>> spec, T value)
+	{
+		for(Tuple2<String, String[]> tup: spec)
+		{
+			// Fetch the values of the query
+			Set<String> keys = keyextractor.getKeys(tup.getFirstEntity(), value);
 		}
 		
 		return true;
@@ -396,7 +445,7 @@ public class Indexer<T>
 			{
 				ServiceQuery<?> query = (ServiceQuery<?>)value;
 				Set<String> ret = null;
-				if(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE.equals(keytype))
+				if(ServiceKeyExtractor.KEY_TYPE_INTERFACE.equals(keytype))
 				{
 					if(query.getServiceType()!=null)
 					{
@@ -412,7 +461,7 @@ public class Indexer<T>
 //							ret.add(supertype.toString());
 //					}
 				}
-				else if(JadexServiceKeyExtractor.KEY_TYPE_TAGS.equals(keytype))
+				else if(ServiceKeyExtractor.KEY_TYPE_TAGS.equals(keytype))
 				{
 					String[] tags = query.getServiceTags();
 					if(tags!=null)
@@ -424,12 +473,12 @@ public class Indexer<T>
 						}
 					}
 				}
-				else if(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER.equals(keytype))
+				else if(ServiceKeyExtractor.KEY_TYPE_PROVIDER.equals(keytype))
 				{
 					if(query.getProvider()!=null)
 						ret = new SetWrapper<String>(query.getProvider().toString());
 				}
-				else if(JadexServiceKeyExtractor.KEY_TYPE_PLATFORM.equals(keytype))
+				else if(ServiceKeyExtractor.KEY_TYPE_PLATFORM.equals(keytype))
 				{
 					if(query.getProvider()!=null)
 						ret = new SetWrapper<String>(query.getProvider().getRoot().toString());
@@ -441,7 +490,18 @@ public class Indexer<T>
 				}
 				return ret;
 			}
-		}, JadexServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
+		
+			
+			/**
+			 *  Get the key names for this type of extractor.
+			 *  @return The key names.
+			 */
+			public String[] getKeyNames()
+			{
+				return ServiceKeyExtractor.SERVICE_KEY_TYPES;
+			}
+		
+		}, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
 		
 		ServiceQuery<IComponentManagementService> q1 = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, null, null, null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
@@ -454,9 +514,9 @@ public class Indexer<T>
 		idx.addValue(q3);
 		
 		List<Tuple2<String, String[]>> spec = new ArrayList<Tuple2<String,String[]>>();
-		Tuple2<String, String[]> s1 = new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{IComponentManagementService.class.getName()});
+		Tuple2<String, String[]> s1 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{IComponentManagementService.class.getName()});
 		spec.add(s1);
-		Tuple2<String, String[]> s2 = new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_TAGS, new String[]{"a", "b"});
+		Tuple2<String, String[]> s2 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, new String[]{"a", "b"});
 		spec.add(s2);
 		System.out.println(idx.getValuesOr(spec));
 	}

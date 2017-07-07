@@ -17,7 +17,7 @@ import jadex.bridge.service.IService;
 /**
  *  Responsible for extracting values.
  */
-public class JadexServiceKeyExtractor implements IKeyExtractor
+public class ServiceKeyExtractor implements IKeyExtractor
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -31,6 +31,7 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	/** Key type for the service platform. */
 	public static final String KEY_TYPE_PLATFORM = "platform";
 	
+	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
 	
 	static
@@ -38,7 +39,7 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 		List<String> keytypes = new ArrayList<String>();
 		try
 		{
-			Field[] fields = JadexServiceKeyExtractor.class.getDeclaredFields();
+			Field[] fields = ServiceKeyExtractor.class.getDeclaredFields();
 			for (Field field : fields)
 			{
 				if (field.getName().startsWith("KEY_TYPE_"))
@@ -64,6 +65,16 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	{
 		return getKeysStatic(keytype, serv);
 	}
+	
+	/**
+	 *  Get the key names for this type of extractor.
+	 *  @return The key names.
+	 */
+	public String[] getKeyNames()
+	{
+		return SERVICE_KEY_TYPES;
+	}
+	
 	
 	/**
 	 *  Extracts keys from a service.
