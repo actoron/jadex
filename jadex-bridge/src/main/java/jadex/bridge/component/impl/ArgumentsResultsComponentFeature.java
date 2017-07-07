@@ -41,6 +41,9 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	/** The result subscription, if any. */
 	protected Set<SubscriptionIntermediateFuture<Tuple2<String, Object>>>	resfuts;
 	
+	/** Flag to remember when an exception was notified to a listener. */
+	protected boolean	notified;
+	
 	//-------- constructors --------
 	
 	/**
@@ -207,6 +210,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			Exception	ex	= getComponent().getException();
 			if(ex!=null)
 			{
+				notified	= true;
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
 				{
 					fut.setExceptionIfUndone(ex);
@@ -315,9 +319,9 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	 *  Check if there is somebody waiting for this component to finish.
 	 *  Used to decide if a fatal error needs to be printed to the console.
 	 */
-	public boolean	hasListener()
+	public boolean	exceptionNotified()
 	{
-		return resfuts!=null && !resfuts.isEmpty();
+		return notified;
 	}
 
 	//-------- helper methods --------
