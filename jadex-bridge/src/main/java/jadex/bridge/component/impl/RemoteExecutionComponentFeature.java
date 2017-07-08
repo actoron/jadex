@@ -30,6 +30,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -391,11 +392,17 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						if(nonfunc!=null)
 						{
 							ServiceCall sc = ServiceCall.getLastInvocation();
-							ServiceCall sc1 = ServiceCall.getCurrentInvocation();
-							ServiceCall sc2 = ServiceCall.getNextInvocation();
-							for(String name: nonfunc.keySet())
+							if(sc==null)
 							{
-								sc.setProperty(name, nonfunc.get(name));
+								// TODO: why null?
+								sc	= CallAccess.createServiceCall((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), nonfunc);
+							}
+							else
+							{
+								for(String name: nonfunc.keySet())
+								{
+									sc.setProperty(name, nonfunc.get(name));
+								}
 							}
 						}
 					}
