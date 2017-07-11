@@ -193,7 +193,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			secinf = new MsgSecurityInfos();
 			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformtrusted);
-			secinf.setTrustedPlatform(platformtrusted);
+			secinf.setTrustedPlatform(false);
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
@@ -220,7 +220,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			secinf = new MsgSecurityInfos();
 			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformtrusted);
-			secinf.setTrustedPlatform(platformtrusted);
+			secinf.setTrustedPlatform(false);
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
 			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);

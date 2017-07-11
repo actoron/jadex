@@ -109,7 +109,7 @@ public class KeySecret extends SharedSecret
 	public static final KeySecret createRandom()
 	{
 		byte[] rawkey = new byte[32];
-		SSecurity.getHighlySecureRandom().nextBytes(rawkey);
+		SSecurity.getSecureRandom().nextBytes(rawkey);
 		return new KeySecret(rawkey);
 	}
 }

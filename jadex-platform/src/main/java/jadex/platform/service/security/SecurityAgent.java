@@ -1,11 +1,14 @@
 package jadex.platform.service.security;
 
+import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import org.bouncycastle.crypto.digests.Blake2bDigest;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -35,6 +38,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
@@ -79,7 +83,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected static final String SECURITY_MESSAGE = "__securitymessage__";
 	
 	/** Timeout used for internal expirations */
-	protected static final long TIMEOUT = 30000;
+	protected static final long TIMEOUT = 60000;
 	
 	/** Component access. */
 	@Agent
@@ -269,18 +273,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						HandshakeState hstate = initializingcryptosuites.get(rplat);
 						if (hstate == null)
 						{
-							String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
-							hstate = new HandshakeState();
-							hstate.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
-							hstate.setConversationId(convid);
-							hstate.setResultFuture(new Future<ICryptoSuite>());
-							
-							initializingcryptosuites.put(rplat, hstate);
-							
-							String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
-							InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getComponentIdentifier(), convid, csuites);
-							BasicComponentIdentifier rsec = new BasicComponentIdentifier("security@" + rplat);
-							sendSecurityHandshakeMessage(rsec, ihm);
+							initializeHandshake(rplat);
+							hstate = initializingcryptosuites.get(rplat);
 						}
 						
 						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret)
@@ -595,10 +589,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		});
 	}
 	
+	protected void initializeHandshake(String cid)
+	{
+		String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
+		HandshakeState hstate = new HandshakeState();
+		hstate.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
+		hstate.setConversationId(convid);
+		hstate.setResultFuture(new Future<ICryptoSuite>());
+		
+		initializingcryptosuites.put(cid.toString(), hstate);
+		
+		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
+		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getComponentIdentifier(), convid, csuites);
+		BasicComponentIdentifier rsec = new BasicComponentIdentifier("security@" + cid);
+		sendSecurityHandshakeMessage(rsec, ihm);
+	}
+	
 	/**
 	 *  Get the settings service.
 	 */
-	public ISettingsService getSettingsService()
+	protected ISettingsService getSettingsService()
 	{
 		ISettingsService ret = null;
 		try
@@ -866,5 +876,43 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
 	{
 		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
+	}
+	
+	public static void main(String[] args)
+	{
+		String dn = "O=Someorg,C=US,CN=My CA";
+		int str = 256;
+		int days = 30;
+//		String scheme = "RSAANDMGF1";
+		String scheme = "ECDSA";
+		String hash = "SHA256";
+		
+		Tuple2<String, String> tup = SSecurity.createRootCaCertificate(dn, scheme, hash, str, days);
+		
+		String dn2 = "O=Someorg,C=US,CN=My Intermediate CA";
+		String dn3 = "O=Someorg,C=US,CN=My Intermediate CA2";
+		String dn4 = "O=Someorg,C=US,CN=My Platform";
+		
+		Tuple2<String, String> tup2 = SSecurity.createIntermediateCaCertificate(tup.getFirstEntity(), tup.getSecondEntity(), dn2, 1, scheme, hash, str, days);
+		Tuple2<String, String> tup3 = SSecurity.createIntermediateCaCertificate(tup2.getFirstEntity(), tup2.getSecondEntity(), dn3, 0, scheme, hash, str, days);
+		Tuple2<String, String> tup4 = SSecurity.createCertificate(tup3.getFirstEntity(), tup3.getSecondEntity(), dn4, scheme, hash, str, days);
+		
+		System.out.println(tup.getFirstEntity());
+		System.out.println(tup.getSecondEntity());
+		System.out.println("=====================================================");
+//		System.out.println(tup2.getFirstEntity());
+		System.out.println(tup4.getFirstEntity());
+		
+		ByteArrayInputStream pemcert = new ByteArrayInputStream(tup4.getFirstEntity().getBytes(SUtil.UTF8));
+		ByteArrayInputStream pemkey = new ByteArrayInputStream(tup4.getSecondEntity().getBytes(SUtil.UTF8));
+		Blake2bDigest dig = new Blake2bDigest(512);
+		dig.update("TestMessage".getBytes(SUtil.UTF8), 0, 11);
+		byte[] msghash = new byte[64];
+		dig.doFinal(msghash, 0);
+		byte[] token = SSecurity.signWithPEM(msghash, pemcert, pemkey);
+		ByteArrayInputStream trustedpemcert = new ByteArrayInputStream(tup.getFirstEntity().getBytes(SUtil.UTF8));
+		System.out.println(SSecurity.verifyWithPEM(msghash, token, trustedpemcert));
+		
+//		X509CertificateHolder = new X509C
 	}
 }

@@ -59,7 +59,7 @@ public class NHChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 		if (remotepublickey == null)
 		{
 			NHKeyPairGenerator kpg = new NHKeyPairGenerator();
-			kpg.init(new KeyGenerationParameters(SSecurity.getHighlySecureRandom(), -1));
+			kpg.init(new KeyGenerationParameters(SSecurity.getSecureRandom(), -1));
 			
 			AsymmetricCipherKeyPair keypair = kpg.generateKeyPair();
 			NHAgreement nhagree = new NHAgreement();
@@ -68,7 +68,7 @@ public class NHChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 		}
 		else
 		{
-			NHExchangePairGenerator ekpg2 = new NHExchangePairGenerator(SSecurity.getHighlySecureRandom());
+			NHExchangePairGenerator ekpg2 = new NHExchangePairGenerator(SSecurity.getSecureRandom());
 			ret = ekpg2.generateExchange(new NHPublicKeyParameters(remotepublickey));
 		}
 		return ret;
@@ -99,13 +99,13 @@ public class NHChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 	public static void main(String[] args)
 	{
 		NHKeyPairGenerator kpg = new NHKeyPairGenerator();
-		kpg.init(new KeyGenerationParameters(SSecurity.getHighlySecureRandom(), -1));
+		kpg.init(new KeyGenerationParameters(SSecurity.getSecureRandom(), -1));
 		
 		AsymmetricCipherKeyPair keypair1 = kpg.generateKeyPair();
 		NHAgreement na1 = new NHAgreement();
 		na1.init(keypair1.getPrivate());
 		
-		NHExchangePairGenerator ekpg2 = new NHExchangePairGenerator(SSecurity.getHighlySecureRandom());
+		NHExchangePairGenerator ekpg2 = new NHExchangePairGenerator(SSecurity.getSecureRandom());
 		ExchangePair ep2 = ekpg2.generateExchange(keypair1.getPublic());
 		byte[] shared2 = ep2.getSharedValue();
 		

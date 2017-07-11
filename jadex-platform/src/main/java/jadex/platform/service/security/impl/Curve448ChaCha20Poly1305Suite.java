@@ -56,7 +56,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 	protected Object createEphemeralKey()
 	{
 		byte[] ret = new byte[56];
-		SSecurity.getHighlySecureRandom().nextBytes(ret);
+		SSecurity.getSecureRandom().nextBytes(ret);
 		return ret;
 	}
 	
@@ -170,7 +170,7 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 				networks = new HashMap<String, AbstractAuthenticationSecret>();
 //				networks.put("test", new PasswordSecret("password:123456789012345"));
 				byte[] key = new byte[32];
-				SSecurity.getHighlySecureRandom().nextBytes(key);
+				SSecurity.getSecureRandom().nextBytes(key);
 				networks.put("test", new KeySecret(key));
 			}
 			

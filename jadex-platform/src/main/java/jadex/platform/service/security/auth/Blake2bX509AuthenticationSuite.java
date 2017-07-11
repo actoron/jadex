@@ -11,9 +11,9 @@ import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroup;
-import org.bouncycastle.crypto.agreement.jpake.JPAKEPrimeOrderGroups;
+import org.bouncycastle.crypto.agreement.DHStandardGroups;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
+import org.bouncycastle.crypto.params.DHParameters;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.Pack;
@@ -40,7 +40,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	protected static final int SALT_SIZE = 32;
 	
 	/** Schnorr group used for zero-knowledge password proof. */
-	protected static final JPAKEPrimeOrderGroup SCHNORR_GROUP = JPAKEPrimeOrderGroups.NIST_3072;
+	protected static final DHParameters SCHNORR_GROUP = DHStandardGroups.rfc3526_4096;
 	
 	/**
 	 *  Gets the authentication suite ID.
@@ -96,7 +96,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				
 				BigInteger dkbi = new BigInteger(1, dk);
 				
-				BigInteger s = dkbi.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getQ());
+				BigInteger s = dkbi.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getP());
 				
 				byte[] kdfparams = ((PasswordSecret) ssecret).getKdfParams();
 				
@@ -286,7 +286,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		dig.doFinal(challengebytes, 0);
 		BigInteger challenge = new BigInteger(challengebytes);
 		
-		BigInteger s = sec.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getQ());
+		BigInteger s = sec.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getP());
 		
 		// s,randpub
 		

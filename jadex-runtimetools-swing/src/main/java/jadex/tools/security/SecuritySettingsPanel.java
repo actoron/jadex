@@ -123,9 +123,6 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	/** The keystore update action. */
 	protected Runnable updateact;
 	
-	/** The validity duration textfield. */
-	protected JTextField tfvaldur;
-	
 	//-------- methods --------
 	
 	/**
@@ -162,25 +159,6 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			{
 				secservice.setTrustedLanMode(cbtrulan.isSelected());
 //				doRefresh();
-			}
-		});
-		
-		tfvaldur = new JTextField(10);
-		tfvaldur.setToolTipText("Default validity duration of messages");
-		JButton buvaldur = new JButton("Apply");
-		buvaldur.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					long val = Long.parseLong(tfvaldur.getText());
-					secservice.setValidityDuration(val*60000);
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
 			}
 		});
 		
@@ -315,7 +293,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		
 		JScrollPane sktt = new JScrollPane(ktt);
 		
-		MouseAdapter ma = new MouseAdapter()
+		/*MouseAdapter ma = new MouseAdapter()
 		{
 			// Create file chooser lazily to allow jenkins build to succeed
 			// (new JFileChooser() throws exception in headless windows)
@@ -704,7 +682,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		
 		ktt.addMouseListener(ma);
 		ktt.getTableHeader().addMouseListener(ma);
-		sktt.addMouseListener(ma);
+		sktt.addMouseListener(ma);*/
 		
 		JButton bureload = new JButton("Reload");
 		bureload.addActionListener(new ActionListener()
@@ -762,8 +740,9 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		JLabel l = new JLabel("Validity duration [mins]");
 		l.setToolTipText("Validity duration of messages, i.e. older messages are not accepted.");
 		plocal.add(l, new GridBagConstraints(0, gbc.gridy, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
-		plocal.add(tfvaldur, new GridBagConstraints(1, gbc.gridy, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
-		plocal.add(buvaldur, new GridBagConstraints(2, gbc.gridy, 1, 1, 0, 0,  GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
+// TODO
+//		plocal.add(tfvaldur, new GridBagConstraints(1, gbc.gridy, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
+//		plocal.add(buvaldur, new GridBagConstraints(2, gbc.gridy, 1, 1, 0, 0,  GridBagConstraints.WEST, GridBagConstraints.VERTICAL, gbc.insets, 0, 0));
 		gbc.gridy++;
 		plocal.add(new JPanel(), new GridBagConstraints(0, gbc.gridy, 1, 1, GridBagConstraints.REMAINDER, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, gbc.insets, 0, 0));
 		
