@@ -29,5 +29,5 @@ public interface IInternalRemoteExecutionFeature
 	 *  @param args	The arguments.
 	 *  @return	The result(s) of the method invocation, if any. Connects any futures involved.
 	 */
-	public Object	executeRemoteMethod(RemoteReference ref, Method method, Object[] args);
+	public <T> IFuture<T>	executeRemoteMethod(RemoteReference ref, Method method, Object[] args);
 }

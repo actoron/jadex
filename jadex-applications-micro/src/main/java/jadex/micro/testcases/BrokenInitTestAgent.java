@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import java.util.Collection;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -9,6 +11,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -120,9 +123,17 @@ public class BrokenInitTestAgent
 		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut1)
 		{
+			@SuppressWarnings("deprecation")
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null)
+				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), new IResultListener<Collection<Tuple2<String,Object>>>()
+				{
+					// Dummy listener to avoid fatal error being printed.
+					@Override
+					public void exceptionOccurred(Exception exception){}
+					@Override					
+					public void resultAvailable(Collection<Tuple2<String,Object>> result) {};
+				})
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier result)

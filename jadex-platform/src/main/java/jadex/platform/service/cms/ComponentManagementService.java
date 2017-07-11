@@ -2092,7 +2092,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(ex!=null)
 			{
 				// Unhandled component exception
-				if(af!=null && ((IInternalArgumentsResultsFeature)af).hasListener())
+				if(af!=null && ((IInternalArgumentsResultsFeature)af).exceptionNotified())
 				{
 					// Delegated exception to some listener, only print info.
 					comp.getInternalAccess().getLogger().info("Fatal error, component '"+cid+"' will be removed due to "+ex);

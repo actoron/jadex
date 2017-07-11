@@ -676,38 +676,34 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 //			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
 			
-			if(service instanceof IService)
+			
+			try
 			{
-				IService serv = (IService) service;
-				Class<?> clazz = serv.getServiceIdentifier().getServiceType().getType(ia.getClassLoader());
-				
+				Class<?> clazz = sid.getServiceType().getType(ia.getClassLoader());
 				boolean addhandler = false;
-				try
-				{
-					Method[] ms = SReflect.getAllMethods(clazz);
-					
-					formethod:
-					for (Method m : ms)
-					{
-						Annotation[] as = m.getAnnotations();
-						for (Annotation anno : as)
-							if (anno instanceof CheckNotNull 
-								|| anno instanceof CheckState
-								|| anno instanceof CheckIndex)
-							{
-								addhandler = true;
-								break formethod;
-							}
-					}
-				}
-				catch (Exception e)
-				{
-				}
+				Method[] ms = SReflect.getAllMethods(clazz);
 				
+				formethod:
+				for (Method m : ms)
+				{
+					Annotation[] as = m.getAnnotations();
+					for (Annotation anno : as)
+						if (anno instanceof CheckNotNull 
+							|| anno instanceof CheckState
+							|| anno instanceof CheckIndex)
+						{
+							addhandler = true;
+							break formethod;
+						}
+				}
 				if (addhandler)
 					handler.addFirstServiceInterceptor(new PrePostConditionInterceptor(ia));
 			}
-			else
+			catch (Exception e)
+			{
+			}
+			
+			if(!(service instanceof IService))
 			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor());
 			}

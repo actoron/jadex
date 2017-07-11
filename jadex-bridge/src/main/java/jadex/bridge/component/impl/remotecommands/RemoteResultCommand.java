@@ -1,5 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.IRemoteConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -9,7 +11,7 @@ import jadex.commons.future.IFuture;
 /**
  * Command for results.
  */
-public class RemoteResultCommand<T> implements IRemoteConversationCommand<T>
+public class RemoteResultCommand<T>	extends AbstractInternalRemoteCommand implements IRemoteConversationCommand<T>
 {
 	/** The result. */
 	protected T result;
@@ -27,16 +29,18 @@ public class RemoteResultCommand<T> implements IRemoteConversationCommand<T>
 	/**
 	 *  Create the command.
 	 */
-	public RemoteResultCommand(T result)
+	public RemoteResultCommand(T result, Map<String, Object> nonfunc)
 	{
+		super(nonfunc);
 		this.result = result;
 	}
 	
 	/**
 	 *  Create the command.
 	 */
-	public RemoteResultCommand(Exception exception)
+	public RemoteResultCommand(Exception exception, Map<String, Object> nonfunc)
 	{
+		super(nonfunc);
 		this.exception = exception;
 	}
 	

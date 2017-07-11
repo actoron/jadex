@@ -1,32 +1,23 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.util.Collection;
-import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.IRemoteConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.IPullIntermediateFuture;
 
 /**
- *  Command for finished intermediate futures.
+ *  Command for pulling from pull intermediate futures.
  */
-public class RemoteFinishedCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteConversationCommand<Collection<T>>
+public class RemotePullCommand<T> implements IRemoteConversationCommand<Collection<T>>
 {
 	/**
 	 *  Create the command.
 	 */
-	public RemoteFinishedCommand()
+	public RemotePullCommand()
 	{
-	}
-	
-	/**
-	 *  Create the command.
-	 */
-	public RemoteFinishedCommand(Map<String, Object> nonfunc)
-	{
-		super(nonfunc);
 	}
 	
 	/**
@@ -37,6 +28,6 @@ public class RemoteFinishedCommand<T>	extends AbstractInternalRemoteCommand	impl
 	 */
 	public void	execute(IInternalAccess access, IFuture<Collection<T>> future, IMsgSecurityInfos secinf)
 	{
-		((IntermediateFuture<T>)future).setFinished();
+		((IPullIntermediateFuture<T>)future).pullIntermediateResult();
 	}
 }
