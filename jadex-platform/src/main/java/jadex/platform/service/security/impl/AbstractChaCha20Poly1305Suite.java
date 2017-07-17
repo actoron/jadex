@@ -17,6 +17,7 @@ import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.SSecurity;
@@ -24,6 +25,7 @@ import jadex.platform.service.security.MsgSecurityInfos;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
+import jadex.platform.service.security.auth.IAuthenticationSuite;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 
@@ -47,6 +49,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	
 	/** The remote-generated authentication challenge. */
 	protected byte[] remoteauthchallenge;
+	
+	/** The authentication suite. */
+	protected IAuthenticationSuite authsuite;
 	
 	/** Next step in the handshake protocol. */
 	protected int nextstep;
@@ -162,6 +167,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			localauthchallenge = new byte[32];
 			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
 			
+			authsuite = new Blake2bX509AuthenticationSuite(remoteauthchallenge, localauthchallenge);
+			
 			hashednetworks = getHashedNetworks(agent.getNetworks(), remoteauthchallenge);
 			
 			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, sem.getHashedNetworkNames());
@@ -180,6 +187,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			KeyExchangeMessage incmsg = (KeyExchangeMessage) incomingmessage;
 			
 			remoteauthchallenge = incmsg.getChallenge();
+			
+			authsuite = new Blake2bX509AuthenticationSuite(localauthchallenge, remoteauthchallenge);
 			
 			remotepublickey = incmsg.getPublicKey();
 			
@@ -236,6 +245,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			remoteauthchallenge = null;
 			hashednetworks = null;
 			remotepublickey = null;
+			authsuite = null;
 			
 			nextstep = 4;
 			
@@ -255,6 +265,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			localauthchallenge = null;
 			remoteauthchallenge = null;
 			hashednetworks = null;
+			authsuite = null;
 			
 			ret = false;
 			nextstep = 4;
@@ -276,6 +287,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		ephemeralkey = null;
 		localauthchallenge = null;
 		remoteauthchallenge = null;
+		authsuite = null;
 		if (key != null)
 		{
 			byte[] raw = new byte[key.length << 2];
@@ -300,12 +312,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		byte[] local = null;
 		AbstractAuthenticationSecret ps = agent.getPlatformSecret();
 		if (ps != null && ps.canSign())
-			local = signKey(remoteauthchallenge, pubkey, ps);
+			local = signKey(localauthchallenge, pubkey, ps);
 		
 		byte[] remote = null;
 		ps = agent.getPlatformSecret(remoteid);
 		if (ps != null && ps.canSign())
-			remote = signKey(remoteauthchallenge, pubkey, ps);
+			remote = signKey(localauthchallenge, pubkey, ps);
 		
 		if (local != null || remote != null)
 			return new Tuple2<byte[], byte[]>(local, remote);
@@ -327,12 +339,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			if (sigs.getFirstEntity() != null)
 			{
-				ret = verifyKey(localauthchallenge, key, localsecret, sigs.getFirstEntity());
+				ret = verifyKey(remoteauthchallenge, key, localsecret, sigs.getFirstEntity());
 			}
 			
 			if (!ret && sigs.getSecondEntity() != null)
 			{
-				ret = verifyKey(localauthchallenge, key, localsecret, sigs.getSecondEntity());
+				ret = verifyKey(remoteauthchallenge, key, localsecret, sigs.getSecondEntity());
 			}
 		}
 		return ret;
@@ -355,7 +367,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			{
 				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(hnwname);
 				if (tup != null)
-					networksigs.put(hnwname, signKey(remoteauthchallenge, key, tup.getSecondEntity()));
+					networksigs.put(hnwname, signKey(localauthchallenge, key, tup.getSecondEntity()));
 			}
 		}
 		return networksigs;
@@ -378,21 +390,13 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(nwsig.getKey());
 				if (tup != null)
 				{
-					if (verifyKey(localauthchallenge, key, tup.getSecondEntity(), nwsig.getValue()))
+					if (verifyKey(remoteauthchallenge, key, tup.getSecondEntity(), nwsig.getValue()))
 						ret.add(tup.getFirstEntity());
 				}
 			}
 		}
 		return ret;
 	}
-	
-	/**
-	 *  Finalize.
-	 */
-	protected void finalize() throws Throwable
-	{
-		destroy();
-	};
 	
 	/**
 	 *  Signs a key for authentication.
@@ -402,12 +406,11 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param secret Secret used for authentication.
 	 *  @return Signature.
 	 */
-	protected static final byte[] signKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret)
+	protected byte[] signKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret)
 	{
 		byte[] sigmsg = new byte[key.length + challenge.length];
 		System.arraycopy(key, 0, sigmsg, 0, key.length);
 		System.arraycopy(challenge, 0, sigmsg, key.length, challenge.length);
-		Blake2bX509AuthenticationSuite authsuite = new Blake2bX509AuthenticationSuite();
 		return authsuite.createAuthenticationToken(sigmsg, secret);
 	}
 	
@@ -419,14 +422,21 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param secret Secret used for authentication.
 	 *  @return Signature.
 	 */
-	protected static final boolean verifyKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret, byte[] authtoken)
+	protected boolean verifyKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret, byte[] authtoken)
 	{
 		byte[] sigmsg = new byte[key.length + challenge.length];
 		System.arraycopy(key, 0, sigmsg, 0, key.length);
 		System.arraycopy(challenge, 0, sigmsg, key.length, challenge.length);
-		Blake2bX509AuthenticationSuite authsuite = new Blake2bX509AuthenticationSuite();
 		return authsuite.verifyAuthenticationToken(sigmsg, secret, authtoken);
 	}
+	
+	/**
+	 *  Finalize.
+	 */
+	protected void finalize() throws Throwable
+	{
+		destroy();
+	};
 	
 	/**
 	 *  Hashes the network name.
@@ -858,83 +868,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public ReadyMessage(IComponentIdentifier sender, String conversationid)
 		{
 			super(sender, conversationid);
-		}
-	}
-	
-	/**
-	 *  Wrapper to allow byte arrays as hash keys.
-	 *
-	 */
-	protected static final class ByteArrayWrapper
-	{
-		/** The wrapped byte array. */
-		protected byte[] array;
-		
-		/**
-		 *  Creates the wrapper.
-		 */
-		public ByteArrayWrapper()
-		{
-		}
-		
-		/**
-		 *  Creates the wrapper.
-		 */
-		public ByteArrayWrapper(byte[] array)
-		{
-			this.array = array;
-		}
-
-		/**
-		 *  Gets the array.
-		 *
-		 *  @return The array.
-		 */
-		public byte[] getArray()
-		{
-			return array;
-		}
-
-		/**
-		 *  Sets the array.
-		 *
-		 *  @param array The array.
-		 */
-		public void setArray(byte[] array)
-		{
-			this.array = array;
-		}
-		
-		/**
-		 *  Creates a hash code.
-		 */
-		public int hashCode()
-		{
-			if (array == null)
-				return 0;
-			
-			return Arrays.hashCode(array);
-		}
-		
-		/**
-		 *  Compares two arrays.
-		 */
-		public boolean equals(Object obj)
-		{
-			boolean ret = false;
-			if (obj instanceof ByteArrayWrapper)
-			{
-				ByteArrayWrapper other = (ByteArrayWrapper) obj;
-				if (other.getArray() == null && array == null)
-				{
-					ret = true;
-				}
-				else
-				{
-					ret = Arrays.equals(array, other.getArray());
-				}
-			}
-			return ret;
 		}
 	}
 }

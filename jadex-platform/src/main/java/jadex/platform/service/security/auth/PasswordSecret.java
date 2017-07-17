@@ -3,6 +3,7 @@ package jadex.platform.service.security.auth;
 import java.util.logging.Logger;
 
 import org.bouncycastle.crypto.generators.SCrypt;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Pack;
 
 import jadex.commons.SUtil;
@@ -27,7 +28,7 @@ public class PasswordSecret extends SharedSecret
 	protected static final int SCRYPT_R = 8;
 	
 	/** SCrypt parallelization. */
-	protected static final int SCRYPT_P = 1;
+	protected static final int SCRYPT_P = 4;
 	
 	/** The password. */
 	protected String password;
@@ -112,7 +113,7 @@ public class PasswordSecret extends SharedSecret
 	 */
 	public byte[] deriveKey(int keysize, byte[] salt)
 	{
-		return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, keysize);
+		return SCryptParallel.generate(password.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, keysize);
 	}
 	
 	/**
@@ -132,7 +133,7 @@ public class PasswordSecret extends SharedSecret
 		int r = Pack.littleEndianToInt(dfparams, 8);
 		int p = Pack.littleEndianToInt(dfparams, 12);
 		
-		return SCrypt.generate(password.getBytes(SUtil.UTF8), salt, n, r, p, keysize);
+		return SCryptParallel.generate(password.getBytes(SUtil.UTF8), salt, n, r, p, keysize);
 	}
 	
 	/** 
@@ -152,7 +153,15 @@ public class PasswordSecret extends SharedSecret
 		SSecurity.getSecureRandom().nextBytes(salt);
 		
 		long ts = System.currentTimeMillis();
-		pws.deriveKey(64, salt);
+//		pws.deriveKey(64, salt);
+		byte[] single = SCrypt.generate(pws.getPassword().getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 64);
 		System.out.println(System.currentTimeMillis() - ts);
+		
+		ts = System.currentTimeMillis();
+//		pws.deriveKey(64, salt);
+		byte[] par = SCryptParallel.generate(pws.getPassword().getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 64);
+		System.out.println(System.currentTimeMillis() - ts);
+		
+		System.out.println(Arrays.areEqual(single, par));
 	}
 }

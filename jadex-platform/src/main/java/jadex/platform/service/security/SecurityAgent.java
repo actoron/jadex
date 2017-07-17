@@ -160,7 +160,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			System.out.println("Generated new platform access key: "+secretstr.substring(4));
 			
 		}
-		secretstr = "pw:AAAACHBsYXRmb3JtAAAAQKH1B5mo3k/x5Ms4I1l3D7A6gS174vZnpol/TSEpWk0LZp1Ixsaiz80qYRFOftoK1J9wUwexE/Osbphf6DN1HW8:fmkds09djf0s9d0sf9kd";
 		
 		if (changedprops)
 		{

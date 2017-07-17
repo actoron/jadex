@@ -3,19 +3,17 @@ package jadex.platform.service.security.auth;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.crypto.agreement.DHStandardGroups;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
-import org.bouncycastle.crypto.params.DHParameters;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.Pack;
@@ -29,7 +27,6 @@ import net.i2p.crypto.eddsa.EdDSAEngine;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.KeyPairGenerator;
-import net.i2p.crypto.eddsa.spec.EdDSAGenParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
@@ -56,6 +53,21 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	
 	/** Schnorr group used for zero-knowledge password proof. */
 //	protected static final DHParameters SCHNORR_GROUP = DHStandardGroups.rfc3526_4096;
+	
+	protected byte[] combinedchallenge;
+	
+	/** Cache for derived keys. */
+	protected Map<PasswordSecret, byte[]> derivedkeyscache = new HashMap<PasswordSecret, byte[]>();
+	
+	public Blake2bX509AuthenticationSuite(byte[] firstchallenge, byte[] secondchallenge)
+	{
+		int maxlen = Math.max(firstchallenge.length, secondchallenge.length);
+		combinedchallenge = new byte[maxlen];
+		Blake2bDigest dig = new Blake2bDigest(maxlen << 3);
+		dig.update(firstchallenge, 0, firstchallenge.length);
+		dig.update(secondchallenge, 0, secondchallenge.length);
+		dig.doFinal(combinedchallenge, 0);
+	}
 	
 	/**
 	 *  Gets the authentication suite ID.
@@ -90,7 +102,21 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{
 			SharedSecret ssecret = (SharedSecret) secret;
 			
-			byte[] dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+			byte[] dk = null;
+			if (ssecret instanceof PasswordSecret)
+			{
+				dk = derivedkeyscache.get(ssecret);
+				if (dk == null)
+				{
+					dk = ssecret.deriveKey(DERIVED_KEY_SIZE, combinedchallenge);
+					derivedkeyscache.put((PasswordSecret) ssecret, dk);
+				}
+			}
+			
+			if (dk == null)
+			{
+				dk = ssecret.deriveKey(DERIVED_KEY_SIZE, salt);
+			}
 			
 			if (ssecret instanceof PasswordSecret)
 			{
@@ -243,7 +269,20 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 					
 					byte[] msghash = getMessageHash(msg, salt);
 					
-					byte[] dk = ((PasswordSecret) ssecret).deriveKey(DERIVED_KEY_SIZE, salt, kdfparams);
+					byte[] dk = null;
+					if (Arrays.equals(kdfparams, ((PasswordSecret) ssecret).getKdfParams()))
+					{
+						dk = derivedkeyscache.get(ssecret);
+						if (dk == null)
+						{
+							dk = ((PasswordSecret) ssecret).deriveKey(DERIVED_KEY_SIZE, combinedchallenge, kdfparams);
+							derivedkeyscache.put((PasswordSecret) ssecret, dk);
+						}
+					}
+					else
+					{
+						dk = ((PasswordSecret) ssecret).deriveKey(DERIVED_KEY_SIZE, combinedchallenge, kdfparams);
+					}
 					
 					KeyPair pair = deriveEd25519KeyPair(dk);
 					
