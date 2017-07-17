@@ -121,7 +121,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	{
 		return msgid.get() < AbstractCryptoSuite.MSG_ID_START;
 	}
-	
+	long ts;
 	/**
 	 *  Handles handshake messages.
 	 *  
@@ -137,6 +137,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		
 		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
+			ts = System.currentTimeMillis();
 			StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
 			localauthchallenge = new byte[32];
 			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
@@ -257,6 +258,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			ret = false;
 			nextstep = 4;
+			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
 		}
 		else
 		{

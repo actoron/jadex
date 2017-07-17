@@ -58,6 +58,16 @@ public class KeySecret extends SharedSecret
 	}
 	
 	/**
+	 *  Returns the encoded secret.
+	 *  
+	 *  @return The encoded secret.
+	 */
+	public String getEncoded()
+	{
+		return PREFIX + ":" + toString();
+	}
+	
+	/**
 	 *  Gets the key.
 	 *  
 	 *  @return The key.
@@ -103,7 +113,7 @@ public class KeySecret extends SharedSecret
 	 */
 	public String toString()
 	{
-		return PREFIX + ":" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
+		return new String(Base64.encodeNoPadding(key), SUtil.UTF8);
 	}
 	
 	public static final KeySecret createRandom()

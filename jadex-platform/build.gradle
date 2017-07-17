@@ -16,5 +16,6 @@ dependencies
 	compile group: 'org.tukaani', name: 'xz', version: '1.5'
 	compile group: 'net.jpountz.lz4', name: 'lz4', version: '1.3.0'
 	compile group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.2.6'
+	compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
 }
 

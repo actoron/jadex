@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.math.BigInteger;
@@ -33,6 +32,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -40,7 +40,6 @@ import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.bc.BcX509v3CertificateBuilder;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.Mac;
-import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -49,17 +48,20 @@ import org.bouncycastle.crypto.generators.DSAParametersGenerator;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.DSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.DSAParameters;
+import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
 import org.bouncycastle.crypto.params.ECNamedDomainParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.crypto.prng.EntropySource;
 import org.bouncycastle.crypto.prng.EntropySourceProvider;
 import org.bouncycastle.crypto.prng.SP800SecureRandomBuilder;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -68,15 +70,17 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.bc.BcContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
-import org.bouncycastle.pqc.crypto.sphincs.SPHINCS256KeyGenerationParameters;
-import org.bouncycastle.pqc.crypto.sphincs.SPHINCS256KeyPairGenerator;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.random.SecureThreadedRandom;
@@ -323,17 +327,7 @@ public class SSecurity
 			certdata = SUtil.readStream(gis);
 			byte[] sig = splitdata.get(1);
 			
-			PEMParser pemparser = new PEMParser(new InputStreamReader(new ByteArrayInputStream(certdata), SUtil.UTF8));
-			List<X509CertificateHolder> certchain = new ArrayList<X509CertificateHolder>();
-			Object object = pemparser.readPemObject();
-			while (object != null)
-			{
-				X509CertificateHolder crtholder = new X509CertificateHolder(((PemObject) object).getContent());
-				certchain.add(crtholder);
-				object = pemparser.readPemObject();
-			}
-			pemparser.close();
-			pemparser = null;
+			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(new String(certdata, SUtil.UTF8));
 			
 			// Verify certificate chain
 			JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
@@ -367,6 +361,7 @@ public class SSecurity
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			Logger.getLogger("authentication").info("Verification failed: " + e.toString());
 		}
 		finally
@@ -392,14 +387,14 @@ public class SSecurity
 	 *  @param daysvalid Number of days valid.
 	 *  @return The certificate.
 	 */
-	public static final Tuple2<String, String> createSelfSignedCertificate(String subjectdn, String scheme, String hashalg, int strength, int daysvalid)
+	public static final Tuple2<String, String> createSelfSignedCertificate(String subjectdn, String scheme, String schemeconf, String hashalg, int strength, int daysvalid)
 	{
 		X500Name subject = new X500Name(subjectdn);
 		
 		Extension bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(false)));
 		Extension kuext = new Extension(Extension.keyUsage, true, asn1ToBytes(new KeyUsage(KeyUsage.digitalSignature)));
 		
-		return createCertificateBySpecification(null, null, subject, scheme, hashalg, strength, daysvalid, bcext, kuext);
+		return createCertificateBySpecification(null, null, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
 	}
 	
 	/**
@@ -414,14 +409,14 @@ public class SSecurity
 	 *  @param daysvalid Number of days valid.
 	 *  @return The certificate.
 	 */
-	public static final Tuple2<String, String> createCertificate(String issuercert, String issuerkey, String subjectdn, String scheme, String hashalg, int strength, int daysvalid)
+	public static final Tuple2<String, String> createCertificate(String issuercert, String issuerkey, String subjectdn, String scheme, String schemeconf, String hashalg, int strength, int daysvalid)
 	{
 		X500Name subject = new X500Name(subjectdn);
 		
 		Extension bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(false)));
 		Extension kuext = new Extension(Extension.keyUsage, true, asn1ToBytes(new KeyUsage(KeyUsage.digitalSignature)));
 		
-		return createCertificateBySpecification(issuercert, issuerkey, subject, scheme, hashalg, strength, daysvalid, bcext, kuext);
+		return createCertificateBySpecification(issuercert, issuerkey, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
 	}
 	
 	/**
@@ -437,14 +432,14 @@ public class SSecurity
 	 *  @param daysvalid Number of days valid.
 	 *  @return The certificate.
 	 */
-	public static final Tuple2<String, String> createIntermediateCaCertificate(String issuercert, String issuerkey, String subjectdn, int pathlen, String scheme, String hashalg, int strength, int daysvalid)
+	public static final Tuple2<String, String> createIntermediateCaCertificate(String issuercert, String issuerkey, String subjectdn, int pathlen, String scheme, String schemeconf, String hashalg, int strength, int daysvalid)
 	{
 		X500Name subject = new X500Name(subjectdn);
 		
 		Extension bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(pathlen)));
 		Extension kuext = new Extension(Extension.keyUsage, true, asn1ToBytes(new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign)));
 		
-		return createCertificateBySpecification(issuercert, issuerkey, subject, scheme, hashalg, strength, daysvalid, bcext, kuext);
+		return createCertificateBySpecification(issuercert, issuerkey, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
 	}
 	
 	/**
@@ -457,14 +452,14 @@ public class SSecurity
 	 *  @param daysvalid Number of days valid.
 	 *  @return The certificate.
 	 */
-	public static final Tuple2<String, String> createRootCaCertificate(String subjectdn, String scheme, String hashalg, int strength, int daysvalid)
+	public static final Tuple2<String, String> createRootCaCertificate(String subjectdn, String scheme, String schemeconf, String hashalg, int strength, int daysvalid)
 	{
 		X500Name subject = new X500Name(subjectdn);
 		
 		Extension bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(true)));
 		Extension kuext = new Extension(Extension.keyUsage, true, asn1ToBytes(new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign)));
 		
-		return createCertificateBySpecification(null, null, subject, scheme, hashalg, strength, daysvalid, bcext, kuext);
+		return createCertificateBySpecification(null, null, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
 	}
 	
 	/**
@@ -476,12 +471,127 @@ public class SSecurity
 	 */
 	public static final byte[] xor(byte[] op1result, byte[] op2)
 	{
-		int max = Math.max(op1result.length, op2.length);
+		int max = Math.min(op1result.length, op2.length);
 		for (int i = 0; i < max; ++i)
 		{
 			op1result[i] = (byte) (op1result[i] ^ op2[i]);
 		}
 		return op1result;
+	}
+	
+	/**
+	 *  Read a certificate from a PEM-encoded string.
+	 *  
+	 *  @param pem The PEM-encoded string.
+	 *  @return The certificate.
+	 */
+	public static final X509CertificateHolder readCertificateFromPEM(String pem)
+	{
+		try
+		{
+			PEMParser pemparser = new PEMParser(new StringReader(pem));
+			PemObject pemcertobj = pemparser.readPemObject();
+			pemparser.close();
+			return new X509CertificateHolder(pemcertobj.getContent());
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Reads a certificate chain.
+	 *  
+	 *  @param pem PEM of the chain.
+	 *  @return The chain, starting with the leaf.
+	 */
+	public static final List<X509CertificateHolder> readCertificateChainFromPEM(String pem)
+	{
+		List<X509CertificateHolder> certchain = new ArrayList<X509CertificateHolder>();
+		
+		try
+		{
+			PEMParser pemparser = new PEMParser(new StringReader(pem));
+			Object object = pemparser.readPemObject();
+			while (object != null)
+			{
+				X509CertificateHolder crtholder = new X509CertificateHolder(((PemObject) object).getContent());
+				certchain.add(crtholder);
+				object = pemparser.readPemObject();
+			}
+			pemparser.close();
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+		
+		return certchain;
+	}
+	
+	/**
+	 *  Reads a private key from a PEM string.
+	 *  
+	 *  @param pem The PEM-encoded string.
+	 *  @return The private key.
+	 */
+	public static final PrivateKeyInfo readPrivateKeyFromPEM(String pem)
+	{
+		PrivateKeyInfo ret = null;
+		
+		// Two-prong approach due to bug with ECDSA keys.
+		PemReader pemreader = new PemReader(new StringReader(pem));
+		Object pemobject = null;
+		do
+		{
+			try
+			{
+				pemobject = pemreader.readPemObject();
+				ECPrivateKey ecpk = ECPrivateKey.getInstance(((PemObject) pemobject).getContent());
+				AlgorithmIdentifier algid = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, ecpk.getParameters());
+                ret = new PrivateKeyInfo(algid, ecpk);
+                pemreader.close();
+                pemreader = null;
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		while (ret == null && pemobject != null);
+		
+		if (ret != null)
+		{
+			PEMParser pemparser = new PEMParser(new StringReader(pem));
+			
+			do
+			{
+				try
+				{
+					pemobject = pemparser.readObject();
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			while (!(pemobject instanceof PEMKeyPair) && pemobject != null);
+			
+			try
+			{
+				pemparser.close();
+			}
+			catch (Exception e)
+			{
+			}
+			
+			if (pemobject instanceof PEMKeyPair)
+				ret = ((PEMKeyPair) pemobject).getPrivateKeyInfo();
+		}
+		
+		if (ret == null)
+			throw new RuntimeException("Could not read private key: " + pem);
+		
+		return ret;
 	}
 	
 	/**
@@ -610,13 +720,14 @@ public class SSecurity
 	 *  @param issuerkey Key of the issuer (CA).
 	 *  @param subject Subject of the certificate.
 	 *  @param scheme Signature scheme to use, e.g. RSA, DSA, ECDSA.
+	 *  @param schemeconf Additional scheme configuration, may be null.
 	 *  @param hashalg Hash algorithm to use.
 	 *  @param strength Strength of the key.
 	 *  @param daysvalid Number of days valid.
 	 *  @param extensions Certificate extensions.
 	 *  @return Generated Certificate and private key as PEM-encoded strings.
 	 */
-	protected static final Tuple2<String, String> createCertificateBySpecification(String issuercert, String issuerkey, X500Name subject, String scheme, String hashalg, int strength, int daysvalid, Extension... extensions)
+	protected static final Tuple2<String, String> createCertificateBySpecification(String issuercert, String issuerkey, X500Name subject, String scheme, String schemeconf, String hashalg, int strength, int daysvalid, Extension... extensions)
 	{
 		try
 		{
@@ -637,7 +748,7 @@ public class SSecurity
 			SSecurity.getSecureRandom().nextBytes(serialbytes);
 			BigInteger serial = new BigInteger(1, serialbytes);
 			
-			AsymmetricCipherKeyPair pair = createKeyPair(scheme, strength);
+			AsymmetricCipherKeyPair pair = createKeyPair(scheme, schemeconf, strength);
 			
 			String algospec = hashalg + "WITH" + scheme;
 			
@@ -649,36 +760,79 @@ public class SSecurity
 			ContentSigner signer = null;
 		
 			SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(pair.getPublic());
-			DefaultDigestAlgorithmIdentifierFinder algfinder = new DefaultDigestAlgorithmIdentifierFinder();
+			DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
 			BcDigestCalculatorProvider dcp = new BcDigestCalculatorProvider();
-			X509ExtensionUtils utils = new X509ExtensionUtils(dcp.get(algfinder.find(hashalg)));
+			X509ExtensionUtils utils = new X509ExtensionUtils(dcp.get(digalgfinder.find(hashalg)));
 			SubjectKeyIdentifier ski = utils.createSubjectKeyIdentifier(spki);
 			
-			AuthorityKeyIdentifier aki = null;
+			
+			SubjectPublicKeyInfo parentspki = null;
 			if (loadedissuercert != null)
 			{
-				aki = utils.createAuthorityKeyIdentifier(loadedissuercert.getSubjectPublicKeyInfo());
+				parentspki = loadedissuercert.getSubjectPublicKeyInfo();
 			}
 			else
 			{
-				aki = utils.createAuthorityKeyIdentifier(spki);
+				parentspki = spki;
 			}
+			AuthorityKeyIdentifier aki = utils.createAuthorityKeyIdentifier(parentspki);
 			
 			pki = PrivateKeyInfoFactory.createPrivateKeyInfo(pair.getPrivate());
 			
-			PrivateKey parentpk = null;
+			PrivateKeyInfo parentpki = null;
 			if (issuerkey != null)
 			{
-				PrivateKeyInfo parentpki = SSecurity.readPrivateKeyFromPEM(issuerkey);
-				parentpk = (new JcaPEMKeyConverter()).getPrivateKey(parentpki);
+				parentpki = SSecurity.readPrivateKeyFromPEM(issuerkey);
 			}
 			else
 			{
-				parentpk = (new JcaPEMKeyConverter()).getPrivateKey(pki);
+				parentpki = pki;
 			}
 			
-			JcaContentSignerBuilder signerbuilder = new JcaContentSignerBuilder(algospec);
-			signer = signerbuilder.build(parentpk);
+//			JcaContentSignerBuilder signerbuilder = new JcaContentSignerBuilder(algospec);
+//			signer = signerbuilder.build(parentpk);
+			
+//			AsymmetricCipherKeyPair parentpair = new AsymmetricCipherKeyPair(PublicKeyFactory.createKey(parentspki), PrivateKeyFactory.createKey(parentpki));
+			
+			AsymmetricKeyParameter parentprivkeyparam = null;
+			// Fix Bouncy bug?
+			if ("ECDSA".equals(scheme))
+			{
+				AlgorithmIdentifier algid = parentpki.getPrivateKeyAlgorithm();
+				X962Parameters params = new X962Parameters((X9ECParameters) algid.getParameters());
+
+	            X9ECParameters x9;
+	            ECDomainParameters dparams;
+	            
+                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier)params.getParameters();
+
+                x9 = CustomNamedCurves.getByOID(oid);
+                if (x9 == null)
+                {
+                    x9 = ECNamedCurveTable.getByOID(oid);
+                }
+                dparams = new ECNamedDomainParameters(oid, x9.getCurve(), x9.getG(), x9.getN(), x9.getH(), x9.getSeed());
+	            
+
+	            ECPrivateKey ec = ECPrivateKey.getInstance(parentpki.parsePrivateKey());
+	            BigInteger d = ec.getKey();
+
+	            parentprivkeyparam = new ECPrivateKeyParameters(d, dparams);
+			}
+			else
+			{
+				parentprivkeyparam = PrivateKeyFactory.createKey(parentpki);
+			}
+			
+			DefaultSignatureAlgorithmIdentifierFinder sigalgfinder = new DefaultSignatureAlgorithmIdentifierFinder();
+			BcContentSignerBuilder signerbuilder = null;
+			if ("ECDSA".equals(scheme))
+				signerbuilder = new BcECContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(hashalg));
+			else if ("RSA".equals(scheme))
+				signerbuilder = new BcRSAContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(hashalg));
+			else if ("DSA".equals(scheme))
+				signerbuilder = new BcDSAContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(hashalg));
+			signer = signerbuilder.build(parentprivkeyparam);
 			
 			builder = new BcX509v3CertificateBuilder(issuer, serial, new Date(), notafter, subject, pair.getPublic());
 			
@@ -724,7 +878,7 @@ public class SSecurity
 	 *  @param strength Strength of the key pair.
 	 *  @return The generated key pair.
 	 */
-	protected static final AsymmetricCipherKeyPair createKeyPair(String alg, int strength)
+	protected static final AsymmetricCipherKeyPair createKeyPair(String alg, String algconf, int strength)
 	{
 		AsymmetricCipherKeyPair pair = null;
 		
@@ -748,25 +902,32 @@ public class SSecurity
 		else if ("ECDSA".equals(alg))
 		{
 			String curvname = null;
-			if (strength > 384)
-				curvname = "secp521r1";
-			else if (strength > 256)
-				curvname = "secp384r1";
+			if (algconf == null || "NIST".equals(algconf.toUpperCase()))
+			{
+				if (strength > 384)
+					curvname = "secp521k1";
+				else if (strength > 256)
+					curvname = "secp384k1";
+				else
+					curvname = "secp256k1";
+			}
 			else
-				curvname = "secp256r1";
+			{
+				if (strength > 384)
+					curvname = "brainpoolp512r1";
+				else if (strength > 256)
+					curvname = "brainpoolp384r1";
+				else
+					curvname = "brainpoolp256r1";
+			}
 			
 			X9ECParameters x9 = CustomNamedCurves.getByName(curvname);
+			if (x9 == null)
+				x9 = ECNamedCurveTable.getByName(curvname);
 			ASN1ObjectIdentifier oid = ECNamedCurveTable.getOID(curvname);
 			ECNamedDomainParameters dparams = new ECNamedDomainParameters(oid, x9.getCurve(), x9.getG(), x9.getN(), x9.getH(), x9.getSeed());
 			ECKeyGenerationParameters kgparams = new ECKeyGenerationParameters(dparams, SSecurity.getSecureRandom());
 			ECKeyPairGenerator kpg = new ECKeyPairGenerator();
-			kpg.init(kgparams);
-			pair = kpg.generateKeyPair();
-		}
-		else if ("SPHINCS256".equals(alg))
-		{
-			SPHINCS256KeyGenerationParameters kgparams = new SPHINCS256KeyGenerationParameters(SSecurity.getSecureRandom(), new SHA256Digest());
-			SPHINCS256KeyPairGenerator kpg = new SPHINCS256KeyPairGenerator();
 			kpg.init(kgparams);
 			pair = kpg.generateKeyPair();
 		}
@@ -775,91 +936,6 @@ public class SSecurity
 			throw new IllegalArgumentException("Could not generate key pair: Signature scheme " + alg + " not found.");
 		
 		return pair;
-	}
-	
-	/**
-	 *  Read a certificate from a PEM-encoded string.
-	 *  
-	 *  @param pem The PEM-encoded string.
-	 *  @return The certificate.
-	 */
-	protected static final X509CertificateHolder readCertificateFromPEM(String pem)
-	{
-		try
-		{
-			PEMParser pemparser = new PEMParser(new StringReader(pem));
-			PemObject pemcertobj = pemparser.readPemObject();
-			pemparser.close();
-			return new X509CertificateHolder(pemcertobj.getContent());
-		}
-		catch (Exception e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
-	}
-	
-	/**
-	 *  Reads a private key from a PEM string.
-	 *  
-	 *  @param pem The PEM-encoded string.
-	 *  @return The private key.
-	 */
-	protected static final PrivateKeyInfo readPrivateKeyFromPEM(String pem)
-	{
-		PrivateKeyInfo ret = null;
-		
-		// Two-prong approach due to bug with ECDSA keys.
-		PemReader pemreader = new PemReader(new StringReader(pem));
-		Object pemobject = null;
-		do
-		{
-			try
-			{
-				pemobject = pemreader.readPemObject();
-				ECPrivateKey ecpk = ECPrivateKey.getInstance(((PemObject) pemobject).getContent());
-				AlgorithmIdentifier algid = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, ecpk.getParameters());
-                ret = new PrivateKeyInfo(algid, ecpk);
-                pemreader.close();
-                pemreader = null;
-			}
-			catch (Exception e)
-			{
-			}
-		}
-		while (ret == null && pemobject != null);
-		
-		if (ret != null)
-		{
-			PEMParser pemparser = new PEMParser(new StringReader(pem));
-			
-			do
-			{
-				try
-				{
-					pemobject = pemparser.readObject();
-				}
-				catch (Exception e)
-				{
-				}
-			}
-			while (!(pemobject instanceof PEMKeyPair) && pemobject != null);
-			
-			try
-			{
-				pemparser.close();
-			}
-			catch (Exception e)
-			{
-			}
-			
-			if (pemobject instanceof PEMKeyPair)
-				ret = ((PEMKeyPair) pemobject).getPrivateKeyInfo();
-		}
-		
-		if (ret == null)
-			throw new RuntimeException("Could not read private key: " + pem);
-		
-		return ret;
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package jadex.commons.security.random;
 
 import java.security.SecureRandom;
 
+import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.crypto.engines.ChaChaEngine;
 import org.bouncycastle.util.Pack;
 
@@ -34,15 +35,57 @@ public class ChaCha20Random extends SecureRandom
 	/** Pointer to unused output. */
 	protected int outptr = 64;
 	
+	/**
+	 *  Initializes the PRNG.
+	 */
 	public ChaCha20Random()
 	{
 		seedrandom = SSecurity.getSeedRandom();
 		reseed();
 	}
 	
+	/**
+	 *  Initializes the PRNG.
+	 */
 	public ChaCha20Random(SecureRandom seedrandom)
 	{
 		this.seedrandom = seedrandom;
+		reseed();
+	}
+	
+	/**
+	 *  Initializes the PRNG in deterministic mode.
+	 */
+	public ChaCha20Random(byte[] seed)
+	{
+		Blake2bDigest dig = new Blake2bDigest(512);
+		dig.update(seed, 0, seed.length);
+		byte[] hash = new byte[64];
+		dig.doFinal(hash, 0);
+		byte[] trunc = new byte[24];
+		System.arraycopy(hash, 40, trunc, 0, trunc.length);
+		SSecurity.xor(hash, trunc);
+		final byte[] seedbytes = new byte[40];
+		System.arraycopy(hash, 0, seedbytes, 0, seedbytes.length);
+		 
+		this.seedrandom = new SecureRandom()
+		{
+			private boolean used = false;
+			
+			public void nextBytes(byte[] bytes)
+			{
+				if (used)
+				{
+					throw new SecurityException("Deterministic mode ChaCha20 Random out of seed.");
+				}
+				else
+				{
+					assert bytes.length == 40;
+					System.arraycopy(seedbytes, 0, bytes, 0, bytes.length);
+					used = true;
+				}
+			}
+		};
 		reseed();
 	}
 	
@@ -62,6 +105,7 @@ public class ChaCha20Random extends SecureRandom
 		return SUtil.bytesToInt(bytes);
 	}
 	
+	
 	public void nextBytes(byte[] bytes)
 	{
 		int filled = 0;
@@ -76,6 +120,9 @@ public class ChaCha20Random extends SecureRandom
 		}
 	}
 	
+	/**
+	 *  Generates the next ChaCha block.
+	 */
 	protected void nextBlock()
 	{
 //		if (state[12] < 0)
@@ -89,6 +136,9 @@ public class ChaCha20Random extends SecureRandom
 		outptr = 0;
 	}
 	
+	/**
+	 *  Reseeds the PRNG.
+	 */
 	public void reseed()
 	{
 		byte[] seedstate = new byte[40];

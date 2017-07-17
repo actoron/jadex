@@ -49,6 +49,8 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.AbstractX509PemSecret;
+import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.auth.PasswordSecret;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
@@ -136,19 +138,29 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			props.addProperty(new Property("printpass", "true"));
 			changedprops = true;
 		}
-		
-		String secretstr = props.getStringProperty("password");
+		String secretstr = props.getStringProperty("platformsecret");
+		if (secretstr == null)
+		{
+			secretstr = props.getStringProperty("password");
+			if (secretstr != null)
+			{
+				props.removeSubproperties("password");
+				props.addProperty(new Property("platformsecret", secretstr));
+				changedprops = true;
+			}
+		}
 		boolean printpass = props.getBooleanProperty("printpass");
 		boolean usepass = props.getBooleanProperty("usepass");
 		
 		if (usepass && secretstr == null)
 		{
 			secretstr = SUtil.createRandomKey();
-			props.addProperty(new Property("password", secretstr));
+			props.addProperty(new Property("platformsecret", secretstr));
 			changedprops = true;
-			System.out.println("Generated new platform access password: "+secretstr);
+			System.out.println("Generated new platform access key: "+secretstr.substring(4));
 			
 		}
+		secretstr = "pw:AAAACHBsYXRmb3JtAAAAQKH1B5mo3k/x5Ms4I1l3D7A6gS174vZnpol/TSEpWk0LZp1Ixsaiz80qYRFOftoK1J9wUwexE/Osbphf6DN1HW8:fmkds09djf0s9d0sf9kd";
 		
 		if (changedprops)
 		{
@@ -158,18 +170,27 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		try
 		{
-			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
+			platformsecret = AbstractAuthenticationSecret.fromString("platform", secretstr);
 		}
 		catch (IllegalArgumentException e)
 		{
 			secretstr = PasswordSecret.PREFIX + ":" + secretstr;
-			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
+			platformsecret = AbstractAuthenticationSecret.fromString("platform", secretstr);
 		}
+		System.out.println(platformsecret.getEncoded());
 		
 		if (printpass && platformsecret != null)
 		{
 			secretstr = platformsecret.toString();
-			System.out.println("Platform access secret: "+secretstr);
+			
+			if (platformsecret instanceof PasswordSecret)
+				System.out.println("Platform access password: "+secretstr);
+			else if (platformsecret instanceof KeySecret)
+				System.out.println("Platform access key: "+secretstr);
+			else if (platformsecret instanceof AbstractX509PemSecret)
+				System.out.println("Platform access certificates: "+secretstr);
+			else
+				System.out.println("Platform access secret: "+secretstr);
 		}
 		
 		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
@@ -179,7 +200,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			String nwname = (String) argfeat.getArguments().get("networkname");
 			String nwpass = (String) argfeat.getArguments().get("networkpass");
 			if (nwname != null)
-				networks.put(nwname, AbstractAuthenticationSecret.fromString(nwpass));
+				networks.put(nwname, AbstractAuthenticationSecret.fromString(nwname, nwpass));
 		}
 		catch (Exception e)
 		{
@@ -438,7 +459,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				}
 				else
 				{
-					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(secret);
+					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(cid.toString(), secret);
 					
 					if (agent.getComponentIdentifier().getRoot().equals(cid))
 						platformsecret = authsec;
@@ -884,18 +905,21 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		int str = 256;
 		int days = 30;
 //		String scheme = "RSAANDMGF1";
+//		String scheme = "RSA";
+//		String schemeconf = "brainpool";
+		String schemeconf = null;
 		String scheme = "ECDSA";
 		String hash = "SHA256";
 		
-		Tuple2<String, String> tup = SSecurity.createRootCaCertificate(dn, scheme, hash, str, days);
+		Tuple2<String, String> tup = SSecurity.createRootCaCertificate(dn, scheme, schemeconf, hash, str, days);
 		
 		String dn2 = "O=Someorg,C=US,CN=My Intermediate CA";
 		String dn3 = "O=Someorg,C=US,CN=My Intermediate CA2";
 		String dn4 = "O=Someorg,C=US,CN=My Platform";
 		
-		Tuple2<String, String> tup2 = SSecurity.createIntermediateCaCertificate(tup.getFirstEntity(), tup.getSecondEntity(), dn2, 1, scheme, hash, str, days);
-		Tuple2<String, String> tup3 = SSecurity.createIntermediateCaCertificate(tup2.getFirstEntity(), tup2.getSecondEntity(), dn3, 0, scheme, hash, str, days);
-		Tuple2<String, String> tup4 = SSecurity.createCertificate(tup3.getFirstEntity(), tup3.getSecondEntity(), dn4, scheme, hash, str, days);
+		Tuple2<String, String> tup2 = SSecurity.createIntermediateCaCertificate(tup.getFirstEntity(), tup.getSecondEntity(), dn2, 1, scheme, schemeconf, hash, str, days);
+		Tuple2<String, String> tup3 = SSecurity.createIntermediateCaCertificate(tup2.getFirstEntity(), tup2.getSecondEntity(), dn3, 0, scheme, schemeconf, hash, str, days);
+		Tuple2<String, String> tup4 = SSecurity.createCertificate(tup3.getFirstEntity(), tup3.getSecondEntity(), dn4, scheme, schemeconf, hash, str, days);
 		
 		System.out.println(tup.getFirstEntity());
 		System.out.println(tup.getSecondEntity());

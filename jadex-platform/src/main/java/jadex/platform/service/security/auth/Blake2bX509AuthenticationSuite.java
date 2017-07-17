@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,8 +21,19 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.Pack;
 import org.bouncycastle.util.io.pem.PemObject;
 
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
 import jadex.commons.security.SSecurity;
+import jadex.commons.security.random.ChaCha20Random;
+import net.i2p.crypto.eddsa.EdDSAEngine;
+import net.i2p.crypto.eddsa.EdDSAPrivateKey;
+import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import net.i2p.crypto.eddsa.KeyPairGenerator;
+import net.i2p.crypto.eddsa.spec.EdDSAGenParameterSpec;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
+import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
+import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
  *  Symmetric authentication based on Blake2b MACs.
@@ -39,8 +52,10 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	/** Size of the salt. */
 	protected static final int SALT_SIZE = 32;
 	
+	protected static final EdDSAParameterSpec ED25519 = EdDSANamedCurveTable.getByName("Ed25519");
+	
 	/** Schnorr group used for zero-knowledge password proof. */
-	protected static final DHParameters SCHNORR_GROUP = DHStandardGroups.rfc3526_4096;
+//	protected static final DHParameters SCHNORR_GROUP = DHStandardGroups.rfc3526_4096;
 	
 	/**
 	 *  Gets the authentication suite ID.
@@ -81,7 +96,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			{
 				// Using Schnorr signature
 				
-				byte[] randsecbytes = new byte[64];
+				/*byte[] randsecbytes = new byte[64];
 				SSecurity.getSecureRandom().nextBytes(randsecbytes);
 				BigInteger randsec = new BigInteger(1, randsecbytes);
 				BigInteger randpub = SCHNORR_GROUP.getG().modPow(randsec, SCHNORR_GROUP.getP());
@@ -101,6 +116,31 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				byte[] kdfparams = ((PasswordSecret) ssecret).getKdfParams();
 				
 				tmp = SUtil.mergeData(s.toByteArray(), randpub.toByteArray(), salt, kdfparams);
+				
+				ret = new byte[tmp.length + 4];
+				Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
+				System.arraycopy(tmp, 0, ret, 4, tmp.length);*/
+				
+				// Using ed25519 / EDDSA
+				
+				KeyPair pair = deriveEd25519KeyPair(dk);
+				
+				EdDSAEngine eddsa = new EdDSAEngine();
+				byte[] eddsasig = null;
+				try
+				{
+					eddsa.initSign(pair.getPrivate(), SSecurity.getSecureRandom());
+					eddsasig = eddsa.signOneShot(msghash);
+				}
+				catch (Exception e)
+				{
+					throw SUtil.throwUnchecked(e);
+				}
+				
+				byte[] kdfparams = ((PasswordSecret) ssecret).getKdfParams();
+				
+				byte[] tmp = SUtil.mergeData(eddsasig, salt, kdfparams);
+				System.out.println(new String(Base64.encodeNoPadding(eddsasig), SUtil.UTF8));
 				
 				ret = new byte[tmp.length + 4];
 				Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
@@ -161,7 +201,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			{
 				if (secret instanceof PasswordSecret)
 				{
-					List<byte[]> authlist = SUtil.splitData(authtoken, 4, -1);
+					/*List<byte[]> authlist = SUtil.splitData(authtoken, 4, -1);
 					if (authlist.size() != 4)
 						return false;
 					
@@ -191,7 +231,25 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //					System.out.println("Schnorr res0:" + res0);
 //					System.out.println("Schnorr res1:" + res1);
 					
-					ret = res0.equals(res1);
+					ret = res0.equals(res1);*/
+					
+					List<byte[]> authlist = SUtil.splitData(authtoken, 4, -1);
+					if (authlist.size() != 3)
+						return false;
+					
+					byte[] eddsasig = authlist.get(0);
+					byte[] salt = authlist.get(1);
+					byte[] kdfparams = authlist.get(2);
+					
+					byte[] msghash = getMessageHash(msg, salt);
+					
+					byte[] dk = ((PasswordSecret) ssecret).deriveKey(DERIVED_KEY_SIZE, salt, kdfparams);
+					
+					KeyPair pair = deriveEd25519KeyPair(dk);
+					
+					EdDSAEngine eddsa = new EdDSAEngine();
+					eddsa.initVerify(pair.getPublic());
+					ret = eddsa.verifyOneShot(msghash, eddsasig);
 				}
 				else
 				{
@@ -261,6 +319,19 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		return msghash;
 	}
 	
+	protected static final KeyPair deriveEd25519KeyPair(byte[] secret)
+	{
+		byte[] seed = new byte[32];
+		Blake2bDigest dig = new Blake2bDigest(256);
+		dig.update(secret, 0, secret.length);
+		dig.doFinal(seed, 0);
+		
+		EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(seed, ED25519);
+        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(privKey.getA(), ED25519);
+
+        return new KeyPair(new EdDSAPublicKey(pubKey), new EdDSAPrivateKey(privKey));
+	}
+	
 	/**
 	 *  Main
 	 */
@@ -268,34 +339,51 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	{
 		byte[] m = "Message".getBytes(SUtil.UTF8);
 		
-		byte[] secbytes = new byte[32];
-		SSecurity.getSecureRandom().nextBytes(secbytes);
-		BigInteger sec = new BigInteger(secbytes);
-		BigInteger pub = SCHNORR_GROUP.getG().modPow(sec, SCHNORR_GROUP.getP());
+		KeyPairGenerator edgen = new KeyPairGenerator();
+		edgen.initialize(256, new ChaCha20Random("blabla".getBytes(SUtil.UTF8)));
+		KeyPair pair = edgen.generateKeyPair();
+		System.out.println(Arrays.toString(pair.getPrivate().getEncoded()));
 		
-		byte[] randsecbytes = new byte[32];
-		SSecurity.getSecureRandom().nextBytes(randsecbytes);
-		BigInteger randsec = new BigInteger(randsecbytes);
-		BigInteger randpub = SCHNORR_GROUP.getG().modPow(randsec, SCHNORR_GROUP.getP());
+		EdDSAEngine eddsa = new EdDSAEngine();
+		eddsa.initSign(pair.getPrivate(), SSecurity.getSecureRandom());
+		byte[] eddsasig = eddsa.signOneShot(m);
 		
-		byte[] challengebytes = new byte[64];
-		Blake2bDigest dig = new Blake2bDigest(512);
-		byte[] tmp = randpub.toByteArray();
-		dig.update(tmp, 0, tmp.length);
-		dig.update(m, 0, m.length);
-		dig.doFinal(challengebytes, 0);
-		BigInteger challenge = new BigInteger(challengebytes);
+		edgen = new KeyPairGenerator();
+		edgen.initialize(256, new ChaCha20Random("blabla".getBytes(SUtil.UTF8)));
+		pair = edgen.generateKeyPair();
 		
-		BigInteger s = sec.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getP());
+		eddsa = new EdDSAEngine();
+		eddsa.initVerify(pair.getPublic());
+		System.out.println("V: " + eddsa.verifyOneShot(m, eddsasig));
 		
-		// s,randpub
-		
-		
-		BigInteger res1 = SCHNORR_GROUP.getG().modPow(s, SCHNORR_GROUP.getP());
-		BigInteger res2 = pub.modPow(challenge, SCHNORR_GROUP.getP()).multiply(randpub).mod(SCHNORR_GROUP.getP());
-		
-		System.out.println(res1);
-		System.out.println(res2);
+//		byte[] secbytes = new byte[32];
+//		SSecurity.getSecureRandom().nextBytes(secbytes);
+//		BigInteger sec = new BigInteger(secbytes);
+//		BigInteger pub = SCHNORR_GROUP.getG().modPow(sec, SCHNORR_GROUP.getP());
+//		
+//		byte[] randsecbytes = new byte[32];
+//		SSecurity.getSecureRandom().nextBytes(randsecbytes);
+//		BigInteger randsec = new BigInteger(randsecbytes);
+//		BigInteger randpub = SCHNORR_GROUP.getG().modPow(randsec, SCHNORR_GROUP.getP());
+//		
+//		byte[] challengebytes = new byte[64];
+//		Blake2bDigest dig = new Blake2bDigest(512);
+//		byte[] tmp = randpub.toByteArray();
+//		dig.update(tmp, 0, tmp.length);
+//		dig.update(m, 0, m.length);
+//		dig.doFinal(challengebytes, 0);
+//		BigInteger challenge = new BigInteger(challengebytes);
+//		
+//		BigInteger s = sec.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getP());
+//		
+//		// s,randpub
+//		
+//		
+//		BigInteger res1 = SCHNORR_GROUP.getG().modPow(s, SCHNORR_GROUP.getP());
+//		BigInteger res2 = pub.modPow(challenge, SCHNORR_GROUP.getP()).multiply(randpub).mod(SCHNORR_GROUP.getP());
+//		
+//		System.out.println(res1);
+//		System.out.println(res2);
 		
 	}
 	
@@ -386,10 +474,10 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //		System.out.println("Verify: " + cv.verify(sig));
 		
 		
-		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
-		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")));
-		System.out.println("toklen: " + token.length);
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")), token));
-		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("superdupersecret")), token));
+//		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
+//		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")));
+//		System.out.println("toklen: " + token.length);
+//		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")), token));
+//		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("superdupersecret")), token));
 	}
 }

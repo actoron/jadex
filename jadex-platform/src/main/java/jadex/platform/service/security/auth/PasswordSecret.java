@@ -24,7 +24,7 @@ public class PasswordSecret extends SharedSecret
 	protected static final int SCRYPT_N = 16384;
 	
 	/** SCrypt block size. */
-	protected static final int SCRYPT_R = 16;
+	protected static final int SCRYPT_R = 8;
 	
 	/** SCrypt parallelization. */
 	protected static final int SCRYPT_P = 1;

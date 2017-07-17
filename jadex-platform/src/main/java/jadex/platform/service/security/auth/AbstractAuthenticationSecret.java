@@ -28,12 +28,23 @@ public abstract class AbstractAuthenticationSecret
 	public abstract boolean canSign();
 	
 	/**
+	 *  Returns the encoded secret.
+	 *  
+	 *  @return The encoded secret.
+	 */
+	public String getEncoded()
+	{
+		return toString();
+	}
+	
+	/**
 	 *  Decodes a secret from a string.
 	 *  
+	 *  @param subject The subject the secret is associated.
 	 *  @param secret The secret as string.
 	 *  @return The instantiated secret.
 	 */
-	public static final AbstractAuthenticationSecret fromString(String secret)
+	public static final AbstractAuthenticationSecret fromString(String subject, String secret)
 	{
 		if (secret == null)
 			throw new IllegalArgumentException("Secret is null: " + secret);
@@ -54,6 +65,14 @@ public abstract class AbstractAuthenticationSecret
 				}
 				catch (Exception e)
 				{
+					try
+					{
+						Constructor<?> con = secrettype.getConstructor(String.class, String.class);
+						ret = (AbstractAuthenticationSecret) con.newInstance(subject, secret);
+					}
+					catch (Exception e1)
+					{
+					}
 				}
 			}
 		}
