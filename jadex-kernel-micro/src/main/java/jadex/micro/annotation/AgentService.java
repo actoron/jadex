@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 public @interface AgentService
 {
 	/**
-	 *  The argument name.
+	 *  The required service name that is used for searching the service.
 	 */
 	public String name() default "";
 	
@@ -36,8 +36,8 @@ public @interface AgentService
 	 */
 	public RequiredService requiredservice() default @RequiredService(name="", type=Object.class);
 	
-	/**
-	 *  Should be used as service query.
-	 */
-	public boolean isquery() default false;
+//	/**
+//	 *  Should be used as service query.
+//	 */
+//	public boolean isquery() default false;
 }

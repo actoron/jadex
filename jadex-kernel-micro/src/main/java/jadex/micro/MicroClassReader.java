@@ -73,6 +73,7 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
@@ -811,12 +812,44 @@ public class MicroClassReader
 							rsers.put(rsis.getName(), rsis);
 						}
 						
-						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), ser.lazy());
+						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), ser.lazy(), false);
 					}
 					else
 					{
 						String name = ser.name().length()>0? ser.name(): fields[i].getName();
-						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), ser.lazy());
+						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), ser.lazy(), false);
+					}
+				}
+				else if(isAnnotationPresent(fields[i], AgentServiceQuery.class, cl))
+				{
+					AgentServiceQuery ser = getAnnotation(fields[i], AgentServiceQuery.class, cl);
+					RequiredService rs = ser.requiredservice();
+					
+					if(!rs.type().equals(Object.class))
+					{
+						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+						
+						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+						if(rsis.getName().length()==0)
+							rsis.setName(fields[i].getName());
+					
+						if(rsers.containsKey(rsis.getName()))
+						{
+							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
+							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
+						}
+						else
+						{
+							rsers.put(rsis.getName(), rsis);
+						}
+						
+						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), true, true);
+					}
+					else
+					{
+						String name = fields[i].getName();
+						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), true, true);
 					}
 				}
 				else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
@@ -880,6 +913,37 @@ public class MicroClassReader
 						}
 					}
 					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
+				}
+				
+				if(isAnnotationPresent(methods[i], AgentServiceQuery.class, cl))
+				{
+					AgentServiceQuery asq = getAnnotation(methods[i], AgentServiceQuery.class, cl);
+					
+					String name = SUtil.createUniqueId(methods[i].getName());
+					ModelInfo mi = (ModelInfo)micromodel.getModelInfo();
+					
+					Class<?> iftype = asq.type();
+					if(Object.class.equals(iftype))
+					{
+						Class<?>[] ptypes = methods[i].getParameterTypes();
+						for(Class<?> ptype: ptypes)
+						{
+							if(isAnnotationPresent(ptype, Service.class, cl))
+							{
+								iftype = ptype;
+								break;
+							}
+						}
+					}
+					
+					if(iftype==null || Object.class.equals(iftype))
+						throw new RuntimeException("No service interface found for service query");
+					
+					RequiredServiceInfo rsi = new RequiredServiceInfo(name, iftype, asq.scope(), null);
+					rsi.setMultiple(asq.multiple());
+					mi.addRequiredService(rsi);
+					
+					micromodel.addServiceInjection(name, new MethodInfo(methods[i]), true);
 				}
 
 				// todo: method name, parameters, intervals...

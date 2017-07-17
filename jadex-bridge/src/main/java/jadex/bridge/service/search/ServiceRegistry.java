@@ -707,9 +707,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				}
 				sqi.setRemoteFuture(fut);
 			}
+
+			sqi.getFuture().addResultListener(new IntermediateDelegationResultListener<T>(ret));
 		}
-		
-		ret.addResultListener(new IntermediateDelegationResultListener<T>(ret));
 		
 		return ret;
 	}
@@ -1258,6 +1258,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service, final boolean removed)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITime")!=-1)
+			System.out.println("hhh");
 		
 		if(it.hasNext())
 		{
