@@ -902,12 +902,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public static void main(String[] args)
 	{
 		String dn = "O=Someorg,C=US,CN=My CA";
-		int str = 256;
+		int str = 512;
 		int days = 30;
 //		String scheme = "RSAANDMGF1";
 //		String scheme = "RSA";
-//		String schemeconf = "brainpool";
-		String schemeconf = null;
+		String schemeconf = "brainpool";
+//		String schemeconf = null;
 		String scheme = "ECDSA";
 		String hash = "SHA256";
 		

@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.math.BigInteger;
-import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,20 +63,22 @@ import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifier;
+import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
@@ -259,12 +260,9 @@ public class SSecurity
 			
 			String pemkeystr = new String(SUtil.readStream(pemkey), SUtil.UTF8);
 			pemkey.close();
-			JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
-			PrivateKey privatekey = jpkc.getPrivateKey(readPrivateKeyFromPEM(pemkeystr));
 			
-			DefaultAlgorithmNameFinder algfinder = new DefaultAlgorithmNameFinder();
-			JcaContentSignerBuilder signerbuilder = new JcaContentSignerBuilder(algfinder.getAlgorithmName(cert.getSignatureAlgorithm()));
-			ContentSigner signer = signerbuilder.build(privatekey);
+			DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
+			ContentSigner signer = getSigner(anf.getAlgorithmName(cert.getSignatureAlgorithm()), readPrivateKeyFromPEM(pemkeystr));
 			signer.getOutputStream().write(msghash);
 			signer.getOutputStream().close();
 			
@@ -327,10 +325,10 @@ public class SSecurity
 			certdata = SUtil.readStream(gis);
 			byte[] sig = splitdata.get(1);
 			
-			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(new String(certdata, SUtil.UTF8));
 			
+			
+			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(new String(certdata, SUtil.UTF8));
 			// Verify certificate chain
-			JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
 			for (int i = 0; i < certchain.size() - 1; ++i)
 			{
 				X509CertificateHolder signedcert = certchain.get(i);
@@ -342,19 +340,19 @@ public class SSecurity
 				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
 					return false;
 				
-				if (!signedcert.isSignatureValid(jcvpb.build(signercert)))
+				if (!signedcert.isSignatureValid(getVerifierProvider(signercert)))
 					return false;
 			}
 			
 			// Verify the last chain link is signed by trust anchor.
-			if (!certchain.get(certchain.size() - 1).isSignatureValid(jcvpb.build(trustedcrtholder)))
+			if (!certchain.get(certchain.size() - 1).isSignatureValid(getVerifierProvider(trustedcrtholder)))
 				return false;
 			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
 			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
 				return false;
 			
 			// Verify signature
-			ContentVerifier cv = jcvpb.build(certchain.get(0)).get(certchain.get(0).getSignatureAlgorithm());
+			ContentVerifier cv = getVerifier(certchain.get(0));
 			cv.getOutputStream().write(msghash);
 			cv.getOutputStream().close();
 			return cv.verify(sig);
@@ -719,52 +717,52 @@ public class SSecurity
 	 *  @param issuercert Certificate of the issuer (CA).
 	 *  @param issuerkey Key of the issuer (CA).
 	 *  @param subject Subject of the certificate.
-	 *  @param scheme Signature scheme to use, e.g. RSA, DSA, ECDSA.
+	 *  @param sigalg Signature scheme to use, e.g. RSA, DSA, ECDSA.
 	 *  @param schemeconf Additional scheme configuration, may be null.
-	 *  @param hashalg Hash algorithm to use.
+	 *  @param digalg Hash algorithm to use.
 	 *  @param strength Strength of the key.
 	 *  @param daysvalid Number of days valid.
 	 *  @param extensions Certificate extensions.
 	 *  @return Generated Certificate and private key as PEM-encoded strings.
 	 */
-	protected static final Tuple2<String, String> createCertificateBySpecification(String issuercert, String issuerkey, X500Name subject, String scheme, String schemeconf, String hashalg, int strength, int daysvalid, Extension... extensions)
+	protected static final Tuple2<String, String> createCertificateBySpecification(String issuercert, String issuerkey, X500Name subject, String sigalg, String schemeconf, String digalg, int strength, int daysvalid, Extension... extensions)
 	{
 		try
 		{
 			X500Name issuer = null;
 			X509CertificateHolder loadedissuercert = null;
+			String sigspec = null;
 			
 			if (issuercert == null)
 			{
 				issuer = subject;
+				sigspec = digalg + "WITH" + sigalg;
 			}
 			else
 			{
 				loadedissuercert = SSecurity.readCertificateFromPEM(issuercert);
 				issuer = loadedissuercert.getSubject();
+				DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
+				sigspec = anf.getAlgorithmName(loadedissuercert.getSignatureAlgorithm());
 			}
 			
 			byte[] serialbytes = new byte[20];
 			SSecurity.getSecureRandom().nextBytes(serialbytes);
 			BigInteger serial = new BigInteger(1, serialbytes);
 			
-			AsymmetricCipherKeyPair pair = createKeyPair(scheme, schemeconf, strength);
-			
-			String algospec = hashalg + "WITH" + scheme;
+			AsymmetricCipherKeyPair pair = createKeyPair(sigalg, schemeconf, strength);
 			
 			long notafterts = System.currentTimeMillis() + daysvalid*24L*3600L*1000L;
 			Date notafter = new Date(notafterts);
 			
 			BcX509v3CertificateBuilder builder = null;
 			PrivateKeyInfo pki = null;
-			ContentSigner signer = null;
 		
 			SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(pair.getPublic());
 			DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
 			BcDigestCalculatorProvider dcp = new BcDigestCalculatorProvider();
-			X509ExtensionUtils utils = new X509ExtensionUtils(dcp.get(digalgfinder.find(hashalg)));
+			X509ExtensionUtils utils = new X509ExtensionUtils(dcp.get(digalgfinder.find(digalg)));
 			SubjectKeyIdentifier ski = utils.createSubjectKeyIdentifier(spki);
-			
 			
 			SubjectPublicKeyInfo parentspki = null;
 			if (loadedissuercert != null)
@@ -789,50 +787,7 @@ public class SSecurity
 				parentpki = pki;
 			}
 			
-//			JcaContentSignerBuilder signerbuilder = new JcaContentSignerBuilder(algospec);
-//			signer = signerbuilder.build(parentpk);
-			
-//			AsymmetricCipherKeyPair parentpair = new AsymmetricCipherKeyPair(PublicKeyFactory.createKey(parentspki), PrivateKeyFactory.createKey(parentpki));
-			
-			AsymmetricKeyParameter parentprivkeyparam = null;
-			// Fix Bouncy bug?
-			if ("ECDSA".equals(scheme))
-			{
-				AlgorithmIdentifier algid = parentpki.getPrivateKeyAlgorithm();
-				X962Parameters params = new X962Parameters((X9ECParameters) algid.getParameters());
-
-	            X9ECParameters x9;
-	            ECDomainParameters dparams;
-	            
-                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier)params.getParameters();
-
-                x9 = CustomNamedCurves.getByOID(oid);
-                if (x9 == null)
-                {
-                    x9 = ECNamedCurveTable.getByOID(oid);
-                }
-                dparams = new ECNamedDomainParameters(oid, x9.getCurve(), x9.getG(), x9.getN(), x9.getH(), x9.getSeed());
-	            
-
-	            ECPrivateKey ec = ECPrivateKey.getInstance(parentpki.parsePrivateKey());
-	            BigInteger d = ec.getKey();
-
-	            parentprivkeyparam = new ECPrivateKeyParameters(d, dparams);
-			}
-			else
-			{
-				parentprivkeyparam = PrivateKeyFactory.createKey(parentpki);
-			}
-			
-			DefaultSignatureAlgorithmIdentifierFinder sigalgfinder = new DefaultSignatureAlgorithmIdentifierFinder();
-			BcContentSignerBuilder signerbuilder = null;
-			if ("ECDSA".equals(scheme))
-				signerbuilder = new BcECContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(hashalg));
-			else if ("RSA".equals(scheme))
-				signerbuilder = new BcRSAContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(hashalg));
-			else if ("DSA".equals(scheme))
-				signerbuilder = new BcDSAContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(hashalg));
-			signer = signerbuilder.build(parentprivkeyparam);
+			ContentSigner signer = getSigner(sigspec, parentpki);
 			
 			builder = new BcX509v3CertificateBuilder(issuer, serial, new Date(), notafter, subject, pair.getPublic());
 			
@@ -902,16 +857,7 @@ public class SSecurity
 		else if ("ECDSA".equals(alg))
 		{
 			String curvname = null;
-			if (algconf == null || "NIST".equals(algconf.toUpperCase()))
-			{
-				if (strength > 384)
-					curvname = "secp521k1";
-				else if (strength > 256)
-					curvname = "secp384k1";
-				else
-					curvname = "secp256k1";
-			}
-			else
+			if (algconf == null || "BRAINPOOL".equals(algconf.toUpperCase()))
 			{
 				if (strength > 384)
 					curvname = "brainpoolp512r1";
@@ -919,6 +865,15 @@ public class SSecurity
 					curvname = "brainpoolp384r1";
 				else
 					curvname = "brainpoolp256r1";
+			}
+			else
+			{
+				if (strength > 384)
+					curvname = "secp521k1";
+				else if (strength > 256)
+					curvname = "secp384k1";
+				else
+					curvname = "secp256k1";
 			}
 			
 			X9ECParameters x9 = CustomNamedCurves.getByName(curvname);
@@ -936,6 +891,124 @@ public class SSecurity
 			throw new IllegalArgumentException("Could not generate key pair: Signature scheme " + alg + " not found.");
 		
 		return pair;
+	}
+	
+	/**
+	 *  Gets a signer based on a private key to identify the algorithm.
+	 * 
+	 *  @param pki The private key.
+	 *  @return A content signer.
+	 */
+	protected static final ContentSigner getSigner(String algospec, PrivateKeyInfo pki)
+	{
+		try
+		{
+			String[] algs = algospec.split("WITH");
+			String sigalg = algs[1];
+			String digalg = algs[0];
+			
+			AsymmetricKeyParameter privkeyparam = null;
+			// Fix Bouncy bug?
+			if ("ECDSA".equals(sigalg))
+			{
+				AlgorithmIdentifier algid = pki.getPrivateKeyAlgorithm();
+				Object aparams = algid.getParameters();
+				X962Parameters params = null;
+				if (aparams instanceof X962Parameters)
+					params = (X962Parameters) aparams;
+				else if (aparams instanceof X9ECParameters)
+					params = new X962Parameters((X9ECParameters) aparams);
+				else
+					params = new X962Parameters((ASN1ObjectIdentifier) aparams);
+	
+	            X9ECParameters x9;
+	            ECDomainParameters dparams;
+	            
+	            ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier)params.getParameters();
+	
+	            x9 = CustomNamedCurves.getByOID(oid);
+	            if (x9 == null)
+	            {
+	                x9 = ECNamedCurveTable.getByOID(oid);
+	            }
+	            dparams = new ECNamedDomainParameters(oid, x9.getCurve(), x9.getG(), x9.getN(), x9.getH(), x9.getSeed());
+	            
+	
+	            ECPrivateKey ec = ECPrivateKey.getInstance(pki.parsePrivateKey());
+	            BigInteger d = ec.getKey();
+	
+	            privkeyparam = new ECPrivateKeyParameters(d, dparams);
+			}
+			else
+			{
+				privkeyparam = PrivateKeyFactory.createKey(pki);
+			}
+			
+			DefaultSignatureAlgorithmIdentifierFinder sigalgfinder = new DefaultSignatureAlgorithmIdentifierFinder();
+			DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
+			BcContentSignerBuilder signerbuilder = null;
+			if ("ECDSA".equals(sigalg))
+				signerbuilder = new BcECContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(digalg));
+			else if ("RSA".equals(sigalg))
+				signerbuilder = new BcRSAContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(digalg));
+			else if ("DSA".equals(sigalg))
+				signerbuilder = new BcDSAContentSignerBuilder(sigalgfinder.find(algospec), digalgfinder.find(digalg));
+			return signerbuilder.build(privkeyparam);
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Gets a verifier based on a certificate to identify the algorithm.
+	 * 
+	 *  @param cert The certificate.
+	 *  @return A content verifier.
+	 */
+	protected static final ContentVerifier getVerifier(X509CertificateHolder cert)
+	{
+		try
+		{
+			return getVerifierProvider(cert).get(cert.getSignatureAlgorithm());
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  
+	 *  Gets a verifier provider based on a certificate to identify the algorithm.
+	 *  
+	 *  @param cert The certificate
+	 *  @return The content verifier provider.
+	 */
+	protected static final ContentVerifierProvider getVerifierProvider(X509CertificateHolder cert)
+	{
+		DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
+		String algospec = anf.getAlgorithmName(cert.getSignatureAlgorithm());
+		String[] algs = algospec.split("WITH");
+		
+		DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
+		BcContentVerifierProviderBuilder verifierbuilder = null;
+		if ("ECDSA".equals(algs[1]))
+			verifierbuilder = new BcECContentVerifierProviderBuilder(digalgfinder);
+		else if ("RSA".equals(algs[1]))
+			verifierbuilder = new BcRSAContentVerifierProviderBuilder(digalgfinder);
+		else if ("DSA".equals(algs[1]))
+			verifierbuilder = new BcDSAContentVerifierProviderBuilder(digalgfinder);
+		
+		try
+		{
+			return verifierbuilder.build(cert);
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 	
 	/**
