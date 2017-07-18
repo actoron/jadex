@@ -257,8 +257,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			boolean ret = false;
 			if(header.getProperty(RX_ID) instanceof String)
 			{
-				if (secinfos.isTrustedPlatform() ||
-					(secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass())))
+				if (secinfos.isTrustedPlatform()
+					|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception
+					|| secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass()))
 					ret = true;
 			}
 			return ret;
