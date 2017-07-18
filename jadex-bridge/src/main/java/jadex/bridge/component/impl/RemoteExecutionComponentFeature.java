@@ -60,7 +60,17 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	/** Commands safe to use with untrusted clients. */
 	protected static final Set<Class<?>> SAFE_COMMANDS	= Collections.unmodifiableSet(new HashSet<Class<?>>()
 	{{
-		// TODO: security and safe commands
+		// Unconditional commands
+		add(RemoteFinishedCommand.class);
+		add(RemoteForwardCmdCommand.class);
+		add(RemoteIntermediateResultCommand.class);
+		add(RemotePullCommand.class);
+		add(RemoteResultCommand.class);
+		add(RemoteTerminationCommand.class);
+
+		// Conditional commands (throwing security exception in execute when not allowed).
+		add(RemoteSearchCommand.class);
+		add(RemoteMethodInvocationCommand.class);
 	}});
 	
 	protected Map<String, IFuture<?>> commands;
@@ -95,7 +105,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	public <T> IFuture<T>	execute(final IComponentIdentifier target, IRemoteCommand<T> command, Class<? extends IFuture<T>> clazz, Long timeout)
 	{
 		final String rxid = SUtil.createUniqueId("");
-		
+//		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
 		final long ftimeout	= timeout!=null ? timeout.longValue() : PlatformConfiguration.getRemoteDefaultTimeout(getComponent().getComponentIdentifier());
 		
 		// TODO: Merge with DecouplingInterceptor code.
@@ -272,6 +282,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
+//			System.out.println(getComponent().getComponentIdentifier() + " received remote command: "+msg+", rxid="+rxid);
+
+			
 			if(msg instanceof IRemoteCommand)
 			{
 				IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;

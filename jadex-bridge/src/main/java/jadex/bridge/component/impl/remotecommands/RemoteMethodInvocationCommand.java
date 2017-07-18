@@ -104,6 +104,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	{
 //		System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
 		
+		// TODO: security checks
 		Object	ret	= null;
 		if(target instanceof IServiceIdentifier)
 		{
