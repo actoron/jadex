@@ -14,7 +14,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -47,7 +47,7 @@ public class Par2Agent implements IParallelService
 	//-------- attributes --------
 	
 	/** The pool service (injected by jadex runtime). */
-	@AgentService
+	@AgentServiceSearch
 	protected IServicePoolService	poolser;
 	
 	/** The sequential service (set in init). */

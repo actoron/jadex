@@ -613,7 +613,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	String paname = pacid.getName().replace('@', '.');
 																	
-																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
+																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getNameHint()!=null? lmodel.getNameHint(): lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
 																	ServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);

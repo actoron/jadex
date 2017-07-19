@@ -5,7 +5,7 @@ import jadex.base.Starter;
 import jadex.bridge.service.IService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -21,7 +21,7 @@ public class TimeUserAgent
 	/**
 	 *  The time services are searched and added at agent startup.
 	 */
-	@AgentService//(isquery=true)
+	@AgentServiceSearch//(isquery=true)
 	public void	addTimeService(ITimeService timeservice)
 	{
 		ISubscriptionIntermediateFuture<String>	subscription	= timeservice.subscribe();

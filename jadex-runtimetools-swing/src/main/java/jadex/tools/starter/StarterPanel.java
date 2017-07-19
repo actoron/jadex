@@ -328,7 +328,7 @@ public class StarterPanel extends JLayeredPane
 							final String fullname = model.getFullName();//model.getPackage()+"."+model.getName();
 							final IModelInfo mymodel = model;
 							final boolean dokilllis = storeresults!=null && storeresults.isSelected();
-							final String an = genname.isSelected()?  null: componentname.getText();
+							final String an = genname.isSelected()?  null: model.getName().equals(componentname.getText())? null: componentname.getText();
 							final String configname = (String)config.getModel().getSelectedItem();
 							final int max = ((Integer)numcomponents.getValue()).intValue();
 								

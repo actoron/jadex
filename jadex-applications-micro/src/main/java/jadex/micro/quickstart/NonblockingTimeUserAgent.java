@@ -6,7 +6,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -23,7 +23,7 @@ public class NonblockingTimeUserAgent
 	//-------- attributes --------
 	
 	/** The time services are searched and set at agent startup. */
-	@AgentService
+	@AgentServiceSearch
 	private IIntermediateFuture<ITimeService>	timeservices;
 	
 	//-------- methods --------

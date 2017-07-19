@@ -55,6 +55,9 @@ public class ServiceQuery<T>
 	 */
 	protected Object filter;
 	
+	/** The multiple flag. */
+	protected boolean multiple;
+	
 	/**
 	 *  Create a new service query.
 	 */
@@ -416,6 +419,24 @@ public class ServiceQuery<T>
 	public void setId(String id)
 	{
 		this.id = id;
+	}
+	
+	/**
+	 *  Get the multiple.
+	 *  @return the multiple
+	 */
+	public boolean isMultiple()
+	{
+		return multiple;
+	}
+
+	/**
+	 *  Set the multiple.
+	 *  @param multiple The multiple to set
+	 */
+	public void setMultiple(boolean multiple)
+	{
+		this.multiple = multiple;
 	}
 
 	/**

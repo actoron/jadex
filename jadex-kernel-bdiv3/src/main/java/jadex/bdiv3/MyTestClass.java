@@ -1,9 +1,27 @@
 package jadex.bdiv3;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 public class MyTestClass
 {
+	protected InvocationHandler handler;
+	
+	public MyTestClass()
+	{
+		Object[] ar = new Object[3];
+		ar[0] = String.class;
+		ar[1] = "hallo";
+	}
+	
+	public MyTestClass(InvocationHandler handler)
+	{
+		this.handler = handler;
+	}
+
 //	public int testfield = inc();
 
 //	@Belief(dependson="testfield")
@@ -47,10 +65,32 @@ public class MyTestClass
 	{
 	}
 	
-	public static Object getNull()
+//	public void call()
+//	{
+////		String mname = Thread.currentThread().getStackTrace()[1].getMethodName();
+//		try
+//		{
+//			handler.invoke(this, null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			SUtil.rethrowAsUnchecked(e);
+//		}
+//	}
+	
+	public void call2(String hallo, int a) throws Throwable
 	{
-		return null;
+//		String mname = Thread.currentThread().getStackTrace()[1].getMethodName();
+		
+//		Method m = this.getClass().getMethod("call2", new Class[]{});
+		
+//		handler.invoke(this, m, null);
 	}
+	
+//	public static Object getNull()
+//	{
+//		return null;
+//	}
 	
 //	public void setVal(double val)
 //	{
@@ -94,10 +134,10 @@ public class MyTestClass
 //		return d;
 //	}
 //
-	public boolean getboVal()
-	{
-		return false;
-	}
+//	public boolean getboVal()
+//	{
+//		return false;
+//	}
 //
 //	public char getcVal()
 //	{

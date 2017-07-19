@@ -40,7 +40,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModel.ServiceInjectionInfo;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 /**
@@ -199,7 +199,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										public void exceptionOccurred(Exception e)
 										{
 											if(!(e instanceof ServiceNotFoundException)
-												|| f.getAnnotation(AgentService.class).required())
+												|| f.getAnnotation(AgentServiceSearch.class).required())
 											{
 												component.getLogger().warning("Field injection failed: "+e);
 												lis2.exceptionOccurred(e);
@@ -272,7 +272,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									public void exceptionOccurred(Exception e)
 									{
 										if(!(e instanceof ServiceNotFoundException)
-											|| m.getAnnotation(AgentService.class).required())
+											|| m.getAnnotation(AgentServiceSearch.class).required())
 										{
 											component.getLogger().warning("Method injection failed: "+e);
 										}
@@ -353,7 +353,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										public void exceptionOccurred(Exception e)
 										{
 											if(!(e instanceof ServiceNotFoundException)
-												|| m.getAnnotation(AgentService.class).required())
+												|| m.getAnnotation(AgentServiceSearch.class).required())
 											{
 												component.getLogger().warning("Method injection failed: "+e);
 											}
@@ -395,7 +395,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										public void exceptionOccurred(Exception e)
 										{
 											if(!(e instanceof ServiceNotFoundException)
-												|| m.getAnnotation(AgentService.class).required())
+												|| m.getAnnotation(AgentServiceSearch.class).required())
 											{
 												component.getLogger().warning("Method service injection failed: "+e);
 											}

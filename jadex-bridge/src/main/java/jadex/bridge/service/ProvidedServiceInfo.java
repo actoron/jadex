@@ -53,7 +53,7 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties)
 	{
-		this(name, new ClassInfo(SReflect.getClassName(type)), implementation, scope, publish, properties, ServiceIdentifier.isSystemService(type));
+		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)): null, implementation, scope, publish, properties, ServiceIdentifier.isSystemService(type));
 	}
 	
 	/**

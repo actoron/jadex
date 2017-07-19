@@ -25,7 +25,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -80,7 +80,7 @@ public class DirectoryDownloaderAgent
 	protected long	interval;
 	
 	/** The thread pool for asynchronous download. */
-	@AgentService(lazy=false)
+	@AgentServiceSearch(lazy=false)
 	protected IDaemonThreadPoolService	tp;
 	
 	/** The connection manager for open connections. */

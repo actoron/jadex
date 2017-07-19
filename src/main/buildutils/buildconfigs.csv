@@ -52,6 +52,7 @@ jadex-kernel-extension-envsupport-jmonkey,,,,,X,,,,,,,,,,X
 jadex-kernel-extension-envsupport-opengl,,X,X,,,,,,,,,,,,X
 jadex-kernel-gpmn,,,,,,,,,,,,,,,
 jadex-kernel-micro,X,X,X,X,,,,,,,,,X,X,X
+jadex-kernel-microservice,X,X,X,X,,,,,,,,,X,X,X
 jadex-model-bpmn,,X,X,X,,,,,,,,,,,X
 jadex-platform,X,X,X,X,,,,,,,,,X,,X
 jadex-platform-android,,,,X,,,,,,,,,,,X

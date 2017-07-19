@@ -72,7 +72,7 @@ import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentResult;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
@@ -785,9 +785,9 @@ public class MicroClassReader
 				{
 					micromodel.addParentInjection(new FieldInfo(fields[i]));
 				}
-				else if(isAnnotationPresent(fields[i], AgentService.class, cl))
+				else if(isAnnotationPresent(fields[i], AgentServiceSearch.class, cl))
 				{
-					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
+					AgentServiceSearch ser = getAnnotation(fields[i], AgentServiceSearch.class, cl);
 					RequiredService rs = ser.requiredservice();
 					
 					if(!rs.type().equals(Object.class))
@@ -888,9 +888,9 @@ public class MicroClassReader
 			Method[] methods = cma.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
-				if(isAnnotationPresent(methods[i], AgentService.class, cl))
+				if(isAnnotationPresent(methods[i], AgentServiceSearch.class, cl))
 				{
-					AgentService ser = getAnnotation(methods[i], AgentService.class, cl);
+					AgentServiceSearch ser = getAnnotation(methods[i], AgentServiceSearch.class, cl);
 					String name;
 					if(ser.name().length()>0)
 					{
@@ -1675,7 +1675,7 @@ public class MicroClassReader
 	/**
 	 *  Create a service implementation.
 	 */
-	protected ProvidedServiceImplementation createImplementation(Implementation impl, Class<?> cma)
+	public static ProvidedServiceImplementation createImplementation(Implementation impl, Class<?> cma)
 	{
 		Class<?> cl = impl.value();
 		String exp = impl.expression().length()>0? 
@@ -1698,7 +1698,7 @@ public class MicroClassReader
 	/**
 	 *  Create a service binding.
 	 */
-	protected RequiredServiceBinding createBinding(Binding bd)
+	public static RequiredServiceBinding createBinding(Binding bd)
 	{
 		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
@@ -1767,7 +1767,7 @@ public class MicroClassReader
 	/**
 	 *  Create component instance info from creation info annotation.
 	 */
-	protected ComponentInstanceInfo createComponentInstanceInfo(CreationInfo comp)
+	public static ComponentInstanceInfo createComponentInstanceInfo(CreationInfo comp)
 	{
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
@@ -1801,7 +1801,7 @@ public class MicroClassReader
 	/**
 	 *  Create unparsed expressions.
 	 */
-	protected UnparsedExpression[] createUnparsedExpressions(Value[] values)
+	public static UnparsedExpression[] createUnparsedExpressions(Value[] values)
 	{
 		UnparsedExpression[] ret = null;
 		if(values.length>0)

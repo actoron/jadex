@@ -92,6 +92,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The component features. */
 	protected IComponentFeatureFactory[] features;
 	
+	/** The name hint for instances of this model. */
+	protected String namehint;
+	
 	//-------- constructors --------
 	
 	/**
@@ -1031,5 +1034,23 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setFeatures(IComponentFeatureFactory[] features)
 	{
 		this.features = features;
+	}
+
+	/**
+	 *  Get the namehint.
+	 *  @return the namehint
+	 */
+	public String getNameHint()
+	{
+		return namehint;
+	}
+
+	/**
+	 *  Set the namehint.
+	 *  @param namehint The namehint to set
+	 */
+	public void setNameHint(String namehint)
+	{
+		this.namehint = namehint;
 	}
 }

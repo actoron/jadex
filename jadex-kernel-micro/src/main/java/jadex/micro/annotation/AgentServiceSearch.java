@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AgentService
+public @interface AgentServiceSearch
 {
 	/**
 	 *  The required service name that is used for searching the service.
