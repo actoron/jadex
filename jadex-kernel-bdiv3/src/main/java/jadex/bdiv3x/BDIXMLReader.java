@@ -1,5 +1,6 @@
 package jadex.bdiv3x;
 
+import java.awt.TrayIcon.MessageType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -45,7 +46,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -78,21 +78,21 @@ import jadex.xml.stax.QName;
  */
 public class BDIXMLReader extends ComponentXMLReader
 {
-	public static final IStringObjectConverter msgtypeconv = new IStringObjectConverter()
-	{
-		public Object convertString(String val, Object context) throws Exception
-		{
-			return MessageType.getMessageType(val);
-		}
-	};
-	
-	public static final IObjectStringConverter remsgtypeconv = new IObjectStringConverter()
-	{
-		public String convertObject(Object val, Object context)
-		{
-			return ((MessageType)val).getName();
-		}
-	};
+//	public static final IStringObjectConverter msgtypeconv = new IStringObjectConverter()
+//	{
+//		public Object convertString(String val, Object context) throws Exception
+//		{
+//			return MessageType.getMessageType(val);
+//		}
+//	};
+//	
+//	public static final IObjectStringConverter remsgtypeconv = new IObjectStringConverter()
+//	{
+//		public String convertObject(Object val, Object context)
+//		{
+//			return ((MessageType)val).getName();
+//		}
+//	};
 	
 	public static final IStringObjectConverter dirconv = new IStringObjectConverter()
 	{
@@ -919,15 +919,16 @@ public class BDIXMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(OAVBDIMetaModel.internaleventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageevent")), new ObjectInfo(MMessageEvent.class),
-			new MappingInfo(null, null, null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(msgtypeconv, remsgtypeconv)),
-				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
-				new SubobjectInfo[]{
-					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
-					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
-				}),
-			new LinkingInfo(atlinker)));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageevent")), new ObjectInfo(MMessageEvent.class),
+//			new MappingInfo(null, null, null, new AttributeInfo[]{
+//				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(msgtypeconv, remsgtypeconv)),
+//				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
+//				new SubobjectInfo[]{
+//					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
+//					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
+//				}),
+//			new LinkingInfo(atlinker)));
+		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(OAVBDIMetaModel.messageeventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "match")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 

@@ -340,8 +340,8 @@ public class WaitAbstraction
 			{
 				for(Tuple2<RMessageEvent, Set<MMessageEvent>> msg: replyelements)
 				{
-					ret = (msg.getSecondEntity()==null || msg.getSecondEntity().contains(((RMessageEvent)procelem).getMMessageEvent()))
-						&& BDIXMessageComponentFeature.isReply(msg.getFirstEntity(), (RMessageEvent)procelem);
+//					ret = (msg.getSecondEntity()==null || msg.getSecondEntity().contains(((RMessageEvent)procelem).getMMessageEvent()))
+//						&& BDIXMessageComponentFeature.isReply(msg.getFirstEntity(), (RMessageEvent)procelem);
 					if(ret)
 						break;
 				}

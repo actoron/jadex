@@ -36,15 +36,15 @@ public class REventbase extends RElement implements IEventbase
 
 	//-------- IEventbase interface --------
 	
-	/**
-	 *  Send a message after some delay.
-	 *  @param me	The message event.
-	 *  @return The filter to wait for an answer.
-	 */
-	public IFuture<Void> sendMessage(IMessageEvent me)
-	{
-		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType());
-	}
+//	/**
+//	 *  Send a message after some delay.
+//	 *  @param me	The message event.
+//	 *  @return The filter to wait for an answer.
+//	 */
+//	public IFuture<Void> sendMessage(IMessageEvent me)
+//	{
+//		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType());
+//	}
 
 	/**
 	 *  Dispatch an event.
@@ -66,21 +66,21 @@ public class REventbase extends RElement implements IEventbase
 		return new RMessageEvent(mevent, getAgent(), null);
 	}
 
-	/**
-	 *  Create a reply to a message event.
-	 *  @param event	The received message event.
-	 *  @param type	The reply message event type.
-	 *  @return The reply event.
-	 */
-	public IMessageEvent createReply(IMessageEvent event, String type)
-	{
-		if(event==null)
-			throw new IllegalArgumentException("Event must not null");
-		
-		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
-		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
-		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
-	}
+//	/**
+//	 *  Create a reply to a message event.
+//	 *  @param event	The received message event.
+//	 *  @param type	The reply message event type.
+//	 *  @return The reply event.
+//	 */
+//	public IMessageEvent createReply(IMessageEvent event, String type)
+//	{
+//		if(event==null)
+//			throw new IllegalArgumentException("Event must not null");
+//		
+//		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
+//		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
+//		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
+//	}
 	
 	/**
 	 *  Create a new intenal event.

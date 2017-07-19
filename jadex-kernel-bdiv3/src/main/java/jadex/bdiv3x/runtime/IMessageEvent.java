@@ -1,6 +1,6 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bridge.service.types.message.MessageType;
+import java.awt.TrayIcon.MessageType;
 
 
 /**

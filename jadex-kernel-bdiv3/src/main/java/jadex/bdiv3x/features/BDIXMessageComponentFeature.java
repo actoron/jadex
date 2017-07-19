@@ -1,5 +1,6 @@
 package jadex.bdiv3x.features;
 
+import java.awt.TrayIcon.MessageType;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -66,146 +66,146 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	
 	//-------- IInternalMessageFeature interface --------
 	
-	/**
-	 *  Helper method to override message handling.
-	 *  May be called from external threads.
-	 */
-	protected IComponentStep<Void> createHandleMessageStep(IMessageAdapter message)
-	{
-		return new HandleBDIMessageStep(message);
-	}
-	
-	/**
-	 *  Step to handle a message.
-	 */
-	public class HandleBDIMessageStep extends HandleMessageStep
-	{
-		public HandleBDIMessageStep(IMessageAdapter message)
-		{
-			super(message);
-		}
-
-		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
-		 */
-		protected boolean invokeHandlers(IMessageAdapter message)
-		{
-			boolean ret = false;
-			
-			MMessageEvent mevent = null;
-			
-//			System.out.println("rec msg: "+message.getMessage());
-			
-			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
-//			List<MMessageEvent> mevents = bdif.getBDIModel().getCapability().getMessageEvents();
-//			for(MMessageEvent mevent: mevents)
+//	/**
+//	 *  Helper method to override message handling.
+//	 *  May be called from external threads.
+//	 */
+//	protected IComponentStep<Void> createHandleMessageStep(IMessageAdapter message)
+//	{
+//		return new HandleBDIMessageStep(message);
+//	}
+//	
+//	/**
+//	 *  Step to handle a message.
+//	 */
+//	public class HandleBDIMessageStep extends HandleMessageStep
+//	{
+//		public HandleBDIMessageStep(IMessageAdapter message)
+//		{
+//			super(message);
+//		}
+//
+//		/**
+//		 *  Extracted to allow overriding behaviour.
+//		 *  @return true, when at least one matching handler was found.
+//		 */
+//		protected boolean invokeHandlers(IMessageAdapter message)
+//		{
+//			boolean ret = false;
+//			
+//			MMessageEvent mevent = null;
+//			
+////			System.out.println("rec msg: "+message.getMessage());
+//			
+//			IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
+////			List<MMessageEvent> mevents = bdif.getBDIModel().getCapability().getMessageEvents();
+////			for(MMessageEvent mevent: mevents)
+////			{
+////				if(mevent.getDirection())
+////			}
+//			
+//			// Find the event to which the message is a reply (if any).
+////			IRMessageEvent original = null;
+////			List	capas = agent.getAllCapabilities();
+////			for(int i=0; i<capas.size(); i++)
+////			{
+////				IRMessageEvent	rep	= ((RCapability)capas.get(i)).getEventbase().getInReplyMessageEvent(message);
+////				if(rep!=null && original!=null)
+////				{
+////					agent.getLogger().severe("Cannot match reply message (multiple capabilities "+rep.getScope().getName()+", "+original.getScope().getName()+") for: "+message);
+////					return;	// Hack!!! Ignore message?
+////				}
+////				else if(rep!=null)
+////				{
+////					original	= rep;
+////					// Todo: break if production mode.
+////				}
+////			}
+//
+//			// Find all matching event models for received message.
+//			List<MMessageEvent>	events	= SCollection.createArrayList();
+//			List<MMessageEvent>	matched	= SCollection.createArrayList();
+//			int	degree	= 0;
+//			
+//			// Find original message event to know in which scope the
+//			//   new message event type should be searched
+//			// For messages without conversation all capabilities are considered.
+//			// For messages of ongoing conversations only the source capability is considered.
+//			RMessageEvent	original	= getInReplyMessageEvent(message);
+//			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType(),
+//				original!=null, original==null ? null : original.getModelElement().getCapabilityName());
+//
+//			if(events.size()==0)
 //			{
-//				if(mevent.getDirection())
+//				getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot process message, no message event matches: "+message.getMessage());
 //			}
-			
-			// Find the event to which the message is a reply (if any).
-//			IRMessageEvent original = null;
-//			List	capas = agent.getAllCapabilities();
-//			for(int i=0; i<capas.size(); i++)
+//			else
 //			{
-//				IRMessageEvent	rep	= ((RCapability)capas.get(i)).getEventbase().getInReplyMessageEvent(message);
-//				if(rep!=null && original!=null)
+//				if(events.size()>1)
 //				{
-//					agent.getLogger().severe("Cannot match reply message (multiple capabilities "+rep.getScope().getName()+", "+original.getScope().getName()+") for: "+message);
-//					return;	// Hack!!! Ignore message?
+//					// Multiple matches of highest degree.
+//					getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot decide which event matches message, " +
+//						"using first: "+message.getMessage()+", "+events);
 //				}
-//				else if(rep!=null)
+//				else if(matched.size()>1)
 //				{
-//					original	= rep;
-//					// Todo: break if production mode.
+//					// Multiple matches but different degrees.
+//					getComponent().getLogger().info(getComponent().getComponentIdentifier()+" multiple events matching message, using " +
+//						"message event with highest specialization degree: "+message+" ("+degree+"), "+events.get(0)+", "+matched);
 //				}
+//				
+////				IMReferenceableElement	mevent	= (IMReferenceableElement)events.get(0);
+////				RCapability	scope	= agent.lookupCapability(mevent.getScope());
+////				scope.getEventbase().dispatchIncomingMessageEvent(mevent, message, original);
+//			
+//				mevent = events.get(0);
 //			}
-
-			// Find all matching event models for received message.
-			List<MMessageEvent>	events	= SCollection.createArrayList();
-			List<MMessageEvent>	matched	= SCollection.createArrayList();
-			int	degree	= 0;
-			
-			// Find original message event to know in which scope the
-			//   new message event type should be searched
-			// For messages without conversation all capabilities are considered.
-			// For messages of ongoing conversations only the source capability is considered.
-			RMessageEvent	original	= getInReplyMessageEvent(message);
-			degree = matchMessageEvents(message.getParameterMap(), bdif.getBDIModel().getCapability().getMessageEvents(), matched, events, degree, message.getMessageType(),
-				original!=null, original==null ? null : original.getModelElement().getCapabilityName());
-
-			if(events.size()==0)
-			{
-				getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot process message, no message event matches: "+message.getMessage());
-			}
-			else
-			{
-				if(events.size()>1)
-				{
-					// Multiple matches of highest degree.
-					getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot decide which event matches message, " +
-						"using first: "+message.getMessage()+", "+events);
-				}
-				else if(matched.size()>1)
-				{
-					// Multiple matches but different degrees.
-					getComponent().getLogger().info(getComponent().getComponentIdentifier()+" multiple events matching message, using " +
-						"message event with highest specialization degree: "+message+" ("+degree+"), "+events.get(0)+", "+matched);
-				}
-				
-//				IMReferenceableElement	mevent	= (IMReferenceableElement)events.get(0);
-//				RCapability	scope	= agent.lookupCapability(mevent.getScope());
-//				scope.getEventbase().dispatchIncomingMessageEvent(mevent, message, original);
-			
-				mevent = events.get(0);
-			}
-			
-			if(mevent!=null)
-			{
-				RMessageEvent revent = new RMessageEvent(mevent, message.getParameterMap(), message.getMessageType(), getComponent());
-				FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
-				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
-			}
-			else
-			{
-				ret	= super.invokeHandlers(message);
-			}
-			
-			return ret;
-		}
-	}
-
-	/**
-	 *  Helper method to override stream handling.
-	 *  May be called from external threads.
-	 */
-	protected IComponentStep<Void> createHandleStreamStep(IConnection con)
-	{
-		return new HandleBDIStreamStep(con);
-	}
-	
-	/**
-	 *  Step to handle a message.
-	 */
-	public class HandleBDIStreamStep	extends HandleStreamStep
-	{
-		public HandleBDIStreamStep(IConnection con)
-		{
-			super(con);
-		}
-
-		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
-		 */
-		protected boolean invokeHandlers(IConnection con)
-		{
-			// todo: create bdi reasoning event
-			
-			return super.invokeHandlers(con);
-		}
-	}
+//			
+//			if(mevent!=null)
+//			{
+//				RMessageEvent revent = new RMessageEvent(mevent, message.getParameterMap(), message.getMessageType(), getComponent());
+//				FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
+//				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+//			}
+//			else
+//			{
+//				ret	= super.invokeHandlers(message);
+//			}
+//			
+//			return ret;
+//		}
+//	}
+//
+//	/**
+//	 *  Helper method to override stream handling.
+//	 *  May be called from external threads.
+//	 */
+//	protected IComponentStep<Void> createHandleStreamStep(IConnection con)
+//	{
+//		return new HandleBDIStreamStep(con);
+//	}
+//	
+//	/**
+//	 *  Step to handle a message.
+//	 */
+//	public class HandleBDIStreamStep	extends HandleStreamStep
+//	{
+//		public HandleBDIStreamStep(IConnection con)
+//		{
+//			super(con);
+//		}
+//
+//		/**
+//		 *  Extracted to allow overriding behaviour.
+//		 *  @return true, when at least one matching handler was found.
+//		 */
+//		protected boolean invokeHandlers(IConnection con)
+//		{
+//			// todo: create bdi reasoning event
+//			
+//			return super.invokeHandlers(con);
+//		}
+//	}
 	
 	/**
 	 *  Match message events with a message adapter.
@@ -325,26 +325,26 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		{
 			Map<String, Object> exparams = new HashMap<String, Object>();
 			
-			List<String> names = new ArrayList<String>();
-			for(String name: mt.getParameterNames())
-				names.add(name);
-			for(String name: mt.getParameterSetNames())
-				names.add(name);
-			
-			for(String name: mt.getParameterNames())
-			{
-				try
-				{
-					Object pvalue = msg.get(name);
-					// Hack! converts "-" to "_" because variable names must not contain "-" in Java
-					String paramname = "$"+ SUtil.replace(name, "-", "_");
-					exparams.put(paramname, pvalue);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
+//			List<String> names = new ArrayList<String>();
+//			for(String name: mt.getParameterNames())
+//				names.add(name);
+//			for(String name: mt.getParameterSetNames())
+//				names.add(name);
+//			
+//			for(String name: mt.getParameterNames())
+//			{
+//				try
+//				{
+//					Object pvalue = msg.get(name);
+//					// Hack! converts "-" to "_" because variable names must not contain "-" in Java
+//					String paramname = "$"+ SUtil.replace(name, "-", "_");
+//					exparams.put(paramname, pvalue);
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
 			
 //			for(int i=0; i<params.length; i++)
 //			{
@@ -448,35 +448,35 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			boolean	match = true; // Does the message match all convid parameters?
 			boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
 //			MessageType	type = ((MMessageEvent)smes[i].getOriginalElement().getModelElement()).getMessageType();
-			MessageType	type = ((MMessageEvent)smes[i].getModelElement()).getType();
-
-			MessageType.ParameterSpecification[] params = type.getParameters();
-			for(int j=0; match && j<params.length; j++)
-			{
-				if(params[j].isConversationIdentifier())
-				{
-					Object sourceval = smes[i].getParameter(params[j].getSource()).getValue();
-					Object destval = message.getValue(params[j].getName());
-					match = SUtil.equals(sourceval, destval);
-					matched = matched || sourceval!=null;
-				}
-			}
-
-			MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
-			for(int j=0; match && j<paramsets.length; j++)
-			{
-				if(paramsets[j].isConversationIdentifier())
-				{
-					Object sourceval = smes[i].getParameter(paramsets[j].getSource()).getValue();
-					Iterator it2 = SReflect.getIterator(message.getValue(paramsets[j].getName()));
-					while(it2.hasNext())
-					{
-						Object destval = it2.next();
-						match = SUtil.equals(sourceval, destval);
-						matched	= matched || sourceval!=null;
-					}
-				}
-			}
+//			MessageType	type = ((MMessageEvent)smes[i].getModelElement()).getType();
+//
+//			MessageType.ParameterSpecification[] params = type.getParameters();
+//			for(int j=0; match && j<params.length; j++)
+//			{
+//				if(params[j].isConversationIdentifier())
+//				{
+//					Object sourceval = smes[i].getParameter(params[j].getSource()).getValue();
+//					Object destval = message.getValue(params[j].getName());
+//					match = SUtil.equals(sourceval, destval);
+//					matched = matched || sourceval!=null;
+//				}
+//			}
+//
+//			MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
+//			for(int j=0; match && j<paramsets.length; j++)
+//			{
+//				if(paramsets[j].isConversationIdentifier())
+//				{
+//					Object sourceval = smes[i].getParameter(paramsets[j].getSource()).getValue();
+//					Iterator it2 = SReflect.getIterator(message.getValue(paramsets[j].getName()));
+//					while(it2.hasNext())
+//					{
+//						Object destval = it2.next();
+//						match = SUtil.equals(sourceval, destval);
+//						matched	= matched || sourceval!=null;
+//					}
+//				}
+//			}
 			
 			if(matched && match)
 			{
@@ -505,35 +505,35 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		boolean	match = true; // Does the message match all convid parameters?
 		boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
 //		MessageType	type = ((MMessageEvent)smes[i].getOriginalElement().getModelElement()).getMessageType();
-		MessageType	type = ((MMessageEvent)msg.getModelElement()).getType();
-
-		MessageType.ParameterSpecification[] params = type.getParameters();
-		for(int j=0; match && j<params.length; j++)
-		{
-			if(params[j].isConversationIdentifier())
-			{
-				Object sourceval = msg.getParameter(params[j].getSource()).getValue();
-				Object destval = reply.getParameter(params[j].getName()).getValue();
-				match = SUtil.equals(sourceval, destval);
-				matched = matched || sourceval!=null;
-			}
-		}
-
-		MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
-		for(int j=0; match && j<paramsets.length; j++)
-		{
-			if(paramsets[j].isConversationIdentifier())
-			{
-				Object sourceval = msg.getParameter(paramsets[j].getSource()).getValue();
-				Iterator it2 = SReflect.getIterator(reply.getParameter(paramsets[j].getName()).getValue());
-				while(it2.hasNext())
-				{
-					Object destval = it2.next();
-					match = SUtil.equals(sourceval, destval);
-					matched	= matched || sourceval!=null;
-				}
-			}
-		}
+//		MessageType	type = ((MMessageEvent)msg.getModelElement()).getType();
+//
+//		MessageType.ParameterSpecification[] params = type.getParameters();
+//		for(int j=0; match && j<params.length; j++)
+//		{
+//			if(params[j].isConversationIdentifier())
+//			{
+//				Object sourceval = msg.getParameter(params[j].getSource()).getValue();
+//				Object destval = reply.getParameter(params[j].getName()).getValue();
+//				match = SUtil.equals(sourceval, destval);
+//				matched = matched || sourceval!=null;
+//			}
+//		}
+//
+//		MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
+//		for(int j=0; match && j<paramsets.length; j++)
+//		{
+//			if(paramsets[j].isConversationIdentifier())
+//			{
+//				Object sourceval = msg.getParameter(paramsets[j].getSource()).getValue();
+//				Iterator it2 = SReflect.getIterator(reply.getParameter(paramsets[j].getName()).getValue());
+//				while(it2.hasNext())
+//				{
+//					Object destval = it2.next();
+//					match = SUtil.equals(sourceval, destval);
+//					matched	= matched || sourceval!=null;
+//				}
+//			}
+//		}
 		
 		return matched && match;
 	}

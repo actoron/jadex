@@ -1,10 +1,10 @@
 package jadex.bdiv3.model;
 
+import java.awt.TrayIcon.MessageType;
 import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.message.MessageType;
 
 /**
  *  Model element for a message.
