@@ -1,17 +1,19 @@
 package jadex.bdiv3;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.ClassReader;
@@ -31,8 +33,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 public class SASM
 {
@@ -234,7 +236,7 @@ public class SASM
 	/**
 	 *  Generate a proxy for an existing class.
 	 */
-	public static Object newProxyInstance(ClassLoader loader, final Class<?> clazz, InvocationHandler handler) throws Exception
+	public static Object newProxyInstance(ClassLoader loader, final Class<?> clazz, final Class<?>[] ifaces, InvocationHandler handler) throws Exception
 	{
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 //		ClassReader cr = new ClassReader(clazz.getName());
@@ -247,6 +249,13 @@ public class SASM
 		cn.name = Type.getInternalName(clazz)+"Proxy";
 		cn.superName = Type.getInternalName(clazz);
 		cn.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, "handler", "Ljava/lang/reflect/InvocationHandler;", null, null));
+		if(ifaces!=null)
+		{
+			for(int i=0; i<ifaces.length; i++)
+			{
+				cn.interfaces.add(Type.getInternalName(ifaces[i]));
+			}
+		}
 		
 		MethodNode mn = new MethodNode(Opcodes.ACC_PUBLIC, "<init>", "(Ljava/lang/reflect/InvocationHandler;)V", null, null);
 		
@@ -259,96 +268,38 @@ public class SASM
 		
 		cn.methods.add(mn);
 		
-		ClassNode cns = new ClassNode();
-		ClassReader crs = new ClassReader(clazz.getName());
-		crs.accept(cns, 0);
+		ClassNode cns = getClassNode(clazz);
 //		crs.accept(new TraceClassVisitor(cns, new PrintWriter(System.out)), 0);
 //		crs.accept(new TraceClassVisitor(cns, new ASMifier(), new PrintWriter(System.out)), 0);
 		
-		List<MethodNode> ms = cns.methods;
+		List<MethodNode> ms = new ArrayList<MethodNode>(cns.methods);
+		
 		for(MethodNode m: ms)
 		{
-			if(!"<init>".equals(m.name))
+			MethodNode nmn = genrateInvocationCode(m, cn.name, null);
+			if(nmn!=null)
+				cn.methods.add(nmn);
+		}
+		
+		if(ifaces!=null)
+		{
+			for(int i=0; i<ifaces.length; i++)
 			{
-				// todo: exceptions
-				MethodNode nm = new MethodNode(m.access, m.name, m.desc, m.signature, null);
-				Type[] ptypes = Type.getArgumentTypes(nm.desc);
-								
-				// Object on which method is invoked (handler)
-				
-				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				nm.instructions.add(new FieldInsnNode(Opcodes.GETFIELD, cn.name, "handler", Type.getDescriptor(InvocationHandler.class)));
-				
-				// Arguments proxy, method, args
-				
-				// Proxy
-				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				
-//				nm.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;"));
-//				nm.instructions.add(new LdcInsnNode("0ppppppp"));
-//				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false));
-				
-				// Method
-				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false));
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false));
-				nm.instructions.add(new LdcInsnNode(m.name));
-				nm.instructions.add(new LdcInsnNode(ptypes.length));
-				nm.instructions.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Class"));				
-				for(int i=0; i<ptypes.length; i++)
+				ClassNode tcn = getClassNode(ifaces[i]);
+				List<MethodNode> tms = tcn.methods;
+				for(MethodNode m: tms)
 				{
-					nm.instructions.add(new InsnNode(Opcodes.DUP));
-					nm.instructions.add(new LdcInsnNode(i));
-					Class<?> cl = SReflect.findClass(ptypes[i].getClassName(), null, null);
-					
-					if(cl.isPrimitive())
-					{
-						// Special hack to get primitive class
-//						nm.instructions.add(new LdcInsnNode(Type.getType(SReflect.getWrappedType(cl))));
-						nm.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, Type.getInternalName(SReflect.getWrappedType(cl)), "TYPE", "Ljava/lang/Class;"));
-					}
-					else
-					{
-						nm.instructions.add(new LdcInsnNode(ptypes[i]));
-					}
-					nm.instructions.add(new InsnNode(Opcodes.AASTORE));
+					MethodNode nmn = genrateInvocationCode(m, cn.name, ifaces[i]);
+					if(nmn!=null)
+						cn.methods.add(nmn);
 				}
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getMethod", "(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false));
-
-				// Arguments
-				nm.instructions.add(new LdcInsnNode(ptypes.length));
-				nm.instructions.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Object"));
-				int pos = 1;
-				for(int i=0; i<ptypes.length; i++)
-				{
-					nm.instructions.add(new InsnNode(Opcodes.DUP));
-					nm.instructions.add(new LdcInsnNode(i));
-//					nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, i+1));
-					pos = SASM.makeObject(nm.instructions, ptypes[i], pos);
-					nm.instructions.add(new InsnNode(Opcodes.AASTORE));
-				}
-				
-//				nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
-//				nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
-//				nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
-				
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/lang/reflect/InvocationHandler", "invoke", "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;", true));
-				
-				Type rettype = Type.getReturnType(m.desc);
-				if(Type.VOID_TYPE.equals(rettype))
-					nm.instructions.add(new InsnNode(Opcodes.POP));
-				
-				SASM.makeBasicType(nm.instructions, rettype);
-				SASM.makeReturn(nm.instructions, rettype);
-				
-				cn.methods.add(nm);
 			}
 		}
 		
 		cn.accept(cw);
 //		cn.accept(tcv);
 //		cn.accept(new CheckClassAdapter(tcv));
-//		cn.accept(new TraceClassVisitor(tcv, new ASMifier(), new PrintWriter(System.out)));
+//		cn.accept(new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out)));
 		
 //		ByteClassLoader bcl = new ByteClassLoader(loader!=null? loader: SASM.class.getClassLoader());
 		Class<?> cl = toClass(cn.name.replace("/", "."), cw.toByteArray(), new URLClassLoader(new URL[0], ASMBDIClassGenerator.class.getClassLoader()), null);
@@ -357,6 +308,106 @@ public class SASM
 		Object o = c.newInstance(handler);
 		
 		return o;
+	}
+	
+	/**
+	 *  Generate the code for delegating the call to the invocation handler.
+	 *  @param m The methodnode.
+	 *  @param classname The class name.
+	 *  @param iface The interface (null means the class is owner of the method)
+	 *  @return The new method node (or null).
+	 */
+	protected static MethodNode genrateInvocationCode(MethodNode m, String classname, Class<?> iface) throws Exception
+	{
+		MethodNode ret = null;
+		
+		if(!"<init>".equals(m.name))
+		{
+			// todo: exceptions
+//			MethodNode nm = new MethodNode(m.access, m.name, m.desc, m.signature, null);
+			ret = new MethodNode(Opcodes.ACC_PUBLIC, m.name, m.desc, m.signature, null);
+			System.out.println(m.name+" "+m.desc+" "+m.signature);
+			Type[] ptypes = Type.getArgumentTypes(ret.desc);
+							
+			// Object on which method is invoked (handler)
+			
+			ret.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+			ret.instructions.add(new FieldInsnNode(Opcodes.GETFIELD, classname, "handler", Type.getDescriptor(InvocationHandler.class)));
+			
+			// Arguments proxy, method, args
+			
+			// Proxy
+			ret.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+			
+//			nm.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;"));
+//			nm.instructions.add(new LdcInsnNode("0ppppppp"));
+//			nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false));
+			
+			// Method
+			ret.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+			if(iface==null)
+			{
+				ret.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false));
+				ret.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false));
+			}
+			else
+			{
+//				ret.instructions.add(new LdcInsnNode(Type.getType(iface)));
+				ret.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false));
+			}
+			ret.instructions.add(new LdcInsnNode(m.name));
+			ret.instructions.add(new LdcInsnNode(ptypes.length));
+			ret.instructions.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Class"));				
+			for(int i=0; i<ptypes.length; i++)
+			{
+				ret.instructions.add(new InsnNode(Opcodes.DUP));
+				ret.instructions.add(new LdcInsnNode(i));
+				Class<?> cl = SReflect.findClass(ptypes[i].getClassName(), null, null);
+				
+				if(cl.isPrimitive())
+				{
+					// Special hack to get primitive class
+//					nm.instructions.add(new LdcInsnNode(Type.getType(SReflect.getWrappedType(cl))));
+					ret.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, Type.getInternalName(SReflect.getWrappedType(cl)), "TYPE", "Ljava/lang/Class;"));
+				}
+				else
+				{
+					ret.instructions.add(new LdcInsnNode(ptypes[i]));
+				}
+				ret.instructions.add(new InsnNode(Opcodes.AASTORE));
+			}
+			ret.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getMethod", "(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false));
+
+			// Arguments
+			ret.instructions.add(new LdcInsnNode(ptypes.length));
+			ret.instructions.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Object"));
+			int pos = 1;
+			for(int i=0; i<ptypes.length; i++)
+			{
+				ret.instructions.add(new InsnNode(Opcodes.DUP));
+				ret.instructions.add(new LdcInsnNode(i));
+//				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, i+1));
+				pos = SASM.makeObject(ret.instructions, ptypes[i], pos);
+				ret.instructions.add(new InsnNode(Opcodes.AASTORE));
+			}
+			
+//			nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
+//			nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
+//			nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
+			
+			ret.instructions.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/lang/reflect/InvocationHandler", "invoke", "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;", true));
+			
+			Type rettype = Type.getReturnType(m.desc);
+			if(Type.VOID_TYPE.equals(rettype))
+				ret.instructions.add(new InsnNode(Opcodes.POP));
+			
+			SASM.makeBasicType(ret.instructions, rettype);
+			SASM.makeReturn(ret.instructions, rettype);
+			
+//			cn.methods.add(ret);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -424,6 +475,30 @@ public class SASM
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get a class node for a class.
+	 *  @param clazz The clazz. 
+	 *  @return The class node.
+	 */
+	public static ClassNode getClassNode(Class<?> clazz)
+	{
+		ClassNode cns = null;
+		
+		try
+		{
+			cns = new ClassNode();
+			ClassReader crs = new ClassReader(clazz.getName());
+			crs.accept(cns, 0);
+			return cns;
+		}
+		catch(Exception e)
+		{
+			SUtil.rethrowAsUnchecked(e);
+		}
+		
+		return cns;
+	}
 
 	/**
 	 *  Main for testing.
@@ -431,12 +506,22 @@ public class SASM
 	public static void main(String[] args) throws Exception
 	{
 		final MyTestClass mtc = new MyTestClass();
-		MyTestClass proxy = (MyTestClass)newProxyInstance(null, MyTestClass.class, new InvocationHandler()
+		MyTestClass proxy = (MyTestClass)newProxyInstance(null, MyTestClass.class, 
+			new Class<?>[]{ActionListener.class},
+			new InvocationHandler()
 		{
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
 				System.out.println("Handler called: "+proxy+" "+method+" "+args);
-				return method.invoke(mtc, args);
+				try
+				{
+					return method.invoke(mtc, args);
+				}
+				catch(Exception e)
+				{
+					System.out.println("Could not delegate to original object: "+e.getMessage());
+					return null;
+				}
 			}
 		});
 		
@@ -446,6 +531,7 @@ public class SASM
 		{
 			proxy.call2("hallo", 12);
 			System.out.println(proxy.add(1, 2));
+			((ActionListener)proxy).actionPerformed(new ActionEvent(new Object(), 1, null));
 		}
 		catch(Throwable t)
 		{
