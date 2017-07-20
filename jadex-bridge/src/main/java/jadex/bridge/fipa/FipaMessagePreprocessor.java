@@ -18,6 +18,19 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor
 	{
 		FipaMessage	fmsg	= (FipaMessage)msg;
 		
+		// Set/check consistent sender.
+		IComponentIdentifier	fsen	= fmsg.getSender();
+		IComponentIdentifier	hsen	= (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER);
+		assert	hsen!=null : "Message feature should always provider sender!";
+		if(fsen==null)
+		{
+			fmsg.setReceiver(hsen);
+		}
+		else if(!fsen.equals(hsen))
+		{
+			throw new IllegalArgumentException("Inconsistent msg/header sender: "+fsen+" vs. "+hsen);
+		}
+		
 		// Set/check consistent receiver.
 		IComponentIdentifier	frec	= fmsg.getReceiver();
 		IComponentIdentifier	hrec	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
@@ -34,17 +47,20 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor
 			throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+hrec);
 		}
 		
-		// Set/check consistent sender.
-		IComponentIdentifier	fsen	= fmsg.getSender();
-		IComponentIdentifier	hsen	= (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER);
-		assert	hsen!=null : "Message feature should always provider sender!";
-		if(fsen==null)
+		// Set/check consistent conv id.
+		String	fconv	= fmsg.getConversationId();
+		String	hconv	= (String)header.getProperty(IMsgHeader.CONVERSATION_ID);
+		if(fconv==null)
 		{
-			fmsg.setReceiver(hsen);
+			fmsg.setConversationId(hconv);
 		}
-		else if(!fsen.equals(hsen))
+		else if(hconv==null)
 		{
-			throw new IllegalArgumentException("Inconsistent msg/header sender: "+fsen+" vs. "+hsen);
+			header.addProperty(IMsgHeader.CONVERSATION_ID, fmsg.getConversationId());
 		}
+		else if(!fconv.equals(hconv))
+		{
+			throw new IllegalArgumentException("Inconsistent msg/header conversation IDs: "+fconv+" vs. "+hconv);
+		}		
 	}
 }

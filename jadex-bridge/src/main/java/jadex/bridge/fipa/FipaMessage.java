@@ -133,9 +133,21 @@ public class FipaMessage
 //	/** Denotes the interaction protocol that the sending agent is employing with this ACL message. */
 //	public String	protocol;
 //
-//	/** Introduces an expression (a conversation identifier) which is used to identify
-//	 *  the ongoing sequence of communicative acts that together form a conversation. */
-//	public String	conversation_id;
+	/** Introduces an expression (a conversation identifier) which is used to identify
+	 *  the ongoing sequence of communicative acts that together form a conversation. */
+	private String	convid;
+	/** Introduces an expression (a conversation identifier) which is used to identify
+	 *  the ongoing sequence of communicative acts that together form a conversation. */
+	public String	getConversationId()
+	{
+		return convid;
+	}
+	/** Introduces an expression (a conversation identifier) which is used to identify
+	 *  the ongoing sequence of communicative acts that together form a conversation. */
+	public void	setConversationId(String convid)
+	{
+		this.convid	= convid;
+	}
 //
 //	/** Introduces an expression that will be used by the responding agent to identify this message. */
 //	public String	reply_with;
@@ -155,5 +167,17 @@ public class FipaMessage
 	public String	toString()
 	{
 		return performative+"("+content+")";
+	}
+	
+	/**
+	 *  Create a reply for a given message.
+	 */
+	public FipaMessage	createReply()
+	{
+		FipaMessage	ret	= new FipaMessage();
+		ret.setSender(getReceiver());
+		ret.setReceiver(getSender());
+		ret.setConversationId(getConversationId());
+		return ret;
 	}
 }
