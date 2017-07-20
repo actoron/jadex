@@ -54,7 +54,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.micro.MicroClassReader.DummyClassLoader;
 
 
@@ -554,64 +553,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		mn.instructions = nl;
 	}
 	
-	/**
-	 * 
-	 */
-	protected void makeObject(InsnList nl, Type arg)
-	{
-		makeObject(nl, arg, 1);
-	}
 	
-	/**
-	 * 
-	 */
-	protected void makeObject(InsnList nl, Type arg, int pos)
-	{
-		if(arg.getClassName().equals("byte"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;"));
-		}
-		else if(arg.getClassName().equals("short"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;"));
-		}
-		else if(arg.getClassName().equals("int"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;"));
-		}
-		else if(arg.getClassName().equals("char"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;"));
-		}
-		else if(arg.getClassName().equals("boolean"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;"));
-		}
-		else if(arg.getClassName().equals("long"))
-		{
-			nl.add(new VarInsnNode(Opcodes.LLOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;"));
-		}
-		else if(arg.getClassName().equals("float"))
-		{
-			nl.add(new VarInsnNode(Opcodes.FLOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;"));
-		}
-		else if(arg.getClassName().equals("double"))
-		{
-			nl.add(new VarInsnNode(Opcodes.DLOAD, pos));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;"));
-		}
-		else // Object
-		{
-			nl.add(new VarInsnNode(Opcodes.ALOAD, pos));
-		}
-	}
 	
 	/**
 	 * 
@@ -628,7 +570,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, GLOBALNAME_FIELD_NAME, "Ljava/lang/String;"));
 		nl.add(new LdcInsnNode(belname));
 		
-		makeObject(nl, arg);
+		SASM.makeObject(nl, arg);
 		
 		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "setAbstractBeliefValue", "(Ljadex/bridge/IInternalAccess;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V"));
 		nl.add(new InsnNode(Opcodes.RETURN));
@@ -662,7 +604,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0) does not work for other types than object
 		if(args.length>0)
 		{
-			makeObject(nl, args[0]);
+			SASM.makeObject(nl, args[0]);
 		}
 		else
 		{
@@ -1315,24 +1257,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		}
 //	}
 	
-	/**
-	 * 
-	 */
-	public static void main(String[] args) throws Exception
-	{
-		ASMBDIClassGenerator gen = new ASMBDIClassGenerator();
-		gen.generateProxy(MyTestClass.class, new InvocationHandler()
-		{
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-			{
-				System.out.println("Invoked handler: "+proxy+" "+method+" "+Arrays.toString(args));
-				return null;
-			}
-		});
-		
-		return;
-	}
-	
 //	public static void main(String[] args) throws Exception
 //	{
 ////		System.out.println(int.class.getName());
@@ -1497,135 +1421,4 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 ////		m.invoke(null, new Object[]{new String[0]});
 //	}
 	
-	/**
-	 *  Generate a proxy for an existing class.
-	 */
-	public void generateProxy(final Class<?> clazz, InvocationHandler handler) throws Exception
-	{
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-		
-//		ClassReader cr = new ClassReader(clazz.getName());
-		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
-//		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
-		
-//		ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, tcv)
-//		{
-//			// Change super class name
-//			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
-//			{
-//				super.visit(version, access, name+"Proxy", signature, Type.getInternalName(clazz), interfaces);
-//			}
-//			
-//			public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
-//			{
-//				return super.visitMethod(access, name, desc, signature, exceptions);
-//			}
-//		};
-		
-//		cr.accept(cv, 0);
-		
-		ClassNode cn = new ClassNode();
-		cn.version = Opcodes.V1_5;
-		cn.access = Opcodes.ACC_PUBLIC;
-		cn.name = Type.getInternalName(clazz)+"Proxy";
-		cn.superName = Type.getInternalName(clazz);
-		cn.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, "handler", "Ljava/lang/reflect/InvocationHandler;", null, null));
-		
-		MethodNode mn = new MethodNode(Opcodes.ACC_PUBLIC, "<init>", "(Ljava/lang/reflect/InvocationHandler;)V", null, null);
-		mn.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		mn.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, Type.getInternalName(clazz), "<init>", "()V"));
-		mn.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		mn.instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
-		mn.instructions.add(new FieldInsnNode(Opcodes.PUTFIELD, cn.name, "handler", "Ljava/lang/reflect/InvocationHandler;"));
-		mn.instructions.add(new InsnNode(Opcodes.RETURN));
-		
-		cn.methods.add(mn);
-		
-		ClassNode cns = new ClassNode();
-		ClassReader crs = new ClassReader(clazz.getName());
-//		crs.accept(new TraceClassVisitor(cns, new PrintWriter(System.out)), 0);
-		crs.accept(new TraceClassVisitor(cns, new ASMifier(), new PrintWriter(System.out)), 0);
-		
-		List<MethodNode> ms = cns.methods;
-		for(MethodNode m: ms)
-		{
-			if(!"<init>".equals(m.name))
-			{
-				// todo: exceptions
-				MethodNode nm = new MethodNode(m.access, m.name, m.desc, m.signature, null);
-				Type[] ptypes = Type.getArgumentTypes(nm.desc);
-				
-				// Object on which method is invoked (handler)
-				
-				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				nm.instructions.add(new FieldInsnNode(Opcodes.GETFIELD, cn.name, "handler", Type.getDescriptor(InvocationHandler.class)));
-				
-				// Arguments proxy, method, args
-				
-				// Proxy
-				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				
-				// Method
-				nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false));
-				nm.instructions.add(new LdcInsnNode(m.name));
-				nm.instructions.add(new LdcInsnNode(ptypes.length));
-				nm.instructions.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Class"));
-				for(int i=0; i<ptypes.length; i++)
-				{
-					nm.instructions.add(new InsnNode(Opcodes.DUP));
-					nm.instructions.add(new LdcInsnNode(i));
-//					System.out.println("bbb: "+ptypes[i]+" "+ptypes[i].getClassName()+" "+Type.getInternalName(SReflect.findClass(ptypes[i].getClassName(), null, null)));
-//					String ty = Type.getInternalName(SReflect.findClass(ptypes[i].getClassName(), null, null));
-//					System.out.println("bbb: "+ty);
-					nm.instructions.add(new LdcInsnNode(ptypes[i]));
-					nm.instructions.add(new InsnNode(Opcodes.AASTORE));
-				}
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getMethod", "(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false));
-
-				// Arguments
-				nm.instructions.add(new LdcInsnNode(ptypes.length));
-				nm.instructions.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Object"));
-				for(int i=0; i<ptypes.length; i++)
-				{
-					nm.instructions.add(new InsnNode(Opcodes.DUP));
-					nm.instructions.add(new LdcInsnNode(i));
-//					nm.instructions.add(new VarInsnNode(Opcodes.ALOAD, i+1));
-					makeObject(nm.instructions, ptypes[i], i+1);
-					nm.instructions.add(new InsnNode(Opcodes.AASTORE));
-				}
-				
-//				nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
-//				nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
-//				nm.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
-				
-				nm.instructions.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/lang/reflect/InvocationHandler", "invoke", "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;", true));
-				nm.instructions.add(new InsnNode(Opcodes.POP));
-				nm.instructions.add(new InsnNode(Opcodes.RETURN));
-				
-				cn.methods.add(nm);
-			}
-		}
-		
-	
-		cn.accept(tcv);
-//		cn.accept(new CheckClassAdapter(tcv));
-		
-		ByteClassLoader bcl = new ByteClassLoader(ASMBDIClassGenerator.class.getClassLoader());
-//		Class<?> cl = toClass("jadex.bdiv3.MyTestClass", cw.toByteArray(), new URLClassLoader(new URL[0], ASMBDIClassGenerator.class.getClassLoader()), null);
-		Class<?> cl = bcl.loadClass("jadex.bdiv3.MyTestClassProxy", cw.toByteArray(), true);
-		Constructor<?> c = cl.getConstructor(new Class[]{InvocationHandler.class});
-		Object o = c.newInstance(handler);
-		System.out.println("o: "+o+" "+o.getClass().getField("handler").get(o));
-		
-		try
-		{
-			((MyTestClass)o).call2("hallo", 12);
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-		}
-	}
-
 }

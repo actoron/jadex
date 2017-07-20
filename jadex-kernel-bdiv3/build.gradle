@@ -11,8 +11,8 @@ dependencies
 	compile project(':jadex-rules-eca')
 	compile project(':jadex-xml')
 	
-	compileNoAndroidRuntime 'org.ow2.asm:asm-all:5.0.3'
-//	compile 'org.ow2.asm:asm-all:5.0.3'
+	compileNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
+//	compile 'org.ow2.asm:asm-all:6.0_ALPHA'
 }
 
 task mappings << {

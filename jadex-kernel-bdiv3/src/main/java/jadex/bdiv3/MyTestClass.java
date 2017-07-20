@@ -1,20 +1,15 @@
 package jadex.bdiv3;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
-public class MyTestClass
+public class MyTestClass extends java.util.ArrayList
 {
 	protected InvocationHandler handler;
 	
 	public MyTestClass()
 	{
-		Object[] ar = new Object[3];
-		ar[0] = String.class;
-		ar[1] = "hallo";
+//		long d = 14L;
+//		System.out.println(d);
 	}
 	
 	public MyTestClass(InvocationHandler handler)
@@ -61,9 +56,11 @@ public class MyTestClass
 ////		testfield = 22;
 //	}
 	
-	public void nix()
-	{
-	}
+//	public boolean nix()
+//	{
+//		Boolean b = Boolean.TRUE;
+//		return b;
+//	}
 	
 //	public void call()
 //	{
@@ -78,13 +75,19 @@ public class MyTestClass
 //		}
 //	}
 	
-	public void call2(String hallo, int a) throws Throwable
+	public void call2(String hallo, long l) 
 	{
+		System.out.println("Hallo: "+hallo+" "+l);
 //		String mname = Thread.currentThread().getStackTrace()[1].getMethodName();
 		
 //		Method m = this.getClass().getMethod("call2", new Class[]{});
 		
 //		handler.invoke(this, m, null);
+	}
+	
+	public int add(long a, int b) 
+	{
+		return (int)a+b;
 	}
 	
 //	public static Object getNull()
