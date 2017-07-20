@@ -3,7 +3,7 @@ package jadex.bdi.benchmarks;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.fipa.SFipa;
+import jadex.bridge.fipa.FipaMessage;
 
 /**
  *  Send a specified amount of messages.
@@ -27,9 +27,9 @@ public class MessageSenderPlan	extends Plan
 		// Send messages.
 		for(int i=1; i<=msgcnt; i++)
 		{
-			IMessageEvent request = createMessageEvent("inform");
-			request.getParameterSet(SFipa.RECEIVERS).addValue(receiver);
-			request.getParameter(SFipa.REPLY_WITH).setValue("some reply id");
+			IMessageEvent<FipaMessage> request = createMessageEvent("inform");
+			request.getMessage().receiver	= receiver;
+//			request.getMessage().reply_with	= "some reply id";
 			sendMessage(request);
 			
 			getBeliefbase().getBelief("sent").setFact(Integer.valueOf(i));

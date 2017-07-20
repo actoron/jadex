@@ -810,14 +810,14 @@ public abstract class Plan
 		getGoalbase().dispatchTopLevelGoal(goal);
 	}
 
-//	/**
-//	 *  Send a message.
-//	 *  @param me	The message event.
-//	 */
-//	public IFuture<Void> sendMessage(IMessageEvent me, byte[] codecids)
-//	{	
-//		return getEventbase().sendMessage(me, codecids);
-//	}
+	/**
+	 *  Send a message.
+	 *  @param me	The message event.
+	 */
+	public IFuture<Void> sendMessage(IMessageEvent<?> me)
+	{	
+		return getEventbase().sendMessage(me);
+	}
 
 	/**
 	 *  Dispatch an internal event.
@@ -829,14 +829,14 @@ public abstract class Plan
 		getEventbase().dispatchInternalEvent(event);
 	}
 
-//	/**
-//	 *  Create a new message event.
-//	 *  @return The new message event.
-//	 */
-//	public IMessageEvent createMessageEvent(String type)
-//	{
-//		return getEventbase().createMessageEvent(type);
-//	}
+	/**
+	 *  Create a new message event.
+	 *  @return The new message event.
+	 */
+	public <T> IMessageEvent<T> createMessageEvent(String type)
+	{
+		return getEventbase().createMessageEvent(type);
+	}
 
 	/**
 	 *  Create a new intenal event.

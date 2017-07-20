@@ -9,12 +9,12 @@ import jadex.commons.future.IFuture;
  */
 public interface IEventbase extends IElement
 {
-//	/**
-//	 *  Send a message after some delay.
-//	 *  @param me	The message event.
-//	 *  @return The filter to wait for an answer.
-//	 */
-//	public IFuture<Void> sendMessage(IMessageEvent me);
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 */
+	public IFuture<Void> sendMessage(IMessageEvent<?> me);
 
 	/**
 	 *  Dispatch an event.
@@ -22,11 +22,11 @@ public interface IEventbase extends IElement
 	 */
 	public void dispatchInternalEvent(IInternalEvent event);
 
-//	/**
-//	 *  Create a new message event.
-//	 *  @return The new message event.
-//	 */
-//	public IMessageEvent createMessageEvent(String type);
+	/**
+	 *  Create a new message event.
+	 *  @return The new message event.
+	 */
+	public <T> IMessageEvent<T> createMessageEvent(String type);
 //
 //	/**
 //	 *  Create a reply to a message event.

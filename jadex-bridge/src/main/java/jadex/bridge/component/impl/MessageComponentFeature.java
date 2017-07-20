@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -111,9 +112,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public IFuture<Void> sendMessage(final IComponentIdentifier receiver, Object message, Map<String, Object> addheaderfields)
 	{
-		if (receiver == null)
-			return new Future<Void>(new IllegalArgumentException("Messages must have a receiver."));
-		
 		final MsgHeader header = new MsgHeader();
 		if (addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
@@ -307,6 +305,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/**
 	 *  Inform the component that a message has arrived.
+	 *  Called from transports (i.e. remote messages).
 	 *  
 	 *  @param header The message header.
 	 *  @param bodydata The encrypted message that arrived.
@@ -343,6 +342,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/**
 	 *  Inform the component that a message has arrived.
+	 *  Called directly for intra-platform message delivery (i.e. local messages)
+	 *  and indirectly for remote messages.
 	 *  
 	 *  @param secinfos The security meta infos.
 	 *  @param header The message header.
@@ -419,7 +420,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	protected IFuture<Void> sendMessage(final MsgHeader header, Object message)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		preprocessMessage(header, message);
+		
 		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
+		if (receiver == null)
+			return new Future<Void>(new IllegalArgumentException("Messages must have a receiver."));
+		
 		
 		if (receiver.getRoot().equals(platformid))
 		{
@@ -765,4 +772,91 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //			this.reply = reply;
 //		}
 //	}
+	
+	/** Cache for message preprocessors. */
+	protected static final Map<Class<?>, IMessagePreprocessor>	preprocessors	= Collections.synchronizedMap(new HashMap<Class<?>, IMessagePreprocessor>());
+	
+	/**
+	 *  Preprocess a message before sending.
+	 *  Allows adding special treatment of certain user message types
+	 *  like FIPA messages.
+	 *  @param header	The message header, may be changed by preprocessor.
+	 *  @param msg	The user object, may be changed by preprocessor.
+	 */
+	protected void	preprocessMessage(IMsgHeader header, Object msg)
+	{
+		if(msg!=null)
+		{
+			IMessagePreprocessor	proc;
+			Class<?>	clazz	= msg.getClass();
+			if(preprocessors.containsKey(clazz))
+			{
+				proc	= preprocessors.get(clazz);
+			}
+			else
+			{
+				// Try class itself
+				proc	= findPreprocessor(clazz);
+				
+				// Try interfaces
+				if(proc==null)
+				{
+					for(Class<?> inter: clazz.getInterfaces())
+					{
+						proc	= findPreprocessor(inter);
+						if(proc!=null)
+						{
+							break;
+						}
+					}
+				}
+				
+				// Try super classes
+				if(proc==null)
+				{
+					Class<?>	sup	= clazz;
+					while(proc==null && sup.getSuperclass()!=null)
+					{
+						sup	= sup.getSuperclass();
+						proc	= findPreprocessor(sup);
+					}
+				}
+				
+				preprocessors.put(clazz, proc);
+			}
+			
+			if(proc!=null)
+			{
+				proc.preprocessMessage(header, msg);
+			}
+		}
+	}
+	
+	/**
+	 *  Try to load a message preprocessor for a given class.
+	 */
+	protected IMessagePreprocessor	findPreprocessor(Class<?> clazz)
+	{
+		IMessagePreprocessor	ret	= null;
+		try
+		{
+			clazz	= Class.forName(clazz.getName()+"Preprocessor", true, clazz.getClassLoader());
+			ret	= (IMessagePreprocessor)clazz.newInstance();
+		}
+		catch(ClassNotFoundException e)
+		{
+			// ignore
+		}
+		catch(NoClassDefFoundError e)
+		{
+			// ignore
+		}
+		catch(Throwable t)
+		{
+			// Class found, but e.g. instantiation or class cast exception
+			throw SUtil.throwUnchecked(t);
+		}
+		
+		return ret;
+	}
 }

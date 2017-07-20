@@ -919,15 +919,15 @@ public class BDIXMLReader extends ComponentXMLReader
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "internaleventref")), new ObjectInfo(OAVBDIMetaModel.internaleventreference_type),
 //			null, null, new OAVObjectReaderHandler()));
 		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageevent")), new ObjectInfo(MMessageEvent.class),
-//			new MappingInfo(null, null, null, new AttributeInfo[]{
-//				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(msgtypeconv, remsgtypeconv)),
-//				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
-//				new SubobjectInfo[]{
-//					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
-//					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
-//				}),
-//			new LinkingInfo(atlinker)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageevent")), new ObjectInfo(MMessageEvent.class),
+			new MappingInfo(null, null, null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("type", "type"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("direction", "direction"), new AttributeConverter(dirconv, redirconv))},
+				new SubobjectInfo[]{
+					new SubobjectInfo(new XMLInfo(new QName(uri, "match")), new AccessInfo("match", "matchExpression")),
+					new SubobjectInfo(new AccessInfo(new QName(uri, "parameterset"), "parameter")),
+				}),
+			new LinkingInfo(atlinker)));
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(OAVBDIMetaModel.messageeventreference_type),
 //			null, null, new OAVObjectReaderHandler()));

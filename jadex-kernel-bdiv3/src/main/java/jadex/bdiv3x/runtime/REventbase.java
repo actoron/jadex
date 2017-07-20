@@ -1,7 +1,5 @@
 package jadex.bdiv3x.runtime;
 
-import java.util.Map;
-
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
@@ -10,7 +8,6 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
 
 /**
@@ -36,15 +33,15 @@ public class REventbase extends RElement implements IEventbase
 
 	//-------- IEventbase interface --------
 	
-//	/**
-//	 *  Send a message after some delay.
-//	 *  @param me	The message event.
-//	 *  @return The filter to wait for an answer.
-//	 */
-//	public IFuture<Void> sendMessage(IMessageEvent me)
-//	{
-//		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType());
-//	}
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 */
+	public IFuture<Void> sendMessage(IMessageEvent<?> me)
+	{
+		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage(null, me.getMessage());
+	}
 
 	/**
 	 *  Dispatch an event.

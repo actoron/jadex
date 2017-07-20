@@ -1,9 +1,9 @@
 package jadex.bdiv3.model;
 
-import java.awt.TrayIcon.MessageType;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
@@ -56,7 +56,7 @@ public class MMessageEvent extends MProcessableElement
 	protected Direction direction = Direction.SENDRECEIVE; // default of BDI XML schema
 	
 	/** The message type. */
-	protected MessageType type;
+	protected ClassInfo type;
 	
 	/** The spec. degree. */
 	protected int degree;
@@ -112,7 +112,7 @@ public class MMessageEvent extends MProcessableElement
 	 *  Get the type.
 	 *  @return The type
 	 */
-	public MessageType getType()
+	public ClassInfo getType()
 	{
 		return type;
 	}
@@ -121,7 +121,7 @@ public class MMessageEvent extends MProcessableElement
 	 *  The type to set.
 	 *  @param type The type to set
 	 */
-	public void setType(MessageType type)
+	public void setType(ClassInfo type)
 	{
 		this.type = type;
 	}

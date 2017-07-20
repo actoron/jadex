@@ -20,6 +20,7 @@ public interface IInternalMessageFeature
 	
 	/**
 	 *  Inform the component that a message has arrived.
+	 *  Called from transports (i.e. remote messages).
 	 *  
 	 *  @param header The message header.
 	 *  @param bodydata The encrypted message that arrived.
@@ -28,6 +29,8 @@ public interface IInternalMessageFeature
 	
 	/**
 	 *  Inform the component that a message has arrived.
+	 *  Called directly for intra-platform message delivery (i.e. local messages)
+	 *  and indirectly for remote messages.
 	 *  
 	 *  @param secinfos The security meta infos.
 	 *  @param header The message header.
