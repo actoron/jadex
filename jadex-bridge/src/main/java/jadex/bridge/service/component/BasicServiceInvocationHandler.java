@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
@@ -501,7 +502,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info, scope);
-			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			ret	= (IInternalService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			try
+			{
+				((IService)service).getServiceIdentifier();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			
 			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
@@ -715,7 +725,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
-		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader, ia.getModel().getAllImports())}, handler); //sid.getServiceType()
+		return (IInternalService)ProxyFactory.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader, ia.getModel().getAllImports())}, handler); //sid.getServiceType()
 	}
 
 	/**
@@ -769,7 +779,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> ty = info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 			if(ty==null)
 				throw new IllegalArgumentException("Type must not null: "+ty);
-			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 
+			ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 
 		
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed

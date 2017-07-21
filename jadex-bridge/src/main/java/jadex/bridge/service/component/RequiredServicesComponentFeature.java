@@ -9,6 +9,7 @@ import java.util.Map;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -354,7 +355,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> T getMultiService(String reqname, Class<T> multitype)
 	{
-		return (T)Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{multitype}, 
+		return (T)ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{multitype}, 
 			new MultiServiceInvocationHandler(getComponent(), reqname, multitype));
 	}
 	

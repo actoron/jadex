@@ -17,6 +17,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
@@ -883,7 +884,7 @@ public class RemoteReferenceModule
 			// c) enhance xml to annotate the resource the classes belong to (best solution)
 			// currently just uses the 'global' platform classloader 
 			
-			ret = Proxy.newProxyInstance(classloader, 
+			ret = ProxyFactory.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
 			
 			incProxyCount(pr.getRemoteReference());

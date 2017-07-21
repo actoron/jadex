@@ -10,6 +10,7 @@ dependencies
 	compile project(':jadex-kernel-micro')
 	compile project(':jadex-rules-eca')
 	compile project(':jadex-xml')
+	compile project(':jadex-bytecode-tools')
 	
 	compileNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
 //	compile 'org.ow2.asm:asm-all:6.0_ALPHA'

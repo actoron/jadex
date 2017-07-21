@@ -9,6 +9,7 @@ import java.util.List;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
@@ -160,7 +161,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 											return sfut;
 										}
 									});
-									Object proxy = Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, clz}, h);
+									Object proxy = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, clz}, h);
 								
 									try
 									{

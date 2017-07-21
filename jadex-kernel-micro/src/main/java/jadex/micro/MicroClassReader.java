@@ -28,6 +28,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -2043,7 +2044,7 @@ public class MicroClassReader
 					nin[i] = getClass(in[i], cl);
 				}
 				
-				ret = (T)Proxy.newProxyInstance(cl, nin, new InvocationHandler()
+				ret = (T)ProxyFactory.newProxyInstance(cl, nin, new InvocationHandler()
 				{
 					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 					{

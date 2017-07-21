@@ -51,6 +51,7 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
+import jadex.bytecode.SASM;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

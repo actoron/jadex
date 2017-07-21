@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -39,7 +40,7 @@ public class SBootstrapLoader
 			Object	fut	= SReflect.getMethods(cfclass, "loadModel")[0].invoke(cfac, new Object[]{model, null, null});
 			// .addResultListener(new DelegationResultListener<IModelInfo>(ret)
 			fut.getClass().getMethod("addResultListener", new Class<?>[]{rlclass}).invoke(fut, new Object[]{
-				Proxy.newProxyInstance(cl, new Class<?>[]{rlclass}, new InvocationHandler()
+				ProxyFactory.newProxyInstance(cl, new Class<?>[]{rlclass}, new InvocationHandler()
 			{
 				public Object invoke(Object proxy, Method method, Object[] args)	throws Throwable
 				{

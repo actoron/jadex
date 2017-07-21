@@ -3,6 +3,7 @@ package jadex.extension.ws.invoke;
 import java.lang.reflect.Proxy;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Agent;
@@ -37,7 +38,7 @@ public class WebServiceAgent
 	 */
 	public Object createServiceImplementation(Class<?> type, WebServiceMappingInfo mapping)
 	{
-		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+		return ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
 			new WebServiceWrapperInvocationHandler(agent, mapping));
 	}
 }
