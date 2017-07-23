@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
@@ -103,7 +104,7 @@ public class ValidationInterceptor extends ComponentThreadInterceptor
 //			IFuture<Boolean>	valid	= ser.isValid();
 			
 			// Call isValid() directly for speed.
-			BasicServiceInvocationHandler	handler	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
+			BasicServiceInvocationHandler	handler	= (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(sic.getProxy());
 			Object	service	= handler.getService();
 			IFuture<Boolean>	valid;
 			

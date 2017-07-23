@@ -215,6 +215,7 @@ public class SASM
 		}
 		else 
 		{
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, type.getInternalName()));
 			nl.add(new InsnNode(Opcodes.ARETURN));
 		}
 	}
@@ -294,14 +295,14 @@ public class SASM
 	 *  @param clazz The clazz. 
 	 *  @return The class node.
 	 */
-	public static ClassNode getClassNode(Class<?> clazz)
+	public static ClassNode getClassNode(Class<?> clazz, ClassLoader classloader)
 	{
 		ClassNode cns = null;
 		
 		try
 		{
 			cns = new ClassNode();
-			ClassReader crs = new ClassReader(clazz.getName());
+			ClassReader crs = new ClassReader(SUtil.getResource(clazz.getName().replace(".", "/")+".class", classloader));
 			crs.accept(cns, 0);
 			return cns;
 		}

@@ -1,4 +1,4 @@
-package jadex.micro.examples.microservice;
+package jadex.micro.examples.microservice.async;
 
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

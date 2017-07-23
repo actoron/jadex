@@ -18,6 +18,7 @@ import java.util.Set;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
@@ -764,7 +765,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		T service = getProvidedService(clazz);
 		if(service!=null)
 		{
-			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 			ret = clazz.cast(handler.getDomainService());
 		}
 		
@@ -784,7 +785,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		Object service = getProvidedService(name);
 		if(service!=null)
 		{
-			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 			ret = handler.getDomainService();
 		}
 		
@@ -841,9 +842,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			if(service!=null)
 			{
-				if(Proxy.isProxyClass(service.getClass()))
+				if(ProxyFactory.isProxyClass(service.getClass()))
 				{
-					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 					ret = handler.getDomainService();
 				}
 				else
@@ -1242,7 +1243,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
-		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 		handler.addServiceInterceptor(interceptor, pos);
 	}
 	
@@ -1253,7 +1254,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
-		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 		handler.removeServiceInterceptor(interceptor);
 	}
 	
@@ -1264,7 +1265,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public IServiceInvocationInterceptor[] getInterceptors(Object service)
 	{
-		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 		return handler.getInterceptors();
 	}
 }

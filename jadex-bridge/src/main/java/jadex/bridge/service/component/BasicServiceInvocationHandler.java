@@ -212,7 +212,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		}
 		else if(args!=null && args.length==1 && args[0]!=null && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
 		{
-			Object	cmp	= Proxy.isProxyClass(args[0].getClass()) ? Proxy.getInvocationHandler(args[0]) : args[0];
+			Object	cmp	= ProxyFactory.isProxyClass(args[0].getClass()) ? ProxyFactory.getInvocationHandler(args[0]) : args[0];
 			ret	= equals(cmp);
 		}
 		else
@@ -503,14 +503,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info, scope);
 			ret	= (IInternalService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
-			try
-			{
-				((IService)service).getServiceIdentifier();
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+//			try
+//			{
+//				((IService)service).getServiceIdentifier();
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
 			
 			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
@@ -519,8 +519,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			{
 				if(!service.getClass().isAnnotationPresent(Service.class)
 					// Hack!!! BPMN uses a proxy as service implementation.
-					&& !(Proxy.isProxyClass(service.getClass())
-					&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
+					&& !(ProxyFactory.isProxyClass(service.getClass())
+					&& ProxyFactory.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
 				{
 					//throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
 					ia.getLogger().warning("Pojo service should declare @Service annotation: "+service.getClass());
@@ -971,9 +971,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static boolean isRequiredServiceProxy(Object service)
 	{
 		boolean ret = false;
-		if(Proxy.isProxyClass(service.getClass()))
+		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
-			Object tmp = Proxy.getInvocationHandler(service);
+			Object tmp = ProxyFactory.getInvocationHandler(service);
 			if(tmp instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)tmp;
@@ -991,9 +991,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static boolean isProvidedServiceProxy(Object service)
 	{
 		boolean ret = false;
-		if(Proxy.isProxyClass(service.getClass()))
+		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
-			Object tmp = Proxy.getInvocationHandler(service);
+			Object tmp = ProxyFactory.getInvocationHandler(service);
 			if(tmp instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)tmp;

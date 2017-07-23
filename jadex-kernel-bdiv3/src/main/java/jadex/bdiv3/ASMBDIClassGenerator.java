@@ -1258,22 +1258,26 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		}
 //	}
 	
-//	public static void main(String[] args) throws Exception
-//	{
-////		System.out.println(int.class.getName());
-//		
-////		Method m = SReflect.getMethods(BDIAgent.class, "writeArrayField")[0];
-////		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
-////		for(Method m: ms)
-////		{
-////			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
-////		}
-//				
-//		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+	public static void main(String[] args) throws Exception
+	{
+//		System.out.println(int.class.getName());
+		
+//		Method m = SReflect.getMethods(BDIAgent.class, "writeArrayField")[0];
+//		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
+//		for(Method m: ms)
+//		{
+//			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
+//		}
+				
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+		
 ////		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
-//		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
+		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
 ////		CheckClassAdapter cc = new CheckClassAdapter(tcv);
-//		
+
+		ClassNode cn = SASM.getClassNode(MyTestClass.class, null);
+		cn.accept(tcv);
+	}	
 ////		final String classname = "lars/Lars";
 ////		final String supername = "jadex/bdiv3/MyTestClass";
 //		

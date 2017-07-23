@@ -10,6 +10,7 @@ import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.BasicService;
@@ -130,7 +131,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Object obj = Proxy.isProxyClass(si.getDomainService().getClass())? Proxy.getInvocationHandler(si.getDomainService()): si.getDomainService();
+		Object obj = ProxyFactory.isProxyClass(si.getDomainService().getClass())? ProxyFactory.getInvocationHandler(si.getDomainService()): si.getDomainService();
 		
 		Method[] methods = SReflect.getAllMethods(obj.getClass());
 		Method found = null;

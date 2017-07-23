@@ -132,6 +132,10 @@ public class MicroserviceClassReader
 				sif = iface;
 			}
 		}
+		if(sif==null && MicroClassReader.isAnnotationPresent(clazz, Service.class, cl))
+		{
+			sif = clazz;
+		}
 		
 		ProvidedServiceImplementation impl = new ProvidedServiceImplementation(clazz, null, Implementation.PROXYTYPE_DECOUPLED, null, null);
 		ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz.getName()+"ms", sif, impl, null, null, null);

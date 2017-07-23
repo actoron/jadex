@@ -17,6 +17,7 @@ import java.util.Set;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
@@ -267,7 +268,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		
 		if(Proxy.isProxyClass(target.getClass()))
 		{
-			Object handler = Proxy.getInvocationHandler(target);
+			Object handler = ProxyFactory.getInvocationHandler(target);
 			if(handler instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
@@ -279,7 +280,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			else 
 			{
 				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.platform.service.remote
-				ret = Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
+				ret = ProxyFactory.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 			}
 		}
 		return ret;

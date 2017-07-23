@@ -154,7 +154,7 @@ public class RemoteReferenceModule
 		// Strip required service proxy if any, to avoid exception due to being called from wrong thread.
 		if(Proxy.isProxyClass(target.getClass()))
 		{
-			InvocationHandler	handler	= Proxy.getInvocationHandler(target);
+			InvocationHandler	handler	= ProxyFactory.getInvocationHandler(target);
 			if(handler instanceof BasicServiceInvocationHandler)
 			{
 				if(((BasicServiceInvocationHandler)handler).isRequired())
@@ -628,7 +628,7 @@ public class RemoteReferenceModule
 		{
 			if(Proxy.isProxyClass(target.getClass()))
 			{
-				Object handler = Proxy.getInvocationHandler(target);
+				Object handler = ProxyFactory.getInvocationHandler(target);
 				if(handler instanceof BasicServiceInvocationHandler)
 				{
 					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
@@ -645,7 +645,7 @@ public class RemoteReferenceModule
 				}
 				else if(handler instanceof RemoteMethodInvocationHandler)
 				{
-					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)Proxy.getInvocationHandler(target);
+					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
 					ret	= rmih.pr.getRemoteReference();
 				}
 			}

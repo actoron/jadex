@@ -1,4 +1,4 @@
-package jadex.micro.examples.microservice;
+package jadex.micro.examples.microservice.sync;
 
 import jadex.bridge.service.annotation.Service;
 

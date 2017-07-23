@@ -15,6 +15,6 @@ public class GetComponentFeatureMethodReplacement implements IMethodReplacement
 	 */
 	public Object invoke(Object obj, Object[] args)
 	{
-		return ProxyFactory.newProxyInstance(obj.getClass().getClassLoader(), new Class[]{(Class<?>)args[0]}, Proxy.getInvocationHandler(obj));
+		return ProxyFactory.newProxyInstance(obj.getClass().getClassLoader(), new Class[]{(Class<?>)args[0]}, ProxyFactory.getInvocationHandler(obj));
 	}
 }

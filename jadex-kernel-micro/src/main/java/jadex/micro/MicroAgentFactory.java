@@ -409,7 +409,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		Collection<IComponentFeatureFactory> ret = features;
 //		if(model.getFeatures().length>0)
 //			ret = SUtil.arrayToSet(model.getFeatures());
-		return new Future<Collection<IComponentFeatureFactory>>(model.getFeatures().length==0? features: (Collection)SUtil.arrayToList(model.getFeatures()));
+		Collection<IComponentFeatureFactory> ret = model.getFeatures().length==0? features: (Collection)SUtil.arrayToList(model.getFeatures());
+//		System.out.println("getCompFeat: "+ret);
+		return new Future<Collection<IComponentFeatureFactory>>(ret);
 	}
 
 //	/**

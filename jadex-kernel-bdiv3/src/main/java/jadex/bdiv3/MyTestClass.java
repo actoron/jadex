@@ -8,8 +8,9 @@ public class MyTestClass extends java.util.ArrayList
 	
 	public MyTestClass()
 	{
-//		long d = 14L;
-//		System.out.println(d);
+		Object o = new Object();
+		String st = o.toString();
+		System.out.println(st);
 	}
 	
 	public MyTestClass(InvocationHandler handler)
@@ -74,6 +75,11 @@ public class MyTestClass extends java.util.ArrayList
 //			SUtil.rethrowAsUnchecked(e);
 //		}
 //	}
+	
+	public String[] abc() 
+	{
+		return new String[0];
+	}
 	
 	public void call2(String hallo, long l) 
 	{

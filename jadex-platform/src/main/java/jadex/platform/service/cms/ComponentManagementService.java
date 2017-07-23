@@ -1,6 +1,7 @@
 package jadex.platform.service.cms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -482,11 +483,21 @@ public class ComponentManagementService implements IComponentManagementService
 														}
 														else
 														{
-															factory.getComponentFeatures(lmodel)
-																.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
+//															System.out.print("<"+lmodel.getName()+" "+factory.getClass());
+															IFuture fut = factory.getComponentFeatures(lmodel);
+															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
 															{
 																public void customResultAvailable(Collection<IComponentFeatureFactory> features)
 																{
+//															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Object, IComponentIdentifier>(inited)
+//															{
+//																public void customResultAvailable(Object o)
+//																{
+//																	if(!(o instanceof Collection))
+//																		System.out.println("ppp: "+o);
+																	
+//																	Collection<IComponentFeatureFactory> features = (Collection<IComponentFeatureFactory>)o;
+//																	System.out.println(">");
 																	// Create id and adapter.
 																	
 																	final BasicComponentIdentifier cid;

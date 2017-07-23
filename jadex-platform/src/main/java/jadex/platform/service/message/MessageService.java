@@ -42,6 +42,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.MessageFailureException;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.component.IExecutionFeature;
@@ -625,8 +626,8 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				Class<?> clazz = SReflect.getClass(type);
 				return Proxy.isProxyClass(clazz) &&
-					(Proxy.getInvocationHandler(object) instanceof BasicServiceInvocationHandler
-						|| Proxy.getInvocationHandler(object) instanceof RemoteMethodInvocationHandler);
+					(ProxyFactory.getInvocationHandler(object) instanceof BasicServiceInvocationHandler
+						|| ProxyFactory.getInvocationHandler(object) instanceof RemoteMethodInvocationHandler);
 			}
 		});
 		
