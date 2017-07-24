@@ -1,10 +1,11 @@
-package jadex.micro.examples.microservice.pojoservice;
+package jadex.micro.examples.microservice.multi;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.micro.examples.microservice.sync.ISyncService;
 
 /**
  *  An example microservice user.
@@ -20,7 +21,9 @@ public class UserMicroservice
 	@ServiceStart
 	public void start(IInternalAccess component)
 	{
-		PojoMicroservice ser = SServiceProvider.getService(component, PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		System.out.println(ser.sayHello("Lars"));
+		ISyncService sser = SServiceProvider.getService(component, ISyncService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		ISyncService aser = SServiceProvider.getService(component, ISyncService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		System.out.println(sser.sayHello("A")+" "+aser.sayHello("B"));
+		System.out.println(sser.sayHello("C")+" "+aser.sayHello("D"));
 	}
 }

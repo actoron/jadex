@@ -13,5 +13,5 @@ public interface IAsyncService
 	 *  Say hello method.
 	 *  @param name The name.
 	 */
-	public IFuture<String> sayHello(String name);
+	public IFuture<String> sayMeHello(String name);
 }

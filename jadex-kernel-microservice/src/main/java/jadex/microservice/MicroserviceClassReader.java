@@ -3,6 +3,7 @@ package jadex.microservice;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bridge.ClassInfo;
@@ -124,22 +125,37 @@ public class MicroserviceClassReader
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
-		Class<?> sif = null;
+		List<Class<?>> sifs = new ArrayList<Class<?>>();
 		for(Class<?> iface: clazz.getInterfaces())
 		{
 			if(MicroClassReader.isAnnotationPresent(iface, Service.class, cl))
 			{
-				sif = iface;
+				sifs.add(iface);
 			}
 		}
-		if(sif==null && MicroClassReader.isAnnotationPresent(clazz, Service.class, cl))
+		if(sifs.size()==0 && MicroClassReader.isAnnotationPresent(clazz, Service.class, cl))
 		{
-			sif = clazz;
+			sifs.add(clazz);
 		}
 		
-		ProvidedServiceImplementation impl = new ProvidedServiceImplementation(clazz, null, Implementation.PROXYTYPE_DECOUPLED, null, null);
-		ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz.getName()+"ms", sif, impl, null, null, null);
-		modelinfo.addProvidedService(psi);
+		
+		if(sifs.size()>0)
+		{
+			String firstname = sifs.get(0).getName()+"ms";
+			String exp = "$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\""+firstname+"\")";
+			boolean first = true;
+			for(Class<?> sif: sifs)
+			{
+				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(first? clazz: null, first? null: exp, Implementation.PROXYTYPE_DECOUPLED, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(sif.getName()+"ms", sif, impl, null, null, null);
+				modelinfo.addProvidedService(psi);
+				first = false;
+			}
+		}
+		else
+		{
+			throw new RuntimeException("No service interface/class found.");
+		}
 	}
 	
 	/**

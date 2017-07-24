@@ -13,7 +13,7 @@ public class AsyncMicroservice implements IAsyncService
 	 *  Say hello method.
 	 *  @param name The name.
 	 */
-	public IFuture<String> sayHello(String name)
+	public IFuture<String> sayMeHello(String name)
 	{
 		return new Future<String>("Hello "+name);
 	}
