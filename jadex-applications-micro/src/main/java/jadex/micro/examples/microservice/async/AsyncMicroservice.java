@@ -4,7 +4,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Microservice example with asynchronous interface.
  */
 //@Microservice
 public class AsyncMicroservice implements IAsyncService

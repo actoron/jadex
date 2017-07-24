@@ -2,6 +2,9 @@ package jadex.micro.examples.microservice.pojoservice;
 
 import jadex.bridge.service.annotation.Service;
 
+/**
+ *  This example shows a microservice as Java pojo
+ */
 @Service
 public class PojoMicroservice
 {

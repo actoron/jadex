@@ -6,14 +6,18 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
+/**
+ *  Micro agent that uses the pojo service.
+ *  Search is here done by using the implementation class not the interface.
+ */
 @Agent
 public class UserAgent
 {	
-	@Agent
-	protected IInternalAccess agent;
-
+	/**
+	 *  The agent body is called once on agent startup.
+	 */
 	@AgentBody
-	public void body()
+	public void body(IInternalAccess agent)
 	{
 		PojoMicroservice ser = SServiceProvider.getService(agent, PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		System.out.println(ser.sayHello("Lars"));

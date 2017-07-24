@@ -449,7 +449,6 @@ public class SServiceProvider
 		final Future<T> ret = new Future<T>();
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
 		{
-			
 			public void customResultAvailable(Void result)
 			{
 				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);

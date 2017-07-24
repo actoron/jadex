@@ -4,8 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
@@ -20,7 +22,9 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.IParameterGuesser;
 import jadex.commons.SReflect;
+import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -79,6 +83,17 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/** The component. */
+	protected IInternalAccess ia;
+	
+	/**
+	 *  Create a new ResolveInterceptor.
+	 */
+	public ResolveInterceptor(IInternalAccess ia)
+	{
+		this.ia = ia;
 	}
 	
 	/**
@@ -164,9 +179,18 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			if(found!=null)
 			{
-				final ServiceInvocationContext	domainsic	= new ServiceInvocationContext(sic);
+				final ServiceInvocationContext domainsic = new ServiceInvocationContext(sic);
 				domainsic.setMethod(found);
 				domainsic.setObject(obj);
+				// Guess parameters for allowing injected value in pojo methods
+				IParameterGuesser guesser = ia.getParameterGuesser();
+				List<Object> args = new ArrayList<Object>();
+				for(int i=0; i<found.getParameterTypes().length; i++)
+				{
+					args.add(guesser.guessParameter(found.getParameterTypes()[i], false));
+				}
+				domainsic.setArguments(args);
+				
 				sic.setObject(si.getManagementService());
 				
 				if(firstorig)

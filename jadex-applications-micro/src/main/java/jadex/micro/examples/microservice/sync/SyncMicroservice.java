@@ -1,7 +1,7 @@
 package jadex.micro.examples.microservice.sync;
 
 /**
- * 
+ *  Microservice example with synchronous interface.
  */
 //@Microservice
 public class SyncMicroservice implements ISyncService

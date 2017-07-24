@@ -258,7 +258,20 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //							System.out.println("call method init");
 						try
 						{
-							FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+							// Although normally ret.getResult() is a future there are cases when not
+							// because of mapping the method during the call (could be future method and inner one is not)
+							if(sic.getResult() instanceof Exception)
+							{
+								fret.setException((Exception)sic.getResult());
+							}
+							else if(sic.getResult()!=null && !(sic.getResult() instanceof IFuture))
+							{
+								fret.setResult(sic.getResult());
+							}
+							else
+							{
+								FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+							}
 						}
 						catch(Exception e)
 						{
@@ -692,7 +705,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor(ia));
 			if(!(service instanceof IService))
 			{
-				handler.addFirstServiceInterceptor(new ResolveInterceptor());
+				handler.addFirstServiceInterceptor(new ResolveInterceptor(ia));
 			}
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
 			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
