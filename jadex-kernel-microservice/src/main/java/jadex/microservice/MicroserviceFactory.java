@@ -54,7 +54,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	public static final String	FILETYPE_MICROSERVICE = "Micro Service";
 	
 	/** The image icon. */
-	protected static final LazyResource ICON = new LazyResource(MicroserviceFactory.class, "/jadex/microservice/images/microservice2.png");
+	protected static final LazyResource ICON = new LazyResource(MicroserviceFactory.class, "/jadex/microservice/images/microservice.png");
 	
 	//-------- attributes --------
 	
