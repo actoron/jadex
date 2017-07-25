@@ -7,15 +7,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,6 +24,7 @@ import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.fipa.FipaMessage;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
@@ -55,7 +50,7 @@ public class FipaMessagePanel extends JPanel
 	//-------- attributes --------
 
 	/** The displayed message. */
-	protected Map	message;
+	protected FipaMessage	message;
 
 	/** Flag indicating if editing is allowed. */
 	protected boolean	editable;
@@ -67,22 +62,23 @@ public class FipaMessagePanel extends JPanel
 	protected JTextField	tfreceivers;
 	protected JButton	editreceivers;
 	protected JButton	clearreceivers;
-	protected JTextField	tfreplyto;
-	protected JButton	setreplyto;
-	protected JButton	clearreplyto;
-	protected JTextField	encoding;
-	protected JTextField	language;
-	protected JTextField	ontology;
-	protected JComboBox	protocol;
+//	protected JTextField	tfreplyto;
+//	protected JButton	setreplyto;
+//	protected JButton	clearreplyto;
+//	protected JTextField	encoding;
+//	protected JTextField	language;
+//	protected JTextField	ontology;
+//	protected JComboBox	protocol;
 	protected JTextField	convid;
-	protected JTextField	inreplyto;
-	protected JTextField	replywith;
-	protected JFormattedTextField	replyby;
+//	protected JTextField	inreplyto;
+//	protected JTextField	replywith;
+//	protected JFormattedTextField	replyby;
 	protected JTextArea	content;
 
 	protected IComponentIdentifier	sender;
-	protected IComponentIdentifier	replyto;
-	protected IComponentIdentifier[]	receivers;
+//	protected IComponentIdentifier	replyto;
+//	protected IComponentIdentifier[]	receivers;
+	protected IComponentIdentifier	receiver;
 	
 	//-------- constructors --------
 
@@ -93,7 +89,7 @@ public class FipaMessagePanel extends JPanel
 	 *  @param cmshandler	The shared CMS update handler.
 	 *  @param comptree	The comptree (if any) will be repainted when new receivers are set in the panel.
 	 */
-	public FipaMessagePanel(Map message, IExternalAccess access, IExternalAccess jccaccess, CMSUpdateHandler cmshandler,
+	public FipaMessagePanel(FipaMessage message, IExternalAccess access, IExternalAccess jccaccess, CMSUpdateHandler cmshandler,
 		ComponentIconCache iconcache,  final Component comptree)
 	{
 		super(new GridBagLayout());
@@ -124,26 +120,26 @@ public class FipaMessagePanel extends JPanel
 		clearreceivers.setMargin(new Insets(0,0,0,0));
 		clearreceivers.setToolTipText("Clear receiver agent identifiers");
 
-		tfreplyto = new JTextField(DEFCOLS);
-		tfreplyto.setEditable(false);
-
-		setreplyto	= new JButton(icons.getIcon("edit"));
-		setreplyto.setMargin(new Insets(0,0,0,0));
-		setreplyto.setToolTipText("Set reply-to agent identifier");
-
-		clearreplyto	= new JButton(icons.getIcon("delete"));
-		clearreplyto.setMargin(new Insets(0,0,0,0));
-		clearreplyto.setToolTipText("Remove reply-to agent identifier");
-
-		language = new JTextField(DEFCOLS);
-		encoding = new JTextField(DEFCOLS);
-		ontology = new JTextField(DEFCOLS);
-		protocol = new JComboBox(SFipa.PROTOCOLS.toArray());
-		protocol.setEditable(true);
+//		tfreplyto = new JTextField(DEFCOLS);
+//		tfreplyto.setEditable(false);
+//
+//		setreplyto	= new JButton(icons.getIcon("edit"));
+//		setreplyto.setMargin(new Insets(0,0,0,0));
+//		setreplyto.setToolTipText("Set reply-to agent identifier");
+//
+//		clearreplyto	= new JButton(icons.getIcon("delete"));
+//		clearreplyto.setMargin(new Insets(0,0,0,0));
+//		clearreplyto.setToolTipText("Remove reply-to agent identifier");
+//
+//		language = new JTextField(DEFCOLS);
+//		encoding = new JTextField(DEFCOLS);
+//		ontology = new JTextField(DEFCOLS);
+//		protocol = new JComboBox(SFipa.PROTOCOLS.toArray());
+//		protocol.setEditable(true);
 		convid = new JTextField(DEFCOLS);
-		inreplyto = new JTextField(DEFCOLS);
-		replywith = new JTextField(DEFCOLS);
-		replyby = new JFormattedTextField(DateFormat.getDateInstance());
+//		inreplyto = new JTextField(DEFCOLS);
+//		replywith = new JTextField(DEFCOLS);
+//		replyby = new JFormattedTextField(DateFormat.getDateInstance());
 		content = new JTextArea(3,DEFCOLS);
 
 		JLabel	label;
@@ -203,16 +199,16 @@ public class FipaMessagePanel extends JPanel
 		participants.add(editreceivers, butcons1);
 		participants.add(clearreceivers, butcons2);
 
-		leftcons.gridy	= rightcons.gridy	= butcons1.gridy	= butcons2.gridy	= row++;
-		label	= new JLabel("Reply_to");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		participants.add(label, leftcons);
-		rightcons.gridwidth	= 1;
-		participants.add(tfreplyto, rightcons);
-		rightcons.gridwidth	= GridBagConstraints.REMAINDER;
-		participants.add(setreplyto, butcons1);
-		participants.add(clearreplyto, butcons2);
+//		leftcons.gridy	= rightcons.gridy	= butcons1.gridy	= butcons2.gridy	= row++;
+//		label	= new JLabel("Reply_to");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		participants.add(label, leftcons);
+//		rightcons.gridwidth	= 1;
+//		participants.add(tfreplyto, rightcons);
+//		rightcons.gridwidth	= GridBagConstraints.REMAINDER;
+//		participants.add(setreplyto, butcons1);
+//		participants.add(clearreplyto, butcons2);
 
 		
 		// Conversation control.
@@ -222,12 +218,12 @@ public class FipaMessagePanel extends JPanel
 		this.add(convcontrol, boxcons);
 		row	= 0;
 
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("Protocol");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		convcontrol.add(label, leftcons);
-		convcontrol.add(protocol, rightcons);
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("Protocol");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		convcontrol.add(label, leftcons);
+//		convcontrol.add(protocol, rightcons);
 
 		leftcons.gridy	= rightcons.gridy	= row++;
 		label	= new JLabel("Conversation_id");
@@ -236,55 +232,55 @@ public class FipaMessagePanel extends JPanel
 		convcontrol.add(label, leftcons);
 		convcontrol.add(convid, rightcons);
 
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("Reply_with");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		convcontrol.add(label, leftcons);
-		convcontrol.add(replywith, rightcons);
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("Reply_with");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		convcontrol.add(label, leftcons);
+//		convcontrol.add(replywith, rightcons);
+//
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("In_reply_to");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		convcontrol.add(label, leftcons);
+//		convcontrol.add(inreplyto, rightcons);
+//
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("Reply_by");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		convcontrol.add(label, leftcons);
+//		convcontrol.add(replyby, rightcons);
 
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("In_reply_to");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		convcontrol.add(label, leftcons);
-		convcontrol.add(inreplyto, rightcons);
 
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("Reply_by");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		convcontrol.add(label, leftcons);
-		convcontrol.add(replyby, rightcons);
-
-
-		// Content description.
-		boxcons.gridy	= box++;
-		JPanel	contentdesc	= new JPanel(new GridBagLayout());
-		contentdesc.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Content Description "));
-		this.add(contentdesc, boxcons);
-		row	= 0;
-
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("Language");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		contentdesc.add(label, leftcons);
-		contentdesc.add(language, rightcons);
-
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("Encoding");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		contentdesc.add(label, leftcons);
-		contentdesc.add(encoding, rightcons);
-
-		leftcons.gridy	= rightcons.gridy	= row++;
-		label	= new JLabel("Ontology");
-		label.setMinimumSize(labeldim);
-		label.setPreferredSize(labeldim);
-		contentdesc.add(label, leftcons);
-		contentdesc.add(ontology, rightcons);
+//		// Content description.
+//		boxcons.gridy	= box++;
+//		JPanel	contentdesc	= new JPanel(new GridBagLayout());
+//		contentdesc.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Content Description "));
+//		this.add(contentdesc, boxcons);
+//		row	= 0;
+//
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("Language");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		contentdesc.add(label, leftcons);
+//		contentdesc.add(language, rightcons);
+//
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("Encoding");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		contentdesc.add(label, leftcons);
+//		contentdesc.add(encoding, rightcons);
+//
+//		leftcons.gridy	= rightcons.gridy	= row++;
+//		label	= new JLabel("Ontology");
+//		label.setMinimumSize(labeldim);
+//		label.setPreferredSize(labeldim);
+//		contentdesc.add(label, leftcons);
+//		contentdesc.add(ontology, rightcons);
 
 		
 		// Content.
@@ -322,43 +318,46 @@ public class FipaMessagePanel extends JPanel
 				tfsender.setText("");
 			}
 		});
-		setreplyto.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				IComponentIdentifier	aid	= agentselector.selectAgent(replyto);
-				if(aid!=null)
-				{
-					replyto	= aid;
-					tfreplyto.setText(aid.toString());
-					tfreplyto.setCaretPosition(0);
-				}
-			}
-		});
-		clearreplyto.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				replyto	= null;
-				tfreplyto.setText("");
-			}
-		});
+//		setreplyto.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				IComponentIdentifier	aid	= agentselector.selectAgent(replyto);
+//				if(aid!=null)
+//				{
+//					replyto	= aid;
+//					tfreplyto.setText(aid.toString());
+//					tfreplyto.setCaretPosition(0);
+//				}
+//			}
+//		});
+//		clearreplyto.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				replyto	= null;
+//				tfreplyto.setText("");
+//			}
+//		});
 		editreceivers.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier[]	aids	= agentselector.selectAgents(receivers);
+				IComponentIdentifier[]	aids	= agentselector.selectAgents(new IComponentIdentifier[]{receiver});
 				if(aids!=null)
 				{
 					if(aids.length>0)
 					{
-						receivers	= aids;
-						tfreceivers.setText(SUtil.arrayToString(receivers));
+						receiver	= aids[0];
+						tfreceivers.setText(receiver.toString());
+//						receivers	= aids;
+//						tfreceivers.setText(SUtil.arrayToString(receivers));
 						tfreceivers.setCaretPosition(0);
 					}
 					else
 					{
-						receivers	= null;
+						receiver	= null;
+//						receivers	= null;
 						tfreceivers.setText("");
 					}
 				}
@@ -370,9 +369,9 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				receivers	= null;
+				receiver	= null;
 				tfreceivers.setText("");
-				FipaMessagePanel.this.message.remove(SFipa.RECEIVERS);
+				FipaMessagePanel.this.message.setReceiver(null);
 				if(comptree!=null)
 					comptree.repaint();
 			}
@@ -384,48 +383,49 @@ public class FipaMessagePanel extends JPanel
 	/**
 	 *  Set the message to be displayed.
 	 */
-	public void	setMessage(Map message)
+	public void	setMessage(FipaMessage message)
 	{
 		this.message = message;
 
 		// Extract parameter values.
 		
-		performative.setSelectedItem(getParameter(SFipa.PERFORMATIVE));
-		tfsender.setText(getParameter(SFipa.SENDER));
-		tfreplyto.setText(getParameter(SFipa.REPLY_TO));
-		tfreceivers.setText(getParameter(SFipa.RECEIVERS));
-		content.setText(getParameter(SFipa.CONTENT));
-		language.setText(getParameter(SFipa.LANGUAGE));
-		encoding.setText(getParameter(SFipa.ENCODING));
-		ontology.setText(getParameter(SFipa.ONTOLOGY));
-		protocol.setSelectedItem(getParameter(SFipa.PROTOCOL));
-		convid.setText(getParameter(SFipa.CONVERSATION_ID));
-		inreplyto.setText(getParameter(SFipa.IN_REPLY_TO));
-		replywith.setText(getParameter(SFipa.REPLY_WITH));
-		replyby.setText(getParameter(SFipa.REPLY_BY));
+		performative.setSelectedItem(message.getPerformative());
+		tfsender.setText(""+message.getSender());
+//		tfreplyto.setText(getParameter(SFipa.REPLY_TO));
+		tfreceivers.setText(""+message.getReceiver());
+		content.setText(""+message.getContent());
+//		language.setText(getParameter(SFipa.LANGUAGE));
+//		encoding.setText(getParameter(SFipa.ENCODING));
+//		ontology.setText(getParameter(SFipa.ONTOLOGY));
+//		protocol.setSelectedItem(getParameter(SFipa.PROTOCOL));
+		convid.setText(""+message.getConversationId());
+//		inreplyto.setText(getParameter(SFipa.IN_REPLY_TO));
+//		replywith.setText(getParameter(SFipa.REPLY_WITH));
+//		replyby.setText(getParameter(SFipa.REPLY_BY));
 
 		// Beautify appearance of text fields.
 		tfsender.setCaretPosition(0);
-		tfreplyto.setCaretPosition(0);
+//		tfreplyto.setCaretPosition(0);
 		content.setCaretPosition(0);
-		language.setCaretPosition(0);
-		encoding.setCaretPosition(0);
-		ontology.setCaretPosition(0);
+//		language.setCaretPosition(0);
+//		encoding.setCaretPosition(0);
+//		ontology.setCaretPosition(0);
 		convid.setCaretPosition(0);
-		inreplyto.setCaretPosition(0);
-		replywith.setCaretPosition(0);
-		replyby.setCaretPosition(0);
+//		inreplyto.setCaretPosition(0);
+//		replywith.setCaretPosition(0);
+//		replyby.setCaretPosition(0);
 		
 		// Extract sender / replyto
-		sender	= (IComponentIdentifier)message.get(SFipa.SENDER);	
-		replyto	= (IComponentIdentifier)message.get(SFipa.REPLY_TO);					
-		Object	recs	= message.get(SFipa.RECEIVERS);
-		if(recs instanceof IComponentIdentifier)
-			receivers	= new IComponentIdentifier[]{(IComponentIdentifier)recs};
-		else if(recs instanceof IComponentIdentifier[])
-			receivers  = (IComponentIdentifier[])recs;
-		else if(recs instanceof Collection)
-			receivers  = (IComponentIdentifier[])((Collection)recs).toArray(new IComponentIdentifier[((Collection)recs).size()]);
+		sender	= message.getSender();
+		receiver	= message.getReceiver();
+//		replyto	= (IComponentIdentifier)message.get(SFipa.REPLY_TO);					
+//		Object	recs	= message.getReceiver();
+//		if(recs instanceof IComponentIdentifier)
+//			receivers	= new IComponentIdentifier[]{(IComponentIdentifier)recs};
+//		else if(recs instanceof IComponentIdentifier[])
+//			receivers  = (IComponentIdentifier[])recs;
+//		else if(recs instanceof Collection)
+//			receivers  = (IComponentIdentifier[])((Collection)recs).toArray(new IComponentIdentifier[((Collection)recs).size()]);
 	}
   
 	/**
@@ -433,50 +433,50 @@ public class FipaMessagePanel extends JPanel
 	 *  Should be called to ensure that uptodate values are
 	 *  contained in the message parameters.
 	 */
-	public Map getMessage()
+	public FipaMessage getMessage()
 	{
 		if(!editable)
 			return this.message;
 		else
-			this.message = new HashMap(this.message);
+			this.message = new FipaMessage();
 		
 		// Set parameter values.
-		setParameter(SFipa.PERFORMATIVE, (String)performative.getSelectedItem());
-		setParameter(SFipa.CONTENT, content.getText());
-		setParameter(SFipa.LANGUAGE, language.getText());
-		setParameter(SFipa.ENCODING, encoding.getText());
-		setParameter(SFipa.ONTOLOGY, ontology.getText());
-		setParameter(SFipa.PROTOCOL, (String)protocol.getSelectedItem());
-		setParameter(SFipa.CONVERSATION_ID, convid.getText());
-		setParameter(SFipa.IN_REPLY_TO, inreplyto.getText());
-		setParameter(SFipa.REPLY_WITH, replywith.getText());
+		message.setPerformative((String)performative.getSelectedItem());
+		message.setContent(content.getText());
+//		setParameter(SFipa.LANGUAGE, language.getText());
+//		setParameter(SFipa.ENCODING, encoding.getText());
+//		setParameter(SFipa.ONTOLOGY, ontology.getText());
+//		setParameter(SFipa.PROTOCOL, (String)protocol.getSelectedItem());
+		message.setConversationId(convid.getText());
+//		setParameter(SFipa.IN_REPLY_TO, inreplyto.getText());
+//		setParameter(SFipa.REPLY_WITH, replywith.getText());
 
 		// Set sender / replyto
-		setParameter(SFipa.SENDER, sender);
-		setParameter(SFipa.REPLY_TO, replyto);
+		message.setSender(sender);
+//		setParameter(SFipa.REPLY_TO, replyto);
 
 		// Add receivers.
-		setParameterSet(SFipa.RECEIVERS, receivers);
+		message.setReceiver(receiver);
 
-		// Parse reply-by field.
-		Object	replybyval	= null;
-		if(replyby.getText()!=null && !replyby.getText().equals(""))
-		{
-			try
-			{
-				replyby.commitEdit();
-				replybyval	= replyby.getValue();
-			}
-			catch(ParseException e)
-			{
-				throw new RuntimeException("Error parsing reply-by date: "+e);
-			}
-		}
-		else
-		{
-			replybyval	= null;
-		}
-		setParameter(SFipa.REPLY_BY, replybyval);
+//		// Parse reply-by field.
+//		Object	replybyval	= null;
+//		if(replyby.getText()!=null && !replyby.getText().equals(""))
+//		{
+//			try
+//			{
+//				replyby.commitEdit();
+//				replybyval	= replyby.getValue();
+//			}
+//			catch(ParseException e)
+//			{
+//				throw new RuntimeException("Error parsing reply-by date: "+e);
+//			}
+//		}
+//		else
+//		{
+//			replybyval	= null;
+//		}
+//		setParameter(SFipa.REPLY_BY, replybyval);
 
 		return this.message;
 	}
@@ -500,54 +500,27 @@ public class FipaMessagePanel extends JPanel
 			clearsender.setEnabled(editable);
 			editreceivers.setEnabled(editable);
 			clearreceivers.setEnabled(editable);
-			setreplyto.setEnabled(editable);
-			clearreplyto.setEnabled(editable);
+//			setreplyto.setEnabled(editable);
+//			clearreplyto.setEnabled(editable);
 			content.setEditable(editable);
-			language.setEditable(editable);
-			encoding.setEditable(editable);
-			ontology.setEditable(editable);
-			protocol.setEnabled(editable);
+//			language.setEditable(editable);
+//			encoding.setEditable(editable);
+//			ontology.setEditable(editable);
+//			protocol.setEnabled(editable);
 			convid.setEditable(editable);
-			replywith.setEditable(editable);
-			inreplyto.setEditable(editable);
-			replyby.setEditable(editable);
+//			replywith.setEditable(editable);
+//			inreplyto.setEditable(editable);
+//			replyby.setEditable(editable);
 		}
 	}
 
 	//-------- helper methods --------
 
 	/**
-	 *  Get a message parameter value as string.
-	 */
-	protected String getParameter(String name)
-	{
-		Object	val	= message.get(name);
-		return val!=null ? SUtil.arrayToString(val): "";	// arrayToString also works for non arrays.
-	}
-
-	/**
-	 *  Set a message parameter from string.
-	 */
-	protected void setParameter(String name, final Object value)
-	{
-		// Replace empty string with null.
-		final Object oval = value==null || value.equals("") ? null : value;		
-		message.put(name, oval);
-	}
-
-	/**
-	 *  Set a message parameter set.
-	 */
-	protected void	setParameterSet(String name, final Object[] values)
-	{
-		message.put(name, values);
-	}
-
-	/**
 	 *  Get the currently set receivers.
 	 */
 	public IComponentIdentifier[] getReceivers()
 	{
-		return receivers;
+		return new IComponentIdentifier[]{receiver};
 	}
 }

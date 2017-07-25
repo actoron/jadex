@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,21 +32,15 @@ import javax.swing.border.TitledBorder;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
+import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.fipa.FipaMessage;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -72,10 +65,7 @@ public class ConversationPanel extends JSplitPane
 		"sent_message", SGUI.makeIcon(ConversationPanel.class, "/jadex/tools/common/images/new_sent_message.png"),
 		"received_message", SGUI.makeIcon(ConversationPanel.class, "/jadex/tools/common/images/new_received_message.png")
 	});
-	
-	/** Id for message type. */
-	protected static final String	MESSAGE_TYPE = "FipaConversationPanel-message-type";
-	
+		
 	//-------- attributes --------
 	
 	/** The agent to dispatch events to. */
@@ -83,10 +73,7 @@ public class ConversationPanel extends JSplitPane
 	
 	/** The platform running the gui. */
 	protected IExternalAccess	jccaccess;
-	
-	/** The default message type. */
-	protected MessageType	defaulttype;
-	
+		
 	/** The tabbed panel. */
 	protected JTabbedPane	tabs;
 
@@ -106,18 +93,16 @@ public class ConversationPanel extends JSplitPane
 	 *  Create the gui.
 	 */
 	public ConversationPanel(final IExternalAccess agent, final IExternalAccess jccaccess, final CMSUpdateHandler cmshandler,
-		final ComponentIconCache iconcache, Component comptree, MessageType defaulttype)
+		final ComponentIconCache iconcache, Component comptree)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);
 
 		this.agent	= agent;
-		this.defaulttype	= defaulttype;
 		
 		// Right side starts with initial send panel only.
-		Map	msg	= new HashMap();
-		msg.put(MESSAGE_TYPE, defaulttype);
-		msg.put(defaulttype.getSenderIdentifier(), agent.getComponentIdentifier());
+		FipaMessage	msg	= new FipaMessage();
+		msg.setSender(agent.getComponentIdentifier());
 		sendpanel = new FipaMessagePanel(msg, agent, jccaccess, cmshandler, iconcache, comptree);
 
 		JButton send = new JButton("Send");
@@ -127,37 +112,38 @@ public class ConversationPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				// Hack! For handling conversations.
-				// If no replies are sent sentmessages are 
-				Map	msg	= sendpanel.getMessage();
-				MessageType mt = (MessageType)msg.get(MESSAGE_TYPE);
-				String ri = mt.getReceiverIdentifier();
-				ParameterSpecification ris = mt.getParameter(ri);
-				
-				// Check if receiver is specified
-				if(ris.isSet())
-				{
-					Object	value = msg.get(ri);
-					if(value==null || value instanceof Object[] && ((Object[])value).length==0)	// Hack!!! Even for set may use single cid???
-					{
-						noReceiverSpecified();
-					}
-					else
-					{
-						sendMessage(msg);
-					}
-				}
-				else
-				{
-					if(msg.get(ri)==null)
-					{
-						noReceiverSpecified();
-					}
-					else
-					{
-						sendMessage(msg);
-					}
-				}
+//				// Hack! For handling conversations.
+//				// If no replies are sent sentmessages are 
+//				Map	msg	= sendpanel.getMessage();
+//				MessageType mt = (MessageType)msg.get(MESSAGE_TYPE);
+//				String ri = mt.getReceiverIdentifier();
+//				ParameterSpecification ris = mt.getParameter(ri);
+//				
+//				// Check if receiver is specified
+//				if(ris.isSet())
+//				{
+//					Object	value = msg.get(ri);
+//					if(value==null || value instanceof Object[] && ((Object[])value).length==0)	// Hack!!! Even for set may use single cid???
+//					{
+//						noReceiverSpecified();
+//					}
+//					else
+//					{
+//						sendMessage(msg);
+//					}
+//				}
+//				else
+//				{
+//					if(msg.get(ri)==null)
+//					{
+//						noReceiverSpecified();
+//					}
+//					else
+//					{
+//						sendMessage(msg);
+//					}
+//				}
+				sendMessage(null, sendpanel.getMessage());
 			}
 		});
 		
@@ -205,7 +191,7 @@ public class ConversationPanel extends JSplitPane
 			{
 				if(e.getClickCount()==2 && sentmsgs.locationToIndex(e.getPoint())!=-1)
 				{
-					final Map msg	= (Map)sentmsgs.getModel()
+					final FipaMessage msg	= (FipaMessage)sentmsgs.getModel()
 						.getElementAt(sentmsgs.locationToIndex(e.getPoint()));
 					final JPanel	msgtab	= new JPanel(new BorderLayout());
 					final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, jccaccess, cmshandler, iconcache, null);
@@ -220,7 +206,7 @@ public class ConversationPanel extends JSplitPane
 					{
 						public void actionPerformed(ActionEvent ae)
 						{
-							sendpanel.setMessage(new HashMap(msg));
+							sendpanel.setMessage(msg);
 							tabs.setSelectedComponent(sendtab);
 						}
 					});
@@ -233,7 +219,7 @@ public class ConversationPanel extends JSplitPane
 					{
 						public void actionPerformed(ActionEvent ae)
 						{
-							sendMessage(msg);
+							sendMessage(null, msg);
 						}
 					});
 
@@ -278,7 +264,7 @@ public class ConversationPanel extends JSplitPane
 					int	idx	= receivedmsgs.locationToIndex(e.getPoint());
 					if(idx!=-1)
 					{
-						final Map	msg	= (Map)receivedmsgs.getModel().getElementAt(idx);
+						final FipaMessage	msg	= (FipaMessage)receivedmsgs.getModel().getElementAt(idx);
 						final JPanel msgtab	= new JPanel(new BorderLayout());
 						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, jccaccess, cmshandler, iconcache, null);
 						msgpanel.setEditable(false);
@@ -293,10 +279,7 @@ public class ConversationPanel extends JSplitPane
 						{
 							public void actionPerformed(ActionEvent ae)
 							{
-								MessageType	mt	= (MessageType)msg.get(MESSAGE_TYPE);
-								Map	replymsg	= mt.createReply(msg);
-								replymsg.put(MESSAGE_TYPE, mt);
-								replymsg.put(mt.getSenderIdentifier(), agent.getComponentIdentifier());
+								FipaMessage	replymsg	= msg.createReply();
 								sendpanel.setMessage(replymsg);
 								tabs.setSelectedComponent(sendtab);
 							}
@@ -385,10 +368,11 @@ public class ConversationPanel extends JSplitPane
 	/**
 	 *  Get the message as a title.
 	 */
-	protected String getMessageTitle(Map msg)
+	protected String getMessageTitle(Object msg)
 	{
-		MessageType	mt	= (MessageType)msg.get(MESSAGE_TYPE);
-		String	ret	= mt.getSimplifiedRepresentation(msg);
+//		MessageType	mt	= (MessageType)msg.get(MESSAGE_TYPE);
+//		String	ret	= mt.getSimplifiedRepresentation(msg);
+		String	ret	= msg.toString();
 		
 		if(ret.length()>25)
 		{
@@ -401,15 +385,13 @@ public class ConversationPanel extends JSplitPane
 	/**
 	 *  Add a received message.
 	 */
-	public void	addMessage(final IMessageAdapter msg)
+	public void	addMessage(final Object msg)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void	run()
 			{
-				Map	msgmap	= new HashMap(msg.getParameterMap());
-				msgmap.put(MESSAGE_TYPE, msg.getMessageType());
-				((DefaultListModel)receivedmsgs.getModel()).addElement(msgmap);
+				((DefaultListModel)receivedmsgs.getModel()).addElement(msg);
 			}
 		});
 	}
@@ -443,9 +425,8 @@ public class ConversationPanel extends JSplitPane
 		{
 			public void run() 
 			{
-				Map	msg	= new HashMap();
-				msg.put(MESSAGE_TYPE, defaulttype);
-				msg.put(defaulttype.getSenderIdentifier(), agent.getComponentIdentifier());
+				FipaMessage	msg	= new FipaMessage();
+				msg.setSender(agent.getComponentIdentifier());
 				sendpanel.setMessage(msg);
 			}
 		});				
@@ -522,10 +503,9 @@ public class ConversationPanel extends JSplitPane
 			
 			if(msg!=null)
 			{
-				final Map	message	= decodeMessage(msg);
+				final FipaMessage	message	= (FipaMessage)decodeMessage(msg);
 				// Update sender.
-				MessageType	mt	= (MessageType)message.get(MESSAGE_TYPE);
-				message.put(mt.getSenderIdentifier(), agent.getComponentIdentifier());
+				message.setSender(agent.getComponentIdentifier());
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -545,10 +525,9 @@ public class ConversationPanel extends JSplitPane
 			for(int i=0; i<sents.length; i++)
 			{
 				final boolean last = i == sents.length-1;
-				Map	message	= decodeMessage(sents[i].getValue());
+				FipaMessage	message	= (FipaMessage)decodeMessage(sents[i].getValue());
 				// Update sender.
-				MessageType	mt	= (MessageType)message.get(MESSAGE_TYPE);
-				message.put(mt.getSenderIdentifier(), agent.getComponentIdentifier());
+				message.setSender(agent.getComponentIdentifier());
 				sentmsgs.add(0, message);	// Re-revert order
 				
 				if(last)
@@ -571,10 +550,9 @@ public class ConversationPanel extends JSplitPane
 	/**
 	 *  Fill in message values from string.
 	 */
-	public Map decodeMessage(String msg)
+	public Object decodeMessage(String msg)
 	{
-		Map map = (Map)JavaReader.objectFromXML(msg, null);	// Todo: classloader!?
-		return map;
+		return JavaReader.objectFromXML(msg, null);	// Todo: classloader!?
 	}
 
 	/** 
@@ -587,8 +565,8 @@ public class ConversationPanel extends JSplitPane
 			
 		Properties	props	= new Properties();
 		// Save message displayed in message panel.
-		Map	message	= getMessagePanel().getMessage();
-		String msg = (String)encodeMessage(message);
+		Object	message	= getMessagePanel().getMessage();
+		String msg = encodeMessage(message);
 		props.addProperty(new Property(ConversationPlugin.LAST_MESSAGE, msg));
 		
 		// Save list of sent messages (limit to 5 messages).
@@ -611,7 +589,7 @@ public class ConversationPanel extends JSplitPane
 	 *  Convert message to a string.
 	 *  @param message The message.
 	 */
-	public String encodeMessage(Map message)
+	public String encodeMessage(Object message)
 	{
 		String	msg	= JavaWriter.objectToXML(message, null);	// Todo: classloader!?
 		return msg;
@@ -620,38 +598,20 @@ public class ConversationPanel extends JSplitPane
 	/**
 	 *  Send a message.
 	 */
-	protected void sendMessage(final Map msg)
+	protected void sendMessage(final IComponentIdentifier receiver, final Object message)
 	{
-		// Remove message type for sending.
-		final Map	sendmsg	= new HashMap(msg);
-		final MessageType	mt	= (MessageType)sendmsg.remove(MESSAGE_TYPE);
-		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("sendM")
-			public IFuture<Void> execute(final IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final Future	ret	= new Future();
-						
-				SServiceProvider.getService(ia, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IMessageService	ms	= (IMessageService)result;
-						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null, null, null)
-							.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-					}
-				}));
-				return ret;
+				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
-		}).addResultListener(new SwingDefaultResultListener(this)
+		}).addResultListener(new SwingDefaultResultListener<Void>(this)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				// Re-add message type for storing sent msg. 
-				sendmsg.put(MESSAGE_TYPE, mt);
-				((DefaultListModel)sentmsgs.getModel()).addElement(sendmsg);
+//				((DefaultListModel)sentmsgs.getModel()).addElement(sendmsg);
 			}
 		});
 	}
@@ -665,8 +625,8 @@ public class ConversationPanel extends JSplitPane
 		public Component getListCellRendererComponent(JList list, Object value, 
 			int index, boolean sel, boolean hasfocus)
 		{		
-			assert value instanceof Map;
-			value	= getMessageTitle((Map)value);
+//			assert value instanceof Map;
+			value	= getMessageTitle(value);
 			return super.getListCellRendererComponent(list, value, index, sel, hasfocus);
 		}
 	}
