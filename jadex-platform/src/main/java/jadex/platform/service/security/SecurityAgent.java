@@ -161,12 +161,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 		}
 		
-		if (changedprops)
-		{
-			getSettingsService().setProperties(PROPERTIES_ID, props);
-			getSettingsService().saveProperties().get();
-		}
-		
 		try
 		{
 			platformsecret = AbstractAuthenticationSecret.fromString("platform", secretstr);
@@ -175,8 +169,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			secretstr = PasswordSecret.PREFIX + ":" + secretstr;
 			platformsecret = AbstractAuthenticationSecret.fromString("platform", secretstr);
+			props.removeSubproperties("platformsecret");
+			props.addProperty(new Property("platformsecret", secretstr));
+			changedprops = true;
 		}
-		System.out.println(platformsecret.getEncoded());
+		
+		if (changedprops)
+		{
+			getSettingsService().setProperties(PROPERTIES_ID, props);
+			getSettingsService().saveProperties().get();
+		}
 		
 		if (printpass && platformsecret != null)
 		{
@@ -910,7 +912,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String scheme = "ECDSA";
 		String hash = "SHA256";
 		
-		Tuple2<String, String> tup = SSecurity.createRootCaCertificate(dn, scheme, schemeconf, hash, str, days);
+		Tuple2<String, String> tup = SSecurity.createRootCaCertificate(dn, -1, scheme, schemeconf, hash, str, days);
 		
 		String dn2 = "O=Someorg,C=US,CN=My Intermediate CA";
 		String dn3 = "O=Someorg,C=US,CN=My Intermediate CA2";

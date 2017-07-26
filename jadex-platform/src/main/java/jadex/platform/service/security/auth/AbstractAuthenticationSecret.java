@@ -28,16 +28,6 @@ public abstract class AbstractAuthenticationSecret
 	public abstract boolean canSign();
 	
 	/**
-	 *  Returns the encoded secret.
-	 *  
-	 *  @return The encoded secret.
-	 */
-	public String getEncoded()
-	{
-		return toString();
-	}
-	
-	/**
 	 *  Decodes a secret from a string.
 	 *  
 	 *  @param subject The subject the secret is associated.

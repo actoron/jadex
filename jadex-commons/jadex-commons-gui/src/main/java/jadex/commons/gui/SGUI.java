@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -36,6 +37,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -46,7 +48,9 @@ import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -437,6 +441,19 @@ public class SGUI
 		
 		JOptionPane.showMessageDialog(parent, message, errortitle, JOptionPane.ERROR_MESSAGE);
 	}
+	
+	/**
+	 *  Adjust components to equal sizes according to their
+	 *  miminum, maximum, and preferred sizes.
+	 *  
+	 *  All components must be JComponents, this performs automatic array conversion.
+	 */
+	public static void	adjustComponentSizes(Component[] components)
+	{
+		JComponent[] jcomponents = new JComponent[components.length];
+		System.arraycopy(components, 0, jcomponents, 0, components.length);
+		adjustComponentSizes(jcomponents);
+	}
 
 
 	/**
@@ -471,6 +488,40 @@ public class SGUI
 		
 		for(int i=0; i<components.length; i++)
 		{
+			components[i].setMinimumSize(minimum);
+			components[i].setMaximumSize(maximum);
+			components[i].setPreferredSize(preferred);
+		}
+	}
+	
+	/**
+	 *  Adjust components to equal sizes according to their
+	 *  miminum, maximum, and preferred sizes horizontally.
+	 */
+	public static void	adjustComponentHorizontalSizes(JComponent[] components)
+	{
+		int minimumwidth	= 0;
+		int maximumwidth	= 0;
+		int preferredwidth	= 0;
+
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension	minimum	= components[i].getMinimumSize();
+			Dimension	maximum	= components[i].getMaximumSize();
+			Dimension	preferred	= components[i].getPreferredSize();
+			minimumwidth = Math.max(minimumwidth, minimum.width);
+			maximumwidth = Math.max(maximumwidth, maximum.width);
+			preferredwidth = Math.max(preferredwidth, preferred.width);
+		}
+		
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension minimum	= components[i].getMinimumSize();
+			Dimension maximum	= components[i].getMaximumSize();
+			Dimension preferred	= components[i].getPreferredSize();
+			minimum		= new Dimension(minimumwidth, minimum.height);
+			maximum		= new Dimension(maximumwidth, maximum.height);
+			preferred	= new Dimension(preferredwidth, preferred.height);
 			components[i].setMinimumSize(minimum);
 			components[i].setMaximumSize(maximum);
 			components[i].setPreferredSize(preferred);
@@ -705,12 +756,70 @@ public class SGUI
 	 *  @param h The height.
 	 *  @param type The type (Image.SCALE_XYZ).
 	 */
-	public static BufferedImage scaleImage(Image src, int w, int h, int type)
+	public static final BufferedImage scaleImage(Image src, int w, int h, int type)
 	{
 		Image img = src.getScaledInstance(w, h, type);
 		BufferedImage ret = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		Graphics g = ret.createGraphics();
 		g.drawImage(img, 0, 0, new Color(0,0,0), null);
+		g.dispose();
+		return ret;
+	}
+	
+	/**
+	 *  Converts a buffered image to a new image type.
+	 *  E.g. BufferedImage.TYPE_4BYTE_ABGR_PRE.
+	 *  
+	 *  @param original Original image.
+	 *  @param type New type.
+	 *  @return Converted image.
+	 */
+	public static final BufferedImage convertBufferedImageType(BufferedImage original, int type)
+	{
+		BufferedImage ret = new BufferedImage(original.getWidth(), original.getHeight(), type);
+		Graphics g = ret.createGraphics();
+		g.drawImage(original, 0, 0, null);
+		g.dispose();
+		return ret;
+	}
+	
+	/**
+	 *  Gets the index of the selected button in a button group.
+	 *  
+	 *  @param bg The button group.
+	 *  @return The selected index.
+	 */
+	public static int getSelectedButton(ButtonGroup bg)
+	{
+		int ret = -1;
+		Enumeration<AbstractButton> enumer = bg.getElements();
+		int i = 0;
+		while (enumer.hasMoreElements())
+		{
+			if (enumer.nextElement().isSelected())
+			{
+				ret = i;
+				break;
+			}
+			++i;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Scales a buffered image.
+	 *  
+	 *  @param original Original image.
+	 *  @param w New width.
+	 *  @param h New height.
+	 *  @return Scaled image.
+	 */
+	public static final BufferedImage scaleBufferedImage(BufferedImage original, int w, int h)
+	{
+		Image scaled = original.getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING);
+		BufferedImage ret = new BufferedImage(w, h, original.getType());
+		Graphics2D g = ret.createGraphics();
+		g.drawImage(scaled, 0, 0, null);
 		g.dispose();
 		return ret;
 	}

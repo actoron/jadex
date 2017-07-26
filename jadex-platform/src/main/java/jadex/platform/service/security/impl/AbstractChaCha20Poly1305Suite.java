@@ -45,10 +45,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected byte[] remotepublickey;
 	
 	/** The locally-generated authentication challenge. */
-	protected byte[] localauthchallenge;
+//	protected byte[] localauthchallenge;
 	
 	/** The remote-generated authentication challenge. */
-	protected byte[] remoteauthchallenge;
+//	protected byte[] remoteauthchallenge;
+	
+	protected byte[] challenge;
 	
 	/** The authentication suite. */
 	protected IAuthenticationSuite authsuite;
@@ -142,13 +144,24 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		
 		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
+//			ts = System.currentTimeMillis();
+//			StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
+//			localauthchallenge = new byte[32];
+//			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
+//			sem.setChallenge(localauthchallenge);
+//			hashednetworks = getHashedNetworks(agent.getNetworks(), localauthchallenge);
+//			sem.setHashedNetworkNames(hashednetworks.keySet());
+//			
+//			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
+//			nextstep = 1;
+			
 			ts = System.currentTimeMillis();
+			authsuite = new Blake2bX509AuthenticationSuite();
 			StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
-			localauthchallenge = new byte[32];
-			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
-			sem.setChallenge(localauthchallenge);
-			hashednetworks = getHashedNetworks(agent.getNetworks(), localauthchallenge);
-			sem.setHashedNetworkNames(hashednetworks.keySet());
+			challenge = new byte[32];
+			SSecurity.getSecureRandom().nextBytes(challenge);
+			sem.setChallenge(challenge);
+			sem.setPakeRound1Data(authsuite.getPakeRound1(agent, incomingmessage.getSender().getRoot()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
 			nextstep = 1;
@@ -156,120 +169,153 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		else if (nextstep == 0 && incomingmessage instanceof StartExchangeMessage)
 		{
 			StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
-			remoteauthchallenge = sem.getChallenge();
 			
-			if (remoteauthchallenge.length < 16)
-				throw new SecurityException("Remote authentication challenge too short.");
+			AckExchangeMessage reply = new AckExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
+			challenge = new byte[32];
+			SSecurity.getSecureRandom().nextBytes(challenge);
+			reply.setChallenge(challenge);
 			
-			ephemeralkey = createEphemeralKey();
-			byte[] pubkey = getPubKey();
+			challenge = new byte[32];
+			Blake2bDigest dig = new Blake2bDigest(256);
+			dig.update(sem.getChallenge(), 0, sem.getChallenge().length);
+			dig.update(reply.getChallenge(), 0, reply.getChallenge().length);
+			dig.doFinal(challenge, 0);
 			
-			localauthchallenge = new byte[32];
-			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
+			authsuite = new Blake2bX509AuthenticationSuite();
 			
-			authsuite = new Blake2bX509AuthenticationSuite(remoteauthchallenge, localauthchallenge);
+			IComponentIdentifier remoteid = sem.getSender().getRoot();
+			try
+			{
+				reply.setPakeRound1Data(authsuite.getPakeRound1(agent, remoteid));
+				reply.setPakeRound2Data(authsuite.getPakeRound2(agent, remoteid, sem.getPakeRound1Data()));
+			}
+			catch (Exception e)
+			{
+			}
 			
-			hashednetworks = getHashedNetworks(agent.getNetworks(), remoteauthchallenge);
-			
-			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, sem.getHashedNetworkNames());
-			
-			KeyExchangeMessage em = new KeyExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
-			em.setPublicKey(pubkey);
-			em.setChallenge(localauthchallenge);
-			em.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, sem.getSender().getRoot()));
-			em.setNetworkSigs(networksigs);
-			
-			agent.sendSecurityHandshakeMessage(sem.getSender(), em);
+			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 2;
+			
+			hashednetworks = getHashedNetworks(agent.getNetworks(), challenge);
 		}
-		else if (nextstep == 1 && incomingmessage instanceof KeyExchangeMessage)
+		else if (nextstep == 1 && incomingmessage instanceof AckExchangeMessage)
 		{
-			KeyExchangeMessage incmsg = (KeyExchangeMessage) incomingmessage;
+			AckExchangeMessage ack = (AckExchangeMessage) incomingmessage;
 			
-			remoteauthchallenge = incmsg.getChallenge();
+			Blake2bDigest dig = new Blake2bDigest(256);
+			dig.update(challenge, 0, challenge.length);
+			dig.update(ack.getChallenge(), 0, ack.getChallenge().length);
+			challenge = new byte[32];
+			dig.doFinal(challenge, 0);
 			
-			authsuite = new Blake2bX509AuthenticationSuite(localauthchallenge, remoteauthchallenge);
+			hashednetworks = getHashedNetworks(agent.getNetworks(), challenge);
 			
-			remotepublickey = incmsg.getPublicKey();
+			IComponentIdentifier remoteid = ack.getSender().getRoot();
+			
+			KeyExchangeMessage reply = new KeyExchangeMessage(agent.getComponentIdentifier(), ack.getConversationId());
+			reply.setHashedNetworkNames(hashednetworks.keySet());
+			
+			try
+			{
+				reply.setPakeRound2Data(authsuite.getPakeRound2(agent, remoteid, ack.getPakeRound1Data()));
+				authsuite.finalizePake(agent, remoteid, ack.getPakeRound2Data());
+			}
+			catch (Exception e)
+			{
+			}
 			
 			ephemeralkey = createEphemeralKey();
 			byte[] pubkey = getPubKey();
+			reply.setPublicKey(pubkey);
 			
-			Map<ByteArrayWrapper, byte[]> networksigs = getNetworkSignatures(pubkey, incmsg.getNetworkSigs().keySet());
+			reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
+			reply.setNetworkSigs(getNetworkSignatures(pubkey, hashednetworks.keySet()));
 			
-			boolean platformtrusted = verifyPlatformSignatures(remotepublickey, incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
-			
-			List<String> authnets = verifyNetworkSignatures(remotepublickey, incmsg.getNetworkSigs());
-			
-			secinf = new MsgSecurityInfos();
-			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformtrusted);
-			secinf.setTrustedPlatform(false);
-			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
-			
-			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
-			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
-			
-			KeyExchangeMessage exmsg = new KeyExchangeMessage(agent.getComponentIdentifier(), incmsg.getConversationId());
-			exmsg.setNetworkSigs(networksigs);
-			exmsg.setPublicKey(pubkey);
-			exmsg.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, incmsg.getSender().getRoot()));
-			
-			agent.sendSecurityHandshakeMessage(incmsg.getSender(), exmsg);
-			
+			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 3;
 		}
 		else if (nextstep == 2 && incomingmessage instanceof KeyExchangeMessage)
 		{
-			KeyExchangeMessage incmsg = (KeyExchangeMessage) incomingmessage;
+			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
 			
-			remotepublickey = incmsg.getPublicKey();
+			IComponentIdentifier remoteid = kx.getSender().getRoot();
 			
-			boolean platformtrusted = verifyPlatformSignatures(remotepublickey, incmsg.getPlatformSecretSigs(), agent.getPlatformSecret());
+			try
+			{
+				authsuite.finalizePake(agent, remoteid, kx.getPakeRound2Data());
+			}
+			catch (Exception e)
+			{
+			}
 			
-			List<String> authnets = verifyNetworkSignatures(remotepublickey, incmsg.getNetworkSigs());
+			remotepublickey = kx.getPublicKey();
 			
+			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getPlatformSecret());
+			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			secinf = new MsgSecurityInfos();
-			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformtrusted);
+			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformauth);
 			secinf.setTrustedPlatform(false);
 			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
 			
-			nonceprefix = Pack.littleEndianToInt(localauthchallenge, 0);
-			nonceprefix ^= Pack.littleEndianToInt(remoteauthchallenge, 0);
+			ephemeralkey = createEphemeralKey();
+			byte[] pubkey = getPubKey();
+			
+			nonceprefix = Pack.littleEndianToInt(challenge, 0);
+			
+			KeyExchangeMessage reply = new KeyExchangeMessage(agent.getComponentIdentifier(), kx.getConversationId());
+			reply.setPublicKey(pubkey);
+			reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
+			reply.setNetworkSigs(getNetworkSignatures(pubkey, kx.getNetworkSigs().keySet()));
+			
+			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
+			nextstep = 4;
+		}
+		else if (nextstep == 3 && incomingmessage instanceof KeyExchangeMessage)
+		{
+			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
+			
+			remotepublickey = kx.getPublicKey();
+			
+			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getPlatformSecret());
+			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
+			secinf = new MsgSecurityInfos();
+			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformauth);
+			secinf.setTrustedPlatform(false);
+			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+			
+			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;
 			key = generateChaChaKey();
-			System.out.println("Shared Key1: " + Arrays.toString(key));
+			System.out.println("Shared Key1: " + Arrays.toString(key) + " " + secinf.isAuthenticatedPlatform());
 			
 			// Delete handshake state
 			ephemeralkey = null;
-			localauthchallenge = null;
-			remoteauthchallenge = null;
+			challenge = null;
 			hashednetworks = null;
 			remotepublickey = null;
 			authsuite = null;
 			
-			nextstep = 4;
-			
-			ReadyMessage rdy = new ReadyMessage(agent.getComponentIdentifier(), incmsg.getConversationId());
-			agent.sendSecurityHandshakeMessage(incmsg.getSender(), rdy);
+			ReadyMessage rdy = new ReadyMessage(agent.getComponentIdentifier(), kx.getConversationId());
+			agent.sendSecurityHandshakeMessage(kx.getSender(), rdy);
 			
 			ret = false;
+			nextstep = 5;
+			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
 		}
-		else if (nextstep == 3 && incomingmessage instanceof ReadyMessage)
+		else if (nextstep == 4 && incomingmessage instanceof ReadyMessage)
 		{
 			key = generateChaChaKey();
-			System.out.println("Shared Key2: " + Arrays.toString(key));
+			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticatedPlatform());
 			
 			// Delete handshake state
 			ephemeralkey = null;
 			remotepublickey = null;
-			localauthchallenge = null;
-			remoteauthchallenge = null;
+			challenge = null;
 			hashednetworks = null;
 			authsuite = null;
 			
 			ret = false;
-			nextstep = 4;
-			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
+			nextstep = 5;
 		}
 		else
 		{
@@ -285,8 +331,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	public void destroy()
 	{
 		ephemeralkey = null;
-		localauthchallenge = null;
-		remoteauthchallenge = null;
+		challenge = null;
 		authsuite = null;
 		if (key != null)
 		{
@@ -312,12 +357,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		byte[] local = null;
 		AbstractAuthenticationSecret ps = agent.getPlatformSecret();
 		if (ps != null && ps.canSign())
-			local = signKey(localauthchallenge, pubkey, ps);
+			local = signKey(challenge, pubkey, ps);
 		
 		byte[] remote = null;
 		ps = agent.getPlatformSecret(remoteid);
 		if (ps != null && ps.canSign())
-			remote = signKey(localauthchallenge, pubkey, ps);
+			remote = signKey(challenge, pubkey, ps);
 		
 		if (local != null || remote != null)
 			return new Tuple2<byte[], byte[]>(local, remote);
@@ -339,12 +384,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			if (sigs.getFirstEntity() != null)
 			{
-				ret = verifyKey(remoteauthchallenge, key, localsecret, sigs.getFirstEntity());
+				ret = verifyKey(challenge, key, localsecret, sigs.getFirstEntity());
 			}
 			
 			if (!ret && sigs.getSecondEntity() != null)
 			{
-				ret = verifyKey(remoteauthchallenge, key, localsecret, sigs.getSecondEntity());
+				ret = verifyKey(challenge, key, localsecret, sigs.getSecondEntity());
 			}
 		}
 		return ret;
@@ -367,7 +412,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			{
 				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(hnwname);
 				if (tup != null)
-					networksigs.put(hnwname, signKey(localauthchallenge, key, tup.getSecondEntity()));
+					networksigs.put(hnwname, signKey(challenge, key, tup.getSecondEntity()));
 			}
 		}
 		return networksigs;
@@ -390,7 +435,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(nwsig.getKey());
 				if (tup != null)
 				{
-					if (verifyKey(remoteauthchallenge, key, tup.getSecondEntity(), nwsig.getValue()))
+					if (verifyKey(challenge, key, tup.getSecondEntity(), nwsig.getValue()))
 						ret.add(tup.getFirstEntity());
 				}
 			}
@@ -680,8 +725,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		/** Challenge for the exchange authentication. */
 		protected byte[] challenge;
 		
-		/** The available hashed network names */
-		protected Set<ByteArrayWrapper> hashednetworknames;
+		/** PAKE round 1 data. */
+		protected byte[] pakeround1data;
 		
 		/**
 		 *  Creates the message.
@@ -717,53 +762,54 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			this.challenge = challenge;
 		}
-
+		
 		/**
-		 *  Gets the network names.
-		 *
-		 *  @return The network names.
+		 *  Gets the PAKE Round 1 data.
+		 *  
+		 *  @return The PAKE Round 1 data.
 		 */
-		public Set<ByteArrayWrapper> getHashedNetworkNames()
+		public byte[] getPakeRound1Data()
 		{
-			return hashednetworknames;
+			return pakeround1data;
 		}
-
+		
 		/**
-		 *  Sets the hashed network names.
-		 *
-		 *  @param hashednetworknames The hashed network names.
+		 *  Sets the PAKE Round 1 data.
+		 *  
+		 *  @param pakeround1data The PAKE Round 1 data.
 		 */
-		public void setHashedNetworkNames(Set<ByteArrayWrapper> hashednetworknames)
+		public void setPakeRound1Data(byte[] pakeround1data)
 		{
-			this.hashednetworknames = hashednetworknames;
+			this.pakeround1data = pakeround1data;
 		}
 	}
 	
-	protected static class KeyExchangeMessage extends BasicSecurityMessage
+	/**
+	 *  Message for acknowledging the start of the exchange.
+	 *
+	 */
+	protected static class AckExchangeMessage extends BasicSecurityMessage
 	{
-		/** Public key of the exchange. */
-		protected byte[] publickey;
-		
-		/** Signatures based on the local and remote platform access secrets. */
-		protected Tuple2<byte[], byte[]> platformsecretsigs;
-		
-		/** Network signatures of the public key. */
-		protected Map<ByteArrayWrapper, byte[]> networksigs;
-		
 		/** Challenge for the exchange authentication. */
 		protected byte[] challenge;
+		
+		/** PAKE round 1 data. */
+		protected byte[] pakeround1data;
+		
+		/** PAKE round 2 data. */
+		protected byte[] pakeround2data;
 		
 		/**
 		 *  Creates the message.
 		 */
-		public KeyExchangeMessage()
+		public AckExchangeMessage()
 		{
 		}
 		
 		/**
 		 *  Creates the message.
 		 */
-		public KeyExchangeMessage(IComponentIdentifier sender, String conversationid)
+		public AckExchangeMessage(IComponentIdentifier sender, String conversationid)
 		{
 			super(sender, conversationid);
 		}
@@ -786,6 +832,119 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public void setChallenge(byte[] challenge)
 		{
 			this.challenge = challenge;
+		}
+		
+		/**
+		 *  Gets the PAKE Round 1 data.
+		 *  
+		 *  @return The PAKE Round 1 data.
+		 */
+		public byte[] getPakeRound1Data()
+		{
+			return pakeround1data;
+		}
+		
+		/**
+		 *  Sets the PAKE Round 1 data.
+		 *  
+		 *  @param pakeround1data The PAKE Round 1 data.
+		 */
+		public void setPakeRound1Data(byte[] pakeround1data)
+		{
+			this.pakeround1data = pakeround1data;
+		}
+		
+		/**
+		 *  Gets the PAKE Round 2 data.
+		 *  
+		 *  @return The PAKE Round 2 data.
+		 */
+		public byte[] getPakeRound2Data()
+		{
+			return pakeround2data;
+		}
+		
+		/**
+		 *  Sets the PAKE Round 2 data.
+		 *  
+		 *  @param pakeround1data The PAKE Round 2 data.
+		 */
+		public void setPakeRound2Data(byte[] pakeround2data)
+		{
+			this.pakeround2data = pakeround2data;
+		}
+	}
+	
+	protected static class KeyExchangeMessage extends BasicSecurityMessage
+	{
+		/** Public key of the exchange. */
+		protected byte[] publickey;
+		
+		/** Signatures based on the local and remote platform access secrets. */
+		protected Tuple2<byte[], byte[]> platformsecretsigs;
+		
+		/** Network signatures of the public key. */
+		protected Map<ByteArrayWrapper, byte[]> networksigs;
+		
+		/** The available hashed network names */
+		protected Set<ByteArrayWrapper> hashednetworknames;
+		
+		/** PAKE round 2 data. */
+		protected byte[] pakeround2data;
+		
+		/**
+		 *  Creates the message.
+		 */
+		public KeyExchangeMessage()
+		{
+		}
+		
+		/**
+		 *  Creates the message.
+		 */
+		public KeyExchangeMessage(IComponentIdentifier sender, String conversationid)
+		{
+			super(sender, conversationid);
+		}
+		
+		/**
+		 *  Gets the PAKE Round 2 data.
+		 *  
+		 *  @return The PAKE Round 2 data.
+		 */
+		public byte[] getPakeRound2Data()
+		{
+			return pakeround2data;
+		}
+		
+		/**
+		 *  Sets the PAKE Round 2 data.
+		 *  
+		 *  @param pakeround1data The PAKE Round 2 data.
+		 */
+		public void setPakeRound2Data(byte[] pakeround2data)
+		{
+			this.pakeround2data = pakeround2data;
+		}
+		
+		/**
+		 *  Gets the network names.
+		 *
+		 *  @return The network names.
+		 */
+		public Set<ByteArrayWrapper> getHashedNetworkNames()
+		{
+			return hashednetworknames;
+		}
+
+		/**
+		 *  Sets the hashed network names.
+		 *
+		 *  @param hashednetworknames The hashed network names.
+		 */
+		public void setHashedNetworkNames(Set<ByteArrayWrapper> hashednetworknames)
+		{
+			this.hashednetworknames = hashednetworknames;
 		}
 		
 		/**

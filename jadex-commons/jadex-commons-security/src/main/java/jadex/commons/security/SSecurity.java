@@ -434,7 +434,11 @@ public class SSecurity
 	{
 		X500Name subject = new X500Name(subjectdn);
 		
-		Extension bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(pathlen)));
+		Extension bcext = null;
+		if (pathlen == -1)
+			bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(true)));
+		else
+			bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(pathlen)));
 		Extension kuext = new Extension(Extension.keyUsage, true, asn1ToBytes(new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign)));
 		
 		return createCertificateBySpecification(issuercert, issuerkey, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
@@ -450,11 +454,15 @@ public class SSecurity
 	 *  @param daysvalid Number of days valid.
 	 *  @return The certificate.
 	 */
-	public static final Tuple2<String, String> createRootCaCertificate(String subjectdn, String scheme, String schemeconf, String hashalg, int strength, int daysvalid)
+	public static final Tuple2<String, String> createRootCaCertificate(String subjectdn, int pathlen, String scheme, String schemeconf, String hashalg, int strength, int daysvalid)
 	{
 		X500Name subject = new X500Name(subjectdn);
 		
-		Extension bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(true)));
+		Extension bcext = null;
+		if (pathlen == -1)
+			bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(true)));
+		else
+			bcext = new Extension(Extension.basicConstraints, true, asn1ToBytes(new BasicConstraints(pathlen)));
 		Extension kuext = new Extension(Extension.keyUsage, true, asn1ToBytes(new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign)));
 		
 		return createCertificateBySpecification(null, null, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
@@ -529,6 +537,29 @@ public class SSecurity
 	}
 	
 	/**
+	 *  Writes a certificate as PEM-encoded string.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return Encoded string.
+	 */
+	public static final String writeCertificateAsPEM(X509CertificateHolder cert)
+	{
+		try
+		{
+			ByteArrayOutputStream boscert = new ByteArrayOutputStream();
+			JcaPEMWriter pemwriter = new JcaPEMWriter(new OutputStreamWriter(boscert));
+			pemwriter.writeObject(cert);
+			pemwriter.close();
+			
+			return new String(boscert.toByteArray(), SUtil.UTF8);
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
 	 *  Reads a private key from a PEM string.
 	 *  
 	 *  @param pem The PEM-encoded string.
@@ -558,7 +589,7 @@ public class SSecurity
 		}
 		while (ret == null && pemobject != null);
 		
-		if (ret != null)
+		if (ret == null)
 		{
 			PEMParser pemparser = new PEMParser(new StringReader(pem));
 			
@@ -590,6 +621,19 @@ public class SSecurity
 			throw new RuntimeException("Could not read private key: " + pem);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Tests if a certificate is a CA certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return True, if CA certificate.
+	 */
+	public static final boolean isCaCertificate(String cert)
+	{
+		X509CertificateHolder lcert = readCertificateFromPEM(cert);
+		BasicConstraints bc = BasicConstraints.fromExtensions(lcert.getExtensions());
+		return bc.isCA();
 	}
 	
 	/**

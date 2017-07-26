@@ -1,5 +1,8 @@
 package jadex.platform.service.security.auth;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.platform.service.security.SecurityAgent;
+
 /**
  *  Suite for authenticating messages.
  * @author jander
@@ -34,4 +37,23 @@ public interface IAuthenticationSuite
 	 *  @return True if authenticated, false otherwise.
 	 */
 	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key, byte[] authtoken);
+	
+	/** 
+	 *  Gets the first round of the password-authenticated key-exchange.
+	 *  
+	 *  @return First round payload.
+	 */
+	public byte[] getPakeRound1(SecurityAgent agent, IComponentIdentifier remoteid);
+	
+	/** 
+	 *  Gets the second round of the password-authenticated key-exchange.
+	 *  
+	 *  @return Second round payload.
+	 */
+	public byte[] getPakeRound2(SecurityAgent agent, IComponentIdentifier remoteid, byte[] round1data);
+	
+	/**
+	 *  Finalizes the password-authenticated key exchange.
+	 */
+	public void finalizePake(SecurityAgent agent, IComponentIdentifier remoteid, byte[] round2data);
 }
