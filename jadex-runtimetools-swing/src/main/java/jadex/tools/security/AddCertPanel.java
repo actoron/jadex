@@ -1,4 +1,4 @@
-package jadex.platform.service.security;
+package jadex.tools.security;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,9 +41,9 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.security.SSecurity;
 
 /**
- *  Panel for creating certificates.
+ *  Panel for adding new certificates.
  */
-public class CertCreationPanel extends JPanel
+public class AddCertPanel extends JPanel
 {
 	/** Shorthand for GL-size. */
 	protected static final int PS = GroupLayout.PREFERRED_SIZE;
@@ -90,7 +90,7 @@ public class CertCreationPanel extends JPanel
 	/**
 	 * 
 	 */
-	public CertCreationPanel(Tuple2<String, String> selectedcert, ActionListener listener)
+	public AddCertPanel(Tuple2<String, String> selectedcert, ActionListener listener)
 	{
 		this.listener = listener;
 		this.issuercert = selectedcert;
@@ -172,7 +172,7 @@ public class CertCreationPanel extends JPanel
 	/**
 	 *  Gets the certificate from the panel.
 	 */
-	public Tuple2<String, String> getCreatedCertificate()
+	public Tuple2<String, String> getCertificate()
 	{
 		Tuple2<String, String> ret = null;
 		String cert = ((JTextArea) certarea.getViewport().getView()).getText();
@@ -537,7 +537,7 @@ public class CertCreationPanel extends JPanel
 					((JTextArea) certarea.getViewport().getView()).setText("");
 					((JTextArea) keyarea.getViewport().getView()).setText("");
 					
-					listener.actionPerformed(new ActionEvent(CertCreationPanel.this, -1, ""));
+					listener.actionPerformed(new ActionEvent(AddCertPanel.this, -1, ""));
 				}
 			});
 			
@@ -557,7 +557,7 @@ public class CertCreationPanel extends JPanel
 						
 						try
 						{
-							listener.actionPerformed(new ActionEvent(CertCreationPanel.this, ActionEvent.ACTION_PERFORMED, ""));
+							listener.actionPerformed(new ActionEvent(AddCertPanel.this, ActionEvent.ACTION_PERFORMED, ""));
 						}
 						catch (Exception e1)
 						{
@@ -565,7 +565,7 @@ public class CertCreationPanel extends JPanel
 					}					
 					catch (Exception e1)
 					{
-						JOptionPane.showMessageDialog(CertCreationPanel.this, "Invalid certificate.");
+						JOptionPane.showMessageDialog(AddCertPanel.this, "Invalid certificate.");
 					}
 				}
 			});

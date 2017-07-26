@@ -1,13 +1,11 @@
-package jadex.platform.service.security;
+package jadex.tools.security;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -35,24 +33,34 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.gui.ModulateComposite;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
+import jadex.commons.security.SCertStore;
 import jadex.commons.security.SSecurity;
 
 public class CertTree extends JTree implements TreeModel
 {
+	/** CA Certificate Icon. */
 	public static final Icon CA_CERT_ICON;
 	
+	/** Certificate Icon. */
 	public static final Icon CERT_ICON;
 	
+	/** CA Certificate Icon with key. */
 	public static final Icon CA_CERT_ICON_KEY;
 	
+	/** Certificate Icon with key. */
 	public static final Icon CERT_ICON_KEY;
 	
+	/** Size of the icons. */
+	protected static final int ICON_SIZE = 24;
+	
+	/** Intialize icons. */
 	static
 	{
 		BufferedImage caimg = null;
@@ -61,8 +69,8 @@ public class CertTree extends JTree implements TreeModel
 		BufferedImage certkeyimg = null;
 		try
 		{
-			String iconpath = CertTree.class.getPackage().getName().replace(".", "/") + "/cert_white.png";
-			System.out.println(iconpath);
+			String pckg = CertTree.class.getPackage().getName() + ".images";
+			String iconpath = pckg.replace(".", "/") + "/cert_white.png";
 			InputStream is = SUtil.getResource(iconpath, CertTree.class.getClassLoader());
 			BufferedImage baseimg = SGUI.convertBufferedImageType(ImageIO.read(is), BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			is.close();
@@ -70,7 +78,7 @@ public class CertTree extends JTree implements TreeModel
 			int sizex = baseimg.getWidth();
 			int sizey = baseimg.getHeight();
 			
-			iconpath = CertTree.class.getPackage().getName().replace(".", "/") + "/key.png";
+			iconpath = pckg.replace(".", "/") + "/key.png";
 			is = SUtil.getResource(iconpath, CertTree.class.getClassLoader());
 			BufferedImage keyimg = SGUI.convertBufferedImageType(ImageIO.read(is), BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			is.close();
@@ -128,7 +136,7 @@ public class CertTree extends JTree implements TreeModel
 			g.drawImage(img, 0, 0, null);
 			g.dispose();
 			
-			sizex = 16;
+			sizex = ICON_SIZE;
 			sizey = sizex;
 			
 			caimg = SGUI.scaleBufferedImage(caimg, sizex, sizey);
@@ -146,16 +154,29 @@ public class CertTree extends JTree implements TreeModel
 		CERT_ICON_KEY = new ImageIcon(certkeyimg);
 	}
 	
+	/** The loaded certificates used as model. */
 	Map<String, Tuple2<String, String>> certmodel;
 	
+	/** Lookup helper for finding tree nodes. */
 	Map<String, CertTreeNode> nodelookup;
 	
+	/** The root node. */
 	protected CertTreeNode root;
 	
+	/** Model listeners. */
 	protected List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 	
-	public CertTree(Map<String, Tuple2<String, String>> certmodel)
+	/** Path to certificate store. */
+	protected String storepath;
+	
+	/**
+	 *  Creates the tree.
+	 *  
+	 *  @param certstorepath Certificate store path.
+	 */
+	public CertTree(String certstorepath)
 	{
+		storepath = certstorepath;
 		root = createRootNode();
 		setEditable(false);
 		setShowsRootHandles(true);
@@ -163,7 +184,15 @@ public class CertTree extends JTree implements TreeModel
 		setRootVisible(false);
 		setBorder(BorderFactory.createTitledBorder("Certificates"));
 		
-		this.certmodel = certmodel;
+		certmodel = new HashMap<String, Tuple2<String,String>>();		
+		try
+		{
+			certmodel = SCertStore.convertToSubjectMap(SCertStore.loadCertStore(storepath));
+		}
+		catch (Exception e)
+		{
+		}
+		
 		this.nodelookup = new HashMap<String, CertTreeNode>();
 		setModel(this);
 		new TreeExpansionHandler(this);
@@ -203,7 +232,7 @@ public class CertTree extends JTree implements TreeModel
 				{
 					JPopupMenu menu = new JPopupMenu();
 					
-					JMenuItem addcert = new JMenuItem(new AbstractAction("Create Certificate...")
+					JMenuItem addcert = new JMenuItem(new AbstractAction("Add Certificate...")
 					{
 						public void actionPerformed(ActionEvent e)
 						{
@@ -212,14 +241,14 @@ public class CertTree extends JTree implements TreeModel
 //							createdia.getRootPane().add(new JButton("oisdfjogisdjf"), BorderLayout.CENTER);
 //							createdia.getRootPane().add(new CertCreationPanel(CertTree.this.certmodel), BorderLayout.CENTER);
 							
-							final CertCreationPanel certpanel = new CertCreationPanel(getSelectedCert(), new AbstractAction()
+							final AddCertPanel certpanel = new AddCertPanel(getSelectedCert(), new AbstractAction()
 							{
 								public void actionPerformed(ActionEvent e)
 								{
 									if (e.getID() == ActionEvent.ACTION_PERFORMED)
 									{
-										CertCreationPanel pan = (CertCreationPanel) e.getSource();
-										Tuple2<String, String> cert = pan.getCreatedCertificate();
+										AddCertPanel pan = (AddCertPanel) e.getSource();
+										Tuple2<String, String> cert = pan.getCertificate();
 										
 										String subjectid = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
 										
@@ -242,7 +271,20 @@ public class CertTree extends JTree implements TreeModel
 						}
 					});
 					
+					JMenuItem delcert = new JMenuItem(new AbstractAction("Delete Certificate")
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							Tuple2<String, String> cert = getSelectedCert();
+							String name = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
+							certmodel.remove(name);
+							
+							updateModel();
+						}
+					});
+					
 					menu.add(addcert);
+					menu.add(delcert);
 					
 					menu.show(CertTree.this, e.getX(), e.getY());
 				}
@@ -311,7 +353,6 @@ public class CertTree extends JTree implements TreeModel
 	
 	public void updateModel()
 	{
-		System.out.println("=========");
 		root.clearChildren();
 		nodelookup.clear();
 		clearToggledPaths();
@@ -329,8 +370,8 @@ public class CertTree extends JTree implements TreeModel
 					
 					if (!nodelookup.containsKey(cert.getSubject().toString()))
 					{
-					
-						CertTreeNode node = new CertTreeNode(cert.getSubject().toString());
+						String sub = cert.getSubject().toString();
+						CertTreeNode node = new CertTreeNode(sub);
 						nodelookup.put(cert.getSubject().toString(), node);
 						
 						if (cert.getIssuer().equals(cert.getSubject()))
@@ -388,6 +429,8 @@ public class CertTree extends JTree implements TreeModel
 //		invalidate();
 //		validate();
 //		repaint();
+		
+		SCertStore.saveCertStore(storepath, certmodel.values());
 	}
 	
 	protected Tuple2<String, String> getSelectedCert()
@@ -410,6 +453,11 @@ public class CertTree extends JTree implements TreeModel
 			public boolean equals(Object obj)
 			{
 				return (obj != null && obj.getClass().equals(getClass()));
+			}
+			
+			public String toString()
+			{
+				return subjectid;
 			}
 		};
 	}
@@ -460,7 +508,6 @@ public class CertTree extends JTree implements TreeModel
 		{
 			if (!children.contains(node))
 			{
-				System.out.println("NODE Added: " + node);
 				children.add(node);
 			}
 			else
@@ -512,7 +559,11 @@ public class CertTree extends JTree implements TreeModel
 		
 		public String toString()
 		{
-			return subjectid;
+			X509CertificateHolder cert = SSecurity.readCertificateFromPEM(certmodel.get(subjectid).getFirstEntity());
+			DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
+			String alg = anf.getAlgorithmName(cert.getSignatureAlgorithm());
+			alg = alg.split("WITH")[1];
+			return subjectid + " (" + alg + ")";
 		}
 	}
 }

@@ -572,22 +572,26 @@ public class SSecurity
 		// Two-prong approach due to bug with ECDSA keys.
 		PemReader pemreader = new PemReader(new StringReader(pem));
 		Object pemobject = null;
-		do
+		
+		if (pem.contains("-----BEGIN EC PRIVATE KEY-----"))
 		{
-			try
+			do
 			{
-				pemobject = pemreader.readPemObject();
-				ECPrivateKey ecpk = ECPrivateKey.getInstance(((PemObject) pemobject).getContent());
-				AlgorithmIdentifier algid = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, ecpk.getParameters());
-                ret = new PrivateKeyInfo(algid, ecpk);
-                pemreader.close();
-                pemreader = null;
+				try
+				{
+					pemobject = pemreader.readPemObject();
+					ECPrivateKey ecpk = ECPrivateKey.getInstance(((PemObject) pemobject).getContent());
+					AlgorithmIdentifier algid = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, ecpk.getParameters());
+	                ret = new PrivateKeyInfo(algid, ecpk);
+	                pemreader.close();
+	                pemreader = null;
+				}
+				catch (Exception e)
+				{
+				}
 			}
-			catch (Exception e)
-			{
-			}
+			while (ret == null && pemobject != null);
 		}
-		while (ret == null && pemobject != null);
 		
 		if (ret == null)
 		{
@@ -830,6 +834,8 @@ public class SSecurity
 			{
 				parentpki = pki;
 			}
+			
+			System.out.println(parentpki.getPrivateKeyAlgorithm().getAlgorithm().toString());
 			
 			ContentSigner signer = getSigner(sigspec, parentpki);
 			
