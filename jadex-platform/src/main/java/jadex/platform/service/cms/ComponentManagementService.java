@@ -47,7 +47,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -62,7 +61,6 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -2158,20 +2156,24 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-//		ret.addResultListener(new IResultListener<IExternalAccess>()
-//		{
-//			public void resultAvailable(IExternalAccess result)
-//			{
-//				if(result==null)
-//				{
-//					System.err.println("ea is null in cms!!! "+cid);
-//				}
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//			}
-//		});
+		ret.addResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess result)
+			{
+				if(cid.toString().indexOf("Killer")!=-1)
+				{
+					System.out.println("getExternalAccess: "+cid+", "+result+", "+agent);
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(cid.toString().indexOf("Killer")!=-1)
+				{
+					System.out.println("getExternalAccess: "+cid+", "+exception+", "+agent);
+				}
+			}
+		});
 		
 		if(cid==null)
 		{
@@ -2181,24 +2183,13 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(isRemoteComponent(cid))
 		{
-//			ServiceCall	sc	= ServiceCall.getCurrentInvocation();
-//			System.out.println("getExternalAccess: remote "+sc);
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 			{
-				public void customResultAvailable(IRemoteServiceManagementService rms)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					rms.getExternalAccessProxy(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 				}
 			});
-	
-	//		getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
-	//		{
-	//			public void customResultAvailable(IComponentManagementService rcms)
-	//			{
-	//				rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-	//			}
-	//		});
 		}
 		else
 		{
