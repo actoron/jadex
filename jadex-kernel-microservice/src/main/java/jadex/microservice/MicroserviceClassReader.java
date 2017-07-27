@@ -18,10 +18,8 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.micro.MicroAgentFactory;
 import jadex.micro.MicroClassReader;
 import jadex.micro.MicroModel;
-import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 
 /**
@@ -88,7 +86,7 @@ public class MicroserviceClassReader
 //		modelinfo.setFilename(src+File.separatorChar+model);
 		modelinfo.setFilename(src+SReflect.getClassName(cma).replace('.', cma.getProtectionDomain()!=null? File.separatorChar: '/')+".class");
 //		System.out.println("mircor: "+src+File.separatorChar+model);
-		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
+		modelinfo.setType(MicroserviceFactory.FILETYPE_MICROSERVICE);
 		modelinfo.setStartable(true);
 		
 		if(features!=null)

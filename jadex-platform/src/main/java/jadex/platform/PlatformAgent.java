@@ -444,7 +444,91 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-	})
+	}),
+	@Configuration(name="minimal", arguments={
+		@NameValue(name=TCPPORT, value="0"),
+		@NameValue(name=NIOTCPPORT, value="0"),
+		@NameValue(name=SSLTCPPORT, value="0"),
+		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+	}, components={
+//		@Component(name="system", type="system", daemon=Boolean3.TRUE),
+//		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
+		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
+			@NameValue(name="libpath", value="$args.libpath"),
+			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
+			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
+		}),
+		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0", arguments={
+			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
+		}),
+		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
+//		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
+		
+//		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
+//		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+//		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+//		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"application\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+//		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"v3\")!=-1 ? 1 : 0"),
+//		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdi\")!=-1 && $args.get(\"kernels\").indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
+//		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+//		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+//		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+		
+		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
+		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
+		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
+			@NameValue(name="usepass", value="$args.usepass"),
+			@NameValue(name="printpass", value="$args.printpass"),
+			@NameValue(name="trustedlan", value="$args.trustedlan"),
+			@NameValue(name="networkname", value="$args.networkname"),
+			@NameValue(name="networkpass", value="$args.networkpass"),
+			@NameValue(name="virtualnames", value="$args.virtualnames"),
+			@NameValue(name="validityduration", value="$args.validityduration")
+		}),
+//		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
+//			@NameValue(name="localtransport", value="$args.localtransport"),
+//			@NameValue(name="tcptransport", value="$args.tcptransport"),
+//			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
+//			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
+//			@NameValue(name="relaytransport", value="$args.relaytransport"),
+//			@NameValue(name="tcpport", value="$args.tcpport"),
+//			@NameValue(name="niotcpport", value="$args.niotcpport"),
+//			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
+//			@NameValue(name="relayaddress", value="$args.relayaddress"),
+//			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
+//			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
+//			@NameValue(name="binarymessages", value="$args.binarymessages"),
+//			@NameValue(name="strictcom", value="$args.strictcom"),
+//		}),
+//		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
+//		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
+
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		
+//		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
+//		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+//			arguments={
+//				@NameValue(name="mechanisms", value="$args.awamechanisms"),
+//				@NameValue(name="delay", value="$args.awadelay"),
+//				@NameValue(name="fast", value="$args.awafast"),
+//				@NameValue(name="includes", value="$args.awaincludes"),
+//				@NameValue(name="excludes", value="$args.awaexcludes")}),
+//		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
+		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
+			arguments={
+				@NameValue(name="saveonexit", value="$args.saveonexit"),
+				@NameValue(name="platforms", value="$args.jccplatforms")}),
+//		@Component(name="rspub", type="$args.RSPUBLISHCOMPONENT", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
+//		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
+//		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
+//		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
+//			arguments={@NameValue(name="console", value="$args.cliconsole")}),
+		
+//		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
+	}),
 })
 @Agent
 public class PlatformAgent
