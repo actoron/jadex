@@ -19,6 +19,9 @@ public class CreationInfo
 {
 	//-------- attributes --------
 	
+	/** The file name. */
+	protected String filename;
+	
 	/** The configuration. */
 	protected String	config;
 	
@@ -85,6 +88,7 @@ public class CreationInfo
 	{
 		if(info!=null)
 		{
+			this.filename = info.getFilename();
 			this.config	= info.getConfiguration();
 			this.args	= info.getArguments();
 			this.parent	= info.getParent();
@@ -586,4 +590,22 @@ public class CreationInfo
 		this.persistable = persistable;
 	}
 
+	/**
+	 *  Get the filename.
+	 *  @return the filename
+	 */
+	public String getFilename()
+	{
+		return filename;
+	}
+
+	/**
+	 *  Set the filename.
+	 *  @param filename The filename to set
+	 */
+	public void setFilename(String filename)
+	{
+		this.filename = filename;
+	}
+	
 }
