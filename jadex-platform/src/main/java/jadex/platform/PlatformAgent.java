@@ -244,7 +244,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
-	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class)
+	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
+	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class")
 })
 
 @ProvidedServices({
@@ -474,7 +475,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 //		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 //		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 //		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		
+
+
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
@@ -486,6 +488,9 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
+		
+		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE),
+		
 //		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
 //			@NameValue(name="localtransport", value="$args.localtransport"),
 //			@NameValue(name="tcptransport", value="$args.tcptransport"),
@@ -516,15 +521,15 @@ import jadex.platform.service.simulation.SimulationAgent;
 //				@NameValue(name="includes", value="$args.awaincludes"),
 //				@NameValue(name="excludes", value="$args.awaexcludes")}),
 //		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
-		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
-			arguments={
-				@NameValue(name="saveonexit", value="$args.saveonexit"),
-				@NameValue(name="platforms", value="$args.jccplatforms")}),
+//		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
+//			arguments={
+//				@NameValue(name="saveonexit", value="$args.saveonexit"),
+//				@NameValue(name="platforms", value="$args.jccplatforms")}),
 //		@Component(name="rspub", type="$args.RSPUBLISHCOMPONENT", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 //		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 //		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
-//		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-//			arguments={@NameValue(name="console", value="$args.cliconsole")}),
+		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
+			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 //		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),

@@ -274,6 +274,15 @@ public class CreationInfo
 		this.rid = rid;
 	}
 	
+	/**
+	 *  Create a new creation info.
+	 *  @param filename The filename.
+	 */
+	public CreationInfo(String filename)
+	{
+		this.filename = filename;
+	}
+	
 	//-------- methods --------
 	
 	/**
