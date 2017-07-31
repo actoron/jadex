@@ -392,7 +392,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	protected void dataRead()
 	{
-		((IInputConnectionHandler)getConnectionHandler()).notifyDataRead();
+//		((IInputConnectionHandler)getConnectionHandler()).notifyDataRead();
 	}
 	
 	/**
