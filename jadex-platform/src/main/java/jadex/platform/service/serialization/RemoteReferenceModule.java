@@ -298,7 +298,7 @@ public class RemoteReferenceModule
 		// Check for excluded and synchronous methods.
 		if(properties!=null)
 		{
-			Object ex = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_EXCLUDED, imports, null, cl);
+			Object ex = SJavaParser.getProperty(properties, Excluded.class.getName(), imports, null, cl);
 			if(ex!=null)
 			{
 				for(Iterator<Object> it = SReflect.getIterator(ex); it.hasNext(); )
@@ -310,7 +310,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object syn = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_SYNCHRONOUS, imports, null, cl);
+			Object syn = SJavaParser.getProperty(properties, Synchronous.class.getName(), imports, null, cl);
 			if(syn!=null)
 			{
 				for(Iterator<Object> it = SReflect.getIterator(syn); it.hasNext(); )
@@ -322,7 +322,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object un = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_UNCACHED, imports, null, cl);
+			Object un = SJavaParser.getProperty(properties, Uncached.class.getName(), imports, null, cl);
 			if(un!=null)
 			{
 				for(Iterator<Object> it = SReflect.getIterator(un); it.hasNext(); )
@@ -334,7 +334,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object mr = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_METHODREPLACEMENT, imports, null, cl);
+			Object mr = SJavaParser.getProperty(properties, Replacement.class.getName(), imports, null, cl);
 			if(mr!=null)
 			{
 				for(Iterator<Object> it = SReflect.getIterator(mr); it.hasNext(); )
@@ -347,7 +347,7 @@ public class RemoteReferenceModule
 					}
 				}
 			}
-			Object to = SJavaParser.getProperty(properties, RemoteServiceManagementService.REMOTE_TIMEOUT, imports, null, cl);
+			Object to = SJavaParser.getProperty(properties, Timeout.class.getName(), imports, null, cl);
 			if(to!=null)
 			{
 				for(Iterator<Object> it = SReflect.getIterator(to); it.hasNext(); )
