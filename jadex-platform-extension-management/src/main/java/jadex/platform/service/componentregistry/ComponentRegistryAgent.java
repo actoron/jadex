@@ -22,6 +22,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -38,6 +39,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -58,6 +60,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -75,13 +78,17 @@ import jadex.platform.service.servicepool.ServicePoolAgent;
 	// MonitoringAgent
     @Argument(name="componentinfos", clazz=CreationInfo.class, description="The component models to add initially.",
     	defaultvalue="new CreationInfo[]{"
-    		+ "new CreationInfo(\"jadex/platform/service/componentregistry/HelloAgent.class\"), "
-    		+ "new CreationInfo(\"jadex/platform/service/message/MessageAgent.class\"), "
+//    		+ "new CreationInfo(\"jadex/platform/service/componentregistry/HelloAgent.class\"), "
+    		+ "new CreationInfo(\"jadex/platform/service/address/TransportAddressAgent.class\"), "
+//    		+ "new CreationInfo(\"jadex/platform/service/message/MessageAgent.class\"), " // message service is raw :-(
+//    		+ "new CreationInfo(\"jadex/platform/service/marshal/MarshalAgent.class\"), " // marshal service is raw :-(
     		+ "new CreationInfo(\"jadex/platform/service/chat/ChatAgent.class\"), "
     		+ "new CreationInfo(\"jadex/platform/service/cli/CliAgent.class\"), "
     		+ "new CreationInfo(\"jadex/platform/service/filetransfer/FileTransferAgent.class\"), "
        		+ "new CreationInfo(\"jadex/platform/service/simulation/SimulationAgent.class\"), "
-      		+ "new CreationInfo(\"jadex/platform/service/df/DirectoryFacilitatorAgent.class\") "
+      		+ "new CreationInfo(\"jadex/platform/service/df/DirectoryFacilitatorAgent.class\"), "
+      		+ "new CreationInfo(\"jadex/platform/service/settings/SettingsAgent.class\"), "
+      		+ "new CreationInfo(\"jadex/platform/service/context/ContextAgent.class\", null, jadex.commons.SUtil.createHashMap(new String[]{\"contextserviceclass\"}, new Object[]{$args.args.contextserviceclass})) "
 //      		+ "new CreationInfo(\"jadex/platform/service/remote/RemoteServiceManagementAgent.class\")" // has no service :-(
 //      		+ "new CreationInfo(\"%{$args.rspublishcomponent}\"), " // todo 	    		
     		+ "}")
@@ -112,7 +119,6 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         final Future<Void> ret = new Future<Void>();
 
         CreationInfo[] cis = (CreationInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("componentinfos");
-
         if(cis!=null)
         {
             CounterResultListener<Void> lis = new CounterResultListener<Void>(cis.length, true, new DelegationResultListener<Void>(ret));
@@ -164,8 +170,8 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	                        {
 	                            assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
 
-//	                            if(servicetype.getName().indexOf("Chat")!=-1)
-//	                            	System.out.println("chat called: "+method.getName());
+//	                            if(servicetype.getName().indexOf("Settings")!=-1)
+//	                            	System.out.println("settings called: "+method.getName());
 	                            
 	                            if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 	                            {

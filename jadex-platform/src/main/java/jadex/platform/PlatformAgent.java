@@ -459,10 +459,10 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
 			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 		}),
-		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0", arguments={
-			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
-		}),
-		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
+//		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0", arguments={
+//			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
+//		}),
+//		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 //		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
@@ -476,8 +476,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 //		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 //		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 
-
-		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
+//		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
 			@NameValue(name="usepass", value="$args.usepass"),
@@ -489,37 +488,38 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
 		
-		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE),
+		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, arguments={
+			@NameValue(name="args", value="$args")}),
 		
-//		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
-//			@NameValue(name="localtransport", value="$args.localtransport"),
-//			@NameValue(name="tcptransport", value="$args.tcptransport"),
-//			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
-//			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
-//			@NameValue(name="relaytransport", value="$args.relaytransport"),
-//			@NameValue(name="tcpport", value="$args.tcpport"),
-//			@NameValue(name="niotcpport", value="$args.niotcpport"),
-//			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
-//			@NameValue(name="relayaddress", value="$args.relayaddress"),
-//			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
-//			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
-//			@NameValue(name="binarymessages", value="$args.binarymessages"),
-//			@NameValue(name="strictcom", value="$args.strictcom"),
-//		}),
+		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
+			@NameValue(name="localtransport", value="$args.localtransport"),
+			@NameValue(name="tcptransport", value="$args.tcptransport"),
+			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
+			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
+			@NameValue(name="relaytransport", value="$args.relaytransport"),
+			@NameValue(name="tcpport", value="$args.tcpport"),
+			@NameValue(name="niotcpport", value="$args.niotcpport"),
+			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
+			@NameValue(name="relayaddress", value="$args.relayaddress"),
+			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
+			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
+			@NameValue(name="binarymessages", value="$args.binarymessages"),
+			@NameValue(name="strictcom", value="$args.strictcom"),
+		}),
 //		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 //		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		
-//		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
-//		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-//			arguments={
-//				@NameValue(name="mechanisms", value="$args.awamechanisms"),
-//				@NameValue(name="delay", value="$args.awadelay"),
-//				@NameValue(name="fast", value="$args.awafast"),
-//				@NameValue(name="includes", value="$args.awaincludes"),
-//				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+			arguments={
+				@NameValue(name="mechanisms", value="$args.awamechanisms"),
+				@NameValue(name="delay", value="$args.awadelay"),
+				@NameValue(name="fast", value="$args.awafast"),
+				@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
 //		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 //		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 //			arguments={

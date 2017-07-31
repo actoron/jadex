@@ -283,6 +283,17 @@ public class CreationInfo
 		this.filename = filename;
 	}
 	
+	/**
+	 *  Create a new creation info.
+	 *  @param filename The filename.
+	 */
+	public CreationInfo(String filename, String config, Map<String, Object> args)
+	{
+		this.filename = filename;
+		this.config = config;
+		this.args = args;
+	}
+	
 	//-------- methods --------
 	
 	/**

@@ -4832,6 +4832,11 @@ public class SUtil
 		 * @return true, if current thread is ui main thread.
 		 */
 		boolean runningOnUiThread();
+		
+		/**
+		 * Get the network ips.
+		 */
+		public List<InetAddress> getNetworkIps();
 	}
 	
 //	/**

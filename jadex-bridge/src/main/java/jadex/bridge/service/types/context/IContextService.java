@@ -84,6 +84,8 @@ public interface IContextService
 	 */
 	public IFuture<Boolean> dispatchEvent(IJadexAndroidEvent event);
 
+	// Problem: Using Android the context is needed due to wifi manager
+	// todo: remove?!
 	/**
 	 * Get the network ips.
 	 */
