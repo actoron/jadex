@@ -130,34 +130,35 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		final Future<Void> ret = new Future<Void>();
-	
-//		System.out.println("fast: "+fast);
-		
-//		System.out.println(agent.getComponentIdentifier()+" includes: "+SUtil.arrayToString(includes));
-//		System.out.println(agent.getComponentIdentifier()+" excludes: "+SUtil.arrayToString(excludes));
-		
-//		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
-		
-		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
-		{
-			public void customResultAvailable(ICodec[] result)
-			{
-				defaultcodecs = result;
-				msgser.getAllSerializersAndCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>>, Void>(ret)
-				{
-					public void customResultAvailable(Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>> result)
-					{
-						allserializers = result.getFirstEntity();
-						allcodecs = result.getSecondEntity();
-						ret.setResult(null);
-					}
-				}));
-			}
-		}));
-		
-		return ret;
+//		final Future<Void> ret = new Future<Void>();
+//	
+////		System.out.println("fast: "+fast);
+//		
+////		System.out.println(agent.getComponentIdentifier()+" includes: "+SUtil.arrayToString(includes));
+////		System.out.println(agent.getComponentIdentifier()+" excludes: "+SUtil.arrayToString(excludes));
+//		
+////		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
+//		
+//		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
+//		{
+//			public void customResultAvailable(ICodec[] result)
+//			{
+//				defaultcodecs = result;
+//				msgser.getAllSerializersAndCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>>, Void>(ret)
+//				{
+//					public void customResultAvailable(Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>> result)
+//					{
+//						allserializers = result.getFirstEntity();
+//						allcodecs = result.getSecondEntity();
+//						ret.setResult(null);
+//					}
+//				}));
+//			}
+//		}));
+//		
+//		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -536,7 +537,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		Map<String, String[]> addresses = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
+		Map<String, String[]> addresses = TransportAddressBook.getAddressBook(getRoot()).getAllPlatformAddresses(getRoot());
 		AwarenessInfo info = new AwarenessInfo(root, addresses, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
 				getExcludes(), null, awa);
 		ret.setResult(info);

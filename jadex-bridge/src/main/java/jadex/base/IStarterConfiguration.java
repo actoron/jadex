@@ -52,8 +52,8 @@ public interface IStarterConfiguration {
 
     /** The default platform configuration. */
 //	String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/Platform.component.xml";
-//    String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformAgent.class";
-    String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformNGAgent.class";
+    String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformAgent.class";
+//    String FALLBACK_PLATFORM_CONFIGURATION = "jadex/platform/PlatformNGAgent.class";
 
     /** The default component factory to be used for platform component. */
 //	String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
