@@ -2200,7 +2200,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			Future<Boolean> fret = new Future<Boolean>();
 			
 			IService ser = (IService) obj;
-			if (!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getProvider(), ser)))
+			if (!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getOwner(), ser)))
 			{
 				fret.setResult(Boolean.FALSE);
 			}
