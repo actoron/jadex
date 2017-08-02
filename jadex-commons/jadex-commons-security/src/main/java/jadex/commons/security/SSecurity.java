@@ -20,6 +20,7 @@ import java.util.zip.GZIPOutputStream;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -67,7 +68,6 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
@@ -92,6 +92,9 @@ import jadex.commons.security.random.SecureThreadedRandom;
  */
 public class SSecurity
 {
+	/** Default hash used for signatures. */
+	protected static final String DEFAULT_SIGNATURE_HASH = "SHA512";
+	
 	/**
 	 *  Flag if the paranoid/hedged-mode PRNG should be used (much slower, but guarded against single-point failures).
 	 */
@@ -261,8 +264,8 @@ public class SSecurity
 			String pemkeystr = new String(SUtil.readStream(pemkey), SUtil.UTF8);
 			pemkey.close();
 			
-			DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-			ContentSigner signer = getSigner(anf.getAlgorithmName(cert.getSignatureAlgorithm()), readPrivateKeyFromPEM(pemkeystr));
+			String sigalg = getCertSigAlg(cert);
+			ContentSigner signer = getSigner(DEFAULT_SIGNATURE_HASH + "WITH" + sigalg, readPrivateKeyFromPEM(pemkeystr));
 			signer.getOutputStream().write(msghash);
 			signer.getOutputStream().close();
 			
@@ -352,7 +355,7 @@ public class SSecurity
 				return false;
 			
 			// Verify signature
-			ContentVerifier cv = getVerifier(certchain.get(0));
+			ContentVerifier cv = getDefaultVerifier(certchain.get(0));
 			cv.getOutputStream().write(msghash);
 			cv.getOutputStream().close();
 			return cv.verify(sig);
@@ -641,6 +644,40 @@ public class SSecurity
 	}
 	
 	/**
+	 *  Gets the signatures algorithm supported by the key provided by a certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return The signature algorithm.
+	 */
+	public static final String getCertSigAlg(String cert)
+	{
+		X509CertificateHolder lcert = readCertificateFromPEM(cert);
+		return getCertSigAlg(lcert);
+	}
+	
+	/**
+	 *  Gets the signatures algorithm supported by the key provided by a certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return The signature algorithm.
+	 */
+	public static final String getCertSigAlg(X509CertificateHolder cert)
+	{
+		SubjectPublicKeyInfo spki = cert.getSubjectPublicKeyInfo();
+		
+		String ret = spki.getAlgorithm().getAlgorithm().getId();
+
+		if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(ret))
+			ret = "ECDSA";
+		else if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(ret))
+			ret = "RSA";
+		else if (X9ObjectIdentifiers.id_dsa.getId().equals(ret))
+			ret = "DSA";
+		
+		return ret;
+	}
+	
+	/**
 	 *  Generates a fast secure PRNG. The setup attempts to prepare a PRNG that is fast and secure.
 	 *  @return Secure PRNG.
 	 */
@@ -765,9 +802,9 @@ public class SSecurity
 	 *  @param issuercert Certificate of the issuer (CA).
 	 *  @param issuerkey Key of the issuer (CA).
 	 *  @param subject Subject of the certificate.
-	 *  @param sigalg Signature scheme to use, e.g. RSA, DSA, ECDSA.
+	 *  @param sigalg Signature scheme / certificate key algorithm to use, e.g. RSA, DSA, ECDSA.
 	 *  @param schemeconf Additional scheme configuration, may be null.
-	 *  @param digalg Hash algorithm to use.
+	 *  @param digalg Hash algorithm to use for certificate signature.
 	 *  @param strength Strength of the key.
 	 *  @param daysvalid Number of days valid.
 	 *  @param extensions Certificate extensions.
@@ -790,8 +827,7 @@ public class SSecurity
 			{
 				loadedissuercert = SSecurity.readCertificateFromPEM(issuercert);
 				issuer = loadedissuercert.getSubject();
-				DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-				sigspec = anf.getAlgorithmName(loadedissuercert.getSignatureAlgorithm());
+				sigspec = digalg + "WITH" + getCertSigAlg(loadedissuercert);
 			}
 			
 			byte[] serialbytes = new byte[20];
@@ -1017,11 +1053,15 @@ public class SSecurity
 	 *  @param cert The certificate.
 	 *  @return A content verifier.
 	 */
-	protected static final ContentVerifier getVerifier(X509CertificateHolder cert)
+	protected static final ContentVerifier getDefaultVerifier(X509CertificateHolder cert)
 	{
+		DefaultSignatureAlgorithmIdentifierFinder saf = new DefaultSignatureAlgorithmIdentifierFinder();
+		String sig = getCertSigAlg(cert);
+		AlgorithmIdentifier algspec = saf.find(DEFAULT_SIGNATURE_HASH + "WITH" + sig);
+		
 		try
 		{
-			return getVerifierProvider(cert).get(cert.getSignatureAlgorithm());
+			return getVerifierProvider(cert).get(algspec);
 		}
 		catch (Exception e)
 		{
@@ -1038,17 +1078,15 @@ public class SSecurity
 	 */
 	protected static final ContentVerifierProvider getVerifierProvider(X509CertificateHolder cert)
 	{
-		DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-		String algospec = anf.getAlgorithmName(cert.getSignatureAlgorithm());
-		String[] algs = algospec.split("WITH");
+		String sigalg = getCertSigAlg(cert);
 		
 		DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
 		BcContentVerifierProviderBuilder verifierbuilder = null;
-		if ("ECDSA".equals(algs[1]))
+		if ("ECDSA".equals(sigalg))
 			verifierbuilder = new BcECContentVerifierProviderBuilder(digalgfinder);
-		else if ("RSA".equals(algs[1]))
+		else if ("RSA".equals(sigalg))
 			verifierbuilder = new BcRSAContentVerifierProviderBuilder(digalgfinder);
-		else if ("DSA".equals(algs[1]))
+		else if ("DSA".equals(sigalg))
 			verifierbuilder = new BcDSAContentVerifierProviderBuilder(digalgfinder);
 		
 		try

@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,20 +20,21 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.WindowConstants;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
@@ -180,6 +180,14 @@ public class CertTree extends JTree implements TreeModel
 	 */
 	public CertTree(String certstorepath)
 	{
+		setSelectionModel(new DefaultTreeSelectionModel()
+		{
+			protected boolean canPathsBeAdded(TreePath[] paths)
+			{
+				return false;
+			}
+		});
+		
 		storepath = certstorepath;
 		root = createRootNode();
 		setEditable(false);
@@ -564,17 +572,9 @@ public class CertTree extends JTree implements TreeModel
 		{
 			Tuple2<String, String> tup = certmodel.get(subjectid);
 			
-//			if (tup.getSecondEntity() != null)
-//			{
-//				PrivateKeyInfo pki = SSecurity.readPrivateKeyFromPEM(tup.getSecondEntity());
-//				DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-//				DefaultSignatureAlgorithmIdentifierFinder
-//				String alg = anf.getAlgorithmName(pki.getPrivateKeyAlgorithm().getAlgorithm());
-////				alg = alg.split("WITH")[1];
-//				return subjectid + "( " + alg + ")";
-//			}
+			String name = subjectid + " (" + SSecurity.getCertSigAlg(tup.getFirstEntity()) + ")";
 			
-			return subjectid;
+			return name;
 		}
 	}
 }

@@ -295,14 +295,14 @@ public class AddCertPanel extends JPanel
 		sigalg.addItemListener(sigalglis);
 		sigalglis.itemStateChanged(null);
 		
-		JLabel hashalglb = new JLabel("Hash");
+		JLabel hashalglb = new JLabel("Signature Hash");
 		hashalg = new JComboBox<String>();
 		hashalg.setLightWeightPopupEnabled(false);
 		hashalg.setEditable(false);
 		hashalg.addItem("SHA256");
 		hashalg.addItem("SHA384");
 		hashalg.addItem("SHA512");
-		hashalg.setSelectedIndex(0);
+		hashalg.setSelectedIndex(2);
 		
 		JLabel validitylb = new JLabel("Validity");
 		validity = new JComboBox<String>();

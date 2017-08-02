@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JTextField;
@@ -12,9 +11,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.EventType;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Highlighter;
 
 /**
  *  Class offering a "placeholder" text similar to HTML input.
@@ -46,7 +48,11 @@ public class JPlaceholderTextField extends JTextField
 	/** Color for invalid field. */
 	protected Color invalidcolor;
 	
+	/** Document listener to intercept edits when in placeholder mode. */
 	protected DocumentListener doclistener;
+	
+	/** The default highlighter to exchange with null when placeholder is active. */
+	protected Highlighter highlighter;
 	
 //	protected TextUI brokenui = null;
 //	
@@ -57,6 +63,7 @@ public class JPlaceholderTextField extends JTextField
 	 */
 	public JPlaceholderTextField()
 	{
+		highlighter = getHighlighter();
 		placeholdercolor = Color.LIGHT_GRAY;
 		invalidcolor = Color.RED;
 		foregroundcolor = super.getForeground();
@@ -85,6 +92,19 @@ public class JPlaceholderTextField extends JTextField
 			public void focusGained(FocusEvent e)
 			{
 				setCaretPosition(0);
+			}
+		});
+		
+		addCaretListener(new CaretListener()
+		{
+			public void caretUpdate(CaretEvent e)
+			{
+				if (activeplaceholder)
+				{
+					removeCaretListener(this);
+					setCaretPosition(0);
+					addCaretListener(this);
+				}
 			}
 		});
 		
@@ -426,6 +446,7 @@ public class JPlaceholderTextField extends JTextField
 		getDocument().removeDocumentListener(doclistener);
 		super.setText(placeholder);
 		getDocument().addDocumentListener(doclistener);
+		setHighlighter(null);
 	}
 	
 	/**
@@ -440,6 +461,7 @@ public class JPlaceholderTextField extends JTextField
 		txt = txt.replace(placeholder, "");
 		super.setText(txt);
 		getDocument().addDocumentListener(doclistener);
+		setHighlighter(highlighter);
 	}
 	
 	/** Line border with changeable color */
