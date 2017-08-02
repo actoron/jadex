@@ -3,14 +3,17 @@ package jadex.platform.service.security;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -62,18 +65,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
  *  Agent that provides the security service.
  */
 @Agent
-@Arguments({
-	@Argument(name="cryptosuites", clazz=String[].class),
-	@Argument(name="usepass", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="printpass", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="trustedlan", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="networkname", clazz=String.class),
-	@Argument(name="networkpass", clazz=String.class),
-	@Argument(name="virtualnames", clazz=String[].class),
-	@Argument(name="validityduration", clazz=long.class)
-})
 @Service
-//@ProvidedServices(@ProvidedService(type=ISecurityService.class))
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
@@ -90,6 +82,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Component access. */
 	@Agent
 	protected IInternalAccess agent;
+	
+	/** Flag whether to use the platform secret for authentication. */
+	protected boolean usesecret;
+	
+	/** Flag whether the platform secret should be printed during start. */
+	protected boolean printsecret;
 	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
@@ -124,63 +122,124 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (!agent.getComponentIdentifier().getLocalName().equals("security"))
 			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
 		
-		IArgumentsResultsFeature argfeat = agent.getComponentFeature(IArgumentsResultsFeature.class);
+		Map<String, String> activeprops = new HashMap<String, String>();
+		Map<String, String> networkprops = new HashMap<String, String>();
+		Map<String, String> remotepfprops = new HashMap<String, String>();
 		
-		jadex.commons.Properties props = getSettingsService().getProperties(PROPERTIES_ID).get();
-//		props.addProperty(new Property("password", "aaaaaaaa-123"));
-		
-		boolean changedprops = false;
-		
-		if (props == null)
+		jadex.commons.Properties settings = getSettingsService().getProperties(PROPERTIES_ID).get();
+		if (settings != null)
 		{
-			props = new jadex.commons.Properties();
-			props.addProperty(new Property("usepass", "true"));
-			props.addProperty(new Property("printpass", "true"));
-			changedprops = true;
-		}
-		String secretstr = props.getStringProperty("platformsecret");
-		if (secretstr == null)
-		{
-			secretstr = props.getStringProperty("password");
-			if (secretstr != null)
+			Property[] proparr = settings.getProperties();
+			for (Property prop : proparr)
 			{
-				props.removeSubproperties("password");
-				props.addProperty(new Property("platformsecret", secretstr));
-				changedprops = true;
+				if (prop.getName() == null)
+				{
+					activeprops.put(prop.getType(), prop.getValue());
+				}
+				else
+				{
+					if ("networks".equals(prop.getType()))
+						networkprops.put(prop.getName(), prop.getValue());
+					else if ("remoteplatformsecrets".equals(prop.getType()))
+						remotepfprops.put(prop.getName(), prop.getValue());
+				}
 			}
 		}
-		boolean printpass = props.getBooleanProperty("printpass");
-		boolean usepass = props.getBooleanProperty("usepass");
 		
-		if (usepass && secretstr == null)
+		IArgumentsResultsFeature argfeat = agent.getComponentFeature(IArgumentsResultsFeature.class);
+		Map<String, Object> args = argfeat.getArguments();
+		if (args != null)
 		{
-			secretstr = SUtil.createRandomKey();
-			props.addProperty(new Property("platformsecret", secretstr));
-			changedprops = true;
-			System.out.println("Generated new platform access key: "+secretstr.substring(4));
+			Set<String> argexcluded = new HashSet<String>();
+			argexcluded.add(PROPERTY_NETWORK);
+			argexcluded.add(PROPERTY_NETWORKSECRET);
+			argexcluded.add(PROPERTY_REMOTEPLATFORM);
+			argexcluded.add(PROPERTY_REMOTEPLATFORMSECRET);
 			
+			for (Map.Entry<String, Object> arg : args.entrySet())
+			{
+				if (!argexcluded.contains(arg.getKey()) && arg.getValue() instanceof String)
+					activeprops.put(arg.getKey(), (String) arg.getValue());
+			}
+			
+			Object name = args.get(PROPERTY_NETWORK);
+			Object secret = args.get(PROPERTY_NETWORKSECRET);
+			if (name instanceof String && secret instanceof String)
+			{
+				networkprops.put((String) name, (String) secret);
+			}
+			else if (name instanceof String[] && secret instanceof String[])
+			{
+				String[] aname = (String[]) name;
+				String[] asecret = (String[]) secret;
+				if (aname.length == asecret.length)
+				{
+					for (int i = 0; i < aname.length; ++i)
+					{
+						networkprops.put(aname[i], asecret[i]);
+					}
+				}
+			}
+			
+			name = args.get(PROPERTY_REMOTEPLATFORM);
+			secret = args.get(PROPERTY_REMOTEPLATFORMSECRET);
+			if (name instanceof String && secret instanceof String)
+			{
+				remotepfprops.put((String) name, (String) secret);
+			}
+			else if (name instanceof String[] && secret instanceof String[])
+			{
+				String[] aname = (String[]) name;
+				String[] asecret = (String[]) secret;
+				if (aname.length == asecret.length)
+				{
+					for (int i = 0; i < aname.length; ++i)
+					{
+						remotepfprops.put(aname[i], asecret[i]);
+					}
+				}
+			}
+		}
+		
+		if (!activeprops.containsKey(ISecurityService.PROPERTY_USESECRET))
+			activeprops.put(ISecurityService.PROPERTY_USESECRET, "true");
+		
+		if (!activeprops.containsKey(ISecurityService.PROPERTY_PRINTSECRET))
+			activeprops.put(ISecurityService.PROPERTY_PRINTSECRET, "true");
+		
+		String secretstr = activeprops.get(ISecurityService.PROPERTY_PLATFORMSECRET);
+		printsecret = "true".equals(activeprops.get(ISecurityService.PROPERTY_PRINTSECRET).toLowerCase());
+		usesecret = "true".equals(activeprops.get(ISecurityService.PROPERTY_USESECRET).toLowerCase());
+		
+		if (usesecret && secretstr == null)
+		{
+			secretstr = KeySecret.createRandomAsString();
+			activeprops.put(ISecurityService.PROPERTY_PLATFORMSECRET, secretstr);
+			System.out.println("Generated new platform access key: "+secretstr.substring(KeySecret.PREFIX.length() + 1));
 		}
 		
 		try
 		{
-			platformsecret = AbstractAuthenticationSecret.fromString("platform", secretstr);
+			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
 		}
 		catch (IllegalArgumentException e)
 		{
 			secretstr = PasswordSecret.PREFIX + ":" + secretstr;
-			platformsecret = AbstractAuthenticationSecret.fromString("platform", secretstr);
-			props.removeSubproperties("platformsecret");
-			props.addProperty(new Property("platformsecret", secretstr));
-			changedprops = true;
+			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
+			activeprops.put(ISecurityService.PROPERTY_PLATFORMSECRET, secretstr);
 		}
 		
-		if (changedprops)
-		{
-			getSettingsService().setProperties(PROPERTIES_ID, props);
-			getSettingsService().saveProperties().get();
-		}
+		networks = new HashMap<String, AbstractAuthenticationSecret>();
+		for (Map.Entry<String, String> entry : networkprops.entrySet())
+			networks.put(entry.getKey(), AbstractAuthenticationSecret.fromString(entry.getValue()));
 		
-		if (printpass && platformsecret != null)
+		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
+		for (Map.Entry<String, String> entry : remotepfprops.entrySet())
+			remoteplatformsecrets.put(new ComponentIdentifier(entry.getKey()), AbstractAuthenticationSecret.fromString(entry.getValue()));
+		
+		saveSettings();
+		
+		if (printsecret && platformsecret != null)
 		{
 			secretstr = platformsecret.toString();
 			
@@ -194,18 +253,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				System.out.println("Platform access secret: "+secretstr);
 		}
 		
-		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
-		networks = new HashMap<String, AbstractAuthenticationSecret>();
-		try
-		{
-			String nwname = (String) argfeat.getArguments().get("networkname");
-			String nwpass = (String) argfeat.getArguments().get("networkpass");
-			if (nwname != null)
-				networks.put(nwname, AbstractAuthenticationSecret.fromString(nwname, nwpass));
-		}
-		catch (Exception e)
-		{
-		}
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
 		currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
 		expiringcryptosuites = new HashMap<String, Tuple2<ICryptoSuite,Long>>();
@@ -460,7 +507,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				}
 				else
 				{
-					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(cid.toString(), secret);
+					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(secret);
 					
 					if (agent.getComponentIdentifier().getRoot().equals(cid))
 						platformsecret = authsec;
@@ -503,6 +550,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cid.equals(agent.getComponentIdentifier().getRoot()))
 			return getPlatformSecret();
 		return remoteplatformsecrets.get(cid.getRoot());
+	}
+	
+	/**
+	 *  Checks whether to use platform secret.
+	 *  @return True, if used.
+	 */
+	public boolean usePlatformSecret()
+	{
+		return usesecret;
 	}
 	
 	// -------- Cleanup
@@ -641,6 +697,35 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Saves the current settings.
+	 */
+	protected void saveSettings()
+	{
+		jadex.commons.Properties settings = new jadex.commons.Properties();
+		
+		settings.addProperty(new Property(ISecurityService.PROPERTY_USESECRET, String.valueOf(usesecret)));
+		settings.addProperty(new Property(ISecurityService.PROPERTY_PRINTSECRET, String.valueOf(printsecret)));
+		
+		if (platformsecret != null)
+			settings.addProperty(new Property(ISecurityService.PROPERTY_PLATFORMSECRET, platformsecret.toString()));
+		
+		if (networks != null && networks.size() > 0)
+		{
+			for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+				settings.addProperty(new Property(entry.getKey(), "networks", entry.getValue().toString()));
+		}
+		
+		if (remoteplatformsecrets != null && remoteplatformsecrets.size() > 0)
+		{
+			for (Map.Entry<IComponentIdentifier, AbstractAuthenticationSecret> entry : remoteplatformsecrets.entrySet())
+				settings.addProperty(new Property(entry.getKey().toString(), "remoteplatformsecrets", entry.getValue().toString()));
+		}
+		
+		getSettingsService().setProperties(PROPERTIES_ID, settings);
+		getSettingsService().saveProperties().get();
 	}
 	
 	/**

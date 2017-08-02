@@ -19,8 +19,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -34,7 +32,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import jadex.commons.Tuple2;
-import jadex.commons.gui.GlowBorder;
 import jadex.commons.gui.JBusyRing;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.SGUI;
@@ -156,7 +153,7 @@ public class AddCertPanel extends JPanel
 			.addGroup(layout.createSequentialGroup()
 				.addComponent(certtypepanel, PS, DS, PS)
 				.addComponent(secpanel, PS, DS, PS)
-				.addComponent(subjectpanel))
+				.addComponent(subjectpanel, DS, DS, PS))
 			.addGroup(layout.createSequentialGroup()
 				.addComponent(certareapanel)
 				.addComponent(keyareapanel))
@@ -236,6 +233,11 @@ public class AddCertPanel extends JPanel
 		return typepanel;
 	}
 	
+	/**
+	 *  Creates the panel for security infos.
+	 *  
+	 *  @return The panel for security infos.
+	 */
 	protected JPanel createSecurityPanel()
 	{
 		JPanel cryptsettings = new JPanel();
@@ -436,6 +438,11 @@ public class AddCertPanel extends JPanel
 		return cryptsettings;
 	}
 	
+	/**
+	 *  Creates the button panel.
+	 *  
+	 *  @return The button panel.
+	 */
 	protected JPanel createButtonPanel()
 	{
 		JPanel ret = new JPanel();
@@ -587,14 +594,12 @@ public class AddCertPanel extends JPanel
 		return ret;
 	}
 	
+	/**
+	 *  Panel with subject data.
+	 *
+	 */
 	protected static class SubjectPanel extends JPanel
 	{
-		/** CN field panel. */
-//		protected JPanel cnfieldpanel;
-		
-		/** CN field border. */
-		protected GlowBorder cnfieldborder;
-		
 		/** CN field. */
 		protected JPlaceholderTextField cnfield;
 		
@@ -616,49 +621,51 @@ public class AddCertPanel extends JPanel
 		/** Light yellow. */
 		protected static final Color L_Yellow = new Color(1.0f, 1.0f, 0.82f, 1.0f);
 		
+		/** Soft red. */
+		protected static final Color S_RED = new Color(252, 220, 216);
+		
 		public SubjectPanel()
 		{
+			setLayout(new BorderLayout());
 			setMinimumSize(new Dimension(200, getMinimumSize().height));
-			setPreferredSize(getMinimumSize());
+			
+			JPanel inner = new JPanel();
 			setBorder(BorderFactory.createTitledBorder("Certificate Subject"));
 			
-			int bs = 5;
-			cnfieldborder = new GlowBorder(bs, bs, bs, bs);
 			cnfield = new JPlaceholderTextField();
-			cnfield.setBorder(cnfieldborder);
-			cnfieldborder.setInnerColor(Color.WHITE);
 			cnfield.setPlaceholder("Name (CN)");
+			cnfield.setInvalidColor(Color.RED);
 			cnfield.addFocusListener(new FocusAdapter()
 			{
 				public void focusGained(FocusEvent e)
 				{
-					cnfieldborder.setInnerColor(Color.WHITE);
+//					cnfield.setBackground(Color.WHITE);
 				}
 			});
-			add(cnfield);
+			inner.add(cnfield);
 			
 			ofield = new JPlaceholderTextField();
 			ofield.setPlaceholder("Organization (O)");
-			add(ofield);
+			inner.add(ofield);
 			
 			oufield = new JPlaceholderTextField();
 			oufield.setPlaceholder("Organizational Unit (OU)");
-			add(oufield);
+			inner.add(oufield);
 			
 			lfield = new JPlaceholderTextField();
 			lfield.setPlaceholder("City (L)");
-			add(lfield);
+			inner.add(lfield);
 			
 			sfield = new JPlaceholderTextField();
 			sfield.setPlaceholder("State (S)");
-			add(sfield);
+			inner.add(sfield);
 			
 			cfield = new JPlaceholderTextField();
 			cfield.setPlaceholder("Country (C)");
-			add(cfield);
+			inner.add(cfield);
 			
-			GroupLayout layout = createGroupLayout(this);
-			setLayout(layout);
+			GroupLayout layout = createGroupLayout(inner);
+			inner.setLayout(layout);
 			
 			SequentialGroup hgroup = layout.createSequentialGroup();
 			hgroup.addGroup(layout.createParallelGroup()
@@ -686,6 +693,14 @@ public class AddCertPanel extends JPanel
 				.addGap(mingap, mingap, maxgap)
 				.addComponent(cfield, PS, DS, PS);
 			layout.setVerticalGroup(vgroup);
+			
+//			inner.setPreferredSize(inner.getMinimumSize());
+//			setMaximumSize(inner.getMaximumSize());
+			
+//			add(inner);
+			JScrollPane scroll = new JScrollPane(inner);
+			scroll.setBorder(BorderFactory.createEmptyBorder());
+			add(scroll);
 		}
 		
 		/** Returns the DN */
@@ -693,10 +708,12 @@ public class AddCertPanel extends JPanel
 		{
 			if (cnfield.getText().length() == 0)
 			{
+//				cnfield.setBackground(S_RED);
 //				cnfield.setBackground(Color.RED);
-				cnfieldborder.setInnerColor(Color.RED);
+//				cnfieldborder.setInnerColor(Color.RED);
 //				cnfieldpanel.repaint();
-				cnfield.repaint();
+//				cnfield.repaint();
+				cnfield.showInvalid();
 				return null;
 			}
 			
@@ -734,7 +751,7 @@ public class AddCertPanel extends JPanel
 				ret.append(cfield.getText());
 			}
 			
-			cnfieldborder.setInnerColor(Color.WHITE);
+//			cnfieldborder.setInnerColor(Color.WHITE);
 //			cnfieldpanel.repaint();
 			cnfield.repaint();
 //			cnfield.setBackground(L_Yellow);

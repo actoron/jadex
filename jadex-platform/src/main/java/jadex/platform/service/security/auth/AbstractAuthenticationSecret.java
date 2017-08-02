@@ -30,11 +30,22 @@ public abstract class AbstractAuthenticationSecret
 	/**
 	 *  Decodes a secret from a string.
 	 *  
-	 *  @param subject The subject the secret is associated.
 	 *  @param secret The secret as string.
 	 *  @return The instantiated secret.
 	 */
-	public static final AbstractAuthenticationSecret fromString(String subject, String secret)
+	public static final AbstractAuthenticationSecret fromString(String secret)
+	{
+		return fromString(secret, false);
+	}
+	
+	/**
+	 *  Decodes a secret from a string.
+	 *  
+	 *  @param secret The secret as string.
+	 *  @param strict If false, interpret invalid string as a password.
+	 *  @return The instantiated secret.
+	 */
+	public static final AbstractAuthenticationSecret fromString(String secret, boolean strict)
 	{
 		if (secret == null)
 			throw new IllegalArgumentException("Secret is null: " + secret);
@@ -55,20 +66,17 @@ public abstract class AbstractAuthenticationSecret
 				}
 				catch (Exception e)
 				{
-					try
-					{
-						Constructor<?> con = secrettype.getConstructor(String.class, String.class);
-						ret = (AbstractAuthenticationSecret) con.newInstance(subject, secret);
-					}
-					catch (Exception e1)
-					{
-					}
 				}
 			}
 		}
 		
 		if (ret == null)
-			throw new IllegalArgumentException("Could not decode authentication secret: " + secret);
+		{
+			if (strict)
+				throw new IllegalArgumentException("Could not decode authentication secret: " + secret);
+			else
+				ret = new PasswordSecret(secret, false);
+		}
 		
 		return ret;
 	}

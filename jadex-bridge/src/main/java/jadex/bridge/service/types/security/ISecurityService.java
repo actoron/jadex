@@ -1,10 +1,14 @@
 package jadex.bridge.service.types.security;
 
+import java.util.Map;
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
@@ -24,6 +28,27 @@ import jadex.commons.future.IFuture;
 })
 public interface ISecurityService
 {
+	/** Allow the use of the local platform secret. */
+	public static final String PROPERTY_USESECRET = "usesecret";
+	
+	/** Print the local platform secret on start. */
+	public static final String PROPERTY_PRINTSECRET = "printsecret";
+	
+	/** The local platform secret. */
+	public static final String PROPERTY_PLATFORMSECRET = "platformsecret";
+	
+	/** Remote platform(s) to include. */
+	public static final String PROPERTY_REMOTEPLATFORM = "remoteplatform";
+
+	/** The Remote platform secret(s). */
+	public static final String PROPERTY_REMOTEPLATFORMSECRET = "remoteplatformsecret";
+	
+	/** Network(s) to include. */
+	public static final String PROPERTY_NETWORK = "network";
+
+	/** The network secret(s). */
+	public static final String PROPERTY_NETWORKSECRET = "networksecret";
+	
 	//-------- message-level encryption/authentication -------
 	
 	/**

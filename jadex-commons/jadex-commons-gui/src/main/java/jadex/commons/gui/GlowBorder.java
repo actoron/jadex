@@ -55,7 +55,22 @@ public class GlowBorder implements Border
 	 */
 	public void setOuterColorTransparent()
 	{
-		outer = null;
+		if (inner != null)
+			outer = null;
+		else
+			outer = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+	}
+	
+	/**
+	 *  Sets inner color to a transparent version of the outer color.
+	 *  
+	 */
+	public void setInnerColorTransparent()
+	{
+		if (outer != null)
+			inner = null;
+		else
+			inner = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 	}
 	
 	/**
@@ -66,6 +81,7 @@ public class GlowBorder implements Border
 		Graphics2D g2 = (Graphics2D) gg;
 		
 		Color outer = this.outer == null ? new Color(inner.getRed(), inner.getGreen(), inner.getBlue(), 0) : this.outer;
+		Color inner = this.inner == null ? new Color(outer.getRed(), outer.getGreen(), outer.getBlue(), 0) : this.inner;
 		
 		double or = outer.getRed() / 255.0;
 		double og = outer.getGreen() / 255.0;
@@ -108,7 +124,7 @@ public class GlowBorder implements Border
 //					double avg  = dy;
 //					double val = Math.max(dx, dy);
 //					double val = (dx * dx) + (dy * dy);
-					double val = Math.min(1.0, Math.pow(((dx * dx) + (dy * dy)) / 0.5, 0.25));
+					double val = Math.min(1.0, Math.pow(((dx * dx) + (dy * dy)) / 0.5, 0.5));
 					double ival = 1.0 - val;
 					a = oa * val + ia * ival;
 					r = or * val + ir * ival;

@@ -1,10 +1,15 @@
 package jadex.tools.security;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+
+import jadex.commons.gui.JWizard;
 
 public class CertTestWindow extends JFrame
 {
@@ -19,9 +24,9 @@ public class CertTestWindow extends JFrame
 		        {
 		            UIManager.setLookAndFeel(info.getClassName());
 		            
-//		            break;
+		            break;
 		        }
-		        System.out.println(info.getName());
+//		        System.out.println(info.getName());
 		    }
 		}
 		catch (Exception e)
@@ -35,6 +40,17 @@ public class CertTestWindow extends JFrame
 		
 		setVisible(true);
 		setSize(1024, 768);
+		
+		final SecretWizard wizard = new SecretWizard();
+		JFrame dia = JWizard.createFrame("TestWizard", wizard);
+		dia.setVisible(true);
+		wizard.addTerminationListener(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.out.println("Result was: " + wizard.getResult());
+			}
+		});
 	}
 	
 	

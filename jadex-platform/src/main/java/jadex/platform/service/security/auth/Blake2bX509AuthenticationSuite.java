@@ -31,13 +31,7 @@ import jadex.commons.security.SSecurity;
 import jadex.commons.security.random.ChaCha20Random;
 import jadex.platform.service.security.SecurityAgent;
 import net.i2p.crypto.eddsa.EdDSAEngine;
-import net.i2p.crypto.eddsa.EdDSAPrivateKey;
-import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.KeyPairGenerator;
-import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
-import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
-import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
-import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
  *  Symmetric authentication based on Blake2b MACs.
@@ -56,7 +50,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	/** Size of the salt. */
 	protected static final int SALT_SIZE = 32;
 	
-	protected static final EdDSAParameterSpec ED25519 = EdDSANamedCurveTable.getByName("Ed25519");
+//	protected static final EdDSAParameterSpec ED25519 = EdDSANamedCurveTable.getByName("Ed25519");
 	
 	/** State for password-authenticated key exchange. */
 	protected Map<PasswordSecret, JadexJPakeParticipant> pakestate;
@@ -97,7 +91,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		byte[] local = new byte[0];
 		byte[] remoteremote = new byte[0];
-		if (agent.getPlatformSecret() instanceof PasswordSecret)
+		if (agent.getPlatformSecret() instanceof PasswordSecret && agent.usePlatformSecret())
 		{
 			PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret();
 			JadexJPakeParticipant jpake = createJPakeParticipant(pid, secret.getPassword());
@@ -160,7 +154,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //		System.out.println("ID SALT 2: " + Arrays.toString(idsalt));
 		
 		byte[] local = new byte[0];
-		if (r1list.get(1).length > 0)
+		if (r1list.get(1).length > 0 && agent.usePlatformSecret())
 		{
 			if (agent.getPlatformSecret() instanceof PasswordSecret)
 			{
@@ -180,12 +174,12 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		
 		byte[] localremote = new byte[0];
-		if (r1list.get(2).length > 0)
+		if (r1list.get(2).length > 0 && agent.usePlatformSecret())
 		{
 			JPAKERound1Payload r1 = bytesToRound1(r1list.get(2));
 			if (agent.getPlatformSecret() instanceof PasswordSecret)
 			{
-				PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret();
+//				PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret();
 				try
 				{
 					remotepwpake.getSecondEntity().validateRound1PayloadReceived(r1);
@@ -843,18 +837,18 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		return ret;
 	}
 	
-	protected static final KeyPair deriveEd25519KeyPair(byte[] secret)
-	{
-		byte[] seed = new byte[32];
-		Blake2bDigest dig = new Blake2bDigest(256);
-		dig.update(secret, 0, secret.length);
-		dig.doFinal(seed, 0);
-		
-		EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(seed, ED25519);
-        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(privKey.getA(), ED25519);
-
-        return new KeyPair(new EdDSAPublicKey(pubKey), new EdDSAPrivateKey(privKey));
-	}
+//	protected static final KeyPair deriveEd25519KeyPair(byte[] secret)
+//	{
+//		byte[] seed = new byte[32];
+//		Blake2bDigest dig = new Blake2bDigest(256);
+//		dig.update(secret, 0, secret.length);
+//		dig.doFinal(seed, 0);
+//		
+//		EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(seed, ED25519);
+//        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(privKey.getA(), ED25519);
+//
+//        return new KeyPair(new EdDSAPublicKey(pubKey), new EdDSAPrivateKey(privKey));
+//	}
 	
 	/**
 	 *  Main

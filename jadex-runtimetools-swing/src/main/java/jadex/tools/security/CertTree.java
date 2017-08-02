@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,22 +19,25 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.WindowConstants;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -182,7 +186,7 @@ public class CertTree extends JTree implements TreeModel
 		setShowsRootHandles(true);
 		setLargeModel(true);
 		setRootVisible(false);
-		setBorder(BorderFactory.createTitledBorder("Certificates"));
+//		setBorder(BorderFactory.createTitledBorder("Certificates"));
 		
 		certmodel = new HashMap<String, Tuple2<String,String>>();		
 		try
@@ -236,8 +240,9 @@ public class CertTree extends JTree implements TreeModel
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							final JDialog createdia = new JDialog(JOptionPane.getRootFrame(), "Create Certificate", false);
-							createdia.getRootPane().setLayout(new BorderLayout());
+//							final JDialog createdia = new JDialog(JOptionPane.getRootFrame(), "Add Certificate", false);
+							final JFrame addwindow = new JFrame("Add Certificate");
+							addwindow.getRootPane().setLayout(new BorderLayout());
 //							createdia.getRootPane().add(new JButton("oisdfjogisdjf"), BorderLayout.CENTER);
 //							createdia.getRootPane().add(new CertCreationPanel(CertTree.this.certmodel), BorderLayout.CENTER);
 							
@@ -256,18 +261,16 @@ public class CertTree extends JTree implements TreeModel
 										
 										updateModel();
 									}
-									createdia.setVisible(false);
-									createdia.dispose();
+									addwindow.setVisible(false);
+									addwindow.dispose();
 								}
 							});
 							
-							createdia.getRootPane().add(certpanel, BorderLayout.CENTER);
-//							createdia.pack();
-							createdia.setSize(800, 600);
-							createdia.setMinimumSize(createdia.getRootPane().getPreferredSize());
-							createdia.setVisible(true);
-							
-//							createdia.dispose();
+							addwindow.getRootPane().add(certpanel, BorderLayout.CENTER);
+							addwindow.setSize(800, 600);
+							addwindow.setMinimumSize(addwindow.getRootPane().getPreferredSize());
+							addwindow.setVisible(true);
+							addwindow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 						}
 					});
 					
@@ -559,11 +562,19 @@ public class CertTree extends JTree implements TreeModel
 		
 		public String toString()
 		{
-			X509CertificateHolder cert = SSecurity.readCertificateFromPEM(certmodel.get(subjectid).getFirstEntity());
-			DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-			String alg = anf.getAlgorithmName(cert.getSignatureAlgorithm());
-			alg = alg.split("WITH")[1];
-			return subjectid + " (" + alg + ")";
+			Tuple2<String, String> tup = certmodel.get(subjectid);
+			
+//			if (tup.getSecondEntity() != null)
+//			{
+//				PrivateKeyInfo pki = SSecurity.readPrivateKeyFromPEM(tup.getSecondEntity());
+//				DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
+//				DefaultSignatureAlgorithmIdentifierFinder
+//				String alg = anf.getAlgorithmName(pki.getPrivateKeyAlgorithm().getAlgorithm());
+////				alg = alg.split("WITH")[1];
+//				return subjectid + "( " + alg + ")";
+//			}
+			
+			return subjectid;
 		}
 	}
 }

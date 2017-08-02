@@ -2072,31 +2072,6 @@ public class SUtil
 	}
 	
 	/**
-	 *  Creates a random shared key.
-	 * 
-	 *  @return Random shared key.
-	 */
-	public static final String createRandomKey()
-	{
-		byte[] rawkey = new byte[32]; // 256-bit key
-		SECURE_RANDOM.nextBytes(rawkey);
-		
-		return ("key:" + new String (Base64.encodeNoPadding(rawkey), UTF8));
-	}
-	
-	/**
-	 *  Generates an encoded network password from a raw password.
-	 *  (Adds information about the key derivation function)
-	 *  
-	 *  @param rawpassword The raw password.
-	 *  @return Encoded password.
-	 */
-	public static final String createNetworkPassword(String rawpassword)
-	{
-		return "scrypt:" + rawpassword;
-	}
-	
-	/**
 	 * 
 	 */
 	protected static void testIntByteConversion()
@@ -5012,6 +4987,17 @@ public class SUtil
 			(bytes[1] & 0xFF) == 0xBB && 
 			(bytes[2] & 0xFF) == 0xBF;
     }
+	
+	/**
+	 *  Returns a UTF8 byte array as string.
+	 * 
+	 *  @param bytes The bytes.
+	 *  @return The string.
+	 */
+	public static String toUTF8(byte[] bytes)
+	{
+		return new String(bytes, UTF8);
+	}
 	
 	/**
 	 *  Get the exception stacktrace.

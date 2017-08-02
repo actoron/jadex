@@ -228,7 +228,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			byte[] pubkey = getPubKey();
 			reply.setPublicKey(pubkey);
 			
-			reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
+			if (agent.usePlatformSecret())
+				reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
 			reply.setNetworkSigs(getNetworkSignatures(pubkey, hashednetworks.keySet()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
@@ -251,6 +252,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			remotepublickey = kx.getPublicKey();
 			
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getPlatformSecret());
+			platformauth &= agent.usePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			secinf = new MsgSecurityInfos();
 			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformauth);
@@ -264,7 +266,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			KeyExchangeMessage reply = new KeyExchangeMessage(agent.getComponentIdentifier(), kx.getConversationId());
 			reply.setPublicKey(pubkey);
-			reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
+			if (agent.usePlatformSecret())
+					reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
 			reply.setNetworkSigs(getNetworkSignatures(pubkey, kx.getNetworkSigs().keySet()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
@@ -277,6 +280,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			remotepublickey = kx.getPublicKey();
 			
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getPlatformSecret());
+			platformauth &= agent.usePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			secinf = new MsgSecurityInfos();
 			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformauth);
