@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import jadex.bridge.service.types.message.ICodec;
-import jadex.platform.service.message.transport.codecs.GZIPCodec;
+import jadex.platform.service.serialization.codecs.GZIPCodec;
 
 /**
  *  Test gzip.

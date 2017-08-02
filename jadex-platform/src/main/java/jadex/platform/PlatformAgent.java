@@ -28,7 +28,6 @@ import static jadex.base.IRootComponentConfiguration.LOGGING;
 import static jadex.base.IRootComponentConfiguration.LOGGING_LEVEL;
 import static jadex.base.IRootComponentConfiguration.MARSHAL;
 import static jadex.base.IRootComponentConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.IRootComponentConfiguration.MESSAGE;
 import static jadex.base.IRootComponentConfiguration.MONITORINGCOMP;
 import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
 import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
@@ -37,10 +36,6 @@ import static jadex.base.IRootComponentConfiguration.NIOTCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.PERSIST;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
-import static jadex.base.IRootComponentConfiguration.RELAYAWAONLY;
-import static jadex.base.IRootComponentConfiguration.RELAYSECURITY;
-import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
 import static jadex.base.IRootComponentConfiguration.RSPUBLISHCOMPONENT;
 import static jadex.base.IRootComponentConfiguration.SAVEONEXIT;
@@ -97,7 +92,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.sensor.SensorHolderAgent;
-import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
@@ -105,11 +99,9 @@ import jadex.platform.service.df.DirectoryFacilitatorAgent;
 import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.marshal.MarshalAgent;
-import jadex.platform.service.message.MessageAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
 import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
 import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
-import jadex.platform.service.remote.RemoteServiceManagementAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
 import jadex.platform.service.simulation.SimulationAgent;
@@ -146,7 +138,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CHAT, clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name=AWARENESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
+	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Multicast, Local\""),
+//	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
 	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
 	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
 	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
@@ -168,10 +161,10 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="9876"),
 	@Argument(name=NIOTCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=NIOTCPPORT, clazz=int.class, defaultvalue="8765"),
-	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
-	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
-	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
+//	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+//	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
+//	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
+//	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
 
@@ -193,7 +186,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=MONITORINGCOMP, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=DF, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=CLOCK, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=MESSAGE, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SIMUL, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=FILETRANSFER, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=MARSHAL, clazz=boolean.class, defaultvalue="true"),
@@ -219,7 +211,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),
 	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
 	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
-	@ComponentType(name="rms", clazz=RemoteServiceManagementAgent.class), //filename="jadex/platform/service/remote/RemoteServiceManagementAgent.class"),
 	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
@@ -232,7 +223,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="sensor", clazz=SensorHolderAgent.class), //filename="jadex/platform/sensor/SensorHolderAgent.class")
 	@ComponentType(name="df", clazz=DirectoryFacilitatorAgent.class),
 	@ComponentType(name="clock", clazz=ClockAgent.class),
-	@ComponentType(name="message", clazz=MessageAgent.class),
 	@ComponentType(name="simulation", clazz=SimulationAgent.class),
 	@ComponentType(name="filetransfer", clazz=FileTransferAgent.class),
 	@ComponentType(name="marshal", clazz=MarshalAgent.class),
@@ -242,7 +232,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
-	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class)
 })
@@ -258,7 +247,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 //	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() : $args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 //	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component, $args.simulation): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component, $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)")),
-//	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.platform.service.message.MessageService($component.getExternalAccess(), $component.getLogger(), new jadex.platform.service.message.transport.ITransport[]{$args.localtransport? new jadex.platform.service.message.transport.localmtp.LocalTransport($component): null, $args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component, $args.tcpport): null, $args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component, $args.niotcpport, $component.getLogger()): null, $args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component, $args.ssltcpport): null, $args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(), $args.strictcom)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.persist, $args.uniqueids) : new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.uniqueids)")),
 //	@ProvidedService(type=IDF.class, implementation=@Implementation(DirectoryFacilitatorService.class)),
 //	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(SimulationService.class)),
@@ -309,7 +297,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		
-		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
+//		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
 			@NameValue(name="usepass", value="$args.usepass"),
@@ -320,25 +308,9 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
-		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
-			@NameValue(name="localtransport", value="$args.localtransport"),
-			@NameValue(name="tcptransport", value="$args.tcptransport"),
-			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
-			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
-			@NameValue(name="relaytransport", value="$args.relaytransport"),
-			@NameValue(name="tcpport", value="$args.tcpport"),
-			@NameValue(name="niotcpport", value="$args.niotcpport"),
-			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
-			@NameValue(name="relayaddress", value="$args.relayaddress"),
-			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
-			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
-			@NameValue(name="binarymessages", value="$args.binarymessages"),
-			@NameValue(name="strictcom", value="$args.strictcom"),
-		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
-		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
@@ -393,7 +365,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		
-		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
+//		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
 			@NameValue(name="usepass", value="$args.usepass"),
@@ -404,25 +376,9 @@ import jadex.platform.service.simulation.SimulationAgent;
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
-		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
-			@NameValue(name="localtransport", value="$args.localtransport"),
-			@NameValue(name="tcptransport", value="$args.tcptransport"),
-			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
-			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
-			@NameValue(name="relaytransport", value="$args.relaytransport"),
-			@NameValue(name="tcpport", value="$args.tcpport"),
-			@NameValue(name="niotcpport", value="$args.niotcpport"),
-			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
-			@NameValue(name="relayaddress", value="$args.relayaddress"),
-			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
-			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
-			@NameValue(name="binarymessages", value="$args.binarymessages"),
-			@NameValue(name="strictcom", value="$args.strictcom"),
-		}),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
-		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
@@ -439,8 +395,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+//		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+//		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 	})
 })

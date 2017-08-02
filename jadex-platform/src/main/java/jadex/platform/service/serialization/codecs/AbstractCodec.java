@@ -1,4 +1,4 @@
-package jadex.platform.service.message.transport.codecs;
+package jadex.platform.service.serialization.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
 

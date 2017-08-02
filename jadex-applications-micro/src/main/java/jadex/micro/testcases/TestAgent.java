@@ -405,13 +405,6 @@ public abstract class TestAgent
 				if(manualremove)
 					platforms.remove(exta);
 				
-				// Add addresses of new platform to current
-				TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
-				TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(exta.getComponentIdentifier());
-				tab1.addPlatformAddresses(exta.getComponentIdentifier(), "tcp",
-					tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
-//				System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
-				
 				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)

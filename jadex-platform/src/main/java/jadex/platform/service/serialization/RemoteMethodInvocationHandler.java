@@ -3,9 +3,6 @@ package jadex.platform.service.serialization;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
@@ -15,7 +12,6 @@ import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.remote.IFinalize;
 
 /**
  *  Class that implements the Java proxy InvocationHandler, which
@@ -23,22 +19,22 @@ import jadex.platform.service.remote.IFinalize;
  */
 public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitchCall //extends MethodListenerHandler
 {
-	protected static final Method schedulestep;
-	
-	protected static final Method finalize;
-	
-	static
-	{
-		try
-		{
-			finalize = IFinalize.class.getMethod("finalize", new Class[0]);
-			schedulestep = IExternalAccess.class.getMethod("scheduleStep", new Class[]{IComponentStep.class});
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+//	protected static final Method schedulestep;
+//	
+//	protected static final Method finalize;
+//	
+//	static
+//	{
+//		try
+//		{
+//			finalize = IFinalize.class.getMethod("finalize", new Class[0]);
+//			schedulestep = IExternalAccess.class.getMethod("scheduleStep", new Class[]{IComponentStep.class});
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 	//-------- attributes --------
 	

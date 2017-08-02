@@ -796,33 +796,23 @@ public class Starter
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
+		// Add remote addresses to local address book
+		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(local.getComponentIdentifier());
+		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(remote.getComponentIdentifier());
+		tab1.addPlatformAddresses(remote.getComponentIdentifier(), "tcp",
+			tab2.getPlatformAddresses(remote.getComponentIdentifier(), "tcp"));
+//		System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+
+		
 		SServiceProvider.getService(local, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService flocal)
+			public void customResultAvailable(final IComponentManagementService localcms)
 			{
 				Map<String, Object>	args = new HashMap<String, Object>();
 				args.put("component", remote.getComponentIdentifier());
 				CreationInfo ci = new CreationInfo(args);
-				flocal.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-				
-//				SServiceProvider.getService(remote, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
-//				{
-//					public void customResultAvailable(ITransportAddressService tas)
-//					{
-//						tas.getTransportComponentIdentifier(remote.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
-//						{
-//							public void customResultAvailable(ITransportComponentIdentifier extacid)
-//							{
-//								Map<String, Object>	args = new HashMap<String, Object>();
-//								args.put("component", extacid);
-//								CreationInfo ci = new CreationInfo(args);
-//								flocal.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-//							}
-//						});
-//					}
-//				});
+				localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
 		

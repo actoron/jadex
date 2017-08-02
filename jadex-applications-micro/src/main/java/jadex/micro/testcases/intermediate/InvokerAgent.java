@@ -161,14 +161,7 @@ public class InvokerAgent
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
-				{
-					// Add addresses of new platform to current
-					TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(agent.getComponentIdentifier());
-					TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(platform.getComponentIdentifier());
-					tab1.addPlatformAddresses(platform.getComponentIdentifier(), "tcp",
-						tab2.getPlatformAddresses(platform.getComponentIdentifier(), "tcp"));
-//					System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
-					
+				{					
 					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)

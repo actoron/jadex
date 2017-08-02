@@ -254,15 +254,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 */
 		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
-			boolean ret = false;
-			if(header.getProperty(RX_ID) instanceof String)
-			{
-				if (secinfos.isTrustedPlatform()
-					|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception
-					|| secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass()))
-					ret = true;
-			}
-			return ret;
+			return header.getProperty(RX_ID) instanceof String;
 		}
 		
 		/**
@@ -284,147 +276,161 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
 //			System.out.println(getComponent().getComponentIdentifier() + " received remote command: "+msg+", rxid="+rxid);
-
 			
 			if(msg instanceof IRemoteCommand)
 			{
-				IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;
-				ServiceCall	sc	= null;
-				if(cmd instanceof AbstractInternalRemoteCommand)
-				{
-					Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
-					if(nonfunc!=null)
-					{
-						IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
-						sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
-						IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
-					}
-				}
-				final ServiceCall	fsc	= sc;
-				
-				final IFuture<?> retfut = cmd.execute(component, secinfos);
-				if (commands == null)
-					commands = new HashMap<String, IFuture<?>>();
-				IFuture<?> prev	= commands.put(rxid, retfut);
-				assert prev==null;
-				
-				final IResultListener<Void>	term;
-				if(retfut instanceof ITerminableFuture)
-				{
-					term	= new IResultListener<Void>()
-					{
-						public void exceptionOccurred(Exception exception)
-						{
-							((ITerminableFuture)retfut).terminate();
-							commands.remove(rxid);
-						}
-						
-						public void resultAvailable(Void result)
-						{
-						}
-					};
-				}
-				else
-				{
-					term	= null;
-				}
-				
 				final IComponentIdentifier remote = (IComponentIdentifier) header.getProperty(IMsgHeader.SENDER);
-				
-				retfut.addResultListener(new IIntermediateFutureCommandResultListener()
+				if(checkSecurity(secinfos, header, msg))
 				{
-					public void intermediateResultAvailable(Object result)
-					{
-						RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
-						IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
-						if(term!=null)
-						{
-							fut.addResultListener(term);
-						}
-					}
-					
-					public void finished()
-					{
-						commands.remove(rxid);
-						RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
-						sendRxMessage(remote, rxid, rc);
-					}
-					
-					public void resultAvailable(Object result)
-					{
-						commands.remove(rxid);
-						RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
-						sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
-						{
-							@Override
-							public void exceptionOccurred(Exception exception)
-							{
-								// Serialization of result failed -> send back exception.
-								RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
-								sendRxMessage(remote, rxid, rc);
-							}
-							
-							@Override
-							public void resultAvailable(Void result)
-							{
-								// OK -> ignore
-							}
-						});
-					}
-					
-					public void resultAvailable(Collection result)
-					{
-						resultAvailable(result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						commands.remove(rxid);
-						RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
-						sendRxMessage(remote, rxid, rc);
-					}
-					
-					public void commandAvailable(Object command)
-					{
-						IFuture<Void>	fut	= sendRxMessage(remote, rxid, new RemoteForwardCmdCommand(command));
-						if(term!=null)
-						{
-							fut.addResultListener(term);
-						}
-					}
-				});
-			}
-			else if(msg instanceof IRemoteConversationCommand)
-			{
-				IFuture<?> fut = commands.get(rxid);
-				if(fut!=null)
-				{
-					IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
+					IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;
+					ServiceCall	sc	= null;
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
 						Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
 						if(nonfunc!=null)
 						{
-							ServiceCall sc = ServiceCall.getLastInvocation();
-							if(sc==null)
-							{
-								// TODO: why null?
-								sc	= CallAccess.createServiceCall((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), nonfunc);
-							}
-							else
-							{
-								for(String name: nonfunc.keySet())
-								{
-									sc.setProperty(name, nonfunc.get(name));
-								}
-							}
+							IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
+							sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
+							IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
 						}
 					}
-					cmd.execute(component, (IFuture)fut, secinfos);
+					final ServiceCall	fsc	= sc;
+					
+					final IFuture<?> retfut = cmd.execute(component, secinfos);
+					if (commands == null)
+						commands = new HashMap<String, IFuture<?>>();
+					IFuture<?> prev	= commands.put(rxid, retfut);
+					assert prev==null;
+					
+					final IResultListener<Void>	term;
+					if(retfut instanceof ITerminableFuture)
+					{
+						term	= new IResultListener<Void>()
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								((ITerminableFuture)retfut).terminate();
+								commands.remove(rxid);
+							}
+							
+							public void resultAvailable(Void result)
+							{
+							}
+						};
+					}
+					else
+					{
+						term	= null;
+					}
+					
+					retfut.addResultListener(new IIntermediateFutureCommandResultListener()
+					{
+						public void intermediateResultAvailable(Object result)
+						{
+							RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
+							IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
+							if(term!=null)
+							{
+								fut.addResultListener(term);
+							}
+						}
+						
+						public void finished()
+						{
+							commands.remove(rxid);
+							RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
+							sendRxMessage(remote, rxid, rc);
+						}
+						
+						public void resultAvailable(Object result)
+						{
+							commands.remove(rxid);
+							RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
+							sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
+							{
+								@Override
+								public void exceptionOccurred(Exception exception)
+								{
+									// Serialization of result failed -> send back exception.
+									RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
+									sendRxMessage(remote, rxid, rc);
+								}
+								
+								@Override
+								public void resultAvailable(Void result)
+								{
+									// OK -> ignore
+								}
+							});
+						}
+						
+						public void resultAvailable(Collection result)
+						{
+							resultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							commands.remove(rxid);
+							RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
+							sendRxMessage(remote, rxid, rc);
+						}
+						
+						public void commandAvailable(Object command)
+						{
+							IFuture<Void>	fut	= sendRxMessage(remote, rxid, new RemoteForwardCmdCommand(command));
+							if(term!=null)
+							{
+								fut.addResultListener(term);
+							}
+						}
+					});
 				}
 				else
 				{
-					getComponent().getLogger().warning("Outdated remote command: "+msg);
+					// Not allowed -> send back exception.
+					RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException("Command "+msg.getClass()+" not allowed."), null);
+					sendRxMessage(remote, rxid, rc);	
+				}
+			}
+			else if(msg instanceof IRemoteConversationCommand)
+			{
+				if(checkSecurity(secinfos, header, msg))
+				{
+					IFuture<?> fut = commands.get(rxid);
+					if(fut!=null)
+					{
+						IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
+						if(cmd instanceof AbstractInternalRemoteCommand)
+						{
+							Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
+							if(nonfunc!=null)
+							{
+								ServiceCall sc = ServiceCall.getLastInvocation();
+								if(sc==null)
+								{
+									// TODO: why null?
+									sc	= CallAccess.createServiceCall((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), nonfunc);
+								}
+								else
+								{
+									for(String name: nonfunc.keySet())
+									{
+										sc.setProperty(name, nonfunc.get(name));
+									}
+								}
+							}
+						}
+						cmd.execute(component, (IFuture)fut, secinfos);
+					}
+					else
+					{
+						getComponent().getLogger().warning("Outdated remote command: "+msg);
+					}
+				}
+				else
+				{
+					getComponent().getLogger().warning("Command from "+header.getProperty(IMsgHeader.SENDER)+" not allowed: "+msg.getClass());
 				}
 			}
 			else if(header.getProperty(MessageComponentFeature.EXCEPTION)!=null)
@@ -440,6 +446,18 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			{
 				getComponent().getLogger().warning("Invalid remote execution message: "+header+", "+msg);
 			}
+		}
+
+		/**
+		 *  Check if it is ok to execute a command.
+		 */
+		protected boolean checkSecurity(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		{
+			return secinfos.isTrustedPlatform()	// Trusted -> always ok
+				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
+				|| secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
+					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
+						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
 		}
 	}
 }

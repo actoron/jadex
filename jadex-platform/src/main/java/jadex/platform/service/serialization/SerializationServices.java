@@ -23,12 +23,12 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
-import jadex.platform.service.message.transport.codecs.GZIPCodec;
-import jadex.platform.service.message.transport.codecs.LZ4Codec;
-import jadex.platform.service.message.transport.codecs.SnappyCodec;
-import jadex.platform.service.message.transport.codecs.XZCodec;
-import jadex.platform.service.message.transport.serializers.JadexBinarySerializer;
-import jadex.platform.service.message.transport.serializers.JadexJsonSerializer;
+import jadex.platform.service.serialization.codecs.GZIPCodec;
+import jadex.platform.service.serialization.codecs.LZ4Codec;
+import jadex.platform.service.serialization.codecs.SnappyCodec;
+import jadex.platform.service.serialization.codecs.XZCodec;
+import jadex.platform.service.serialization.serializers.JadexBinarySerializer;
+import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
 
 /**
  *  Functionality for managing serialization.
