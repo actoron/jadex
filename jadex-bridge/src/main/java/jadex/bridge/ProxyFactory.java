@@ -10,7 +10,7 @@ import jadex.commons.SReflect;
  */
 public class ProxyFactory
 {
-	public static boolean useasm = true;
+	public static boolean useasm = false;
 	
 	/**
      * Returns an instance of a proxy class for the specified interfaces

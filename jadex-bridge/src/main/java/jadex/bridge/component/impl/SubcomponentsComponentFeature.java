@@ -208,6 +208,8 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 				SubcomponentTypeInfo type = components[i].getType(model);
 				if(type!=null)
 				{
+//					if(type.getFilename().indexOf("Registry")!=-1)
+//						System.out.println("reg");
 					final Boolean suspend	= components[i].getSuspend()!=null ? components[i].getSuspend() : type.getSuspend();
 					Boolean	master = components[i].getMaster()!=null ? components[i].getMaster() : type.getMaster();
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();

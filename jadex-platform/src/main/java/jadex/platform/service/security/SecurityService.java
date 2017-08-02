@@ -440,7 +440,7 @@ public class SecurityService implements ISecurityService
 												}
 											}
 											
-//														System.out.println("fini2");
+//											System.out.println("fini2");
 											
 											return new Future<Properties>(ret);
 										}
@@ -849,6 +849,9 @@ public class SecurityService implements ISecurityService
 				error	= "Shared secret required.";
 			}
 		}
+		
+		if(error!=null)
+			System.out.println("sec er");
 		
 		return error==null ? new Future<Void>((Void)null) : new Future<Void>(new SecurityException(error+" "+request));
 	}
