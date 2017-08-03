@@ -357,25 +357,7 @@ public class ServiceQuery<T>
 	}
 	
 	/**
-	 *  Get the platform.
-	 *  @param platform The platform
-	 */
-	public void setPlatform(IComponentIdentifier platform)
-	{
-		this.platform = platform;
-	}
-	
-	/**
-	 *  Get the platform.
-	 *  @return The platform
-	 */
-	public IComponentIdentifier getPlatform()
-	{
-		return platform;
-	}
-	
-	/**
-	 *  Get the platform.
+	 *  Set the platform.
 	 *  @param platform The platform
 	 */
 	public void setPlatform(IComponentIdentifier platform)
