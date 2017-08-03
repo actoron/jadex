@@ -9,7 +9,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -27,11 +27,11 @@ public class RequiredServicesAgent
 	@Agent
 	protected IInternalAccess agent;
 
-	@AgentService(name="clock", lazy=false)
+	@AgentServiceSearch(name="clock", lazy=false)
 	protected IClockService clockser;
 	
 	// todo: allow for omitting name=""
-	@AgentService(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 	protected IComponentManagementService cms;
 
 	/**

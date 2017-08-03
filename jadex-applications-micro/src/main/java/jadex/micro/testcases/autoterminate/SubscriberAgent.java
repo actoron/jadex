@@ -10,7 +10,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
@@ -42,7 +42,7 @@ public class SubscriberAgent
 //	protected IAutoTerminateService	sub;
 
 	/** The cms. */
-	@AgentService
+	@AgentServiceSearch
 	protected IComponentManagementService	cms;
 	
 	//-------- methods --------

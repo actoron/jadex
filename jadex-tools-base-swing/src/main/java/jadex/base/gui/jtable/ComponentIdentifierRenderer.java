@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.commons.SUtil;
 
 
 /**
@@ -15,6 +16,24 @@ import jadex.bridge.ITransportComponentIdentifier;
  */
 public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 {
+	/** The local platform. */
+	protected IComponentIdentifier platform;
+	
+	/**
+	 * Create a new ComponentIdentifierRenderer.
+	 */
+	public ComponentIdentifierRenderer()
+	{
+	}
+	
+	/**
+	 * Create a new ComponentIdentifierRenderer.
+	 */
+	public ComponentIdentifierRenderer(IComponentIdentifier platform)
+	{
+		this.platform = platform.getRoot();
+	}
+	
 	/**
 	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
 	 * Object, boolean, boolean, int, int)
@@ -25,7 +44,7 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		IComponentIdentifier cid = (IComponentIdentifier)value;
 		if(cid!=null)
 		{
-			setText(cid.getName());
+			setText(SUtil.equals(cid, platform)? "local": cid.getName());
 			setToolTipText(getTooltipText(cid));
 		}
 		return this;

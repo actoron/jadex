@@ -122,7 +122,7 @@ public class SJavaParser
 		{
 			try
 			{
-				ret = (String)SJavaParser.evaluateExpression(text.substring(2, text.length()-1), imports, fetcher, cl);
+				ret = SJavaParser.evaluateExpression(text.substring(2, text.length()-1), imports, fetcher, cl);
 			}
 			catch(Exception e)
 			{

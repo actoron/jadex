@@ -1,6 +1,7 @@
 package jadex.micro.quickstart;
 
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 
@@ -11,6 +12,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  restrictions are required. 
  */
 @Security(Security.UNRESTRICTED)
+@Service
 public interface ITimeService
 {
 	/**

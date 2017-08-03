@@ -3,6 +3,7 @@ package jadex.extension.ws.invoke;
 import java.lang.reflect.Proxy;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 
 /**
  * 
@@ -15,7 +16,7 @@ public class SWebService
 	 */
 	public static Object createServiceImplementation(IInternalAccess agent, Class<?> type, WebServiceMappingInfo mapping)
 	{
-		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+		return ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
 			new WebServiceWrapperInvocationHandler(agent, mapping));
 	}
 }

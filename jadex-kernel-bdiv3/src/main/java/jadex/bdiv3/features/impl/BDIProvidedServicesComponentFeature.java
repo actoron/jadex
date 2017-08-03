@@ -10,6 +10,7 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.impl.BDIServiceInvocationHandler;
 import jadex.bdiv3.runtime.impl.CapabilityPojoWrapper;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.ProvidedServiceImplementation;
@@ -72,7 +73,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 		if(impl!=null && impl.getClazz()!=null && impl.getClazz().getType(getComponent().getClassLoader()).equals(IBDIAgent.class))
 		{
 			Class<?> iface = info.getType().getType(getComponent().getClassLoader());
-			ret = Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
+			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
 				new BDIServiceInvocationHandler(getComponent(), iface));
 		}
 		else

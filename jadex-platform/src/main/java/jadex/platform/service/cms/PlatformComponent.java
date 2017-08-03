@@ -624,7 +624,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return info.getComponentDescription().getName();
+		return info!=null && info.getComponentDescription()!=null? info.getComponentDescription().getName(): null;
 	}
 	
 	/**
@@ -906,9 +906,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					}
 					
 					if(!found)
-					{
 						throw new RuntimeException("Value not found: "+name);
-					}
+//					else
+//						System.out.println("fetcher: "+name+" "+ret);
 					
 					return ret;
 				}
@@ -1098,6 +1098,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public String	toString()
 	{
-		return getComponentIdentifier().getName();
+		return getComponentIdentifier()!=null? getComponentIdentifier().getName(): "n/a";
 	}
 }

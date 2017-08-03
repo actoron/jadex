@@ -6,6 +6,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
@@ -112,6 +113,6 @@ public class PojoDService implements IDService
 	public IFuture<Boolean> testServiceArgument(IDService service) 
 	{
 //		System.out.println("service: "+service.getClass());
-		return Proxy.isProxyClass(service.getClass()) ? IFuture.TRUE: IFuture.FALSE;
+		return ProxyFactory.isProxyClass(service.getClass()) ? IFuture.TRUE: IFuture.FALSE;
 	};
 }

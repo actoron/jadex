@@ -22,7 +22,7 @@ import jadex.examples.presentationtimer.common.State;
 import jadex.examples.presentationtimer.display.ui.ConfigureFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -45,7 +45,7 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	private Set<SubscriptionIntermediateFuture<State>> stateFutures;
 	private Set<SubscriptionIntermediateFuture<String>> timeFutures;
 
-	@AgentService
+	@AgentServiceSearch
 	private IComponentManagementService cms;
 	
 	@Agent

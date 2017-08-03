@@ -14,7 +14,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -38,7 +38,7 @@ public class ReceiverAgent
 	@AgentArgument
 	protected String filename;
 	
-	@AgentService
+	@AgentServiceSearch
 	protected IContextService contextService;
 	
 	/**

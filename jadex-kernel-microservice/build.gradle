@@ -1,0 +1,10 @@
+description 'The Jadex micro kernel provides a lightweight and very efficient kernel for minimal agents with an extremely low memory footprint. Micro agents have a simple internal architecture that is similar to active objects. They are programmed as Java objects overriding a framework class, which has predefined methods for the setup, termination, execution logic as well as message receipt.'
+
+dependencies
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-javaparser')
+	compile project(':jadex-bridge')
+	compile project(':jadex-kernel-base')
+	compile project(':jadex-kernel-micro')
+}

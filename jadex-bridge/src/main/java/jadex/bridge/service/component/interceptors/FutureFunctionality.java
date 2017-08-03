@@ -1,8 +1,10 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import jadex.bridge.ProxyFactory;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -297,8 +299,6 @@ public class FutureFunctionality
 		}
 		else if(target instanceof ISubscriptionIntermediateFuture)
 		{
-			if(source instanceof DelegatingFuture)
-				System.out.println("hhhhhhhh");
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
 				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)source);
 			source.addResultListener(lis);
@@ -1232,6 +1232,8 @@ class DelegatingFuture extends Future<Object>
 	{
 		try
 		{
+//			if(result!=null && ProxyFactory.isProxyClass(result.getClass()))
+//				System.out.println("DelegatingFuture.setResult: "+result);
 			result = func.handleResult(result);
 			return DelegatingFuture.super.doSetResult(result, func.isUndone(undone));
 		}

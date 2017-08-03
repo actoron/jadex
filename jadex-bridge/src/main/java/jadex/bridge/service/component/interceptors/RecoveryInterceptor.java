@@ -4,6 +4,7 @@ import java.lang.reflect.Proxy;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -153,7 +154,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 			public void customResultAvailable(Object result) 
 			{
 //				System.out.println("rebind: "+((IService)result).getServiceIdentifier()+Thread.currentThread());
-				BasicServiceInvocationHandler handler =  (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
+				BasicServiceInvocationHandler handler =  (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(result);
 				Object rawservice = handler.getService();
 				sic.setObject(rawservice);
 				sic.invoke().addResultListener(new DelegationResultListener(ret));

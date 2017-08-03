@@ -2,7 +2,6 @@ package jadex.bridge.service.component.interceptors;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,6 +14,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IExecutionFeature;
@@ -23,7 +23,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
-import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.marshal.IMarshalService;
@@ -321,7 +320,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
-					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					InvocationHandler handler = (InvocationHandler)ProxyFactory.getInvocationHandler(proxy);
 					context.setResult(handler.toString());
 					return IFuture.DONE;
 				}
@@ -331,10 +330,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
-					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					InvocationHandler handler = (InvocationHandler)ProxyFactory.getInvocationHandler(proxy);
 					Object[] args = (Object[])context.getArguments().toArray();
-					context.setResult(Boolean.valueOf(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
-						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
+					context.setResult(Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
+						&& handler.equals(ProxyFactory.getInvocationHandler(args[0]))));
 					return IFuture.DONE;
 				}
 			});
@@ -343,7 +342,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
-					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
+					InvocationHandler handler = ProxyFactory.getInvocationHandler(proxy);
 					context.setResult(Integer.valueOf(handler.hashCode()));
 					return IFuture.DONE;
 				}

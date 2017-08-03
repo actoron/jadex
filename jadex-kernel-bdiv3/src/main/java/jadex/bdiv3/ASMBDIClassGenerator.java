@@ -2,13 +2,18 @@ package jadex.bdiv3;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -38,6 +43,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import jadex.bdiv3.exceptions.JadexBDIGenerationException;
@@ -45,9 +51,10 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
+import jadex.bytecode.SASM;
+import jadex.commons.ByteClassLoader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.micro.MicroClassReader.DummyClassLoader;
 
 
@@ -547,56 +554,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		mn.instructions = nl;
 	}
 	
-	/**
-	 * 
-	 */
-	protected void makeObject(InsnList nl, Type arg)
-	{
-		if(arg.getClassName().equals("byte"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;"));
-		}
-		else if(arg.getClassName().equals("short"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;"));
-		}
-		else if(arg.getClassName().equals("int"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;"));
-		}
-		else if(arg.getClassName().equals("char"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;"));
-		}
-		else if(arg.getClassName().equals("boolean"))
-		{
-			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;"));
-		}
-		else if(arg.getClassName().equals("long"))
-		{
-			nl.add(new VarInsnNode(Opcodes.LLOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;"));
-		}
-		else if(arg.getClassName().equals("float"))
-		{
-			nl.add(new VarInsnNode(Opcodes.FLOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;"));
-		}
-		else if(arg.getClassName().equals("double"))
-		{
-			nl.add(new VarInsnNode(Opcodes.DLOAD, 1));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;"));
-		}
-		else // Object
-		{
-			nl.add(new VarInsnNode(Opcodes.ALOAD, 1));
-		}
-	}
+	
 	
 	/**
 	 * 
@@ -613,7 +571,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, GLOBALNAME_FIELD_NAME, "Ljava/lang/String;"));
 		nl.add(new LdcInsnNode(belname));
 		
-		makeObject(nl, arg);
+		SASM.makeObject(nl, arg);
 		
 		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/features/impl/BDIAgentFeature", "setAbstractBeliefValue", "(Ljadex/bridge/IInternalAccess;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V"));
 		nl.add(new InsnNode(Opcodes.RETURN));
@@ -647,7 +605,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0) does not work for other types than object
 		if(args.length>0)
 		{
-			makeObject(nl, args[0]);
+			SASM.makeObject(nl, args[0]);
 		}
 		else
 		{
@@ -1300,9 +1258,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		}
 //	}
 	
-	/**
-	 * 
-	 */
 	public static void main(String[] args) throws Exception
 	{
 //		System.out.println(int.class.getName());
@@ -1315,156 +1270,160 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		}
 				
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-//		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
+		
+////		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
 		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
-//		CheckClassAdapter cc = new CheckClassAdapter(tcv);
-		
-//		final String classname = "lars/Lars";
-//		final String supername = "jadex/bdiv3/MyTestClass";
-		
-//		final ASMifier asm = new ASMifier();
-		
-		ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, tcv)
-		{
-//			public void visit(int version, int access, String name,
-//				String signature, String superName, String[] interfaces)
-//			{
-//				super.visit(version, access, classname, null, superName, interfaces);
-//			}
-		
-			public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
-			{
-				return new MethodVisitor(api, super.visitMethod(access, methodname, desc, signature, exceptions))
-				{
-//					public void visitFieldInsn(int opcode, String owner, String name, String desc)
-//					{
-//						super.visitFieldInsn(opcode, owner, methodname, desc);
-//					}
-					public void visitInsn(int opcode)
-					{
-						super.visitInsn(opcode);
-					}
-				};
-				
-//				return super.visitMethod(access, methodname, desc, signature, exceptions);
-//				
-//				System.out.println("visit method: "+methodname);
-				
-//				if("<init>".equals(methodname))
-//				{
-//					return new TraceMethodVisitor(super.visitMethod(access, methodname, desc, signature, exceptions), asm);
-//				}
-//				else
-//				{
-//					return super.visitMethod(access, methodname, desc, signature, exceptions);
-//				}
-			}
-		};
-		
-		ClassReader cr = new ClassReader("jadex.bdiv3.MyTestClass");
-		cr.accept(cv, 0);
-//		ClassNode cn = new ClassNode();
-//		cr.accept(cn, 0);
-//		
-//		String prefix = "__update";
-//		Set<String> todo = new HashSet<String>();
-//		todo.add("testfield");
-//		todo.add("testfield2");
-//		todo.add("testfield3");
-//		
-//		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
-//		for(MethodNode mn: mths)
-//		{
-//			System.out.println(mn.name);
-//			if(mn.name.equals("<init>"))
-//			{
-//				InsnList l = cn.methods.get(0).instructions;
-//				for(int i=0; i<l.size() && !todo.isEmpty(); i++)
-//				{
-//					AbstractInsnNode n = l.get(i);
-//					if(n instanceof LabelNode)
-//					{
-//						LabelNode ln = (LabelNode)n;
-//						System.out.println(ln.getLabel());
-//					}
-//					else if(n instanceof FieldInsnNode)
-//					{
-//						FieldInsnNode fn = (FieldInsnNode)n;
-//						
-//						if(Opcodes.PUTFIELD==fn.getOpcode() && todo.contains(fn.name))
-//						{
-//							todo.remove(fn.name);
-//							System.out.println("found putfield node: "+fn.name+" "+fn.getOpcode());
-//							AbstractInsnNode start = fn;
-//							while(!(start instanceof LabelNode))
-//							{
-//								start = start.getPrevious();
-//							}
-//
-//							MethodNode mnode = new MethodNode(mn.access, prefix+SUtil.firstToUpperCase(fn.name), mn.desc, mn.signature, null);
-//							
-//							Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
-//							while(!start.equals(fn))
-//							{
-//								AbstractInsnNode clone;
-//								if(start instanceof LabelNode)
-//								{
-//									clone = new LabelNode(new Label());
-//									labels.put((LabelNode)start, (LabelNode)clone);
-//								}
-//								else
-//								{
-//									clone = start.clone(labels);
-//								}
-//								mnode.instructions.add(clone);
-//								start = start.getNext();
-//							}
-//							mnode.instructions.add(start.clone(labels));
-//							mnode.visitInsn(Opcodes.RETURN);
-//							
-//							cn.methods.add(mnode);
-//						}
-//					}
-//					else
-//					{
-//						System.out.println(n);
-//					}
-//				}
-//			}
-//		}
-		
-//		cn.name = classname;
-		
-//		System.out.println("cn: "+cn);
-		
-//		System.out.println(asm.getText());
-		
-//		ClassWriter cw = new ClassWriter(0);
-//		cw.accept(tcv);
-//		byte[] data = cw.toByteArray();
-		
-//		ByteClassLoader bcl = new ByteClassLoader(ASMBDIClassGenerator.class.getClassLoader());
-		
-//		Class<?> cl = toClass("jadex.bdiv3.MyTestClass", data, new URLClassLoader(new URL[0], ASMBDIClassGenerator.class.getClassLoader()), null);
-////		Class<?> cl = bcl.loadClass("lars.Lars", cw.toByteArray(), true);
-//		Object o = cl.newInstance();
-////		System.out.println("o: "+o);
-////		Object v = cl.getMethod("getVal", new Class[0]).invoke(o, new Object[0]);
-//		String mn = prefix+SUtil.firstToUpperCase("testfield");
-//		Object v = cl.getMethod(mn, new Class[0]).invoke(o, new Object[0]);
-//		cl.getMethod(mn, new Class[0]).invoke(o, new Object[0]);
-//		cl.getMethod(mn, new Class[0]).invoke(o, new Object[0]);
-//		System.out.println("res: "+cl.getDeclaredField("testfield").get(o));
-		
-//		System.out.println(SUtil.arrayToString(cl.getDeclaredMethods()));
-		
-//		System.out.println(cl);
-//		Constructor<?> c = cl.getConstructor(new Class[0]);
-//		c.setAccessible(true);
-//		c.newInstance(new Object[0]);
-//		Method m = cl.getMethod("main", new Class[]{String[].class});
-//		m.setAccessible(true);
-//		m.invoke(null, new Object[]{new String[0]});
-	}
+////		CheckClassAdapter cc = new CheckClassAdapter(tcv);
 
+		ClassNode cn = SASM.getClassNode(MyTestClass.class, null);
+		cn.accept(tcv);
+	}	
+////		final String classname = "lars/Lars";
+////		final String supername = "jadex/bdiv3/MyTestClass";
+//		
+////		final ASMifier asm = new ASMifier();
+//		
+//		ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, tcv)
+//		{
+////			public void visit(int version, int access, String name,
+////				String signature, String superName, String[] interfaces)
+////			{
+////				super.visit(version, access, classname, null, superName, interfaces);
+////			}
+//		
+//			public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
+//			{
+//				return new MethodVisitor(api, super.visitMethod(access, methodname, desc, signature, exceptions))
+//				{
+////					public void visitFieldInsn(int opcode, String owner, String name, String desc)
+////					{
+////						super.visitFieldInsn(opcode, owner, methodname, desc);
+////					}
+//					public void visitInsn(int opcode)
+//					{
+//						super.visitInsn(opcode);
+//					}
+//				};
+//				
+////				return super.visitMethod(access, methodname, desc, signature, exceptions);
+////				
+////				System.out.println("visit method: "+methodname);
+//				
+////				if("<init>".equals(methodname))
+////				{
+////					return new TraceMethodVisitor(super.visitMethod(access, methodname, desc, signature, exceptions), asm);
+////				}
+////				else
+////				{
+////					return super.visitMethod(access, methodname, desc, signature, exceptions);
+////				}
+//			}
+//		};
+//		
+//		ClassReader cr = new ClassReader("jadex.bdiv3.MyTestClass");
+//		cr.accept(cv, 0);
+////		ClassNode cn = new ClassNode();
+////		cr.accept(cn, 0);
+////		
+////		String prefix = "__update";
+////		Set<String> todo = new HashSet<String>();
+////		todo.add("testfield");
+////		todo.add("testfield2");
+////		todo.add("testfield3");
+////		
+////		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
+////		for(MethodNode mn: mths)
+////		{
+////			System.out.println(mn.name);
+////			if(mn.name.equals("<init>"))
+////			{
+////				InsnList l = cn.methods.get(0).instructions;
+////				for(int i=0; i<l.size() && !todo.isEmpty(); i++)
+////				{
+////					AbstractInsnNode n = l.get(i);
+////					if(n instanceof LabelNode)
+////					{
+////						LabelNode ln = (LabelNode)n;
+////						System.out.println(ln.getLabel());
+////					}
+////					else if(n instanceof FieldInsnNode)
+////					{
+////						FieldInsnNode fn = (FieldInsnNode)n;
+////						
+////						if(Opcodes.PUTFIELD==fn.getOpcode() && todo.contains(fn.name))
+////						{
+////							todo.remove(fn.name);
+////							System.out.println("found putfield node: "+fn.name+" "+fn.getOpcode());
+////							AbstractInsnNode start = fn;
+////							while(!(start instanceof LabelNode))
+////							{
+////								start = start.getPrevious();
+////							}
+////
+////							MethodNode mnode = new MethodNode(mn.access, prefix+SUtil.firstToUpperCase(fn.name), mn.desc, mn.signature, null);
+////							
+////							Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
+////							while(!start.equals(fn))
+////							{
+////								AbstractInsnNode clone;
+////								if(start instanceof LabelNode)
+////								{
+////									clone = new LabelNode(new Label());
+////									labels.put((LabelNode)start, (LabelNode)clone);
+////								}
+////								else
+////								{
+////									clone = start.clone(labels);
+////								}
+////								mnode.instructions.add(clone);
+////								start = start.getNext();
+////							}
+////							mnode.instructions.add(start.clone(labels));
+////							mnode.visitInsn(Opcodes.RETURN);
+////							
+////							cn.methods.add(mnode);
+////						}
+////					}
+////					else
+////					{
+////						System.out.println(n);
+////					}
+////				}
+////			}
+////		}
+//		
+////		cn.name = classname;
+//		
+////		System.out.println("cn: "+cn);
+//		
+////		System.out.println(asm.getText());
+//		
+////		ClassWriter cw = new ClassWriter(0);
+////		cw.accept(tcv);
+////		byte[] data = cw.toByteArray();
+//		
+////		ByteClassLoader bcl = new ByteClassLoader(ASMBDIClassGenerator.class.getClassLoader());
+//		
+////		Class<?> cl = toClass("jadex.bdiv3.MyTestClass", data, new URLClassLoader(new URL[0], ASMBDIClassGenerator.class.getClassLoader()), null);
+//////		Class<?> cl = bcl.loadClass("lars.Lars", cw.toByteArray(), true);
+////		Object o = cl.newInstance();
+//////		System.out.println("o: "+o);
+//////		Object v = cl.getMethod("getVal", new Class[0]).invoke(o, new Object[0]);
+////		String mn = prefix+SUtil.firstToUpperCase("testfield");
+////		Object v = cl.getMethod(mn, new Class[0]).invoke(o, new Object[0]);
+////		cl.getMethod(mn, new Class[0]).invoke(o, new Object[0]);
+////		cl.getMethod(mn, new Class[0]).invoke(o, new Object[0]);
+////		System.out.println("res: "+cl.getDeclaredField("testfield").get(o));
+//		
+////		System.out.println(SUtil.arrayToString(cl.getDeclaredMethods()));
+//		
+////		System.out.println(cl);
+////		Constructor<?> c = cl.getConstructor(new Class[0]);
+////		c.setAccessible(true);
+////		c.newInstance(new Object[0]);
+////		Method m = cl.getMethod("main", new Class[]{String[].class});
+////		m.setAccessible(true);
+////		m.invoke(null, new Object[]{new String[0]});
+//	}
+	
 }

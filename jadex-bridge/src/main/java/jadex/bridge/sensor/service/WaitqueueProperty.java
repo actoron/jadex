@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 import jadex.bridge.service.IService;
@@ -40,7 +41,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 		this.method = method;
 		this.sid = service.getServiceIdentifier();
 		
-		if(Proxy.isProxyClass(service.getClass()))
+		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
 			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{

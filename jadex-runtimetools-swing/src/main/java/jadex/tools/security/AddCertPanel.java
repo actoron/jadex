@@ -55,22 +55,22 @@ public class AddCertPanel extends JPanel
 	protected ButtonGroup certtypes;
 	
 	/** Signature algorithm chooser. */
-	protected JComboBox<String> sigalg;
+	protected JComboBox sigalg;
 	
 	/** Signature algorithm key strength chooser. */
-	protected JComboBox<String> sigalgstr;
+	protected JComboBox sigalgstr;
 	
 	/** Signature algorithm configuration chooser. */
-	protected JComboBox<String> sigalgconf;
+	protected JComboBox sigalgconf;
 	
 	/** Hash algorithm chooser. */
-	protected JComboBox<String> hashalg;
+	protected JComboBox hashalg;
 	
 	/** Validity of the certificate */
-	protected JComboBox<String> validity;
+	protected JComboBox validity;
 	
 	/** Path length of CA certificates */
-	protected JComboBox<String> pathlen;
+	protected JComboBox pathlen;
 	
 	/** The subject panel. */
 	protected SubjectPanel subjectpanel;
@@ -247,18 +247,18 @@ public class AddCertPanel extends JPanel
 		cryptsettings.setLayout(layout);
 		
 		JLabel sigalgstrlb = new JLabel("Key Strength");
-		sigalgstr = new JComboBox<String>();
+		sigalgstr = new JComboBox();
 		sigalgstr.setEditable(false);
 		sigalgstr.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalgconflb = new JLabel("Curve");
-		sigalgconf = new JComboBox<String>();
+		sigalgconf = new JComboBox();
 		sigalgconf.addItem("Brainpool");
 		sigalgconf.addItem("NIST");
 		sigalgconf.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalglb = new JLabel("Algorithm");
-		sigalg = new JComboBox<String>();
+		sigalg = new JComboBox();
 		sigalg.setLightWeightPopupEnabled(false);
 		sigalg.addItem("ECDSA");
 		sigalg.addItem("RSA");
@@ -296,7 +296,7 @@ public class AddCertPanel extends JPanel
 		sigalglis.itemStateChanged(null);
 		
 		JLabel hashalglb = new JLabel("Signature Hash");
-		hashalg = new JComboBox<String>();
+		hashalg = new JComboBox();
 		hashalg.setLightWeightPopupEnabled(false);
 		hashalg.setEditable(false);
 		hashalg.addItem("SHA256");
@@ -305,7 +305,7 @@ public class AddCertPanel extends JPanel
 		hashalg.setSelectedIndex(2);
 		
 		JLabel validitylb = new JLabel("Validity");
-		validity = new JComboBox<String>();
+		validity = new JComboBox();
 		validity.setLightWeightPopupEnabled(false);
 		validity.setEditable(true);
 		validity.addItem("30 days");
@@ -367,7 +367,7 @@ public class AddCertPanel extends JPanel
 		});
 		
 		JLabel pathlenlb = new JLabel("Path Length");
-		pathlen = new JComboBox<String>();
+		pathlen = new JComboBox();
 		pathlen.setLightWeightPopupEnabled(false);
 		pathlen.addItem("0");
 		pathlen.addItem("1");

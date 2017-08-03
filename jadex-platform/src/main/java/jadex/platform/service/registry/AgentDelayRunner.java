@@ -1,10 +1,13 @@
 package jadex.platform.service.registry;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Delay runner based on agent time scheduling.
@@ -47,6 +50,18 @@ public class AgentDelayRunner implements IDelayRunner
 			public boolean isValid()
 			{
 				return valid[0] && !cancelled;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(!(exception instanceof StepInvalidException)
+					&& !(exception instanceof ComponentTerminatedException))
+					exception.printStackTrace();
 			}
 		});
 		

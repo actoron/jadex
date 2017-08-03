@@ -1,6 +1,7 @@
 package jadex.bridge.service.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -44,11 +46,17 @@ public class ServiceQuery<T>
 	/** Flag, if service by the owner should be excluded. */
 	protected boolean excludeowner;
 	
+	/** The query id. */
+	protected String id;
+	
 	/** 
 	 *  Filter for checking further service attributes.
 	 *  Either IAsyncFilter<T> or IFilter<T>.
 	 */
 	protected Object filter;
+	
+	/** The multiple flag. */
+	protected boolean multiple;
 	
 	/**
 	 *  Create a new service query.
@@ -183,8 +191,8 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
 	{
-		if(owner==null)
-			throw new IllegalArgumentException("Owner must not null");
+//		if(owner==null)
+//			throw new IllegalArgumentException("Owner must not null");
 		
 		this.servicetype = servicetype;
 		this.scope = scope;
@@ -192,6 +200,8 @@ public class ServiceQuery<T>
 		this.owner = owner;
 		this.filter = filter;
 		this.returntype = returntype;
+		
+		this.id = SUtil.createUniqueId(""+servicetype);
 	}
 	
 	/**
@@ -206,6 +216,7 @@ public class ServiceQuery<T>
 		this.servicetags = original.servicetags;
 		this.filter = original.filter;
 		this.owner = original.owner;
+		this.id = original.id;
 	}
 
 	/**
@@ -355,6 +366,24 @@ public class ServiceQuery<T>
 	}
 	
 	/**
+	 *  Get the platform.
+	 *  @return The platform
+	 */
+	public IComponentIdentifier getPlatform()
+	{
+		return platform;
+	}
+	
+	/**
+	 *  Get the platform.
+	 *  @param platform The platform
+	 */
+	public void setPlatform(IComponentIdentifier platform)
+	{
+		this.platform = platform;
+	}
+	
+	/**
 	 *  Get the owner.
 	 *  @return The owner
 	 */
@@ -393,6 +422,42 @@ public class ServiceQuery<T>
 	}
 	
 	/**
+	 *  Get the id.
+	 *  @return the id
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	/**
+	 *  Set the id.
+	 *  @param id The id to set
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+	
+	/**
+	 *  Get the multiple.
+	 *  @return the multiple
+	 */
+	public boolean isMultiple()
+	{
+		return multiple;
+	}
+
+	/**
+	 *  Set the multiple.
+	 *  @param multiple The multiple to set
+	 */
+	public void setMultiple(boolean multiple)
+	{
+		this.multiple = multiple;
+	}
+
+	/**
 	 *  Gets the specification for the indexer.
 	 *  
 	 *  @return The specification for the indexer.
@@ -402,20 +467,20 @@ public class ServiceQuery<T>
 		List<Tuple2<String, String[]>> ret = new ArrayList<Tuple2<String,String[]>>();
 		
 		if(platform != null)
-			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
+			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
 		
 		if(provider != null)
-			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
+			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
 		
 		if(servicetype != null)
-			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
+			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
 		
 		if(servicetags != null && servicetags.length > 0)
-			ret.add(new Tuple2<String, String[]>(JadexServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
+			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
 		
 		return ret;
 	}
-	
+		
 	/**
 	 *  Tests if the query matches a service.
 	 *  
@@ -460,7 +525,7 @@ public class ServiceQuery<T>
 		
 		if (servicetags != null)
 		{
-			Set<String> tagsset = JadexServiceKeyExtractor.getKeysStatic(JadexServiceKeyExtractor.KEY_TYPE_TAGS, service);
+			Set<String> tagsset = ServiceKeyExtractor.getKeysStatic(ServiceKeyExtractor.KEY_TYPE_TAGS, service);
 			if (tagsset == null)
 				return false;
 			
@@ -482,5 +547,34 @@ public class ServiceQuery<T>
 		return true;
 	}
 	
-	
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return id.hashCode()*13;
+	}
+
+	/**
+	 *  Test if other object equals this one.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof ServiceQuery)
+		{
+			ServiceQuery<?> other = (ServiceQuery<?>)obj;
+			ret = SUtil.equals(getId(), other.getId());
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ServiceQuery(returntype=" + returntype + ", servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", scope=" + scope + ", owner=" + owner + ", provider="
+			+ provider + ", platform=" + platform + ", excludeowner=" + excludeowner + ", filter=" + filter + ")";
+	}
 }

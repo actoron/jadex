@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.StepAborted;
@@ -54,9 +55,9 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			boolean switchcall = true;
 			
 			// is not sufficient as could also be basicinvocationhandler of provided proxy
-			if(Proxy.isProxyClass(sic.getObject().getClass()))
+			if(ProxyFactory.isProxyClass(sic.getObject().getClass()))
 			{
-				Object handler = Proxy.getInvocationHandler(sic.getObject());
+				Object handler = ProxyFactory.getInvocationHandler(sic.getObject());
 				if(handler instanceof ISwitchCall)
 				{
 					switchcall = ((ISwitchCall)handler).isSwitchCall();
@@ -84,7 +85,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			else
 			{
 				// Remember context for rmi command (extracts and stores it until return command arrives and non-func can be set)
-				if(Proxy.getInvocationHandler(sic.getObject()).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1)
+				if(ProxyFactory.getInvocationHandler(sic.getObject()).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1)
 					ServiceInvocationContext.SICS.set(sic);
 				
 //				if(sic.getMethod().getName().indexOf("test")!=-1)

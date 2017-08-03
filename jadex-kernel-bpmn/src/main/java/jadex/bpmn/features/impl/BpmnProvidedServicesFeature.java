@@ -13,6 +13,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.ProcessServiceInvocationHandler;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -107,7 +108,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
-			ret = Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{info.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())}, 
+			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{info.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())}, 
 				new ProcessServiceInvocationHandler(getComponent(), methods));
 		}
 		

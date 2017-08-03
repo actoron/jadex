@@ -1,6 +1,7 @@
 package jadex.commons.future;
 
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -372,6 +373,13 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public void	setResult(E result)
     {
+//    	if(result!=null && (SReflect.getField(result.getClass(), "isproxy")!=null
+//    		|| Proxy.isProxyClass(result.getClass())))
+//    	{
+//    		System.out.println("proxy result: "+result);
+////    		Thread.dumpStack();
+//    	}
+    	
     	doSetResult(result, false);
     	
     	resume();
