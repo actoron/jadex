@@ -48,6 +48,7 @@ import static jadex.base.IRootComponentConfiguration.SSLTCPPORT;
 import static jadex.base.IRootComponentConfiguration.SSLTCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.STRICTCOM;
 import static jadex.base.IRootComponentConfiguration.SUPERPEER;
+import static jadex.base.IRootComponentConfiguration.SUPERPEERCLIENT;
 import static jadex.base.IRootComponentConfiguration.TCPPORT;
 import static jadex.base.IRootComponentConfiguration.TCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.THREADPOOLCLASS;
@@ -195,7 +196,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false")
+	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="!\"true\".equals($args.superpeer)")
 })
 
 @ComponentTypes({
@@ -313,7 +315,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 0 : 1"),
 		
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
@@ -380,7 +382,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 0 : 1"),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
@@ -445,7 +447,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		}),
 
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 0 : 1"),
 
 		// no service
 		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),

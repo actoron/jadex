@@ -486,8 +486,13 @@ public interface IRootComponentConfiguration {
     // default:
     // true
 
-    /** Flag if registry synchronization should be used. **/
+    /** Flag if platform should support registry synchronization. **/
     public static final String	SUPERPEER			= StarterConfiguration.SUPERPEER;		// class:
+    // default:
+    // false
+
+    /** Flag if registry synchronization should be used. **/
+    public static final String	SUPERPEERCLIENT			= StarterConfiguration.SUPERPEERCLIENT;		// class:
     // default:
     // false
 
@@ -501,7 +506,7 @@ public interface IRootComponentConfiguration {
             PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, NIOTCPTRANSPORT, RELAYTRANSPORT,
             RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
             MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
-            LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER
+            LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER, SUPERPEERCLIENT
     };
 
 
