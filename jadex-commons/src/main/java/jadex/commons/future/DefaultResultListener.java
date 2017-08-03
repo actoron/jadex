@@ -86,10 +86,6 @@ public abstract class DefaultResultListener<E> implements IFutureCommandResultLi
 	 */
 	public void exceptionOccurred(Exception exception)
 	{
-		if(exception.toString().indexOf("lain")!=-1)
-		{
-			System.out.println("xcfj glkb");
-		}
 		if(Future.DEBUG)
 		{
 			this.exception.printStackTrace();

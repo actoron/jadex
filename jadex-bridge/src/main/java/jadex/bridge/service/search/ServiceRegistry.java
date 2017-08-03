@@ -25,6 +25,7 @@ import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.IAsyncFilter;
@@ -106,8 +107,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean isSuperpeer()
 	{
-		return false;
-//		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
+		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
 	}
 	
 //	/**
@@ -354,14 +354,19 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected IFuture<IComponentIdentifier> searchSuperpeer()
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
-			.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
+		// Only search for super peer when super peer client agent is running. (hack???)
+		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
+		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
 		{
-			public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
+			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
+				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 			{
-				ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
-			}	
-		});
+				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
+				{
+					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+				}	
+			});
+		}
 		return ret;
 	}
 	

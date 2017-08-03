@@ -18,7 +18,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -236,6 +235,7 @@ public abstract class TestAgent
 							"-simulation", "false",
 							"-printpass", "false",
 							"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class",
+							"-superpeerclient", "false"
 //							"-logging", "true",
 ////							"-relaytransport", "false",
 //							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)

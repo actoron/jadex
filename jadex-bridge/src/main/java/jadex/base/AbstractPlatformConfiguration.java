@@ -192,6 +192,9 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setSettings(true);
         rootConfig.setContext(true);
         rootConfig.setAddress(true);
+        
+		rootConfig.setValue(StarterConfiguration.SUPERPEERCLIENT, false);
+        
         return config;
     }
 

@@ -315,7 +315,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
@@ -382,7 +382,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
@@ -430,7 +430,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		}),
 		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 
 		// not requested as service
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
