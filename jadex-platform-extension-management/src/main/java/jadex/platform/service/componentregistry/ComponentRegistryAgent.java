@@ -63,7 +63,7 @@ import jadex.micro.annotation.ProvidedServices;
     @Argument(name="componentinfos", clazz=CreationInfo.class, description="The component models to add initially.",
     	defaultvalue="new CreationInfo[]{"
 //    		+ "new CreationInfo(\"jadex/platform/service/componentregistry/HelloAgent.class\"), "
-    		+ "new CreationInfo(\"jadex/platform/service/address/TransportAddressAgent.class\"), "
+//    		+ "new CreationInfo(\"jadex/platform/service/address/TransportAddressAgent.class\"), "
 //    		+ "new CreationInfo(\"jadex/platform/service/message/MessageAgent.class\"), " // message service is raw :-(
 //    		+ "new CreationInfo(\"jadex/platform/service/marshal/MarshalAgent.class\"), " // marshal service is raw :-(
     		+ "new CreationInfo(\"jadex/platform/service/chat/ChatAgent.class\"), "

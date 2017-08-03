@@ -428,27 +428,27 @@ import jadex.platform.service.simulation.SimulationAgent;
 		}),
 		
 		// raw
-		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
-			@NameValue(name="localtransport", value="$args.localtransport"),
-			@NameValue(name="tcptransport", value="$args.tcptransport"),
-			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
-			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
-			@NameValue(name="relaytransport", value="$args.relaytransport"),
-			@NameValue(name="tcpport", value="$args.tcpport"),
-			@NameValue(name="niotcpport", value="$args.niotcpport"),
-			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
-			@NameValue(name="relayaddress", value="$args.relayaddress"),
-			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
-			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
-			@NameValue(name="binarymessages", value="$args.binarymessages"),
-			@NameValue(name="strictcom", value="$args.strictcom"),
-		}),
+//		@Component(name="message", type="message", daemon=Boolean3.TRUE, number="$args.message? 1 : 0", arguments={
+//			@NameValue(name="localtransport", value="$args.localtransport"),
+//			@NameValue(name="tcptransport", value="$args.tcptransport"),
+//			@NameValue(name="niotcptransport", value="$args.niotcptransport"),
+//			@NameValue(name="ssltcptransport", value="$args.ssltcptransport"),
+//			@NameValue(name="relaytransport", value="$args.relaytransport"),
+//			@NameValue(name="tcpport", value="$args.tcpport"),
+//			@NameValue(name="niotcpport", value="$args.niotcpport"),
+//			@NameValue(name="ssltcpport", value="$args.ssltcpport"),
+//			@NameValue(name="relayaddress", value="$args.relayaddress"),
+//			@NameValue(name="relaysecurity", value="$args.relaysecurity"),
+//			@NameValue(name="relayawaonly", value="$args.relayawaonly"),
+//			@NameValue(name="binarymessages", value="$args.binarymessages"),
+//			@NameValue(name="strictcom", value="$args.strictcom"),
+//		}),
 
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
 
 		// no service
-		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
+//		@Component(name="rms", type="rms", daemon=Boolean3.TRUE),
 		
 		// not requested as service
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
