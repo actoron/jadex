@@ -14,7 +14,10 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 
-public class JadexServiceKeyExtractor implements IKeyExtractor
+/**
+ *  Responsible for extracting values.
+ */
+public class ServiceKeyExtractor implements IKeyExtractor
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -28,13 +31,15 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	/** Key type for the service platform. */
 	public static final String KEY_TYPE_PLATFORM = "platform";
 	
+	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
+	
 	static
 	{
 		List<String> keytypes = new ArrayList<String>();
 		try
 		{
-			Field[] fields = JadexServiceKeyExtractor.class.getDeclaredFields();
+			Field[] fields = ServiceKeyExtractor.class.getDeclaredFields();
 			for (Field field : fields)
 			{
 				if (field.getName().startsWith("KEY_TYPE_"))
@@ -60,6 +65,16 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	{
 		return getKeysStatic(keytype, serv);
 	}
+	
+	/**
+	 *  Get the key names for this type of extractor.
+	 *  @return The key names.
+	 */
+	public String[] getKeyNames()
+	{
+		return SERVICE_KEY_TYPES;
+	}
+	
 	
 	/**
 	 *  Extracts keys from a service.
@@ -104,7 +119,7 @@ public class JadexServiceKeyExtractor implements IKeyExtractor
 	/**
 	 *  Efficiently wrap a single value as a Set.
 	 */
-	private static class SetWrapper<T> implements Set<T>
+	public static class SetWrapper<T> implements Set<T>
 	{
 		private T wrappedobject;
 		

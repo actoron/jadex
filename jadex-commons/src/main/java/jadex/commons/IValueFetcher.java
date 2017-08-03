@@ -9,7 +9,7 @@ package jadex.commons;
  *  values can be dynamically retrieved.
  */
 public interface IValueFetcher
-{
+{	
 	/**
 	 *  Fetch a value via its name.
 	 *  @param name The name.

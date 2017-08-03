@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.sensor.time.TimedProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -49,7 +50,7 @@ public class LatencyProperty extends TimedProperty
 		{
 			this.sid = service.getServiceIdentifier();
 		
-			if(Proxy.isProxyClass(service.getClass()))
+			if(ProxyFactory.isProxyClass(service.getClass()))
 			{
 				listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 				{

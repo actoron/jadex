@@ -9,6 +9,7 @@ import java.util.List;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
@@ -40,7 +41,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModel.ServiceInjectionInfo;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 /**
@@ -99,7 +100,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 					
-					RequiredServiceInfo	info	= model.getModelInfo().getRequiredService(sername);				
+					// Uses required service info to search service
+					RequiredServiceInfo	info = model.getModelInfo().getRequiredService(sername);				
 										
 					for(int j=0; j<infos.length; j++)
 					{
@@ -110,7 +112,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							
 							// todo: what about multi case?
 							// why not add values to a collection as they come?!
-							// currently waits until the search has finised before injecting
+							// currently waits until the search has finished before injecting
 							
 							// Is annotation is at field and field is of type future directly set it
 							if(SReflect.isSupertype(IFuture.class, f.getType()))
@@ -159,7 +161,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 											return sfut;
 										}
 									});
-									Object proxy = Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, clz}, h);
+									Object proxy = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, clz}, h);
 								
 									try
 									{
@@ -198,7 +200,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										public void exceptionOccurred(Exception e)
 										{
 											if(!(e instanceof ServiceNotFoundException)
-												|| f.getAnnotation(AgentService.class).required())
+												|| f.getAnnotation(AgentServiceSearch.class).required())
 											{
 												component.getLogger().warning("Field injection failed: "+e);
 												lis2.exceptionOccurred(e);
@@ -225,12 +227,13 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						}
 						else if(infos[j].getMethodInfo()!=null)
 						{
-							final Method	m	= SReflect.getMethod(agent.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
+							final Method m = SReflect.getMethod(agent.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
 
 							if(infos[j].isQuery())
 							{
 								TagFilter<Object> tagfil = info.getTags()==null || info.getTags().size()==0? null: new TagFilter<Object>(component.getExternalAccess(), info.getTags());
 								ISubscriptionIntermediateFuture<Object> sfut = SServiceProvider.addQuery(getComponent(), (Class<Object>)info.getType().getType(getComponent().getClassLoader()), info.getDefaultBinding().getScope(), tagfil);
+								lis2.resultAvailable(null);
 								
 								// Invokes methods for each intermediate result
 								sfut.addResultListener(new IIntermediateResultListener<Object>()
@@ -270,7 +273,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									public void exceptionOccurred(Exception e)
 									{
 										if(!(e instanceof ServiceNotFoundException)
-											|| m.getAnnotation(AgentService.class).required())
+											|| m.getAnnotation(AgentServiceSearch.class).required())
 										{
 											component.getLogger().warning("Method injection failed: "+e);
 										}
@@ -351,7 +354,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										public void exceptionOccurred(Exception e)
 										{
 											if(!(e instanceof ServiceNotFoundException)
-												|| m.getAnnotation(AgentService.class).required())
+												|| m.getAnnotation(AgentServiceSearch.class).required())
 											{
 												component.getLogger().warning("Method injection failed: "+e);
 											}
@@ -393,7 +396,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										public void exceptionOccurred(Exception e)
 										{
 											if(!(e instanceof ServiceNotFoundException)
-												|| m.getAnnotation(AgentService.class).required())
+												|| m.getAnnotation(AgentServiceSearch.class).required())
 											{
 												component.getLogger().warning("Method service injection failed: "+e);
 											}

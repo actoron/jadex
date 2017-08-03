@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
@@ -207,7 +208,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		}
 		else if(args!=null && args.length==1 && args[0]!=null && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
 		{
-			Object	cmp	= Proxy.isProxyClass(args[0].getClass()) ? Proxy.getInvocationHandler(args[0]) : args[0];
+			Object	cmp	= ProxyFactory.isProxyClass(args[0].getClass()) ? ProxyFactory.getInvocationHandler(args[0]) : args[0];
 			ret	= equals(cmp);
 		}
 		else
@@ -253,7 +254,20 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //							System.out.println("call method init");
 						try
 						{
-							FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+							// Although normally ret.getResult() is a future there are cases when not
+							// because of mapping the method during the call (could be future method and inner one is not)
+							if(sic.getResult() instanceof Exception)
+							{
+								fret.setException((Exception)sic.getResult());
+							}
+							else if(sic.getResult()!=null && !(sic.getResult() instanceof IFuture))
+							{
+								fret.setResult(sic.getResult());
+							}
+							else
+							{
+								FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
+							}
 						}
 						catch(Exception e)
 						{
@@ -497,7 +511,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info, scope);
-			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			ret	= (IInternalService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+//			try
+//			{
+//				((IService)service).getServiceIdentifier();
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+			
 			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
@@ -505,8 +528,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			{
 				if(!service.getClass().isAnnotationPresent(Service.class)
 					// Hack!!! BPMN uses a proxy as service implementation.
-					&& !(Proxy.isProxyClass(service.getClass())
-					&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
+					&& !(ProxyFactory.isProxyClass(service.getClass())
+					&& ProxyFactory.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
 				{
 					//throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
 					ia.getLogger().warning("Pojo service should declare @Service annotation: "+service.getClass());
@@ -705,7 +728,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if(!(service instanceof IService))
 			{
-				handler.addFirstServiceInterceptor(new ResolveInterceptor());
+				handler.addFirstServiceInterceptor(new ResolveInterceptor(ia));
 			}
 			
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
@@ -739,7 +762,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
-		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader, ia.getModel().getAllImports())}, handler); //sid.getServiceType()
+		return (IInternalService)ProxyFactory.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader, ia.getModel().getAllImports())}, handler); //sid.getServiceType()
 	}
 
 	/**
@@ -793,7 +816,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> ty = info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 			if(ty==null)
 				throw new IllegalArgumentException("Type must not null: "+ty);
-			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 
+			ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 
 		
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
@@ -985,9 +1008,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static boolean isRequiredServiceProxy(Object service)
 	{
 		boolean ret = false;
-		if(Proxy.isProxyClass(service.getClass()))
+		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
-			Object tmp = Proxy.getInvocationHandler(service);
+			Object tmp = ProxyFactory.getInvocationHandler(service);
 			if(tmp instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)tmp;
@@ -1005,9 +1028,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static boolean isProvidedServiceProxy(Object service)
 	{
 		boolean ret = false;
-		if(Proxy.isProxyClass(service.getClass()))
+		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
-			Object tmp = Proxy.getInvocationHandler(service);
+			Object tmp = ProxyFactory.getInvocationHandler(service);
 			if(tmp instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)tmp;

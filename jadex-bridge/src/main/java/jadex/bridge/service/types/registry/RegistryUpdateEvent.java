@@ -13,6 +13,22 @@ public class RegistryUpdateEvent
 	protected long leasetime;
 	
 	/**
+	 *  Create a new RegistryUpdateEvent.
+	 */
+	public RegistryUpdateEvent()
+	{
+	}
+	
+	/**
+	 *  Create a new RegistryUpdateEvent.
+	 */
+	public RegistryUpdateEvent(boolean removed, long leasetime)
+	{
+		this.removed = removed;
+		this.leasetime = leasetime;
+	}
+
+	/**
 	 *  Ask if the client was removed from the server.
 	 *  Should send a full update as next event.
 	 */

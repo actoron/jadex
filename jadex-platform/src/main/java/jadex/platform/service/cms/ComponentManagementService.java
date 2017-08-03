@@ -1,6 +1,7 @@
 package jadex.platform.service.cms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -549,11 +550,21 @@ public class ComponentManagementService implements IComponentManagementService
 														}
 														else
 														{
-															factory.getComponentFeatures(lmodel)
-																.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
+//															System.out.print("<"+lmodel.getName()+" "+factory.getClass());
+															IFuture fut = factory.getComponentFeatures(lmodel);
+															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
 															{
 																public void customResultAvailable(Collection<IComponentFeatureFactory> features)
 																{
+//															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Object, IComponentIdentifier>(inited)
+//															{
+//																public void customResultAvailable(Object o)
+//																{
+//																	if(!(o instanceof Collection))
+//																		System.out.println("ppp: "+o);
+																	
+//																	Collection<IComponentFeatureFactory> features = (Collection<IComponentFeatureFactory>)o;
+//																	System.out.println(">");
 																	// Create id and adapter.
 																	
 																	final BasicComponentIdentifier cid;
@@ -680,7 +691,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	String paname = pacid.getName().replace('@', '.');
 																	
-																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
+																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getNameHint()!=null? lmodel.getNameHint(): lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
 																	ServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);

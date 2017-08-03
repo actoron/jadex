@@ -1,9 +1,23 @@
 package jadex.bdiv3;
 
+import java.lang.reflect.InvocationHandler;
 
-
-public class MyTestClass
+public class MyTestClass extends java.util.ArrayList
 {
+	protected InvocationHandler handler;
+	
+	public MyTestClass()
+	{
+		Object o = new Object();
+		String st = o.toString();
+		System.out.println(st);
+	}
+	
+	public MyTestClass(InvocationHandler handler)
+	{
+		this.handler = handler;
+	}
+
 //	public int testfield = inc();
 
 //	@Belief(dependson="testfield")
@@ -43,14 +57,49 @@ public class MyTestClass
 ////		testfield = 22;
 //	}
 	
-	public void nix()
+//	public boolean nix()
+//	{
+//		Boolean b = Boolean.TRUE;
+//		return b;
+//	}
+	
+//	public void call()
+//	{
+////		String mname = Thread.currentThread().getStackTrace()[1].getMethodName();
+//		try
+//		{
+//			handler.invoke(this, null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			SUtil.rethrowAsUnchecked(e);
+//		}
+//	}
+	
+	public String[] abc() 
 	{
+		return new String[0];
 	}
 	
-	public static Object getNull()
+	public void call2(String hallo, long l) 
 	{
-		return null;
+		System.out.println("Hallo: "+hallo+" "+l);
+//		String mname = Thread.currentThread().getStackTrace()[1].getMethodName();
+		
+//		Method m = this.getClass().getMethod("call2", new Class[]{});
+		
+//		handler.invoke(this, m, null);
 	}
+	
+	public int add(long a, int b) 
+	{
+		return (int)a+b;
+	}
+	
+//	public static Object getNull()
+//	{
+//		return null;
+//	}
 	
 //	public void setVal(double val)
 //	{
@@ -94,10 +143,10 @@ public class MyTestClass
 //		return d;
 //	}
 //
-	public boolean getboVal()
-	{
-		return false;
-	}
+//	public boolean getboVal()
+//	{
+//		return false;
+//	}
 //
 //	public char getcVal()
 //	{

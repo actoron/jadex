@@ -14,7 +14,7 @@ import jadex.commons.gui.future.SwingDelegationResultListener;
 /**
  *  Panel for the daemon view.
  */
-public class SimServiceViewerPanel extends AbstractServiceViewerPanel
+public class SimServiceViewerPanel extends AbstractServiceViewerPanel<ISimulationService>
 {
 	//-------- attributes --------
 	

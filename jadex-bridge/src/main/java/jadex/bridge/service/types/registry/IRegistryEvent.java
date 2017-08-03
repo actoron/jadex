@@ -28,9 +28,9 @@ public interface IRegistryEvent
 	 */
 	public boolean isDelta();
 	
-//	/**
-//	 *  Get the size of the event in terms of the number of subevents.
-//	 *  @return The number of contained changes.
-//	 */
-//	public int size();
+	/**
+	 *  Get the size of the event in terms of the number of subevents.
+	 *  @return The number of contained changes.
+	 */
+	public int size();
 }

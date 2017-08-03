@@ -16,7 +16,7 @@ public interface IServicePoolService
 //	public static final String POOL_BROADCAST = "pool_broadcast";
 	
 	/**
-	 *  Add a new service type and a strategy.
+	 *  Add a new service type.
 	 *  @param servicetype The service type.
 	 *  @param componentmodel The component model.
 	 */
@@ -26,6 +26,7 @@ public interface IServicePoolService
 	 *  Add a new service type and a strategy.
 	 *  @param servicetype The service type.
 	 *  @param componentmodel The component model.
+	 *  @param info The creation info.
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info);
 	

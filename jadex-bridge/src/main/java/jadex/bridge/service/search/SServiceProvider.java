@@ -449,7 +449,6 @@ public class SServiceProvider
 		final Future<T> ret = new Future<T>();
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
 		{
-			
 			public void customResultAvailable(Void result)
 			{
 				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
@@ -2342,6 +2341,17 @@ public class SServiceProvider
 //		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, cid);
 		
 //		return SynchronizedServiceRegistry.getRegistry(cid).addQuery(query);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IExternalAccess component, ServiceQuery<T> query)
+	{
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot()).addQuery(query);
 	}
 }
 

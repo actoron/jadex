@@ -23,7 +23,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -50,7 +50,7 @@ public class ElizaAgent
 	protected IInternalAccess	agent;
 	
 	/** The gui service for controlling the inner chat component. */
-	@AgentService
+	@AgentServiceSearch
 	protected IChatGuiService	chat;
 	
 	/** Each contact gets its own eliza conversation. */

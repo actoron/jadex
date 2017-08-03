@@ -28,6 +28,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -73,7 +74,8 @@ import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentResult;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
@@ -789,9 +791,9 @@ public class MicroClassReader
 				{
 					micromodel.addParentInjection(new FieldInfo(fields[i]));
 				}
-				else if(isAnnotationPresent(fields[i], AgentService.class, cl))
+				else if(isAnnotationPresent(fields[i], AgentServiceSearch.class, cl))
 				{
-					AgentService ser = getAnnotation(fields[i], AgentService.class, cl);
+					AgentServiceSearch ser = getAnnotation(fields[i], AgentServiceSearch.class, cl);
 					RequiredService rs = ser.requiredservice();
 					
 					if(!rs.type().equals(Object.class))
@@ -816,12 +818,44 @@ public class MicroClassReader
 							rsers.put(rsis.getName(), rsis);
 						}
 						
-						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), ser.lazy());
+						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), ser.lazy(), false);
 					}
 					else
 					{
 						String name = ser.name().length()>0? ser.name(): fields[i].getName();
-						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), ser.lazy());
+						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), ser.lazy(), false);
+					}
+				}
+				else if(isAnnotationPresent(fields[i], AgentServiceQuery.class, cl))
+				{
+					AgentServiceQuery ser = getAnnotation(fields[i], AgentServiceQuery.class, cl);
+					RequiredService rs = ser.requiredservice();
+					
+					if(!rs.type().equals(Object.class))
+					{
+						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+						
+						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+						if(rsis.getName().length()==0)
+							rsis.setName(fields[i].getName());
+					
+						if(rsers.containsKey(rsis.getName()))
+						{
+							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
+							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
+						}
+						else
+						{
+							rsers.put(rsis.getName(), rsis);
+						}
+						
+						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), true, true);
+					}
+					else
+					{
+						String name = fields[i].getName();
+						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), true, true);
 					}
 				}
 				else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
@@ -860,9 +894,9 @@ public class MicroClassReader
 			Method[] methods = cma.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
-				if(isAnnotationPresent(methods[i], AgentService.class, cl))
+				if(isAnnotationPresent(methods[i], AgentServiceSearch.class, cl))
 				{
-					AgentService ser = getAnnotation(methods[i], AgentService.class, cl);
+					AgentServiceSearch ser = getAnnotation(methods[i], AgentServiceSearch.class, cl);
 					String name;
 					if(ser.name().length()>0)
 					{
@@ -885,6 +919,37 @@ public class MicroClassReader
 						}
 					}
 					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
+				}
+				
+				if(isAnnotationPresent(methods[i], AgentServiceQuery.class, cl))
+				{
+					AgentServiceQuery asq = getAnnotation(methods[i], AgentServiceQuery.class, cl);
+					
+					String name = SUtil.createUniqueId(methods[i].getName());
+					ModelInfo mi = (ModelInfo)micromodel.getModelInfo();
+					
+					Class<?> iftype = asq.type();
+					if(Object.class.equals(iftype))
+					{
+						Class<?>[] ptypes = methods[i].getParameterTypes();
+						for(Class<?> ptype: ptypes)
+						{
+							if(isAnnotationPresent(ptype, Service.class, cl))
+							{
+								iftype = ptype;
+								break;
+							}
+						}
+					}
+					
+					if(iftype==null || Object.class.equals(iftype))
+						throw new RuntimeException("No service interface found for service query");
+					
+					RequiredServiceInfo rsi = new RequiredServiceInfo(name, iftype, asq.scope(), null);
+					rsi.setMultiple(asq.multiple());
+					mi.addRequiredService(rsi);
+					
+					micromodel.addServiceInjection(name, new MethodInfo(methods[i]), true);
 				}
 
 				// todo: method name, parameters, intervals...
@@ -1614,7 +1679,7 @@ public class MicroClassReader
 	/**
 	 *  Create a service implementation.
 	 */
-	protected ProvidedServiceImplementation createImplementation(Implementation impl, Class<?> cma)
+	public static ProvidedServiceImplementation createImplementation(Implementation impl, Class<?> cma)
 	{
 		Class<?> cl = impl.value();
 		String exp = impl.expression().length()>0? 
@@ -1637,7 +1702,7 @@ public class MicroClassReader
 	/**
 	 *  Create a service binding.
 	 */
-	protected RequiredServiceBinding createBinding(Binding bd)
+	public static RequiredServiceBinding createBinding(Binding bd)
 	{
 		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
@@ -1706,7 +1771,7 @@ public class MicroClassReader
 	/**
 	 *  Create component instance info from creation info annotation.
 	 */
-	protected ComponentInstanceInfo createComponentInstanceInfo(CreationInfo comp)
+	public static ComponentInstanceInfo createComponentInstanceInfo(CreationInfo comp)
 	{
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
@@ -1740,7 +1805,7 @@ public class MicroClassReader
 	/**
 	 *  Create unparsed expressions.
 	 */
-	protected UnparsedExpression[] createUnparsedExpressions(Value[] values)
+	public static UnparsedExpression[] createUnparsedExpressions(Value[] values)
 	{
 		UnparsedExpression[] ret = null;
 		if(values.length>0)
@@ -1982,7 +2047,7 @@ public class MicroClassReader
 					nin[i] = getClass(in[i], cl);
 				}
 				
-				ret = (T)Proxy.newProxyInstance(cl, nin, new InvocationHandler()
+				ret = (T)ProxyFactory.newProxyInstance(cl, nin, new InvocationHandler()
 				{
 					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 					{

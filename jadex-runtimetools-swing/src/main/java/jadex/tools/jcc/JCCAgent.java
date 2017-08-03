@@ -31,6 +31,7 @@ import jadex.micro.annotation.Properties;
 import jadex.tools.awareness.AwarenessServicePlugin;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
+import jadex.tools.registry.RegistryComponentPlugin;
 import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
@@ -251,7 +252,8 @@ public class JCCAgent	implements IComponentStep<Void>
 //					AwarenessComponentPlugin.class.getName(),
 					AwarenessServicePlugin.class.getName(),
 					ComponentViewerPlugin.class.getName(),
-					SecurityServicePlugin.class.getName()
+					SecurityServicePlugin.class.getName(),
+					RegistryComponentPlugin.class.getName()
 	//				DeployerPlugin.class.getName()
 				},
 			saveonexit).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));

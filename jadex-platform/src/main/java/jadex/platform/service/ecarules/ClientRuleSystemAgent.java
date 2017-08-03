@@ -16,7 +16,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -57,7 +57,7 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 	/**
 	 * 
 	 */
-	@AgentService
+	@AgentServiceSearch
 	public void	setRulebaseService(IRulebaseService rbser)
 	{
 		final ISubscriptionIntermediateFuture<IRulebaseEvent> subscription = rbser.subscribeToRulebase();
