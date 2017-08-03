@@ -1,25 +1,11 @@
 package jadex.bpmn.runtime.handler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.component.IMessageFeature;
 import jadex.commons.IFilter;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -29,20 +15,14 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 {
 	//-------- constants --------
 	
-	/** The isThrowing property name (distinguishes send/receive events). */
-	//public static final String	PROPERTY_THROWING = "isThrowing";	
-	
-	/** The type property message type identifies the meta type (e.g. fipa). */
-	public static final String	PROPERTY_MESSAGETYPE = "messagetype";
-	
 	/** The filter property describes the filter for receiving a message. */
 	public static final String	PROPERTY_FILTER	= "filter";
 	
-	/** The property message is the message to be sent. */
+	/** The property message is the message object to be sent. */
 	public static final String	PROPERTY_MESSAGE = "message";
 	
-	/** The property message is the message to be sent. */
-	public static final String	PROPERTY_CODECIDS = "codecids";
+	/** The property receiver is the cid of the intended receiver (may be null if set in message object, e.g. in FIPA messages). */
+	public static final String	PROPERTY_RECEIVER = "receiver";
 	
 	//-------- methods --------
 	
@@ -54,8 +34,6 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
-		
 //		System.out.println("send message acticity2: "+activity);
 		
 		if(activity.isThrowing())
@@ -76,98 +54,12 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
-		IMessageService ms = SServiceProvider.getLocalService(instance, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//		IComponentManagementService cms = SServiceProvider.getLocalService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
-		MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
-		
-		Map<String, Object> msg;
-				
-		if(thread.hasPropertyValue(PROPERTY_MESSAGE))
-		{
-			msg = (Map<String, Object>)thread.getPropertyValue(PROPERTY_MESSAGE);
-		}
-		else
-		{
-			msg = new HashMap<String, Object>();
-		}
-			
-		// Convenience conversion of strings to component identifiers for receivers.
-		String ri = mt.getReceiverIdentifier();
-		if(thread.hasPropertyValue(ri))
-		{
-			Object recs = thread.getPropertyValue(ri);
-			List<IComponentIdentifier> newrecs = new ArrayList<IComponentIdentifier>();
-			if(SReflect.isIterable(recs))
-			{
-				for(Iterator<IComponentIdentifier> it=SReflect.getIterator(recs); it.hasNext(); )
-				{
-					Object rec = it.next();
-					if(rec instanceof String)
-					{
-						newrecs.add(new BasicComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
-					}
-					else if(rec instanceof IComponentIdentifier)
-					{
-						newrecs.add((IComponentIdentifier)rec);
-					}
-				}
-			}
-			else
-			{
-				if(recs instanceof String)
-				{
-					newrecs.add(new BasicComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
-				}
-				else if(recs instanceof IComponentIdentifier)
-				{
-					newrecs.add((IComponentIdentifier)recs);
-				}
-				else
-				{
-					throw new RuntimeException("Receiver nulls.");
-				}
-			}
-			msg.put(ri, newrecs);
-		}
-		
-		String[] params	= mt.getParameterNames();
-		for(int i=0; params!=null && i<params.length; i++)
-		{
-			if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
-			{
-				msg.put(params[i], thread.getPropertyValue(params[i]));
-			}
-		}
-		
-		String[] paramsets	= mt.getParameterSetNames();
-		for(int i=0; paramsets!=null && i<paramsets.length; i++)
-		{
-			if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
-			{
-				msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
-			}
-		}
-		
-		// todo: implement me on gui layer
-		byte[] codecids;
-		String tmp = (String)thread.getPropertyValue(PROPERTY_CODECIDS);
-		if(tmp!=null)
-		{
-			StringTokenizer stok = new StringTokenizer(tmp, ",");
-			codecids = new byte[stok.countTokens()];
-			for(int i=0; stok.hasMoreTokens(); i++)
-				codecids[i] = Byte.parseByte(stok.nextToken());
-		}
-		else
-		{
-			codecids	= null;
-		}
-		Byte serializer=null;
-		
+		Object message	= thread.getPropertyValue(PROPERTY_MESSAGE);
+		IComponentIdentifier receiver	= (IComponentIdentifier)thread.getPropertyValue(PROPERTY_RECEIVER);
 		thread.setWaiting(true);
-//		System.out.println("send message to: "+msg.get(ri));
-		ms.sendMessage(msg, mt, instance.getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, serializer, codecids)
+//		System.out.println("sending message: "+msg.get(ri));
+		
+		instance.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message)
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
@@ -192,59 +84,11 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	protected void receiveMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		thread.setWaiting(true);
-//		thread.setWaitInfo(type);
-		IFilter filter = (IFilter)thread.getPropertyValue(PROPERTY_FILTER, activity);
+		@SuppressWarnings("unchecked")
+		IFilter<Object> filter = (IFilter<Object>)thread.getPropertyValue(PROPERTY_FILTER, activity);
 		if(filter==null)
 		{
-			filter	= new IFilter<Object>()
-			{
-				public boolean filter(Object obj)
-				{
-					boolean	ret	= obj instanceof IMessageAdapter;
-					if(ret)
-					{
-						try
-						{
-							IMessageAdapter	msg	= (IMessageAdapter)obj;
-							String[]	params	= activity.getPropertyNames();
-							for(int i=0; ret && params!=null && i<params.length; i++)
-							{
-								// Todo: distinguish message activity properties and message parameters
-								if(!params[i].equals("isThrowing"))
-								{
-									// Fetch property from message event activity, because current activity might be multiple event.
-									Object propval = thread.getPropertyValue(params[i], activity);
-									Object msgval = msg.getValue(params[i]);
-									
-									// Hack to support string component names and component identifiers
-									if(propval instanceof String && msgval instanceof IComponentIdentifier)
-									{
-										msgval = ((IComponentIdentifier)msgval).getLocalName();
-									}
-									else if(msgval instanceof String && propval instanceof IComponentIdentifier)
-									{
-										propval = ((IComponentIdentifier)propval).getLocalName();
-									}
-									
-									ret	= SUtil.equals(propval, msgval);
-								}
-							}
-						}
-						catch(RuntimeException e)
-						{
-							instance.getLogger().warning("Error during message matching: "+instance+", "+thread+", "+obj+", "+e);
-							ret	= false;
-						}
-					}
-					
-//					if(ret)
-//					{
-//						System.out.println("Message matched: "+thread+", "+obj);
-//					}
-					
-					return ret;
-				}
-			};
+			throw new NullPointerException("Message receiving event needs "+PROPERTY_FILTER+" property: "+thread);
 		}
 		thread.setWaitFilter(filter);
 		
