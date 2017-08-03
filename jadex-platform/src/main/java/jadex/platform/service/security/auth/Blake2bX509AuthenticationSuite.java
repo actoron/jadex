@@ -345,7 +345,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			}
 		}
 		
-		if (remotepwpake.getSecondEntity().getDerivedKey() == null)
+		if (remotepwpake != null && remotepwpake.getSecondEntity().getDerivedKey() == null)
 			remotepwpake = null;
 		
 		for (Iterator<Map.Entry<PasswordSecret, JadexJPakeParticipant>> it = pakestate.entrySet().iterator(); it.hasNext(); )
