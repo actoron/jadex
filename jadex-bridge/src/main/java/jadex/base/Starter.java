@@ -448,6 +448,7 @@ public class Starter
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
 										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
 									}
 									fret.setResult(component.getInternalAccess().getExternalAccess());
 								}

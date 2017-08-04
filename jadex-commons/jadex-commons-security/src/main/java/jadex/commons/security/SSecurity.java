@@ -103,8 +103,8 @@ public class SSecurity
 	/** Common secure random number source. */
 	protected static volatile SecureRandom SECURE_RANDOM;
 	
-	/** Random number source for seeding CSPRNGS. */
-	protected static volatile SecureRandom SECURE_SEED_RANDOM;
+	/** Entropy source for seeding CSPRNGS. */
+	protected static volatile IEntropySource ENTROPY_SOURCE;
 	
 	/**
 	 *  Gets access to the common secure PRNG.
@@ -129,48 +129,79 @@ public class SSecurity
 	}
 	
 	/**
-	 *  Gets a secure random seed value from OS or other sources.
+	 *  Gets a secure entropy source from OS or otherwise.
 	 *  
-	 *  @param numbytes number of seed bytes needed.
-	 *  @return Secure seed.
+	 *  @return Secure entropy source.
 	 */
-	public static SecureRandom getSeedRandom()
+	public static IEntropySource getEntropySource()
 	{
-		if (SECURE_SEED_RANDOM == null)
+		if (ENTROPY_SOURCE == null)
 		{
 			synchronized (SSecurity.class)
 			{
-				if (SECURE_SEED_RANDOM == null)
+				if (ENTROPY_SOURCE == null)
 				{
-					final SecureRandom basicseed = new SecureRandom()
+					final IEntropySource basicsource = new IEntropySource()
 					{
-						private static final long serialVersionUID = -8238246099124227737L;
+//						protected long bcount = 0;
 						
-//						protected long bytecounter = 0;
-
-						public synchronized void nextBytes(byte[] ret)
+						/** Input stream for POSIX-like systems. */
+						protected InputStream urandomis;
+						
 						{
-							boolean noseed = true;
 							File urandom = new File("/dev/urandom");
-							InputStream urandomin = null;
-							try
+							if (urandom.exists())
 							{
-								urandomin = new FileInputStream(urandom);
-								if (urandom.exists())
+								try
 								{
-									SUtil.readStream(ret, urandomin);
-									noseed = false;
-									SUtil.close(urandomin);
+									urandomis = new FileInputStream(urandom);
+								}
+								catch (Exception e)
+								{
+									SUtil.close(urandomis);
 								}
 							}
-							catch (Exception e)
+							
+							if (urandomis == null)
 							{
-								SUtil.close(urandomin);
+								urandom = new File("/dev/random");
+								if (urandom.exists())
+								{
+									try
+									{
+										urandomis = new FileInputStream(urandom);
+									}
+									catch (Exception e)
+									{
+										SUtil.close(urandomis);
+									}
+								}
+							}
+						}
+						
+						public synchronized void getEntropy(byte[] ret)
+						{
+//							bcount += ret.length;
+//							System.out.println("Entropy bytes: " + bcount);
+							boolean noseed = true;
+							if (urandomis != null)
+							{
+								try
+								{
+									SUtil.readStream(ret, urandomis);
+									noseed = false;
+								}
+								catch (Exception e)
+								{
+									if (urandomis != null)
+										SUtil.close(urandomis);
+									urandomis = null;
+								}
 							}
 							
 							if (noseed)
 							{
-								// For Windows, use Windows API to gather seed data
+								// For Windows, use Windows API to gather entropy data
 								String osname = System.getProperty("os.name");
 								String osversion = System.getProperty("os.version");
 								int minmajwinversion = 6;
@@ -193,49 +224,39 @@ public class SSecurity
 							
 							if (noseed)
 							{
+								// Fallback to Java if nothing works.
 								ret = SecureRandom.getSeed(ret.length);
 							}
-							
-//							bytecounter += ret.length;
-//							System.out.println("Seed consumption: " + bytecounter);
 						}
 						
-						public byte[] generateSeed(int numbytes)
+						protected void finalize() throws Throwable
 						{
-							byte[] ret = new byte[numbytes];
-							nextBytes(ret);
-							return ret;
+							if (urandomis != null)
+								SUtil.close(urandomis);
 						}
 					};
 					
 					if (PARANOID_PRNG)
 					{
-						SECURE_SEED_RANDOM = new SecureRandom()
+						ENTROPY_SOURCE = new IEntropySource()
 						{
-							public synchronized void nextBytes(byte[] bytes)
+							public synchronized void getEntropy(byte[] bytes)
 							{
 								byte[] addent = SecureRandom.getSeed(bytes.length);
-								basicseed.nextBytes(bytes);
+								basicsource.getEntropy(bytes);
 								xor(bytes, addent);
-							}
-							
-							public byte[] generateSeed(int numbytes)
-							{
-								byte[] ret = new byte[numbytes];
-								nextBytes(ret);
-								return ret;
 							}
 						};
 					}
 					else
 					{
-						SECURE_SEED_RANDOM = basicseed;
+						ENTROPY_SOURCE = basicsource;
 					}
 				}
 			}
 		}
 		
-		return SECURE_SEED_RANDOM;
+		return ENTROPY_SOURCE;
 	}
 	
 	/**
@@ -702,37 +723,7 @@ public class SSecurity
 				// Convert to bytes.
 				int numbytes = (int) Math.ceil(bitsRequired / 8.0);
 				final byte[] fseed = new byte[numbytes];
-				getSeedRandom().nextBytes(fseed);;
-				
-				EntropySource ret = new EntropySource()
-				{
-					public boolean isPredictionResistant()
-					{
-						return true;
-					}
-					
-					public byte[] getEntropy()
-					{
-						return fseed;
-					}
-					
-					public int entropySize()
-					{
-						return fseed.length * 8;
-					}
-				};
-				return ret;
-			}
-		};
-		
-		EntropySourceProvider nonceprovider = new EntropySourceProvider()
-		{
-			public EntropySource get(int bitsRequired)
-			{
-				// Convert to bytes.
-				int numbytes = (int) Math.ceil(bitsRequired / 8.0);
-				final byte[] fseed = new byte[numbytes];
-				getSecureRandom().nextBytes(fseed);;
+				getEntropySource().getEntropy(fseed);;
 				
 				EntropySource ret = new EntropySource()
 				{
@@ -760,11 +751,11 @@ public class SSecurity
 		
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESEngine eng = new AESEngine();
-		prngs.add(builder.buildCTR(eng, 256, nonceprovider.get(256).getEntropy(), false));
+		prngs.add(builder.buildCTR(eng, 256, esp.get(256).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		Mac m = new HMac(new SHA512Digest());
-		prngs.add(builder.buildHMAC(m, nonceprovider.get(512).getEntropy(), false));
+		prngs.add(builder.buildHMAC(m, esp.get(512).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		prngs.add(generateSecureRandom());
@@ -870,8 +861,6 @@ public class SSecurity
 			{
 				parentpki = pki;
 			}
-			
-			System.out.println(parentpki.getPrivateKeyAlgorithm().getAlgorithm().toString());
 			
 			ContentSigner signer = getSigner(sigspec, parentpki);
 			

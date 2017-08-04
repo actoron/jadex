@@ -66,7 +66,7 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
 		String	seclevel	= secreq!=null ? secreq.value() : null;
 		
-		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticatedPlatform())
+		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticated())
 		{
 			// No recursive global search -> change global scope to platform, and owner to local platform.
 			if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))

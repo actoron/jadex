@@ -40,6 +40,7 @@ import jadex.commons.security.SSecurity;
 /**
  *  Panel for adding new certificates.
  */
+@SuppressWarnings("rawtypes") // Bad JComboBox, BAD!
 public class AddCertPanel extends JPanel
 {
 	/** Shorthand for GL-size. */
@@ -238,6 +239,7 @@ public class AddCertPanel extends JPanel
 	 *  
 	 *  @return The panel for security infos.
 	 */
+	@SuppressWarnings("unchecked")
 	protected JPanel createSecurityPanel()
 	{
 		JPanel cryptsettings = new JPanel();

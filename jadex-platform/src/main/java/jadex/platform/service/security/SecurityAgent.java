@@ -1,16 +1,15 @@
 package jadex.platform.service.security;
 
-import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
-
-import org.bouncycastle.crypto.digests.Blake2bDigest;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
@@ -41,11 +40,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.security.SSecurity;
+import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
@@ -110,6 +107,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** CryptoSuites that are expiring with expiration time. */
 	protected Map<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
 	
+	/** Map of entities and associated roles. */
+	protected Map<String, Set<String>> roles;
+	
 	/** Task for cleanup duties. */
 	protected volatile IFuture<Void> cleanuptask;
 	
@@ -125,6 +125,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		Map<String, String> activeprops = new HashMap<String, String>();
 		Map<String, String> networkprops = new HashMap<String, String>();
 		Map<String, String> remotepfprops = new HashMap<String, String>();
+		roles = new HashMap<String, Set<String>>();
 		
 		jadex.commons.Properties settings = getSettingsService().getProperties(PROPERTIES_ID).get();
 		if (settings != null)
@@ -139,9 +140,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				else
 				{
 					if ("networks".equals(prop.getType()))
+					{
 						networkprops.put(prop.getName(), prop.getValue());
+					}
 					else if ("remoteplatformsecrets".equals(prop.getType()))
+					{
 						remotepfprops.put(prop.getName(), prop.getValue());
+					}
+					else if ("roles".equals(prop.getType()))
+					{
+						Set<String> eroles = roles.get(prop.getName());
+						if (eroles == null)
+						{
+							eroles = new HashSet<String>();
+							roles.put(prop.getName(), eroles);
+						}
+						
+						eroles.add(prop.getValue());
+					}
 				}
 			}
 		}
@@ -282,6 +298,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
 		return IFuture.DONE;
 	}
+	
+	//---- ISecurityService methods. ----
 	
 	/**
 	 *  Encrypts and signs the message for a receiver.
@@ -469,11 +487,129 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		});
 	}
 	
-	//-------- Information access -------
-	
-	public IComponentIdentifier getComponentIdentifier()
+	/**
+	 *  Checks if platform secret is used.
+	 *  
+	 *  @return True, if so.
+	 */
+	public IFuture<Boolean> isUsePlatformSecret()
 	{
-		return agent.getComponentIdentifier();
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Boolean>()
+		{
+			public IFuture<Boolean> execute(IInternalAccess ia)
+			{
+				return new Future<Boolean>(usesecret);
+			}
+		});
+	}
+	
+	/**
+	 *  Sets whether the platform secret should be used.
+	 *  
+	 *  @param useplatformsecret The flag.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> setUsePlatformSecret(final boolean useplatformsecret)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				usesecret = useplatformsecret;
+				saveSettings();
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Checks if platform secret is printed.
+	 *  
+	 *  @return True, if so.
+	 */
+	public IFuture<Boolean> isPrintPlatformSecret()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Boolean>()
+		{
+			public IFuture<Boolean> execute(IInternalAccess ia)
+			{
+				return new Future<Boolean>(printsecret);
+			}
+		});
+	}
+	
+	/**
+	 *  Sets whether the platform secret should be printed.
+	 *  
+	 *  @param printplatformsecret The flag.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> setPrintPlatformSecret(final boolean printplatformsecret)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				printsecret = printplatformsecret;
+				saveSettings();
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Sets a new network.
+	 * 
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> setNetwork(final String networkname, final String secret)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if (secret == null)
+				{
+					networks.remove(networkname);
+				}
+				else
+				{
+					AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
+					networks.put(networkname, asecret);
+				}
+				
+				saveSettings();
+				
+				//TODO: RESET keys / sessions?
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Gets the current networks and secrets. 
+	 *  
+	 *  @return The current networks and secrets.
+	 */
+	public IFuture<Map<String, String>> getNetworks()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Map<String, String>>()
+		{
+			public IFuture<Map<String, String>> execute(IInternalAccess ia)
+			{
+				Map<String, String> ret = new HashMap<String, String>();
+				
+				for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+				{
+					ret.put(entry.getKey(), entry.getValue().toString());
+				}
+				
+				return new Future<Map<String,String>>(ret);
+			}
+		});
 	}
 	
 	/**
@@ -482,10 +618,20 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param cid ID of the platform.
 	 *  @return Encoded secret or null.
 	 */
-	public IFuture<String> getEncodedPlatformSecret(IComponentIdentifier cid)
+	public IFuture<String> getPlatformSecret(final IComponentIdentifier cid)
 	{
-		AbstractAuthenticationSecret secret = getPlatformSecret(cid);
-		return new Future<String>(secret != null ? secret.toString() : null);
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<String>()
+		{
+			public IFuture<String> execute(IInternalAccess ia)
+			{
+				AbstractAuthenticationSecret secret = null;
+				if (cid == null)
+					secret = getInternalPlatformSecret();
+				else
+					getInternalPlatformSecret(cid);
+				return new Future<String>(secret != null ? secret.toString() : null);
+			}
+		});
 	}
 	
 	/**
@@ -494,38 +640,121 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param cid ID of the platform.
 	 *  @return Encoded secret or null.
 	 */
-	public IFuture<Void> setEncodedPlatformSecret(final IComponentIdentifier cid, final String secret)
+	public IFuture<Void> setPlatformSecret(final IComponentIdentifier cid, final String secret)
 	{
-		return agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// TODO: Refresh?
-				if (cid == null)
+				if (secret == null)
 				{
-					remoteplatformsecrets.remove(cid);
+					if (cid == null || agent.getComponentIdentifier().getRoot().equals(cid))
+						platformsecret = null;
+					else
+						remoteplatformsecrets.remove(cid);
 				}
 				else
 				{
 					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(secret);
 					
-					if (agent.getComponentIdentifier().getRoot().equals(cid))
+					if (cid == null || agent.getComponentIdentifier().getRoot().equals(cid))
 						platformsecret = authsec;
 					else
 						remoteplatformsecrets.put(cid, authsec);
 				}
+				
+				saveSettings();
+				
 				return IFuture.DONE;
 			}
 		});
-		
 	}
+	
+	/**
+	 *  Adds a role for an entity (platform or network name).
+	 *  
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addRole(final String entity, final String role)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				//TODO: Reset cryptosuites.
+				Set<String> eroles = roles.get(entity);
+				if (eroles == null)
+				{
+					eroles = new HashSet<String>();
+					roles.put(entity, eroles);
+				}
+				
+				eroles.add(role);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Adds a role of an entity (platform or network name).
+	 *  
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeRole(final String entity, final String role)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				//TODO: Reset cryptosuites.
+				Set<String> eroles = roles.get(entity);
+				if (eroles != null)
+				{
+					eroles.remove(entity);
+					if (eroles.isEmpty())
+						roles.remove(entity);
+				}
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Gets a copy of the current role map.
+	 *  
+	 *  @return Copy of the role map.
+	 */
+	public IFuture<Map<String, Set<String>>> getRoleMap()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Map<String, Set<String>>>()
+		{
+			@SuppressWarnings("unchecked")
+			public IFuture<Map<String, Set<String>>> execute(IInternalAccess ia)
+			{
+				return new Future<Map<String,Set<String>>>((Map<String, Set<String>>) SCloner.clone(roles));
+			}
+		});
+	}
+	
+	//---- Internal direct access methods. ----
 	
 	/**
 	 *  Get access to the stored virtual network configurations.
 	 * 
 	 *  @return The stored virtual network configurations.
 	 */
-	public Map<String, AbstractAuthenticationSecret> getNetworks()
+	public Map<String, AbstractAuthenticationSecret> getInternalNetworks()
 	{
 		return networks;
 	}
@@ -533,7 +762,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Gets the local platform secret.
 	 */
-	public AbstractAuthenticationSecret getPlatformSecret()
+	public AbstractAuthenticationSecret getInternalPlatformSecret()
 	{
 		return platformsecret;
 	}
@@ -544,21 +773,39 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param cid ID of the platform.
 	 *  @return Secret or null.
 	 */
-	public AbstractAuthenticationSecret getPlatformSecret(IComponentIdentifier cid)
+	public AbstractAuthenticationSecret getInternalPlatformSecret(IComponentIdentifier cid)
 	{
 		cid = cid.getRoot();
 		if (cid.equals(agent.getComponentIdentifier().getRoot()))
-			return getPlatformSecret();
+			return getInternalPlatformSecret();
 		return remoteplatformsecrets.get(cid.getRoot());
+	}
+	
+	/**
+	 *  Gets the role map.
+	 * 
+	 *  @return The role map.
+	 */
+	public Map<String, Set<String>> getInternalRoles()
+	{
+		return roles;
 	}
 	
 	/**
 	 *  Checks whether to use platform secret.
 	 *  @return True, if used.
 	 */
-	public boolean usePlatformSecret()
+	public boolean getInternalUsePlatformSecret()
 	{
 		return usesecret;
+	}
+	
+	/**
+	 *  Get component ID.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return agent.getComponentIdentifier();
 	}
 	
 	// -------- Cleanup
@@ -722,6 +969,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			for (Map.Entry<IComponentIdentifier, AbstractAuthenticationSecret> entry : remoteplatformsecrets.entrySet())
 				settings.addProperty(new Property(entry.getKey().toString(), "remoteplatformsecrets", entry.getValue().toString()));
+		}
+		
+		if (roles != null && roles.size() > 0)
+		{
+			List<Tuple2<String, String>> flatroles = flattenRoleMap(roles);
+			for (Tuple2<String, String> tup : flatroles)
+				settings.addProperty(new Property(tup.getFirstEntity(), "roles", tup.getSecondEntity()));
 		}
 		
 		getSettingsService().setProperties(PROPERTIES_ID, settings);
@@ -985,44 +1239,21 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
 	}
 	
-	public static void main(String[] args)
+	/**
+	 *   Helper for flattening the role map.
+	 */
+	public static final List<Tuple2<String, String>> flattenRoleMap(Map<String, Set<String>> rolemap)
 	{
-		String dn = "O=Someorg,C=US,CN=My CA";
-		int str = 512;
-		int days = 30;
-//		String scheme = "RSAANDMGF1";
-//		String scheme = "RSA";
-		String schemeconf = "brainpool";
-//		String schemeconf = null;
-		String scheme = "ECDSA";
-		String hash = "SHA256";
+		List<Tuple2<String, String>> ret = new ArrayList<Tuple2<String,String>>();
 		
-		Tuple2<String, String> tup = SSecurity.createRootCaCertificate(dn, -1, scheme, schemeconf, hash, str, days);
+		for (Map.Entry<String, Set<String>> entry : rolemap.entrySet())
+		{
+			for (String rolename : entry.getValue())
+			{
+				ret.add(new Tuple2<String, String>(entry.getKey(), rolename));
+			}
+		}
 		
-		String dn2 = "O=Someorg,C=US,CN=My Intermediate CA";
-		String dn3 = "O=Someorg,C=US,CN=My Intermediate CA2";
-		String dn4 = "O=Someorg,C=US,CN=My Platform";
-		
-		Tuple2<String, String> tup2 = SSecurity.createIntermediateCaCertificate(tup.getFirstEntity(), tup.getSecondEntity(), dn2, 1, scheme, schemeconf, hash, str, days);
-		Tuple2<String, String> tup3 = SSecurity.createIntermediateCaCertificate(tup2.getFirstEntity(), tup2.getSecondEntity(), dn3, 0, scheme, schemeconf, hash, str, days);
-		Tuple2<String, String> tup4 = SSecurity.createCertificate(tup3.getFirstEntity(), tup3.getSecondEntity(), dn4, scheme, schemeconf, hash, str, days);
-		
-		System.out.println(tup.getFirstEntity());
-		System.out.println(tup.getSecondEntity());
-		System.out.println("=====================================================");
-//		System.out.println(tup2.getFirstEntity());
-		System.out.println(tup4.getFirstEntity());
-		
-		ByteArrayInputStream pemcert = new ByteArrayInputStream(tup4.getFirstEntity().getBytes(SUtil.UTF8));
-		ByteArrayInputStream pemkey = new ByteArrayInputStream(tup4.getSecondEntity().getBytes(SUtil.UTF8));
-		Blake2bDigest dig = new Blake2bDigest(512);
-		dig.update("TestMessage".getBytes(SUtil.UTF8), 0, 11);
-		byte[] msghash = new byte[64];
-		dig.doFinal(msghash, 0);
-		byte[] token = SSecurity.signWithPEM(msghash, pemcert, pemkey);
-		ByteArrayInputStream trustedpemcert = new ByteArrayInputStream(tup.getFirstEntity().getBytes(SUtil.UTF8));
-		System.out.println(SSecurity.verifyWithPEM(msghash, token, trustedpemcert));
-		
-//		X509CertificateHolder = new X509C
+		return ret;
 	}
 }

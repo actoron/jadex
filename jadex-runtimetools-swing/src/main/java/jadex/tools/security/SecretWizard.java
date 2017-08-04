@@ -3,26 +3,35 @@ package jadex.tools.security;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
+import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.auth.PasswordSecret;
 import jadex.platform.service.security.auth.SCryptParallel;
+import jadex.platform.service.security.auth.X509PemSecret;
 
 /**
  *  Wizard for selecting authentication secrets.
@@ -32,6 +41,16 @@ public class SecretWizard extends JWizard
 {
 //	protected ButtonGroup secrettypes;
 	
+	/** SCrypt work factor / hardness for password strengthening. */
+	protected static final int SCRYPT_N = 524288;
+	
+	/** SCrypt block size. */
+	protected static final int SCRYPT_R = 16;
+	
+	/** SCrypt parallelization. */
+	protected static final int SCRYPT_P = 4;
+	
+	/** Entity which is the secret owner. */
 	protected String entity;
 	
 	/** Current secret. */
@@ -61,6 +80,9 @@ public class SecretWizard extends JWizard
 		node = createPasswordNode();
 		node.addChild(finish);
 		start.addChild(node);
+		
+		node = createPasswordX509Node();
+		node.addChild(finish);
 		start.addChild(node);
 		
 		start.addChild(finish);
@@ -76,6 +98,15 @@ public class SecretWizard extends JWizard
 	public AbstractAuthenticationSecret getResult()
 	{
 		return result;
+	}
+	
+	/**
+	 *  Sets the entity of the secret.
+	 *  @param entity The entity.
+	 */
+	public void setEntity(String entity)
+	{
+		this.entity = entity;
 	}
 	
 	/**
@@ -138,7 +169,7 @@ public class SecretWizard extends JWizard
 						{
 							public void run()
 							{
-								final byte[] keydata = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, 524288, 16, 4, 32);
+								final byte[] keydata = SCryptParallel.generate(pw.getBytes(SUtil.UTF8), salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, 32);
 								SwingUtilities.invokeLater(new Runnable()
 								{
 									public void run()
@@ -243,6 +274,89 @@ public class SecretWizard extends JWizard
 	}
 	
 	/**
+	 *  Creates the X509 node.
+	 *  
+	 *  @return The X509 node.
+	 */
+	protected WizardNode createPasswordX509Node()
+	{
+		final CertTree trusttree = new CertTree(SecuritySettingsPanel.DEFAULT_CERT_STORE);
+		final CertTree certtree = new CertTree(SecuritySettingsPanel.DEFAULT_CERT_STORE);
+		
+		JPanel trustpanel = new JPanel();
+		trustpanel.setBorder(BorderFactory.createTitledBorder("Trust Anchor"));
+		trustpanel.setLayout(new BorderLayout());
+		trustpanel.add(trusttree);
+		
+		JPanel certpanel = new JPanel();
+		certpanel.setBorder(BorderFactory.createTitledBorder("Local Certificate"));
+		certpanel.setLayout(new BorderLayout());
+		certpanel.add(certtree);
+		
+		final JCheckBox validonly = new JCheckBox("Validation only");
+		validonly.addActionListener(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				certtree.setEnabled(!validonly.isSelected());
+//				if (certtree.isEnabled())
+//					certtree.updateExternalModel();
+			}
+		});
+		certpanel.add(validonly, BorderLayout.SOUTH);
+		
+		final AbstractAction validationaction = new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				boolean valid = trusttree.getSelectedCert() != null;
+				valid &= validonly.isSelected() | (certtree.getSelectedCert() != null && certtree.getSelectedCert().getSecondEntity() != null);
+				setEnableNext(valid);
+			}
+		};
+		TreeSelectionListener sellis = new TreeSelectionListener()
+		{
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				validationaction.actionPerformed(null);
+			}
+		};
+		
+		validonly.addActionListener(validationaction);
+		trusttree.addTreeSelectionListener(sellis);
+		certtree.addTreeSelectionListener(sellis);
+		
+		JPanel inner = new JPanel();
+		SGUI.createVerticalGroupLayout(inner, new JComponent[] { trustpanel, certpanel }, false);
+		
+		WizardNode node = new WizardNode()
+		{
+			public void onShow()
+			{
+				validationaction.actionPerformed(null);
+			}
+			
+			protected void onNext()
+			{
+				Tuple2<String, String> trust = trusttree.getSelectedCert();
+				Tuple2<String, String> cert = certtree.getSelectedCert();
+				
+				X509PemSecret s = null;
+				if (validonly.isSelected())
+					s = new X509PemSecret(trust.getFirstEntity(), null, null);
+				else
+					s = new X509PemSecret(trust.getFirstEntity(), cert.getFirstEntity(), cert.getSecondEntity());
+				
+				secret = s;
+			}
+		};
+		node.setLayout(new BorderLayout());
+		node.add(inner);
+		
+		return node;
+	}
+	
+	/**
 	 *  Creates the key node.
 	 *  
 	 *  @return The key node.
@@ -280,6 +394,7 @@ public class SecretWizard extends JWizard
 					setEnableNext(false);
 			}
 		});
+		JScrollPane scroll = new JScrollPane(secretarea);
 		
 		WizardNode node = new WizardNode()
 		{
@@ -289,6 +404,7 @@ public class SecretWizard extends JWizard
 				{
 					SGUI.setText(secretarea, secret.toString());
 					secretarea.setEditable(false);
+					secretarea.setCaretPosition(0);
 				}
 				else
 				{
@@ -305,7 +421,7 @@ public class SecretWizard extends JWizard
 		JPanel inner = new JPanel();
 		inner.setBorder(BorderFactory.createTitledBorder("Encoded Secret"));
 		node.add(inner);
-		SGUI.createVerticalGroupLayout(inner, new JComponent[] { secretarea }, false);
+		SGUI.createVerticalGroupLayout(inner, new JComponent[] { scroll }, false);
 		return node;
 	}
 }

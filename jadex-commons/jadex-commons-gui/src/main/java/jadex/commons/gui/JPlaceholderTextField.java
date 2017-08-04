@@ -112,7 +112,7 @@ public class JPlaceholderTextField extends JTextField
 		{
 			public void removeUpdate(final DocumentEvent e)
 			{
-				doclistener.changedUpdate(e);
+				changedUpdate(e);
 			}
 			
 			public void insertUpdate(DocumentEvent e)
@@ -382,7 +382,9 @@ public class JPlaceholderTextField extends JTextField
 	public void setNonPlaceholderText(String t)
 	{
 		deactivatePlaceholder();
+		getDocument().removeDocumentListener(doclistener);
 		super.setText(t);
+		getDocument().addDocumentListener(doclistener);
 	}
 	
 	/**

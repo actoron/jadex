@@ -35,10 +35,10 @@ import jadex.commons.collection.IdentityHashSet;
 public class JWizard extends JPanel
 {
 	/** ID for finish events. */
-	public int FINISH_ID = 0;
+	public static final int FINISH_ID = 0;
 	
 	/** ID for cancel events. */
-	public int CANCEL_ID = 1;
+	public static final int CANCEL_ID = 1;
 	
 	/** Start frame of the wizard. */
 	protected WizardNode start;

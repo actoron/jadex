@@ -118,7 +118,7 @@ public class X509PemSecret extends AbstractX509PemSecret
 	 */
 	public String toString()
 	{
-		String ret = PREFIX + cacert;
+		String ret = PREFIX + ":" + cacert;
 		if (canSign())
 		{
 			ret += ":" + cert;

@@ -455,7 +455,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			return secinfos.isTrustedPlatform()	// Trusted -> always ok
 				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
-				|| secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
+				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
 					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
 						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
 		}

@@ -8,7 +8,6 @@ import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
@@ -59,7 +58,6 @@ public interface ISecurityService
 	 *  @return Encrypted/signed message.
 	 */
 	public @Reference IFuture<byte[]> encryptAndSign(IMsgHeader header, byte[] content);
-//	public @Reference IFuture<byte[]> encryptAndSign(@Reference Map<String, Object> header, @Reference byte[] content);
 	
 	/**
 	 *  Decrypt and authenticates the message from a sender.
@@ -71,18 +69,89 @@ public interface ISecurityService
 	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
 	
 	/**
+	 *  Checks if platform secret is used.
+	 *  
+	 *  @return True, if so.
+	 */
+	public IFuture<Boolean> isUsePlatformSecret();
+	
+	/**
+	 *  Sets whether the platform secret should be used.
+	 *  
+	 *  @param useplatformsecret The flag.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> setUsePlatformSecret(boolean useplatformsecret);
+	
+	/**
+	 *  Checks if platform secret is printed.
+	 *  
+	 *  @return True, if so.
+	 */
+	public IFuture<Boolean> isPrintPlatformSecret();
+	
+	/**
+	 *  Sets whether the platform secret should be printed.
+	 *  
+	 *  @param printplatformsecret The flag.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> setPrintPlatformSecret(boolean printplatformsecret);
+	
+	/**
+	 *  Sets a new network.
+	 * 
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> setNetwork(String networkname, String secret);
+	
+	/**
+	 *  Gets the current networks and secrets. 
+	 *  
+	 *  @return The current networks and secrets.
+	 */
+	public IFuture<Map<String, String>> getNetworks();
+	
+	/**
 	 *  Gets the secret of a platform if available.
 	 * 
 	 *  @param cid ID of the platform.
 	 *  @return Encoded secret or null.
 	 */
-	public IFuture<String> getEncodedPlatformSecret(IComponentIdentifier cid);
+	public IFuture<String> getPlatformSecret(IComponentIdentifier cid);
 	
 	/**
 	 *  Sets the secret of a platform.
 	 * 
 	 *  @param cid ID of the platform.
-	 *  @return Encoded secret or null.
+	 *  @param secret Encoded secret or null to remove.
 	 */
-	public IFuture<Void> setEncodedPlatformSecret(IComponentIdentifier cid, String secret);
+	public IFuture<Void> setPlatformSecret(IComponentIdentifier cid, String secret);
+	
+	/**
+	 *  Adds a role for an entity (platform or network name).
+	 *  
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addRole(String entity, String role);
+	
+	/**
+	 *  Adds a role of an entity (platform or network name).
+	 *  
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeRole(String entity, String role);
+	
+	/**
+	 *  Gets a copy of the current role map.
+	 *  
+	 *  @return Copy of the role map.
+	 */
+	public IFuture<Map<String, Set<String>>> getRoleMap();
 }

@@ -91,9 +91,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		byte[] local = new byte[0];
 		byte[] remoteremote = new byte[0];
-		if (agent.getPlatformSecret() instanceof PasswordSecret && agent.usePlatformSecret())
+		if (agent.getInternalPlatformSecret() instanceof PasswordSecret && agent.getInternalUsePlatformSecret())
 		{
-			PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret();
+			PasswordSecret secret = (PasswordSecret) agent.getInternalPlatformSecret();
 			JadexJPakeParticipant jpake = createJPakeParticipant(pid, secret.getPassword());
 			pakestate.put(secret, jpake);
 			JPAKERound1Payload r1pl = jpake.createRound1PayloadToSend();
@@ -105,20 +105,20 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		
 		byte[] localremote = new byte[0];
-		if (agent.getPlatformSecret(remoteid) instanceof PasswordSecret)
+		if (agent.getInternalPlatformSecret(remoteid) instanceof PasswordSecret)
 		{
-			PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret(remoteid);
+			PasswordSecret secret = (PasswordSecret) agent.getInternalPlatformSecret(remoteid);
 			JadexJPakeParticipant jpake = createJPakeParticipant(pid, secret.getPassword());
-			pakestate.put((PasswordSecret) agent.getPlatformSecret(remoteid), jpake);
+			pakestate.put((PasswordSecret) agent.getInternalPlatformSecret(remoteid), jpake);
 			JPAKERound1Payload r1pl = jpake.createRound1PayloadToSend();
 			
 			localremote = round1ToBytes(r1pl);
 		} 
 		
 		List<byte[]> networks = new ArrayList<byte[]>();
-		if (agent.getNetworks() != null && agent.getNetworks().size() > 0)
+		if (agent.getInternalNetworks() != null && agent.getInternalNetworks().size() > 0)
 		{
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getNetworks().entrySet())
+			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getInternalNetworks().entrySet())
 			{
 				if (entry.getValue() instanceof PasswordSecret)
 				{
@@ -154,12 +154,12 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 //		System.out.println("ID SALT 2: " + Arrays.toString(idsalt));
 		
 		byte[] local = new byte[0];
-		if (r1list.get(1).length > 0 && agent.usePlatformSecret())
+		if (r1list.get(1).length > 0 && agent.getInternalUsePlatformSecret())
 		{
-			if (agent.getPlatformSecret() instanceof PasswordSecret)
+			if (agent.getInternalPlatformSecret() instanceof PasswordSecret)
 			{
 				JPAKERound1Payload r1 = bytesToRound1(r1list.get(1));
-				PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret();
+				PasswordSecret secret = (PasswordSecret) agent.getInternalPlatformSecret();
 				JadexJPakeParticipant part = pakestate.get(secret);
 				
 				try
@@ -174,10 +174,10 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		
 		byte[] localremote = new byte[0];
-		if (r1list.get(2).length > 0 && agent.usePlatformSecret())
+		if (r1list.get(2).length > 0 && agent.getInternalUsePlatformSecret())
 		{
 			JPAKERound1Payload r1 = bytesToRound1(r1list.get(2));
-			if (agent.getPlatformSecret() instanceof PasswordSecret)
+			if (agent.getInternalPlatformSecret() instanceof PasswordSecret)
 			{
 //				PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret();
 				try
@@ -192,9 +192,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		
 		byte[] remoteremote = new byte[0];
-		if (agent.getPlatformSecret(remoteid) instanceof PasswordSecret)
+		if (agent.getInternalPlatformSecret(remoteid) instanceof PasswordSecret)
 		{
-			PasswordSecret secret = (PasswordSecret) agent.getPlatformSecret(remoteid);
+			PasswordSecret secret = (PasswordSecret) agent.getInternalPlatformSecret(remoteid);
 			JPAKERound1Payload r1 = bytesToRound1(r1list.get(3));
 			JadexJPakeParticipant part = pakestate.get(secret);
 			
@@ -209,11 +209,11 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		
 		List<byte[]> networks = new ArrayList<byte[]>();
-		if (r1list.get(4).length > 0 && agent.getNetworks().size() > 0)
+		if (r1list.get(4).length > 0 && agent.getInternalNetworks().size() > 0)
 		{ 
 			Map<ByteArrayWrapper, PasswordSecret> reversemap = new HashMap<ByteArrayWrapper, PasswordSecret>();
 			
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getNetworks().entrySet())
+			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getInternalNetworks().entrySet())
 			{
 				if (entry.getValue() instanceof PasswordSecret)
 					reversemap.put(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), (PasswordSecret) entry.getValue());
@@ -241,7 +241,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 					}
 					catch (Exception e)
 					{
-						pakestate.remove(agent.getPlatformSecret());
+						pakestate.remove(agent.getInternalPlatformSecret());
 					}
 				}
 			}
@@ -267,7 +267,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		if (r2list.get(1).length > 0)
 		{
-			JadexJPakeParticipant part = pakestate.get(agent.getPlatformSecret());
+			JadexJPakeParticipant part = pakestate.get(agent.getInternalPlatformSecret());
 			JPAKERound2Payload r2 = bytesToRound2(r2list.get(1));
 			if (part != null)
 			{
@@ -284,7 +284,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		
 		if (r2list.get(2).length > 0)
 		{
-			JadexJPakeParticipant part = pakestate.get(agent.getPlatformSecret(remoteid));
+			JadexJPakeParticipant part = pakestate.get(agent.getInternalPlatformSecret(remoteid));
 			JPAKERound2Payload r2 = bytesToRound2(r2list.get(2));
 			try
 			{
@@ -309,11 +309,11 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			}
 		}
 		
-		if (r2list.get(4).length > 0 && agent.getNetworks().size() > 0)
+		if (r2list.get(4).length > 0 && agent.getInternalNetworks().size() > 0)
 		{ 
 			Map<ByteArrayWrapper, JadexJPakeParticipant> reversemap = new HashMap<ByteArrayWrapper, JadexJPakeParticipant>();
 			
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getNetworks().entrySet())
+			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getInternalNetworks().entrySet())
 			{
 				if (entry.getValue() instanceof PasswordSecret)
 				{
@@ -340,7 +340,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				}
 				catch (Exception e)
 				{
-					pakestate.remove(agent.getPlatformSecret());
+					pakestate.remove(agent.getInternalPlatformSecret());
 				}
 			}
 		}
@@ -835,167 +835,5 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			ret[i] = new BigInteger(list.get(i));
 		
 		return ret;
-	}
-	
-//	protected static final KeyPair deriveEd25519KeyPair(byte[] secret)
-//	{
-//		byte[] seed = new byte[32];
-//		Blake2bDigest dig = new Blake2bDigest(256);
-//		dig.update(secret, 0, secret.length);
-//		dig.doFinal(seed, 0);
-//		
-//		EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(seed, ED25519);
-//        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(privKey.getA(), ED25519);
-//
-//        return new KeyPair(new EdDSAPublicKey(pubKey), new EdDSAPrivateKey(privKey));
-//	}
-	
-	/**
-	 *  Main
-	 */
-	public static void main(String[] args) throws Exception
-	{
-		byte[] m = "Message".getBytes(SUtil.UTF8);
-		
-		KeyPairGenerator edgen = new KeyPairGenerator();
-		edgen.initialize(256, new ChaCha20Random("blabla".getBytes(SUtil.UTF8)));
-		KeyPair pair = edgen.generateKeyPair();
-		System.out.println(Arrays.toString(pair.getPrivate().getEncoded()));
-		
-		EdDSAEngine eddsa = new EdDSAEngine();
-		eddsa.initSign(pair.getPrivate(), SSecurity.getSecureRandom());
-		byte[] eddsasig = eddsa.signOneShot(m);
-		
-		edgen = new KeyPairGenerator();
-		edgen.initialize(256, new ChaCha20Random("blabla".getBytes(SUtil.UTF8)));
-		pair = edgen.generateKeyPair();
-		
-		eddsa = new EdDSAEngine();
-		eddsa.initVerify(pair.getPublic());
-		System.out.println("V: " + eddsa.verifyOneShot(m, eddsasig));
-		
-//		byte[] secbytes = new byte[32];
-//		SSecurity.getSecureRandom().nextBytes(secbytes);
-//		BigInteger sec = new BigInteger(secbytes);
-//		BigInteger pub = SCHNORR_GROUP.getG().modPow(sec, SCHNORR_GROUP.getP());
-//		
-//		byte[] randsecbytes = new byte[32];
-//		SSecurity.getSecureRandom().nextBytes(randsecbytes);
-//		BigInteger randsec = new BigInteger(randsecbytes);
-//		BigInteger randpub = SCHNORR_GROUP.getG().modPow(randsec, SCHNORR_GROUP.getP());
-//		
-//		byte[] challengebytes = new byte[64];
-//		Blake2bDigest dig = new Blake2bDigest(512);
-//		byte[] tmp = randpub.toByteArray();
-//		dig.update(tmp, 0, tmp.length);
-//		dig.update(m, 0, m.length);
-//		dig.doFinal(challengebytes, 0);
-//		BigInteger challenge = new BigInteger(challengebytes);
-//		
-//		BigInteger s = sec.multiply(challenge).add(randsec).mod(SCHNORR_GROUP.getP());
-//		
-//		// s,randpub
-//		
-//		
-//		BigInteger res1 = SCHNORR_GROUP.getG().modPow(s, SCHNORR_GROUP.getP());
-//		BigInteger res2 = pub.modPow(challenge, SCHNORR_GROUP.getP()).multiply(randpub).mod(SCHNORR_GROUP.getP());
-//		
-//		System.out.println(res1);
-//		System.out.println(res2);
-		
-	}
-	
-	public static void mainx(String[] args) throws Exception
-	{
-		String home = System.getProperty("user.home") + File.separator;
-		byte[] tsig = SSecurity.signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "rsa.pem"), new FileInputStream(home + "rsa.key"));
-		System.out.println("VerifyTest: " + SSecurity.verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "rootCA.pem")));
-//		byte[] tsig = signWithPEM("TestMessage".getBytes(SUtil.UTF8), new FileInputStream(home + "test.pem"), new FileInputStream(home + "test.key"));
-//		System.out.println("VerifyTest: " + verifyWithPEM("TestMessage".getBytes(SUtil.UTF8), tsig, new FileInputStream(home + "trusted.pem")));
-		System.out.println("TSIGLEN " + tsig.length);
-		
-		FileReader fr = new FileReader(home + "rsa.key");
-		@SuppressWarnings("resource")
-		PEMParser r = new PEMParser(fr);;
-		Object object = r.readObject();;
-		r.close();
-//		object = r.readObject();
-//		ASN1StreamParser p = new ASN1StreamParser(new ByteArrayInputStream(object.getContent()));
-//		DERSequenceParser dp = (DERSequenceParser) p.readObject();
-		
-		System.out.println(object.getClass());
-		PEMKeyPair keypair = (PEMKeyPair) object;
-		System.out.println("AAA" + keypair.getPublicKeyInfo());
-		PrivateKeyInfo pki = keypair.getPrivateKeyInfo();
-		System.out.println("PKI: " + pki);
-//		AsymmetricKeyParameter akp = PrivateKeyFactory.createKey(pki);
-		
-		
-		r = new PEMParser(new FileReader(home + "test.pem"));
-		List<X509CertificateHolder> certchain = new ArrayList<X509CertificateHolder>();
-		try
-		{
-			int i = 0;
-			object = r.readPemObject();
-			while (object != null)
-			{
-				X509CertificateHolder crtholder2 = new X509CertificateHolder(((PemObject) object).getContent());
-				System.out.println(i++ + ": "+crtholder2.getSubject().toString());
-				certchain.add(crtholder2);
-				object = r.readPemObject();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-//		for (int i = 0; i < certchain.size() - 1; ++i)
-//		{
-//			X509CertificateHolder signedcert = certchain.get(i);
-//			X509CertificateHolder signercert = certchain.get(i + 1);
-//			
-//			JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
-////			ContentVerifierProvider cvp = jcvpb.build(signercert);
-////			ContentVerifier cv = cvp.get(signercert.getSignatureAlgorithm());
-//			
-//			System.out.println("VerifyCert: " + signedcert.isSignatureValid(jcvpb.build(signercert)));
-//		}
-		
-//		r = new PEMParser(new FileReader("/home/jander/test.pem"));
-//		object = r.readPemObject();
-//		X509CertificateHolder crtholder = new X509CertificateHolder(((PemObject) object).getContent());
-//		System.out.println(crtholder.getIssuer());
-//		System.out.println(crtholder.getSignatureAlgorithm());
-//		System.out.println(crtholder.getSubject());
-//		System.out.println(crtholder.getSubjectPublicKeyInfo().parsePublicKey());
-//		System.out.println(crtholder.isValidOn(new Date()));
-		
-//		String testmsg = "testmsg";
-		
-//		DefaultAlgorithmNameFinder danf = new DefaultAlgorithmNameFinder();
-//		JcaPEMKeyConverter jpkc = new JcaPEMKeyConverter();
-//		PrivateKey pk = jpkc.getPrivateKey(pki);
-//		JcaContentSignerBuilder sb = new JcaContentSignerBuilder(danf.getAlgorithmName(crtholder.getSignatureAlgorithm()));
-//		sb.setSecureRandom(SSecurity.getSecureRandom());
-//		ContentSigner cs = sb.build(pk);
-//		System.out.println("ABC "+cs);
-//		cs.getOutputStream().write(testmsg.getBytes(SUtil.UTF8));
-//		cs.getOutputStream().close();
-//		byte[] sig = cs.getSignature();
-		
-//		JcaContentVerifierProviderBuilder jcvpb = new JcaContentVerifierProviderBuilder();
-//		ContentVerifierProvider cvp = jcvpb.build(crtholder);
-//		ContentVerifier cv = cvp.get(crtholder.getSignatureAlgorithm());
-//		cv.getOutputStream().write(testmsg.getBytes(SUtil.UTF8));
-//		cv.getOutputStream().close();
-//		System.out.println("Verify: " + cv.verify(sig));
-		
-		
-//		Blake2bX509AuthenticationSuite auth = new Blake2bX509AuthenticationSuite();
-//		byte[] token = auth.createAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")));
-//		System.out.println("toklen: " + token.length);
-//		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("sooperdoopersecruit")), token));
-//		System.out.println(auth.verifyAuthenticationToken("Test".getBytes(SUtil.UTF8), new PasswordSecret(SUtil.createNetworkPassword("superdupersecret")), token));
 	}
 }
