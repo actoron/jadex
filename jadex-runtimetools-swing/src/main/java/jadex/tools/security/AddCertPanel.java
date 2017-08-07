@@ -378,6 +378,7 @@ public class AddCertPanel extends JPanel
 		pathlen.addItem("4");
 		pathlen.addItem("5");
 		pathlen.addItem("Unlimited");
+		pathlen.setSelectedIndex(6);
 		pathlen.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
@@ -605,11 +606,11 @@ public class AddCertPanel extends JPanel
 		/** CN field. */
 		protected JPlaceholderTextField cnfield;
 		
-		/** O field. */
-		protected JPlaceholderTextField ofield;
-		
 		/** OU field. */
 		protected JPlaceholderTextField oufield;
+		
+		/** O field. */
+		protected JPlaceholderTextField ofield;
 		
 		/** L field. */
 		protected JPlaceholderTextField lfield;
@@ -646,13 +647,13 @@ public class AddCertPanel extends JPanel
 			});
 			inner.add(cnfield);
 			
-			ofield = new JPlaceholderTextField();
-			ofield.setPlaceholder("Organization (O)");
-			inner.add(ofield);
-			
 			oufield = new JPlaceholderTextField();
 			oufield.setPlaceholder("Organizational Unit (OU)");
 			inner.add(oufield);
+			
+			ofield = new JPlaceholderTextField();
+			ofield.setPlaceholder("Organization (O)");
+			inner.add(ofield);
 			
 			lfield = new JPlaceholderTextField();
 			lfield.setPlaceholder("City (L)");
@@ -723,18 +724,18 @@ public class AddCertPanel extends JPanel
 			ret.append("CN=");
 			ret.append(cnfield.getText());
 			
+			if (oufield.getText().length() > 0)
+			{
+				ret.append(", OU=");
+				ret.append(oufield.getText());
+			}
+			
 			if (ofield.getText().length() > 0)
 			{
 				ret.append(", O=");
 				ret.append(ofield.getText());
 			}
 			
-			if (oufield.getText().length() > 0)
-			{
-				ret.append(", OU=");
-				ret.append(oufield.getText());
-			}
-
 			if (lfield.getText().length() > 0)
 			{
 				ret.append(", L=");

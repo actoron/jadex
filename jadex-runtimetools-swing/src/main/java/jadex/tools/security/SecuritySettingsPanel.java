@@ -1,19 +1,27 @@
 package jadex.tools.security;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -38,7 +46,7 @@ import jadex.commons.gui.jtable.StringArrayTableModel;
  */
 public class SecuritySettingsPanel implements IServiceViewerPanel
 {
-	protected static final String DEFAULT_CERT_STORE = "certstore.zip";
+	protected static final String DEFAULT_CERT_STORE = "jadex_certstore.zip";
 	
 	/** Access to jcc component. */
 	protected IExternalAccess jccaccess;
@@ -50,6 +58,9 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	
 	/** Networks table. */
 	protected JTable nwtable;
+	
+	/** Role table. */
+	protected JTable roletable;
 	
 	/** Use secret check box. */
 	protected JCheckBox usesecret;
@@ -90,6 +101,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						main.add("General", createGeneralPanel());
 						
 						main.add("Networks", createNetworkPanel());
+						
+						main.add("Roles", createRolePanel());
 						
 						main.add("Certificate Store", new CertTree(DEFAULT_CERT_STORE));
 						
@@ -337,6 +350,179 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	}
 	
 	/**
+	 *  Creates the role panel.
+	 *  
+	 *  @return The role panel.
+	 */
+	protected JPanel createRolePanel()
+	{
+		JPanel rolepanel = new JPanel();
+		
+		roletable = new JTable();
+		
+		JScrollPane scroll = new JScrollPane(roletable);
+		
+		final JPlaceholderTextField entityname = new JPlaceholderTextField();
+		entityname.setPlaceholder("Entity Name");
+		
+		final JPlaceholderTextField rolename = new JPlaceholderTextField();
+		rolename.setPlaceholder("Role Name");
+		
+		JButton add = new JButton(new AbstractAction("Add")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final String entity = entityname.getText();
+				if (entity.length() == 0)
+				{
+					entityname.showInvalid();
+					return;
+				}
+				
+				final String role = rolename.getText();
+				if (role.length() == 0)
+				{
+					rolename.showInvalid();
+					return;
+				}
+				
+				entityname.setNonPlaceholderText("");
+				rolename.setNonPlaceholderText("");
+				
+				jccaccess.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						secservice.addRole(entity, role).get();
+						refreshRoles();
+						
+						return IFuture.DONE;
+					}
+				});
+			}
+		});
+		
+		JButton remove = new JButton(new AbstractAction("Remove...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int ind = roletable.getSelectedRow();
+				if (ind >= 0)
+				{
+					final String entity = (String) roletable.getModel().getValueAt(ind, 0);
+					
+					jccaccess.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							final Set<String> roles = secservice.getRoleMap().get().get(entity);
+							
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								@SuppressWarnings("unchecked")
+								public void run()
+								{
+									JPanel removepanel = new JPanel();
+									@SuppressWarnings("rawtypes")
+									final JComboBox roleschoice = new JComboBox();
+									roleschoice.setEditable(false);
+									roleschoice.setLightWeightPopupEnabled(false);
+									for (String role : roles)
+										roleschoice.addItem(role);
+									
+									final JCheckBox all = new JCheckBox("All Roles");
+									
+									final JFrame frame = new JFrame("Remove Role");
+									
+									JPanel buttonpanel = new JPanel();
+									JButton okbutton = new JButton(new AbstractAction("OK")
+									{
+										public void actionPerformed(ActionEvent e)
+										{
+											final List<String> removal = new ArrayList<String>();
+											if (!all.isSelected())
+											{
+												String sel = (String) roleschoice.getSelectedItem();
+												if (sel == null)
+												{
+													frame.dispose();
+													return;
+												}
+												removal.add(sel);
+											}
+											else
+											{
+												removal.addAll(roles);
+											}
+											
+											jccaccess.scheduleStep(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													for (String role : removal)
+														secservice.removeRole(entity, role).get();
+													refreshRoles();
+													return IFuture.DONE;
+												}
+											});
+											
+											frame.dispose();
+										}
+									});
+									
+									JButton cancelbutton = new JButton(new AbstractAction("Cancel")
+									{
+										public void actionPerformed(ActionEvent e)
+										{
+											frame.dispose();
+										}
+									});
+									
+									SGUI.createHorizontalGroupLayout(buttonpanel, new JComponent[] { okbutton, cancelbutton }, true);
+									
+									SGUI.createVerticalGroupLayout(removepanel, new JComponent[] { roleschoice, all, buttonpanel }, true);
+									
+									frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+									frame.getRootPane().setLayout(new BorderLayout());
+									frame.getRootPane().add(removepanel, BorderLayout.CENTER);
+									frame.setSize(400, 300);
+									frame.setMinimumSize(frame.getRootPane().getPreferredSize());
+									frame.setLocation(SGUI.calculateMiddlePosition(frame));
+									frame.setVisible(true);
+								}
+							});
+							
+							return IFuture.DONE;
+						}
+					});
+				}
+			}
+		});
+		
+		JButton refresh = new JButton(new AbstractAction("Refresh")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				refreshRoles();
+			}
+		});
+		
+		SGUI.adjustComponentSizes(new JComponent[] { add, remove, refresh } );
+		
+		JPanel buttonpanel = new JPanel();
+		SGUI.createHorizontalGroupLayout(buttonpanel, new JComponent[] { entityname, rolename, add, remove, refresh }, true);
+		
+		SGUI.setMinimumSize(entityname, 200, -1);
+		SGUI.setMinimumSize(rolename, 200, -1);
+		
+		SGUI.createVerticalGroupLayout(rolepanel, new JComponent[] { scroll, buttonpanel }, false);
+		
+		refreshRoles();
+		
+		return rolepanel;
+	}
+	
+	/**
 	 *  Sets secret for network.
 	 *  
 	 *  @param nwn The network name.
@@ -436,6 +622,58 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						StringArrayTableModel model = new StringArrayTableModel(table);
 						model.setColumnNames(new String[] { "Network Name", "Secret" });
 						nwtable.setModel(model);
+						
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Refreshes the networks.
+	 */
+	protected void refreshRoles()
+	{
+		jccaccess.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final Map<String, Set<String>> roles = secservice.getRoleMap().get();
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String[][] table = null;
+						if (roles != null && roles.size() > 0)
+						{
+							table = new String[roles.size()][2];
+							
+							int i = 0;
+							for (Map.Entry<String, Set<String>> entry : roles.entrySet())
+							{
+								table[i][0] = entry.getKey();
+								StringBuilder rolesstr = new StringBuilder();
+								for (String role : entry.getValue())
+								{
+									rolesstr.append(role);
+									rolesstr.append(',');
+								}
+								rolesstr.delete(rolesstr.length() - 1, rolesstr.length());
+								table[i][1] = rolesstr.toString();
+								++i;
+							}
+						}
+						else
+						{
+							table = new String[0][0];
+						}
+						
+						StringArrayTableModel model = new StringArrayTableModel(table);
+						model.setColumnNames(new String[] { "Entity", "Roles" });
+						roletable.setModel(model);
 						
 					}
 				});
