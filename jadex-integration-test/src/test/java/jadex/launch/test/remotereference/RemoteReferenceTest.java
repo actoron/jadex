@@ -49,15 +49,8 @@ public class RemoteReferenceTest //extends TestCase
 		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
-		ISearchService	search = SServiceProvider.waitForService(platform1, new IResultCommand<IFuture<ISearchService>, Void>()
-		{
-			public IFuture<ISearchService> execute(Void args)
-			{
-				return SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL);
-			}
-		}, 4, 1500).get();
+		ISearchService	search = SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 
-//		ISearchService	search	= SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
 		// Invoke service to obtain reference to local service.
 		ILocalService	service2	= search.searchService("dummy").get(timeout);
 		
