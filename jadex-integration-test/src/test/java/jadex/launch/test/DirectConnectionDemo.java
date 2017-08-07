@@ -27,7 +27,7 @@ public class DirectConnectionDemo
 		{
 			"-awareness", "false",
 			"-relay", "false",
-			"-niotcpport", "12345",
+			"-tcpport", "12345",
 			"-platformname", "test_remote"
 		};
 		Starter.createPlatform(platformargs).get();

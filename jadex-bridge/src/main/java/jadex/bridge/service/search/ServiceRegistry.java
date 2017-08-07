@@ -1888,6 +1888,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected <T> IFuture<T> searchServiceAsyncByAskAll(final ServiceQuery<T> query)
 	{
+//		if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//		{
+//			System.out.println("searchServiceAsyncByAskAll: "+query);
+//		}
+		
 		final Future<T> ret = new Future<T>();
 		searchServiceAsyncByAskMe(query).addResultListener(new IResultListener<T>()
 		{
@@ -1900,6 +1905,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 				{
+//					if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//					{
+//						System.out.println("searchServiceAsyncByAskAll1: "+query);
+//					}
 					final ITerminableIntermediateFuture<T> sfut = searchRemoteServices(query);
 					sfut.addIntermediateResultListener(new IIntermediateResultListener<T>()
 					{
@@ -1955,7 +1964,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				IProxyAgentService pas = (IProxyAgentService)ser;
 				
 				bar.addFuture(pas.getRemoteComponentIdentifier());
-//					System.out.println("PROVID: " + ser.getServiceIdentifier().getProviderId());
+//				if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//				{
+//					System.out.println("searchRemoteServices0: "+pas+", "+query);
+//				}
 			}
 			bar.waitForResultsIgnoreFailures(null).addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
 			{
@@ -2065,6 +2077,10 @@ Ende Lars-Version */
 								{
 									try
 									{
+//										if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//										{
+//											System.out.println("searchRemoteServices1: "+result+", "+query);
+//										}
 										result.scheduleStep(new IComponentStep<Collection<T>>()
 										{
 											public IFuture<Collection<T>> execute(IInternalAccess ia)
@@ -2137,6 +2153,10 @@ Ende Lars-Version */
 								
 								public void exceptionOccurred(Exception exception)
 								{
+//									if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//									{
+//										System.out.println("searchRemoteServices ex: "+exception+", "+query);
+//									}
 									remotefin.setResult(null);
 								}
 							});

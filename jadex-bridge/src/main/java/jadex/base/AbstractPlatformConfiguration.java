@@ -92,10 +92,8 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setPrintPass(true);
 
         rootConfig.setLocalTransport(true);
-        rootConfig.setTcpTransport(false);
+        rootConfig.setTcpTransport(true);
         rootConfig.setTcpPort(0);
-        rootConfig.setNioTcpTransport(true);
-        rootConfig.setNioTcpPort(0);
         rootConfig.setRelayTransport(true);
 //		rootConfig.setRelayAddress("jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS");
 //			rootConfig.setRelaySecurity(true);
@@ -172,7 +170,7 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setAwaMechanisms();
 
         rootConfig.setLocalTransport(true); // needed by message
-        rootConfig.setNioTcpTransport(false);
+        rootConfig.setTcpTransport(false);
         rootConfig.setRelayTransport(false);
         rootConfig.setSslTcpTransport(false);
 

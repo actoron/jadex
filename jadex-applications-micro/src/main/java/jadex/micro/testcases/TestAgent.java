@@ -238,8 +238,6 @@ public abstract class TestAgent
 							"-superpeerclient", "false"
 //							"-logging", "true",
 ////							"-relaytransport", "false",
-//							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
-//							"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
 //							"-gui", "false", "-usepass", "false", "-simulation", "false"
 //							"-binarymessages", "false",
 						};

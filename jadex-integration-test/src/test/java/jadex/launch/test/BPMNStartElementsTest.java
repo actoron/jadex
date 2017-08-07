@@ -36,8 +36,6 @@ public class BPMNStartElementsTest //extends TestCase
 				"-autoshutdown", "false",
 				"-opengl", "false",
 				"-cli", "false",
-//				"-niotcptransport", "false",
-//				"-tcptransport", "true",
 //				"-deftimeout", "-1",
 				"-printpass", "false",});
 		
