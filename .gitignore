@@ -8,6 +8,7 @@ gen
 *.prefs
 *.copy
 keystore
+jadex_certstore.zip
 *.settings.xml
 alarmclock_settings.ser
 **/testkeystore

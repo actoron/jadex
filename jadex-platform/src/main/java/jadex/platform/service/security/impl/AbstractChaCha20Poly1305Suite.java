@@ -64,9 +64,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	
 	// -------------- Operational state -----------------
 	
-	/** The authentication state. */
-	protected MsgSecurityInfos secinf;
-	
 	/** The ChaCha20 key. */
 	protected int[] key = new int[8];
 	
@@ -244,13 +241,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
 			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
-			secinf = new MsgSecurityInfos();
-			secinf.setAuthenticated(authnets.size() > 0 || platformauth);
-			if (platformauth)
-				secinf.setAuthenticatedPlatformName(remoteid.toString());
-			secinf.setTrustedPlatform(false);
-			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
-			setupRoles(agent);
+			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
 			ephemeralkey = createEphemeralKey();
 			byte[] pubkey = getPubKey();
@@ -277,13 +268,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
 			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
-			secinf = new MsgSecurityInfos();
-			secinf.setAuthenticated(authnets.size() > 0 || platformauth);
-			if (platformauth)
-				secinf.setAuthenticatedPlatformName(remoteid.toString());
-			secinf.setTrustedPlatform(false);
-			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
-			setupRoles(agent);
+			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;
@@ -345,31 +330,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		nonceprefix = 0;
 		msgid.set(0);
 		secinf = null;
-	}
-	
-	/** 
-	 * Sets the roles of the security infos.
-	 */
-	protected void setupRoles(SecurityAgent agent)
-	{
-		Map<String, Set<String>> rolemap = agent.getInternalRoles();
-		Set<String> roles = new HashSet<String>();
-		
-		Set<String> r = rolemap.get(secinf.getAuthenticatedPlatformName());
-		if (r != null)
-			roles.addAll(r);
-		
-		if (secinf.getNetworks() != null)
-		{
-			for (String network : secinf.getNetworks())
-			{
-				r = rolemap.get(network);
-				if (r != null)
-					roles.addAll(r);
-			}
-		}
-		
-		secinf.setRoles(roles);
 	}
 	
 	/**
