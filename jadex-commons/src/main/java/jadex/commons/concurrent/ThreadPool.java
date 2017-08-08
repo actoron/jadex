@@ -306,7 +306,7 @@ public class ThreadPool implements IThreadPool
 			synchronized(thread)
 			{
 				thread.terminated = true;
-				thread.notify();
+				thread.interrupt();	// wakes up threads in I/O as well
 			}
 		}
 		
@@ -320,7 +320,7 @@ public class ThreadPool implements IThreadPool
 			synchronized(thread)
 			{
 				thread.terminated = true;
-				thread.notify();
+				thread.interrupt(); // wakes up threads in I/O as well
 			}
 		}
 		
