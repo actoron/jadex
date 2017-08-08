@@ -450,14 +450,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				// Message could not be delivered -> remove the future (and abort, if possible)
 				
 				// locally executing command -> terminate, if terminable (i.e. abort to callee)
-				if(incommands.get(rxid) instanceof ITerminableFuture)
+				if(incommands!=null && incommands.get(rxid) instanceof ITerminableFuture)
 				{
 					((ITerminableFuture)incommands.remove(rxid))
 						.terminate((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
 				}
 				
 				// Remotely executing command -> set local future to failed (i.e. abort to caller)
-				else if(outcommands.get(rxid) instanceof Future)
+				else if(outcommands!=null && outcommands.get(rxid) instanceof Future)
 				{
 					((Future)outcommands.remove(rxid))
 						.setException((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
