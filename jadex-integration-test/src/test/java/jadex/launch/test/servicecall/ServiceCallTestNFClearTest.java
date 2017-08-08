@@ -68,7 +68,7 @@ public class ServiceCallTestNFClearTest
 		String pid = SUtil.createUniqueId(name.getMethodName(), 3) + "-*";
 
 		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
-		config.setLogging(true);
+//		config.setLogging(true);
 		config.setDefaultTimeout(-1);
 		config.setPlatformName(pid);
 		config.setSaveOnExit(false);
@@ -90,8 +90,11 @@ public class ServiceCallTestNFClearTest
 	@After
 	public void tearDown()
 	{
+		System.out.println("Killing 1...");
 		platform1.killComponent().get();
+		System.out.println("Killing 2...");
 		platform2.killComponent().get();
+		System.out.println("Killing done.");
 	}
 
 	/**
@@ -257,11 +260,13 @@ public class ServiceCallTestNFClearTest
 			exta = createServiceAgent(p2, consumer);
 		}
 
+		System.out.println("bdisvbgorudo 1");
 		exta.scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
+				System.out.println("bdisvbgorudo 1a");
 				IServiceCallService service;
 				if(useProvided)
 				{
@@ -269,6 +274,7 @@ public class ServiceCallTestNFClearTest
 					// service = (IServiceCallService)
 					// ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(requiredOrProvidedServiceName);
 					// } else {
+					System.out.println("bdisvbgorudo 1b");
 					service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
 					// }
 				}
@@ -279,15 +285,25 @@ public class ServiceCallTestNFClearTest
 					{
 						public jadex.commons.future.IFuture<IServiceCallService> execute(Void args) 
 						{
-							return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName);
+							System.out.println("bdisvbgorudo 1c");
+							try
+							{
+								return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName);
+							}
+							catch(Throwable e)
+							{
+								e.printStackTrace();
+								throw SUtil.throwUnchecked(e);
+							}
 						}
 					}, 7, 1500).get();
-						
 				}
+				System.out.println("bdisvbgorudo 1d");						
 				assertServiceCallResetsServiceInvocation(service);
 				return Future.DONE;
 			}
 		}).get();
+		System.out.println("bdisvbgorudo 2");
 	}
 
 	private void assertServiceCallResetsServiceInvocation(IServiceCallService service)
