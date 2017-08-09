@@ -7,6 +7,9 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
@@ -321,12 +324,23 @@ public class ServiceQuery<T>
 	
 	/**
 	 *  Sets the service tags.
-	 *  
 	 *  @param servicetags The service tags. 
 	 */
 	public void setServiceTags(String[] servicetags)
 	{
+		TagProperty.checkReservedTags(servicetags);
 		this.servicetags = servicetags;
+	}
+	
+	/**
+	 *  Sets the service tags.
+	 *  @param servicetags The service tags.
+	 *  
+	 *  todo: move or refactor to hide complexity!?
+	 */
+	public void setServiceTags(String[] servicetags, IExternalAccess component)
+	{
+		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags.length]);
 	}
 	
 	/**

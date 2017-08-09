@@ -24,7 +24,7 @@ import jadex.platform.service.cli.ResultInfo;
 /**
  * 
  */
-public class JCCommand extends CreateComponentCommand
+public class JCCCommand extends CreateComponentCommand
 {
 	/**
 	 *  Get the command names (name including alias').
@@ -32,7 +32,7 @@ public class JCCommand extends CreateComponentCommand
 	 */
 	public String[] getNames()
 	{
-		return new String[]{"openjcc", "startjcc", "jcc"};
+		return new String[]{"openjcc", "startjcc", "jcc", "gui"};
 	}
 	
 	/**

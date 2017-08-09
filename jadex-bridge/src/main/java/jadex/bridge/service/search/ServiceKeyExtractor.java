@@ -31,6 +31,9 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	/** Key type for the service platform. */
 	public static final String KEY_TYPE_PLATFORM = "platform";
 	
+	/** Key type for the service id. */
+	public static final String KEY_TYPE_SID = "serviceid";
+	
 	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
 	
@@ -86,15 +89,15 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	@SuppressWarnings("unchecked")
 	public static final Set<String> getKeysStatic(String keytype, Object serv)
 	{
-		if(serv instanceof IService)
-		{
-			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
-				System.out.println("sdhgfsdh");
-		}
+//		if(serv instanceof IService)
+//		{
+//			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//				System.out.println("sdhgfsdh");
+//		}
 		
 		IService service = (IService) serv;
 		Set<String> ret = null;
-		if (KEY_TYPE_INTERFACE.equals(keytype))
+		if(KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			ret = new HashSet<String>();
 			ret.add(service.getServiceIdentifier().getServiceType().toString());
@@ -105,19 +108,23 @@ public class ServiceKeyExtractor implements IKeyExtractor
 					ret.add(supertype.toString());
 			}
 		}
-		else if (KEY_TYPE_TAGS.equals(keytype))
+		else if(KEY_TYPE_TAGS.equals(keytype))
 		{
 			Map<String, Object> sprops = service.getPropertyMap();
 			if(sprops != null)
 				ret = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
 		}
-		else if (KEY_TYPE_PROVIDER.equals(keytype))
+		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
 			ret = new SetWrapper<String>(service.getServiceIdentifier().getProviderId().toString());
 		}
-		else if (KEY_TYPE_PLATFORM.equals(keytype))
+		else if(KEY_TYPE_PLATFORM.equals(keytype))
 		{
 			ret = new SetWrapper<String>(service.getServiceIdentifier().getProviderId().getRoot().toString());
+		}
+		else if(KEY_TYPE_SID.equals(keytype))
+		{
+			ret = new SetWrapper<String>(service.getServiceIdentifier().toString());
 		}
 		return ret;
 	}

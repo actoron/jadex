@@ -173,4 +173,31 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Check if it is a reserved tag.
+	 *  @param tag The tag.
+	 *  @return True if is reserved.
+	 */
+	public static void checkReservedTags(String[] tags)
+	{
+		for(String tag: tags)
+		{
+			checkReservedTag(tag);
+		}
+	}
+	
+	/**
+	 *  Check if it is a reserved tag.
+	 *  @param tag The tag.
+	 *  @return True if is reserved.
+	 */
+	public static void checkReservedTag(String tag)
+	{
+		if(PLATFORM_NAME_INTERNAL.equals(tag) || PLATFORM_NAME.equals(tag) || JADEX_VERSION_INTERNAL.equals(tag) 
+			|| JADEX_VERSION.equals(tag))
+		{
+			throw new IllegalArgumentException("Tag name is reserved.");
+		}
+	}
 }

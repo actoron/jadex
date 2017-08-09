@@ -486,8 +486,8 @@ public class SerializationServices implements ISerializationServices
 	 *  @param platform The platform ID.
 	 *  @return The serialization services.
 	 */
-	protected static final ISerializationServices getSerializationServices(IComponentIdentifier platform)
+	public static final ISerializationServices getSerializationServices(IComponentIdentifier platform)
 	{
-		return (ISerializationServices) PlatformConfiguration.getPlatformValue(platform, IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices)PlatformConfiguration.getPlatformValue(platform, IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
 	}
 }

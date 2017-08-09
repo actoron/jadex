@@ -206,7 +206,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							System.out.println("searching6: "+info.getName());
 						}
 						// Search service using search specification.
-						SServiceProvider.getTaggedService(ia, type, binding.getScope(), ffilter, false)
+						SServiceProvider.getTaggedService(ia, type, binding.getScope(), ffilter, false, tags)
 							.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding)
 						{
 							public void customResultAvailable(T result)
@@ -405,7 +405,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						query.setReturnType(query.getServiceType());
 						query.setScope(binding.getScope());
 						query.setAsyncFilter(ffilter);
-						query.setServiceTags(tags);
+						query.setServiceTags(tags, ia.getExternalAccess());
 						
 //						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
 						IIntermediateFuture<T>	ifut	= ServiceRegistry.getRegistry(ia.getComponentIdentifier().getRoot()).searchServicesAsync(query);

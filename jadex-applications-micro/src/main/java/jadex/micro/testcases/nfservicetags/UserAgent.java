@@ -69,42 +69,42 @@ public class UserAgent
 			tr1.setReason("Exception occurred: "+e);
 		}
 		results.add(tr1);
-//		
-//		TestReport tr2 = new TestReport("#2", "Test if can find service with tags in required service defition.");
-//		try
-//		{
-//			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser2").get();
-//			tr2.setSucceeded(true);
-//		}
-//		catch(Exception e)
-//		{
-//			tr2.setReason("Exception occurred: "+e);
-//		}
-//		results.add(tr2);
 		
-//		TestReport tr3 = new TestReport("#3", "Test if can find service with tags in required service defition that are not defined on service.");
-//		try
-//		{
-//			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser3").get();
-//			tr3.setReason("Found service that does not have the tag");
-//		}
-//		catch(Exception e)
-//		{
-//			tr3.setSucceeded(true);
-//		}
-//		results.add(tr3);
+		TestReport tr2 = new TestReport("#2", "Test if can find service with tags in required service defition.");
+		try
+		{
+			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser2").get();
+			tr2.setSucceeded(true);
+		}
+		catch(Exception e)
+		{
+			tr2.setReason("Exception occurred: "+e);
+		}
+		results.add(tr2);
 		
-//		TestReport tr4 = new TestReport("#4", "Test if can find service via SServiceProvider.getServices()");
-//		try
-//		{
-//			Collection<ITestService> sers = SServiceProvider.getTaggedServices(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
-//			tr4.setSucceeded(true);
-//		}
-//		catch(Exception e)
-//		{
-//			tr4.setReason("Exception occurred: "+e);
-//		}
-//		results.add(tr4);
+		TestReport tr3 = new TestReport("#3", "Test if can find service with tags in required service defition that are not defined on service.");
+		try
+		{
+			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser3").get();
+			tr3.setReason("Found service that does not have the tag");
+		}
+		catch(Exception e)
+		{
+			tr3.setSucceeded(true);
+		}
+		results.add(tr3);
+		
+		TestReport tr4 = new TestReport("#4", "Test if can find service via SServiceProvider.getServices()");
+		try
+		{
+			Collection<ITestService> sers = SServiceProvider.getTaggedServices(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
+			tr4.setSucceeded(true);
+		}
+		catch(Exception e)
+		{
+			tr4.setReason("Exception occurred: "+e);
+		}
+		results.add(tr4);
 		
 		TestReport tr5 = new TestReport("#5", "Test if can find service via SServiceProvider.getService()");
 		try
@@ -118,17 +118,17 @@ public class UserAgent
 		}
 		results.add(tr5);
 		
-//		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
-//		try
-//		{
-//			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).get(); 
-//			tr6.setSucceeded(true);
-//		}
-//		catch(Exception e)
-//		{
-//			tr6.setReason("Exception occurred: "+e);
-//		}
-//		results.add(tr6);
+		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
+		try
+		{
+			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, new String[]{null}).get(); 
+			tr6.setSucceeded(true);
+		}
+		catch(Exception e)
+		{
+			tr6.setReason("Exception occurred: "+e);
+		}
+		results.add(tr6);
 		
 		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));

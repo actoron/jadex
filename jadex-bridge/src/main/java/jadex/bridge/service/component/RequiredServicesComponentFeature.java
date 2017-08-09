@@ -482,11 +482,6 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 
-		if("decoupled".equals(name))
-		{
-			System.out.println("searching: "+name+", "+info);
-		}
-		
 		if(info==null)
 		{
 			Future<T> ret = new Future<T>();
