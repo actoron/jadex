@@ -324,9 +324,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
 						// Only accept messages we trust.
-						if (secinf.isAuthenticatedPlatform() || allowuntrusted)
+						if (secinf.isAuthenticated() || allowuntrusted)
 						{
-							Object message = deserializeMessage(header, result.getSecondEntity());
+							Object message;
+							try
+							{
+								message = deserializeMessage(header, result.getSecondEntity());
+							}
+							catch(Exception e)
+							{
+								// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
+								message 	= null;
+								header.addProperty(EXCEPTION, e);
+							}
 							messageArrived(secinf, header, message);
 						}
 					}

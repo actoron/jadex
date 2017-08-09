@@ -41,6 +41,7 @@ import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
@@ -929,16 +930,28 @@ public class RemoteReferenceModule
 		Object ret;
 		
 		// If is local return local target object.
-//		if(pr.getRemoteReference().getRemoteManagementServiceIdentifier().equals(rsms.getRMSComponentIdentifier()))
-//		{
-//			ret = targetobjects.containsKey(pr.getRemoteReference())
-//				? targetobjects.get(pr.getRemoteReference())
-//				: targetcomps.get(pr.getRemoteReference());
-//			if(ret==null)
-//				System.out.println("No object for reference: "+pr.getRemoteReference());
-//		}
-//		// Else return new or old proxy.
-//		else
+		if(pr.getRemoteReference().getRemoteComponent().getRoot().equals(platform))
+		{
+			if(pr.getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
+			{
+				IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
+				@SuppressWarnings("unused")
+				IFuture<Object>	fut	= SServiceProvider.getService(access, (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier());
+				// TODO: get service sync???
+				throw new UnsupportedOperationException("Local reuse of remote service not yet supported.");
+			}
+			else if(pr.getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
+			{
+				// TODO: get external access sync???
+				throw new UnsupportedOperationException("Local reuse of remote components not yet supported.");
+			}
+			else
+			{
+				throw new UnsupportedOperationException("Plain remote objects not yet supported.");
+			}
+		}
+		// Else return new or old proxy.
+		else
 		{
 //			System.out.println("interfaces of proxy: "+SUtil.arrayToString(pi.getTargetInterfaces()));
 			

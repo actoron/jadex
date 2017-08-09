@@ -426,6 +426,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						cs.createTimer(delay, to);					
 					}
 				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Ignore (TODO: why happens during shutdown!?)
+				}
 			}));
 		}
 		else

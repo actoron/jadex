@@ -454,26 +454,6 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 	}
 
 	@Override
-	public boolean getNioTcpTransport() {
-		return getRootConfig().getNioTcpTransport();
-	}
-
-	@Override
-	public void setNioTcpTransport(boolean value) {
-		getRootConfig().setNioTcpTransport(value);
-	}
-
-	@Override
-	public int getNioTcpPort() {
-		return getRootConfig().getNioTcpPort();
-	}
-
-	@Override
-	public void setNioTcpPort(int value) {
-		getRootConfig().setNioTcpPort(value);
-	}
-
-	@Override
 	public boolean getRelayTransport() {
 		return getRootConfig().getRelayTransport();
 	}

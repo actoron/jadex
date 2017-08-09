@@ -139,7 +139,7 @@ public class FutureBarrier<E>
 					Collection<E> res = new ArrayList<E>();
 					for(IFuture<E> fut: futures)
 					{
-						if(fut.getException()!=null)
+						if(fut.getException()==null)
 							res.add(fut.get());
 					}
 					ret.setResult(res);

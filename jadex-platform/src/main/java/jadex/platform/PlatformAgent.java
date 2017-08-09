@@ -31,8 +31,6 @@ import static jadex.base.IRootComponentConfiguration.MAVEN_DEPENDENCIES;
 import static jadex.base.IRootComponentConfiguration.MONITORINGCOMP;
 import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
 import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
-import static jadex.base.IRootComponentConfiguration.NIOTCPPORT;
-import static jadex.base.IRootComponentConfiguration.NIOTCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.PERSIST;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
@@ -48,6 +46,7 @@ import static jadex.base.IRootComponentConfiguration.SSLTCPPORT;
 import static jadex.base.IRootComponentConfiguration.SSLTCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.STRICTCOM;
 import static jadex.base.IRootComponentConfiguration.SUPERPEER;
+import static jadex.base.IRootComponentConfiguration.SUPERPEERCLIENT;
 import static jadex.base.IRootComponentConfiguration.TCPPORT;
 import static jadex.base.IRootComponentConfiguration.TCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.THREADPOOLCLASS;
@@ -105,6 +104,7 @@ import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
 import jadex.platform.service.simulation.SimulationAgent;
+import jadex.platform.service.transport.tcp.TcpTransportAgent;
 
 /**
  *	Basic standalone platform services provided as a micro agent. 
@@ -157,10 +157,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=VALIDITYDURATION, clazz=long.class),
 
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="9876"),
-	@Argument(name=NIOTCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=NIOTCPPORT, clazz=int.class, defaultvalue="8765"),
+	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="8765"),
 //	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
@@ -195,7 +193,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false")
+	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="!\"true\".equals($args.superpeer)")
 })
 
 @ComponentTypes({
@@ -234,7 +233,8 @@ import jadex.platform.service.simulation.SimulationAgent;
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
-	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class")
+	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
+	@ComponentType(name="tcp", clazz=TcpTransportAgent.class)
 })
 
 @ProvidedServices({
@@ -270,7 +270,6 @@ import jadex.platform.service.simulation.SimulationAgent;
 {
 	@Configuration(name="auto", arguments={
 		@NameValue(name=TCPPORT, value="0"),
-		@NameValue(name=NIOTCPPORT, value="0"),
 		@NameValue(name=SSLTCPPORT, value="0"),
 		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
@@ -313,7 +312,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
@@ -335,11 +334,14 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
+			arguments={
+				@NameValue(name="port", value="$args.tcpport")
+			}),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
 		//@NameValue(name="ssltcpport", value="0"),
-		//@NameValue(name="niotcpport", value="0"),
 		//@NameValue(name="platformname", value="null"),
 		//@NameValue(name="kernels", value="\"component,micro,application,bdi,bdiv3,bpmn,gpmn\"")
 	}, components={
@@ -380,7 +382,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
@@ -398,10 +400,13 @@ import jadex.platform.service.simulation.SimulationAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
+			arguments={
+				@NameValue(name="port", value="$args.tcpport")
+			}),
 	}),
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
-		@NameValue(name=NIOTCPPORT, value="0"),
 		@NameValue(name=SSLTCPPORT, value="0"),
 		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
@@ -428,7 +433,7 @@ import jadex.platform.service.simulation.SimulationAgent;
 		}),
 		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeer? 0 : 1"),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 
 		// not requested as service
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
@@ -442,6 +447,10 @@ import jadex.platform.service.simulation.SimulationAgent;
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
+			arguments={
+				@NameValue(name="port", value="$args.tcpport")
+			}),
 	}),
 })
 @Agent

@@ -16,7 +16,7 @@
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
       <jadex:import>jadex.base.test.*</jadex:import>
       <jadex:import>jadex.commons.IFilter</jadex:import>
-      <jadex:import>jadex.bridge.fipa.SFipa</jadex:import>
+      <jadex:import>jadex.bridge.fipa.*</jadex:import>
       <jadex:import>jadex.bridge.*</jadex:import>
     </jadex:imports>
     <jadex:results>
@@ -95,10 +95,7 @@
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
         <jadex:property name="mode">&quot;send&quot;</jadex:property>
-        <jadex:property name="msgtype">&quot;fipa&quot;</jadex:property>
-        <jadex:property name="performative">SFipa.INFORM</jadex:property>
-        <jadex:property name="receivers">new IComponentIdentifier[]{$component.getComponentIdentifier()}</jadex:property>
-        <jadex:property name="content">&quot;content&quot;</jadex:property>
+        <jadex:property name="message">new FipaMessage($component.getComponentIdentifier(), FipaMessage.Performative.INFORM, &quot;content&quot;)</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateThrowEvent>
     <semantic:sequenceFlow sourceRef="_eQvvsRJgEd-3Ruc_856dPQ" targetRef="_2dIbMRJgEd-3Ruc_856dPQ" id="_2dIbOhJgEd-3Ruc_856dPQ">

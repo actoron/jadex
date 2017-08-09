@@ -1,11 +1,12 @@
 package jadex.bridge.fipa;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFilter;
 
 /**
  *  FIPA message as struct.
  */
-public class FipaMessage
+public class FipaMessage	implements IFilter<Object>
 {
 	// cf. http://www.fipa.org/specs/fipa00061/SC00061G.html
 	
@@ -159,6 +160,35 @@ public class FipaMessage
 //	 *  by which the sending agent would like to receive a reply. */
 //	public Long	reply_by;
 	
+	//-------- constructors --------
+	
+	/**
+	 *  Bean constructor.
+	 */
+	public FipaMessage(){}
+	
+	/**
+	 *  Constructor for most common fields (for sending).
+	 */
+	public FipaMessage(IComponentIdentifier receiver, String performative, Object content)
+	{
+		this.receiver	= receiver;
+		this.performative	= performative;
+		this.content	= content;
+	}
+	
+	/**
+	 *  Constructor for all fields (e.g. for match template).
+	 */
+	public FipaMessage(IComponentIdentifier sender, IComponentIdentifier receiver, String performative, Object content, String convid)
+	{
+		this.sender	= sender;
+		this.receiver	= receiver;
+		this.performative	= performative;
+		this.content	= content;
+		this.convid	= convid;
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -179,5 +209,28 @@ public class FipaMessage
 		ret.setReceiver(getSender());
 		ret.setConversationId(getConversationId());
 		return ret;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Test if an object passes the filter.
+	 *  @return True, if passes the filter.
+	 */
+	public boolean filter(Object obj)
+	{
+		if(obj instanceof FipaMessage)
+		{
+			FipaMessage	msg	= (FipaMessage)obj;
+			return sender==null || sender.equals(msg.getSender())
+				&& receiver==null || receiver.equals(msg.getSender())
+				&& performative==null || performative.equals(msg.getSender())
+				&& content==null || content.equals(msg.getSender())
+				&& convid==null || convid.equals(msg.getSender());
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

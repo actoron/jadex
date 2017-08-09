@@ -262,8 +262,8 @@ public class SerializationServices implements ISerializationServices
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
-					throw new RuntimeException(e);
+//					e.printStackTrace();
+					throw SUtil.throwUnchecked(e);
 				}
 			}
 		};

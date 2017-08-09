@@ -288,22 +288,10 @@ public interface IRootComponentConfiguration {
     public static final String	TCPTRANSPORT		= "tcptransport";							// class:
     // boolean
     // default:
-    // false
+    // true
 
     /** Port for TCP transport. **/
     public static final String	TCPPORT				= "tcpport";								// class:
-    // int
-    // default:
-    // 9876
-
-    /** Flag if niotcp transport is enabled. **/
-    public static final String	NIOTCPTRANSPORT		= "niotcptransport";						// class:
-    // boolean
-    // default:
-    // true
-
-    /** Port for NIOTCP transport. **/
-    public static final String	NIOTCPPORT			= "niotcpport";								// class:
     // int
     // default:
     // 8765
@@ -486,8 +474,13 @@ public interface IRootComponentConfiguration {
     // default:
     // true
 
-    /** Flag if registry synchronization should be used. **/
+    /** Flag if platform should support registry synchronization. **/
     public static final String	SUPERPEER			= StarterConfiguration.SUPERPEER;		// class:
+    // default:
+    // false
+
+    /** Flag if registry synchronization should be used. **/
+    public static final String	SUPERPEERCLIENT			= StarterConfiguration.SUPERPEERCLIENT;		// class:
     // default:
     // false
 
@@ -498,10 +491,10 @@ public interface IRootComponentConfiguration {
     public static final String[] BOOLEAN_ARGS = {
             WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
             UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
-            PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, NIOTCPTRANSPORT, RELAYTRANSPORT,
+            PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, RELAYTRANSPORT,
             RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
             MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
-            LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER
+            LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER, SUPERPEERCLIENT
     };
 
 
@@ -664,14 +657,6 @@ public interface IRootComponentConfiguration {
     int getTcpPort();
 
     void setTcpPort(int value);
-
-    boolean getNioTcpTransport();
-
-    void setNioTcpTransport(boolean value);
-
-    int getNioTcpPort();
-
-    void setNioTcpPort(int value);
 
     boolean getRelayTransport();
 

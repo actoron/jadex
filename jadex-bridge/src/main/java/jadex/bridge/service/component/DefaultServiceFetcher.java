@@ -35,6 +35,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -96,7 +97,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, IAsyncFilter<T> filter)
 	{
-//		System.out.println("searching: "+info.getName());
+		if("decoupled".equals(info.getName()))
+		{
+			System.out.println("searching: "+info.getName());
+		}
 		
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
@@ -130,18 +134,30 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		{
 			public void customResultAvailable(Object result)
 			{
+				if("decoupled".equals(info.getName()))
+				{
+					System.out.println("searching1: "+info.getName());
+				}
 				// Test if already bound.
 				if(result==null)
 				{
 					// Search component per name.
 					if(binding.getComponentName()!=null)
 					{
+						if("decoupled".equals(info.getName()))
+						{
+							System.out.println("searching2: "+info.getName());
+						}
 //						System.out.println("searching: "+binding.getComponentName());
 						// Search service by component name.
 						getExternalAccessByName(ia, info, binding).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
+								if("decoupled".equals(info.getName()))
+								{
+									System.out.println("searching3: "+info.getName());
+								}
 //								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
 								IFuture<T> fut = SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags);
 								fut.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
@@ -156,11 +172,19 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					}
 					else if(binding.getComponentType()!=null)
 					{
+						if("decoupled".equals(info.getName()))
+						{
+							System.out.println("searching4: "+info.getName());
+						}
 						// Search service by component type.
 						getExternalAccessesByType(ia, info, binding).addResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, T>(ret)
 						{
 							public void customResultAvailable(Collection<IExternalAccess> coll)
 							{
+								if("decoupled".equals(info.getName()))
+								{
+									System.out.println("searching5: "+info.getName());
+								}
 								if(coll!=null && coll.size()>0)
 								{
 									IExternalAccess ea = coll.iterator().next();
@@ -177,22 +201,28 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					}
 					else
 					{
+						if("decoupled".equals(info.getName()))
+						{
+							System.out.println("searching6: "+info.getName());
+						}
 						// Search service using search specification.
 						SServiceProvider.getTaggedService(ia, type, binding.getScope(), ffilter, false)
 							.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding)
 						{
-//							public void customResultAvailable(Object result)
-//							{
-//								System.out.println("type ra: "+type);
-//								if(info.getType().getTypeName().indexOf("ICro")!=-1)
-//									System.out.println("diss" );
-//								super.customResultAvailable(result);
-//							}
+							public void customResultAvailable(T result)
+							{
+								if("decoupled".equals(info.getName()))
+								{
+									System.out.println("searching7: "+info.getName());
+								}
+								super.customResultAvailable(result);
+							}
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println("type ex: "+type);
-//								if(info.getType().getTypeName().indexOf("ICro")!=-1)
-//									System.out.println("diss" );
+								if("decoupled".equals(info.getName()))
+								{
+									System.out.println("searching8: "+info.getName()+"\n"+SUtil.getExceptionStacktrace(exception));
+								}
 								createComponent(provider, info, binding).addResultListener(
 									new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 								{
@@ -208,6 +238,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				}
 				else
 				{
+					if("decoupled".equals(info.getName()))
+					{
+						System.out.println("searching9: "+info.getName());
+					}
 					ret.setResult((T)result);
 				}
 			}

@@ -33,7 +33,7 @@ public class CertTestWindow extends JFrame
 		{
 		}
 		
-		final CertTree certtree = new CertTree("certstore.zip");
+		final CertTree certtree = new CertTree(SecuritySettingsPanel.DEFAULT_CERT_STORE);
 		
 		JScrollPane scrollpane = new JScrollPane(certtree);
 		getContentPane().add(scrollpane);

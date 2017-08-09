@@ -25,6 +25,7 @@ import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.IAsyncFilter;
@@ -106,8 +107,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean isSuperpeer()
 	{
-		return false;
-//		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
+		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
 	}
 	
 //	/**
@@ -354,14 +354,19 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected IFuture<IComponentIdentifier> searchSuperpeer()
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
-			.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
+		// Only search for super peer when super peer client agent is running. (hack???)
+		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
+		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
 		{
-			public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
+			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
+				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 			{
-				ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
-			}	
-		});
+				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
+				{
+					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+				}	
+			});
+		}
 		return ret;
 	}
 	
@@ -1883,6 +1888,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected <T> IFuture<T> searchServiceAsyncByAskAll(final ServiceQuery<T> query)
 	{
+//		if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//		{
+//			System.out.println("searchServiceAsyncByAskAll: "+query);
+//		}
+		
 		final Future<T> ret = new Future<T>();
 		searchServiceAsyncByAskMe(query).addResultListener(new IResultListener<T>()
 		{
@@ -1895,6 +1905,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 				{
+//					if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//					{
+//						System.out.println("searchServiceAsyncByAskAll1: "+query);
+//					}
 					final ITerminableIntermediateFuture<T> sfut = searchRemoteServices(query);
 					sfut.addIntermediateResultListener(new IIntermediateResultListener<T>()
 					{
@@ -1950,7 +1964,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				IProxyAgentService pas = (IProxyAgentService)ser;
 				
 				bar.addFuture(pas.getRemoteComponentIdentifier());
-//					System.out.println("PROVID: " + ser.getServiceIdentifier().getProviderId());
+//				if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//				{
+//					System.out.println("searchRemoteServices0: "+pas+", "+query);
+//				}
 			}
 			bar.waitForResultsIgnoreFailures(null).addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
 			{
@@ -2060,6 +2077,10 @@ Ende Lars-Version */
 								{
 									try
 									{
+//										if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//										{
+//											System.out.println("searchRemoteServices1: "+result+", "+query);
+//										}
 										result.scheduleStep(new IComponentStep<Collection<T>>()
 										{
 											public IFuture<Collection<T>> execute(IInternalAccess ia)
@@ -2132,6 +2153,10 @@ Ende Lars-Version */
 								
 								public void exceptionOccurred(Exception exception)
 								{
+//									if((""+query.getServiceType()).indexOf("LocalService")!=-1)
+//									{
+//										System.out.println("searchRemoteServices ex: "+exception+", "+query);
+//									}
 									remotefin.setResult(null);
 								}
 							});

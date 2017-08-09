@@ -337,7 +337,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info)
 	{
-		System.out.println("new info " + info);
+//		System.out.println("new info " + info);
 		// Return if inital discovery.
 		boolean ret = false;
 		
@@ -348,10 +348,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 //		{
 //			addresses.addPlatformAddresses(info.getSender().getRoot(), entry.getKey(), entry.getValue());
 //		}
-		System.out.println(agent.getComponentIdentifier().toString() + " merging " + info.getAddresses() + " " + info.getSender());
+//		System.out.println(agent.getComponentIdentifier().toString() + " merging " + info.getAddresses() + " " + info.getSender());
 		changedaddrs = TransportAddressBook.getAddressBook(agent).mergePlatformAddresses(info.getSender().getRoot(), info.getAddresses());
-		System.out.println("MERGED " + agent + " THIS: " + info.getSender().getRoot() + " " + info.getAddresses());
-		System.out.println("Merged: " + changedaddrs + " " + agent);
+//		System.out.println("MERGED " + agent + " THIS: " + info.getSender().getRoot() + " " + info.getAddresses());
+//		System.out.println("Merged: " + changedaddrs + " " + agent);
 		
 //		addresses.addPlatformAddresses(info.getSender());
 //		tas.addPlatformAddresses(info.getSender());

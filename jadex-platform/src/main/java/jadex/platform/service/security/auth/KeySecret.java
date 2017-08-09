@@ -139,9 +139,6 @@ public class KeySecret extends SharedSecret
 	 */
 	public static final String createRandomAsString()
 	{
-		byte[] rawkey = new byte[32]; // 256-bit key
-		SSecurity.getSecureRandom().nextBytes(rawkey);
-		
-		return (PREFIX + new String (Base64.encodeNoPadding(rawkey), SUtil.UTF8));
+		return createRandom().toString();
 	}
 }

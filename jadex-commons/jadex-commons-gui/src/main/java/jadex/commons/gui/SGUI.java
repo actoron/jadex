@@ -576,6 +576,23 @@ public class SGUI
 	}
 	
 	/**
+	 *  Sets the minimum size along with the preferred size.
+	 *  Negative values will remain the same.
+	 *  
+	 *  @param c Component.
+	 *  @param w Width.
+	 *  @param h Height.
+	 */
+	public static void setMinimumSize(JComponent c, int w, int h)
+	{
+		Dimension ms = c.getMinimumSize();
+		Dimension ps = c.getPreferredSize();
+		
+		c.setMinimumSize(new Dimension(w < 0 ? ms.width : w, h < 0 ? ms.height : h));
+		c.setPreferredSize(new Dimension(w < 0 ? ps.width : w, h < 0 ? ps.height : h));
+	}
+	
+	/**
 	 *  Creates a simple vertical arrangement using group layout with gaps.
 	 *  Automatically adds the components.
 	 *  
