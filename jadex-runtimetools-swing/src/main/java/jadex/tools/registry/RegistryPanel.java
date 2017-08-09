@@ -479,4 +479,11 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			return ret;
 		}
 	};
+	
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		timer.stop();
+		return super.shutdown();
+	}
 }
