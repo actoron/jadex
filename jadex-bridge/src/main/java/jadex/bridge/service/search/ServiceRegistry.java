@@ -623,6 +623,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			// When this node is superpeer or the search scope is platform or below
 			if(isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
 			{
+				if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+				{
+					System.out.println("searchServiceAsync1: "+query);
+				}
 				searchServiceAsyncByAskMe(query).addResultListener(new DelegationResultListener<T>(ret));
 			}
 			else
@@ -630,11 +634,19 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				IComponentIdentifier cid = getSuperpeerSync();
 				if(cid!=null)
 				{
+					if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+					{
+						System.out.println("searchServiceAsync2: "+query);
+					}
 					searchServiceAsyncByAskSuperpeer(query, cid).addResultListener(new DelegationResultListener<T>(ret));
 				}
 				// else need to search by asking all other peer
 				else
 				{
+					if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+					{
+						System.out.println("searchServiceAsync3: "+query);
+					}
 					searchServiceAsyncByAskAll(query).addResultListener(new DelegationResultListener<T>(ret));
 				}
 			}
@@ -1905,10 +1917,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 				{
-//					if((""+query.getServiceType()).indexOf("LocalService")!=-1)
-//					{
-//						System.out.println("searchServiceAsyncByAskAll1: "+query);
-//					}
+					if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+					{
+						System.out.println("searchServiceAsyncByAskAll1: "+query);
+					}
 					final ITerminableIntermediateFuture<T> sfut = searchRemoteServices(query);
 					sfut.addIntermediateResultListener(new IIntermediateResultListener<T>()
 					{
@@ -1964,15 +1976,19 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				IProxyAgentService pas = (IProxyAgentService)ser;
 				
 				bar.addFuture(pas.getRemoteComponentIdentifier());
-//				if((""+query.getServiceType()).indexOf("LocalService")!=-1)
-//				{
-//					System.out.println("searchRemoteServices0: "+pas+", "+query);
-//				}
+				if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+				{
+					System.out.println("searchRemoteServices0: "+pas+", "+query);
+				}
 			}
 			bar.waitForResultsIgnoreFailures(null).addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
 			{
 				public void resultAvailable(Collection<IComponentIdentifier> result)
 				{
+					if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+					{
+						System.out.println("searchRemoteServices00: "+result);
+					}
 					if(result != null && result.size() > 0)
 					{
 						FutureBarrier<Void> finishedbar = new FutureBarrier<Void>();
@@ -2077,10 +2093,10 @@ Ende Lars-Version */
 								{
 									try
 									{
-//										if((""+query.getServiceType()).indexOf("LocalService")!=-1)
-//										{
-//											System.out.println("searchRemoteServices1: "+result+", "+query);
-//										}
+										if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+										{
+											System.out.println("searchRemoteServices1: "+result+", "+query);
+										}
 										result.scheduleStep(new IComponentStep<Collection<T>>()
 										{
 											public IFuture<Collection<T>> execute(IInternalAccess ia)
@@ -2088,15 +2104,18 @@ Ende Lars-Version */
 												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
 													.executeRemoteSearch(platid, query);
 											}
-										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch));
-//										{
-//											@Override
-//											public void customResultAvailable(Collection<T> result)
-//											{
-//												System.out.println("Remote results: "+result);
-//												super.customResultAvailable(result);
-//											}
-//										});
+										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch)
+										{
+											@Override
+											public void customResultAvailable(Collection<T> result)
+											{
+												if((""+query.getServiceType()).indexOf("IServiceCallService")!=-1)
+												{
+													System.out.println("Remote results: "+result);
+												}
+												super.customResultAvailable(result);
+											}
+										});
 									}
 									catch(Exception e)
 									{
