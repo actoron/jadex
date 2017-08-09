@@ -86,6 +86,12 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	@SuppressWarnings("unchecked")
 	public static final Set<String> getKeysStatic(String keytype, Object serv)
 	{
+		if(serv instanceof IService)
+		{
+			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+				System.out.println("sdhgfsdh");
+		}
+		
 		IService service = (IService) serv;
 		Set<String> ret = null;
 		if (KEY_TYPE_INTERFACE.equals(keytype))
@@ -102,8 +108,8 @@ public class ServiceKeyExtractor implements IKeyExtractor
 		else if (KEY_TYPE_TAGS.equals(keytype))
 		{
 			Map<String, Object> sprops = service.getPropertyMap();
-			if (sprops != null)
-				ret = (Set<String>) sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+			if(sprops != null)
+				ret = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
 		}
 		else if (KEY_TYPE_PROVIDER.equals(keytype))
 		{

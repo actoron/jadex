@@ -2311,4 +2311,13 @@ Ende Lars-Version */
 		}
 		
 	}
+
+	/**
+	 *  Get the indexer.
+	 *  @return the indexer
+	 */
+	public ServiceIndexer<IService> getIndexer()
+	{
+		return indexer;
+	}
 }

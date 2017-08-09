@@ -577,8 +577,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if(service instanceof BasicService)
 			{
-				serprops.putAll(((BasicService) service).getPropertyMap());
-				((BasicService) service).setPropertyMap(serprops);
+				serprops.putAll(((BasicService)service).getPropertyMap());
+				((BasicService)service).setPropertyMap(serprops);
 			}
 			
 			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), ia.getComponentDescription().getCause(), false);
