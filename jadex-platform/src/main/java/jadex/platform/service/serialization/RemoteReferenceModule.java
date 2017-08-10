@@ -939,11 +939,8 @@ public class RemoteReferenceModule
 		{
 			if(pr.getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
 			{
-//				IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
-//				@SuppressWarnings("unused")
-//				IFuture<Object>	fut	= SServiceProvider.getService(access, (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier());
-				// TODO: get service sync???
-				throw new UnsupportedOperationException("Local reuse of remote service not yet supported.");
+				IServiceIdentifier	sid	= (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier();
+				ret	= SServiceProvider.getLocalService(null, sid, sid.getServiceType().getType(classloader));
 			}
 			else if(pr.getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
 			{
@@ -955,7 +952,7 @@ public class RemoteReferenceModule
 				throw new UnsupportedOperationException("Plain remote objects not yet supported.");
 			}
 		}
-		// Else return new or old proxy.
+		// Else return new proxy.
 		else
 		{
 //			System.out.println("interfaces of proxy: "+SUtil.arrayToString(pi.getTargetInterfaces()));

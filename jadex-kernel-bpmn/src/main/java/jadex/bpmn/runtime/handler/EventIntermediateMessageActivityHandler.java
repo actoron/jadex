@@ -2,6 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
@@ -55,7 +56,18 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	protected void sendMessage(final MActivity activity, final IInternalAccess instance, final ProcessThread thread)
 	{
 		Object message	= thread.getPropertyValue(PROPERTY_MESSAGE);
-		IComponentIdentifier receiver	= (IComponentIdentifier)thread.getPropertyValue(PROPERTY_RECEIVER);
+		IComponentIdentifier receiver;
+		Object rec	= thread.getPropertyValue(PROPERTY_RECEIVER);
+		if(rec instanceof String)
+		{
+			// Special case -> string converted to sibling cid.
+			receiver	= new BasicComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent());
+		}
+		else
+		{
+			receiver	= (IComponentIdentifier)rec;
+		}
+
 		thread.setWaiting(true);
 //		System.out.println("sending message: "+msg.get(ri));
 		
@@ -88,7 +100,9 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		IFilter<Object> filter = (IFilter<Object>)thread.getPropertyValue(PROPERTY_FILTER, activity);
 		if(filter==null)
 		{
-			throw new NullPointerException("Message receiving event needs "+PROPERTY_FILTER+" property: "+thread);
+			// TODO: distinguish between messages and other objects?
+			filter	= IFilter.ALWAYS;
+//			throw new NullPointerException("Message receiving event needs "+PROPERTY_FILTER+" property: "+thread);
 		}
 		thread.setWaitFilter(filter);
 		

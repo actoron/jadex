@@ -17,6 +17,7 @@ import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.fipa.FipaMessage;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -109,8 +110,15 @@ public class ComponentXMLReader
 	{
 		public Object convertString(String val, Object context) throws Exception
 		{
-			ClassInfo ret = new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader()));
-			return ret;
+			// hack: load pre messaging-ng2 models with message type "fipa"
+			if("fipa".equals(val))
+			{
+				return new ClassInfo(FipaMessage.class);
+			}
+			else
+			{
+				return new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader()));
+			}
 		}
 	};
 	

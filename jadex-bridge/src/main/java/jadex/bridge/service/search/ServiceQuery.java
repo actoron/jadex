@@ -8,7 +8,6 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -344,7 +343,7 @@ public class ServiceQuery<T>
 	 */
 	public void setServiceTags(String[] servicetags, IExternalAccess component)
 	{
-		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags.length]);
+		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags!=null ? servicetags.length : 0]);
 	}
 	
 	/**

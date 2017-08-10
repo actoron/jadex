@@ -19,7 +19,14 @@ public class UserAgent
 	@AgentBody
 	public void body(IInternalAccess agent)
 	{
-		PojoMicroservice ser = SServiceProvider.getService(agent, PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		System.out.println(ser.sayHello("Lars"));
+		try
+		{
+			PojoMicroservice ser = SServiceProvider.getService(agent, PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			System.out.println(ser.sayHello("Lars"));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

@@ -34,7 +34,7 @@ public class PlatformsTest //extends TestCase
 	// The platforms to test as pairs of componentfactory and model.
 	String[]	PLATFORMS	= new String[]
 	{
-		"jadex.component.ComponentComponentFactory", "jadex.platform.Platform.component.xml",
+//		"jadex.component.ComponentComponentFactory", "jadex.platform.Platform.component.xml",
 		"jadex.micro.MicroAgentFactory", "jadex.platform.PlatformAgent"
 //		"jadex.bpmn.BpmnFactory", "jadex.platform.Platform.bpmn2"
 	};
