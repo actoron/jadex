@@ -388,7 +388,7 @@ public class ServiceQuery<T>
 	 *
 	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getServiceidentifier()
+	public IServiceIdentifier getServiceIdentifier()
 	{
 		return serviceidentifier;
 	}
@@ -398,7 +398,7 @@ public class ServiceQuery<T>
 	 *
 	 *  @param serviceidentifier The service identifier.
 	 */
-	public void setServiceidentifier(IServiceIdentifier serviceidentifier)
+	public void setServiceIdentifier(IServiceIdentifier serviceidentifier)
 	{
 		this.serviceidentifier = serviceidentifier;
 	}

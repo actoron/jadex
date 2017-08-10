@@ -28,8 +28,6 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
@@ -103,6 +101,24 @@ public class SServiceProvider
 	public static <T> T getLocalService(final IInternalAccess component, final Class<T> type)
 	{
 		return getLocalService(component, type, (String)null, true);
+	}
+	
+	/**
+	 *  Get one service of a type. 
+	 *  (Returns required service proxy).
+	 *  @param serviceidentifier The service identifier.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IInternalAccess component, Class<T> type, IServiceIdentifier serviceidentifier, String scope)
+	{
+		checkThreadAccess(component, true);
+		
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		query.setServiceIdentifier(serviceidentifier);
+		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+		if(ret==null)
+			throw new ServiceNotFoundException(type.getName());
+		return createRequiredProxy(component, ret, type);
 	}
 	
 	/**
