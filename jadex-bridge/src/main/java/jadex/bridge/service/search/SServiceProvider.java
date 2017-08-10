@@ -105,20 +105,20 @@ public class SServiceProvider
 	
 	/**
 	 *  Get one service of a type. 
-	 *  (Returns required service proxy).
+	 *  
+	 *  @param component The component doing the search. Warning: If set to null, the returned service proxy will be provided proxy ONLY.
 	 *  @param serviceidentifier The service identifier.
 	 *  @return The corresponding service.
 	 */
-	public static <T> T getLocalService(IInternalAccess component, Class<T> type, IServiceIdentifier serviceidentifier, String scope)
+	public static <T> T getLocalService(IInternalAccess component, IServiceIdentifier serviceidentifier, Class<T> type)
 	{
-		checkThreadAccess(component, true);
-		
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), null);
+		IComponentIdentifier cid = component != null ? component.getComponentIdentifier() : serviceidentifier.getProviderId();
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null);
 		query.setServiceIdentifier(serviceidentifier);
-		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+		T ret = ServiceRegistry.getRegistry(cid).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
-		return createRequiredProxy(component, ret, type);
+		return component != null ? createRequiredProxy(component, ret, type) : ret;
 	}
 	
 	/**
