@@ -27,14 +27,14 @@ public interface IEventbase extends IElement
 	 *  @return The new message event.
 	 */
 	public <T> IMessageEvent<T> createMessageEvent(String type);
-//
-//	/**
-//	 *  Create a reply to a message event.
-//	 *  @param event	The received message event.
-//	 *  @param msgeventtype	The reply message event type.
-//	 *  @return The reply event.
-//	 */
-//	public IMessageEvent createReply(IMessageEvent event, String msgeventtype);
+
+	/**
+	 *  Create a reply to a message event.
+	 *  @param event	The received message event.
+	 *  @param msgeventtype	The reply message event type.
+	 *  @return The reply event.
+	 */
+	public <T> IMessageEvent<T>	createReply(IMessageEvent<T> event, String type);
 	
 	/**
 	 *  Create a new intenal event.

@@ -57,7 +57,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 	{
 		Object message	= thread.getPropertyValue(PROPERTY_MESSAGE);
 		IComponentIdentifier receiver;
-		Object rec	= (IComponentIdentifier)thread.getPropertyValue(PROPERTY_RECEIVER);
+		Object rec	= thread.getPropertyValue(PROPERTY_RECEIVER);
 		if(rec instanceof String)
 		{
 			// Special case -> string converted to sibling cid.

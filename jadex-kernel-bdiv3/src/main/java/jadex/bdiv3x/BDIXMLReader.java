@@ -1,6 +1,5 @@
 package jadex.bdiv3x;
 
-import java.awt.TrayIcon.MessageType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

@@ -1,31 +1,19 @@
 package jadex.bdiv3x.runtime;
 
-import java.awt.TrayIcon.MessageType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MMessageEvent;
-import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.fipa.SFipa;
-import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
  *  The runtime message event.
  */
-public class RMessageEvent extends RProcessableElement implements IMessageEvent 
+public class RMessageEvent<T> extends RProcessableElement implements IMessageEvent<T> 
 {
 	//-------- attributes --------
 	
 	/** The message. */
-	protected Map<String, Object> msg;
-	
-	/** The message type. */
-	protected MessageType mt;
+	protected T msg;
 	
 	//-------- constructors --------
 	
@@ -68,10 +56,10 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 *  
 	 *  Constructor Without parameter init for received messages.
 	 */
-	public RMessageEvent(MMessageEvent modelelement, Map<String, Object> msg, MessageType mt, IInternalAccess agent)
+	public RMessageEvent(MMessageEvent modelelement, T msg, IInternalAccess agent)
 	{
-		super(modelelement, null, agent, msg, null);
-//		this.msg = msg;
+		super(modelelement, null, agent, null, null);
+		this.msg = msg;
 //		this.mt = mt;
 //		
 //		// Tricky, must do init for default values if NOT present in the map
@@ -232,19 +220,11 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 *  Get the native (platform specific) message object.
 	 *  @return The native message.
 	 */
-	public Object getMessage()
+	public T getMessage()
 	{
 		return msg;
 	}
 
-	/**
-	 *  Get the message type.
-	 *  @return The message type.
-	 */
-	public MessageType getMessageType()
-	{
-		return mt;
-	}
 //	
 ////	/**
 ////	 *  Get the element type (i.e. the name declared in the ADF).
