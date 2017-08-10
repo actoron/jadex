@@ -986,7 +986,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot());
+				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if (state != null)
 				{
 					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake."));
@@ -1260,7 +1260,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						e.printStackTrace();
 						state.getResultFuture().setException(e);
-						initializingcryptosuites.remove(secmsg.getSender().getRoot());
+						initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 					}
 				}
 			}
