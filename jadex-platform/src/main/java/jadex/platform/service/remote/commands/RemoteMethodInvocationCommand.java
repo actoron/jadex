@@ -89,7 +89,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		Object[] parametervalues, String callid, IComponentIdentifier caller, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-//		if(method.getName().equals("secMethod"))
+//		if(method.getName().equals("updateClientData") && parametervalues[0]==null)
 //			System.out.println("caller: "+caller);
 		
 		this.rr = rr;

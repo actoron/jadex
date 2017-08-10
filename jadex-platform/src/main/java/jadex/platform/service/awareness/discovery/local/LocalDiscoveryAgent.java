@@ -53,7 +53,7 @@ import jadex.micro.annotation.RequiredServices;
 {
 	@Argument(name="leasetime", clazz=Long.class, defaultvalue="30000L")
 })
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 public class LocalDiscoveryAgent implements IDiscoveryService
 {
 	/** The discovery directory. */

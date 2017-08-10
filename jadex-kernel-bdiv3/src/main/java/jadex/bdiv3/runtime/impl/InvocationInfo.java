@@ -1,7 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 /**
- * 
+ *  Info about a service invocation containing parameters and result.
  */
 public class InvocationInfo
 {

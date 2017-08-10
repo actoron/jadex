@@ -100,6 +100,11 @@ public interface IExecutionFeature
 
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future or a failure occurs in a step.
+	 * 
+	 * Warning: In order to avoid memory leaks, the returned subscription future does NOT store
+	 * values, requiring the addition of a listener within the same step the repeat
+	 * step was schedule.
+	 * 
 	 * @param initialDelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
@@ -109,6 +114,11 @@ public interface IExecutionFeature
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
+	 * 
+	 * Warning: In order to avoid memory leaks, the returned subscription future does NOT store
+	 * values, requiring the addition of a listener within the same step the repeat
+	 * step was schedule.
+	 * 
 	 * @param initialDelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step

@@ -13,6 +13,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -43,11 +44,13 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		System.out.println("TEST LOCAL");
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
+				System.out.println("TEST REMOVE");
 				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
@@ -87,12 +90,13 @@ public class InitiatorAgent extends TestAgent
 	protected IFuture<TestReport> testRemote(final int testno)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
-		
+		System.out.println("SETUP PLATFORM");
 		setupRemotePlatform(false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
+				System.out.println("PLATFORM DONE< PERFORM TEST");
 				performTest(platform.getComponentIdentifier(), testno, false)
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
@@ -126,11 +130,13 @@ public class InitiatorAgent extends TestAgent
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
+		System.out.println("root: "+root+" "+root.getPlatformName());
 		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+				System.out.println("Comp created.");
 				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			

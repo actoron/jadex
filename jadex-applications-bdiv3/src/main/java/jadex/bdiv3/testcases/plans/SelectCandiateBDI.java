@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.GoalSelectCandidate;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
- * 
+ *  Testcase for user based select candidate logic. 
  */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
@@ -41,7 +42,7 @@ public class SelectCandiateBDI
 	public static class MyGoal
 	{
 		@GoalSelectCandidate
-		protected Object selectCandidate(List<Object> candidates)
+		protected ICandidateInfo selectCandidate(List<ICandidateInfo> candidates)
 		{
 			for(Object cand: candidates)
 			{

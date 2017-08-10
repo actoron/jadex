@@ -77,7 +77,7 @@ public class ServiceCallAgent	extends TestAgent
 						{
 							public void customResultAvailable(Void result)
 							{
-								System.out.println("XXXXXXXXXXXXXXXXXXX: "+local);
+//								System.out.println("XXXXXXXXXXXXXXXXXXX: "+local);
 								ret.setResult(new TestReport("#1", "test", true, null));
 							}
 						});

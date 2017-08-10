@@ -4,21 +4,27 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.IParameterGuesser;
 import jadex.commons.SReflect;
+import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -79,6 +85,17 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		}
 	}
 	
+	/** The component. */
+	protected IInternalAccess ia;
+	
+	/**
+	 *  Create a new ResolveInterceptor.
+	 */
+	public ResolveInterceptor(IInternalAccess ia)
+	{
+		this.ia = ia;
+	}
+	
 	/**
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
@@ -129,7 +146,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Object obj = Proxy.isProxyClass(si.getDomainService().getClass())? Proxy.getInvocationHandler(si.getDomainService()): si.getDomainService();
+		Object obj = ProxyFactory.isProxyClass(si.getDomainService().getClass())? ProxyFactory.getInvocationHandler(si.getDomainService()): si.getDomainService();
 		
 		Method[] methods = SReflect.getAllMethods(obj.getClass());
 		Method found = null;
@@ -162,9 +179,18 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			if(found!=null)
 			{
-				final ServiceInvocationContext	domainsic	= new ServiceInvocationContext(sic);//sic.clone();
+				final ServiceInvocationContext domainsic = new ServiceInvocationContext(sic);
 				domainsic.setMethod(found);
 				domainsic.setObject(obj);
+				// Guess parameters for allowing injected value in pojo methods
+				IParameterGuesser guesser = ia.getParameterGuesser();
+				List<Object> args = new ArrayList<Object>();
+				for(int i=0; i<found.getParameterTypes().length; i++)
+				{
+					args.add(guesser.guessParameter(found.getParameterTypes()[i], false));
+				}
+				domainsic.setArguments(args);
+				
 				sic.setObject(si.getManagementService());
 				
 				if(firstorig)
@@ -182,11 +208,12 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 									{
 										public void customResultAvailable(Void result)
 										{
+//											if(sic.getObject() instanceof BasicService && ((BasicService)sic.getObject()).getInterfaceType().getName().indexOf("Peer")!=-1)
+//												System.out.println("hhhhhhhhhhhhhhhhhh");
+											
 											// If domain result is future, replace finished mgmt result with potentially not yet finished domain future.
-											if(domainsic.getResult() instanceof IFuture<?>)
-											{
+											if(domainsic.getResult() instanceof IFuture<?> || domainsic.getResult() instanceof Exception)
 												sic.setResult(domainsic.getResult());
-											}
 											super.customResultAvailable(result);
 										}
 									});

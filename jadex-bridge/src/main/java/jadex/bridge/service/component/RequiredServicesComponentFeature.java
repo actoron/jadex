@@ -3,30 +3,26 @@ package jadex.bridge.service.component;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.TagFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.DelegationResultListener;
@@ -81,7 +77,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			sermap.put(ms[i].getName(), ms[i]);
 		}
 
-		if(config!=null)
+		if(config!=null && model.getConfiguration(config)!=null)
 		{
 			ConfigurationInfo cinfo = model.getConfiguration(config);
 			RequiredServiceInfo[] cs = cinfo.getRequiredServices();
@@ -155,7 +151,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public IFuture<Void> shutdown()
 	{
 		// Remove the persistent queries
-		SynchronizedServiceRegistry.getRegistry(component).removeQueries(getId());
+		ServiceRegistry.getRegistry(component).removeQueries(getId());
 		return IFuture.DONE;
 	}
 	
@@ -359,7 +355,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> T getMultiService(String reqname, Class<T> multitype)
 	{
-		return (T)Proxy.newProxyInstance(getComponent().getClassLoader(), new Class[]{multitype}, 
+		return (T)ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{multitype}, 
 			new MultiServiceInvocationHandler(getComponent(), reqname, multitype));
 	}
 	
@@ -671,7 +667,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type, String scope, IAsyncFilter<T> filter)
 	{
-		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, getComponent().getComponentIdentifier());
-		return SynchronizedServiceRegistry.getRegistry(getComponent()).addQuery(query);
+		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, getComponent().getComponentIdentifier(), filter);
+		return ServiceRegistry.getRegistry(getComponent()).addQuery(query);
 	}
 }

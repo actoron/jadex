@@ -57,6 +57,7 @@ public class Traverser
 		processors.add(new LogRecordProcessor());
 		processors.add(new DateProcessor());
 		processors.add(new UUIDProcessor());
+		processors.add(new BigIntegerProcessor());
 		processors.add(new CloneProcessor());
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
@@ -138,8 +139,8 @@ public class Traverser
 	 */
 	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
-//		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
-//			System.out.println("Cloning: "+object);
+		if(clone && object!=null && object.getClass().getName().indexOf("Not")!=-1)
+			System.out.println("Cloning: "+object);
 //			if(!clone) 
 			
 //			if(object!=null && (object.getClass().getName().indexOf("Connection")!=-1 || 

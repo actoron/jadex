@@ -1,25 +1,24 @@
 package jadex.platform.service.registry;
 
-import jadex.bridge.IComponentStep;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Delay runner based on agent time scheduling.
  */
 public class AgentDelayRunner implements IDelayRunner
 {
-	public static final Runnable NOP = new Runnable()
-	{
-		public void run()
-		{
-		}
-	};
-	
 	/** The agent. */
 	protected IInternalAccess agent;
+	
+	/** Flag if delay runner was cancelled. */
+	protected volatile boolean cancelled;
 	
 	/**
 	 *  Create a new AgentDelayRunner.
@@ -36,15 +35,45 @@ public class AgentDelayRunner implements IDelayRunner
 	 */
 	public Runnable waitForDelay(long delay, final Runnable step)
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		if(cancelled)
+			throw new RuntimeException("Runner was cancelled already");
+		
+		final boolean valid[] = new boolean[]{true};
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IConditionalComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				step.run();
 				return IFuture.DONE;
 			}
+			
+			public boolean isValid()
+			{
+				return valid[0] && !cancelled;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(!(exception instanceof StepInvalidException)
+					&& !(exception instanceof ComponentTerminatedException))
+					exception.printStackTrace();
+			}
 		});
-		return NOP;
+		
+		// Set the valid flag of the step to invalid so that the step is not executed
+		return new Runnable()
+		{
+			public void run()
+			{
+				valid[0] = false;
+			}
+		};
+
 	}
 	
 	/**
@@ -52,6 +81,6 @@ public class AgentDelayRunner implements IDelayRunner
 	 */
 	public void cancel()
 	{
-		// nop
+		cancelled = true;
 	}
 }

@@ -1,6 +1,7 @@
 package jadex.platform.service.email;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -14,6 +15,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -67,6 +70,35 @@ import jadex.micro.annotation.RequiredServices;
 @ComponentTypes(@ComponentType(name="fetcher", clazz=EmailFetcherAgent.class))
 public class EmailAgent implements IEmailService
 {
+	//-------- constants --------
+	
+	/** Default SSL versions. */
+	protected static final String	DEFAULT_SSL_VERSION;
+	
+	static
+	{
+		String	ret;
+		try
+		{
+			SSLServerSocket ssocket = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket();
+			StringBuffer	buf	= new StringBuffer();
+			for(String protocol: ssocket.getEnabledProtocols())
+			{
+				if(buf.length()>0)
+				{
+					buf.append(" ");
+				}
+				buf.append(protocol);
+			}
+			ret	= buf.toString();
+		}
+		catch(Exception e)
+		{
+			ret	= "TLSv1 TLSv1.1 TLSv1.2";
+		}
+		DEFAULT_SSL_VERSION	= ret;
+	}
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -154,28 +186,37 @@ public class EmailAgent implements IEmailService
 		
 //		System.out.println("email agent trying to send email");
 		final EmailAccount account = acc!=null? acc: this.account;
+		Properties props = account.getProperties();
+		if(props.getProperty("mail.smtp.ssl.protocols")==null)
+		{
+			props.setProperty("mail.smtp.ssl.protocols", DEFAULT_SSL_VERSION);
+		}
+		if(props.getProperty("mail.smtps.ssl.protocols")==null)
+		{
+			props.setProperty("mail.smtps.ssl.protocols", DEFAULT_SSL_VERSION);
+		}
 		
-		if(email.getSender()==null)
+		// Override account sender, if set in mail.
+		if(email.getSender()!=null)
+		{
+			props.setProperty("mail.from", email.getSender());
+		}
+		else
+		{
 			email.setSender(account.getSender());
-		
-		Properties props = new Properties();
-		props.put("mail.smtp.host", account.getSmtpHost());
-		props.put("mail.from", email.getSender());
+		}
 		
 //		props.put("mail.debug", "true");
 		
 		// Hack!!! bypass certificate check.
 //		props.setProperty("mail.smtp.ssl.trust", account.getSmtpHost());
-        
-		if(account.isStartTls())
-		{
-			props.put("mail.smtp.starttls.enable", "true");
-		}
-		if(account.isSsl())
-		{
-			props.put("mail.smtp.socketFactory.port", ""+account.getSmtpPort());
-			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		}
+
+		// Todo: needed?
+//		if(account.isSsl())
+//		{
+//			props.put("mail.smtp.socketFactory.port", ""+account.getSmtpPort());
+//			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//		}
 		
 		Session sess;
 		
@@ -187,8 +228,6 @@ public class EmailAgent implements IEmailService
 		}
 		else
 		{
-			props.put("mail.smtp.auth", "true");
-			props.setProperty("mail.smtps.auth", "true");
 			sess = Session.getInstance(props, new Authenticator()
 			{
 				protected PasswordAuthentication getPasswordAuthentication()

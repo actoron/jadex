@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import jadex.commons.SUtil;
+
 /**
  *  Converter for basic types.
  */
@@ -327,23 +329,32 @@ class DateTypeConverter implements IStringObjectConverter
 	public Object convertString(String val, Object context)
 	{
 		Object ret = null;
-		for(Locale locale: DateFormat.getAvailableLocales()) 
+		
+		try
 		{
-			for(int style=DateFormat.FULL; style<=DateFormat.SHORT && ret==null; style ++) 
-			{
-		        DateFormat df = DateFormat.getDateInstance(style, locale);
-		        try 
-		        {
-		        	ret = df.parse(val);
-		        } 
-		        catch(ParseException ex) 
-		        {
-		            continue;
-		        }
-		    }
-			if(ret!=null)
-				break;
+			ret = SUtil.dateFromIso8601(val);
 		}
+		catch(Exception e)
+		{
+			for(Locale locale: DateFormat.getAvailableLocales()) 
+			{
+				for(int style=DateFormat.FULL; style<=DateFormat.SHORT && ret==null; style ++) 
+				{
+			        DateFormat df = DateFormat.getDateInstance(style, locale);
+			        try 
+			        {
+			        	ret = df.parse(val);
+			        } 
+			        catch(ParseException ex) 
+			        {
+			            continue;
+			        }
+			    }
+				if(ret!=null)
+					break;
+			}
+		}
+		
 		return ret;
 	}
 }

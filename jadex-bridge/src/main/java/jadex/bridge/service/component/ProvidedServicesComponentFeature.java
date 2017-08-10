@@ -18,6 +18,7 @@ import java.util.Set;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
@@ -37,7 +38,6 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -276,7 +276,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		if(services==null)
 			services = Collections.synchronizedMap(new LinkedHashMap<Class<?>, Collection<IInternalService>>());
 		
-		FutureBarrier<Void> bar = new FutureBarrier<Void>();
+//		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service);
+		
+//		FutureBarrier<Void> bar = new FutureBarrier<Void>();
 		
 		for(Class<?> servicetype: types)
 		{
@@ -289,10 +291,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			tmp.add(service);
 			
 			// Make service available immediately, even before start (hack???).
-			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
+//			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
 		
-		return bar.waitFor();
+		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service);
+//		return bar.waitFor();
 	}
 	
 	/**
@@ -312,25 +315,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	protected void	removeService(IInternalService service)
 	{
-		// Find service types
-		Class<?>	type	= service.getServiceIdentifier().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());
-		Set<Class<?>> types = new LinkedHashSet<Class<?>>();
-		types.add(type);
-		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
-		{
-			if(sin.isAnnotationPresent(Service.class))
-			{
-				types.add(sin);
-			}
-		}
-
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
-			for(Class<?> servicetype: types)
-			{
-				registry.removeService(new ClassInfo(servicetype), service);
-			}
+			registry.removeService(service);
 		}
 	}
 	
@@ -776,7 +765,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		T service = getProvidedService(clazz);
 		if(service!=null)
 		{
-			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 			ret = clazz.cast(handler.getDomainService());
 		}
 		
@@ -796,7 +785,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		Object service = getProvidedService(name);
 		if(service!=null)
 		{
-			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 			ret = handler.getDomainService();
 		}
 		
@@ -853,9 +842,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			if(service!=null)
 			{
-				if(Proxy.isProxyClass(service.getClass()))
+				if(ProxyFactory.isProxyClass(service.getClass()))
 				{
-					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 					ret = handler.getDomainService();
 				}
 				else
@@ -1254,7 +1243,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
-		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 		handler.addServiceInterceptor(interceptor, pos);
 	}
 	
@@ -1265,7 +1254,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
-		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 		handler.removeServiceInterceptor(interceptor);
 	}
 	
@@ -1276,7 +1265,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public IServiceInvocationInterceptor[] getInterceptors(Object service)
 	{
-		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(service);
 		return handler.getInterceptors();
 	}
 }

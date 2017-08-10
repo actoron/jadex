@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.settings;
 
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
@@ -9,6 +10,7 @@ import jadex.commons.future.IFuture;
  *  This service allows storing and retrieving settings
  *  for specific components or services.
  */
+@Service(system=true)
 public interface ISettingsService
 {
 	/**

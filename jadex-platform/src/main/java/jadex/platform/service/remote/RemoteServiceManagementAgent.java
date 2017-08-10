@@ -70,6 +70,7 @@ import jadex.platform.service.remote.replacements.GetComponentFeatureMethodRepla
 	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
 })
 @Agent
+// Dynamically exposes service
 @Properties(@NameValue(name="system", value="true"))
 public class RemoteServiceManagementAgent
 {

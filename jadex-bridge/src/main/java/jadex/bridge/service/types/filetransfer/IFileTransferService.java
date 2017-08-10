@@ -2,12 +2,14 @@ package jadex.bridge.service.types.filetransfer;
 
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Interface for the file transfer service.
  */
+@Service(system=true)
 public interface IFileTransferService
 {
 	/**

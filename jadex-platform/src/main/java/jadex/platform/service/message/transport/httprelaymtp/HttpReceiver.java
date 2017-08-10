@@ -13,13 +13,13 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.ICodec;
@@ -232,8 +232,10 @@ public class HttpReceiver
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IAwarenessManagementService awa	= SynchronizedServiceRegistry.getRegistry(ia)
-					.searchService(new ClassInfo(IAwarenessManagementService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
+//				IAwarenessManagementService awa	= SynchronizedServiceRegistry.getRegistry(ia)
+//					.searchService(new ClassInfo(IAwarenessManagementService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
+				ServiceQuery<IAwarenessManagementService> query = new ServiceQuery<IAwarenessManagementService>(IAwarenessManagementService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier(), null);
+				IAwarenessManagementService awa	= ServiceRegistry.getRegistry(ia).searchService(query, true);
 				if(awa!=null)
 				{
 					try

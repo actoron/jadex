@@ -5,6 +5,7 @@ import java.util.Date;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
@@ -12,6 +13,7 @@ import jadex.commons.future.IFuture;
  *  modifying, deregistering and searching of component resp. service descriptions.
  */
 @GuiClassName("jadex.tools.dfbrowser.DFBrowserPanel")
+@Service(system=true)
 public interface IDF
 {
 	/**

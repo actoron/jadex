@@ -2,9 +2,6 @@ package jadex.extension.rs.invoke;
 
 import java.util.Map;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -42,10 +39,7 @@ public class RestInvocationAgent
 		final Future<Void> done = new Future<Void>();
 		Future<String> ret = new Future<String>();
 		
-		Client client = ClientBuilder.newClient();
-		
 		RestInvocationHelper.performRequest(agent.getExternalAccess(),
-											client,
 											(String) restargs.get("uri"),
 											(String) restargs.get("path"),
 											(Map<String, Object>) restargs.get("headers"),

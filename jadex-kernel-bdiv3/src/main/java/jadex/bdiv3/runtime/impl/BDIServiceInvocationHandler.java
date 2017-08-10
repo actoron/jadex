@@ -63,7 +63,10 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 			public void customResultAvailable(Void result)
 			{
 				Object res = sc.getInvocationInfo().getResult();
-				ret.setResult(res);
+				if(res instanceof Exception)
+					ret.setException((Exception)res);
+				else
+					ret.setResult(res);
 			}
 		});
 		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(sc);

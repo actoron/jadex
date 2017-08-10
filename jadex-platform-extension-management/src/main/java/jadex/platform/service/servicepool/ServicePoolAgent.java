@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.PublishInfo;
@@ -71,7 +72,7 @@ public class ServicePoolAgent implements IServicePoolService
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
 				Class<?> sertype = psi.getServicetype().getType(agent.getClassLoader(), agent.getModel().getAllImports());
 				if(sertype==null)
-					System.out.println("kaputt");
+					throw new RuntimeException("Could not resolve service class: "+psi.getServicetype());
 				addServiceType(sertype, str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
@@ -166,7 +167,7 @@ public class ServicePoolAgent implements IServicePoolService
 		// add service proxy
 		try
 		{
-			Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
+			Object service = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
 			return agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi, scope);
 		}
 		catch(Exception e)

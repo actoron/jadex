@@ -162,11 +162,11 @@ public class RegistrySearchFunctionality
 					{
 						if(filter==null || filter.filter(ser))
 						{
-							if(ret!=null)
-								System.out.println("found another: "+((IService)ser).getServiceIdentifier());
+//							if(ret!=null)
+//								System.out.println("found another: "+((IService)ser).getServiceIdentifier());
 							
 							ret = ser;
-							//break;
+							break;
 						}
 					}
 					catch(Exception e)

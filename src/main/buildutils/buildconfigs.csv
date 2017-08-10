@@ -27,6 +27,7 @@ jadex-bridge,X,X,X,X,,,,,,,,,X,X,X
 jadex-commons,X,X,X,X,,,,,,,,,X,X,X
 jadex-commons:jadex-commons-gui,X,X,X,X,,,,,,,,,X,X,X
 jadex-commons:jadex-commons-security,X,X,X,X,,,,,,,,,X,X,X
+jadex-bytecode-tools,X,X,X,X,,,,,,,,,X,X,X
 jadex-distribution-android,,,,X,,,,,,,,,,,X
 jadex-distribution-minimal,X,X,X,,,,,,,,,,,,X
 jadex-distribution-pro,,,X,,,,,,,,,,,,X
@@ -52,6 +53,7 @@ jadex-kernel-extension-envsupport-jmonkey,,,,,X,,,,,,,,,,X
 jadex-kernel-extension-envsupport-opengl,,X,X,,,,,,,,,,,,X
 jadex-kernel-gpmn,,,,,,,,,,,,,,,
 jadex-kernel-micro,X,X,X,X,,,,,,,,,X,X,X
+jadex-kernel-microservice,X,X,X,X,,,,,,,,,X,X,X
 jadex-model-bpmn,,X,X,X,,,,,,,,,,,X
 jadex-platform,X,X,X,X,,,,,,,,,X,,X
 jadex-platform-android,,,,X,,,,,,,,,,,X
@@ -60,6 +62,7 @@ jadex-platform-extension-maven,,,X,,,,,X,,,,,,,X
 jadex-platform-extension-relay,,,X,,,,,,,,,,X,,X
 jadex-platform-extension-relay-standalone,,,X,,,,,,,,,,X,,X
 jadex-platform-extension-relay-web,,,X,,,,,,,,,,X,,X
+jadex-platform-extension-websockettransport,,X,X,,,,,,,,,,,,X
 jadex-platform-extension-securetransport,,,X,,,,X,,,,,,,,X
 jadex-platform-extension-webservice,,,X,X,,X,,,,,,,,X,X
 jadex-platform-extension-webservice-android,,,,X,,,,,,,,,,,X

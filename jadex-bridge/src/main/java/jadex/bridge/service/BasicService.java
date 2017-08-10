@@ -1,15 +1,19 @@
 package jadex.bridge.service;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
@@ -54,7 +58,6 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	
 	/** The provider id. */
 	protected IComponentIdentifier providerid;
-	
 	
 	protected Class<?> type;
 	
@@ -304,19 +307,38 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	protected IFuture<Void> initNFProperties()
 	{
+		final Future<Void> ret = new Future<Void>();
 		if(getInternalAccess().getComponentFeature0(INFPropertyComponentFeature.class)!=null)
 		{
-			INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
+			final INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
 			IProvidedServicesFeature psf = getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
 			IInternalService ser = (IInternalService)getInternalAccess().getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
 			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
 			// todo: make internal interface for initProperties
-			return ((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype);
+			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+			{
+				public void customResultAvailable(Void result) throws Exception
+				{
+//					nfcf.getRequiredServicePropertyProvider(sid).getNFPropertyValue(TagProperty.NAME).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+//					{
+//						@SuppressWarnings("unchecked")
+//						public void customResultAvailable(Object result) throws Exception
+//						{
+//							Collection<String> coll = (Collection<String>) result;
+//							Set<String> tags = new LinkedHashSet<String>(coll);
+//							properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
+							ret.setResult(null);
+//						}
+//					});
+					
+				}
+			});
 		}
 		else
 		{
-			return IFuture.DONE;
+			ret.setResult(null);
 		}
+		return ret;
 	}
 
 	/**
@@ -364,14 +386,14 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		Future<Void> ret = new Future<Void>();
 		
 		boolean ex = false;
-			if(started)
-			{
-				ex = true;
-			}
-			else
-			{
-				started = true;
-			}
+		if(started)
+		{
+			ex = true;
+		}
+		else
+		{
+			started = true;
+		}
 
 		if(ex)
 		{

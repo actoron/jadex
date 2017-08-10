@@ -277,7 +277,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
+    public IFuture<Void> publishHMTLPage(String uri, String vhost, String html)
     {
         throw new UnsupportedOperationException();
     }

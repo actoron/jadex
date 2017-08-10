@@ -10,6 +10,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.ParameterInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -20,6 +21,7 @@ import jadex.commons.future.ITuple2Future;
 /**
  *  General interface for components that the container can execute.
  */
+@Service(system=true)
 public interface IComponentManagementService
 {
 	//-------- management methods --------

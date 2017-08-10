@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,6 +28,7 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
+import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -39,6 +41,8 @@ import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -63,10 +67,13 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -305,6 +312,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	/**
 	 * Repeats a ComponentStep periodically, until terminate() is called on result future.
+	 * 
+	 * Warning: In order to avoid memory leaks, the returned subscription future does NOT store
+	 * values, requiring the addition of a listener within the same step the repeat
+	 * step was schedule.
+	 * 
 	 * @param initialDelay delay before first execution in milliseconds
 	 * @param delay delay between scheduled executions of the step in milliseconds
 	 * @param step The component step
@@ -323,7 +335,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				stillRepeating.set(Boolean.FALSE);
 			}
-		});
+		}, false);
 		
 		// schedule the initial step
 		waitForDelay(initialDelay, step)
@@ -630,59 +642,100 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-				.addResultListener(new IResultListener<IExecutionService>()
+			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
+			IExecutionService exe = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+			// Hack!!! service is foudn before it is started, grrr.
+			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
-				public void resultAvailable(IExecutionService exe)
+				if(bootstrap)
 				{
-					// Hack!!! service is foudn before it is started, grrr.
-					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-					{
-						if(bootstrap)
-						{
-							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-							available	= true;
-						}
-						else
-						{
-							exe.execute(ExecutionComponentFeature.this);
-						}
-					}
-					else
-					{
-						exceptionOccurred(null);
-					}
+					// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+					available	= true;
 				}
-				
-				public void exceptionOccurred(Exception exception)
+				else
 				{
-					available	= false;
-					
-					// Happens during platform bootstrapping -> execute on platform rescue thread.
-					if(!bootstrap)
+					exe.execute(ExecutionComponentFeature.this);
+				}
+			}
+			else
+			{
+				available	= false;
+				// Happens during platform bootstrapping -> execute on platform rescue thread.
+				if(!bootstrap)
+				{
+					bootstrap	= true;
+					Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
 					{
-						bootstrap	= true;
-						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+						public void run()
 						{
-							public void run()
+							boolean	again	= true;
+							while(!available && again)
 							{
-								boolean	again	= true;
-								while(!available && again)
-								{
-									again	= execute();
-								}
-								bootstrap	= false;
-								
-								if(again)
-								{		
-									// Bootstrapping finished -> do real kickoff
-									wakeup();
-								}
+								again	= execute();
 							}
-						});
-					}
+							bootstrap	= false;
+							
+							if(again)
+							{		
+								// Bootstrapping finished -> do real kickoff
+								wakeup();
+							}
+						}
+					});
 				}
-			});
+			}
+//			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//				.addResultListener(new IResultListener<IExecutionService>()
+//			{
+//				public void resultAvailable(IExecutionService exe)
+//				{
+//					// Hack!!! service is foudn before it is started, grrr.
+//					if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+//					{
+//						if(bootstrap)
+//						{
+//							// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+//							available	= true;
+//						}
+//						else
+//						{
+//							exe.execute(ExecutionComponentFeature.this);
+//						}
+//					}
+//					else
+//					{
+//						exceptionOccurred(null);
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					available	= false;
+//					// Happens during platform bootstrapping -> execute on platform rescue thread.
+//					if(!bootstrap)
+//					{
+//						bootstrap	= true;
+//						Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+//						{
+//							public void run()
+//							{
+//								boolean	again	= true;
+//								while(!available && again)
+//								{
+//									again	= execute();
+//								}
+//								bootstrap	= false;
+//								
+//								if(again)
+//								{		
+//									// Bootstrapping finished -> do real kickoff
+//									wakeup();
+//								}
+//							}
+//						});
+//					}
+//				}
+//			});
 		}
 	}
 	
@@ -1173,7 +1226,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				else
 				{
 					getComponent().getLogger().warning(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
-					ex = new StepAborted();
+					ex = new StepInvalidException(step.getStep());
+					//ex = new StepAborted();
 //					{
 //						public void printStackTrace() 
 //						{
@@ -1213,7 +1267,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// Hard step failure with uncatched exception is shown also when no debug.
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
-					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier())))
+					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier()))
+					&& !(ex instanceof StepInvalidException))
 				{
 					final Throwable fex = ex;
 					// No wait for delayed listener addition for hard failures to print errors immediately.
@@ -1249,22 +1304,44 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				try
 				{
-					stepfut.addResultListener(new DelegationResultListener(step.getFuture())
+					if(step.getFuture() instanceof IntermediateFuture)
 					{
-						public void customResultAvailable(Object result)
+						stepfut.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)step.getFuture())
 						{
-							if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
-								getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							public void customResultAvailable(Collection result)
 							{
-								getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
-									getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-									+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-								// null was step.getCause()
+								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+								{
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
+										getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+									// null was step.getCause()
+								}
+								
+								super.customResultAvailable(result);
 							}
-							
-							super.customResultAvailable(result);
-						}
-					});
+						});
+					}
+					else
+					{	
+						stepfut.addResultListener(new DelegationResultListener(step.getFuture())
+						{
+							public void customResultAvailable(Object result)
+							{
+								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+								{
+									getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
+										getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+									// null was step.getCause()
+								}
+								
+								super.customResultAvailable(result);
+							}
+						});
+					}
 		
 					if(DEBUG && !step.getFuture().hasResultListener())
 					{

@@ -357,10 +357,12 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
 
     /**
      * Set a value to both configs, not recommended.
-     * Use specific methods instead.
+     * Use specific set methods instead.
      * @param key
      * @param value
+     * @deprecated since 3.1.3
      */
+    @Deprecated
     public void setValue(String key, Object value) {
         starterconfig.setValue(key, value);
         rootconfig.setValue(key, value);
@@ -368,7 +370,7 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
 
     /**
      * Returns a value. This only checks the starterconfig (for compatibility reasons)!
-     * Use other methods instead.
+     * Use specific get methods instead.
      * @param key
      * @return
      * @deprecated since 3.0.2

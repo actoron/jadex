@@ -34,7 +34,10 @@ public class ProvidedServiceInfo
 	
 	/** The service properties. */
 	protected List<UnparsedExpression> properties;
-		
+	
+	/** Flag if it is a system service. */
+	protected boolean systemservice;
+	
 	//-------- constructors --------
 	
 	/**
@@ -50,19 +53,20 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties)
 	{
-		this(name, new ClassInfo(SReflect.getClassName(type)), implementation, scope, publish, properties);
+		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)): null, implementation, scope, publish, properties, ServiceIdentifier.isSystemService(type));
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties)
+	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties, boolean systemservice)
 	{
 		this.name = name;
 		this.implementation = implementation;
 		this.publish = publish;
 		this.properties = properties;
 		this.scope = scope;
+		this.systemservice = systemservice;
 		setType(type);
 	}
 	
@@ -180,6 +184,24 @@ public class ProvidedServiceInfo
 	public void setScope(String scope)
 	{
 		this.scope = scope;
+	}
+	
+	/**
+	 *  Get the systemservice.
+	 *  @return The systemservice
+	 */
+	public boolean isSystemService()
+	{
+		return systemservice;
+	}
+
+	/**
+	 *  Set the systemservice.
+	 *  @param systemservice The systemservice to set
+	 */
+	public void setSystemService(boolean systemservice)
+	{
+		this.systemservice = systemservice;
 	}
 
 	/**

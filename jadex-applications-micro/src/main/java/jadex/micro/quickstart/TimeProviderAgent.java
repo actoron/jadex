@@ -124,8 +124,8 @@ public class TimeProviderAgent	implements ITimeService
 			// These free-to-try geoip services have (almost) the same result format.
 //			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
 //			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
-//			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
-			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
+//			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
 			
 			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
 			String	country	= null;
@@ -135,8 +135,8 @@ public class TimeProviderAgent	implements ITimeService
 			{
 				String	key	= scanner.match().group(1);
 				String	val	= scanner.match().group(2);
-				if("country".equals(key))
-//				if("country_name".equals(key))
+//				if("country".equals(key))
+				if("country_name".equals(key))
 				{
 					country	= val;
 				}
@@ -159,6 +159,7 @@ public class TimeProviderAgent	implements ITimeService
 		
 		return ret;
 	}
+	
 
 	/**
 	 *  Start a Jadex platform and the TimeProviderAgent.

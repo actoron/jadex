@@ -3,7 +3,7 @@ package jadex.commons;
 import java.util.Collection;
 
 /**
- * 
+ *  Guess parameter based on type.
  */
 public class SimpleParameterGuesser implements IParameterGuesser
 {
@@ -88,9 +88,7 @@ public class SimpleParameterGuesser implements IParameterGuesser
 	public void setParent(IParameterGuesser parent)
 	{
 		if(this.parent!=null)
-		{
 			throw new IllegalStateException("Already has a parent!");
-		}
 		this.parent = parent;
 	}
 	

@@ -1781,7 +1781,7 @@ public class BpmnXMLReader
 							}
 							
 							// todo: support scope, publish and now also properties
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null, null, null);
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null, null, null, false);
 //							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, null, null);
 							mi.addProvidedService(psi);
 							
@@ -1831,7 +1831,7 @@ public class BpmnXMLReader
 											psim.setBinding(binding);
 										}
 										// todo: support scope, publish and now also properties
-										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null, null, null));
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null, null, null, false));
 //										ci.addProvidedService(new ProvidedServiceInfo(name, type, null, null));
 									}
 								}

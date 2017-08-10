@@ -236,6 +236,11 @@ public class SelectorThread implements Runnable
 	 */
 	public IFuture<NIOTCPOutputConnection>	getConnection(final InetSocketAddress address)
 	{
+		if(address==null)
+		{
+			throw new NullPointerException();
+		}
+		
 		Future<NIOTCPOutputConnection>	ret;
 		
 		synchronized(aliveconnections)

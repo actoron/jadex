@@ -1,8 +1,13 @@
 package jadex.bridge.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.annotation.Service;
+import jadex.commons.SReflect;
 
 
 /**
@@ -21,6 +26,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	
 	/** The service type. */
 	protected ClassInfo type;
+	
+	/** The service super types. */
+	protected ClassInfo[] supertypes;
 
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
@@ -45,16 +53,30 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope)
 	{
-		this(providerid, new ClassInfo(type), servicename, rid, scope);
+		List<ClassInfo> superinfos = new ArrayList<ClassInfo>();
+		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
+		{
+			if(sin.isAnnotationPresent(Service.class))
+			{
+				superinfos.add(new ClassInfo(sin));
+			}
+		}
+		this.providerid = providerid;
+		this.type	= new ClassInfo(type);
+		this.supertypes = superinfos.toArray(new ClassInfo[superinfos.size()]);
+		this.servicename = servicename;
+		this.rid = rid;
+		this.scope = scope;
 	}
 	
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, String servicename, IResourceIdentifier rid, String scope)
+	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope)
 	{
 		this.providerid = providerid;
 		this.type	= type;
+		this.supertypes = supertypes;
 		this.servicename = servicename;
 		this.rid = rid;
 		this.scope = scope;
@@ -96,6 +118,24 @@ public class ServiceIdentifier implements IServiceIdentifier
 	public void	setServiceType(ClassInfo type)
 	{
 		this.type	= type;
+	}
+	
+	/**
+	 *  Get the service super types.
+	 *  @return The service super types.
+	 */
+	public ClassInfo[] getServiceSuperTypes()
+	{
+		return supertypes;
+	}
+
+	/**
+	 *  Set the service super types.
+	 *  @param type The service super types.
+	 */
+	public void	setServiceSuperTypes(ClassInfo[] supertypes)
+	{
+		this.supertypes	= supertypes;
 	}
 
 	/**
@@ -151,6 +191,42 @@ public class ServiceIdentifier implements IServiceIdentifier
 	public void setScope(String scope)
 	{
 		this.scope = scope;
+	}
+	
+	/**
+	 *  Test if the service is a system service.
+	 *  Checks wether the system property is set in properties annotation.
+	 *  @param iftype The interface type. 
+	 */
+	public static boolean isSystemService(Class<?> iftype)
+	{
+		// Hack cast
+		//Class<?> itype = psi.getType().getType();
+		boolean ret = false;
+		if(iftype!=null)
+		{
+			Service ser = iftype.getAnnotation(Service.class);
+			if(ser!=null && ser.system())
+			{
+				ret = true;
+			}
+			
+//			Properties[] props = iftype.getAnnotationsByType(Properties.class);
+//			for(Properties ps: props)
+//			{
+//				for(NameValue nv: ps.value())
+//				{
+//					if(nv.name().equals("system"))
+//					{
+//						Boolean res = (Boolean)SJavaParser.evaluateExpression(nv.value(), null);
+//						if(res!=null)
+//							ret = res.booleanValue();
+//						break;
+//					}
+//				}
+//			}
+		}
+		return ret;
 	}
 
 	/**

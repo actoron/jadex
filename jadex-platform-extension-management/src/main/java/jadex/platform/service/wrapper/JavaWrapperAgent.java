@@ -19,7 +19,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -47,11 +47,11 @@ public class JavaWrapperAgent	implements	IJavaWrapperService
 	protected IInternalAccess	agent;
 	
 	/** The thread pool service. */
-	@AgentService(lazy=false)
+	@AgentServiceSearch(lazy=false)
 	protected IThreadPoolService	tpservice;
 	
 	/** The library service. */
-	@AgentService
+	@AgentServiceSearch
 	protected ILibraryService	libservice;
 	
 	//-------- IJavaWrapperService interface --------

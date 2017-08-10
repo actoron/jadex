@@ -4,8 +4,6 @@ import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

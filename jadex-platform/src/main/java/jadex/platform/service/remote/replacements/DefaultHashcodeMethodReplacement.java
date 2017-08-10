@@ -2,6 +2,7 @@ package jadex.platform.service.remote.replacements;
 
 import java.lang.reflect.Proxy;
 
+import jadex.bridge.ProxyFactory;
 import jadex.commons.transformation.annotations.Alias;
 import jadex.platform.service.remote.IMethodReplacement;
 
@@ -17,6 +18,6 @@ public class DefaultHashcodeMethodReplacement implements IMethodReplacement
 	public Object invoke(Object obj, Object[] args)
 	{
 		// Todo: hash code of proxy info instead of invocation handler?
-		return Integer.valueOf(Proxy.getInvocationHandler(obj).hashCode());
+		return Integer.valueOf(ProxyFactory.getInvocationHandler(obj).hashCode());
 	}
 }

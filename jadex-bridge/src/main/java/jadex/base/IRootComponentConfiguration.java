@@ -487,7 +487,7 @@ public interface IRootComponentConfiguration {
     // true
 
     /** Flag if registry synchronization should be used. **/
-    public static final String	REGISTRY_SYNC			= StarterConfiguration.REGISTRY_SYNC;		// class:
+    public static final String	SUPERPEER			= StarterConfiguration.SUPERPEER;		// class:
     // default:
     // false
 
@@ -501,7 +501,7 @@ public interface IRootComponentConfiguration {
             PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, NIOTCPTRANSPORT, RELAYTRANSPORT,
             RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
             MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
-            LIBRARY, SETTINGS, CONTEXT, ADDRESS, REGISTRY_SYNC
+            LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER
     };
 
 
@@ -779,7 +779,7 @@ public interface IRootComponentConfiguration {
 
     void setAddress(boolean value);
 
-    boolean getRegistrySync();
+    boolean getSuperpeer();
 
-    void setRegistrySync(boolean value);
+    void setSuperpeer(boolean value);
 }

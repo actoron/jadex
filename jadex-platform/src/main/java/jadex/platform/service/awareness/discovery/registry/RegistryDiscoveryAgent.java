@@ -30,7 +30,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 	@Argument(name="address", clazz=String.class, defaultvalue="\"134.100.11.233\"", description="The ip address of registry."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55699", description="The port used for finding other agents.")
 })
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 {
 	//-------- attributes --------

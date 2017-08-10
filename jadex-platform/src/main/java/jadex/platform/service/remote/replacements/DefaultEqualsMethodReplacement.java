@@ -2,6 +2,7 @@ package jadex.platform.service.remote.replacements;
 
 import java.lang.reflect.Proxy;
 
+import jadex.bridge.ProxyFactory;
 import jadex.commons.transformation.annotations.Alias;
 import jadex.platform.service.remote.IMethodReplacement;
 
@@ -18,6 +19,6 @@ public class DefaultEqualsMethodReplacement implements IMethodReplacement
 	{
 		// Todo: compare proxy infos instead of invocation handlers?
 		return Boolean.valueOf(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
-			&& Proxy.getInvocationHandler(obj).equals(Proxy.getInvocationHandler(args[0])));
+			&& ProxyFactory.getInvocationHandler(obj).equals(ProxyFactory.getInvocationHandler(args[0])));
 	}
 }

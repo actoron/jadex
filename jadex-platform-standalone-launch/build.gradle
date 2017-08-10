@@ -9,7 +9,7 @@ dependencies
 										   // Kernels
 										   ':jadex-kernel-base',':jadex-kernel-micro',':jadex-kernel-bpmn',
 										   ':jadex-kernel-application',':jadex-kernel-component',':jadex-applib-bdi',
-										   ':jadex-kernel-bdiv3',
+										   ':jadex-kernel-bdiv3', ':jadex-kernel-microservice',
 										   
 										   // Platform
 										   ':jadex-platform',

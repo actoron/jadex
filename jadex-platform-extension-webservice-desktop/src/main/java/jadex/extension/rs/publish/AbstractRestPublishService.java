@@ -63,8 +63,8 @@ import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.ILeaseTimeCollection;
-import jadex.commons.collection.LeaseTimeCollection;
+import jadex.commons.collection.ILeaseTimeSet;
+import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -72,6 +72,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -164,7 +165,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				return new String(data);
 			}
 		};
-		converters.add("application/x.json+jadex", jjsonc);
+		converters.add(STransformation.MediaType.APPLICATION_JSON_JADEX, jjsonc);
 		converters.add("*/*", jjsonc);
 		
 		IObjectStringConverter xmlc = new IObjectStringConverter()
@@ -198,7 +199,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	public java.util.Collection<AsyncContext> createCollection(final String callid) 
         	{
-        		return LeaseTimeCollection.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
+        		return LeaseTimeSet.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
     			{
         			public void execute(AsyncContext ctx)
         			{
@@ -423,7 +424,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     		public void exceptionOccurred(Exception exception)
                     		{
                     			Object result = mapResult(method, exception);
-                    			writeResponse(exception, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
+                    			writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
 //                    			ctx.complete();
                     		}
 						});
@@ -496,7 +497,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /**
      *  Publish a static page (without ressources).
      */
-    public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
+    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
 
     /**
      *  Publish file resources from the classpath.
@@ -936,15 +937,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        {
 	        	String ret = null;
 	        	String mt = null;
-	        	for(String mediatype: sr)
+	        	if (sr != null)
 	        	{
-	        		mt = mediatype;
-	        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
-	        		if(convs!=null && convs.size()>0)
-	        		{	
-	        			ret = convs.iterator().next().convertObject(result, null);
-	        			break;
-	        		}
+		        	for(String mediatype: sr)
+		        	{
+		        		mt = mediatype;
+		        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
+		        		if(convs!=null && convs.size()>0)
+		        		{	
+		        			Object input = result instanceof Response? ((Response) result).getEntity() : result;
+		        			ret = convs.iterator().next().convertObject(input, null);
+		        			break;
+		        		}
+		        	}
 	        	}
 	        	
 	        	if(mt!=null)
@@ -1039,7 +1044,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		if(to>0)
 		{
 //			System.out.println("req timeout is: "+to);
-			((ILeaseTimeCollection<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
+			((ILeaseTimeSet<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
 		}
 		else
 		{
@@ -1311,6 +1316,25 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						produced = PARAMETER_MEDIATYPES;
 					
 					Class<?>[] ptypes = method.getParameterTypes();
+					String[]	pnames	= new String[ptypes.length];
+					java.lang.annotation.Annotation[][]	pannos	= method.getParameterAnnotations();
+					
+					// Find parameter names
+					for(int p=0; p<ptypes.length; p++)
+					{
+						for(int a=0; a<pannos[p].length; a++)
+						{
+							if(pannos[p][a] instanceof ParameterInfo)
+							{
+								pnames[p]	= ((ParameterInfo)pannos[p][a]).value();
+							}
+						}
+						
+						if(pnames[p]==null)
+						{
+							pnames[p]	= "arg"+p;
+						}
+					}
 					
 					ret.append("<div class=\"method\">");
 					ret.append("\n");
@@ -1326,6 +1350,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						for(int j=0; j<ptypes.length; j++)
 						{
 							ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
+							ret.append(" ");
+							ret.append(pnames[j]);
 							if(j+1<ptypes.length)
 								ret.append(", ");
 						}
@@ -1407,8 +1433,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						
 						for(int j=0; j<ptypes.length; j++)
 						{
-							ret.append("arg").append(j).append(": ");
-							ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
+							ret.append(pnames[j]).append(": ");
+							ret.append("<input name=\"").append(pnames[j]).append("\" type=\"text\" />");
 //							.append(" accept=\"").append(cons[0]).append("\" />");
 						}
 						

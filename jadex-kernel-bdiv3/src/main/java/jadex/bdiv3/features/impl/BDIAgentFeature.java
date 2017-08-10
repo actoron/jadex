@@ -2016,7 +2016,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	// todo: support parameter names via annotation in guesser (guesser with meta information)
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
-	 *  @return A valid assigment or null if no assignment could be found.
+	 *  @return A valid assignment or null if no assignment could be found.
 	 */
 	public static Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs, IInternalAccess component)
 	{
@@ -2099,6 +2099,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					}
 				}
 			}
+			
+			// Special case service call
 			if(rpe.getPojoElement() instanceof InvocationInfo)
 			{
 				vals.add(((InvocationInfo)rpe.getPojoElement()).getParams());
@@ -2108,11 +2110,12 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// Fill in values from annotated events or using parameter guesser.
 		boolean[] notnulls = new boolean[ptypes.length];
 		
-		Object[]	ret	= new Object[ptypes.length];
+		Object[] ret = new Object[ptypes.length];
 		SimpleParameterGuesser	g	= new SimpleParameterGuesser(vals);
 		for(int i=0; i<ptypes.length; i++)
 		{
 			boolean	done	= false;
+			
 			for(int j=0; !done && anns!=null && j<anns[i].length; j++)
 			{
 				if(anns[i][j] instanceof Event)
@@ -2164,9 +2167,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 							}
 						}
 						if(!set)
-						{
 							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
-						}
 						
 //							else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
 //							{
@@ -2181,12 +2182,21 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					{
 						MBelief	mbel	= bdif.getBDIModel().getCapability().getBelief(source);
 						ret[i]	= mbel.getValue(component);
-
 					}
 				}
 				else if(anns[i][j] instanceof CheckNotNull)
 				{
 					notnulls[i] = true;
+				}
+			}
+			
+			if(!done && rpe!=null && rpe.getPojoElement() instanceof InvocationInfo)
+			{
+				Object[] serviceparams = ((InvocationInfo)rpe.getPojoElement()).getParams();
+				if(SReflect.isSupertype(ptypes[i], serviceparams[i].getClass()))
+				{
+					ret[i] = serviceparams[i];
+					done = true;
 				}
 			}
 			
@@ -2860,7 +2870,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
-	 * 
+	 *  Create an event type.
 	 */
 	public static EventType createEventType(RawEvent rawev)
 	{

@@ -896,15 +896,15 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 	}
 
 	@Override
-	public boolean getRegistrySync()
+	public boolean getSuperpeer()
 	{
-		return Boolean.TRUE.equals(getValue(REGISTRY_SYNC));
+		return Boolean.TRUE.equals(getValue(SUPERPEER));
 	}
 
 	@Override
-	public void setRegistrySync(boolean value)
+	public void setSuperpeer(boolean value)
 	{
-		setValue(REGISTRY_SYNC, value);
+		setValue(SUPERPEER, value);
 	}
 
 	/**

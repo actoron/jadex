@@ -2,6 +2,7 @@ package jadex.xml.bean;
 
 
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
@@ -810,6 +811,21 @@ public class JavaWriter
 				}, null
 			));
 			typeinfos.add(ti_ste);
+			
+			// java.math.BigInteger
+			TypeInfo ti_bi = new TypeInfo(new XMLInfo(new QName("typeinfo:java.math", "BigInteger")), 
+				new ObjectInfo(BigInteger.class),
+				new MappingInfo(null, new AttributeInfo[]
+				{
+					new AttributeInfo(new AccessInfo("class", null), new AttributeConverter(null, clconv)),
+					new AttributeInfo(new AccessInfo("byteArray", null, null, null, 
+						new BeanAccessInfo(null, SReflect.getMethod(BigInteger.class, "toByteArray", new Class[0]))), new AttributeConverter(null, bytesconv))
+				}, new SubobjectInfo[]
+				{
+//					new SubobjectInfo(new AccessInfo("byteArray", null, null, null, new BeanAccessInfo(null, SReflect.getMethod(BigInteger.class, "toByteArray", new Class[0]))), null),
+				}
+			));
+			typeinfos.add(ti_bi);
 			
 			if(!SReflect.isAndroid()) 
 			{

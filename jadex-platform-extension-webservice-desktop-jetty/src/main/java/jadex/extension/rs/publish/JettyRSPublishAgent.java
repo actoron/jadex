@@ -1,5 +1,6 @@
 package jadex.extension.rs.publish;
 
+
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.micro.annotation.Agent;

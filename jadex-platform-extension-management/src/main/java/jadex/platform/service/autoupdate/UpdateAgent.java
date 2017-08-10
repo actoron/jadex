@@ -43,7 +43,7 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -101,7 +101,7 @@ public class UpdateAgent implements IUpdateService
 	protected IInternalAccess agent;
 	
 	/** The cms. */
-	@AgentService
+	@AgentServiceSearch
 	protected IComponentManagementService cms;
 	
 //	/** The new cid (need to be acknowledge by create and via call ack). */

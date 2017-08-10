@@ -1,11 +1,13 @@
 package jadex.bridge.service.types.remote;
 
 import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
  *  Service for administration of proxy agents.
  */
+@Service
 public interface IProxyAgentService
 {
 	/** The connection state. */

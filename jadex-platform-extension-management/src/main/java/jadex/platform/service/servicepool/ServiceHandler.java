@@ -100,17 +100,18 @@ public class ServiceHandler implements InvocationHandler
 	}
 	
 	/**
-	 * 
+	 *  Init.
 	 */
 	@ServiceStart
 	public IFuture<Void> init()
 	{
 //		System.out.println("called init: "+this);
 		final Future<Void> ret = new Future<Void>();
-		if(strategy.getWorkerCount()>0)
+		int wcnt = strategy.getWorkerCount();
+		if(wcnt>0)
 		{
-			CounterResultListener<IService> lis = new CounterResultListener<IService>(strategy.getWorkerCount(), new DelegationResultListener<Void>(ret));
-			for(int i=0; i<strategy.getWorkerCount(); i++)
+			CounterResultListener<IService> lis = new CounterResultListener<IService>(wcnt, new DelegationResultListener<Void>(ret));
+			for(int i=0; i<wcnt; i++)
 			{
 				createService().addResultListener(lis);
 			}

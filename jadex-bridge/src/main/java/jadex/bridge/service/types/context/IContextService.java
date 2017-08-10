@@ -7,12 +7,14 @@ import java.util.List;
 
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
  *  Provides access to the application Context specific objects and Android
  *  Resources such as files and preferences.
  */
+@Service(system=true)
 public interface IContextService
 {
 //	/**
@@ -82,6 +84,8 @@ public interface IContextService
 	 */
 	public IFuture<Boolean> dispatchEvent(IJadexAndroidEvent event);
 
+	// Problem: Using Android the context is needed due to wifi manager
+	// todo: remove?!
 	/**
 	 * Get the network ips.
 	 */

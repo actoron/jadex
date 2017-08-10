@@ -17,6 +17,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
@@ -153,7 +154,7 @@ public class RemoteReferenceModule
 		// Strip required service proxy if any, to avoid exception due to being called from wrong thread.
 		if(Proxy.isProxyClass(target.getClass()))
 		{
-			InvocationHandler	handler	= Proxy.getInvocationHandler(target);
+			InvocationHandler	handler	= ProxyFactory.getInvocationHandler(target);
 			if(handler instanceof BasicServiceInvocationHandler)
 			{
 				if(((BasicServiceInvocationHandler)handler).isRequired())
@@ -627,7 +628,7 @@ public class RemoteReferenceModule
 		{
 			if(Proxy.isProxyClass(target.getClass()))
 			{
-				Object handler = Proxy.getInvocationHandler(target);
+				Object handler = ProxyFactory.getInvocationHandler(target);
 				if(handler instanceof BasicServiceInvocationHandler)
 				{
 					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
@@ -644,7 +645,7 @@ public class RemoteReferenceModule
 				}
 				else if(handler instanceof RemoteMethodInvocationHandler)
 				{
-					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)Proxy.getInvocationHandler(target);
+					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
 					ret	= rmih.pr.getRemoteReference();
 				}
 			}
@@ -883,7 +884,7 @@ public class RemoteReferenceModule
 			// c) enhance xml to annotate the resource the classes belong to (best solution)
 			// currently just uses the 'global' platform classloader 
 			
-			ret = Proxy.newProxyInstance(classloader, 
+			ret = ProxyFactory.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
 			
 			incProxyCount(pr.getRemoteReference());

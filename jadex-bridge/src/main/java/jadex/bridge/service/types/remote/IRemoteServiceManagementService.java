@@ -5,6 +5,7 @@ import java.util.Collection;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;
 
@@ -12,6 +13,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Interface for remote management service.
  */
+@Service(system=true)
 public interface IRemoteServiceManagementService
 {	
 	/**

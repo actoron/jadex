@@ -37,6 +37,7 @@ import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -1069,7 +1070,7 @@ public class APL
 	}
 	
 	/**
-	 * 
+	 * Candidate info for mplan.
 	 */
 	public static class CandidateInfoMPlan implements ICandidateInfo
 	{
@@ -1146,10 +1147,18 @@ public class APL
 		{
 			this.rplan = null;
 		}
+		
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return SReflect.getInnerClassName(getClass())+" "+mplaninfo.getMPlan();
+		}
 	}
 	
 	/**
-	 * 
+	 * Candidate info for pojo plan.
 	 */
 	public static class CandidateInfoPojoPlan implements ICandidateInfo
 	{
@@ -1188,8 +1197,8 @@ public class APL
 		 */
 		public IInternalPlan getPlan()
 		{
-			if(rplan!=null)
-				System.out.println("access: "+this);
+//			if(rplan!=null)
+//				System.out.println("access: "+this);
 			
 			if(rplan==null)
 				rplan = RPlan.createRPlan((MPlan)getModelElement(), this, element, agent, null, null);
@@ -1231,10 +1240,18 @@ public class APL
 		{
 			this.rplan = null;
 		}
+		
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return SReflect.getInnerClassName(getClass())+" "+mplan;
+		}
 	}
 	
 	/**
-	 * 
+	 * Candidate info for mgoal.
 	 */
 	public static class CandidateInfoMGoal implements ICandidateInfo
 	{
@@ -1313,10 +1330,18 @@ public class APL
 		{
 			this.rgoal = null;
 		}
+		
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return SReflect.getInnerClassName(getClass())+" "+mgoalinfo.getMGoal();
+		}
 	}
 	
 	/**
-	 * 
+	 * Candidate info for rplan.
 	 */
 	public static class CandidateInfoRPlan implements ICandidateInfo
 	{
@@ -1372,15 +1397,23 @@ public class APL
 		{
 			return rplan.getModelElement();
 		}
+		
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return SReflect.getInnerClassName(getClass())+" "+rplan;
+		}
 	}
 	
 	/**
-	 * 
+	 * Candidate info for waitqueue.
 	 */
 	public static class CandidateInfoWaitqueue implements ICandidateInfo
 	{
 		/** The mplan info. */
-		protected RPlan rplan;;
+		protected RPlan rplan;
 		
 		/** The element. */
 		protected RProcessableElement element;
@@ -1430,6 +1463,14 @@ public class APL
 		public MElement getModelElement()
 		{
 			return rplan.getModelElement();
+		}
+		
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return SReflect.getInnerClassName(getClass())+" "+rplan;
 		}
 	}
 }

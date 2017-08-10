@@ -23,7 +23,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -49,7 +49,7 @@ public class RemovedServiceAgent
 	protected IInternalAccess	agent;
 	
 	/** The cms service. */
-	@AgentService
+	@AgentServiceSearch
 	protected IComponentManagementService	cms;
 	
 	/** The test counter. */

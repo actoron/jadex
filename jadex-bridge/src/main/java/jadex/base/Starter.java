@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
@@ -27,10 +29,8 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.search.GlobalQueryServiceRegistry;
-import jadex.bridge.service.search.MultiServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -376,29 +376,30 @@ public class Starter
 					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
 						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
-					
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
+
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getStarterConfig().getValue(StarterConfiguration.DATA_REALTIMETIMEOUT));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getStarterConfig().getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
-					if(config.getRegistrySync())
-					{
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(true, new MultiServiceRegistry()));
-					}
-					else
-					{
-						// ServiceRegistry cannot handle backport for polling in case of global queries
-						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new SynchronizedServiceRegistry(false, new GlobalQueryServiceRegistry(5000))); 
-					}
+//					if(config.getRegistrySync())
+//					{
+						// todo: delay for registry as parameter (or simply platform timeout?!)
+						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new ServiceRegistry(cid, 10000));
+//					}
+//					else
+//					{
+//						// ServiceRegistry cannot handle backport for polling in case of global queries
+//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServiceRegistry(5000)); 
+//					}
 					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
 
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
 					
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootConfig.getArgs(), desc, null, null);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, config.getConfigurationName(), rootConfig.getArgs(), desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
@@ -413,7 +414,7 @@ public class Starter
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getValue(RootComponentConfiguration.WELCOME)))
+									if(config.getWelcome())
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");

@@ -414,10 +414,20 @@ public class ServiceInvocationContext
 	 */
 	public void setResult(Object result)
 	{
-		assert getMethod()==null || result==null || SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) : "Incompatible types: "+getMethod()+", "+result.getClass();
+		assert getMethod()==null || result==null || result instanceof Throwable || SReflect.isSupertype(getMethod().getReturnType(), result.getClass()) : "Incompatible types: "+getMethod()+", "+result.getClass();
 		
-//		if(getMethod().getName().indexOf("subsc")!=-1)
+//		if(getMethod().getName().indexOf("start")!=-1)
 //			System.out.println("gotta");
+//		if(getObject() instanceof BasicService && ((BasicService)getObject()).getInterfaceType().getName().indexOf("Peer")!=-1)
+//			System.out.println("hhhhhhhhhhhhhhhhhh");
+//		if(getMethod().getName().indexOf("start")!=-1 && sid.getServiceType().getTypeName().indexOf("Peer")!=-1)
+//			System.out.println("call method start end");
+//		if(getMethod().getName().indexOf("init")!=-1 && sid.getServiceType().getTypeName().indexOf("Peer")!=-1)
+//			System.out.println("call method init");
+		
+//		if(SReflect.isSupertype(IFuture.class, getMethod().getReturnType()) && !(result instanceof Future))
+//			System.out.println("hהההההההההההה");
+		
 		this.result.set(used.size()-1, result);
 	}
 
@@ -428,8 +438,8 @@ public class ServiceInvocationContext
 	{
 		IFuture<Void> ret;
 		
-		if(method.getName().equals("addB"))
-			System.out.println("invoke: "+caller);
+		//if(method.getName().indexOf("Void")!=-1)
+		//	System.out.println("invoke: "+caller);
 		
 		push(object, method, args, null);
 		

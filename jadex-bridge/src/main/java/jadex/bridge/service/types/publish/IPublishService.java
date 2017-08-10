@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.publish;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
@@ -9,7 +8,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Service for publishing services in other technologies such as web services.
  */
-@Service
+@Service(system=true)
 public interface IPublishService
 {
 	/** The publish type web service. */

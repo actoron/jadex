@@ -91,7 +91,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				Object cand = ca.getRawCandidate();
 				if(cand instanceof MPlanInfo)
 				{
-					MPlanInfo mplaninfo = (MPlanInfo)cand;
+//					MPlanInfo mplaninfo = (MPlanInfo)cand;
 					try
 					{
 						RPlan rplan = (RPlan)ca.getPlan();

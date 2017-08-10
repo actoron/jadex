@@ -3,6 +3,7 @@ package jadex.bridge.service.types.simulation;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IChangeListener;
@@ -15,6 +16,7 @@ import jadex.commons.future.IFuture;
 	@GuiClassName("jadex.tools.simcenter.SimServiceViewerPanel"),
 	@GuiClassName("jadex.android.controlcenter.settings.SimulationSettings")
 })
+@Service(system=true)
 public interface ISimulationService
 {
 	//-------- constants --------

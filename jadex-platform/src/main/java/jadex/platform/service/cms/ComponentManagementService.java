@@ -1,6 +1,7 @@
 package jadex.platform.service.cms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,9 +37,12 @@ import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -49,7 +53,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -88,6 +91,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.micro.annotation.Properties;
 
 /**
  *  Abstract default implementation of component management service.
@@ -479,11 +483,21 @@ public class ComponentManagementService implements IComponentManagementService
 														}
 														else
 														{
-															factory.getComponentFeatures(lmodel)
-																.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
+//															System.out.print("<"+lmodel.getName()+" "+factory.getClass());
+															IFuture fut = factory.getComponentFeatures(lmodel);
+															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
 															{
 																public void customResultAvailable(Collection<IComponentFeatureFactory> features)
 																{
+//															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Object, IComponentIdentifier>(inited)
+//															{
+//																public void customResultAvailable(Object o)
+//																{
+//																	if(!(o instanceof Collection))
+//																		System.out.println("ppp: "+o);
+																	
+//																	Collection<IComponentFeatureFactory> features = (Collection<IComponentFeatureFactory>)o;
+//																	System.out.println(">");
 																	// Create id and adapter.
 																	
 																	final BasicComponentIdentifier cid;
@@ -492,12 +506,13 @@ public class ComponentManagementService implements IComponentManagementService
 																	Map<String, Object> props = lmodel.getProperties();
 																	
 																	IComponentIdentifier pacid = getParentIdentifier(cinfo);
+																	
 																	boolean systemcomponent = "system".equals(name) && pacid.getParent()==null;
 																	if(props.containsKey("system") && !"system".equals(name))
 																	{
 																		UnparsedExpression uexp = (UnparsedExpression)props.get("system");
 																		IParsedExpression exp = SJavaParser.parseExpression(uexp, lmodel.getAllImports(), null); // todo: classloader
-																		Boolean bool = (Boolean)exp.getValue(new SimpleValueFetcher()
+																		SimpleValueFetcher fet = new SimpleValueFetcher()
 																		{
 																			public Object fetchValue(String name) 
 																			{
@@ -523,7 +538,8 @@ public class ComponentManagementService implements IComponentManagementService
 																				}
 																				return ret;
 																			}
-																		});
+																		};
+																		Boolean bool = (Boolean)exp.getValue(fet);
 																		if(bool!=null && bool.booleanValue())// || (props.get("system").toString().indexOf("true")!=-1))
 																		{
 																			systemcomponent = true;
@@ -546,13 +562,31 @@ public class ComponentManagementService implements IComponentManagementService
 //																			}
 																		}
 																	}
+																	// Check if system is used in service (one declared system service is enough for component being systemcomponent)
+																	if(!systemcomponent)
+																	{
+//																		if(lmodel.getName().indexOf("Remote")!=-1)
+//																			System.out.println("sdfsdfsd");
+																		ProvidedServiceInfo[] psis = lmodel.getProvidedServices();
+																		if(psis!=null)
+																		{
+																			for(ProvidedServiceInfo psi: psis)
+																			{
+																				// Hack cast
+																				Class<?> iftype = psi.getType().getType(((ModelInfo)lmodel).getClassLoader());
+																				systemcomponent = jadex.bridge.service.ServiceIdentifier.isSystemService(iftype);
+																				if(systemcomponent)
+																					break;
+																			}
+																		}
+																	}
 																	
 																	// Lock the parent while creating
 																	final String lockkey = SUtil.createUniqueId("lock");
 																	LockEntry kt = lockentries.get(cinfo.getParent());
 																	if(kt==null)
 																	{
-																		kt= new LockEntry(cinfo.getParent());
+																		kt = new LockEntry(cinfo.getParent());
 																		lockentries.put(cinfo.getParent(), kt);
 																	}
 																	kt.addLocker(lockkey);
@@ -590,10 +624,10 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	String paname = pacid.getName().replace('@', '.');
 																	
-																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getName(), paname);//, addresses);
+																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getNameHint()!=null? lmodel.getNameHint(): lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
-																	SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
+																	ServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -705,7 +739,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Started component: "+cid.getName());
 
-																			SynchronizedServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
 																			
 		//																	System.out.println("created: "+ad);
 																			
@@ -1680,7 +1714,7 @@ public class ComponentManagementService implements IComponentManagementService
 										}
 									}
 									
-									adapter.body().addResultListener(new IResultListener<Void>()
+									adapter.body().addResultListener(adapter.getInternalAccess().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 									{
 										public void resultAvailable(Void result)
 										{
@@ -1695,7 +1729,7 @@ public class ComponentManagementService implements IComponentManagementService
 												adapter.getInternalAccess().killComponent(exception);
 											}
 										}
-									});
+									}));
 								}
 									
 								// Killed after init but before init resume -> execute queued destroy.

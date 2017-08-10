@@ -49,8 +49,17 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	 */
 	public SubscriptionIntermediateFuture(ITerminationCommand terminate)
 	{
+		this(terminate, true);
+	}
+	
+	/**
+	 *  Create a new future.
+	 *  @param terminate The code to be executed in case of termination.
+	 */
+	public SubscriptionIntermediateFuture(ITerminationCommand terminate, boolean storeforfirst)
+	{
 		super(terminate);
-		this.storeforfirst = true;
+		this.storeforfirst = storeforfirst;
 	}
 	
 	//-------- methods --------
@@ -99,9 +108,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
     	
 //    	System.out.println("adding listener: "+this+" "+listener);
     	

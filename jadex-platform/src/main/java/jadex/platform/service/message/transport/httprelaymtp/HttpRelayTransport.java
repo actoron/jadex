@@ -16,14 +16,14 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.SynchronizedServiceRegistry;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.message.IMessageService;
@@ -361,8 +361,10 @@ public class HttpRelayTransport implements ITransport
 							{
 								public void resultAvailable(Void result)
 								{
-									IRelayAwarenessService ras	= SynchronizedServiceRegistry.getRegistry(ia)
-										.searchService(new ClassInfo(IRelayAwarenessService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
+									ServiceQuery<IRelayAwarenessService> query = new ServiceQuery<IRelayAwarenessService>(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM, null, ia.getComponentIdentifier(), null);
+									IRelayAwarenessService ras	= ServiceRegistry.getRegistry(ia).searchService(query, true);
+//									IRelayAwarenessService ras	= SynchronizedServiceRegistry.getRegistry(ia)
+//										.searchService(new ClassInfo(IRelayAwarenessService.class), ia.getComponentIdentifier(), Binding.SCOPE_PLATFORM, true);
 									if(ras!=null)
 									{
 										if(dead)

@@ -17,6 +17,7 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.annotation.Service;
@@ -268,7 +269,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		{
 			gn.put(methodnames[i], goalnames[i]);
 		}
-		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+		return ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
 			new GoalDelegationHandler(agent, gn, type));
 	}
 }

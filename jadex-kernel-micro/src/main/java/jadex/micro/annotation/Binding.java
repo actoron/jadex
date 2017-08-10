@@ -18,26 +18,26 @@ public @interface Binding
 {
 	//-------- constants --------
 	
+	/** None component scope (nothing will be searched, forces required service creation). */
+	public static final String SCOPE_NONE = RequiredServiceInfo.SCOPE_NONE;
+	
 	/** Local component scope. */
-	public static final String SCOPE_LOCAL = "local";
+	public static final String SCOPE_LOCAL = RequiredServiceInfo.SCOPE_LOCAL;
 	
 	/** Component scope. */
-	public static final String SCOPE_COMPONENT = "component";
+	public static final String SCOPE_COMPONENT = RequiredServiceInfo.SCOPE_COMPONENT;
 	
 	/** Application scope. */
-	public static final String SCOPE_APPLICATION = "application";
+	public static final String SCOPE_APPLICATION = RequiredServiceInfo.SCOPE_APPLICATION;
 
 	/** Platform scope. */
-	public static final String SCOPE_PLATFORM = "platform";
+	public static final String SCOPE_PLATFORM = RequiredServiceInfo.SCOPE_PLATFORM;
 
 	/** Global scope. */
-	public static final String SCOPE_GLOBAL = "global";
-	
-	/** Upwards scope. */
-	public static final String SCOPE_UPWARDS = "upwards";
+	public static final String SCOPE_GLOBAL = RequiredServiceInfo.SCOPE_GLOBAL;
 	
 	/** Parent scope. */
-	public static final String SCOPE_PARENT = "parent";
+	public static final String SCOPE_PARENT = RequiredServiceInfo.SCOPE_PARENT;
 	
 	/** The raw proxy type (i.e. no proxy). */
 	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;
@@ -93,7 +93,7 @@ public @interface Binding
 	/**
 	 *  The search scope.
 	 */
-	public String scope() default RequiredServiceInfo.SCOPE_APPLICATION;
+	public String scope() default "";//RequiredServiceInfo.SCOPE_APPLICATION;
 
 	/**
 	 *  The dynamic binding flag.
@@ -114,4 +114,5 @@ public @interface Binding
 	 *  The interceptors.
 	 */
 	public Value[] interceptors() default {};
+	
 }

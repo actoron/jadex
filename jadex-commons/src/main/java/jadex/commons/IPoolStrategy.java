@@ -25,6 +25,7 @@ public interface IPoolStrategy
 	
 	/**
 	 *  Called when a new worker was added proactively to the pool.
+	 *  Workers are automatically removed by the strategy as result of taskFinished().
 	 *  @param cnt The number of new workers.
 	 */
 	public void workersAdded(int cnt);

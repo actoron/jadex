@@ -1,15 +1,9 @@
 package jadex.bridge.service.types.registry;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Registry event for notifications from the registry.
@@ -17,11 +11,11 @@ import jadex.bridge.service.IServiceIdentifier;
 public class RegistryEvent implements IRegistryEvent
 {
 	/** The added services. */
-	protected Map<ClassInfo, Set<IService>> addedservices;
+	protected Set<IService> addedservices;
 //	protected Set<IServiceIdentifier> addedservices;
 	
 	/** The removed services. */
-	protected Map<ClassInfo, Set<IService>> removedservices;
+	protected Set<IService> removedservices;
 //	protected Set<IServiceIdentifier> removedservices;
 
 	/** The number of events that must have occured before a remote message is sent. */
@@ -33,12 +27,23 @@ public class RegistryEvent implements IRegistryEvent
 	/** The time limit. */
 	protected long timelimit;
 	
+	/** Flag if is delta (or full) registry content. */
+	protected boolean delta;
+	
 	/**
 	 *  Create a new registry event.
 	 */
 	public RegistryEvent()
 	{
-		this.timestamp = System.currentTimeMillis();
+		this(true);
+	}
+	
+	/**
+	 *  Create a new registry event.
+	 */
+	public RegistryEvent(boolean delta)
+	{
+		this(null, null, 50, 5000, delta);
 	}
 	
 	/**
@@ -46,11 +51,12 @@ public class RegistryEvent implements IRegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Map<ClassInfo, Set<IService>> addedservices, Map<ClassInfo, Set<IService>> removedservices, int eventslimit, long timelimit)
+	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta)
 	{
 		this.eventslimit = eventslimit;
 		this.timelimit = timelimit;
 		this.timestamp = System.currentTimeMillis();
+		this.delta = delta;
 		setAddedServices(addedservices);
 		setRemovedServices(removedservices);
 	}
@@ -59,7 +65,7 @@ public class RegistryEvent implements IRegistryEvent
 	 *  Get the addedservices.
 	 *  @return the addedservices
 	 */
-	public Map<ClassInfo, Set<IService>> getAddedServices()
+	public Set<IService> getAddedServices()
 	{
 		return addedservices;
 	}
@@ -67,7 +73,7 @@ public class RegistryEvent implements IRegistryEvent
 	/**
 	 *  Set the added services.
 	 */
-	public void setAddedServices(Map<ClassInfo, Set<IService>> services)
+	public void setAddedServices(Set<IService> services)
 	{
 		this.addedservices = services;
 //		if(services!=null && services.size()>0)
@@ -84,7 +90,7 @@ public class RegistryEvent implements IRegistryEvent
 	 *  Get the removedservices.
 	 *  @return the removedservices
 	 */
-	public Map<ClassInfo, Set<IService>> getRemovedServices()
+	public Set<IService> getRemovedServices()
 	{
 		return removedservices;
 	}
@@ -92,7 +98,7 @@ public class RegistryEvent implements IRegistryEvent
 	/**
 	 *  Set the removed services.
 	 */
-	public void setRemovedServices(Map<ClassInfo, Set<IService>> services)
+	public void setRemovedServices(Set<IService> services)
 	{
 		this.removedservices = services;
 //		if(services!=null && services.size()>0)
@@ -109,36 +115,42 @@ public class RegistryEvent implements IRegistryEvent
 	 *  Add an added service.
 	 *  @return True, if changed.
 	 */
-	public boolean addAddedService(ClassInfo type, IService service)
+	public boolean addAddedService(IService service)
 	{
 		if(addedservices==null)
-			addedservices = new HashMap<ClassInfo, Set<IService>>();
-		Set<IService> tmp = addedservices.get(type);
-		if(tmp==null)
-		{
-			tmp = new HashSet<IService>();
-			addedservices.put(type, tmp);
-		}
-		return tmp.add(service);
+			addedservices = new HashSet<IService>();
+		return addedservices.add(service);
 	}
 	
 	/**
 	 *  Add an added service.
 	 *  @return True, if changed.
 	 */
-	public boolean addRemovedService(ClassInfo type, IService service)
+	public boolean addRemovedService(IService service)
 	{
 		if(removedservices==null)
-			removedservices = new HashMap<ClassInfo, Set<IService>>();
-		Set<IService> tmp = removedservices.get(type);
-		if(tmp==null)
-		{
-			tmp = new HashSet<IService>();
-			removedservices.put(type, tmp);
-		}
-		return tmp.add(service);
+			removedservices = new HashSet<IService>();
+		return removedservices.add(service);
 	}
 	
+	/**
+	 *  Get the delta.
+	 *  @return the delta
+	 */
+	public boolean isDelta()
+	{
+		return delta;
+	}
+
+	/**
+	 *  Set the delta.
+	 *  @param delta The delta to set
+	 */
+	public void setDelta(boolean delta)
+	{
+		this.delta = delta;
+	}
+
 	/**
 	 * Returns the number of elements added to this event.
 	 */
@@ -146,21 +158,9 @@ public class RegistryEvent implements IRegistryEvent
 	{
 		int	size = 0;
 		if(addedservices!=null)
-		{
-			for(Map.Entry<ClassInfo, Set<IService>> entry: addedservices.entrySet())
-			{
-				Collection<IService> coll = entry.getValue();
-				size += (coll != null ? coll.size() : 0);
-			}
-		}
+			size += addedservices.size();
 		if(removedservices!=null)
-		{
-			for(Map.Entry<ClassInfo, Set<IService>> entry: removedservices.entrySet())
-			{
-				Collection<IService> coll = entry.getValue();
-				size += (coll != null ? coll.size() : 0);
-			}
-		}
+			size += removedservices.size();
 		return size;
 	}
 	

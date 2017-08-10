@@ -739,13 +739,13 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 	}
 
 	@Override
-	public boolean getRegistrySync() {
-		return getRootConfig().getRegistrySync();
+	public boolean getSuperpeer() {
+		return getRootConfig().getSuperpeer();
 	}
 
 	@Override
-	public void setRegistrySync(boolean value) {
-		getRootConfig().setRegistrySync(value);
+	public void setSuperpeer(boolean value) {
+		getRootConfig().setSuperpeer(value);
 	}
 
 	//---- DELEGATES for StarterConfiguration -----//

@@ -1,16 +1,9 @@
 package jadex.bridge.service.search;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.types.registry.IRegistryListener;
-import jadex.commons.IAsyncFilter;
-import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -22,33 +15,60 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 public interface IServiceRegistry
 {
 	/**
-	 *  Get services per type.
-	 *  @param type The interface type. If type is null all services are returned.
-	 *  @return First matching service or null.
-	 */
-	public Iterator<IService> getServices(ClassInfo type);
-	
-	/**
-	 *  todo: WARNING: dangerous method that exposes the internal data structure
-	 *  Get the service map.
-	 *  @return The full service map.
-	 */
-	// read
-	public Map<ClassInfo, Set<IService>> getServiceMap();
-
-	/**
 	 *  Add a service to the registry.
-	 *  @param sid The service id.
+	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(ClassInfo key, IService service);
+	public IFuture<Void> addService(IService service);
 	
 	/**
 	 *  Remove a service from the registry.
-	 *  @param sid The service id.
+	 *  @param service The service.
 	 */
 	// write
-	public void removeService(ClassInfo key, IService service);
+	public void removeService(IService service);
+	
+	/**
+	 *  Remove services of a platform from the registry.
+	 *  @param platform The platform.
+	 */
+	// write
+	public void removeServices(IComponentIdentifier platform);
+	
+	/**
+	 *  Remove services except from a platform from the registry.
+	 *  @param platform The platform.
+	 */
+	// write
+	public void removeServicesExcept(IComponentIdentifier platform);
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> T searchServiceSync(ServiceQuery<T> query);
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> Set<T> searchServicesSync(ServiceQuery<T> query);
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> IFuture<T> searchServiceAsync(ServiceQuery<T> query);
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsync(ServiceQuery<T> query);
+	
+	/**
+	 *  Search for services.
+	 *  Is deprecated because only used by relay.
+	 */
+//	// read
+	@Deprecated
+	public <T> T searchService(ServiceQuery<T> query, boolean excluded);
 	
 	/**
 	 *  Add a service query to the registry.
@@ -62,14 +82,21 @@ public interface IServiceRegistry
 	 *  @param query ServiceQuery.
 	 */
 	// write
-	public <T> void removeQuery(ServiceQuery<T> query);
+	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query);
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
 	 *  @param owner The query owner.
 	 */
 	// write
-	public void removeQueries(IComponentIdentifier owner);
+	public IFuture<Void> removeQueries(IComponentIdentifier owner);
+	
+	/**
+	 *  Remove all service queries of a specific platform from the registry.
+	 *  @param platform The platform from which the query owner comes.
+	 */
+	// write
+	public IFuture<Void> removeQueriesFromPlatform(IComponentIdentifier platform);
 	
 	/**
 	 *  Get queries per type.
@@ -77,59 +104,7 @@ public interface IServiceRegistry
 	 *  @return The queries.
 	 */
 	// read
-	public <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type);
-	
-	/**
-	 *  Search for services.
-	 */
-	// read
-	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope);
-	
-	/**
-	 *  Search for services.
-	 */
-	// read
-	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, boolean excluded);
-	
-	/**
-	 *  Search for services.
-	 */
-	// read
-	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope);
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> T searchService(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter);
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> Collection<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IFilter<T> filter);
-	
-	/**
-	 *  Search for service.
-	 */
-	public <T> IFuture<T> searchService(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServices(ClassInfo type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
-	
-	/**
-	 *  Search for services.
-	 */
-	// read
-	public <T> IFuture<T> searchGlobalService(final ClassInfo type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
-	
-	/**
-	 *  Search for services.
-	 */
-	// read
-	public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(ClassInfo type, IComponentIdentifier cid, IAsyncFilter<T> filter);
-	
-	
+//	public <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type);
 	
 	/**
 	 *  Add an excluded component. 
@@ -154,75 +129,15 @@ public interface IServiceRegistry
 	public boolean isIncluded(IComponentIdentifier cid, IService ser);
 	
 	/**
-	 *  Add an event listener.
-	 *  @param listener The listener.
+	 *  Get the superpeer.
+	 *  @param force If trues forces fresh search.
+	 *  @return The superpeer.
 	 */
-	public void addEventListener(IRegistryListener listener);
+	public IFuture<IComponentIdentifier> getSuperpeer(boolean force);
 	
 	/**
-	 *  Remove an event listener.
-	 *  @param listener The listener.
+	 *  Get all services.
+	 *  @return All services (copy).
 	 */
-	public void removeEventListener(IRegistryListener listener);
-	
-	/**
-	 *  Get a subregistry.
-	 *  @param cid The platform id.
-	 *  @return The registry.
-	 */
-	// read
-	public IServiceRegistry getSubregistry(IComponentIdentifier cid);
-	
-	/**
-	 *  Remove a subregistry.
-	 *  @param cid The platform id.
-	 */
-	// write
-	public void removeSubregistry(IComponentIdentifier cid);
-
+	public Set<IService> getAllServices();
 }
-
-///**
-// *  Search for services.
-// */
-//// read
-//public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope);
-//
-///**
-// *  Search for services.
-// */
-//// read
-//public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope);
-//
-///**
-// *  Search for service.
-// */
-//public <T> T searchService(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter);
-//
-///**
-// *  Search for service.
-// */
-//public <T> Collection<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IFilter<T> filter);
-//
-///**
-// *  Search for service.
-// */
-//public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
-//
-///**
-// *  Search for services.
-// */
-//public <T> ISubscriptionIntermediateFuture<T> searchServices(Class<T> type, IComponentIdentifier cid, String scope, IAsyncFilter<T> filter);
-//
-///**
-// *  Search for services.
-// */
-//// read
-//public <T> IFuture<T> searchGlobalService(final Class<T> type, IComponentIdentifier cid, final IAsyncFilter<T> filter);
-//
-///**
-// *  Search for services.
-// */
-//// read
-//public <T> ISubscriptionIntermediateFuture<T> searchGlobalServices(Class<T> type, IComponentIdentifier cid, IAsyncFilter<T> filter);
-//

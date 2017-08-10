@@ -4,11 +4,13 @@ import java.util.List;
 
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  Interface for marshalling functionalities.
  */
+@Service(system=true)
 public interface IMarshalService
 {
 	//-------- class reference management --------

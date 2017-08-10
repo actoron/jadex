@@ -26,7 +26,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents.")
 })
-@Properties(@NameValue(name="system", value="true"))
+//@Properties(@NameValue(name="system", value="true"))
 @Agent
 @Service
 public class MulticastDiscoveryAgent extends DiscoveryAgent

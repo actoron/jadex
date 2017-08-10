@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URI;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,6 +60,16 @@ public class SUtilTest //extends TestCase
 		Assert.assertEquals(SUtil.getHashCode(src, false), SUtil.getHashCode(dest, false));
 		
 		SUtil.deleteDirectory(dest.getParentFile());
+	}
+	
+	@Test
+	public void	testISO8601() throws Exception
+	{
+		Date date = new Date();
+		String isostring = SUtil.dateToIso8601(date);
+		System.out.println("Date " + date + " converted to " + isostring);
+		Date date2 = SUtil.dateFromIso8601(isostring);
+		System.out.println("ISO8601 string " + isostring + " converted to " + date2);
 	}
 
 	@Test

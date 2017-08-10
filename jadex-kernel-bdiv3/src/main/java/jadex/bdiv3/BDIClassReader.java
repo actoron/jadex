@@ -557,7 +557,7 @@ public class BDIClassReader extends MicroClassReader
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
 			
 			// todo: allow specifying scope
-			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null));
+			modelinfo.addProvidedService(new ProvidedServiceInfo(null, key, psi, null, null, null, false));
 		}
 		
 		// Create enhanced classes if not already present.
@@ -1011,10 +1011,17 @@ public class BDIClassReader extends MicroClassReader
 		{
 			if(isAnnotationPresent(m, GoalCreationCondition.class, cl))
 			{
-				GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
-				MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
-					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
-				mgoal.addCondition(MGoal.CONDITION_CREATION, mcond);
+				if(Modifier.isStatic(m.getModifiers()))
+				{
+					GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
+					MCondition mcond = createMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
+						c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
+					mgoal.addCondition(MGoal.CONDITION_CREATION, mcond);
+				}
+				else
+				{
+					throw new RuntimeException("Goal creation condition methods need to be static: "+m);
+				}
 			}
 			else if(isAnnotationPresent(m, GoalDropCondition.class, cl))
 			{
