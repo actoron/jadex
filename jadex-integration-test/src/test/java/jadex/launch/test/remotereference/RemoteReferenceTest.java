@@ -7,8 +7,6 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IResultCommand;
-import jadex.commons.future.IFuture;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
