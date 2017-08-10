@@ -332,6 +332,9 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 							Collection<String> coll = (Collection<String>)result;
 							if(coll!=null && coll.size()>0)
 							{
+								if(properties==null)
+									properties = new HashMap<String, Object>();
+								
 								Set<String> tags = new LinkedHashSet<String>(coll);
 								properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
 								// Hack!!!
