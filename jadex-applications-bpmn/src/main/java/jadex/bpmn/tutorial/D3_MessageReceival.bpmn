@@ -28,8 +28,8 @@
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4lwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mARPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mgRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mwRPEeCnwcpWvxOwkg" key="0:1" value="&quot;request&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mgRPEeCnwcpWvxOwkg" key="0:0" value="filter"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mwRPEeCnwcpWvxOwkg" key="0:1" value="new jadex.bridge.fipa.FipaMessage(null, jadex.bridge.fipa.FipaMessage.Performative.REQUEST, null)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WoxQkUJWEd-lXM2_JTGF5Q" iD="_WoxQkEJWEd-lXM2_JTGF5Q" incomingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" name="Order Received" activityType="Task">
