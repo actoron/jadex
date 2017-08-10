@@ -460,6 +460,26 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
+	public static <T> IFuture<T> getService(final IInternalAccess component, final ServiceQuery<T> query)
+	{
+		final Future<T> ret = new Future<T>();
+		ensureThreadAccess(component, true).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				IResultListener<T> lis = new ProxyResultListener<T>(ret, component, query.getServiceType().getType(component.getClassLoader()));
+				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));;
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Get one service of a type.
+//	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
 	public static <T> IFuture<T> getService(final IInternalAccess component, final Class<T> type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
 	{
 		final Future<T> ret = new Future<T>();
