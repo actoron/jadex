@@ -10,7 +10,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import jadex.base.IRootComponentConfiguration.AWAMECHANISM;
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -23,7 +22,6 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -77,6 +75,7 @@ public class ServiceCallTestNFClearTest
 //		config.setAwaMechanisms(AWAMECHANISM.local);
 //		config.setAwareness(true);
 		config.setAwareness(false);
+		config.setTcpTransport(true);
 
 		platform1 = Starter.createPlatform(config).get(timeout);
 
