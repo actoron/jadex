@@ -42,6 +42,35 @@ public class FipaMessage	implements IFilter<Object>
 		public static final String UNKNOWN = "unknown";
 	}
 	
+	//-------- constructors --------
+	
+	/**
+	 *  Bean constructor.
+	 */
+	public FipaMessage(){}
+	
+	/**
+	 *  Constructor for most common fields (for sending).
+	 */
+	public FipaMessage(IComponentIdentifier receiver, String performative, Object content)
+	{
+		this.receiver	= receiver;
+		this.performative	= performative;
+		this.content	= content;
+	}
+	
+	/**
+	 *  Constructor for all fields (e.g. for match template).
+	 */
+	public FipaMessage(IComponentIdentifier sender, IComponentIdentifier receiver, String performative, Object content, String convid)
+	{
+		this.sender	= sender;
+		this.receiver	= receiver;
+		this.performative	= performative;
+		this.content	= content;
+		this.convid	= convid;
+	}
+	
 	//-------- Type of Communicative Act --------
 
 	/** Denotes the type of the communicative act of the ACL message. */
@@ -159,35 +188,6 @@ public class FipaMessage	implements IFilter<Object>
 //	/** Denotes a time and/or date expression which indicates the latest time
 //	 *  by which the sending agent would like to receive a reply. */
 //	public Long	reply_by;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Bean constructor.
-	 */
-	public FipaMessage(){}
-	
-	/**
-	 *  Constructor for most common fields (for sending).
-	 */
-	public FipaMessage(IComponentIdentifier receiver, String performative, Object content)
-	{
-		this.receiver	= receiver;
-		this.performative	= performative;
-		this.content	= content;
-	}
-	
-	/**
-	 *  Constructor for all fields (e.g. for match template).
-	 */
-	public FipaMessage(IComponentIdentifier sender, IComponentIdentifier receiver, String performative, Object content, String convid)
-	{
-		this.sender	= sender;
-		this.receiver	= receiver;
-		this.performative	= performative;
-		this.content	= content;
-		this.convid	= convid;
-	}
 	
 	//-------- methods --------
 	
