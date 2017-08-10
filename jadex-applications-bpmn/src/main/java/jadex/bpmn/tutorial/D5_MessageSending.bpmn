@@ -16,11 +16,13 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jxev0Va0Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wqnywARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlcOCGEeCe5uLOC0nxFQ" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlcOCGEeCe5uLOC0nxFQ" key="dimension" value="2:2"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlceCGEeCe5uLOC0nxFQ" key="uniqueColumnIndex" value="1"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlcuCGEeCe5uLOC0nxFQ" key="complexColumns" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlc-CGEeCe5uLOC0nxFQ" key="0:0" value="message"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRldOCGEeCe5uLOC0nxFQ" key="0:1" value="new jadex.bridge.fipa.FipaMessage(&quot;D3_MessageReceival&quot;,jadex.bridge.fipa.FipaMessage.Performative.REQUEST,&quot;Order sent by D5&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRldOCGEeCe5uLOC0nxFQ" key="0:1" value="new jadex.bridge.fipa.FipaMessage(null,jadex.bridge.fipa.FipaMessage.Performative.REQUEST,&quot;Order sent by D5&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlc-CGEaCe5uLOC0nxFQ" key="1:0" value="receiver"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRldOCGEaCe5uLOC0nxFQ" key="1:1" value="&quot;D3_MessageReceival&quot;"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q6FG-kYiEd-3iKqz0F2Flw" iD="_q6FG-UYiEd-3iKqz0F2Flw"/>
