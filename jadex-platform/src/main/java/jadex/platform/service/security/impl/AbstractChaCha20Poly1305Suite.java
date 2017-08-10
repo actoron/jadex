@@ -45,12 +45,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	/** The remote public key */
 	protected byte[] remotepublickey;
 	
-	/** The locally-generated authentication challenge. */
-//	protected byte[] localauthchallenge;
-	
-	/** The remote-generated authentication challenge. */
-//	protected byte[] remoteauthchallenge;
-	
+	/** Agreed-on random state / challenge. */
 	protected byte[] challenge;
 	
 	/** The authentication suite. */
@@ -273,7 +268,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;
 			key = generateChaChaKey();
-			System.out.println("Shared Key1: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
+//			System.out.println("Shared Key1: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
 			
 			// Delete handshake state
 			ephemeralkey = null;
@@ -292,7 +287,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		else if (nextstep == 4 && incomingmessage instanceof ReadyMessage)
 		{
 			key = generateChaChaKey();
-			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
+//			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
 			
 			// Delete handshake state
 			ephemeralkey = null;
