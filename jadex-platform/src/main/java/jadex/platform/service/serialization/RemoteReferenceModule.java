@@ -174,14 +174,9 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a new remote reference module.
 	 */
-	public RemoteReferenceModule()
+	public RemoteReferenceModule(IComponentIdentifier platform)
 	{
-		platform	= IComponentIdentifier.LOCAL.get();
-		if(platform==null)
-		{
-			throw new IllegalStateException("Must me created on component thread.");
-		}
-		platform	= platform.getRoot();
+		this.platform	= platform;
 		references = Collections.synchronizedMap(new LRU<Class<?>, boolean[]>(500));
 
 //		this.rsms = rsms;
@@ -944,9 +939,9 @@ public class RemoteReferenceModule
 		{
 			if(pr.getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
 			{
-				IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
-				@SuppressWarnings("unused")
-				IFuture<Object>	fut	= SServiceProvider.getService(access, (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier());
+//				IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
+//				@SuppressWarnings("unused")
+//				IFuture<Object>	fut	= SServiceProvider.getService(access, (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier());
 				// TODO: get service sync???
 				throw new UnsupportedOperationException("Local reuse of remote service not yet supported.");
 			}

@@ -9,7 +9,7 @@ import jadex.commons.future.IFuture;
  *  Interface for a transport service.
  *
  */
-@Service
+@Service(system=true)
 public interface ITransportService
 {	
 	/**

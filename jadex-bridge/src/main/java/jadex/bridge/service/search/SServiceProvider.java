@@ -1153,10 +1153,8 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
-				if((""+type).indexOf("IServiceCallService")!=-1)
-				{
-					System.out.println("getTaggedService: "+type+", "+scope);
-				}
+//				if((""+type).indexOf("AutoTerminate")!=-1)
+//					System.out.println("getTaggedService: "+type+", "+scope);
 				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 				query.setServiceTags(tags, component.getExternalAccess());
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);

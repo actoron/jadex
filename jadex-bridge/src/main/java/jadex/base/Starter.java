@@ -415,7 +415,7 @@ public class Starter
 					try
 					{
 						Class<?> serialservclass = Class.forName("jadex.platform.service.serialization.SerializationServices", true, cl);
-						ISerializationServices servs = (ISerializationServices) serialservclass.newInstance();
+						ISerializationServices servs = (ISerializationServices) serialservclass.getConstructor(IComponentIdentifier.class).newInstance(cid);
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALIZATIONSERVICES, servs);
 					}
 					catch (Exception e)
