@@ -1,13 +1,19 @@
 package jadex.platform.service.serialization;
 
 import java.lang.reflect.Type;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.MsgHeader;
@@ -18,7 +24,15 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.commons.IChangeListener;
+import jadex.commons.IRemotable;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.Traverser;
@@ -32,10 +46,41 @@ import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
 
 /**
  *  Functionality for managing serialization.
- *
  */
 public class SerializationServices implements ISerializationServices
 {
+	//-------- constants --------
+	
+	/** The predefined reference settings (clazz->boolean (is reference)). */
+	public static final Map<Class<?>, boolean[]> REFERENCES;
+	
+	static
+	{
+		Map<Class<?>, boolean[]>	refs	= new HashMap<Class<?>, boolean[]>();
+		boolean[] tt = new boolean[]{true, true};
+		refs.put(IRemotable.class, tt);
+		refs.put(IResultListener.class, tt);
+		refs.put(IIntermediateResultListener.class, tt);
+		refs.put(IFuture.class, tt);
+		refs.put(IIntermediateFuture.class, tt);
+		refs.put(IChangeListener.class, tt);
+		refs.put(IRemoteChangeListener.class, tt);
+		refs.put(ClassLoader.class, tt);
+		
+		boolean[] tf = new boolean[]{true, false};
+		refs.put(URL.class, tf);
+		refs.put(InetAddress.class, tf);
+		refs.put(Inet4Address.class, tf);
+		refs.put(Inet6Address.class, tf);
+		refs.put(IComponentIdentifier.class, tf);
+		refs.put(BasicComponentIdentifier.class, tf);
+		Class<?>	ti	= SReflect.classForName0("jadex.xml.TypeInfo", SerializationServices.class.getClassLoader());
+		if(ti!=null)
+			refs.put(ti, tf);
+		
+		REFERENCES = Collections.unmodifiableMap(refs);
+	}
+	
 	/** The remote reference module */
 	protected RemoteReferenceModule rrm;
 	
@@ -56,6 +101,10 @@ public class SerializationServices implements ISerializationServices
 	
 	/** Postprocessors for decoding. */
 	ITraverseProcessor[] postprocessors;
+	
+	
+	/** The reference class cache (clazz->boolean (is reference)). */
+	protected Map<Class<?>, boolean[]> references;
 
 	/** Creates the management. */
 	public SerializationServices()
@@ -478,6 +527,35 @@ public class SerializationServices implements ISerializationServices
 	{
 		// prefixsize[2] | serializerid[4] | codeccount[2] | codecid[4]...
 		return 8 + (codeccount << 4);
+	}
+	
+	/**
+	 *  Test if an object has reference semantics. It is a reference when:
+	 *  - it implements IRemotable
+	 *  - it is an IService, IExternalAccess or IFuture
+	 *  - if the object has used an @Reference annotation at type level
+	 *  - has been explicitly set to be reference
+	 */
+	public boolean isLocalReference(Object object)
+	{
+		return rrm.isLocalReference(object);
+	}
+	
+	/**
+	 *  Test if an object is a remote object.
+	 */
+	public boolean isRemoteObject(Object target)
+	{
+		return rrm.isRemoteObject(target);
+	}
+	
+	/**
+	 *  Get the clone processors.
+	 *  @return The clone processors.
+	 */
+	public List<ITraverseProcessor> getCloneProcessors()
+	{
+		return rrm.getCloneProcessors();
 	}
 	
 	/**

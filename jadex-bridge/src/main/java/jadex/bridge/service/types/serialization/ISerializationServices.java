@@ -1,6 +1,10 @@
 package jadex.bridge.service.types.serialization;
 
+import java.util.List;
+
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.service.annotation.Excluded;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  Functionality for managing serialization.
@@ -27,6 +31,26 @@ public interface ISerializationServices
 	 *  
 	 */
 	public Object decode(IMsgHeader header, ClassLoader cl, byte[] enc);
+	
+	/**
+	 *  Test if an object is a remote object.
+	 */
+	public boolean isRemoteObject(Object target);
+	
+	/**
+	 *  Test if an object has reference semantics. It is a reference when:
+	 *  - it implements IRemotable
+	 *  - it is an IService, IExternalAccess or IFuture
+	 *  - if the object has used an @Reference annotation at type level
+	 *  - has been explicitly set to be reference
+	 */
+	public boolean isLocalReference(Object object);
+	
+	/**
+	 *  Get the clone processors.
+	 *  @return The clone processors.
+	 */
+	public List<ITraverseProcessor> getCloneProcessors();
 	
 //	/**
 //	 *  Gets the remote reference management.

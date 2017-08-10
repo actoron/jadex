@@ -33,6 +33,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedE
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -73,7 +74,7 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 /**
  *  Agent that implements the bpmn monitoring starter interface.
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 @RequiredServices(
 {

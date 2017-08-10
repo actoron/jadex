@@ -3,6 +3,7 @@ package jadex.platform.service.serialization;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -42,6 +43,8 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
+import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
@@ -52,8 +55,14 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.javaparser.SJavaParser;
-import jadex.platform.service.marshal.MarshalService;
+import jadex.platform.service.message.streams.InputConnection;
+import jadex.platform.service.message.streams.LocalInputConnectionHandler;
+import jadex.platform.service.message.streams.LocalOutputConnectionHandler;
+import jadex.platform.service.message.streams.OutputConnection;
 
 /**
  *  This class implements the rmi handling. It mainly supports:
@@ -90,11 +99,9 @@ public class RemoteReferenceModule
 		refs.put(Inet6Address.class, tf);
 		refs.put(IComponentIdentifier.class, tf);
 		refs.put(BasicComponentIdentifier.class, tf);
-		Class<?>	ti	= SReflect.classForName0("jadex.xml.TypeInfo", MarshalService.class.getClassLoader());
+		Class<?> ti = SReflect.classForName0("jadex.xml.TypeInfo", RemoteReferenceModule.class.getClassLoader());
 		if(ti!=null)
-		{
 			refs.put(ti, tf);
-		}
 		
 		REFERENCES = Collections.unmodifiableMap(refs);
 	}
@@ -158,6 +165,9 @@ public class RemoteReferenceModule
 //	
 //	/** The timer. */
 //	protected Timer	timer; 
+	
+	/** The clone processors. */
+	protected List<ITraverseProcessor> processors;
 	
 	//-------- constructors --------
 	
@@ -1702,5 +1712,136 @@ public class RemoteReferenceModule
 		}
 		
 		return (Class[])ret.toArray(new Class[ret.size()]);
+	}
+	
+	
+	/**
+	 *  Test if an object has reference semantics. It is a reference when:
+	 *  - it implements IRemotable
+	 *  - it is an IService, IExternalAccess or IFuture
+	 *  - if the object has used an @Reference annotation at type level
+	 *  - has been explicitly set to be reference
+	 */
+	public boolean isLocalReference(Object object)
+	{
+		return isReference(object, true);
+	}
+	
+	/**
+	 *  Get the clone processors.
+	 *  @return The clone processors.
+	 */
+	public List<ITraverseProcessor> getCloneProcessors()
+	{
+		if(processors==null)
+		{
+			processors = Collections.synchronizedList(Traverser.getDefaultProcessors());
+			// Problem: if micro agent implements a service it cannot
+			// be determined if the service or the agent should be transferred.
+			// Per default a service is assumed.
+			
+			// Insert before FieldProcessor that is always applicable
+			processors.add(processors.size()-1, new ITraverseProcessor()
+			{
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					return object!=null && !(object instanceof BasicService) 
+						&& object.getClass().isAnnotationPresent(Service.class);
+				}
+				
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				{
+					return BasicServiceInvocationHandler.getPojoServiceProxy(object);
+				}
+			});
+			
+			// Add processor for streams
+			processors.add(processors.size()-1, new ITraverseProcessor()
+			{
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					boolean ret = false;
+					if(object instanceof ServiceInputConnectionProxy)
+					{
+						ret = true;
+						// does not work because initiator/participant are always null :-(
+//						ServiceInputConnectionProxy sp = (ServiceInputConnectionProxy)object;
+//						if(sp.getInitiator()!=null && sp.getParticipant()!=null)
+//						{
+//							ret = sp.getInitiator().getPlatformName().equals(sp.getParticipant().getPlatformName());
+//						}
+					}
+					return ret;
+				}
+				
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				{
+					ServiceInputConnectionProxy sicp = (ServiceInputConnectionProxy)object;
+					
+					LocalInputConnectionHandler ich = new LocalInputConnectionHandler(sicp.getNonFunctionalProperties());
+					LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(sicp.getNonFunctionalProperties(), ich);
+					ich.setConnectionHandler(och);
+
+					InputConnection icon = new InputConnection(null, null, sicp.getConnectionId(), false, ich);
+					OutputConnection ocon = new OutputConnection(null, null, sicp.getConnectionId(), true, och);
+					
+					sicp.setOutputConnection(ocon);
+					
+					return icon;
+				}
+			});
+			
+			// Add processor for streams
+			processors.add(processors.size()-1, new ITraverseProcessor()
+			{
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					boolean ret = false;
+					if(object instanceof ServiceOutputConnectionProxy)
+					{
+						ret = true; 
+						// does not work because initiator/participant are always null :-(
+//						ServiceOutputConnectionProxy sp = (ServiceOutputConnectionProxy)object;
+//						if(sp.getInitiator()!=null && sp.getParticipant()!=null)
+//						{
+//							ret = sp.getInitiator().getPlatformName().equals(sp.getParticipant().getPlatformName());
+//						}
+					}
+					return ret;
+				}
+				
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				{
+					ServiceOutputConnectionProxy socp = (ServiceOutputConnectionProxy)object;
+					
+					LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(socp.getNonFunctionalProperties());
+					LocalInputConnectionHandler ich = new LocalInputConnectionHandler(socp.getNonFunctionalProperties(), och);
+					och.setConnectionHandler(ich);
+
+					InputConnection icon = new InputConnection(null, null, socp.getConnectionId(), false, ich);
+					socp.setInputConnection(icon);
+					OutputConnection ocon = new OutputConnection(null, null, socp.getConnectionId(), true, och);
+					
+					return ocon;
+				}
+			});
+		}
+		return new ArrayList(processors);
+	}
+	
+	/**
+	 *  Add a clone processor.
+	 */
+	public void addCloneProcessor(@Reference ITraverseProcessor proc)
+	{
+		this.processors.add(proc);
+	}
+		
+	/**
+	 *  Remove a clone processor.
+	 */
+	public void removeCloneProcessor(@Reference ITraverseProcessor proc)
+	{
+		this.processors.remove(proc);
 	}
 }

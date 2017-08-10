@@ -67,7 +67,6 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -97,7 +96,6 @@ import jadex.platform.service.context.ContextAgent;
 import jadex.platform.service.df.DirectoryFacilitatorAgent;
 import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
-import jadex.platform.service.marshal.MarshalAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
 import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
 import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
@@ -224,7 +222,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="clock", clazz=ClockAgent.class),
 	@ComponentType(name="simulation", clazz=SimulationAgent.class),
 	@ComponentType(name="filetransfer", clazz=FileTransferAgent.class),
-	@ComponentType(name="marshal", clazz=MarshalAgent.class),
 	@ComponentType(name="security", clazz=SecurityAgent.class),
 	@ComponentType(name="library", clazz=LibraryAgent.class),
 //	@ComponentType(name="dependency", clazz=DependencyAgent.class),
@@ -240,7 +237,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 @ProvidedServices({
 	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IDaemonThreadPoolService.class, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new jadex.platform.service.marshal.MarshalService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="$args.contextserviceclass!=null ? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : jadex.commons.SReflect.isAndroid() ? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()}): jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})")),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="	($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(SettingsService.class)),

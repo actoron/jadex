@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -79,9 +80,9 @@ public class ListPlatformsCommand extends ACliCommand
 			{
 				ongoing++;
 	//			System.out.println("found: "+result);
-				ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<ITransportComponentIdentifier>(new IResultListener<ITransportComponentIdentifier>()
+				ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 				{
-					public void resultAvailable(final ITransportComponentIdentifier cid)
+					public void resultAvailable(final IComponentIdentifier cid)
 					{
 //						IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
 						
