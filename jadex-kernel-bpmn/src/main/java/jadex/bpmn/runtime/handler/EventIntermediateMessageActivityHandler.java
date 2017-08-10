@@ -100,7 +100,9 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		IFilter<Object> filter = (IFilter<Object>)thread.getPropertyValue(PROPERTY_FILTER, activity);
 		if(filter==null)
 		{
-			throw new NullPointerException("Message receiving event needs "+PROPERTY_FILTER+" property: "+thread);
+			// TODO: distinguish between messages and other objects?
+			filter	= IFilter.ALWAYS;
+//			throw new NullPointerException("Message receiving event needs "+PROPERTY_FILTER+" property: "+thread);
 		}
 		thread.setWaitFilter(filter);
 		
