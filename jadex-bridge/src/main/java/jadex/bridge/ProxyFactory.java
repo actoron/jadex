@@ -10,7 +10,7 @@ import jadex.commons.SReflect;
  */
 public class ProxyFactory
 {
-	public static boolean useasm = false;
+	public static boolean useasm = true;
 	
 	/**
      * Returns an instance of a proxy class for the specified interfaces
@@ -21,7 +21,15 @@ public class ProxyFactory
     {
     	if(useasm)
     	{
-    		return jadex.bytecode.Proxy.newProxyInstance(loader, interfaces, h);
+    		try
+    		{
+    			return jadex.bytecode.Proxy.newProxyInstance(loader, interfaces, h);
+    		}
+    		catch(Exception e)
+    		{
+    			e.printStackTrace();
+    			throw new RuntimeException(e);
+    		}
     	}
     	else
     	{
@@ -36,11 +44,11 @@ public class ProxyFactory
      */
     public static InvocationHandler getInvocationHandler(Object proxy) throws IllegalArgumentException
     {
-    	if(useasm)
+    	if(proxy!=null && isASMProxyClass(proxy.getClass()))
     	{
     		return jadex.bytecode.Proxy.getInvocationHandler(proxy);
     	}
-    	else
+    	else 
     	{
     		return java.lang.reflect.Proxy.getInvocationHandler(proxy);    	
     	}
@@ -62,7 +70,17 @@ public class ProxyFactory
      */
     public static boolean isProxyClass(Class<?> cl) 
     {
-    	return SReflect.getField(cl, "isproxy")!=null ||
+    	return isASMProxyClass(cl) ||
     		Proxy.isProxyClass(cl);
+    }
+    
+    /**
+     *  Test if it is a ASM proxy class.
+     *  @param cl The class.
+     *  @return True, if is asm proxy class.
+     */
+    public static boolean isASMProxyClass(Class<?> cl) 
+    {
+    	return SReflect.getField(cl, "isproxy")!=null;
     }
 }
