@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.IAsyncFilter;
@@ -36,6 +37,9 @@ public class ServiceQuery<T>
 	
 	/** The search scope. */
 	protected String scope;
+	
+	/** The service ID of the target service. */
+	protected IServiceIdentifier serviceidentifier;
 	
 	/** The query owner. */
 	protected IComponentIdentifier owner;
@@ -380,6 +384,26 @@ public class ServiceQuery<T>
 	}
 	
 	/**
+	 *  Gets the service identifier.
+	 *
+	 *  @return The service identifier.
+	 */
+	public IServiceIdentifier getServiceidentifier()
+	{
+		return serviceidentifier;
+	}
+
+	/**
+	 *  Sets the service identifier.
+	 *
+	 *  @param serviceidentifier The service identifier.
+	 */
+	public void setServiceidentifier(IServiceIdentifier serviceidentifier)
+	{
+		this.serviceidentifier = serviceidentifier;
+	}
+
+	/**
 	 *  Get the owner.
 	 *  @return The owner
 	 */
@@ -473,6 +497,9 @@ public class ServiceQuery<T>
 		
 		if(servicetags != null && servicetags.length > 0)
 			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
+		
+		if(serviceidentifier != null)
+			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_SID, new String[] { serviceidentifier.toString() }));
 		
 		return ret;
 	}
