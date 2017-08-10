@@ -14,6 +14,7 @@ import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,11 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	{
 		Collection<String> ret = null;
 		
-		if(obj instanceof String || obj==null)
+		if(obj==null)
+		{
+			ret = Collections.emptyList();
+		}
+		else if(obj instanceof String)
 		{
 			ret = new ArrayList<String>();
 			ret.add((String)obj);
