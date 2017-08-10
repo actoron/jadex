@@ -395,7 +395,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 							
 							// Process pending tasks.
 							Runnable[]	atasks;
-							synchronized(tasks)
+							synchronized(TcpTransport.this)
 							{
 								atasks	= tasks==null || tasks.isEmpty() ? null : tasks.toArray(new Runnable[tasks.size()]);
 								tasks.clear();

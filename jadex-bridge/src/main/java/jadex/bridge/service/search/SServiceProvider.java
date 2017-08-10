@@ -28,8 +28,6 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
@@ -103,6 +101,24 @@ public class SServiceProvider
 	public static <T> T getLocalService(final IInternalAccess component, final Class<T> type)
 	{
 		return getLocalService(component, type, (String)null, true);
+	}
+	
+	/**
+	 *  Get one service of a type. 
+	 *  
+	 *  @param component The component doing the search. Warning: If set to null, the returned service proxy will be provided proxy ONLY.
+	 *  @param serviceidentifier The service identifier.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(IInternalAccess component, IServiceIdentifier serviceidentifier, Class<T> type)
+	{
+		IComponentIdentifier cid = component != null ? component.getComponentIdentifier() : serviceidentifier.getProviderId();
+		ServiceQuery<T> query = new ServiceQuery<T>(type, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null);
+		query.setServiceIdentifier(serviceidentifier);
+		T ret = ServiceRegistry.getRegistry(cid).searchServiceSync(query);
+		if(ret==null)
+			throw new ServiceNotFoundException(type.getName());
+		return component != null ? createRequiredProxy(component, ret, type) : ret;
 	}
 	
 	/**
@@ -1153,6 +1169,8 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
+//				if((""+type).indexOf("AutoTerminate")!=-1)
+//					System.out.println("getTaggedService: "+type+", "+scope);
 				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 				query.setServiceTags(tags, component.getExternalAccess());
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);

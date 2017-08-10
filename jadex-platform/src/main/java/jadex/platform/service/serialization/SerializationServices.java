@@ -15,6 +15,7 @@ import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
@@ -107,9 +108,9 @@ public class SerializationServices implements ISerializationServices
 	protected Map<Class<?>, boolean[]> references;
 
 	/** Creates the management. */
-	public SerializationServices()
+	public SerializationServices(IComponentIdentifier comp)
 	{
-		rrm	= new RemoteReferenceModule();
+		rrm	= new RemoteReferenceModule(comp);
 		serializers = new HashMap<Integer, ISerializer>();
 		ISerializer serial = new JadexBinarySerializer();
 		serializers.put(serial.getSerializerId(), serial);
