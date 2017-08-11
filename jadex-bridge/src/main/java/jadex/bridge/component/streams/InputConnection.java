@@ -1,4 +1,4 @@
-package jadex.platform.service.message.streams;
+package jadex.bridge.component.streams;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -6,11 +6,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -54,7 +54,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	/**
 	 *  Create a new input connection.
 	 */
-	public InputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, 
+	public InputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, 
 		int id, boolean initiator, IAbstractConnectionHandler ch)
 	{
 		super(sender, receiver, id, true, initiator, ch);

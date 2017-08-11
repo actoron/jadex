@@ -28,6 +28,10 @@ import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
+import jadex.bridge.component.streams.InputConnection;
+import jadex.bridge.component.streams.LocalInputConnectionHandler;
+import jadex.bridge.component.streams.LocalOutputConnectionHandler;
+import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -59,10 +63,6 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.javaparser.SJavaParser;
-import jadex.platform.service.message.streams.InputConnection;
-import jadex.platform.service.message.streams.LocalInputConnectionHandler;
-import jadex.platform.service.message.streams.LocalOutputConnectionHandler;
-import jadex.platform.service.message.streams.OutputConnection;
 
 /**
  *  This class implements the rmi handling. It mainly supports:
@@ -1705,7 +1705,6 @@ public class RemoteReferenceModule
 		
 		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
-	
 	
 	/**
 	 *  Test if an object has reference semantics. It is a reference when:

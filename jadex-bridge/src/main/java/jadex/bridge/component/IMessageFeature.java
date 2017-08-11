@@ -3,6 +3,8 @@ package jadex.bridge.component;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInputConnection;
+import jadex.bridge.IOutputConnection;
 import jadex.commons.future.IFuture;
 
 /**
@@ -75,4 +77,20 @@ public interface IMessageFeature
 	 *  @param allowuntrusted Set to true to allow untrusted messages.
 	 */
 	public void setAllowUntrusted(boolean allowuntrusted);
+	
+	/**
+	 *  Create a virtual output connection.
+	 *  @param sender The sender.
+	 *  @param receiver The receiver.
+	 *  @param nonfunc The nonfunc props.
+	 */
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
+
+	/**
+	 *  Create a virtual input connection.
+	 *  @param sender The sender.
+	 *  @param receiver The receiver.
+	 *  @param nonfunc The nonfunc props.
+	 */
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
 }
