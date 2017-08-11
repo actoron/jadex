@@ -2,9 +2,11 @@ package jadex.bridge.service.types.awareness;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.address.ITransportAddress;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
@@ -22,6 +24,9 @@ public class DiscoveryInfo
 	
 	/** The component identifier of the remote component. */
 	protected IComponentIdentifier cid;
+	
+	/** The transport addresses of the remote component. */
+	protected List<ITransportAddress> addresses;
 	
 	/** Component id of local proxy (if any). */
 	protected IFuture<IComponentIdentifier> proxy;
@@ -85,6 +90,28 @@ public class DiscoveryInfo
 		this.cid = componentIdentifier;
 	}
 	
+	
+	
+	/**
+	 *  Gets the addresses.
+	 *
+	 *  @return The addresses.
+	 */
+	public List<ITransportAddress> getAddresses()
+	{
+		return addresses;
+	}
+
+	/**
+	 *  Sets the addresses.
+	 *
+	 *  @param addresses The addresses.
+	 */
+	public void setAddresses(List<ITransportAddress> addresses)
+	{
+		this.addresses = addresses;
+	}
+
 	/**
 	 *  Get the proxy.
 	 *  @return the proxy.
