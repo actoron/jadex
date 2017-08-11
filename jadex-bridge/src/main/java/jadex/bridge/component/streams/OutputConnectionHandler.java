@@ -1,4 +1,4 @@
-package jadex.platform.service.message.streams;
+package jadex.bridge.component.streams;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -34,7 +35,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	protected Map<Integer, DataSendInfo> sent;
 	
 	/** The data to send. */
-	protected List<Tuple2<StreamSendTask, Future<Void>>> tosend;
+	protected List<Tuple2<StreamPacket, Future<Void>>> tosend;
 
 	/** The current sequence number. */
 	protected int seqnumber;
@@ -94,10 +95,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/**
 	 *  Create a new handler.
 	 */
-	public OutputConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
+	public OutputConnectionHandler(IInternalAccess component, Map<String, Object> nonfunc)
 	{
-		super(ms, nonfunc);//, maxresends, acktimeout, leasetime);
-		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
+		super(component, nonfunc);//, maxresends, acktimeout, leasetime);
+		this.tosend = new ArrayList<Tuple2<StreamPacket, Future<Void>>>();
 		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
@@ -128,7 +129,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 				closereqflag = true;
 				checkClose();
-				sendTask(createTask(StreamSendTask.ACKCLOSEREQ, null, null, nonfunc));
+				sendTask(createTask(ACKCLOSEREQ, null, null, nonfunc));
 				return IFuture.DONE;
 			}
 		});
@@ -267,7 +268,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				}
 				else
 				{
-					StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, getNextSequenceNumber(), nonfunc);
+					StreamPacket task = createTask(DATA, dat, getNextSequenceNumber(), nonfunc);
 					doSendData(task).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				
@@ -361,7 +362,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/**
 	 * 
 	 */
-	protected IFuture<Void> doSendData(StreamSendTask task)
+	protected IFuture<Void> doSendData(StreamPacket task)
 	{
 		IFuture<Void> ret;
 		
@@ -374,7 +375,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 //			System.out.println("store "+System.currentTimeMillis()+": "+task.getSequenceNumber());
 			ret = new Future<Void>();
-			tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
+			tosend.add(new Tuple2<StreamPacket, Future<Void>>(task, (Future<Void>)ret));
 		}
 		
 		return ret;
@@ -394,7 +395,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		boolean	test	= con.isInited() && sent.size()<maxsend && queuecnt<maxqueued;
 		while(!tosend.isEmpty() && (isSendAllowed() || test))
 		{
-			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
+			Tuple2<StreamPacket, Future<Void>> tup = tosend.remove(0);
 //			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
 			sendData(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
 		
@@ -500,7 +501,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			}
 			
 //			System.out.println("sending stream bytes: "+target.length);
-			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, getNextSequenceNumber(), nonfunc);
+			StreamPacket task = createTask(DATA, target, getNextSequenceNumber(), nonfunc);
 			ret	= doSendData(task);
 			
 			multipacket.clear();
@@ -513,7 +514,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/**
 	 *  Send or resend a data message.
 	 */
-	public IFuture<Void> sendData(StreamSendTask task)
+	public IFuture<Void> sendData(StreamPacket task)
 	{
 		DataSendInfo tup = sent.get(task.getSequenceNumber());
 		if(tup==null)
@@ -531,12 +532,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		}
 		
 //		System.out.println("send "+System.currentTimeMillis()+": "+task.getSequenceNumber());
-		sendTask(task);
-		
 		queuecnt++;
 //		System.out.println("queue: "+queuecnt);
 //		final int	seqno	= task.getSequenceNumber();
-		task.getFuture().addResultListener(new IResultListener<Void>()
+		sendTask(task).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -580,7 +579,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		if(acktimeout!=Timeout.NONE)
 		{
 			// Test if packets have been sent till last timer was inited
-			ret	= ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
+			ret	= waitForRealDelay(acktimeout, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -688,7 +687,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	{
 		if(mpsendtimer!=null)
 			mpsendtimer.cancel();
-		mpsendtimer = ms.waitForRealDelay(mpsendtimeout, new IComponentStep<Void>()
+		mpsendtimer = waitForRealDelay(mpsendtimeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -702,6 +701,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				return IFuture.DONE;
 			}
 		});
+		
+		
 	}
 	
 	/**
@@ -719,7 +720,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 //				System.out.println("sending close output side");
 				// Send close message and wait until it was acked
-				sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, SUtil.intToBytes(seqnumber), null, nonfunc), StreamSendTask.CLOSE)
+				sendAcknowledgedMessage(createTask(CLOSE, SUtil.intToBytes(seqnumber), null, nonfunc), CLOSE)
 					.addResultListener(new IResultListener<Object>()
 				{
 					public void resultAvailable(Object result)
@@ -786,13 +787,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		//-------- attributes --------
 		
 		/** The task. */
-		protected StreamSendTask	task;
+		protected StreamPacket task;
 		
 		/** The future. */
-		protected Future<Void>	fut;
+		protected Future<Void> fut;
 		
 		/** The try count. */
-		protected int	tries;
+		protected int tries;
 		
 		/** The timer. */
 		protected TimerTask	timer;
@@ -805,13 +806,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		/**
 		 *  Create a send info.
 		 */
-		public DataSendInfo(StreamSendTask task)
+		public DataSendInfo(StreamPacket task)
 		{
-			this.task	= task;
-			this.fut	= new Future<Void>();
-			this.tries	= 1;
-			timer	= createBulkAckTimer(task.getSequenceNumber());
-			lastsend	= OutputConnectionHandler.this.getSequenceNumber();
+			this.task = task;
+			this.fut = new Future<Void>();
+			this.tries = 1;
+			timer = createBulkAckTimer(task.getSequenceNumber());
+			lastsend = OutputConnectionHandler.this.getSequenceNumber();
 		}
 		
 		//-------- methods --------
@@ -836,14 +837,14 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		 *  Retry sending the message.
 		 *  @return task	The task for resend.
 		 */
-		public StreamSendTask	retry()
+		public StreamPacket retry()
 		{
 			if(timer!=null)
 				timer.cancel();
-			timer	= createBulkAckTimer(task.getSequenceNumber());
-			lastsend	= OutputConnectionHandler.this.getSequenceNumber();
+			timer = createBulkAckTimer(task.getSequenceNumber());
+			lastsend = OutputConnectionHandler.this.getSequenceNumber();
 			tries++;
-			task	= new StreamSendTask(task);
+			task = new StreamPacket(task);
 //			System.out.println("Retry: #"+tries+", seq="+task.getSequenceNumber());
 			return task;
 		}

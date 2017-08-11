@@ -314,9 +314,7 @@ public class MicroModel extends CacheableKernelModel
 	public void setAgentMethod(Class<? extends Annotation> ann, MethodInfo mi)
 	{
 		if(agentmethods==null)
-		{
 			agentmethods = new HashMap<Class<? extends Annotation>, MethodInfo>();
-		}
 		
 		if(!agentmethods.containsKey(ann))
 		{
@@ -324,7 +322,7 @@ public class MicroModel extends CacheableKernelModel
 		}
 		else
 		{
-			MethodInfo	prev	= agentmethods.get(ann);
+			MethodInfo prev = agentmethods.get(ann);
 			if(SUtil.equals(mi.getClassName(), prev.getClassName()))
 			{
 				throw new RuntimeException("Only one @"+ann.getSimpleName()+" method allowed in "+mi.getClassName());
@@ -335,7 +333,7 @@ public class MicroModel extends CacheableKernelModel
 	/**
 	 *  Get an agent method.
 	 */
-	public MethodInfo	getAgentMethod(Class<? extends Annotation> ann)
+	public MethodInfo getAgentMethod(Class<? extends Annotation> ann)
 	{
 		return agentmethods!=null ? agentmethods.get(ann) : null;
 	}

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jadex.platform.service.message.streams;
+package jadex.bridge.component.streams;
 
 /**
  *

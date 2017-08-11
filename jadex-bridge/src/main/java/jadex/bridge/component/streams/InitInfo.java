@@ -1,7 +1,8 @@
-package jadex.platform.service.message.streams;
+package jadex.bridge.component.streams;
 
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.transformation.annotations.Alias;
 
@@ -12,10 +13,10 @@ import jadex.commons.transformation.annotations.Alias;
 public class InitInfo
 {
 	/** The initiator. */
-	protected ITransportComponentIdentifier initiator;
+	protected IComponentIdentifier initiator;
 	
 	/** The participant. */
-	protected ITransportComponentIdentifier participant;
+	protected IComponentIdentifier participant;
 	
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
@@ -30,8 +31,8 @@ public class InitInfo
 	/**
 	 *  Create a new init info.
 	 */
-	public InitInfo(ITransportComponentIdentifier initiator,
-		ITransportComponentIdentifier participant, Map<String, Object> nonfunc)
+	public InitInfo(IComponentIdentifier initiator,
+		IComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
 		this.initiator = initiator;
 		this.participant = participant;
@@ -42,7 +43,7 @@ public class InitInfo
 	 *  Get the initiator.
 	 *  @return the initiator.
 	 */
-	public ITransportComponentIdentifier getInitiator()
+	public IComponentIdentifier getInitiator()
 	{
 		return initiator;
 	}
@@ -51,7 +52,7 @@ public class InitInfo
 	 *  Set the initiator.
 	 *  @param initiator The initiator to set.
 	 */
-	public void setInitiator(ITransportComponentIdentifier initiator)
+	public void setInitiator(IComponentIdentifier initiator)
 	{
 		this.initiator = initiator;
 	}
@@ -60,7 +61,7 @@ public class InitInfo
 	 *  Get the participant.
 	 *  @return the participant.
 	 */
-	public ITransportComponentIdentifier getParticipant()
+	public IComponentIdentifier getParticipant()
 	{
 		return participant;
 	}
@@ -69,7 +70,7 @@ public class InitInfo
 	 *  Set the participant.
 	 *  @param participant The participant to set.
 	 */
-	public void setParticipant(ITransportComponentIdentifier participant)
+	public void setParticipant(IComponentIdentifier participant)
 	{
 		this.participant = participant;
 	}

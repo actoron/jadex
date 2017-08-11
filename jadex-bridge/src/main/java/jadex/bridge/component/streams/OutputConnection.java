@@ -1,12 +1,12 @@
-package jadex.platform.service.message.streams;
+package jadex.bridge.component.streams;
 
 import java.io.InputStream;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -35,7 +35,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	/**
 	 *  Create a new connection.
 	 */
-	public OutputConnection(ITransportComponentIdentifier sender, ITransportComponentIdentifier receiver, 
+	public OutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, 
 		int id, boolean initiator, IOutputConnectionHandler ch)
 	{
 		super(sender, receiver, id, false, initiator, ch);

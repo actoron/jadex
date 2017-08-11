@@ -1,4 +1,4 @@
-package jadex.platform.service.message.streams;
+package jadex.bridge.component.streams;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -18,7 +18,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.PropertiesPanel;
 
 /**
  *  Handler that sits between connection and message service.
@@ -68,9 +67,9 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 	/**
 	 *  Create a new input connection handler.
 	 */
-	public InputConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
+	public InputConnectionHandler(IInternalAccess component, Map<String, Object> nonfunc)
 	{
-		super(ms, nonfunc);
+		super(component, nonfunc);
 		
 		this.rseqno = 0;
 		this.maxseqno = 0;
@@ -101,7 +100,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 			{
 				// Remember that close message was received, close the connection and send an ack.
 //				System.out.println("close received: "+seqno+" "+rseqno+" "+getConnectionId());
-				sendTask(createTask(StreamSendTask.ACKCLOSE, null, null, nonfunc));
+				sendTask(createTask(ACKCLOSE, null, null, nonfunc));
 				if(seqno==rseqno)
 				{
 					sendDataAck(); // send missing acks to speedup closing
@@ -134,7 +133,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 				try
 				{
 					// Needs nothing to do with ack response.
-					sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null, nonfunc), StreamSendTask.CLOSEREQ)
+					sendAcknowledgedMessage(createTask(CLOSEREQ, null, null, nonfunc), CLOSEREQ)
 						.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 					{
 						public void customResultAvailable(Object result)
@@ -290,7 +289,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 		// Test if packets have been received till creation
 		if(datatimer==null && rseqno>lastack && acktimeout!=Timeout.NONE)
 		{
-			datatimer = ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
+			datatimer = waitForRealDelay(acktimeout, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -354,7 +353,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 	 */
 	protected void sendDataAck(int startseqno, int endseqno, boolean stop)
 	{
-		sendTask(createTask(StreamSendTask.ACKDATA, new AckInfo(startseqno, endseqno, stop), true, null, nonfunc));
+		sendTask(createTask(ACKDATA, new AckInfo(startseqno, endseqno, stop), true, null, nonfunc));
 	}
 	
 	/**
@@ -383,58 +382,58 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 		// nop, only used for local connections
 	}
 	
-	/**
-	 * 
-	 */
-	protected JPanel createPanel()
-	{
-		JPanel ret = new JPanel(new BorderLayout());
-		JPanel p1 = super.createPanel();
-		JPanel p2 = new InputConnectionPanel();
-		ret.add(p1, BorderLayout.NORTH);
-		ret.add(p2, BorderLayout.CENTER);
-		return ret;
-	}
+//	/**
+//	 * 
+//	 */
+//	protected JPanel createPanel()
+//	{
+//		JPanel ret = new JPanel(new BorderLayout());
+//		JPanel p1 = super.createPanel();
+//		JPanel p2 = new InputConnectionPanel();
+//		ret.add(p1, BorderLayout.NORTH);
+//		ret.add(p2, BorderLayout.CENTER);
+//		return ret;
+//	}
 	
-	/**
-	 * 
-	 */
-	public class InputConnectionPanel extends JPanel
-	{
-		/**
-		 * 
-		 */
-		public InputConnectionPanel()
-		{
-			PropertiesPanel pp = new PropertiesPanel("Input properties");
-			final JTextField tfrseqno = pp.createTextField("rseqno");
-			final JTextField tfmaxseqno = pp.createTextField("maxseqno");
-			final JTextField tfmaxbuf = pp.createTextField("maxbuf");
-			final JTextField tfmaxstored = pp.createTextField("maxstored");
-			final JTextField tfdata= pp.createTextField("data");
-			final JTextField tflastack = pp.createTextField("lastack");
-			final JTextField tfackcnt = pp.createTextField("ackcnt");
-			final JTextField tflastseqno = pp.createTextField("lastseqno");
-			
-			Timer t = new Timer(1000, new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					tfrseqno.setText(""+rseqno);
-					tfmaxseqno.setText(""+maxseqno);
-					tfmaxbuf.setText(""+maxbuf);
-					tfmaxstored.setText(""+maxstored);
-					tfdata.setText(""+data.size());
-					tflastack.setText(""+lastack);
-					tfackcnt.setText(""+ackcnt);
-					tflastseqno.setText(""+lastseqno);
-				}
-			});
-			t.start();
-			
-			setLayout(new BorderLayout());
-			add(pp, BorderLayout.CENTER);
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	public class InputConnectionPanel extends JPanel
+//	{
+//		/**
+//		 * 
+//		 */
+//		public InputConnectionPanel()
+//		{
+//			PropertiesPanel pp = new PropertiesPanel("Input properties");
+//			final JTextField tfrseqno = pp.createTextField("rseqno");
+//			final JTextField tfmaxseqno = pp.createTextField("maxseqno");
+//			final JTextField tfmaxbuf = pp.createTextField("maxbuf");
+//			final JTextField tfmaxstored = pp.createTextField("maxstored");
+//			final JTextField tfdata= pp.createTextField("data");
+//			final JTextField tflastack = pp.createTextField("lastack");
+//			final JTextField tfackcnt = pp.createTextField("ackcnt");
+//			final JTextField tflastseqno = pp.createTextField("lastseqno");
+//			
+//			Timer t = new Timer(1000, new ActionListener()
+//			{
+//				public void actionPerformed(ActionEvent e)
+//				{
+//					tfrseqno.setText(""+rseqno);
+//					tfmaxseqno.setText(""+maxseqno);
+//					tfmaxbuf.setText(""+maxbuf);
+//					tfmaxstored.setText(""+maxstored);
+//					tfdata.setText(""+data.size());
+//					tflastack.setText(""+lastack);
+//					tfackcnt.setText(""+ackcnt);
+//					tflastseqno.setText(""+lastseqno);
+//				}
+//			});
+//			t.start();
+//			
+//			setLayout(new BorderLayout());
+//			add(pp, BorderLayout.CENTER);
+//		}
+//	}
 	
 }
