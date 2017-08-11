@@ -1706,7 +1706,6 @@ public class RemoteReferenceModule
 		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
 	
-	
 	/**
 	 *  Test if an object has reference semantics. It is a reference when:
 	 *  - it implements IRemotable

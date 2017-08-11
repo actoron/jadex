@@ -4,10 +4,10 @@ package jadex.bridge.service.types.remote;
 import java.io.OutputStream;
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.ICommand;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -142,7 +142,7 @@ public class ServiceInputConnection implements IInputConnection
 	/**
 	 *  Get the initiator.
 	 */
-	public ITransportComponentIdentifier getInitiator()
+	public IComponentIdentifier getInitiator()
 	{
 		if(con!=null)
 			return con.getInitiator();
@@ -153,7 +153,7 @@ public class ServiceInputConnection implements IInputConnection
 	/**
 	 *  Get the participant.
 	 */
-	public ITransportComponentIdentifier getParticipant()
+	public IComponentIdentifier getParticipant()
 	{
 		if(con!=null)
 			return con.getParticipant();

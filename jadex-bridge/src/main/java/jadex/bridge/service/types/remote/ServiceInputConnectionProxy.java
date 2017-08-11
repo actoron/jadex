@@ -3,6 +3,7 @@ package jadex.bridge.service.types.remote;
 import java.io.OutputStream;
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
@@ -21,10 +22,10 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	protected int conid;
 	
 	/** The initiator id. */
-	protected ITransportComponentIdentifier	initiator;
+	protected IComponentIdentifier	initiator;
 	
 	/** The participant id. */
-	protected ITransportComponentIdentifier	participant;
+	protected IComponentIdentifier	participant;
 	
 	/** The non-functional properties. */
 	protected Map<String, Object> nonfunc;
@@ -79,7 +80,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Get the initiator id.
 	 *  @return The initiator id.
 	 */
-	public ITransportComponentIdentifier getInitiator()
+	public IComponentIdentifier getInitiator()
 	{
 		return initiator;
 	}
@@ -88,7 +89,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Set the initiator.
 	 *  @param initiator The initiator to set.
 	 */
-	public void setInitiator(ITransportComponentIdentifier initiator)
+	public void setInitiator(IComponentIdentifier initiator)
 	{
 		this.initiator = initiator;
 	}
@@ -97,7 +98,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  Get the participant id.
 	 *  @return The participant id.
 	 */
-	public ITransportComponentIdentifier getParticipant()
+	public IComponentIdentifier getParticipant()
 	{
 		return participant;
 	}
