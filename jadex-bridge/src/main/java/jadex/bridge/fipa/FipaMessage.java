@@ -1,5 +1,8 @@
 package jadex.bridge.fipa;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFilter;
 
@@ -54,21 +57,33 @@ public class FipaMessage	implements IFilter<Object>
 	 */
 	public FipaMessage(IComponentIdentifier receiver, String performative, Object content)
 	{
-		this.receiver	= receiver;
 		this.performative	= performative;
 		this.content	= content;
+		addReceiver(receiver);
 	}
 	
 	/**
 	 *  Constructor for all fields (e.g. for match template).
 	 */
-	public FipaMessage(IComponentIdentifier sender, IComponentIdentifier receiver, String performative, Object content, String convid)
+	public FipaMessage(IComponentIdentifier sender, Set<IComponentIdentifier> receivers, String performative, Object content,
+		String convid, String protocol, IComponentIdentifier reply_to, String language, String ontology, String encoding,
+		String reply_with, String in_reply_to, Long reply_by)
 	{
 		this.sender	= sender;
-		this.receiver	= receiver;
+		this.receivers	= receivers;
 		this.performative	= performative;
 		this.content	= content;
+		
 		this.convid	= convid;
+		this.protocol	= protocol;
+		this.reply_to	= reply_to;
+		this.language	= language;
+		this.ontology	= ontology;
+		this.encoding	= encoding;
+		
+		this.reply_with	= reply_with;
+		this.in_reply_to	= in_reply_to;
+		this.reply_by	= reply_by;
 	}
 	
 	//-------- Type of Communicative Act --------
@@ -105,17 +120,29 @@ public class FipaMessage	implements IFilter<Object>
 	}
 
 	/** Denotes the identity of the intended recipients of the message. */
-	// TODO: multiple receivers
-	private IComponentIdentifier	receiver;
+	private Set<IComponentIdentifier>	receivers;
 	/** Denotes the identity of the intended recipients of the message. */
-	public IComponentIdentifier	getReceiver()
+	public Set<IComponentIdentifier>	getReceivers()
 	{
-		return receiver;
+		return receivers;
 	}
 	/** Denotes the identity of the intended recipients of the message. */
-	public void	setReceiver(IComponentIdentifier receiver)
+	public void	setReceivers(Set<IComponentIdentifier> receivers)
 	{
-		this.receiver	= receiver;
+		this.receivers	= receivers;
+	}
+	/** Denotes the identity of the intended recipients of the message. */
+	public void	addReceiver(IComponentIdentifier receiver)
+	{
+		if(receivers==null)
+			this.receivers	= new LinkedHashSet<IComponentIdentifier>();
+		receivers.add(receiver);
+	}
+	/** Denotes the identity of the intended recipients of the message. */
+	public void	removeReceiver(Set<IComponentIdentifier> receiver)
+	{
+		if(receivers!=null)
+			receivers.remove(receiver);
 	}
 
 	/** This parameter indicates that subsequent messages in this conversation thread
@@ -292,9 +319,20 @@ public class FipaMessage	implements IFilter<Object>
 	public FipaMessage	createReply()
 	{
 		FipaMessage	ret	= new FipaMessage();
-		ret.setSender(getReceiver());
-		ret.setReceiver(getSender());
+
+		// Copied parameters
 		ret.setConversationId(getConversationId());
+		ret.setProtocol(getProtocol());
+		ret.setLanguage(getLanguage());
+		ret.setOntology(getOntology());
+		ret.setEncoding(getEncoding());
+		
+		// Mapped parameters
+		if(getReplyTo()!=null || getSender()!=null)
+		{
+			ret.addReceiver(getReplyTo()!=null ? getReplyTo() : getSender());
+		}
+		ret.setInReplyTo(getReplyWith());
 		return ret;
 	}
 	
@@ -310,10 +348,10 @@ public class FipaMessage	implements IFilter<Object>
 		{
 			FipaMessage	msg	= (FipaMessage)obj;
 			return sender==null || sender.equals(msg.getSender())
-				&& receiver==null || receiver.equals(msg.getSender())
-				&& performative==null || performative.equals(msg.getSender())
-				&& content==null || content.equals(msg.getSender())
-				&& convid==null || convid.equals(msg.getSender());
+				&& receivers==null || receivers.isEmpty() && msg.getReceivers()==null || receivers.equals(msg.getReceivers())
+				&& performative==null || performative.equals(msg.getPerformative())
+				&& content==null || content.equals(msg.getContent())
+				&& convid==null || convid.equals(msg.getConversationId());
 		}
 		else
 		{

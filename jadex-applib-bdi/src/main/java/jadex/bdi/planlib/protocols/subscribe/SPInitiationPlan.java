@@ -11,13 +11,13 @@ public class SPInitiationPlan extends Plan
 		IMessageEvent subReq = createMessageEvent("sp_subscribe");
 		subReq.getParameter(SFipa.CONTENT).setValue(getParameter("subscription").getValue());
 
-		subReq.getParameterSet("receivers").addValue(getParameter("receiver").getValue());
+		subReq.getParameterSet(SFipa.RECEIVERS).addValue(getParameter("receiver").getValue());
 		if(getParameter("language").getValue()!=null)
-			subReq.getParameter("language").setValue(getParameter("language").getValue());
+			subReq.getParameter(SFipa.LANGUAGE).setValue(getParameter("language").getValue());
 		if(getParameter("ontology").getValue()!=null)
-			subReq.getParameter("ontology").setValue(getParameter("ontology").getValue());
+			subReq.getParameter(SFipa.ONTOLOGY).setValue(getParameter("ontology").getValue());
 		if(getParameter("conversation_id").getValue()!=null)
-			subReq.getParameter("conversation_id").setValue(getParameter("conversation_id").getValue());
+			subReq.getParameter(SFipa.CONVERSATION_ID).setValue(getParameter("conversation_id").getValue());
 		
 		getParameter("subscription_id").setValue(subReq.getParameter(SFipa.CONVERSATION_ID));
 		

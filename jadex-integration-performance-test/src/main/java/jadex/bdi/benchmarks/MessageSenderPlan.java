@@ -28,7 +28,7 @@ public class MessageSenderPlan	extends Plan
 		for(int i=1; i<=msgcnt; i++)
 		{
 			IMessageEvent<FipaMessage> request = createMessageEvent("inform");
-			request.getMessage().setReceiver(receiver);
+			request.getMessage().addReceiver(receiver);
 //			request.getMessage().reply_with	= "some reply id";
 			sendMessage(request);
 			

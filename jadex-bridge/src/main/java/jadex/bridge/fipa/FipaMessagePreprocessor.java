@@ -1,5 +1,7 @@
 package jadex.bridge.fipa;
 
+import java.util.Set;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IMessagePreprocessor;
@@ -24,7 +26,7 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor
 		assert	hsen!=null : "Message feature should always provider sender!";
 		if(fsen==null)
 		{
-			fmsg.setReceiver(hsen);
+			fmsg.setSender(hsen);
 		}
 		else if(!fsen.equals(hsen))
 		{
@@ -32,19 +34,20 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor
 		}
 		
 		// Set/check consistent receiver.
-		IComponentIdentifier	frec	= fmsg.getReceiver();
+		Set<IComponentIdentifier>	frec	= fmsg.getReceivers();
 		IComponentIdentifier	hrec	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 		if(frec==null)
 		{
-			fmsg.setReceiver(hrec);
+			fmsg.addReceiver(hrec);
 		}
-		else if(hrec==null)
+		else if(hrec==null && frec.size()==1)
 		{
-			header.addProperty(IMsgHeader.RECEIVER, fmsg.getReceiver());
+			// TODO: multiple receivers
+			header.addProperty(IMsgHeader.RECEIVER, fmsg.getReceivers().iterator().next());
 		}
-		else if(!frec.equals(hrec))
+		else// if(!frec.equals(hrec))
 		{
-			throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+hrec);
+			throw new IllegalArgumentException("Inconsistent/unsupported msg/header receivers: "+frec+" vs. "+hrec);
 		}
 		
 		// Set/check consistent conv id.
