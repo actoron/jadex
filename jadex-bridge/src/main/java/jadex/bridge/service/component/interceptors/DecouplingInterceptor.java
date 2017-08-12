@@ -2,7 +2,6 @@ package jadex.bridge.service.component.interceptors;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,22 +10,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.IStarterConfiguration;
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
-import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.concurrent.TimeoutException;
@@ -83,17 +83,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The internal access. */
 	protected IInternalAccess ia;	
 		
-//	/** The component adapter. */
-//	protected IComponentAdapter adapter;
-	
 	/** Is the interceptor for a required service proxy? */
 	protected boolean required;
 	
 	/** The argument copy allowed flag. */
 	protected boolean copy;
-	
-	/** The marshal service. */
-	protected IMarshalService marshal;
 	
 	/** The clone filter (facade for marshal). */
 	protected IFilter filter;
@@ -132,15 +126,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			}
 		}
 		
-		// Fetch marshal service first time.		
-		if(marshal==null)
+		// Fetch marshal service first time.	
+		if(filter==null)
 		{
-			marshal	= SServiceProvider.getLocalService(ia, IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 			filter = new IFilter()
 			{
 				public boolean filter(Object object)
 				{
-					return marshal.isLocalReference(object);
+					return getSerializationServices().isLocalReference(object);
 				}
 			};
 		}
@@ -148,7 +141,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.
-		boolean callrem = marshal.isRemoteObject(sic.getProxy());
+		boolean callrem = getSerializationServices().isRemoteObject(sic.getProxy());
 		if(copy && !sic.isRemoteCall() && !callrem)
 		{
 			Method method = sic.getMethod();
@@ -164,7 +157,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		    		// (e.g. for proxy replacement of service references).
 		    		// Does not work, yet as service object might have wrong interface
 		    		// (e.g. service interface instead of listener interface --> settings properties provider)
-					if(!refs[i] && !marshal.isLocalReference(args[i]))
+					if(!refs[i] && !getSerializationServices().isLocalReference(args[i]))
 					{
 			    		// Pass arg as reference if
 			    		// - refs[i] flag is true (use custom filter)
@@ -178,7 +171,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 							}
 						} : this.filter;
 						
-						List<ITraverseProcessor> procs = marshal.getCloneProcessors();
+						List<ITraverseProcessor> procs = getSerializationServices().getCloneProcessors();
 						procs.add(procs.size()-2, new FilterProcessor(filter));
 						copyargs.add(SCloner.clone(args[i], procs));
 //						copyargs.add(Traverser.traverseObject(args[i], null, procs, null, true, null));
@@ -285,7 +278,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			// (e.g. for proxy replacement of service references).
 			// Does not work, yet as service object might have wrong interface
 			// (e.g. service interface instead of listener interface --> settings properties provider)
-			if(copy && !marshal.isLocalReference(value))
+			if(copy && !getSerializationServices().isLocalReference(value))
 			{
 //			System.out.println("copy result: "+result);
 				// Copy result if
@@ -298,7 +291,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return obj==value ? false : deffilter.filter(obj);
 					}
 				} : deffilter;
-				List<ITraverseProcessor> procs = marshal.getCloneProcessors();
+				List<ITraverseProcessor> procs = getSerializationServices().getCloneProcessors();
 				procs.add(procs.size()-1, new FilterProcessor(filter));
 				res = SCloner.clone(value, procs);
 //				res = Traverser.traverseObject(value, null, procs, null, true, null);
@@ -321,7 +314,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
-					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					InvocationHandler handler = (InvocationHandler)ProxyFactory.getInvocationHandler(proxy);
 					context.setResult(handler.toString());
 					return IFuture.DONE;
 				}
@@ -331,10 +324,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
-					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					InvocationHandler handler = (InvocationHandler)ProxyFactory.getInvocationHandler(proxy);
 					Object[] args = (Object[])context.getArguments().toArray();
-					context.setResult(Boolean.valueOf(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
-						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
+					context.setResult(Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
+						&& handler.equals(ProxyFactory.getInvocationHandler(args[0]))));
 					return IFuture.DONE;
 				}
 			});
@@ -343,7 +336,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
-					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
+					InvocationHandler handler = ProxyFactory.getInvocationHandler(proxy);
 					context.setResult(Integer.valueOf(handler.hashCode()));
 					return IFuture.DONE;
 				}
@@ -397,12 +390,12 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			{
 				Method method = sic.getMethod();
 				Reference ref = method.getAnnotation(Reference.class);
-				final boolean copy = DecouplingInterceptor.this.copy && !sic.isRemoteCall() && !marshal.isRemoteObject(sic.getProxy()) && (ref!=null? !ref.local(): true);
+				final boolean copy = DecouplingInterceptor.this.copy && !sic.isRemoteCall() && !getSerializationServices().isRemoteObject(sic.getProxy()) && (ref!=null? !ref.local(): true);
 				final IFilter	deffilter = new IFilter()
 				{
 					public boolean filter(Object object)
 					{
-						return marshal.isLocalReference(object);
+						return getSerializationServices().isLocalReference(object);
 					}
 				};
 
@@ -634,4 +627,15 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 	}
 	
+	// todo: method copy of SerializationService (not acceesible from here)
+	/**
+	 *  Gets the serialization services.
+	 * 
+	 *  @param platform The platform ID.
+	 *  @return The serialization services.
+	 */
+	public final ISerializationServices getSerializationServices()
+	{
+		return (ISerializationServices)PlatformConfiguration.getPlatformValue(ia.getComponentIdentifier(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+	}
 }

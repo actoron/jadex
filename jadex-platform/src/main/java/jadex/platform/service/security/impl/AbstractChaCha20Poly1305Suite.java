@@ -3,6 +3,7 @@ package jadex.platform.service.security.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,12 +45,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	/** The remote public key */
 	protected byte[] remotepublickey;
 	
-	/** The locally-generated authentication challenge. */
-//	protected byte[] localauthchallenge;
-	
-	/** The remote-generated authentication challenge. */
-//	protected byte[] remoteauthchallenge;
-	
+	/** Agreed-on random state / challenge. */
 	protected byte[] challenge;
 	
 	/** The authentication suite. */
@@ -62,9 +58,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
 	
 	// -------------- Operational state -----------------
-	
-	/** The authentication state. */
-	protected MsgSecurityInfos secinf;
 	
 	/** The ChaCha20 key. */
 	protected int[] key = new int[8];
@@ -128,7 +121,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	{
 		return msgid.get() < AbstractCryptoSuite.MSG_ID_START;
 	}
-	long ts;
+	
 	/**
 	 *  Handles handshake messages.
 	 *  
@@ -145,17 +138,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
 //			ts = System.currentTimeMillis();
-//			StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
-//			localauthchallenge = new byte[32];
-//			SSecurity.getSecureRandom().nextBytes(localauthchallenge);
-//			sem.setChallenge(localauthchallenge);
-//			hashednetworks = getHashedNetworks(agent.getNetworks(), localauthchallenge);
-//			sem.setHashedNetworkNames(hashednetworks.keySet());
-//			
-//			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
-//			nextstep = 1;
-			
-			ts = System.currentTimeMillis();
 			authsuite = new Blake2bX509AuthenticationSuite();
 			StartExchangeMessage sem = new StartExchangeMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId());
 			challenge = new byte[32];
@@ -196,7 +178,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 2;
 			
-			hashednetworks = getHashedNetworks(agent.getNetworks(), challenge);
+			hashednetworks = getHashedNetworks(agent.getInternalNetworks(), challenge);
 		}
 		else if (nextstep == 1 && incomingmessage instanceof AckExchangeMessage)
 		{
@@ -208,7 +190,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			challenge = new byte[32];
 			dig.doFinal(challenge, 0);
 			
-			hashednetworks = getHashedNetworks(agent.getNetworks(), challenge);
+			hashednetworks = getHashedNetworks(agent.getInternalNetworks(), challenge);
 			
 			IComponentIdentifier remoteid = ack.getSender().getRoot();
 			
@@ -228,7 +210,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			byte[] pubkey = getPubKey();
 			reply.setPublicKey(pubkey);
 			
-			reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
+			if (agent.getInternalUsePlatformSecret())
+				reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
 			reply.setNetworkSigs(getNetworkSignatures(pubkey, hashednetworks.keySet()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
@@ -250,12 +233,10 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			remotepublickey = kx.getPublicKey();
 			
-			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getPlatformSecret());
+			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
+			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
-			secinf = new MsgSecurityInfos();
-			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformauth);
-			secinf.setTrustedPlatform(false);
-			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
 			ephemeralkey = createEphemeralKey();
 			byte[] pubkey = getPubKey();
@@ -264,7 +245,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			KeyExchangeMessage reply = new KeyExchangeMessage(agent.getComponentIdentifier(), kx.getConversationId());
 			reply.setPublicKey(pubkey);
-			reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
+			if (agent.getInternalUsePlatformSecret())
+					reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
 			reply.setNetworkSigs(getNetworkSignatures(pubkey, kx.getNetworkSigs().keySet()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
@@ -274,19 +256,19 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		{
 			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
 			
+			IComponentIdentifier remoteid = kx.getSender().getRoot();
+			
 			remotepublickey = kx.getPublicKey();
 			
-			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getPlatformSecret());
+			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
+			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
-			secinf = new MsgSecurityInfos();
-			secinf.setAuthenticatedPlatform(authnets.size() > 0 || platformauth);
-			secinf.setTrustedPlatform(false);
-			secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;
 			key = generateChaChaKey();
-			System.out.println("Shared Key1: " + Arrays.toString(key) + " " + secinf.isAuthenticatedPlatform());
+//			System.out.println("Shared Key1: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
 			
 			// Delete handshake state
 			ephemeralkey = null;
@@ -300,12 +282,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			ret = false;
 			nextstep = 5;
-			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
+//			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
 		}
 		else if (nextstep == 4 && incomingmessage instanceof ReadyMessage)
 		{
 			key = generateChaChaKey();
-			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticatedPlatform());
+//			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
 			
 			// Delete handshake state
 			ephemeralkey = null;
@@ -355,12 +337,12 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected Tuple2<byte[], byte[]> getPlatformSignatures(byte[] pubkey, SecurityAgent agent, IComponentIdentifier remoteid)
 	{
 		byte[] local = null;
-		AbstractAuthenticationSecret ps = agent.getPlatformSecret();
+		AbstractAuthenticationSecret ps = agent.getInternalPlatformSecret();
 		if (ps != null && ps.canSign())
 			local = signKey(challenge, pubkey, ps);
 		
 		byte[] remote = null;
-		ps = agent.getPlatformSecret(remoteid);
+		ps = agent.getInternalPlatformSecret(remoteid);
 		if (ps != null && ps.canSign())
 			remote = signKey(challenge, pubkey, ps);
 		

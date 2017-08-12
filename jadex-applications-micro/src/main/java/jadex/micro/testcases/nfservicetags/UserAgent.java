@@ -35,7 +35,6 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Service
-
 @RequiredServices({
 	@RequiredService(name="testser1", type=ITestService.class, 
 		binding=@Binding(create=true, creationinfo=@CreationInfo(type="provider"))),
@@ -119,10 +118,10 @@ public class UserAgent
 		}
 		results.add(tr5);
 		
-		TestReport tr6 = new TestReport("#5", "Test if can find null tagged service service via SServiceProvider.getService()");
+		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, null).get(); 
+			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, new String[]{null}).get(); 
 			tr6.setSucceeded(true);
 		}
 		catch(Exception e)

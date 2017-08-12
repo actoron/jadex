@@ -14,7 +14,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -47,7 +47,7 @@ public class UserAgent
 	@Agent
 	protected IInternalAccess agent;
 
-	@AgentService(lazy=true)
+	@AgentServiceSearch(lazy=true)
 	protected ITestService ts;
 
 	/**

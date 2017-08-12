@@ -58,9 +58,9 @@ public class ComponentTerminatedException	extends RuntimeException
 		this.cid	= cid;
 	}
 	
-//	public void printStackTrace()
-//	{
-//		Thread.dumpStack();
-//		super.printStackTrace();
-//	}
+	public void printStackTrace()
+	{
+		Thread.dumpStack();
+		super.printStackTrace();
+	}
 }

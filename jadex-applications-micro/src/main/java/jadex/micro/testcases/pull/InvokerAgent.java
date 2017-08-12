@@ -19,7 +19,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -64,14 +63,14 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if(SReflect.isAndroid()) 
+//		if(SReflect.isAndroid()) 
 		{
 			tc.setTestCount(2);
 		} 
-		else 
-		{
-			tc.setTestCount(4);
-		}
+//		else 
+//		{
+//			tc.setTestCount(4);
+//		}
 		
 		final Future<Void> ret = new Future<Void>();
 		ret.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
@@ -92,35 +91,19 @@ public class InvokerAgent
 				agent.killComponent();	
 			}
 		}));
-			
-//		testLocal().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+//					
+//		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 //		{
-//			public void customResultAvailable(Void result)
+//			public void customResultAvailable(TestReport[] result)
 //			{
-//				System.out.println("tests finished");
-//			}
-//		}));
-		
-//		testRemote().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				System.out.println("tests finished");
-//			}
-//		}));
-		
-		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
-		{
-			public void customResultAvailable(TestReport[] result)
-			{
-				for(TestReport tr: result)
-					tc.addReport(tr);
-				if(SReflect.isAndroid()) 
-				{
-					ret.setResult(null);
-				} 
-				else 
-				{
+//				for(TestReport tr: result)
+//					tc.addReport(tr);
+//				if(SReflect.isAndroid()) 
+//				{
+//					ret.setResult(null);
+//				} 
+//				else 
+//				{
 					testRemote(2, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 					{
 						public void customResultAvailable(TestReport[] result)
@@ -130,9 +113,9 @@ public class InvokerAgent
 							ret.setResult(null);
 						}
 					}));
-				}
-			}
-		}));
+//				}
+//			}
+//		}));
 	}
 	
 	/**

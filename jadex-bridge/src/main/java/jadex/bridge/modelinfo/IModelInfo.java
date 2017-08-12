@@ -258,4 +258,10 @@ public interface IModelInfo
 	 *  @return The features
 	 */
 	public IComponentFeatureFactory[] getFeatures();
+	
+	/**
+	 *  Get the name hint for instances.
+	 *  @return the name hint
+	 */
+	public String getNameHint();
 }

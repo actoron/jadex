@@ -15,7 +15,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -50,7 +50,7 @@ public class EchoChatAgent
 	protected IInternalAccess	agent;
 	
 	/** The gui service for controlling the inner chat component. */
-	@AgentService(name="%{\"chat_\"+$config}")
+	@AgentServiceSearch(name="%{\"chat_\"+$config}")
 	protected IChatGuiService	chat;
 	
 	//-------- methods --------

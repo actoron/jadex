@@ -1,13 +1,11 @@
 package jadex.platform.service.context;
 
 
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 

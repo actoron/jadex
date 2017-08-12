@@ -92,6 +92,13 @@ public interface IServiceRegistry
 	public IFuture<Void> removeQueries(IComponentIdentifier owner);
 	
 	/**
+	 *  Remove all service queries of a specific platform from the registry.
+	 *  @param platform The platform from which the query owner comes.
+	 */
+	// write
+	public IFuture<Void> removeQueriesFromPlatform(IComponentIdentifier platform);
+	
+	/**
 	 *  Get queries per type.
 	 *  @param type The interface type. If type is null all services are returned.
 	 *  @return The queries.
@@ -127,4 +134,10 @@ public interface IServiceRegistry
 	 *  @return The superpeer.
 	 */
 	public IFuture<IComponentIdentifier> getSuperpeer(boolean force);
+	
+	/**
+	 *  Get all services.
+	 *  @return All services (copy).
+	 */
+	public Set<IService> getAllServices();
 }

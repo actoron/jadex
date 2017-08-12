@@ -46,7 +46,6 @@
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3lI64BYrEd-yC473XtaJZQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3lI64RYrEd-yC473XtaJZQ" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3lI64hYrEd-yC473XtaJZQ" key="mode" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5JH2IBYrEd-yC473XtaJZQ" key="msgtype" value="&quot;fipa&quot;"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5JH2IRYrEd-yC473XtaJZQ" key="filter" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O1nSUGKMEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
@@ -54,14 +53,12 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TVzeYVa3Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mLikxwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikyARPEeCnwcpWvxOwkg" key="dimension" value="3:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikyARPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikyQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikygRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikywRPEeCnwcpWvxOwkg" key="0:1" value="SFipa.INFORM"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikzARPEeCnwcpWvxOwkg" key="1:0" value="receivers"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikygRPEeCnwcpWvxOwkg" key="0:0" value="message"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikywRPEeCnwcpWvxOwkg" key="0:1" value="&quot;hello&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikzARPEeCnwcpWvxOwkg" key="1:0" value="receiver"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikzQRPEeCnwcpWvxOwkg" key="1:1" value="receivers"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikzgRPEeCnwcpWvxOwkg" key="2:0" value="content"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLikzwRPEeCnwcpWvxOwkg" key="2:1" value="&quot;hello&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_0Gs0kc-fEd6NWbZHdUI2WQ" iD="_0Gs0kM-fEd6NWbZHdUI2WQ" outgoingEdges="_5-3ZMdBMEd6NWbZHdUI2WQ" incomingEdges="_0G1-gc-fEd6NWbZHdUI2WQ" name="Message Sent" activityType="Task">

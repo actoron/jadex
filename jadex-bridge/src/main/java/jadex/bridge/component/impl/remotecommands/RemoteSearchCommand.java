@@ -59,14 +59,15 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 	@Override
 	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
-		System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query.getServiceType());
+//		if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
+//			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
 		
 		final IFuture<Collection<T>>	ret;
 		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
 		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
 		String	seclevel	= secreq!=null ? secreq.value() : null;
 		
-		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticatedPlatform())
+		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticated())
 		{
 			// No recursive global search -> change global scope to platform, and owner to local platform.
 			if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))

@@ -4,13 +4,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IResultCommand;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
@@ -42,7 +40,7 @@ public class SubscriberAgent
 //	protected IAutoTerminateService	sub;
 
 	/** The cms. */
-	@AgentService
+	@AgentServiceSearch
 	protected IComponentManagementService	cms;
 	
 	//-------- methods --------
@@ -55,13 +53,8 @@ public class SubscriberAgent
 	{
 //		System.out.println("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IAutoTerminateService>, Void>()
-		{
-			public IFuture<IAutoTerminateService> execute(Void args)
-			{
-				return SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL);
-			}
-		}, 3, 2000).addResultListener(new IResultListener<IAutoTerminateService>()
+		SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			.addResultListener(new IResultListener<IAutoTerminateService>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{

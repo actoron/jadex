@@ -8,6 +8,9 @@ import java.security.SecureRandom;
  */
 public class SecureThreadedRandom extends SecureRandom
 {
+	/** If true, minimize the initial entropy consumption. */
+	private static final boolean MINIMIZE_INITIAL_ENTROPY_CONSUMPTION = true;
+	
 	/** ID */
 	private static final long serialVersionUID = -11931962997946L;
 	
@@ -29,29 +32,41 @@ public class SecureThreadedRandom extends SecureRandom
 		tl = Integer.bitCount(tl) != 1 ? tl << 1 : tl;
 		tl = Math.min(Math.abs(tl), 31);
 		
-		SecureRandom seedrandom = new SynchronizedSecureRandomWrapper(new ChaCha20Random());
 		prngs = new SecureRandom[1 << tl];
 		this.threadingmask = prngs.length - 1;
-		for (int i = 0; i < prngs.length; ++i)
+		
+		if (MINIMIZE_INITIAL_ENTROPY_CONSUMPTION)
 		{
-			prngs[i] = new ChaCha20Random(seedrandom);
+			ChaCha20Random seeder = new ChaCha20Random();
+			for (int i = 0; i < prngs.length; ++i)
+			{
+				byte[] initialseed = new byte[40];
+				seeder.nextBytes(initialseed);
+				prngs[i] = new ChaCha20Random(initialseed);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < prngs.length; ++i)
+			{
+				prngs[i] = new ChaCha20Random();
+			}
 		}
 	}
 	
 	/**
 	 *  Creates the wrapper.
 	 */
-	public SecureThreadedRandom(int threadinglevel)
-	{
-		SecureRandom seedrandom = new SynchronizedSecureRandomWrapper(new ChaCha20Random());
-		threadinglevel = Math.min(Math.abs(threadinglevel), 31);
-		prngs = new SecureRandom[1 << threadinglevel];
-		this.threadingmask = prngs.length - 1;
-		for (int i = 0; i < prngs.length; ++i)
-		{
-			prngs[i] = new ChaCha20Random(seedrandom);
-		}
-	}
+//	public SecureThreadedRandom(int threadinglevel)
+//	{
+//		threadinglevel = Math.min(Math.abs(threadinglevel), 31);
+//		prngs = new SecureRandom[1 << threadinglevel];
+//		this.threadingmask = prngs.length - 1;
+//		for (int i = 0; i < prngs.length; ++i)
+//		{
+//			prngs[i] = new ChaCha20Random();
+//		}
+//	}
 	
 	/**
 	 *  Wrapper method.

@@ -23,34 +23,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriter;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -73,8 +68,10 @@ import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 
@@ -87,6 +84,15 @@ public class SGUI
 	
 	/** This property can be set on components to be automatically adjusted to equal sizes. */
 	public static final String	AUTO_ADJUST	= "auto-adjust";
+	
+	/**
+	 *  IDs of potentially broken UIs that override behavior like setBackground().
+	 */
+	protected static final Set<String> BROKEN_UI_IDS = new HashSet<String>();
+	static
+	{
+		BROKEN_UI_IDS.add("GTK");
+	}
 	
 	//-------- methods --------
 
@@ -570,6 +576,111 @@ public class SGUI
 	}
 	
 	/**
+	 *  Sets the minimum size along with the preferred size.
+	 *  Negative values will remain the same.
+	 *  
+	 *  @param c Component.
+	 *  @param w Width.
+	 *  @param h Height.
+	 */
+	public static void setMinimumSize(JComponent c, int w, int h)
+	{
+		Dimension ms = c.getMinimumSize();
+		Dimension ps = c.getPreferredSize();
+		
+		c.setMinimumSize(new Dimension(w < 0 ? ms.width : w, h < 0 ? ms.height : h));
+		c.setPreferredSize(new Dimension(w < 0 ? ps.width : w, h < 0 ? ps.height : h));
+	}
+	
+	/**
+	 *  Creates a simple vertical arrangement using group layout with gaps.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createVerticalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
+	{
+		GroupLayout l = new GroupLayout(container);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		container.setLayout(l);
+		
+		SequentialGroup rhgroup = l.createSequentialGroup();
+		ParallelGroup hgroup = l.createParallelGroup();
+		rhgroup.addGroup(hgroup);
+		
+		SequentialGroup vgroup = l.createSequentialGroup();
+		l.setVerticalGroup(vgroup);
+		
+		for (int i = 0; i < components.length; ++i)
+		{
+			container.add(components[i]);
+			
+			if (fixedsize)
+			{
+				hgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				vgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+			}
+			else
+			{
+				hgroup.addComponent(components[i]);
+				vgroup.addComponent(components[i]);
+			}
+		}
+		
+		if (fixedsize)
+			SGUI.adjustComponentHorizontalSizes(components);
+		
+		l.setHorizontalGroup(rhgroup);
+		l.setVerticalGroup(vgroup);
+	}
+	
+	/**
+	 *  Creates a simple vertical arrangement using group layout with gaps.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
+	{
+		GroupLayout l = new GroupLayout(container);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		container.setLayout(l);
+		
+		SequentialGroup hgroup = l.createSequentialGroup();
+		l.setVerticalGroup(hgroup);
+		
+		SequentialGroup rvgroup = l.createSequentialGroup();
+		ParallelGroup vgroup = l.createParallelGroup();
+		rvgroup.addGroup(vgroup);
+		
+		for (int i = 0; i < components.length; ++i)
+		{
+			container.add(components[i]);
+			
+			if (fixedsize)
+			{
+				hgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				vgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+			}
+			else
+			{
+				hgroup.addComponent(components[i]);
+				vgroup.addComponent(components[i]);
+			}
+		}
+		
+		if (fixedsize)
+			SGUI.adjustComponentHorizontalSizes(components);
+		
+		l.setHorizontalGroup(hgroup);
+		l.setVerticalGroup(rvgroup);
+	}
+	
+	/**
 	 *  Create a table that displays its contents using nto editable text fields. 
 	 */
 	public static JTable	createReadOnlyTable()
@@ -807,6 +918,21 @@ public class SGUI
 	}
 	
 	/**
+	 *  Sets the enabled state of all buttons in a button group.
+	 *  
+	 *  @param bg The button group.
+	 *  @param enabled True, if enabled
+	 */
+	public static void setAllEnabled(ButtonGroup bg, boolean enabled)
+	{
+		Enumeration<AbstractButton> enumer = bg.getElements();
+		while (enumer.hasMoreElements())
+		{
+			enumer.nextElement().setEnabled(enabled);
+		}
+	}
+	
+	/**
 	 *  Scales a buffered image.
 	 *  
 	 *  @param original Original image.
@@ -832,6 +958,105 @@ public class SGUI
 	public static void invokeLater(Runnable runnable) 
 	{
 		SwingUtilities.invokeLater(runnable);
+	}
+	
+	/**
+	 *  Shortcut method.
+	 *  Text extraction from the Java "Document" class used by JTextArea is braindead,
+	 *  it throws checked exception, lots of parameters: Bloat, bloat, bloat.
+	 *  
+	 *  @param doc The text area.
+	 *  @return The extracted String.
+	 */
+	public static final String getText(JTextArea area)
+	{
+		Document doc = area.getDocument();
+		String ret = null;
+        
+		try
+        {
+            ret = doc.getText(0, doc.getLength());
+            if (ret.length() == 0)
+    		{
+    			ret = null;
+    		}
+        }
+        catch (BadLocationException e)
+        {
+        }
+        
+        return ret;
+	}
+	
+	/**
+	 * 	Shortcut method.
+	 *  Setting text the Java "Document" class used by JTextArea is braindead,
+	 *  it throws non-RuntimeException, multiple invocations, many parameters:
+	 *  Bloat, bloat, bloat.
+	 *  
+	 *  @param doc The document.
+	 *  @return The extracted String.
+	 */
+	public static final void setText(JTextArea area, String text)
+	{
+		Document doc = area.getDocument();
+		try
+		{
+			doc.remove(0, doc.getLength());
+			doc.insertString(0, text, null);
+		}
+		catch (BadLocationException e)
+		{
+		}
+	}
+	
+	/**
+	 *  Adds a copy & paste menu to a text component.
+	 *  
+	 *  @param textcomponent The text component.
+	 */
+	public static void addCopyPasteMenu(final JTextComponent textcomponent)
+	{
+		textcomponent.addMouseListener(new TextCopyPasteMouseListener(textcomponent));
+	}
+	
+	/**
+	 *  Removes copy & paste menu from a text component.
+	 *  
+	 *  @param textcomponent The text component.
+	 */
+	public static void removeCopyPasteMenu(final JTextComponent textcomponent)
+	{
+		for (MouseListener lis : textcomponent.getMouseListeners())
+		{
+			if (lis instanceof TextCopyPasteMouseListener)
+			{
+				textcomponent.removeMouseListener(lis);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 *  Converts a color to RGBA array.
+	 */
+	public static double[] colorToRgba(Color color)
+	{
+		double[] ret = new double[4];
+		ret[0] = color.getRed() / 255.0;
+		ret[1] = color.getGreen() / 255.0;
+		ret[2] = color.getBlue() / 255.0;
+		ret[3] = color.getAlpha() / 255.0;
+		return ret;
+	}
+	
+	/**
+	 *  Converts a RGBA array to color.
+	 */
+	public static Color rgbaToColor(double[] rgba)
+	{
+		assert rgba != null && rgba.length == 4;
+		return new Color((float) rgba[0], (float) rgba[1], (float) rgba[2], (float) rgba[3]);
 	}
 	
 //	/** Lookup table for divider locations (split->Integer).*/
@@ -896,4 +1121,34 @@ public class SGUI
 //			}
 //		}
 //	}
+	
+	/**
+	 *  Listener for copy-paste menu.
+	 *
+	 */
+	public static class TextCopyPasteMouseListener extends MouseAdapter
+	{
+		/** The text component. */
+		protected JTextComponent textcomponent;
+		
+		/**
+		 *  Creates the listener.
+		 */
+		public TextCopyPasteMouseListener(JTextComponent textcomponent)
+		{
+			this.textcomponent = textcomponent;
+		}
+		
+		/**
+		 *  Called when mouse pressed.
+		 */
+		public void mousePressed(MouseEvent e)
+		{
+			if (e.isPopupTrigger())
+			{
+				JCopyPasteContextMenu popup = new JCopyPasteContextMenu(textcomponent);
+				popup.show(textcomponent, e.getX(), e.getY());
+			}
+		}
+	}
 }

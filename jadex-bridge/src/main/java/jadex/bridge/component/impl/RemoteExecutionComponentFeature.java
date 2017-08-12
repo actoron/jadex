@@ -73,7 +73,13 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		add(RemoteMethodInvocationCommand.class);
 	}});
 	
-	protected Map<String, IFuture<?>> commands;
+	/** Commands that have been sent to a remote component.
+	 *  Stored to set return value etc. */
+	protected Map<String, IFuture<?>> outcommands;
+	
+	/** Commands that have been received to be executed locally.
+	 *  Stored to allow termination etc.*/
+	protected Map<String, IFuture<?>> incommands;
 	
 	/**
 	 *  Create the feature.
@@ -138,20 +144,20 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			@Override
 			public void handleFinished(Collection<Object> results) throws Exception
 			{
-				commands.remove(rxid);
+				outcommands.remove(rxid);
 			}
 			
 			@Override
 			public Object handleResult(Object result) throws Exception
 			{
-				commands.remove(rxid);
+				outcommands.remove(rxid);
 				return result;
 			}
 			
 			@Override
 			public void handleException(Exception exception)
 			{
-				commands.remove(rxid);
+				outcommands.remove(rxid);
 			}
 		});
 		
@@ -169,18 +175,18 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			ret.addResultListener(trl);
 		}
 
-		if(commands==null)
+		if(outcommands==null)
 		{
-			commands	= new HashMap<String, IFuture<?>>();
+			outcommands	= new HashMap<String, IFuture<?>>();
 		}
-		commands.put(rxid, ret);
+		outcommands.put(rxid, ret);
 		
 		sendRxMessage(target, rxid, command).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
 				@SuppressWarnings("unchecked")
-				Future<T> ret = (Future<T>) commands.remove(rxid);
+				Future<T> ret = (Future<T>) outcommands.remove(rxid);
 				if (ret != null)
 					ret.setExceptionIfUndone(exception);
 			}
@@ -297,9 +303,11 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					final ServiceCall	fsc	= sc;
 					
 					final IFuture<?> retfut = cmd.execute(component, secinfos);
-					if (commands == null)
-						commands = new HashMap<String, IFuture<?>>();
-					IFuture<?> prev	= commands.put(rxid, retfut);
+					if(incommands == null)
+					{
+						incommands = new HashMap<String, IFuture<?>>();
+					}
+					IFuture<?> prev	= incommands.put(rxid, retfut);
 					assert prev==null;
 					
 					final IResultListener<Void>	term;
@@ -310,7 +318,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							public void exceptionOccurred(Exception exception)
 							{
 								((ITerminableFuture)retfut).terminate();
-								commands.remove(rxid);
+								incommands.remove(rxid);
 							}
 							
 							public void resultAvailable(Void result)
@@ -337,14 +345,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						
 						public void finished()
 						{
-							commands.remove(rxid);
+							incommands.remove(rxid);
 							RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
 							sendRxMessage(remote, rxid, rc);
 						}
 						
 						public void resultAvailable(Object result)
 						{
-							commands.remove(rxid);
+							incommands.remove(rxid);
 							RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
 							sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
 							{
@@ -371,7 +379,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							commands.remove(rxid);
+							incommands.remove(rxid);
 							RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
 							sendRxMessage(remote, rxid, rc);
 						}
@@ -397,7 +405,11 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			{
 				if(checkSecurity(secinfos, header, msg))
 				{
-					IFuture<?> fut = commands.get(rxid);
+					// Can be result/exception -> for outcommands
+					// or termination -> for incommands.
+					IFuture<?> fut = outcommands!=null ? outcommands.get(rxid) : null;
+					fut	= fut!=null ? fut : incommands!=null ? incommands.get(rxid) : null;
+					
 					if(fut!=null)
 					{
 						IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
@@ -435,11 +447,20 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			}
 			else if(header.getProperty(MessageComponentFeature.EXCEPTION)!=null)
 			{
-				// Message could not be delivered -> remove the future (and terminate, if terminable)
-				IFuture<?> fut = commands.remove(rxid);
-				if(fut instanceof ITerminableFuture)
+				// Message could not be delivered -> remove the future (and abort, if possible)
+				
+				// locally executing command -> terminate, if terminable (i.e. abort to callee)
+				if(incommands!=null && incommands.get(rxid) instanceof ITerminableFuture)
 				{
-					((ITerminableFuture)fut).terminate((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
+					((ITerminableFuture)incommands.remove(rxid))
+						.terminate((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
+				}
+				
+				// Remotely executing command -> set local future to failed (i.e. abort to caller)
+				else if(outcommands!=null && outcommands.get(rxid) instanceof Future)
+				{
+					((Future)outcommands.remove(rxid))
+						.setException((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
 				}
 			}
 			else
@@ -455,7 +476,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			return secinfos.isTrustedPlatform()	// Trusted -> always ok
 				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
-				|| secinfos.isAuthenticatedPlatform() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
+				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
 					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
 						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
 		}

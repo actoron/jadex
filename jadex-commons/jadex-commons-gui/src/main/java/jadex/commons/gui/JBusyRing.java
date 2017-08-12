@@ -28,7 +28,7 @@ public class JBusyRing extends JComponent
 	protected Dimension size;
 	
 	/** Color of the ring. */
-	protected Color ringcolor = Color.CYAN; // new Color(120, 190, 255);
+	protected Color ringcolor = Color.WHITE; // new Color(120, 190, 255);
 	
 	/** Start frame time stamp. */
 	protected long startframe = System.currentTimeMillis();
@@ -166,7 +166,13 @@ public class JBusyRing extends JComponent
 		double segsize = ringsize / segs;
 		for (int i = 0; i < segs; ++i)
 		{
-			Color faded = new Color(ringcolor.getRed(), ringcolor.getGreen(), ringcolor.getBlue(), (int) (255 / segs) * i);
+			double finput = ((double)i/segs) - 1.0;
+			finput *= finput;
+			finput *= finput;
+			int f = (int) (finput * 255.0);
+//			if (i > segs / 2)
+//				f = 10;
+			Color faded = new Color(ringcolor.getRed(), ringcolor.getGreen(), ringcolor.getBlue(), f);//(int) (255 / segs) * i);
 			g2.setColor(faded);
 			
 			Arc2D arc = new Arc2D.Double(0.0 + halfstroke,

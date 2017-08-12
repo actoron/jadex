@@ -72,7 +72,7 @@ public class JadexdocServlet extends HttpServlet
 			"-extensions", "null",
 			"-welcome", "false",
 			"-relaytransport", "false",
-			"-niotcptransport", "false",
+			"-tcptransport", "false",
 			"-rspublish", "false",
 			"-wspublish", "false"
 		};

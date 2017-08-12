@@ -424,6 +424,10 @@ public class ServiceInvocationContext
 //			System.out.println("call method start end");
 //		if(getMethod().getName().indexOf("init")!=-1 && sid.getServiceType().getTypeName().indexOf("Peer")!=-1)
 //			System.out.println("call method init");
+		
+//		if(SReflect.isSupertype(IFuture.class, getMethod().getReturnType()) && !(result instanceof Future))
+//			System.out.println("hהההההההההההה");
+		
 		this.result.set(used.size()-1, result);
 	}
 

@@ -7,11 +7,18 @@ package jadex.bridge.service.types.security;
 public interface IMsgSecurityInfos
 {
 	/**
-	 *  Checks if the sender platform ID is authenticated.
+	 *  Checks if the platform has any authentication.
 	 *
 	 *  @return True if authenticated.
 	 */
-	public boolean isAuthenticatedPlatform();
+	public boolean isAuthenticated();
+	
+	/**
+	 *  Returns the authenticated platform name.
+	 *
+	 *  @return The authenticated platform name, null if not authenticated.
+	 */
+	public String getAuthenticatedPlatformName();
 	
 	/**
 	 *  Gets the ID of the sender platform if it is trusted, null otherwise.

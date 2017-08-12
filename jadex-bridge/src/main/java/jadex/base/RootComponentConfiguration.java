@@ -539,30 +539,6 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 	}
 
 	@Override
-	public boolean getNioTcpTransport()
-	{
-		return Boolean.TRUE.equals(getValue(NIOTCPTRANSPORT));
-	}
-
-	@Override
-	public void setNioTcpTransport(boolean value)
-	{
-		setValue(NIOTCPTRANSPORT, value);
-	}
-
-	@Override
-	public int getNioTcpPort()
-	{
-		return (Integer)getValue(NIOTCPPORT);
-	}
-
-	@Override
-	public void setNioTcpPort(int value)
-	{
-		setValue(NIOTCPPORT, value);
-	}
-
-	@Override
 	public boolean getRelayTransport()
 	{
 		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));

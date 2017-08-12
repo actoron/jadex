@@ -20,10 +20,14 @@ import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.ServiceKeyExtractor;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Basic service provide a simple default isValid() implementation
@@ -137,7 +141,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //				this.properties = new HashMap<String, Object>();
 //			this.properties.put(TargetResolver.TARGETRESOLVER, tr.value());
 //		}
-		
+//		
 //		if(type.isAnnotationPresent(NFProperties.class))
 //		{
 //			if(nfproperties==null)
@@ -315,22 +319,37 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			IInternalService ser = (IInternalService)getInternalAccess().getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
 			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
 			// todo: make internal interface for initProperties
+//			if(type!=null && type.getName().indexOf("ITest")!=-1)
+//				System.out.println("sdfsdf");
 			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 			{
 				public void customResultAvailable(Void result) throws Exception
 				{
-//					nfcf.getRequiredServicePropertyProvider(sid).getNFPropertyValue(TagProperty.NAME).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
-//					{
-//						@SuppressWarnings("unchecked")
-//						public void customResultAvailable(Object result) throws Exception
-//						{
-//							Collection<String> coll = (Collection<String>) result;
-//							Set<String> tags = new LinkedHashSet<String>(coll);
-//							properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
+					nfcf.getProvidedServicePropertyProvider(sid).getNFPropertyValue(TagProperty.NAME).addResultListener(new IResultListener<Object>()
+					{
+						public void resultAvailable(Object result)
+						{
+							Collection<String> coll = (Collection<String>)result;
+							if(coll!=null && coll.size()>0)
+							{
+								if(properties==null)
+									properties = new HashMap<String, Object>();
+								
+								Set<String> tags = new LinkedHashSet<String>(coll);
+								properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
+								// Hack!!!
+								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
+								IService orig = reg.getIndexer().getValues(ServiceKeyExtractor.KEY_TYPE_SID, getServiceIdentifier().toString()).iterator().next();
+								reg.getIndexer().addValue(orig);
+							}
 							ret.setResult(null);
-//						}
-//					});
-					
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setResult(null);
+						}
+					});
 				}
 			});
 		}

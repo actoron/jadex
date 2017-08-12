@@ -1,10 +1,16 @@
 package jadex.platform.service.security.impl;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.platform.service.security.ICryptoSuite;
+import jadex.platform.service.security.MsgSecurityInfos;
+import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  Abstract crypto suite class for handling message IDs / replays.
@@ -13,7 +19,7 @@ import jadex.platform.service.security.ICryptoSuite;
 public abstract class AbstractCryptoSuite implements ICryptoSuite
 {
 	/** Maximum windows size. */
-	protected static final int MAX_WINDOW = 8192;
+	protected static final int MAX_WINDOW = 65536;
 	
 	/** The start value of the message id count. */
 	protected static final long MSG_ID_START = Long.MIN_VALUE + Integer.MAX_VALUE;
@@ -26,6 +32,9 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	
 	/** Missing IDs with expiration time. (Id, Expiration Time)*/
 	protected Set<Long> missingids = new LinkedHashSet<Long>();
+	
+	/** The message security info used after key exchange and authentication. */
+	protected MsgSecurityInfos secinf;
 	
 	/** Checks if a message ID is valid */
 	protected synchronized boolean isValid(long msgid)
@@ -64,5 +73,45 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Sets up the message security infos for future messages.
+	 *  
+	 *  @param remoteid The ID of the remote platform.
+	 *  @param authnets The networks the platform is part of and have been authenticated.
+	 *  @param platformauth Flag if the platform name itself was authenticated
+	 *  @param agent The security agent.
+	 */
+	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, SecurityAgent agent)
+	{
+		secinf = new MsgSecurityInfos();
+		secinf.setAuthenticated(authnets.size() > 0 || platformauth);
+		if (platformauth)
+			secinf.setAuthenticatedPlatformName(remoteid.toString());
+		secinf.setTrustedPlatform(false);
+		secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+		
+		Map<String, Set<String>> rolemap = agent.getInternalRoles();
+		Set<String> roles = new HashSet<String>();
+		
+		if (agent.getInternalAllowPlatformRoles())
+		{
+			Set<String> r = rolemap.get(secinf.getAuthenticatedPlatformName());
+			if (r != null)
+				roles.addAll(r);
+		}
+		
+		if (secinf.getNetworks() != null)
+		{
+			for (String network : secinf.getNetworks())
+			{
+				Set<String> r = rolemap.get(network);
+				if (r != null)
+					roles.addAll(r);
+			}
+		}
+		
+		secinf.setRoles(roles);
 	}
 }

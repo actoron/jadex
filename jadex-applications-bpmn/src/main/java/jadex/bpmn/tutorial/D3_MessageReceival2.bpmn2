@@ -29,7 +29,7 @@
       <semantic:outgoing>HOZCycpU9tKRmK+I</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="performative">&quot;request&quot;</jadex:property>
+        <jadex:property name="filter">new jadex.bridge.fipa.FipaMessage(null, jadex.bridge.fipa.FipaMessage.Performative.REQUEST, null)</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:task name="Order Received" id="J6lYjfFxOIdFqQYz">

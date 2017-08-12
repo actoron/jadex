@@ -95,6 +95,9 @@ public interface IStarterConfiguration {
     /** Flag to enable or disable the platform as superpeer. **/
     String SUPERPEER = "superpeer";
 
+    /** Flag to enable or disable the platform as superpeern client. **/
+    String SUPERPEERCLIENT = "superpeerclient";
+
 
     void setPlatformModel(IModelInfo model);
 

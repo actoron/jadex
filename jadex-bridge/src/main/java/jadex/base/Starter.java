@@ -415,7 +415,7 @@ public class Starter
 					try
 					{
 						Class<?> serialservclass = Class.forName("jadex.platform.service.serialization.SerializationServices", true, cl);
-						ISerializationServices servs = (ISerializationServices) serialservclass.newInstance();
+						ISerializationServices servs = (ISerializationServices) serialservclass.getConstructor(IComponentIdentifier.class).newInstance(cid);
 						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERIALIZATIONSERVICES, servs);
 					}
 					catch (Exception e)
@@ -428,7 +428,7 @@ public class Starter
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
 					
-					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, null, rootConfig.getArgs(), desc, null, null);
+					ComponentCreationInfo	cci	= new ComponentCreationInfo(model, config.getConfigurationName(), rootConfig.getArgs(), desc, null, null);
 					Collection<IComponentFeatureFactory>	features	= cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
@@ -448,6 +448,7 @@ public class Starter
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
 										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
 									}
 									fret.setResult(component.getInternalAccess().getExternalAccess());
 								}

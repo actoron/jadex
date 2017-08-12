@@ -2072,31 +2072,6 @@ public class SUtil
 	}
 	
 	/**
-	 *  Creates a random shared key.
-	 * 
-	 *  @return Random shared key.
-	 */
-	public static final String createRandomKey()
-	{
-		byte[] rawkey = new byte[32]; // 256-bit key
-		SECURE_RANDOM.nextBytes(rawkey);
-		
-		return ("key:" + new String (Base64.encodeNoPadding(rawkey), UTF8));
-	}
-	
-	/**
-	 *  Generates an encoded network password from a raw password.
-	 *  (Adds information about the key derivation function)
-	 *  
-	 *  @param rawpassword The raw password.
-	 *  @return Encoded password.
-	 */
-	public static final String createNetworkPassword(String rawpassword)
-	{
-		return "scrypt:" + rawpassword;
-	}
-	
-	/**
 	 * 
 	 */
 	protected static void testIntByteConversion()
@@ -4900,6 +4875,11 @@ public class SUtil
 		 * @return true, if current thread is ui main thread.
 		 */
 		boolean runningOnUiThread();
+		
+		/**
+		 * Get the network ips.
+		 */
+		public List<InetAddress> getNetworkIps();
 	}
 	
 //	/**
@@ -5012,6 +4992,17 @@ public class SUtil
 			(bytes[1] & 0xFF) == 0xBB && 
 			(bytes[2] & 0xFF) == 0xBF;
     }
+	
+	/**
+	 *  Returns a UTF8 byte array as string.
+	 * 
+	 *  @param bytes The bytes.
+	 *  @return The string.
+	 */
+	public static String toUTF8(byte[] bytes)
+	{
+		return new String(bytes, UTF8);
+	}
 	
 	/**
 	 *  Get the exception stacktrace.
@@ -5597,9 +5588,41 @@ public class SUtil
 	 */
 	private static File findDirForProject(String project) {
 		File result = new File(project);
-		if (!result.exists()) {
+		if(!result.exists()) 
+		{
 			result = new File("../" + project);
 		}
 		return result;
+	}
+	
+	/**
+	 *  Generate a diffuse string hash.
+	 *  @param s The string.
+	 *  @return The hash.
+	 */
+	public static final int diffuseStringHash(String s) 
+	{ 
+		long state0 = 0; 
+		long state1 = 0; 
+		char[] chararr = s.toCharArray(); 
+		for(int i = 0; i < chararr.length; ++i) 
+		{ 
+			if ((i & 7) < 4) 
+			{
+				state0 ^= chararr[i] << ((i & 3) << 3); 
+			} 
+			else 
+			{ 
+				state1 ^= chararr[i] << (((i & 7) - 4) << 3); 
+			} 
+		}  
+		
+		for(int i = 0; i < 5; ++i) 
+		{ 
+			state0 = Long.rotateLeft(state0, 55) ^ state1 ^ (state1 << 14); 
+			state1 = Long.rotateLeft(state1, 36); 
+		}  
+		long result = state0 + state1;  
+		return (int) result; 
 	}
 }

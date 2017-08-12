@@ -544,56 +544,46 @@ public abstract class Plan
 		return getExpressionbase().createExpression(exp);
 	}
 	
-//	/**
-//	 *  Send a message and wait for the answer.
-//	 *  @param me The message event.
-//	 *  @return The result event.
-//	 */
-//	public IMessageEvent sendMessageAndWait(IMessageEvent me)
-//	{
-//		return sendMessageAndWait(me, -1);
-//	}
+	/**
+	 *  Send a message and wait for the answer.
+	 *  @param me The message event.
+	 *  @return The result event.
+	 */
+	public <T> IMessageEvent<T> sendMessageAndWait(IMessageEvent<T> me)
+	{
+		return sendMessageAndWait(me, -1);
+	}
 
-//	/**
-//	 *  Send a message and wait for the answer.
-//	 *  Adds a reply_with entry if not present, for tracking the conversation.
-//	 *  @param me The message event.
-//	 *  @param timeout The timeout.
-//	 *  @return The result event.
-//	 */
-//	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
-//	{
-//		checkNotInAtomic();
-//		
-//		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
-//		WaitAbstraction wa = new WaitAbstraction();
-//		wa.addReply((RMessageEvent)me, null);
-//
-//		rplan.setWaitAbstraction(wa);
-//		
-//		sendMessage(me);
-//		
-//		Future<IMessageEvent> ret = new Future<IMessageEvent>();
-//		try
-//		{
-//			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)me);
-//			return ret.get(timeout);
-//		}
-//		finally
-//		{
-//			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)me);
-//		}
-//	}
+	/**
+	 *  Send a message and wait for the answer.
+	 *  Adds a reply_with entry if not present, for tracking the conversation.
+	 *  @param me The message event.
+	 *  @param timeout The timeout.
+	 *  @return The result event.
+	 */
+	public <T> IMessageEvent<T> sendMessageAndWait(IMessageEvent<T> me, long timeout)
+	{
+		checkNotInAtomic();
+		
+		WaitAbstraction wa = new WaitAbstraction();
+		wa.addReply((RMessageEvent<T>)me, null);
 
-//	/**
-//	 *  Send a message and wait until it is sent.
-//	 *  @param me	The message event.
-//	 */
-//	public IFuture<Void> sendMessage(IMessageEvent me)
-//	{
-//		return getEventbase().sendMessage(me);
-//	}
-	
+		rplan.setWaitAbstraction(wa);
+		
+		sendMessage(me);
+		
+		Future<IMessageEvent<T>> ret = new Future<IMessageEvent<T>>();
+		try
+		{
+			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent<T>)me);
+			return ret.get(timeout);
+		}
+		finally
+		{
+			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent<T>)me);
+		}
+	}
+
 	/**
 	 *  Let the plan fail.
 	 */

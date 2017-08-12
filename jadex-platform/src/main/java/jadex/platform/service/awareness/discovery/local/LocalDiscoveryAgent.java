@@ -3,6 +3,7 @@ package jadex.platform.service.awareness.discovery.local;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
@@ -186,6 +187,18 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 										}
 									});
 								}
+							}
+						}
+						catch (InvocationTargetException e)
+						{
+							if(e.getTargetException() instanceof InterruptedException)
+							{
+								// Platform shutdown -> ignore
+								// TODO: clean shutdown of discovery agent
+							}
+							else
+							{
+								e.printStackTrace();
 							}
 						}
 						catch (Exception e)

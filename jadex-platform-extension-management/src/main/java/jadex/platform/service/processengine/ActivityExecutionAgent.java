@@ -5,13 +5,14 @@ import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.exttask.ITaskExecutionService;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 
 /**
  * 
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 public class ActivityExecutionAgent implements ITaskExecutionService
 {

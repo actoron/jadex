@@ -1,7 +1,7 @@
 package jadex.bdiv3x.runtime;
 
-import java.awt.TrayIcon.MessageType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,21 +11,22 @@ import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 /**
  *  The runtime message event.
  */
-public class RMessageEvent extends RProcessableElement implements IMessageEvent 
+public class RMessageEvent<T> extends RProcessableElement implements IMessageEvent<T> 
 {
 	//-------- attributes --------
 	
 	/** The message. */
-	protected Map<String, Object> msg;
-	
-	/** The message type. */
-	protected MessageType mt;
+	protected T msg;
 	
 	//-------- constructors --------
 	
@@ -34,33 +35,59 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 */
 	public RMessageEvent(MMessageEvent modelelement, IInternalAccess agent, MConfigParameterElement config)
 	{
-//		this(modelelement, new HashMap<String, Object>(), SFipa.FIPA_MESSAGE_TYPE, agent, config);
 		super(modelelement, null, agent, null, config);
-//		this.msg = new HashMap<String, Object>();
-//		this.mt = SFipa.FIPA_MESSAGE_TYPE;
-//		
-//		// Must be done after msg has been assigned :-(
-//		super.initParameters(null, config);
-//		
-//		// In case of messages there can be parameters only in the config, not in the model due to underlying message type definition
-//		if(config!=null && config.getParameters()!=null)
-//		{
-//			for(Map.Entry<String, List<UnparsedExpression>> entry: config.getParameters().entrySet())
-//			{
+		// Create initial pojo value.
+		try
+		{
+			@SuppressWarnings("unchecked")
+			T t = (T)modelelement.getType().getType(agent.getClassLoader()).newInstance();
+			this.msg	= t;
+		}
+		catch(Exception e)
+		{
+			SUtil.throwUnchecked(e);
+		}
+		
+		// Must be done after msg has been assigned :-(
+		super.initParameters(null, config);
+		
+		// In case of messages there can be parameters only in the config, not in the model due to underlying message type definition
+		if(config!=null && config.getParameters()!=null)
+		{
+			for(Map.Entry<String, List<UnparsedExpression>> entry: config.getParameters().entrySet())
+			{
 //				if(!msg.containsKey(entry.getKey()))
 //				{
 //					ParameterSpecification ps = mt.getParameter(entry.getKey());
 //					if(!ps.isSet())
-//					{
-//						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey())));
-//					}
+					{
+						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey())));
+					}
 //					else
 //					{
 //						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey())));
 //					}
 //				}
-//			}
-//		}
+			}
+		}
+		
+		// Finally add remaining properties from pojo as parameters.
+		IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+		Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
+		for(Map.Entry<String, BeanProperty> entry: props.entrySet())
+		{
+			if(!hasParameter(entry.getKey()) && !hasParameterSet(entry.getKey()))
+			{
+				if(SReflect.isIterableClass(entry.getValue().getType()))
+				{
+					addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), (Object)null));					
+				}
+				else
+				{
+					addParameter(createParameter(null, entry.getKey(), getAgent(), (Object)null));
+				}
+			}
+		}
 	}
 	
 	/**
@@ -68,25 +95,36 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	 *  
 	 *  Constructor Without parameter init for received messages.
 	 */
-	public RMessageEvent(MMessageEvent modelelement, Map<String, Object> msg, MessageType mt, IInternalAccess agent)
+	public RMessageEvent(MMessageEvent modelelement, T msg, IInternalAccess agent)
 	{
-		super(modelelement, null, agent, msg, null);
-//		this.msg = msg;
-//		this.mt = mt;
-//		
-//		// Tricky, must do init for default values if NOT present in the map
-//		// Must be done after msg has been assigned :-(
-//		super.initParameters(msg, null);
+		super(modelelement, null, agent, null, null);
+		this.msg = msg;
+		
+		Map<String, Object>	def	= null;
+		if(msg!=null)
+		{
+			def	= new HashMap<String, Object>();
+			IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+			Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
+			for(Map.Entry<String, BeanProperty> entry: props.entrySet())
+			{
+				def.put(entry.getKey(), entry.getValue().getPropertyValue(msg));
+			}
+		}
+		
+		// Tricky, must do init for default values if NOT present in the msg
+		// Must be done after msg has been assigned :-(
+		super.initParameters(def, null);
 	}
 	
-//	/**
-//	 *  Create the parameters from model spec.
-//	 */
-//	@Override
-//	public void initParameters(Map<String, Object> vals, MConfigParameterElement config)
-//	{
-//		// do nothing in super constructor init 
-//	}
+	/**
+	 *  Create the parameters from model spec.
+	 */
+	@Override
+	public void initParameters(Map<String, Object> vals, MConfigParameterElement config)
+	{
+		// do nothing in super constructor init 
+	}
 //	
 	/**
 	 *  Get the name of the element in the fetcher (e.g. $goal).
@@ -96,45 +134,45 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 	{
 		return "$event";
 	}
-//	
-//	/**
-//	 * 
-//	 */
-//	@Override
-//	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival)
-//	{
-//		return new RParam(modelelement, name, agent, inival, getModelElement().getName());
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	@Override
-//	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals)
-//	{
-//		return new RParamSet(modelelement, name, agent, inivals, getModelElement().getName());
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	@Override
-//	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, Object value)
-//	{
-//		return new RParam(modelelement, name, agent, value, getModelElement().getName());
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	@Override
-//	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object values)
-//	{
-//		return new RParamSet(modelelement, name, agent, values, getModelElement().getName());
-//	}
-//	
-//	//-------- methods --------
-//	
+	
+	/**
+	 * 
+	 */
+	@Override
+	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival)
+	{
+		return new RParam(modelelement, name, agent, inival, getModelElement().getName());
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals)
+	{
+		return new RParamSet(modelelement, name, agent, inivals, getModelElement().getName());
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public IParameter createParameter(MParameter modelelement, String name, IInternalAccess agent, Object value)
+	{
+		return new RParam(modelelement, name, agent, value, getModelElement().getName());
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public IParameterSet createParameterSet(MParameter modelelement, String name, IInternalAccess agent, Object values)
+	{
+		return new RParamSet(modelelement, name, agent, values, getModelElement().getName());
+	}
+	
+	//-------- methods --------
+	
 //	/**
 //	 *  Get all parameters.
 //	 *  @return All parameters.
@@ -162,7 +200,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 //		}
 //		return ret.toArray(new IParameterSet[ret.size()]);
 //	}
-//
+
 //	/**
 //	 *  Get the parameter element.
 //	 *  @param name The name.
@@ -207,7 +245,7 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 //
 //		return super.getParameterSet(name);
 //	}
-//
+
 //	/**
 //	 *  Has the element a parameter element.
 //	 *  @param name The name.
@@ -227,360 +265,253 @@ public class RMessageEvent extends RProcessableElement implements IMessageEvent
 //	{
 //		return mt.getParameterSet(name)!=null;
 //	}
-//
+
 	/**
 	 *  Get the native (platform specific) message object.
 	 *  @return The native message.
 	 */
-	public Object getMessage()
+	public T getMessage()
 	{
 		return msg;
 	}
-
+	
 	/**
-	 *  Get the message type.
-	 *  @return The message type.
+	 * 
 	 */
-	public MessageType getMessageType()
+	public MMessageEvent getMMessageEvent()
 	{
-		return mt;
+		return (MMessageEvent)getModelElement();
 	}
-//	
-////	/**
-////	 *  Get the element type (i.e. the name declared in the ADF).
-////	 *  @return The element type.
-////	 */
-////	public String getType()
-////	{
-////		return getModelElement().getName();
-////	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public MMessageEvent getMMessageEvent()
-//	{
-//		return (MMessageEvent)getModelElement();
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public class RParam extends RParameter
-//	{
-//		/**
-//		 *  Create a new parameter.
-//		 *  @param modelelement The model element.
-//		 *  @param name The name.
-//		 */
-//		public RParam(MParameter modelelement, String name, IInternalAccess agent, String pename)
-//		{
-//			super(modelelement, name, agent, pename);
-//		}
-//		
-//		/**
-//		 *  Create a new parameter.
-//		 *  @param modelelement The model element.
-//		 *  @param name The name.
-//		 */
-//		public RParam(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, String pename)
-//		{
-//			super(modelelement, name, agent, inival, pename);
-//		}
-//		
-//		/**
-//		 *  Create a new parameter.
-//		 *  @param modelelement The model element.
-//		 *  @param name The name.
-//		 */
-//		public RParam(MParameter modelelement, String name, IInternalAccess agent, Object value, String pename)
-//		{
-//			super(modelelement, name, agent, value, pename);
-//		}
-//		
-//		/**
-//		 *  Set a value of a parameter.
-//		 *  @param value The new value.
-//		 */
-//		public void setValue(Object value)
-//		{
-//			publisher.entryChanged(msg.get(getName()), value, -1);
-//			msg.put(getName(), value);
-//		}
-//
-//		/**
-//		 *  Get the value of a parameter.
-//		 *  @return The value.
-//		 */
-//		public Object	getValue()
-//		{
-//			return msg.get(getName());
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	public class RParamSet extends RParameterSet
-//	{
-//		/**
-//		 *  Create a new parameter.
-//		 *  @param modelelement The model element.
-//		 *  @param name The name.
-//		 */
-//		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, String pename)
-//		{
-//			super(modelelement, name, agent, pename);
-//		}
-//		
-//		/**
-//		 *  Create a new parameter.
-//		 *  @param modelelement The model element.
-//		 *  @param name The name.
-//		 */
-//		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, String pename)
-//		{
-//			super(modelelement, name, agent, inivals, pename);
-//		}
-//		
-//		/**
-//		 *  Create a new parameter.
-//		 *  @param modelelement The model element.
-//		 *  @param name The name.
-//		 */
-//		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, Object values, String pename)
-//		{
-//			super(modelelement, name, agent, values, pename);
-//		}
-//		
-//		/**
-//		 *  Get the class of a value.
-//		 */
-//		@Override
-//		protected Class<?> getClazz()
-//		{
-//			Class<?> ret = getModelElement()!=null? super.getClazz(): null;
-//			if(ret==null)
-//				ret = getMessageType().getParameter(getName()).getClazz();
-//			return ret;
-//		}
-//		
-//		/**
-//		 *  The values to set.
-//		 *  @param values The values to set
-//		 */
-//		protected void setValues(List<Object> values)
-//		{
-//			testWriteOK((MParameter)getModelElement());
-//			
-//			msg.put(getName(), values);
-//		}
-//		
-//		/**
-//		 *  Adapt to message type for implicit parameters.
-//		 */
-//		@Override
-//		public Object[] getValues()
-//		{
-//			Object[]	ret;
-//			if(getModelElement()==null)
-//			{
-//				ret	= super.getValues(mt.getParameterSet(getName()).getClazz());
-//			}
-//			else
-//			{
-//				ret	= super.getValues();
-//			}
-//			
-//			return ret;
-//		}
-//		
-//		/**
-//		 * 
-//		 */
-//		protected List<Object> internalGetValues()
-//		{
-//			List<Object> vals = (List<Object>)msg.get(getName());
-//			if(vals==null)
-//			{
-//				vals = new ArrayList<Object>();
-//				msg.put(getName(), vals);
-//			}
-//			return vals;
-//		}
-//	}
-//	
-//	/** 
-//	 *  Get the string represntation.
-//	 */
-//	public String toString()
-//	{
-////		return "RGoal(lifecyclestate=" + lifecyclestate + ", processingstate="
-////			+ processingstate + ", state=" + state + ", id=" + id + ")";
-//		return "RMessageEvent: "+msg;
-//	}
-//	
-////	/**
-////	 * 
-////	 */
-////	public class RParameter extends RElement implements IParameter
-////	{
-////		/** The name. */
-////		protected String name;
-////
-////		/**
-////		 *  Create a new parameter.
-////		 *  @param modelelement The model element.
-////		 *  @param name The name.
-////		 */
-////		public RParameter(MElement modelelement, String name, IInternalAccess agent)
-////		{
-////			super(modelelement, agent);
-////			this.name = name;
-////		}
-////
-////		/**
-////		 *  Get the name.
-////		 *  @return The name
-////		 */
-////		public String getName()
-////		{
-////			return name;
-////		}
-////		
-////		/**
-////		 *  Set a value of a parameter.
-////		 *  @param value The new value.
-////		 */
-////		public void setValue(Object value)
-////		{
-////			msg.put(name, value);
-////		}
-////
-////		/**
-////		 *  Get the value of a parameter.
-////		 *  @return The value.
-////		 */
-////		public Object	getValue()
-////		{
-////			return msg.get(name);
-////		}
-////	}
-////	
-////	/**
-////	 * 
-////	 */
-////	public class RParameterSet extends RElement implements IParameterSet
-////	{
-////		/** The name. */
-////		protected String name;
-////		
-////		/**
-////		 *  Create a new parameter.
-////		 *  @param modelelement The model element.
-////		 *  @param name The name.
-////		 */
-////		public RParameterSet(MElement modelelement, String name, IInternalAccess agent)
-////		{
-////			super(modelelement, agent);
-////			this.name = name;
-////		}
-////
-////		/**
-////		 *  Get the name.
-////		 *  @return The name
-////		 */
-////		public String getName()
-////		{
-////			return name;
-////		}
-////		
-////		/**
-////		 *  Add a value to a parameter set.
-////		 *  @param value The new value.
-////		 */
-////		public void addValue(Object value)
-////		{
-////			Collection<Object> values = (Collection<Object>)msg.get(name);
-////			if(values==null)
-////			{
-////				values = new ArrayList<Object>();
-////				msg.put(name, values);
-////			}
-////			values.add(value);
-////		}
-////
-////		/**
-////		 *  Remove a value to a parameter set.
-////		 *  @param value The new value.
-////		 */
-////		public void removeValue(Object value)
-////		{
-////			Collection<Object> values = (Collection<Object>)msg.get(name);
-////			if(values!=null)
-////				values.remove(value);
-////		}
-////
-////		/**
-////		 *  Add values to a parameter set.
-////		 */
-////		public void addValues(Object[] values)
-////		{
-////			if(values!=null)
-////			{
-////				for(Object value: values)
-////				{
-////					addValue(value);
-////				}
-////			}
-////		}
-////
-////		/**
-////		 *  Remove all values from a parameter set.
-////		 */
-////		public void removeValues()
-////		{
-////			Collection<Object> values = (Collection<Object>)msg.get(name);
-////			if(values!=null)
-////				values.clear();
-////		}
-////
-////		/**
-////		 *  Get a value equal to the given object.
-////		 *  @param oldval The old value.
-////		 */
-//////		public Object	getValue(Object oldval);
-////
-////		/**
-////		 *  Test if a value is contained in a parameter.
-////		 *  @param value The value to test.
-////		 *  @return True, if value is contained.
-////		 */
-////		public boolean containsValue(Object value)
-////		{
-////			Collection<Object> values = (Collection<Object>)msg.get(name);
-////			return values==null? false: values.contains(value);
-////		}
-////
-////		/**
-////		 *  Get the values of a parameterset.
-////		 *  @return The values.
-////		 */
-////		public Object[]	getValues()
-////		{
-////			Collection<Object> values = (Collection<Object>)msg.get(name);
-////			return values==null? new Object[0]: values.toArray();
-////		}
-////
-////		/**
-////		 *  Get the number of values currently
-////		 *  contained in this set.
-////		 *  @return The values count.
-////		 */
-////		public int size()
-////		{
-////			Collection<Object> values = (Collection<Object>)msg.get(name);
-////			return values==null? 0: values.size();
-////		}
-////	}
+	
+	/**
+	 * 
+	 */
+	public class RParam extends RParameter
+	{
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, String pename)
+		{
+			super(modelelement, name, agent, pename);
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, UnparsedExpression inival, String pename)
+		{
+			super(modelelement, name, agent, inival, pename);
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParam(MParameter modelelement, String name, IInternalAccess agent, Object value, String pename)
+		{
+			super(modelelement, name, agent, value, pename);
+		}
+		
+		/**
+		 *  Set a value of a parameter.
+		 *  @param value The new value.
+		 */
+		public void setValue(Object value)
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			publisher.entryChanged(bp.getPropertyValue(msg), value, -1);
+			bp.setPropertyValue(msg, value);
+		}
+
+		/**
+		 *  Get the value of a parameter.
+		 *  @return The value.
+		 */
+		public Object	getValue()
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			return bp.getPropertyValue(msg);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public class RParamSet extends RParameterSet
+	{
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, String pename)
+		{
+			super(modelelement, name, agent, pename);
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, List<UnparsedExpression> inivals, String pename)
+		{
+			super(modelelement, name, agent, inivals, pename);
+		}
+		
+		/**
+		 *  Create a new parameter.
+		 *  @param modelelement The model element.
+		 *  @param name The name.
+		 */
+		public RParamSet(MParameter modelelement, String name, IInternalAccess agent, Object values, String pename)
+		{
+			super(modelelement, name, agent, values, pename);
+		}
+		
+		/**
+		 *  Get the class of a value.
+		 */
+		@Override
+		protected Class<?> getClazz()
+		{
+			Class<?> ret = getModelElement()!=null? super.getClazz(): null;
+			if(ret==null)
+			{
+				BeanProperty bp = findBeanProperty(getName());
+				ret	= SReflect.getIterableComponentType(bp.getGenericType()!=null ? bp.getGenericType() : bp.getType());
+			}
+			return ret;
+		}
+		
+		/**
+		 *  The values to set.
+		 *  @param values The values to set
+		 */
+		protected void internalSetValues(List<Object> values)
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			Object	value	= SReflect.createComposite(bp.getGenericType()!=null ? bp.getGenericType() : bp.getType(), values);
+			bp.setPropertyValue(msg, value);
+		}
+		
+		/**
+		 *  Adapt to message type for implicit parameters.
+		 */
+		@Override
+		public Object[] getValues()
+		{
+			Object[]	ret;
+			if(getModelElement()==null)
+			{
+				BeanProperty bp = findBeanProperty(getName());
+				ret	= super.getValues(SReflect.getIterableComponentType(bp.getGenericType()!=null ? bp.getGenericType() : bp.getType()));
+			}
+			else
+			{
+				ret	= super.getValues();
+			}
+			
+			return ret;
+		}
+		
+		/**
+		 * 
+		 */
+		protected List<Object> internalGetValues()
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			Object vals = bp.getPropertyValue(msg);
+			List<Object>	ret	= new ArrayList<Object>();
+			if(vals!=null)
+			{
+				for(Object o: SReflect.getIterable(vals))
+				{
+					ret.add(o);
+				}
+			}
+			return ret;
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void internalAddValue(Object value)
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			Object vals = bp.getPropertyValue(msg);
+			if(vals instanceof Collection)
+			{
+				((Collection<Object>)vals).add(value);
+			}
+			else
+			{
+				// TODO
+				throw new UnsupportedOperationException("Composite type not supported: "+vals);
+			}
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void internalRemoveValue(Object value)
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			Object vals = bp.getPropertyValue(msg);
+			if(vals instanceof Collection)
+			{
+				((Collection<Object>)vals).remove(value);
+			}
+			else
+			{
+				// TODO
+				throw new UnsupportedOperationException("Composite type not supported: "+vals);
+			}
+		}
+		
+		@Override
+		protected void internalRemoveValues()
+		{
+			BeanProperty bp = findBeanProperty(getName());
+			bp.setPropertyValue(msg, null);
+		}
+	}
+	
+	/** 
+	 *  Get the string represntation.
+	 */
+	public String toString()
+	{
+//		return "RGoal(lifecyclestate=" + lifecyclestate + ", processingstate="
+//			+ processingstate + ", state=" + state + ", id=" + id + ")";
+		return "RMessageEvent: "+msg;
+	}
+
+	protected BeanProperty findBeanProperty(String name)
+	{
+		IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+		BeanProperty	bp	= bi.getBeanProperties(msg.getClass(), true, false).get(name);
+
+		// If not found -> try converting underscore to camel case.
+		if(bp==null)
+		{
+			for(int idx=name.indexOf("_"); idx!=-1 ; idx=name.indexOf("_"))
+			{
+				String	tmp	= name.substring(0, idx);
+				if(name.length()>idx+1)
+				{
+					tmp	+= name.substring(idx+1, idx+2).toUpperCase();
+					tmp	+= name.substring(idx+2);
+				}
+				name	= tmp;
+			}
+			bp	= bi.getBeanProperties(msg.getClass(), true, false).get(name);
+		}
+		
+		return bp;
+	}
 }

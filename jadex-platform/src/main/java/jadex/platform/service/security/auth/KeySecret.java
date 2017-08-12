@@ -52,19 +52,23 @@ public class KeySecret extends SharedSecret
 	 */
 	public KeySecret(byte[] key)
 	{
-		this.key = key;
-		if (key.length < MIN_KEY_LENGTH)
-			Logger.getLogger("sharedsecret").warning("Weak key detected: + " + key + ", please use at least " + MIN_KEY_LENGTH + " bytes.");
+		this(key, true);
 	}
 	
 	/**
-	 *  Returns the encoded secret.
-	 *  
-	 *  @return The encoded secret.
+	 *  Creates the secret.
 	 */
-	public String getEncoded()
+	public KeySecret(byte[] key, boolean warn)
 	{
-		return PREFIX + ":" + toString();
+		this.key = key;
+		if (key.length < MIN_KEY_LENGTH)
+		{
+			String weak = "Weak key detected: + " + key + ", please use at least " + MIN_KEY_LENGTH + " bytes.";
+			if (warn)
+				Logger.getLogger("sharedsecret").warning(weak);
+			else
+				throw new IllegalArgumentException(weak);
+		}
 	}
 	
 	/**
@@ -82,7 +86,7 @@ public class KeySecret extends SharedSecret
 	 *  
 	 *  @param key The key.
 	 */
-	public void setPassword(byte[] key)
+	public void setKey(byte[] key)
 	{
 		this.key = key;
 	}
@@ -113,13 +117,28 @@ public class KeySecret extends SharedSecret
 	 */
 	public String toString()
 	{
-		return new String(Base64.encodeNoPadding(key), SUtil.UTF8);
+		return PREFIX + ":" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
 	}
 	
+	/**
+	 *  Creates a random shared key.
+	 * 
+	 *  @return Random shared key.
+	 */
 	public static final KeySecret createRandom()
 	{
 		byte[] rawkey = new byte[32];
 		SSecurity.getSecureRandom().nextBytes(rawkey);
 		return new KeySecret(rawkey);
+	}
+	
+	/**
+	 *  Creates a random shared key.
+	 * 
+	 *  @return Random shared key.
+	 */
+	public static final String createRandomAsString()
+	{
+		return createRandom().toString();
 	}
 }

@@ -19,8 +19,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -34,7 +32,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import jadex.commons.Tuple2;
-import jadex.commons.gui.GlowBorder;
 import jadex.commons.gui.JBusyRing;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.SGUI;
@@ -43,6 +40,7 @@ import jadex.commons.security.SSecurity;
 /**
  *  Panel for adding new certificates.
  */
+@SuppressWarnings("rawtypes") // Bad JComboBox, BAD!
 public class AddCertPanel extends JPanel
 {
 	/** Shorthand for GL-size. */
@@ -58,22 +56,22 @@ public class AddCertPanel extends JPanel
 	protected ButtonGroup certtypes;
 	
 	/** Signature algorithm chooser. */
-	protected JComboBox<String> sigalg;
+	protected JComboBox sigalg;
 	
 	/** Signature algorithm key strength chooser. */
-	protected JComboBox<String> sigalgstr;
+	protected JComboBox sigalgstr;
 	
 	/** Signature algorithm configuration chooser. */
-	protected JComboBox<String> sigalgconf;
+	protected JComboBox sigalgconf;
 	
 	/** Hash algorithm chooser. */
-	protected JComboBox<String> hashalg;
+	protected JComboBox hashalg;
 	
 	/** Validity of the certificate */
-	protected JComboBox<String> validity;
+	protected JComboBox validity;
 	
 	/** Path length of CA certificates */
-	protected JComboBox<String> pathlen;
+	protected JComboBox pathlen;
 	
 	/** The subject panel. */
 	protected SubjectPanel subjectpanel;
@@ -156,7 +154,7 @@ public class AddCertPanel extends JPanel
 			.addGroup(layout.createSequentialGroup()
 				.addComponent(certtypepanel, PS, DS, PS)
 				.addComponent(secpanel, PS, DS, PS)
-				.addComponent(subjectpanel))
+				.addComponent(subjectpanel, DS, DS, PS))
 			.addGroup(layout.createSequentialGroup()
 				.addComponent(certareapanel)
 				.addComponent(keyareapanel))
@@ -236,6 +234,12 @@ public class AddCertPanel extends JPanel
 		return typepanel;
 	}
 	
+	/**
+	 *  Creates the panel for security infos.
+	 *  
+	 *  @return The panel for security infos.
+	 */
+	@SuppressWarnings("unchecked")
 	protected JPanel createSecurityPanel()
 	{
 		JPanel cryptsettings = new JPanel();
@@ -245,18 +249,18 @@ public class AddCertPanel extends JPanel
 		cryptsettings.setLayout(layout);
 		
 		JLabel sigalgstrlb = new JLabel("Key Strength");
-		sigalgstr = new JComboBox<String>();
+		sigalgstr = new JComboBox();
 		sigalgstr.setEditable(false);
 		sigalgstr.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalgconflb = new JLabel("Curve");
-		sigalgconf = new JComboBox<String>();
+		sigalgconf = new JComboBox();
 		sigalgconf.addItem("Brainpool");
 		sigalgconf.addItem("NIST");
 		sigalgconf.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalglb = new JLabel("Algorithm");
-		sigalg = new JComboBox<String>();
+		sigalg = new JComboBox();
 		sigalg.setLightWeightPopupEnabled(false);
 		sigalg.addItem("ECDSA");
 		sigalg.addItem("RSA");
@@ -293,17 +297,17 @@ public class AddCertPanel extends JPanel
 		sigalg.addItemListener(sigalglis);
 		sigalglis.itemStateChanged(null);
 		
-		JLabel hashalglb = new JLabel("Hash");
-		hashalg = new JComboBox<String>();
+		JLabel hashalglb = new JLabel("Signature Hash");
+		hashalg = new JComboBox();
 		hashalg.setLightWeightPopupEnabled(false);
 		hashalg.setEditable(false);
 		hashalg.addItem("SHA256");
 		hashalg.addItem("SHA384");
 		hashalg.addItem("SHA512");
-		hashalg.setSelectedIndex(0);
+		hashalg.setSelectedIndex(2);
 		
 		JLabel validitylb = new JLabel("Validity");
-		validity = new JComboBox<String>();
+		validity = new JComboBox();
 		validity.setLightWeightPopupEnabled(false);
 		validity.setEditable(true);
 		validity.addItem("30 days");
@@ -365,7 +369,7 @@ public class AddCertPanel extends JPanel
 		});
 		
 		JLabel pathlenlb = new JLabel("Path Length");
-		pathlen = new JComboBox<String>();
+		pathlen = new JComboBox();
 		pathlen.setLightWeightPopupEnabled(false);
 		pathlen.addItem("0");
 		pathlen.addItem("1");
@@ -374,6 +378,7 @@ public class AddCertPanel extends JPanel
 		pathlen.addItem("4");
 		pathlen.addItem("5");
 		pathlen.addItem("Unlimited");
+		pathlen.setSelectedIndex(6);
 		pathlen.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
@@ -436,6 +441,11 @@ public class AddCertPanel extends JPanel
 		return cryptsettings;
 	}
 	
+	/**
+	 *  Creates the button panel.
+	 *  
+	 *  @return The button panel.
+	 */
 	protected JPanel createButtonPanel()
 	{
 		JPanel ret = new JPanel();
@@ -587,22 +597,20 @@ public class AddCertPanel extends JPanel
 		return ret;
 	}
 	
+	/**
+	 *  Panel with subject data.
+	 *
+	 */
 	protected static class SubjectPanel extends JPanel
 	{
-		/** CN field panel. */
-//		protected JPanel cnfieldpanel;
-		
-		/** CN field border. */
-		protected GlowBorder cnfieldborder;
-		
 		/** CN field. */
 		protected JPlaceholderTextField cnfield;
 		
-		/** O field. */
-		protected JPlaceholderTextField ofield;
-		
 		/** OU field. */
 		protected JPlaceholderTextField oufield;
+		
+		/** O field. */
+		protected JPlaceholderTextField ofield;
 		
 		/** L field. */
 		protected JPlaceholderTextField lfield;
@@ -616,49 +624,51 @@ public class AddCertPanel extends JPanel
 		/** Light yellow. */
 		protected static final Color L_Yellow = new Color(1.0f, 1.0f, 0.82f, 1.0f);
 		
+		/** Soft red. */
+		protected static final Color S_RED = new Color(252, 220, 216);
+		
 		public SubjectPanel()
 		{
+			setLayout(new BorderLayout());
 			setMinimumSize(new Dimension(200, getMinimumSize().height));
-			setPreferredSize(getMinimumSize());
+			
+			JPanel inner = new JPanel();
 			setBorder(BorderFactory.createTitledBorder("Certificate Subject"));
 			
-			int bs = 5;
-			cnfieldborder = new GlowBorder(bs, bs, bs, bs);
 			cnfield = new JPlaceholderTextField();
-			cnfield.setBorder(cnfieldborder);
-			cnfieldborder.setInnerColor(Color.WHITE);
 			cnfield.setPlaceholder("Name (CN)");
+			cnfield.setInvalidColor(Color.RED);
 			cnfield.addFocusListener(new FocusAdapter()
 			{
 				public void focusGained(FocusEvent e)
 				{
-					cnfieldborder.setInnerColor(Color.WHITE);
+//					cnfield.setBackground(Color.WHITE);
 				}
 			});
-			add(cnfield);
-			
-			ofield = new JPlaceholderTextField();
-			ofield.setPlaceholder("Organization (O)");
-			add(ofield);
+			inner.add(cnfield);
 			
 			oufield = new JPlaceholderTextField();
 			oufield.setPlaceholder("Organizational Unit (OU)");
-			add(oufield);
+			inner.add(oufield);
+			
+			ofield = new JPlaceholderTextField();
+			ofield.setPlaceholder("Organization (O)");
+			inner.add(ofield);
 			
 			lfield = new JPlaceholderTextField();
 			lfield.setPlaceholder("City (L)");
-			add(lfield);
+			inner.add(lfield);
 			
 			sfield = new JPlaceholderTextField();
 			sfield.setPlaceholder("State (S)");
-			add(sfield);
+			inner.add(sfield);
 			
 			cfield = new JPlaceholderTextField();
 			cfield.setPlaceholder("Country (C)");
-			add(cfield);
+			inner.add(cfield);
 			
-			GroupLayout layout = createGroupLayout(this);
-			setLayout(layout);
+			GroupLayout layout = createGroupLayout(inner);
+			inner.setLayout(layout);
 			
 			SequentialGroup hgroup = layout.createSequentialGroup();
 			hgroup.addGroup(layout.createParallelGroup()
@@ -686,6 +696,14 @@ public class AddCertPanel extends JPanel
 				.addGap(mingap, mingap, maxgap)
 				.addComponent(cfield, PS, DS, PS);
 			layout.setVerticalGroup(vgroup);
+			
+//			inner.setPreferredSize(inner.getMinimumSize());
+//			setMaximumSize(inner.getMaximumSize());
+			
+//			add(inner);
+			JScrollPane scroll = new JScrollPane(inner);
+			scroll.setBorder(BorderFactory.createEmptyBorder());
+			add(scroll);
 		}
 		
 		/** Returns the DN */
@@ -693,10 +711,12 @@ public class AddCertPanel extends JPanel
 		{
 			if (cnfield.getText().length() == 0)
 			{
+//				cnfield.setBackground(S_RED);
 //				cnfield.setBackground(Color.RED);
-				cnfieldborder.setInnerColor(Color.RED);
+//				cnfieldborder.setInnerColor(Color.RED);
 //				cnfieldpanel.repaint();
-				cnfield.repaint();
+//				cnfield.repaint();
+				cnfield.showInvalid();
 				return null;
 			}
 			
@@ -704,18 +724,18 @@ public class AddCertPanel extends JPanel
 			ret.append("CN=");
 			ret.append(cnfield.getText());
 			
+			if (oufield.getText().length() > 0)
+			{
+				ret.append(", OU=");
+				ret.append(oufield.getText());
+			}
+			
 			if (ofield.getText().length() > 0)
 			{
 				ret.append(", O=");
 				ret.append(ofield.getText());
 			}
 			
-			if (oufield.getText().length() > 0)
-			{
-				ret.append(", OU=");
-				ret.append(oufield.getText());
-			}
-
 			if (lfield.getText().length() > 0)
 			{
 				ret.append(", L=");
@@ -734,7 +754,7 @@ public class AddCertPanel extends JPanel
 				ret.append(cfield.getText());
 			}
 			
-			cnfieldborder.setInnerColor(Color.WHITE);
+//			cnfieldborder.setInnerColor(Color.WHITE);
 //			cnfieldpanel.repaint();
 			cnfield.repaint();
 //			cnfield.setBackground(L_Yellow);

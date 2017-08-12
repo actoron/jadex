@@ -164,7 +164,7 @@ public class Traverser
 	 */
 	public static Object traverseObject(Object object, Class<?> clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors,  MODE mode, ClassLoader targetcl, Object context)
 	{
-//		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
+//		if(clone && object!=null && object.getClass().getName().indexOf("Not")!=-1)
 //			System.out.println("Cloning: "+object);
 //			if(!clone) 
 			

@@ -9,7 +9,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -33,7 +33,7 @@ public class UserAgent
 	protected IInternalAccess					agent;
 
 	/** The message queue. */
-	@AgentService
+	@AgentServiceSearch
 	protected IMessageQueueReplicableService	mq;
 
 	/** The topic argument. */

@@ -1,5 +1,7 @@
 package jadex.bridge.component.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,21 +9,34 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.management.ServiceNotFoundException;
 
 import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IOutputConnection;
+import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.streams.AbstractConnectionHandler;
+import jadex.bridge.component.streams.InputConnection;
+import jadex.bridge.component.streams.InputConnectionHandler;
+import jadex.bridge.component.streams.OutputConnection;
+import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -35,6 +50,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.SCloner;
 
 /**
@@ -67,6 +83,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/** Messages awaiting reply. */
 	protected Map<String, Future<Object>> awaitingmessages;
+	
+	
+	/** The initiator connections. */
+	protected Map<Integer, AbstractConnectionHandler> icons;
+
+	/** The participant connections. */
+	protected Map<Integer, AbstractConnectionHandler> pcons;
+
 	
 	//-------- constructors --------
 	
@@ -324,9 +348,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
 						// Only accept messages we trust.
-						if (secinf.isAuthenticatedPlatform() || allowuntrusted)
+						if (secinf.isAuthenticated() || allowuntrusted)
 						{
-							Object message = deserializeMessage(header, result.getSecondEntity());
+							Object message;
+							try
+							{
+								message = deserializeMessage(header, result.getSecondEntity());
+							}
+							catch(Exception e)
+							{
+								// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
+								message 	= null;
+								header.addProperty(EXCEPTION, e);
+							}
 							messageArrived(secinf, header, message);
 						}
 					}
@@ -351,15 +385,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void messageArrived(final IMsgSecurityInfos secinfos, final IMsgHeader header, Object body)
 	{
-		if (Boolean.TRUE.equals(header.getProperty(SENDREPLY)))
+		if(Boolean.TRUE.equals(header.getProperty(SENDREPLY)))
 		{
 			// send-reply message, check if reply.
 			String convid = (String) header.getProperty(IMsgHeader.CONVERSATION_ID);
 			Future<Object> fut = awaitingmessages != null ? awaitingmessages.remove(convid) : null;
-			if (fut != null)
+			if(fut != null)
 			{
 				Exception exception = (Exception) header.getProperty(EXCEPTION);
-				if (exception != null)
+				if(exception != null)
 					fut.setException(exception);
 				else
 					fut.setResult(body);
@@ -375,7 +409,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  
 	 *  @param secinf Security meta infos.
 	 *  @param header Message header.
-	 * @param body
+	 *  @param body
 	 */
 	protected void handleMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
@@ -385,11 +419,11 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			for(Iterator<IMessageHandler> it = messagehandlers.iterator(); it.hasNext(); )
 			{
 				final IMessageHandler handler = it.next();
-				if (handler.isRemove())
+				if(handler.isRemove())
 				{
 					it.remove();
 				}
-				else if (handler.isHandling(secinf, header, body))
+				else if(handler.isHandling(secinf, header, body))
 				{
 					handled	= true;
 //					component.getComponentFeature0(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
@@ -404,10 +438,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 		}
 		
-		if (!handled)
-		{
+		if(!handled)
 			processUnhandledMessage(secinf, header, body);
-		}
 	}
 	
 	/**
@@ -498,26 +530,61 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  Inform the component that a stream has arrived.
 	 *  @param con The stream that arrived.
 	 */
-//	public void streamArrived(IConnection con)
-//	{
-//		getComponent().getComponentFeature(IExecutionFeature.class)
-//			.scheduleStep(createHandleStreamStep(con))
-//			.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				// NOP
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				// Todo: fail fast components?
-//				StringWriter	sw	= new StringWriter();
-//				exception.printStackTrace(new PrintWriter(sw));
-//				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
-//			}
-//		});
-//	}
+	public void streamArrived(IConnection con)
+	{
+		getComponent().getComponentFeature(IExecutionFeature.class)
+			.scheduleStep(new HandleStreamStep(con))
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// NOP
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: fail fast components?
+				StringWriter sw = new StringWriter();
+				exception.printStackTrace(new PrintWriter(sw));
+				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
+			}
+		});
+	}
+	
+	/**
+	 *  Step to handle a stream.
+	 *  Must not do anything and just throw it away?
+	 */
+	public class HandleStreamStep implements IComponentStep<Void>
+	{
+		private final IConnection con;
+
+		public HandleStreamStep(IConnection con)
+		{
+			this.con = con;
+		}
+
+		public IFuture<Void> execute(IInternalAccess ia)
+		{
+			invokeHandlers(con);
+			return IFuture.DONE;
+		}
+
+		/**
+		 *  Extracted to allow overriding behaviour.
+		 *  @return true, when at least one matching handler was found.
+		 */
+		protected boolean invokeHandlers(IConnection con)
+		{
+			boolean	ret	= false;
+			return ret;
+		}
+
+		public String toString()
+		{
+			return "messageArrived()_#"+this.hashCode();
+		}
+	}
 	
 	/**
 	 *  Find a suitable transport service for a message.
@@ -625,6 +692,333 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		for (int i = 0; i < convid.length; ++i)
 			convid[i] = SUtil.SECURE_RANDOM.nextLong();
 		return convid;
+	}
+	
+	/**
+	 * 
+	 */
+	public IInputConnection getParticipantInputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
+	{
+		return initInputConnection(conid, initiator, participant, nonfunc);
+	}
+	
+	/**
+	 * 
+	 */
+	public IOutputConnection getParticipantOutputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
+	{
+		return initOutputConnection(conid, initiator, participant, nonfunc);
+	}
+	
+	/**
+	 *  Create a virtual output connection.
+	 */
+	public OutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	{
+		UUID uuconid = UUID.randomUUID();
+		int conid = uuconid.hashCode();
+		OutputConnectionHandler och = new OutputConnectionHandler(getComponent(), nonfunc);
+		icons.put(conid, och);
+		OutputConnection con = new OutputConnection(sender, receiver, conid, true, och);
+//			System.out.println("created ocon: "+component+", "+System.currentTimeMillis()+", "+och.getConnectionId());
+		return con;
+	}
+	
+	/**
+	 *  Create a virtual output connection.
+	 */
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	{
+		return new Future<IOutputConnection>(internalCreateOutputConnection(sender, receiver, nonfunc));
+	}
+
+	/**
+	 *  Create a virtual input connection.
+	 */
+	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	{
+		UUID uuconid = UUID.randomUUID();
+		int conid = uuconid.hashCode();
+		InputConnectionHandler ich = new InputConnectionHandler(getComponent(), nonfunc);
+		icons.put(conid, ich);
+		InputConnection con = new InputConnection(sender, receiver, conid, true, ich);
+//			System.out.println("created icon: "+component+", "+System.currentTimeMillis()+", "+ich.getConnectionId());
+		return con;
+	}
+	
+	/**
+	 *  Create a virtual input connection.
+	 */
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc)
+	{
+		return new Future<IInputConnection>(internalCreateInputConnection(sender, receiver, nonfunc));
+	}
+	
+	/**
+	 *  Create local input connection side after receiving a remote init output message.
+	 *  May be called multiple times and does nothing, if connection already exists.
+	 */
+	protected IInputConnection	initInputConnection(final int conid, final IComponentIdentifier initiator, 
+		final IComponentIdentifier participant, final Map<String, Object> nonfunc)
+	{
+		boolean	created;
+		InputConnectionHandler ich	= null;
+		InputConnection con	= null;
+		synchronized(this)
+		{
+			ich	= (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(ich==null)
+			{
+				ich = new InputConnectionHandler(getComponent(), nonfunc);
+				con = new InputConnection(initiator, participant, conid, false, ich);
+				pcons.put(Integer.valueOf(conid), ich);
+//				System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+				created	= true;
+			}
+			else
+			{
+				con	= ich.getInputConnection();
+				created	= false;
+			}
+		}
+		
+		if(created)
+		{
+			ich.initReceived();
+			
+			final InputConnection fcon = con;
+//			final Future<Void> ret = new Future<Void>();
+			
+			IInternalMessageFeature	com	= (IInternalMessageFeature)getComponent().getComponentFeature(IMessageFeature.class);
+			if(com!=null)
+			{
+				com.streamArrived(fcon);
+			}
+			else
+			{
+				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+			}
+			
+//			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService cms)
+//				{
+//					cms.getExternalAccess(participant).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//					{
+//						public void customResultAvailable(IExternalAccess ea)
+//						{
+//							ea.scheduleStep(new IComponentStep<Void>()
+//							{
+//								public IFuture<Void> execute(IInternalAccess ia)
+//								{
+//									IInternalMessageFeature	com	= (IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class);
+//									if(com!=null)
+//									{
+//										com.streamArrived(fcon);
+//									}
+//									else
+//									{
+//										ia.getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+//									}
+//									
+//									return IFuture.DONE;
+//								}
+//							});
+//						}
+//					});
+//				}
+//			});
+		}
+		else
+		{
+			// If connection arrives late
+			if(nonfunc!=null)
+				ich.setNonFunctionalProperties(nonfunc);
+		}
+		
+		return con;
+	}
+
+	/**
+	 *  Create local output connection side after receiving a remote init input message.
+	 *  May be called multiple times and does nothing, if connection already exists.
+	 */
+	protected IOutputConnection	initOutputConnection(final int conid, final IComponentIdentifier initiator, 
+		final IComponentIdentifier participant, final Map<String, Object> nonfunc)
+	{
+		boolean	created;
+		OutputConnectionHandler och;
+		OutputConnection con	= null;
+		synchronized(this)
+		{
+			och	= (OutputConnectionHandler) pcons.get(Integer.valueOf(conid));
+			if(och==null)
+			{
+				och = new OutputConnectionHandler(getComponent(), nonfunc);
+				con = new OutputConnection(initiator, participant, conid, false, och);
+				pcons.put(Integer.valueOf(conid), och);
+//				System.out.println("created: "+con.hashCode());
+				created	= true;
+			}
+			else
+			{
+				con	= och.getOutputConnection();
+				created	= false;
+			}
+		}
+		
+		if(created)
+		{
+			och.initReceived();
+			
+			final OutputConnection	fcon	= con;
+//			final Future<Void> ret = new Future<Void>();
+			
+			IInternalMessageFeature	com	= (IInternalMessageFeature)getComponent().getComponentFeature(IMessageFeature.class);
+			if(com!=null)
+			{
+				com.streamArrived(fcon);
+			}
+			else
+			{
+				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+			}
+			
+//			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService cms)
+//				{
+//					cms.getExternalAccess(participant).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//					{
+//						public void customResultAvailable(IExternalAccess ea)
+//						{
+//							ea.scheduleStep(new IComponentStep<Void>()
+//							{
+//								public IFuture<Void> execute(IInternalAccess ia)
+//								{
+//									IInternalMessageFeature	com	= (IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class);
+//									if(com!=null)
+//									{
+//										com.streamArrived(fcon);
+//									}
+//									else
+//									{
+//										ia.getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+//									}
+//									
+//									return IFuture.DONE;
+//								}
+//							});
+//						}
+//					});
+//				}
+//			});
+		}
+		else
+		{
+			// If connection arrives late
+			if(nonfunc!=null)
+				och.setNonFunctionalProperties(nonfunc);
+		}
+		
+		return con;
+	}
+	
+	/**
+	 * 
+	 */
+	public void startStreamSendAliveBehavior()
+	{
+		final long lt = getMinLeaseTime(getComponent().getComponentIdentifier());
+		if(lt!=Timeout.NONE)
+		{
+			getComponent().scheduleStep(new IComponentStep<Void>()
+			{
+				@Classname("sendAlive")
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+	//				System.out.println("sendAlive: "+pcons+" "+icons);
+					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<mypcons.length; i++)
+					{
+						if(!mypcons[i].isClosed())
+						{
+							mypcons[i].sendAlive();
+						}
+					}
+					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<myicons.length; i++)
+					{
+						if(!myicons[i].isClosed())
+						{
+							myicons[i].sendAlive();
+						}
+					}
+					
+					getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
+					
+					return IFuture.DONE;
+				}
+			});
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void startStreamCheckAliveBehavior()
+	{
+		final long lt = getMinLeaseTime(getComponent().getComponentIdentifier());
+//		System.out.println("to is: "+lt);
+		if(lt!=Timeout.NONE)
+		{
+			getComponent().scheduleStep(new IComponentStep<Void>()
+			{
+				@Classname("checkAlive")
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+	//				final IComponentStep<Void> step = this;
+	//				final Future<Void> ret = new Future<Void>();
+					
+					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<mypcons.length; i++)
+					{
+						if(!mypcons[i].isConnectionAlive())
+						{
+	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
+							mypcons[i].close();
+							pcons.remove(Integer.valueOf(mypcons[i].getConnectionId()));
+						}
+					}
+					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<myicons.length; i++)
+					{
+						if(!myicons[i].isConnectionAlive())
+						{
+	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
+							myicons[i].close();
+							icons.remove(Integer.valueOf(myicons[i].getConnectionId()));
+						}
+					}
+					
+					getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
+					
+					return IFuture.DONE;
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Get the minimum lease time.
+	 *  @param platform The (local) platform.
+	 *  @return The minimum leasetime.
+	 */
+	public static long getMinLeaseTime(IComponentIdentifier platform)
+	{
+		return Starter.getScaledRemoteDefaultTimeout(platform, 1.0/6);
 	}
 
 	/**

@@ -15,7 +15,7 @@ import jadex.micro.annotation.AgentBody;
 public class FipaSenderAgent
 {
 	/** The receiver. */
-	@AgentArgument
+	@AgentArgument(convert="$value!=null ? $value : $component.getComponentIdentifier()")
 	protected IComponentIdentifier	receiver;
 	
 	/**
@@ -24,13 +24,8 @@ public class FipaSenderAgent
 	@AgentBody
 	protected IFuture<Void>	run(IMessageFeature mf)
 	{
-		FipaMessage	request	= new FipaMessage();
-		request.setPerformative(FipaMessage.Performative.REQUEST);
-		request.setReceiver(receiver);
-		request.setContent("Hello?");
-		
+		FipaMessage	request	= new FipaMessage(receiver, FipaMessage.Performative.REQUEST, "Hello?");
 		FipaMessage	reply	= (FipaMessage)mf.sendMessageAndWait(null, request).get();
-		
 		System.out.println("Sender received: "+reply);
 		
 		return IFuture.DONE;

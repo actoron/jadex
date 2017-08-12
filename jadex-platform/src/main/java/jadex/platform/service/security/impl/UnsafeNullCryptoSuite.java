@@ -93,9 +93,9 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage)
 	{
 		secinf = new MsgSecurityInfos();
-		secinf.setAuthenticatedPlatform(true);
+		secinf.setAuthenticated(true);
 		secinf.setTrustedPlatform(true);
-		secinf.setNetworks(agent.getNetworks().keySet().toArray(new String[agent.getNetworks().size()]));
+		secinf.setNetworks(agent.getInternalNetworks().keySet().toArray(new String[agent.getInternalNetworks().size()]));
 		
 		if (!(incomingmessage instanceof NullMessage))
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), new NullMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId()));

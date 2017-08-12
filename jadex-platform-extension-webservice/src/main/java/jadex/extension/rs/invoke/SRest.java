@@ -3,6 +3,7 @@ package jadex.extension.rs.invoke;
 import java.lang.reflect.Proxy;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.extension.rs.RSFactory;
 
 /**
@@ -21,7 +22,7 @@ public class SRest
 	 */
 	public static Object createServiceImplementation(IInternalAccess agent, Class<?> type, Class<?> impl)
 	{
-		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+		return ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
 			RSFactory.getInstance().createRSWrapperInvocationHandler(agent, impl));
 	}
 }

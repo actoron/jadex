@@ -28,6 +28,7 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
+import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -425,6 +426,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						cs.createTimer(delay, to);					
 					}
 				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Ignore (TODO: why happens during shutdown!?)
+				}
 			}));
 		}
 		else
@@ -650,7 +657,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
 			IExecutionService exe = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 			// Hack!!! service is foudn before it is started, grrr.
-			if (exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
@@ -1231,7 +1238,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				else
 				{
 					getComponent().getLogger().warning(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
-					ex = new StepAborted();
+					ex = new StepInvalidException(step.getStep());
+					//ex = new StepAborted();
 //					{
 //						public void printStackTrace() 
 //						{
@@ -1271,7 +1279,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// Hard step failure with uncatched exception is shown also when no debug.
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
-					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier())))
+					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier()))
+					&& !(ex instanceof StepInvalidException))
 				{
 					final Throwable fex = ex;
 					// No wait for delayed listener addition for hard failures to print errors immediately.

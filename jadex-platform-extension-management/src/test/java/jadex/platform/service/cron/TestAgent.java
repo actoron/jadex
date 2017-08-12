@@ -28,7 +28,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -58,7 +58,7 @@ public class TestAgent
 	protected IInternalAccess agent;
 	
 	/** The library service. */
-	@AgentService
+	@AgentServiceSearch
 	protected IClockService clock;
 	
 	//-------- methods --------

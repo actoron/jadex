@@ -171,11 +171,11 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addServiceInjection(String name, FieldInfo field, boolean lazy)
+	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
 	{
 		if(serviceinjections==null)
 			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
-		serviceinjections.add(name, new ServiceInjectionInfo(field, lazy));
+		serviceinjections.add(name, new ServiceInjectionInfo(field, lazy, query));
 	}
 	
 	/**
@@ -314,9 +314,7 @@ public class MicroModel extends CacheableKernelModel
 	public void setAgentMethod(Class<? extends Annotation> ann, MethodInfo mi)
 	{
 		if(agentmethods==null)
-		{
 			agentmethods = new HashMap<Class<? extends Annotation>, MethodInfo>();
-		}
 		
 		if(!agentmethods.containsKey(ann))
 		{
@@ -324,7 +322,7 @@ public class MicroModel extends CacheableKernelModel
 		}
 		else
 		{
-			MethodInfo	prev	= agentmethods.get(ann);
+			MethodInfo prev = agentmethods.get(ann);
 			if(SUtil.equals(mi.getClassName(), prev.getClassName()))
 			{
 				throw new RuntimeException("Only one @"+ann.getSimpleName()+" method allowed in "+mi.getClassName());
@@ -335,7 +333,7 @@ public class MicroModel extends CacheableKernelModel
 	/**
 	 *  Get an agent method.
 	 */
-	public MethodInfo	getAgentMethod(Class<? extends Annotation> ann)
+	public MethodInfo getAgentMethod(Class<? extends Annotation> ann)
 	{
 		return agentmethods!=null ? agentmethods.get(ann) : null;
 	}
@@ -360,10 +358,11 @@ public class MicroModel extends CacheableKernelModel
 		/**
 		 *  Create a new injection info.
 		 */
-		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy)
+		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query)
 		{
 			this.fieldInfo = fieldInfo;
 			this.lazy = lazy;
+			this.query = query;
 		}
 		
 		/**
@@ -374,8 +373,6 @@ public class MicroModel extends CacheableKernelModel
 			this.methodInfo = methodInfo;
 			this.query = query;
 		}
-
-
 
 		/**
 		 *  Get the fieldInfo.

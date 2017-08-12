@@ -19,7 +19,7 @@ public class PasswordSecret extends SharedSecret
 	public static final String PREFIX = "pw";
 	
 	/** Password length warning threshold. */
-	protected static final int WARN_PASSWORD_LENGTH = 12;
+	protected static final int WARN_PASSWORD_LENGTH = 10;
 	
 	/** SCrypt work factor / hardness for password strengthening. */
 	protected static final int SCRYPT_N = 16384;
@@ -53,8 +53,6 @@ public class PasswordSecret extends SharedSecret
 	 */
 	public PasswordSecret(String password, boolean encoded)
 	{
-		
-		
 		if (encoded)
 		{
 			int ind = password.indexOf(':');
@@ -63,6 +61,10 @@ public class PasswordSecret extends SharedSecret
 			if (!PREFIX.startsWith(prefix))
 				throw new IllegalArgumentException("Not a password secret: " + password);
 			this.password = password.substring(ind + 1);
+		}
+		else
+		{
+			this.password = password;
 		}
 		
 		if (this.password.length() < WARN_PASSWORD_LENGTH)

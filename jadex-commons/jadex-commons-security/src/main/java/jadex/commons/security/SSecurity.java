@@ -20,6 +20,7 @@ import java.util.zip.GZIPOutputStream;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -67,7 +68,6 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
@@ -92,6 +92,9 @@ import jadex.commons.security.random.SecureThreadedRandom;
  */
 public class SSecurity
 {
+	/** Default hash used for signatures. */
+	protected static final String DEFAULT_SIGNATURE_HASH = "SHA512";
+	
 	/**
 	 *  Flag if the paranoid/hedged-mode PRNG should be used (much slower, but guarded against single-point failures).
 	 */
@@ -100,8 +103,8 @@ public class SSecurity
 	/** Common secure random number source. */
 	protected static volatile SecureRandom SECURE_RANDOM;
 	
-	/** Random number source for seeding CSPRNGS. */
-	protected static volatile SecureRandom SECURE_SEED_RANDOM;
+	/** Entropy source for seeding CSPRNGS. */
+	protected static volatile IEntropySource ENTROPY_SOURCE;
 	
 	/**
 	 *  Gets access to the common secure PRNG.
@@ -126,48 +129,79 @@ public class SSecurity
 	}
 	
 	/**
-	 *  Gets a secure random seed value from OS or other sources.
+	 *  Gets a secure entropy source from OS or otherwise.
 	 *  
-	 *  @param numbytes number of seed bytes needed.
-	 *  @return Secure seed.
+	 *  @return Secure entropy source.
 	 */
-	public static SecureRandom getSeedRandom()
+	public static IEntropySource getEntropySource()
 	{
-		if (SECURE_SEED_RANDOM == null)
+		if (ENTROPY_SOURCE == null)
 		{
 			synchronized (SSecurity.class)
 			{
-				if (SECURE_SEED_RANDOM == null)
+				if (ENTROPY_SOURCE == null)
 				{
-					final SecureRandom basicseed = new SecureRandom()
+					final IEntropySource basicsource = new IEntropySource()
 					{
-						private static final long serialVersionUID = -8238246099124227737L;
+//						protected long bcount = 0;
 						
-//						protected long bytecounter = 0;
-
-						public synchronized void nextBytes(byte[] ret)
+						/** Input stream for POSIX-like systems. */
+						protected InputStream urandomis;
+						
 						{
-							boolean noseed = true;
 							File urandom = new File("/dev/urandom");
-							InputStream urandomin = null;
-							try
+							if (urandom.exists())
 							{
-								urandomin = new FileInputStream(urandom);
-								if (urandom.exists())
+								try
 								{
-									SUtil.readStream(ret, urandomin);
-									noseed = false;
-									SUtil.close(urandomin);
+									urandomis = new FileInputStream(urandom);
+								}
+								catch (Exception e)
+								{
+									SUtil.close(urandomis);
 								}
 							}
-							catch (Exception e)
+							
+							if (urandomis == null)
 							{
-								SUtil.close(urandomin);
+								urandom = new File("/dev/random");
+								if (urandom.exists())
+								{
+									try
+									{
+										urandomis = new FileInputStream(urandom);
+									}
+									catch (Exception e)
+									{
+										SUtil.close(urandomis);
+									}
+								}
+							}
+						}
+						
+						public synchronized void getEntropy(byte[] ret)
+						{
+//							bcount += ret.length;
+//							System.out.println("Entropy bytes: " + bcount);
+							boolean noseed = true;
+							if (urandomis != null)
+							{
+								try
+								{
+									SUtil.readStream(ret, urandomis);
+									noseed = false;
+								}
+								catch (Exception e)
+								{
+									if (urandomis != null)
+										SUtil.close(urandomis);
+									urandomis = null;
+								}
 							}
 							
 							if (noseed)
 							{
-								// For Windows, use Windows API to gather seed data
+								// For Windows, use Windows API to gather entropy data
 								String osname = System.getProperty("os.name");
 								String osversion = System.getProperty("os.version");
 								int minmajwinversion = 6;
@@ -190,49 +224,39 @@ public class SSecurity
 							
 							if (noseed)
 							{
+								// Fallback to Java if nothing works.
 								ret = SecureRandom.getSeed(ret.length);
 							}
-							
-//							bytecounter += ret.length;
-//							System.out.println("Seed consumption: " + bytecounter);
 						}
 						
-						public byte[] generateSeed(int numbytes)
+						protected void finalize() throws Throwable
 						{
-							byte[] ret = new byte[numbytes];
-							nextBytes(ret);
-							return ret;
+							if (urandomis != null)
+								SUtil.close(urandomis);
 						}
 					};
 					
 					if (PARANOID_PRNG)
 					{
-						SECURE_SEED_RANDOM = new SecureRandom()
+						ENTROPY_SOURCE = new IEntropySource()
 						{
-							public synchronized void nextBytes(byte[] bytes)
+							public synchronized void getEntropy(byte[] bytes)
 							{
 								byte[] addent = SecureRandom.getSeed(bytes.length);
-								basicseed.nextBytes(bytes);
+								basicsource.getEntropy(bytes);
 								xor(bytes, addent);
-							}
-							
-							public byte[] generateSeed(int numbytes)
-							{
-								byte[] ret = new byte[numbytes];
-								nextBytes(ret);
-								return ret;
 							}
 						};
 					}
 					else
 					{
-						SECURE_SEED_RANDOM = basicseed;
+						ENTROPY_SOURCE = basicsource;
 					}
 				}
 			}
 		}
 		
-		return SECURE_SEED_RANDOM;
+		return ENTROPY_SOURCE;
 	}
 	
 	/**
@@ -261,8 +285,8 @@ public class SSecurity
 			String pemkeystr = new String(SUtil.readStream(pemkey), SUtil.UTF8);
 			pemkey.close();
 			
-			DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-			ContentSigner signer = getSigner(anf.getAlgorithmName(cert.getSignatureAlgorithm()), readPrivateKeyFromPEM(pemkeystr));
+			String sigalg = getCertSigAlg(cert);
+			ContentSigner signer = getSigner(DEFAULT_SIGNATURE_HASH + "WITH" + sigalg, readPrivateKeyFromPEM(pemkeystr));
 			signer.getOutputStream().write(msghash);
 			signer.getOutputStream().close();
 			
@@ -352,7 +376,7 @@ public class SSecurity
 				return false;
 			
 			// Verify signature
-			ContentVerifier cv = getVerifier(certchain.get(0));
+			ContentVerifier cv = getDefaultVerifier(certchain.get(0));
 			cv.getOutputStream().write(msghash);
 			cv.getOutputStream().close();
 			return cv.verify(sig);
@@ -641,6 +665,40 @@ public class SSecurity
 	}
 	
 	/**
+	 *  Gets the signatures algorithm supported by the key provided by a certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return The signature algorithm.
+	 */
+	public static final String getCertSigAlg(String cert)
+	{
+		X509CertificateHolder lcert = readCertificateFromPEM(cert);
+		return getCertSigAlg(lcert);
+	}
+	
+	/**
+	 *  Gets the signatures algorithm supported by the key provided by a certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return The signature algorithm.
+	 */
+	public static final String getCertSigAlg(X509CertificateHolder cert)
+	{
+		SubjectPublicKeyInfo spki = cert.getSubjectPublicKeyInfo();
+		
+		String ret = spki.getAlgorithm().getAlgorithm().getId();
+
+		if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(ret))
+			ret = "ECDSA";
+		else if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(ret))
+			ret = "RSA";
+		else if (X9ObjectIdentifiers.id_dsa.getId().equals(ret))
+			ret = "DSA";
+		
+		return ret;
+	}
+	
+	/**
 	 *  Generates a fast secure PRNG. The setup attempts to prepare a PRNG that is fast and secure.
 	 *  @return Secure PRNG.
 	 */
@@ -665,37 +723,7 @@ public class SSecurity
 				// Convert to bytes.
 				int numbytes = (int) Math.ceil(bitsRequired / 8.0);
 				final byte[] fseed = new byte[numbytes];
-				getSeedRandom().nextBytes(fseed);;
-				
-				EntropySource ret = new EntropySource()
-				{
-					public boolean isPredictionResistant()
-					{
-						return true;
-					}
-					
-					public byte[] getEntropy()
-					{
-						return fseed;
-					}
-					
-					public int entropySize()
-					{
-						return fseed.length * 8;
-					}
-				};
-				return ret;
-			}
-		};
-		
-		EntropySourceProvider nonceprovider = new EntropySourceProvider()
-		{
-			public EntropySource get(int bitsRequired)
-			{
-				// Convert to bytes.
-				int numbytes = (int) Math.ceil(bitsRequired / 8.0);
-				final byte[] fseed = new byte[numbytes];
-				getSecureRandom().nextBytes(fseed);;
+				getEntropySource().getEntropy(fseed);;
 				
 				EntropySource ret = new EntropySource()
 				{
@@ -723,11 +751,11 @@ public class SSecurity
 		
 		SP800SecureRandomBuilder builder = new SP800SecureRandomBuilder(esp);
 		AESEngine eng = new AESEngine();
-		prngs.add(builder.buildCTR(eng, 256, nonceprovider.get(256).getEntropy(), false));
+		prngs.add(builder.buildCTR(eng, 256, esp.get(256).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		Mac m = new HMac(new SHA512Digest());
-		prngs.add(builder.buildHMAC(m, nonceprovider.get(512).getEntropy(), false));
+		prngs.add(builder.buildHMAC(m, esp.get(512).getEntropy(), false));
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		prngs.add(generateSecureRandom());
@@ -765,9 +793,9 @@ public class SSecurity
 	 *  @param issuercert Certificate of the issuer (CA).
 	 *  @param issuerkey Key of the issuer (CA).
 	 *  @param subject Subject of the certificate.
-	 *  @param sigalg Signature scheme to use, e.g. RSA, DSA, ECDSA.
+	 *  @param sigalg Signature scheme / certificate key algorithm to use, e.g. RSA, DSA, ECDSA.
 	 *  @param schemeconf Additional scheme configuration, may be null.
-	 *  @param digalg Hash algorithm to use.
+	 *  @param digalg Hash algorithm to use for certificate signature.
 	 *  @param strength Strength of the key.
 	 *  @param daysvalid Number of days valid.
 	 *  @param extensions Certificate extensions.
@@ -790,8 +818,7 @@ public class SSecurity
 			{
 				loadedissuercert = SSecurity.readCertificateFromPEM(issuercert);
 				issuer = loadedissuercert.getSubject();
-				DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-				sigspec = anf.getAlgorithmName(loadedissuercert.getSignatureAlgorithm());
+				sigspec = digalg + "WITH" + getCertSigAlg(loadedissuercert);
 			}
 			
 			byte[] serialbytes = new byte[20];
@@ -834,8 +861,6 @@ public class SSecurity
 			{
 				parentpki = pki;
 			}
-			
-			System.out.println(parentpki.getPrivateKeyAlgorithm().getAlgorithm().toString());
 			
 			ContentSigner signer = getSigner(sigspec, parentpki);
 			
@@ -1017,11 +1042,15 @@ public class SSecurity
 	 *  @param cert The certificate.
 	 *  @return A content verifier.
 	 */
-	protected static final ContentVerifier getVerifier(X509CertificateHolder cert)
+	protected static final ContentVerifier getDefaultVerifier(X509CertificateHolder cert)
 	{
+		DefaultSignatureAlgorithmIdentifierFinder saf = new DefaultSignatureAlgorithmIdentifierFinder();
+		String sig = getCertSigAlg(cert);
+		AlgorithmIdentifier algspec = saf.find(DEFAULT_SIGNATURE_HASH + "WITH" + sig);
+		
 		try
 		{
-			return getVerifierProvider(cert).get(cert.getSignatureAlgorithm());
+			return getVerifierProvider(cert).get(algspec);
 		}
 		catch (Exception e)
 		{
@@ -1038,17 +1067,15 @@ public class SSecurity
 	 */
 	protected static final ContentVerifierProvider getVerifierProvider(X509CertificateHolder cert)
 	{
-		DefaultAlgorithmNameFinder anf = new DefaultAlgorithmNameFinder();
-		String algospec = anf.getAlgorithmName(cert.getSignatureAlgorithm());
-		String[] algs = algospec.split("WITH");
+		String sigalg = getCertSigAlg(cert);
 		
 		DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
 		BcContentVerifierProviderBuilder verifierbuilder = null;
-		if ("ECDSA".equals(algs[1]))
+		if ("ECDSA".equals(sigalg))
 			verifierbuilder = new BcECContentVerifierProviderBuilder(digalgfinder);
-		else if ("RSA".equals(algs[1]))
+		else if ("RSA".equals(sigalg))
 			verifierbuilder = new BcRSAContentVerifierProviderBuilder(digalgfinder);
-		else if ("DSA".equals(algs[1]))
+		else if ("DSA".equals(sigalg))
 			verifierbuilder = new BcDSAContentVerifierProviderBuilder(digalgfinder);
 		
 		try

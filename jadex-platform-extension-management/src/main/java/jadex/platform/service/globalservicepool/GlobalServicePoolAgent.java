@@ -13,6 +13,7 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
@@ -139,7 +140,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 				List<UnparsedExpression> props = new ArrayList<UnparsedExpression>();
 				props.add(new UnparsedExpression(ITargetResolver.TARGETRESOLVER, GlobalServicePoolTargetResolver.class.getName()+".class"));
 				psi.setProperties(props);
-				Object service = Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
+				Object service = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
 				agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			

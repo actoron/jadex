@@ -484,13 +484,13 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	/**
 	 *  Add excluded methods.
 	 */
-	public static void addExcludedMethods(Map props, String[] excludes)
+	public static void addExcludedMethods(Map<String, String[]> props, String[] excludes)
 	{
 		Object ex = props.get("remote_excluded");
 		if(ex!=null)
 		{
-			List newex = new ArrayList();
-			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+			List<String> newex = new ArrayList<String>();
+			for(Iterator<String> it=SReflect.getIterator(ex); it.hasNext(); )
 			{
 				newex.add(it.next());
 			}
