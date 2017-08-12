@@ -3,6 +3,7 @@ package jadex.micro.testcases.semiautomatic.message;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.FipaMessage;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -21,7 +22,7 @@ public class FipaSenderAgent
 	 *  Send the message and wait for the result.
 	 */
 	@AgentBody
-	protected void	run(IMessageFeature mf)
+	protected IFuture<Void>	run(IMessageFeature mf)
 	{
 		FipaMessage	request	= new FipaMessage();
 		request.setPerformative(FipaMessage.Performative.REQUEST);
@@ -31,5 +32,7 @@ public class FipaSenderAgent
 		FipaMessage	reply	= (FipaMessage)mf.sendMessageAndWait(null, request).get();
 		
 		System.out.println("Sender received: "+reply);
+		
+		return IFuture.DONE;
 	} 
 }

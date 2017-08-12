@@ -17,8 +17,8 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 public class MessagingTest
 {
 	protected static boolean	remote	= false;
-	protected static Class<?>	receiver	= FipaReceiverAgent.class;
 	protected static Class<?>	sender	= FipaSenderAgent.class;
+	protected static Class<?>	receiver	= FipaReceiverAgent.class;
 	
 	/**
 	 *  Start two agents on separate platforms and exchange a request/reply.
