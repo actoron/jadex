@@ -29,9 +29,6 @@ public interface IStarterConfiguration {
 
     /** The local service registry data key. */
     String DATA_SERVICEREGISTRY = "serviceregistry";
-
-    /** The transport address book data key. */
-    String DATA_ADDRESSBOOK = "addressbook";
     
     /** The serialization services for serializing and en/decoding objects including remote reference handling. */
     String DATA_SERIALIZATIONSERVICES = "serialservs";

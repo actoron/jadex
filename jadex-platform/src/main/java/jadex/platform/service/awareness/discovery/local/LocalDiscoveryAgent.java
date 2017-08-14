@@ -5,8 +5,8 @@ import java.io.FileOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -17,7 +17,9 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.address.TransportAddressBook;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
@@ -25,11 +27,12 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Base64;
 import jadex.commons.Boolean3;
-import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.micro.annotation.Agent;
@@ -57,7 +60,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Argument(name="leasetime", clazz=Long.class, defaultvalue="30000L")
 })
 //@Properties(@NameValue(name="system", value="true"))
-public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<IComponentIdentifier>
+public class LocalDiscoveryAgent implements IDiscoveryService
 {
 	/** The discovery directory. */
 	protected static final File DISCOVERY_DIR = new File(System.getProperty("java.io.tmpdir") + File.separator + ".jadex" + File.separator + "discovery");
@@ -216,7 +219,27 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 			}
 		}
 		
-		TransportAddressBook.getAddressBook(agent).addListener(this);
+		SServiceProvider.getLocalService(agent, ITransportAddressService.class).subscribeToLocalAddresses().addIntermediateResultListener(new IIntermediateResultListener<Tuple2<TransportAddress,Boolean>>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getLogger().warning(exception.toString());
+			}
+			
+			public void resultAvailable(Collection<Tuple2<TransportAddress, Boolean>> result)
+			{				
+			}
+			
+			public void intermediateResultAvailable(Tuple2<TransportAddress, Boolean> result)
+			{
+				System.out.println("new result " + result.getFirstEntity());
+				postInfo();
+			}
+			
+			public void finished()
+			{
+			}
+		});
 		
 		return IFuture.DONE;
 	}
@@ -224,12 +247,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 	/**
 	 *  Notifies a change occurred.
 	 */
-	public void changeOccurred(ChangeEvent<IComponentIdentifier> event)
-	{
-//		System.out.println("Change occured: " + agent + " " + event.getSource());
-		if (agent.getComponentIdentifier().getRoot().equals(event.getSource()))
-			postInfo();
-	}
+//	public void changeOccurred()
+//	{
+////		System.out.println("Change occured: " + agent + " " + event.getSource());
+////		if (agent.getComponentIdentifier().getRoot().equals(event.getSource()))
+////			postInfo();
+//	}
 	
 	/**
 	 *  Set the send delay.
@@ -285,7 +308,8 @@ public class LocalDiscoveryAgent implements IDiscoveryService, IChangeListener<I
 //		IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //		ITransportComponentIdentifier root = fut2.get();
 		IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
-		Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
+//		Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
+		List<TransportAddress> addr = SServiceProvider.getLocalService(agent, ITransportAddressService.class).getAddresses().get();
 //		System.out.println("=====" + agent + "======");
 //		for (Map.Entry<String, String[]> entry : addr.entrySet())
 //		{

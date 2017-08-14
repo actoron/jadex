@@ -14,7 +14,6 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
