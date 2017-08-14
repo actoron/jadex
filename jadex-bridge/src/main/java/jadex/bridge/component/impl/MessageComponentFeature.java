@@ -788,59 +788,67 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void streamArrived(IConnection con)
 	{
-		getComponent().getComponentFeature(IExecutionFeature.class)
-			.scheduleStep(new HandleStreamStep(con))
-			.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				// NOP
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// Todo: fail fast components?
-				StringWriter sw = new StringWriter();
-				exception.printStackTrace(new PrintWriter(sw));
-				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
-			}
-		});
+//		getComponent().getComponentFeature(IExecutionFeature.class)
+//			.scheduleStep(createHandleStreamStep(con))
+//			.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				// NOP
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// Todo: fail fast components?
+//				StringWriter sw = new StringWriter();
+//				exception.printStackTrace(new PrintWriter(sw));
+//				getComponent().getLogger().severe("Exception during stream processing\n"+sw);
+//			}
+//		});
 	}
 	
-	/**
-	 *  Step to handle a stream.
-	 *  Must not do anything and just throw it away?
-	 */
-	public class HandleStreamStep implements IComponentStep<Void>
-	{
-		private final IConnection con;
-
-		public HandleStreamStep(IConnection con)
-		{
-			this.con = con;
-		}
-
-		public IFuture<Void> execute(IInternalAccess ia)
-		{
-			invokeHandlers(con);
-			return IFuture.DONE;
-		}
-
-		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
-		 */
-		protected boolean invokeHandlers(IConnection con)
-		{
-			boolean	ret	= false;
-			return ret;
-		}
-
-		public String toString()
-		{
-			return "messageArrived()_#"+this.hashCode();
-		}
-	}
+//	/**
+//	 *  Create a new stream step.
+//	 */
+//	public IComponentStep<Void> createHandleStreamStep(IConnection con)
+//	{
+//		return new HandleStreamStep(con);
+//	}
+//	
+//	/**
+//	 *  Step to handle a stream.
+//	 *  Must not do anything and just throw it away?
+//	 */
+//	public class HandleStreamStep implements IComponentStep<Void>
+//	{
+//		private final IConnection con;
+//
+//		public HandleStreamStep(IConnection con)
+//		{
+//			this.con = con;
+//		}
+//
+//		public IFuture<Void> execute(IInternalAccess ia)
+//		{
+//			invokeHandlers(con);
+//			return IFuture.DONE;
+//		}
+//
+//		/**
+//		 *  Extracted to allow overriding behaviour.
+//		 *  @return true, when at least one matching handler was found.
+//		 */
+//		protected boolean invokeHandlers(IConnection con)
+//		{
+//			boolean	ret	= false;
+//			return ret;
+//		}
+//
+//		public String toString()
+//		{
+//			return "messageArrived()_#"+this.hashCode();
+//		}
+//	}
 	
 	/**
 	 *  Find a suitable transport service for a message.
@@ -1045,15 +1053,17 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			final InputConnection fcon = con;
 //			final Future<Void> ret = new Future<Void>();
 			
-			IInternalMessageFeature	com	= (IInternalMessageFeature)getComponent().getComponentFeature(IMessageFeature.class);
-			if(com!=null)
-			{
-				com.streamArrived(fcon);
-			}
-			else
-			{
-				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
-			}
+			streamArrived(fcon);
+			
+//			IInternalMessageFeature	com	= (IInternalMessageFeature)getComponent().getComponentFeature(IMessageFeature.class);
+//			if(com!=null)
+//			{
+//				com.streamArrived(fcon);
+//			}
+//			else
+//			{
+//				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+//			}
 			
 //			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
@@ -1131,15 +1141,17 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			final OutputConnection	fcon	= con;
 //			final Future<Void> ret = new Future<Void>();
 			
-			IInternalMessageFeature	com	= (IInternalMessageFeature)getComponent().getComponentFeature(IMessageFeature.class);
-			if(com!=null)
-			{
-				com.streamArrived(fcon);
-			}
-			else
-			{
-				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
-			}
+			streamArrived(fcon);
+			
+//			IInternalMessageFeature	com	= (IInternalMessageFeature)getComponent().getComponentFeature(IMessageFeature.class);
+//			if(com!=null)
+//			{
+//				com.streamArrived(fcon);
+//			}
+//			else
+//			{
+//				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
+//			}
 			
 //			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
