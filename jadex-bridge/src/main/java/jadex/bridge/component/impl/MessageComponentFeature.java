@@ -22,21 +22,22 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.streams.AbstractConnectionHandler;
+import jadex.bridge.component.streams.AckInfo;
+import jadex.bridge.component.streams.InitInfo;
 import jadex.bridge.component.streams.InputConnection;
 import jadex.bridge.component.streams.InputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.component.streams.OutputConnectionHandler;
+import jadex.bridge.component.streams.StreamPacket;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -86,10 +87,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	
 	/** The initiator connections. */
-	protected Map<Integer, AbstractConnectionHandler> icons;
+	protected Map<Integer, AbstractConnectionHandler> icons = new HashMap<Integer, AbstractConnectionHandler>();
 
 	/** The participant connections. */
-	protected Map<Integer, AbstractConnectionHandler> pcons;
+	protected Map<Integer, AbstractConnectionHandler> pcons = new HashMap<Integer, AbstractConnectionHandler>();
 
 	
 	//-------- constructors --------
@@ -336,19 +337,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void messageArrived(final IMsgHeader header, byte[] bodydata)
 	{
-		if (header != null && bodydata != null)
+		if(header != null && bodydata != null)
 		{
 			getSecurityService().decryptAndAuth((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
 				{
 					// Check if SecurityService ok'd it at all.
-					if (result != null)
+					if(result != null)
 					{
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
 						// Only accept messages we trust.
-						if (secinf.isAuthenticated() || allowuntrusted)
+						if(secinf.isAuthenticated() || allowuntrusted)
 						{
 							Object message;
 							try
@@ -358,7 +359,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							catch(Exception e)
 							{
 								// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
-								message 	= null;
+								message = null;
 								header.addProperty(EXCEPTION, e);
 							}
 							messageArrived(secinf, header, message);
@@ -371,6 +372,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					exception.printStackTrace();
 				}
 			});
+		}
+		else
+		{
+			getComponent().getLogger().warning("Received empty message: "+header+" "+bodydata);
 		}
 	}
 	
@@ -399,9 +404,260 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					fut.setResult(body);
 				return;
 			}
+			else
+			{
+				handleMessage(secinfos, header, body);
+			}
 		}
-		
-		handleMessage(secinfos, header, body);
+		else if(body instanceof StreamPacket)
+		{
+			StreamPacket packet = (StreamPacket)body;
+			byte type = packet.getType();
+			int conid = packet.getConnectionId().intValue();
+			
+			System.out.println("rec stream msg: "+getComponent().getComponentIdentifier().getLocalName()+" "+type);
+			
+			// Handle output connection participant side
+			if(type==AbstractConnectionHandler.INIT_OUTPUT_INITIATOR)
+			{
+				InitInfo ii = (InitInfo)packet.getData();
+				initInputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
+			}
+			else if(type==AbstractConnectionHandler.ACKINIT_OUTPUT_PARTICIPANT)
+			{
+//				System.out.println("CCC: ack init");
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(och!=null)
+				{
+					och.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
+				}
+				else
+				{
+					System.out.println("OutputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.DATA_OUTPUT_INITIATOR)
+			{
+//				System.out.println("received data");
+				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
+				}
+				else
+				{
+					System.out.println("InputStream not found (dai): "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+				}
+			}
+			else if(type==AbstractConnectionHandler.CLOSE_OUTPUT_INITIATOR)
+			{
+//				System.out.println("CCC: close");
+				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
+				}
+				else
+				{
+					System.out.println("InputStream not found (coi): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ACKCLOSE_OUTPUT_PARTICIPANT)
+			{
+//				System.out.println("CCC: ackclose");
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(och!=null)
+				{
+					och.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
+				}
+				else
+				{
+					System.out.println("OutputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.CLOSEREQ_OUTPUT_PARTICIPANT)
+			{
+//				System.out.println("CCC: closereq");
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(och!=null)
+				{
+					och.closeRequestReceived();
+				}
+				else
+				{
+					System.out.println("OutputStream not found (closereq): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ACKCLOSEREQ_OUTPUT_INITIATOR)
+			{
+//				System.out.println("CCC: ackclosereq");
+				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
+//					ich.ackCloseRequestReceived();
+				}
+				else
+				{
+					System.out.println("OutputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ACKDATA_OUTPUT_PARTICIPANT)
+			{
+				// Handle input connection initiator side
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(och!=null)
+				{
+					AckInfo ackinfo = (AckInfo)packet.getData();
+					och.ackDataReceived(ackinfo);
+				}
+				else
+				{
+					System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			
+			else if(type==AbstractConnectionHandler.INIT_INPUT_INITIATOR)
+			{
+				InitInfo ii = (InitInfo)packet.getData();
+				initOutputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
+			}
+			else if(type==AbstractConnectionHandler.ACKINIT_INPUT_PARTICIPANT)
+			{
+				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
+				}
+				else
+				{
+					System.out.println("InputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.DATA_INPUT_PARTICIPANT)
+			{
+				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
+				}
+				else
+				{
+					System.out.println("InputStream not found (data input): "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ACKDATA_INPUT_INITIATOR)
+			{
+				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(och!=null)
+				{
+					AckInfo ackinfo = (AckInfo)packet.getData();
+					och.ackDataReceived(ackinfo);	
+				}
+				else
+				{
+					System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.CLOSEREQ_INPUT_INITIATOR)
+			{
+				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(och!=null)
+				{
+					och.closeRequestReceived();
+				}
+				else
+				{
+					System.out.println("InputStream not found (closereq): "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ACKCLOSEREQ_INPUT_PARTICIPANT)
+			{
+				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
+				}
+				else
+				{
+					System.out.println("InputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.CLOSE_INPUT_PARTICIPANT)
+			{
+				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
+				}
+				else
+				{
+					System.out.println("OutputStream not found (closeinput): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ACKCLOSE_INPUT_INITIATOR)
+			{
+				OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(ich!=null)
+				{
+					ich.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
+				}
+				else
+				{
+					System.out.println("InputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			
+			// Handle lease time update
+			else if(type==AbstractConnectionHandler.ALIVE_INITIATOR)
+			{
+//				System.out.println("alive initiator");
+				AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(Integer.valueOf(conid));
+				if(con!=null)
+				{
+					con.setAliveTime(System.currentTimeMillis());
+				}
+				else
+				{
+					System.out.println("Stream not found (alive ini): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+			else if(type==AbstractConnectionHandler.ALIVE_PARTICIPANT)
+			{
+//				System.out.println("alive particpant");
+				AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(Integer.valueOf(conid));
+				if(con!=null)
+				{
+					con.setAliveTime(System.currentTimeMillis());
+				}
+				else
+				{
+					System.out.println("Stream not found (alive par): "+component+", "+System.currentTimeMillis()+", "+conid);
+				}
+			}
+//	
+////		System.out.println("bbbb: "+mycnt+" "+getComponent().getComponentIdentifier());
+//			}
+////					catch(Throwable e)
+//					catch(final Exception e)
+//					{
+////						e.printStackTrace();
+//						getComponent().scheduleStep(new IComponentStep<Void>()
+//						{
+//							public IFuture<Void> execute(IInternalAccess ia)
+//							{
+//								ia.getLogger().warning("Exception in stream: "+e.getMessage());
+//								return IFuture.DONE;
+//							}
+//						});
+//					}
+//				}
+//			}
+		}
+		else
+		{
+			handleMessage(secinfos, header, body);
+		}
 	}
 	
 	/**
