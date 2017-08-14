@@ -1,7 +1,5 @@
 package jadex.bridge.component.impl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -743,7 +741,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			try
 			{
 				ISerializationServices serialserv = getSerializationServices(platformid);
-				byte[] body = serialserv.encode(header, component.getClassLoader(), message);
+				byte[] body = serialserv.encode(header, component, message);
 				getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 				{
 					public void customResultAvailable(final byte[] body) throws Exception
@@ -779,7 +777,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected Object deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
-		return getSerializationServices(platformid).decode(header, component.getClassLoader(), serializedmsg);
+		return getSerializationServices(platformid).decode(header, component, serializedmsg);
 	}
 	
 	/**
@@ -959,7 +957,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 * 
+	 *  Get the participant input connection.
 	 */
 	public IInputConnection getParticipantInputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
 	{
@@ -967,7 +965,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 * 
+	 *  Get the participant output connection.
 	 */
 	public IOutputConnection getParticipantOutputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant, Map<String, Object> nonfunc)
 	{

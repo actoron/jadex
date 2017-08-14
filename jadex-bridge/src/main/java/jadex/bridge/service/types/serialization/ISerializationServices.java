@@ -2,8 +2,8 @@ package jadex.bridge.service.types.serialization;
 
 import java.util.List;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
@@ -20,17 +20,17 @@ public interface ISerializationServices
 	 *  @param obj Object to be encoded.
 	 *  @return Encoded object.
 	 */
-	public byte[] encode(IMsgHeader header, ClassLoader cl, Object obj);
+	public byte[] encode(IMsgHeader header, IInternalAccess component, Object obj);
 	
 	/**
 	 *  Decodes/deserializes an object.
 	 *  
-	 *  @param cl The classloader used for decoding.
+	 *  @param cl The component used for decoding.
 	 *  @param enc Encoded object.
 	 *  @return Object to be encoded.
 	 *  
 	 */
-	public Object decode(IMsgHeader header, ClassLoader cl, byte[] enc);
+	public Object decode(IMsgHeader header, IInternalAccess component, byte[] enc);
 	
 	/**
 	 *  Test if an object is a remote object.
