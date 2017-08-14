@@ -38,6 +38,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -136,7 +137,18 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void messageReceived(final Con con, final byte[] header, final byte[] body)
 	{
+		// TODO Lars: "NPE when testing streams!", Alex: "cand==null -> race condition between agent and transport?"
 		ConnectionCandidate cand = getConnectionCandidate(con);
+		if(cand==null)
+		{
+			// HACK!!! future result from createConnections will put ConnectionCandidate
+			FutureHelper.notifyStackedListeners();
+			cand = getConnectionCandidate(con);
+			if(cand!=null)
+			{
+				System.out.println("INFO: adapted to race condition in messageReceived: "+con);
+			}
+		}
 		final IComponentIdentifier source = cand.getTarget();
 
 		// First msg is CID from handshake.

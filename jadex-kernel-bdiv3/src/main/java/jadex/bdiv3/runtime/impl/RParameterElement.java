@@ -544,7 +544,15 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				value	= SReflect.convertWrappedValue(value, clazz);
 			}
 			
-			internalGetValues().add(value);
+			internalAddValue(value);
+		}
+		
+		/**
+		 *  Add a value.
+		 */
+		protected void internalAddValue(Object value)
+		{
+			internalGetValues().add(value);			
 		}
 
 		/**
@@ -555,7 +563,15 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			testWriteOK((MParameter)getModelElement());
 			
-			internalGetValues().remove(value);
+			internalRemoveValue(value);
+		}
+		
+		/**
+		 *  Remove a value.
+		 */
+		protected void internalRemoveValue(Object value)
+		{
+			internalGetValues().remove(value);			
 		}
 
 		/**
@@ -579,6 +595,14 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			testWriteOK((MParameter)getModelElement());
 			
+			internalRemoveValues();
+		}
+		
+		/**
+		 *  Remove all values.
+		 */
+		protected void internalRemoveValues()
+		{
 			internalGetValues().clear();
 		}
 

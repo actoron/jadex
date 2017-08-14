@@ -32,7 +32,7 @@ public class MessagingTest
 		config.setSecurity(true);
 		config.setAwaMechanisms(AWAMECHANISM.local);
 		config.setAwareness(true);
-		config.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config.setTcpTransport(true);
 //		config.setNetworkName("remotemessagetest");
 //		config.setNetworkPass(key);
 

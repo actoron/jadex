@@ -8,6 +8,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -22,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -1389,6 +1391,83 @@ public class SReflect
 			|| clazz.isArray();
 	}
 	
+	/**
+	 *  Get the component type of a class that is some kind of collection.
+	 *  @param clazz The class.
+	 *  @return The component type, i.e. type of contained elements as defined in collection class.
+	 */
+	public static Class getIterableComponentType(Type type)
+	{
+		Class	ret	= null;
+		if(type instanceof Class<?> && ((Class<?>)type).isArray())
+		{
+			ret	= ((Class<?>)type).getComponentType();
+		}
+		else if (type instanceof ParameterizedType)
+		{
+			Type[]	args	= ((ParameterizedType)type).getActualTypeArguments();
+			if(args.length==1 && args[0] instanceof Class)	// Iterator, Enumeration, Collection
+			{
+				ret	= (Class)args[0];
+			}
+			else if(args.length==2 && args[1] instanceof Class)	// Map (values)
+			{
+				ret	= (Class)args[1];
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 *  Create an fill an object of a class that is some kind of collection.
+	 *  @param clazz The class.
+	 *  @param values The values.
+	 */
+	public static Object createComposite(Type type, Collection<?> values)
+	{
+		Type	tmp	= type;
+		while(tmp instanceof ParameterizedType)
+		{
+			tmp	= ((ParameterizedType)tmp).getRawType();
+		}
+		Class<?>	clazz	= (Class<?>)tmp;
+		Object	ret	= null;
+		if(clazz.isArray())
+		{
+			ret	= Array.newInstance(getIterableComponentType(type), values.size());
+			Iterator<?>	it	= values.iterator();
+			for(int i=0; i<values.size(); i++)
+			{
+				Array.set(ret, i, it.next());
+			}
+		}
+		else if(isSupertype(Collection.class, clazz) && !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers()))
+		{
+			try
+			{
+				ret	= clazz.newInstance();
+				((Collection)ret).addAll(values);
+			}
+			catch(Exception e)
+			{
+				SUtil.throwUnchecked(e);
+			}
+		}
+		else if(isSupertype(Set.class, clazz))
+		{
+			ret	= new LinkedHashSet(values);
+		}
+		else if(isSupertype(List.class, clazz))
+		{
+			ret	= new ArrayList(values);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Unsupported composite type: "+type);
+		}
+		return ret;
+	}
+
 	protected static final Object[] EMPTY_ARRAY = new Object[0];
 	/**
 	 *  Get an array for an arbitrary collection object.
