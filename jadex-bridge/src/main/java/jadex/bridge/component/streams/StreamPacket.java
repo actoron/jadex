@@ -3,7 +3,7 @@ package jadex.bridge.component.streams;
 import jadex.bridge.IComponentIdentifier;
 
 /**
- * 
+ *  Data container for a streaming packet.
  */
 public class StreamPacket
 {
@@ -39,8 +39,6 @@ public class StreamPacket
 	 */
 	public StreamPacket(byte type, Integer connectionid, Object data, Integer sequencenumber, IComponentIdentifier receiver)
 	{
-		if(type==7)
-			System.out.println("sdfsdf");
 		this.type = type;
 		this.connectionid = connectionid;
 		this.data = data;
