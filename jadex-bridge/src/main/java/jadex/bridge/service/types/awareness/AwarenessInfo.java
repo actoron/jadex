@@ -1,10 +1,12 @@
 package jadex.bridge.service.types.awareness;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.VersionInfo;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
 
 /**
@@ -50,7 +52,7 @@ public class AwarenessInfo
 	protected IComponentIdentifier	sender;
 	
 	/** Addresses of the sender, transport, addresses. */
-	protected Map<String, String[]> addresses;
+	protected List<TransportAddress> addresses;
 
 	/** The component state. */
 	protected String state;
@@ -90,7 +92,7 @@ public class AwarenessInfo
 	/**
 	 *  Create a new awareness info.
 	 */
-	public AwarenessInfo(IComponentIdentifier sender, Map<String, String[]> addresses, String state, long delay, 
+	public AwarenessInfo(IComponentIdentifier sender, List<TransportAddress> addresses, String state, long delay, 
 		String[] includes, String[] excludes, String masterid, String mechsrc)
 	{
 		this.sender = sender;
@@ -139,7 +141,7 @@ public class AwarenessInfo
 	 *
 	 *  @return The addresses.
 	 */
-	public Map<String, String[]> getAddresses()
+	public List<TransportAddress> getAddresses()
 	{
 		return addresses;
 	}
@@ -149,7 +151,7 @@ public class AwarenessInfo
 	 *
 	 *  @param addresses The addresses.
 	 */
-	public void setAddresses(Map<String, String[]> addresses)
+	public void setAddresses(List<TransportAddress> addresses)
 	{
 		this.addresses = addresses;
 	}

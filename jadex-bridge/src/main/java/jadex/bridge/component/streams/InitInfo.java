@@ -3,7 +3,6 @@ package jadex.bridge.component.streams;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.commons.transformation.annotations.Alias;
 
 /**

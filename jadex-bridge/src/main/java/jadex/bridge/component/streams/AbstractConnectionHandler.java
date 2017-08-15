@@ -526,7 +526,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	protected StreamPacket createTask(String type, Object content, boolean useserializer, Integer seqnumber, Map<String, Object> nonfunc)
 	{
-		return new StreamPacket(getMessageType(type), content, seqnumber.intValue(), getConnection().isInitiatorSide()? getConnection().getParticipant(): getConnection().getInitiator());
+		return new StreamPacket(getMessageType(type), getConnectionId(), content, seqnumber, getConnection().isInitiatorSide()? getConnection().getParticipant(): getConnection().getInitiator());
 //		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 //			getConnectionId(), getConnection().isInitiatorSide()? new ITransportComponentIdentifier[]{getConnection().getParticipant()}: new ITransportComponentIdentifier[]{getConnection().getInitiator()}, 
 //			getTransports(), ms.getRemoteMarshalingConfig().getPreprocessors(), useserializer?ms.getRemoteMarshalingConfig().getDefaultSerializer():null, getCodecs(), seqnumber, nonfunc); 

@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URL;
 
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.commons.SUtil;
 
 /**

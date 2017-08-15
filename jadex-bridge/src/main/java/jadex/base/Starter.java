@@ -28,7 +28,8 @@ import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.address.TransportAddressBook;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -409,8 +410,6 @@ public class Starter
 						// ServiceRegistry cannot handle backport for polling in case of global queries
 //						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServ); 
 //					}
-					
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_ADDRESSBOOK, new TransportAddressBook());
 					
 					try
 					{
@@ -793,29 +792,54 @@ public class Starter
 	/**
 	 *  Create a proxy for the remote platform.
 	 */
-	public static IFuture<IComponentIdentifier>	createProxy(IExternalAccess local, final IExternalAccess remote)
+	public static IFuture<IComponentIdentifier>	createProxy(final IExternalAccess local, final IExternalAccess remote)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		// Add remote addresses to local address book
-		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(local.getComponentIdentifier());
-		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(remote.getComponentIdentifier());
-		tab1.addPlatformAddresses(remote.getComponentIdentifier(), "tcp",
-			tab2.getPlatformAddresses(remote.getComponentIdentifier(), "tcp"));
-//		System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
-
-		
-		SServiceProvider.getService(local, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		SServiceProvider.getService(remote, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService localcms)
+			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
-				Map<String, Object>	args = new HashMap<String, Object>();
-				args.put("component", remote.getComponentIdentifier());
-				CreationInfo ci = new CreationInfo(args);
-				localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+				remotetas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
+					{
+						SServiceProvider.getService(local, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						{
+							public void customResultAvailable(ITransportAddressService localtas) throws Exception
+							{
+								localtas.addManualAddresses(remoteaddrs).addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(ret)
+								{
+									public void customResultAvailable(Void result) throws Exception
+									{
+										SServiceProvider.getService(local, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+										{
+											public void customResultAvailable(final IComponentManagementService localcms)
+											{
+												Map<String, Object>	args = new HashMap<String, Object>();
+												args.put("component", remote.getComponentIdentifier());
+												CreationInfo ci = new CreationInfo(args);
+												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+											}
+										});
+									}
+								});
+							}
+						});
+					}
+				});
 			}
 		});
+		
+		// Add remote addresses to local address book
+//		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(local.getComponentIdentifier());
+//		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(remote.getComponentIdentifier());
+//		tab1.addPlatformAddresses(remote.getComponentIdentifier(), "tcp",
+//			tab2.getPlatformAddresses(remote.getComponentIdentifier(), "tcp"));
+//		System.out.println("adresses from "+agent+" to "+exta+": "+tab2.getPlatformAddresses(exta.getComponentIdentifier(), "tcp"));
+		
+		
 		
 		return ret;
 	}
