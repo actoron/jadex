@@ -23,11 +23,9 @@ import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Base64;
 import jadex.commons.Boolean3;
-import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.IThreadPool;
@@ -51,7 +49,7 @@ import jadex.micro.annotation.RequiredServices;
 @Service
 @RequiredServices(
 {
-	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="threadpool", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })

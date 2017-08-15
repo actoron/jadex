@@ -9,8 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.component.IMessageFeature;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -133,27 +132,21 @@ public class Initiator2Agent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				IFuture<IMessageService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("msgservice");
-				msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, TestReport>(ret)
+				IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
+				mf.createInputConnection(agent.getComponentIdentifier(), cid, null)
+					.addResultListener(new ExceptionDelegationResultListener<IInputConnection, TestReport>(ret)
 				{
-					public void customResultAvailable(IMessageService ms)
+					public void customResultAvailable(final IInputConnection icon) 
 					{
-						ms.createInputConnection(agent.getComponentIdentifier(), cid, null)
-							.addResultListener(new ExceptionDelegationResultListener<IInputConnection, TestReport>(ret)
+						receiveBehavior(testno, icon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret)
 						{
-							public void customResultAvailable(final IInputConnection icon) 
+							public void customResultAvailable(final TestReport tr)
 							{
-								receiveBehavior(testno, icon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret)
+								destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, TestReport>(ret)
 								{
-									public void customResultAvailable(final TestReport tr)
+									public void customResultAvailable(Map<String,Object> result) 
 									{
-										destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, TestReport>(ret)
-										{
-											public void customResultAvailable(Map<String,Object> result) 
-											{
-												ret.setResult(tr);
-											}
-										});
+										ret.setResult(tr);
 									}
 								});
 							}

@@ -1,5 +1,6 @@
 package jadex.micro.features.impl;
 
+import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -7,9 +8,11 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.component.streams.StreamPacket;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.AgentStreamArrived;
 
 /**
  *  Extension to allow message injection in agent methods.
@@ -39,7 +42,33 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	 */
 	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
-		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null})
+		if(body instanceof StreamPacket)
+		{
+			MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null})
+				.addResultListener(new IResultListener<Void>()
+			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					// OK -> ignore
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					getComponent().getLogger().warning("Exception during message handling: "+exception);
+				}
+			});
+		}
+	}	
+	
+	/**
+	 *  Inform the component that a stream has arrived.
+	 *  @param con The stream that arrived.
+	 */
+	public void streamArrived(IConnection con)
+	{
+		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentStreamArrived.class, new Object[]{con})
 			.addResultListener(new IResultListener<Void>()
 		{
 			@Override
@@ -54,5 +83,5 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 				getComponent().getLogger().warning("Exception during message handling: "+exception);
 			}
 		});
-	}	
+	}
 }

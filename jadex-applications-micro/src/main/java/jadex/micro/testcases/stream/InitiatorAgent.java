@@ -13,8 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.component.IMessageFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -139,19 +138,13 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				IFuture<IMessageService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("msgservice");
-				msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, TestReport>(ret)
+				IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
+				mf.createOutputConnection(agent.getComponentIdentifier(), cid, null)
+					.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)
 				{
-					public void customResultAvailable(IMessageService ms)
+					public void customResultAvailable(final IOutputConnection ocon) 
 					{
-						ms.createOutputConnection(agent.getComponentIdentifier(), cid, null)
-							.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)
-						{
-							public void customResultAvailable(final IOutputConnection ocon) 
-							{
-								sendBehavior(testno, ocon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret));
-							}
-						});
+						sendBehavior(testno, ocon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret));
 					}
 				});
 			}
@@ -224,7 +217,7 @@ public class InitiatorAgent extends TestAgent
 							read += is.read(buf, read, buf.length-read);
 						}
 						con.write(buf);
-//						System.out.println("wrote: "+size);
+						System.out.println("wrote: "+size);
 						if(is.available()>0)
 						{
 							con.waitForReady().addResultListener(new IResultListener<Integer>()

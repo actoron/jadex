@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IConnection;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Abstract base class for connections.
@@ -57,22 +58,22 @@ public abstract class AbstractConnection implements IConnection
 		if(ch==null)
 			throw new IllegalArgumentException("Connection handler must not null.");
 		
-//		// Send init message if initiator side.
-//		ch.setConnection(this);
-//		
-//		if(isInitiatorSide())
-//			ch.sendInit().addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				setInited();
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				close();
-//			}
-//		});
+		// Send init message if initiator side.
+		ch.setConnection(this);
+		
+		if(isInitiatorSide())
+			ch.sendInit().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				setInited();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				close();
+			}
+		});
 	}
 	
 	//-------- IConnection methods --------
@@ -121,11 +122,11 @@ public abstract class AbstractConnection implements IConnection
 	 */
 	public void setInited()
 	{
-//		synchronized(this)
-//		{
-//			this.inited = true;
-//		}
-//		ch.notifyInited();
+		synchronized(this)
+		{
+			this.inited = true;
+		}
+		ch.notifyInited();
 	}
 	
 	/**
@@ -168,15 +169,15 @@ public abstract class AbstractConnection implements IConnection
 	 */
 	public void close()
 	{
-//		synchronized(this)
-//		{
-//			if(closing || closed)
-//				return;			
-//		}
-//
-//		setClosing();	
-//
-//		ch.doClose();
+		synchronized(this)
+		{
+			if(closing || closed)
+				return;			
+		}
+
+		setClosing();	
+
+		ch.doClose();
 	}
 	
 	/**
@@ -202,8 +203,7 @@ public abstract class AbstractConnection implements IConnection
 	 */
 	public Map<String, Object> getNonFunctionalProperties()
 	{
-//		return ch.getNonFunctionalProperties();
-		return null;
+		return ch.getNonFunctionalProperties();
 	}
 	
 	/**

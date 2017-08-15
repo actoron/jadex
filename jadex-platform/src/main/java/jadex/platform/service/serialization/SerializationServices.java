@@ -15,15 +15,23 @@ import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IOutputConnection;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
+import jadex.bridge.component.streams.InputConnection;
+import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
+import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
+import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
@@ -34,6 +42,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.Traverser;
@@ -141,11 +150,14 @@ public class SerializationServices implements ISerializationServices
 	 *  @param obj Object to be encoded.
 	 *  @return Encoded object.
 	 */
-	public byte[] encode(IMsgHeader header, ClassLoader cl, Object obj)
+	public byte[] encode(IMsgHeader header, IInternalAccess component, Object obj)
 	{
 		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
 		ISerializer serial = getSendSerializer(receiver);
-		byte[] enc = serial.encode(obj, cl, getPreprocessors(), header);
+		Map<String, Object> ctx = new HashMap<String, Object>();
+		ctx.put("header", header);
+		ctx.put("component", component);
+		byte[] enc = serial.encode(obj, component.getClassLoader(), getPreprocessors(), ctx);
 		
 		ICodec[] codecs = getSendCodecs(receiver);
 		if (header == obj)
@@ -183,7 +195,7 @@ public class SerializationServices implements ISerializationServices
 	 *  @return Object to be encoded.
 	 *  
 	 */
-	public Object decode(IMsgHeader header, ClassLoader cl, byte[] enc)
+	public Object decode(IMsgHeader header, IInternalAccess component, byte[] enc)
 	{
 		Object ret = null;
 		
@@ -203,7 +215,7 @@ public class SerializationServices implements ISerializationServices
 					{
 						int offset = prefixsize;
 						raw = enc;
-						for (int i = codecsize - 1; i >= 0; --i)
+						for(int i = codecsize - 1; i >= 0; --i)
 						{
 							raw = getCodecs().get(SUtil.bytesToInt(enc, (i << 4) + 8)).decode(raw, offset, raw.length - offset);
 							offset = 0;
@@ -216,7 +228,10 @@ public class SerializationServices implements ISerializationServices
 					}
 					
 					ISerializer serial = getSerializers().get(SUtil.bytesToInt(enc, 2));
-					ret = serial.decode(raw, cl, getPostprocessors(), null, header);
+					Map<String, Object> context = new HashMap<String, Object>();
+					context.put("header", header);
+					context.put("component", component);
+					ret = serial.decode(raw, component.getClassLoader(), getPostprocessors(), null, context);
 				}
 			}
 			catch (IndexOutOfBoundsException e)
@@ -319,55 +334,55 @@ public class SerializationServices implements ISerializationServices
 		};
 		procs.add(rmipostproc);
 		
-		// TODO: Re-enable for streams!
-//		procs.add(new ITraverseProcessor()
-//		{
-//			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
-//			{
-//				return ServiceInputConnectionProxy.class.equals(type);
-//			}
-//			
-//			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
-//			{
-//				try
-//				{
-//					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
-//					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), 
-//						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
-//					return icon;
-//				}
-//				catch(RuntimeException e)
-//				{
-//					e.printStackTrace();
-//					throw e;
-//				}
-//			}
-//		});
+		procs.add(new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+			{
+				return ServiceInputConnectionProxy.class.equals(type);
+			}
+			
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
+					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					IInputConnection icon = ((IInternalAccess)ctx.get("component")).getComponentFeature(IInternalMessageFeature.class).getParticipantInputConnection(icp.getConnectionId(), 
+						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
+					return icon;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
 		
-		// TODO: Re-enable for streams!
-//		procs.add(new ITraverseProcessor()
-//		{
-//			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
-//			{
-//				return ServiceOutputConnectionProxy.class.equals(type);
-//			}
-//			
-//			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
-//			{
-//				try
-//				{
-//					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
-//					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), 
-//						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
-//					return ocon;
-//				}
-//				catch(RuntimeException e)
-//				{
-//					e.printStackTrace();
-//					throw e;
-//				}
-//			}
-//		});
+		procs.add(new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+			{
+				return ServiceOutputConnectionProxy.class.equals(type);
+			}
+			
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
+					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					IOutputConnection ocon = ((IInternalAccess)ctx.get("component")).getComponentFeature(IInternalMessageFeature.class).getParticipantOutputConnection(ocp.getConnectionId(), 
+						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
+					return ocon;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
 		
 		return procs;
 	}
@@ -449,7 +464,8 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
-					MsgHeader	header	= (MsgHeader)((IUserContextContainer)context).getUserContext();
+					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					MsgHeader header = (MsgHeader)ctx.get("header");
 					IComponentIdentifier receiver = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 					Object ret = rrm.getProxyReference(object, receiver, targetcl);
 					return ret;
@@ -464,62 +480,64 @@ public class SerializationServices implements ISerializationServices
 		procs.add(bpreproc);
 		
 		// output connection as result of call
-		// TODO: Re-enable for streams!
-//		procs.add(new ITraverseProcessor()
-//		{
-//			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
-//			{
-//				try
-//				{
+		procs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					MsgHeader header = (MsgHeader)ctx.get("header");
 //					AbstractRemoteCommand com = getRCFromContext(context);
-//					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-//					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(
-//						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
-//					con.setOutputConnection(ocon);
-//					con.setConnectionId(ocon.getConnectionId());
-//					return con;
-//				}
-//				catch(RuntimeException e)
-//				{
-//					e.printStackTrace();
-//					throw e;
-//				}
-//			}
-//			
-//			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
-//			{
-//				return object instanceof ServiceInputConnectionProxy;
-//			}
-//		});
+					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
+					OutputConnection ocon = ((IInternalAccess)ctx.get("component")).getComponentFeature(IInternalMessageFeature.class).internalCreateOutputConnection(
+						(IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER), null); // todo: nonfunc
+					con.setOutputConnection(ocon);
+					con.setConnectionId(ocon.getConnectionId());
+					return con;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+			
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+			{
+				return object instanceof ServiceInputConnectionProxy;
+			}
+		});
 		
 		// input connection proxy as result of call
-		// TODO: Re-enable for streams!
-//		procs.add(new ITraverseProcessor()
-//		{
-//			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
-//			{
-//				try
-//				{
+		procs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			{
+				try
+				{
 //					AbstractRemoteCommand com = (AbstractRemoteCommand)((IRootObjectContext)context).getRootObject();
-//					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-//					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(
-//						RemoteServiceManagementService.this.component.getComponentIdentifier(), com.getReceiver(), com.getNonFunctionalProperties());
-//					con.setConnectionId(icon.getConnectionId());
-//					con.setInputConnection(icon);
-//					return con;
-//				}
-//				catch(RuntimeException e)
-//				{
-//					e.printStackTrace();
-//					throw e;
-//				}
-//			}
-//			
-//			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
-//			{
-//				return object instanceof ServiceOutputConnectionProxy;
-//			}
-//		});
+					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					MsgHeader header = (MsgHeader)ctx.get("header");
+					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
+					InputConnection icon = ((IInternalAccess)ctx.get("component")).getComponentFeature(IInternalMessageFeature.class).internalCreateInputConnection(
+						(IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER), null);//com.getNonFunctionalProperties());
+					con.setConnectionId(icon.getConnectionId());
+					con.setInputConnection(icon);
+					return con;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+			
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+			{
+				return object instanceof ServiceOutputConnectionProxy;
+			}
+		});
 		
 		return procs;
 	}

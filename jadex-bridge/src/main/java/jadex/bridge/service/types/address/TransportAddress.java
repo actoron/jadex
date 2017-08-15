@@ -72,7 +72,7 @@ public class TransportAddress
 	 *  
 	 *  @param transporttype The type of transport.
 	 */
-	public void setTransportYype(String transporttype)
+	public void setTransportType(String transporttype)
 	{
 		this.transporttype = transporttype;
 	}

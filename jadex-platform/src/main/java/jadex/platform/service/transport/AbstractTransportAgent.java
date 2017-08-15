@@ -169,7 +169,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					if(tup.getSecondEntity() != null)
 					{
 						// Then decode header and deliver to receiver agent.
-						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent.getClassLoader(), tup.getSecondEntity());
+						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent, tup.getSecondEntity());
 						final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 						
 						cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
@@ -428,7 +428,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			byte[] bheader = codec.encode(header, agent.getClassLoader(), header);
+			byte[] bheader = codec.encode(header, agent, header);
 
 			secser.encryptAndSign(header, bheader).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)
 			{
