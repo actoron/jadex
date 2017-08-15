@@ -16,13 +16,13 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3x.runtime.CapabilityWrapper;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.component.impl.IMessagePreprocessor;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -47,7 +47,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	//-------- attributes --------
 	
 	/** Sent message tracking (msg->cnt). */
-	protected Map<RMessageEvent, Integer> sent_mevents;
+	protected Map<RMessageEvent<Object>, Integer> sent_mevents;
 	
 	/** The maximum number of outstanding messages. */
 	protected long mevents_max;
@@ -61,7 +61,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	{
 		super(component, cinfo);
 		
-		this.sent_mevents = new WeakHashMap<RMessageEvent, Integer>();
+		this.sent_mevents = new WeakHashMap<RMessageEvent<Object>, Integer>();
 	}
 	
 	//-------- IInternalMessageFeature interface --------
@@ -87,7 +87,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		//   new message event type should be searched
 		// For messages without conversation all capabilities are considered.
 		// For messages of ongoing conversations only the source capability is considered.
-		RMessageEvent	original	= null; //getInReplyMessageEvent(message);
+		RMessageEvent<Object>	original	= getInReplyMessageEvent(body);
 		
 		// Extract bean properties.
 		Map<String, Object>	vals	= new LinkedHashMap<String, Object>();
@@ -129,7 +129,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			
 		if(mevent!=null)
 		{
-			RMessageEvent revent = new RMessageEvent(mevent, body, getComponent());
+			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getComponent());
 			FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
 			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
 		}
@@ -305,8 +305,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 				{
 					exparams.put("$"+prop, msg.get(prop));
 					// Convert CamelCase to snake_case for FIPA backwards compatibility
-			        String snake_case	= prop.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
-			        exparams.put("$"+snake_case, msg.get(prop));
+			        exparams.put("$"+SUtil.camelToSnakeCase(prop), msg.get(prop));
 //			        System.out.println("added: $"+prop+"/"+snake_case+" -> "+msg.get(prop));
 				}
 				IParsedExpression exp = SJavaParser.parseExpression(matchexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
@@ -327,7 +326,8 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  to send back answers to the source capability.
 	 *  @param msgevent The message event.
 	 */
-	public void registerMessageEvent(RMessageEvent msgevent)
+	@SuppressWarnings("unchecked")
+	public <T> void registerMessageEvent(RMessageEvent<T> msgevent)
 	{
 		if(mevents_max!=0 && sent_mevents.size()>mevents_max)
 		{
@@ -336,7 +336,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		}
 		else
 		{
-			sent_mevents.put(msgevent, sent_mevents.containsKey(msgevent) ? sent_mevents.get(msgevent)+1 : 1);
+			sent_mevents.put((RMessageEvent<Object>)msgevent, sent_mevents.containsKey(msgevent) ? sent_mevents.get(msgevent)+1 : 1);
 		}
 	}
 	
@@ -344,14 +344,15 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  Deregister a conversation or reply-with.
 	 *  @param msgevent The message event.
 	 */
-	public void deregisterMessageEvent(RMessageEvent msgevent)
+	@SuppressWarnings("unchecked")
+	public <T> void deregisterMessageEvent(RMessageEvent<T> msgevent)
 	{
 		if(sent_mevents.containsKey(msgevent))
 		{
 			int	cnt = sent_mevents.get(msgevent)-1;
 			if(cnt>0)
 			{
-				sent_mevents.put(msgevent, cnt);
+				sent_mevents.put((RMessageEvent<Object>)msgevent, cnt);
 			}
 			else
 			{
@@ -364,52 +365,21 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  Find a message event that the given native message is a reply to.
 	 *  @param message The (native) message.
 	 */
-	public RMessageEvent getInReplyMessageEvent(IMessageAdapter message)
+	public RMessageEvent<Object> getInReplyMessageEvent(Object message)
 	{
 //		System.out.println("+++"+getComponent().getComponentIdentifier()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
 		
-		RMessageEvent	ret	= null;
-		// Prefer the newest messages for finding replies.
-		// todo: conversations should be better supported
-		RMessageEvent[] smes = (RMessageEvent[])sent_mevents.keySet().toArray(new RMessageEvent[0]);
-		//todo: indexing for msgevents for speed.
+		RMessageEvent<Object>	ret	= null;
+		@SuppressWarnings("unchecked")
+		RMessageEvent<Object>[] smes = (RMessageEvent[])sent_mevents.keySet().toArray(new RMessageEvent[0]);
 
+		// Reverse loop -> prefer the newest messages for finding replies.
+		// todo: conversations should be better supported
+		// todo: indexing for msgevents for speed.
 		for(int i=smes.length-1; i>-1; i--)
 		{
-			boolean	match = true; // Does the message match all convid parameters?
-			boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
-//			MessageType	type = ((MMessageEvent)smes[i].getOriginalElement().getModelElement()).getMessageType();
-//			MessageType	type = ((MMessageEvent)smes[i].getModelElement()).getType();
-//
-//			MessageType.ParameterSpecification[] params = type.getParameters();
-//			for(int j=0; match && j<params.length; j++)
-//			{
-//				if(params[j].isConversationIdentifier())
-//				{
-//					Object sourceval = smes[i].getParameter(params[j].getSource()).getValue();
-//					Object destval = message.getValue(params[j].getName());
-//					match = SUtil.equals(sourceval, destval);
-//					matched = matched || sourceval!=null;
-//				}
-//			}
-//
-//			MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
-//			for(int j=0; match && j<paramsets.length; j++)
-//			{
-//				if(paramsets[j].isConversationIdentifier())
-//				{
-//					Object sourceval = smes[i].getParameter(paramsets[j].getSource()).getValue();
-//					Iterator it2 = SReflect.getIterator(message.getValue(paramsets[j].getName()));
-//					while(it2.hasNext())
-//					{
-//						Object destval = it2.next();
-//						match = SUtil.equals(sourceval, destval);
-//						matched	= matched || sourceval!=null;
-//					}
-//				}
-//			}
-			
-			if(matched && match)
+			IMessagePreprocessor<Object>	proc	= getPreprocessor(message);
+			if(proc!=null && proc.isReply(smes[i].getMessage(), message))
 			{
 				// Break tie by using shorter (full) capability name -> prefers outer capa before inner (e.g. cnp_cap vs. cnp_cap/cm_cap).
 				if(ret==null || smes[i].getModelElement().getCapabilityName()==null
@@ -421,51 +391,5 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		}
 		
 		return ret;
-	}
-	
-	/**
-	 *  Test is a message is a reply of another message.
-	 *  @param message The (native) message.
-	 */
-	public static boolean isReply(RMessageEvent msg, RMessageEvent reply)
-	{
-		//System.out.println("+++"+getScope().getAgent().getName()+" has open conversations: "+sent_mevents.size()+" "+sent_mevents);
-		
-		// Prefer the newest messages for finding replies.
-		// todo: conversations should be better supported
-		boolean	match = true; // Does the message match all convid parameters?
-		boolean	matched	= false; // Does the message match at least one (non-null) convid parameter?
-//		MessageType	type = ((MMessageEvent)smes[i].getOriginalElement().getModelElement()).getMessageType();
-//		MessageType	type = ((MMessageEvent)msg.getModelElement()).getType();
-//
-//		MessageType.ParameterSpecification[] params = type.getParameters();
-//		for(int j=0; match && j<params.length; j++)
-//		{
-//			if(params[j].isConversationIdentifier())
-//			{
-//				Object sourceval = msg.getParameter(params[j].getSource()).getValue();
-//				Object destval = reply.getParameter(params[j].getName()).getValue();
-//				match = SUtil.equals(sourceval, destval);
-//				matched = matched || sourceval!=null;
-//			}
-//		}
-//
-//		MessageType.ParameterSpecification[] paramsets = type.getParameterSets();
-//		for(int j=0; match && j<paramsets.length; j++)
-//		{
-//			if(paramsets[j].isConversationIdentifier())
-//			{
-//				Object sourceval = msg.getParameter(paramsets[j].getSource()).getValue();
-//				Iterator it2 = SReflect.getIterator(reply.getParameter(paramsets[j].getName()).getValue());
-//				while(it2.hasNext())
-//				{
-//					Object destval = it2.next();
-//					match = SUtil.equals(sourceval, destval);
-//					matched	= matched || sourceval!=null;
-//				}
-//			}
-//		}
-		
-		return matched && match;
 	}
 }

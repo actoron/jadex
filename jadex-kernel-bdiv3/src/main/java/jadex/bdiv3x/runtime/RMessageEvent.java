@@ -108,13 +108,38 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 			Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
 			for(Map.Entry<String, BeanProperty> entry: props.entrySet())
 			{
-				def.put(entry.getKey(), entry.getValue().getPropertyValue(msg));
+				Object	val	= entry.getValue().getPropertyValue(msg);
+				if(val!=null)
+				{
+					def.put(entry.getKey(), val);
+				}
 			}
 		}
 		
 		// Tricky, must do init for default values if NOT present in the msg
 		// Must be done after msg has been assigned :-(
 		super.initParameters(def, null);
+		
+		if(msg!=null)
+		{
+			// Finally add remaining properties from pojo as parameters.
+			IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+			Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
+			for(Map.Entry<String, BeanProperty> entry: props.entrySet())
+			{
+				if(!hasParameter(entry.getKey()) && !hasParameterSet(entry.getKey()))
+				{
+					if(SReflect.isIterableClass(entry.getValue().getType()))
+					{
+						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), def.get(entry.getKey())));					
+					}
+					else
+					{
+						addParameter(createParameter(null, entry.getKey(), getAgent(), def.get(entry.getKey())));
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -170,8 +195,30 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	{
 		return new RParamSet(modelelement, name, agent, values, getModelElement().getName());
 	}
-	
+
 	//-------- methods --------
+	
+	/**
+	 *  Has the element a parameter element.
+	 *  @param name The name.
+	 *  @return True, if it has the parameter.
+	 */
+	@Override
+	public boolean hasParameter(String name)
+	{
+		return super.hasParameter(name) || super.hasParameter(SUtil.camelToSnakeCase(name));
+	}
+
+	/**
+	 *  Has the element a parameter set element.
+	 *  @param name The name.
+	 *  @return True, if it has the parameter set.
+	 */
+	@Override
+	public boolean hasParameterSet(String name)
+	{
+		return super.hasParameterSet(name) || super.hasParameterSet(SUtil.camelToSnakeCase(name));
+	}
 	
 //	/**
 //	 *  Get all parameters.
@@ -201,70 +248,53 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 //		return ret.toArray(new IParameterSet[ret.size()]);
 //	}
 
-//	/**
-//	 *  Get the parameter element.
-//	 *  @param name The name.
-//	 *  @return The param.
-//	 */
-//	public IParameter getParameter(String name)
-//	{
-//		if(mt.getParameter(name)==null)
-//			throw new RuntimeException("Unknown parameter: "+name);
-//		
-//		IParameter param;
-//		if(!super.hasParameter(name))
-//		{
-//			MParameter mp = getMMessageEvent().getParameter(name);
-//			// construct param without setting default values!
-//			param = new RParam(mp, name, getAgent(), getModelElement().getName());
-//			addParameter(param);
-//		}
-//		else
-//		{
-//			param = super.getParameter(name);
-//		}
-//		
-//		return param;
-//	}
-//
-//	/**
-//	 *  Get the parameter set element.
-// 	 *  @param name The name.
-//	 *  @return The param set.
-//	 */
-//	public IParameterSet getParameterSet(String name)
-//	{
-//		if(mt.getParameterSet(name)==null)
-//			throw new RuntimeException("Unknown parameter set: "+name);
-//		
-//		if(!super.hasParameterSet(name))
-//		{
-//			// construct param without setting default values!
-//			addParameterSet(new RParamSet(null, name, getAgent(), null, getModelElement().getName()));
-//		}
-//
-//		return super.getParameterSet(name);
-//	}
+	/**
+	 *  Get the parameter element.
+	 *  @param name The name.
+	 *  @return The param.
+	 */
+	public IParameter getParameter(String name)
+	{
+		IParameter param;
+		if(super.hasParameter(SUtil.camelToSnakeCase(name)))
+		{
+			param	= super.getParameter(SUtil.camelToSnakeCase(name));
+		}
+		else if(super.hasParameter(SUtil.snakeToCamelCase(name)))
+		{
+			param	= super.getParameter(SUtil.snakeToCamelCase(name));
+		}
+		else
+		{
+			// Throws exception when not found.
+			param	= super.getParameter(name);
+		}
+		return param;
+	}
 
-//	/**
-//	 *  Has the element a parameter element.
-//	 *  @param name The name.
-//	 *  @return True, if it has the parameter.
-//	 */
-//	public boolean hasParameter(String name)
-//	{
-//		return mt.getParameter(name)!=null;
-//	}
-//	
-//	/**
-//	 *  Has the element a parameter set element.
-//	 *  @param name The name.
-//	 *  @return True, if it has the parameter set.
-//	 */
-//	public boolean hasParameterSet(String name)
-//	{
-//		return mt.getParameterSet(name)!=null;
-//	}
+	/**
+	 *  Get the parameter set element.
+ 	 *  @param name The name.
+	 *  @return The param set.
+	 */
+	public IParameterSet getParameterSet(String name)
+	{
+		IParameterSet param;
+		if(super.hasParameterSet(SUtil.camelToSnakeCase(name)))
+		{
+			param	= super.getParameterSet(SUtil.camelToSnakeCase(name));
+		}
+		else if(super.hasParameterSet(SUtil.snakeToCamelCase(name)))
+		{
+			param	= super.getParameterSet(SUtil.snakeToCamelCase(name));
+		}
+		else
+		{
+			// Throws exception when not found.
+			param	= super.getParameterSet(name);
+		}
+		return param;
+	}
 
 	/**
 	 *  Get the native (platform specific) message object.
@@ -499,17 +529,7 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 		// If not found -> try converting underscore to camel case.
 		if(bp==null)
 		{
-			for(int idx=name.indexOf("_"); idx!=-1 ; idx=name.indexOf("_"))
-			{
-				String	tmp	= name.substring(0, idx);
-				if(name.length()>idx+1)
-				{
-					tmp	+= name.substring(idx+1, idx+2).toUpperCase();
-					tmp	+= name.substring(idx+2);
-				}
-				name	= tmp;
-			}
-			bp	= bi.getBeanProperties(msg.getClass(), true, false).get(name);
+			bp	= bi.getBeanProperties(msg.getClass(), true, false).get(SUtil.snakeToCamelCase(name));
 		}
 		
 		return bp;

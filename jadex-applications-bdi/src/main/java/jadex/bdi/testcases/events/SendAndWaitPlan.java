@@ -25,7 +25,7 @@ public class SendAndWaitPlan extends Plan
 
 		// Send message and wait for answer. Note that the acl message
 		// should have ReplyWith or ConversationId to catch any answer messages!
-		TestReport tr = new TestReport("send_message.", "Send a message a wait for an answer.");
+		TestReport tr = new TestReport("send_message.", "Send a message and wait for an answer.");
 		try
 		{
 //			System.out.println("sending msg: "+request);

@@ -70,6 +70,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -1035,6 +1036,45 @@ public class SUtil
 				res += tmp;
 		}
 		return res;
+	}
+	
+	/**
+	 *  Convert CamelCase to snake_case.
+	 */
+	public static String	camelToSnakeCase(String camel)
+	{
+        String snake	= camel.replaceAll("([^A-Z])([A-Z]+)", "$1_$2").toLowerCase();
+        return snake;
+	}
+
+	/**
+	 *  Convert snake_case to CamelCase.
+	 */
+	public static String	snakeToCamelCase(String snake)
+	{
+		// Match any number of underscores followed by a single non-underscore (group 1).
+	    Matcher	msnake	= Pattern.compile("_+([^_])").matcher(snake);
+	    StringBuilder camel	= new StringBuilder();
+	    int	end	= 0;
+	    while(msnake.find())
+	    {
+	    	// Add skipped characters
+	    	if(msnake.start()>end)
+	    	{
+	    		camel.append(snake.substring(end, msnake.start()));
+	    	}
+	    	
+	    	// Convert character to uppercase.
+	    	camel.append(msnake.group(1).toUpperCase());
+	    	
+	    	// Remember end index of last match. 
+	    	end	= msnake.end();
+	    }
+	    
+		// Add non-matched rest of string
+	    camel.append(snake.substring(end));
+	    
+        return camel.toString();
 	}
 
 	/**

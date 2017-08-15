@@ -22,7 +22,6 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -36,7 +35,6 @@ import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -1168,7 +1166,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //	}
 	
 	/** Cache for message preprocessors. */
-	protected static final Map<Class<?>, IMessagePreprocessor>	preprocessors	= Collections.synchronizedMap(new HashMap<Class<?>, IMessagePreprocessor>());
+	protected static final Map<Class<?>, IMessagePreprocessor<Object>>	preprocessors	= Collections.synchronizedMap(new HashMap<Class<?>, IMessagePreprocessor<Object>>());
 	
 	/**
 	 *  Preprocess a message before sending.
@@ -1177,11 +1175,26 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header	The message header, may be changed by preprocessor.
 	 *  @param msg	The user object, may be changed by preprocessor.
 	 */
-	protected void	preprocessMessage(IMsgHeader header, Object msg)
+	protected static void	preprocessMessage(IMsgHeader header, Object msg)
 	{
+		IMessagePreprocessor<Object>	proc= getPreprocessor(msg);			
+		if(proc!=null)
+		{
+			proc.preprocessMessage(header, msg);
+		}
+	}
+
+	/**
+	 *  Try to find a message preprocessor for the given object.
+	 *  A preprocessor has the same packe and class name, appending "Preprocessor"
+	 *  and implementing IMessagePreprocessor.
+	 *  Also checks superclasses and interfaces.
+	 */
+	protected static IMessagePreprocessor<Object> getPreprocessor(Object msg)
+	{
+		IMessagePreprocessor<Object> proc	= null;
 		if(msg!=null)
 		{
-			IMessagePreprocessor	proc;
 			Class<?>	clazz	= msg.getClass();
 			if(preprocessors.containsKey(clazz))
 			{
@@ -1218,24 +1231,22 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				
 				preprocessors.put(clazz, proc);
 			}
-			
-			if(proc!=null)
-			{
-				proc.preprocessMessage(header, msg);
-			}
 		}
+		return proc;
 	}
 	
 	/**
 	 *  Try to load a message preprocessor for a given class.
 	 */
-	protected IMessagePreprocessor	findPreprocessor(Class<?> clazz)
+	protected static IMessagePreprocessor<Object>	findPreprocessor(Class<?> clazz)
 	{
-		IMessagePreprocessor	ret	= null;
+		IMessagePreprocessor<Object>	ret	= null;
 		try
 		{
-			clazz	= Class.forName(clazz.getName()+"Preprocessor", true, clazz.getClassLoader());
-			ret	= (IMessagePreprocessor)clazz.newInstance();
+			@SuppressWarnings("unchecked")
+			Class<? extends IMessagePreprocessor<Object>> pclazz	= (Class<? extends IMessagePreprocessor<Object>>)
+				Class.forName(clazz.getName()+"Preprocessor", true, clazz.getClassLoader());
+			ret	= pclazz.newInstance();
 		}
 		catch(ClassNotFoundException e)
 		{
