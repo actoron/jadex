@@ -42,8 +42,9 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	 */
 	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
-		if(body instanceof StreamPacket)
-		{
+		///WTF?
+//		if(body instanceof StreamPacket)
+//		{
 			MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null})
 				.addResultListener(new IResultListener<Void>()
 			{
@@ -59,7 +60,7 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 					getComponent().getLogger().warning("Exception during message handling: "+exception);
 				}
 			});
-		}
+//		}
 	}	
 	
 	/**
