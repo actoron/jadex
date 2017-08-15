@@ -90,6 +90,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.sensor.SensorHolderAgent;
+import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
@@ -226,6 +227,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="library", clazz=LibraryAgent.class),
 //	@ComponentType(name="dependency", clazz=DependencyAgent.class),
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
+	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
 //	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
@@ -304,6 +306,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
+		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
@@ -375,6 +378,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
+		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
@@ -427,6 +431,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
 		}),
+		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),

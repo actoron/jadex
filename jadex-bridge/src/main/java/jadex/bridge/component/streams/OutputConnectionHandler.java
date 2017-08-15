@@ -392,7 +392,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		
 		// Cannot use just isSendAllowed() as at least one message
 		// should be sent in case of stop to provoke acks with continue
-		boolean	test	= con.isInited() && sent.size()<maxsend && queuecnt<maxqueued;
+		boolean	test = con.isInited() && sent.size()<maxsend && queuecnt<maxqueued;
 		while(!tosend.isEmpty() && (isSendAllowed() || test))
 		{
 			Tuple2<StreamPacket, Future<Void>> tup = tosend.remove(0);
@@ -400,7 +400,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			sendData(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
 		
 			// Send only one test message if in stop mode.
-			test	= false;
+			test = false;
 		}
 	}
 	

@@ -25,7 +25,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -160,8 +159,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	/** The cms, cached for speed. */
 	protected IComponentManagementService	cms;
 	
-	/** The addresses. */
-	protected TransportAddressBook addresses;
+//	/** The addresses. */
+//	protected TransportAddressBook addresses;
 	
 	//-------- methods --------
 	
@@ -179,7 +178,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 
 		initArguments();
 		
-		AwarenessManagementAgent.this.addresses = addresses;
+//		AwarenessManagementAgent.this.addresses = addresses;
 //		AwarenessManagementAgent.this.root	= addresses.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 		AwarenessManagementAgent.this.root = agent.getComponentIdentifier().getRoot();
 		
@@ -341,7 +340,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		// Return if inital discovery.
 		boolean ret = false;
 		
-		boolean	changedaddrs	= false;	// Should an existing proxy be updated with new addresses?
+		boolean	changedaddrs	= true; //false;	// Should an existing proxy be updated with new addresses? Yes, always!
 		// Announce new platform addresses
 //		Map<String, String[]> addr = info.getAddresses();
 //		for (Map.Entry<String, String[]> entry : addr.entrySet())
@@ -349,7 +348,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 //			addresses.addPlatformAddresses(info.getSender().getRoot(), entry.getKey(), entry.getValue());
 //		}
 //		System.out.println(agent.getComponentIdentifier().toString() + " merging " + info.getAddresses() + " " + info.getSender());
-		changedaddrs = TransportAddressBook.getAddressBook(agent).mergePlatformAddresses(info.getSender().getRoot(), info.getAddresses());
+//		changedaddrs = TransportAddressBook.getAddressBook(agent).mergePlatformAddresses(info.getSender().getRoot(), info.getAddresses());
 //		System.out.println("MERGED " + agent + " THIS: " + info.getSender().getRoot() + " " + info.getAddresses());
 //		System.out.println("Merged: " + changedaddrs + " " + agent);
 		
@@ -391,7 +390,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
 			if(dif==null)
 			{
-				dif = new DiscoveryInfo(sender, null, remoteexcluded, info.getProperties());
+				dif = new DiscoveryInfo(sender, info.getAddresses(), null, remoteexcluded, info.getProperties());
 				dif.setTimeDelay(awamech, getClockTime(), info.getDelay());
 				discovered.put(sender, dif);
 				informListeners(dif);

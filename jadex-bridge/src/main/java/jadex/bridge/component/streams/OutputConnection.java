@@ -54,8 +54,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 			if(closing || closed)
 				return new Future<Void>(new RuntimeException("Connection closed."));
 		}
-//		return ((IOutputConnectionHandler)ch).send(data);
-		return IFuture.DONE;
+		return ((IOutputConnectionHandler)ch).send(data);
 	}
 	
 	/**
@@ -68,8 +67,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 			if(closing || closed)
 				return;
 		}
-		
-//		((IOutputConnectionHandler)ch).flush();
+		((IOutputConnectionHandler)ch).flush();
 	}
 	
 	/**
@@ -78,8 +76,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 */
 	public IFuture<Integer> waitForReady()
 	{
-//		return ((IOutputConnectionHandler)ch).waitForReady();
-		return new Future(0);
+		return ((IOutputConnectionHandler)ch).waitForReady();
 	}
 	
 	/**

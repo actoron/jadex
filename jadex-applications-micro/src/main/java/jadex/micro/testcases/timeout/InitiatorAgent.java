@@ -2,6 +2,7 @@ package jadex.micro.testcases.timeout;
 
 import java.util.Map;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -233,5 +234,22 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Starter for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+//		config1.setAwaMechanisms(AWAMECHANISM.local);
+//		config1.setAwareness(true);
+		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config1.addComponent(InitiatorAgent.class);
+		Starter.createPlatform(config1).get();
 	}
 }

@@ -1,15 +1,8 @@
 package jadex.bridge.component.streams;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
-
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;

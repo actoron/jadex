@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.base.PlatformConfiguration;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -27,7 +26,8 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.TransportAddressBook;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -169,7 +169,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					if(tup.getSecondEntity() != null)
 					{
 						// Then decode header and deliver to receiver agent.
-						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent.getClassLoader(), tup.getSecondEntity());
+						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent, tup.getSecondEntity());
 						final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 						
 						cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
@@ -313,23 +313,31 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					{
 						// Announce connection addresses.
 						InetAddress[] addresses = SUtil.getNetworkAddresses();
-						String[] saddresses = new String[addresses.length];
+//						String[] saddresses = new String[addresses.length];
+						IComponentIdentifier platformid = agent.getComponentIdentifier().getRoot();
+						List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
 						for(int i = 0; i < addresses.length; i++)
 						{
+							String addrstr = null;
 							if(addresses[i] instanceof Inet6Address)
 							{
-								saddresses[i] = "[" + addresses[i].getHostAddress() + "]:" + port;
+//								saddresses[i] = "[" + addresses[i].getHostAddress() + "]:" + port;
+								addrstr = "[" + addresses[i].getHostAddress() + "]:" + port;
 							}
 							else // if (address instanceof Inet4Address)
 							{
-								saddresses[i] = addresses[i].getHostAddress() + ":" + port;
+//								saddresses[i] = addresses[i].getHostAddress() + ":" + port;
+								addrstr = addresses[i].getHostAddress() + ":" + port;
 							}
+							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
 						agent.getLogger().info("Listening to port " + port + " for " + impl.getProtocolName() + " transport.");
 
-						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
-						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
-						ret.setResult(null);
+//						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
+//						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
+						ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, Binding.SCOPE_PLATFORM, false);
+						
+						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					catch(Exception e)
 					{
@@ -420,7 +428,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			byte[] bheader = codec.encode(header, agent.getClassLoader(), header);
+			byte[] bheader = codec.encode(header, agent, header);
 
 			secser.encryptAndSign(header, bheader).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)
 			{
@@ -660,8 +668,28 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected String[] getAddresses(IMsgHeader header)
 	{
 		IComponentIdentifier target = getTarget(header).getRoot();
-		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
-		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
+//		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
+//		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, Binding.SCOPE_PLATFORM, false);
+		String[] ret = null;
+		try
+		{
+			List<TransportAddress> addrs = tas.resolveAddresses(target, impl.getProtocolName()).get();
+			if (addrs != null)
+			{
+				ret = new String[addrs.size()];
+				int i = 0;
+				for (TransportAddress addr : addrs)
+				{
+					ret[i] = addr.getAddress();
+					++i;
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		
 //		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
 		return ret;
 	}

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.address.ITransportAddress;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
@@ -26,7 +26,7 @@ public class DiscoveryInfo
 	protected IComponentIdentifier cid;
 	
 	/** The transport addresses of the remote component. */
-	protected List<ITransportAddress> addresses;
+	protected List<TransportAddress> addresses;
 	
 	/** Component id of local proxy (if any). */
 	protected IFuture<IComponentIdentifier> proxy;
@@ -59,10 +59,11 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
+	public DiscoveryInfo(IComponentIdentifier cid, List<TransportAddress> addresses, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
 			boolean remoteexcluded, Map<String, String> properties)
 	{
 		this.cid = cid;
+		this.addresses = addresses;
 		this.proxy = proxy;
 //		this.time = time;
 //		this.delay = delay;
@@ -97,7 +98,7 @@ public class DiscoveryInfo
 	 *
 	 *  @return The addresses.
 	 */
-	public List<ITransportAddress> getAddresses()
+	public List<TransportAddress> getAddresses()
 	{
 		return addresses;
 	}
@@ -107,7 +108,7 @@ public class DiscoveryInfo
 	 *
 	 *  @param addresses The addresses.
 	 */
-	public void setAddresses(List<ITransportAddress> addresses)
+	public void setAddresses(List<TransportAddress> addresses)
 	{
 		this.addresses = addresses;
 	}
