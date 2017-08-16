@@ -78,7 +78,6 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-opengl", "false",
 		"-cli", "false",
 //		"-persist", "true", // for testing persistence
-		"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class",
 //		"-deftimeout", "-1",
 		"-printpass", "false",
 		"-superpeerclient", "false"

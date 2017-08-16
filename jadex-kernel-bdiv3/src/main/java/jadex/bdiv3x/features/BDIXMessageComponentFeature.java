@@ -129,7 +129,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			
 		if(mevent!=null)
 		{
-			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getComponent());
+			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getComponent(), original);
 			FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
 			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
 		}

@@ -1,13 +1,17 @@
 package jadex.bdiv3x.features;
 
+import java.util.Map;
+
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDILifecycleFeature;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.IInternalEvent;
+import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.ILifecycleComponentFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
@@ -168,15 +172,6 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
 			return bdif.getGoalbase().dispatchTopLevelGoal((IGoal)goal);
 		}
-		
-//		/**
-//		 *  Dispatch a message event.
-//		 */
-//		public IFuture<Void> dispatchMessageEvent(IMessageEvent message)
-//		{
-//			IBDIMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
-//			return mf.sendMessage((Map<String, Object>)message.getMessage(), message.getMessageType());
-//		}
 		
 		/**
 		 *  Dispatch an internal event.
