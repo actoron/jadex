@@ -2,6 +2,7 @@ package jadex.bdiv3x.runtime;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -489,11 +490,16 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 			Object vals = bp.getPropertyValue(msg);
 			if(vals instanceof Collection)
 			{
+				// TODO: doesn't work if copy is given (should try to find addXXX method???)
 				((Collection<Object>)vals).add(value);
+			}
+			else if(vals==null)
+			{
+				vals	= SReflect.createComposite(bp.getGenericType()!=null ? bp.getGenericType() : bp.getType(), Collections.singleton(value));		
+				bp.setPropertyValue(msg, vals);
 			}
 			else
 			{
-				// TODO
 				throw new UnsupportedOperationException("Composite type not supported: "+vals);
 			}
 		}
