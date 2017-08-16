@@ -53,31 +53,33 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 		}
 		
 		// Must be done after msg has been assigned :-(
+		// 1 -> Create parameters from model
 		super.initParameters(null, config);
 		
 		// In case of messages there can be parameters only in the config, not in the model due to underlying message type definition
+		// 2 -> Create parameters from config
+		IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+		Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
 		if(config!=null && config.getParameters()!=null)
 		{
 			for(Map.Entry<String, List<UnparsedExpression>> entry: config.getParameters().entrySet())
 			{
-//				if(!msg.containsKey(entry.getKey()))
-//				{
-//					ParameterSpecification ps = mt.getParameter(entry.getKey());
-//					if(!ps.isSet())
+				if(!hasParameter(entry.getKey()) && !hasParameterSet(entry.getKey()))
+				{
+					if(SReflect.isIterableClass(props.get(entry.getKey()).getType()))
+					{
+						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey())));
+					}
+					else
 					{
 						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey())));
 					}
-//					else
-//					{
-//						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey())));
-//					}
-//				}
+				}
 			}
 		}
 		
 		// Finally add remaining properties from pojo as parameters.
-		IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
-		Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
+		// 3 -> Create parameters from pojo
 		for(Map.Entry<String, BeanProperty> entry: props.entrySet())
 		{
 			if(!hasParameter(entry.getKey()) && !hasParameterSet(entry.getKey()))
