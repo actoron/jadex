@@ -373,6 +373,54 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public IFuture<Integer> isReady(final IMsgHeader header)
 	{
+		final Future<Integer>	ret	= new Future<Integer>();
+		VirtualConnection	handler;
+		final IComponentIdentifier	target	= getTarget(header);
+		
+		synchronized(this)
+		{
+			handler = getVirtualConnection(target);
+		}
+		if(handler==null)
+		{
+			getAddresses(header).addResultListener(new ExceptionDelegationResultListener<String[], Integer>(ret)
+			{
+				public void customResultAvailable(String[] addresses) throws Exception
+				{
+					synchronized(AbstractTransportAgent.this)
+					{
+						VirtualConnection handler = getVirtualConnection(target);
+						if (handler == null)
+						{
+							if(addresses!=null && addresses.length>0)
+							{
+								handler	= createVirtualConnection(target);
+								handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
+								createConnections(handler, target, addresses);
+							}
+							else
+							{
+								ret.setException(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
+							}
+						}
+						else
+						{
+							handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
+						}
+					}
+				}
+			});
+			
+		}
+		else
+		{
+			handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
+		}
+		
+		return ret;
+	}
+	/*public IFuture<Integer> isReady(final IMsgHeader header)
+	{
 		IFuture<Integer>	ret	= null;
 		boolean	create	= false;
 		String[]	addresses	= null;
@@ -408,7 +456,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 * Send a message. Fail fast implementation. Retry should be handled in
@@ -665,30 +713,51 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param The message header.
 	 * @return The addresses, if any.
 	 */
-	protected String[] getAddresses(IMsgHeader header)
+	protected IFuture<String[]> getAddresses(IMsgHeader header)
 	{
 		IComponentIdentifier target = getTarget(header).getRoot();
 //		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
 //		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
 		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, Binding.SCOPE_PLATFORM, false);
-		String[] ret = null;
-		try
+//		String[] ret = null;
+//		try
+//		{
+//			List<TransportAddress> addrs = tas.resolveAddresses(target, impl.getProtocolName()).get();
+//			if (addrs != null)
+//			{
+//				ret = new String[addrs.size()];
+//				int i = 0;
+//				for (TransportAddress addr : addrs)
+//				{
+//					ret[i] = addr.getAddress();
+//					++i;
+//				}
+//			}
+//		}
+//		catch (Exception e)
+//		{
+//		}
+		
+		final Future<String[]> ret = new Future<String[]>();
+		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, String[]>(ret)
 		{
-			List<TransportAddress> addrs = tas.resolveAddresses(target, impl.getProtocolName()).get();
-			if (addrs != null)
+			public void customResultAvailable(List<TransportAddress> addrs) throws Exception
 			{
-				ret = new String[addrs.size()];
-				int i = 0;
-				for (TransportAddress addr : addrs)
+				String[] straddrs = null;
+				if (addrs != null && addrs.size() > 0)
 				{
-					ret[i] = addr.getAddress();
-					++i;
+					straddrs = new String[addrs.size()];
+					int i = 0;
+					for (TransportAddress addr : addrs)
+					{
+						straddrs[i] = addr.getAddress();
+						++i;
+					}
 				}
+				
+				ret.setResult(straddrs);
 			}
-		}
-		catch (Exception e)
-		{
-		}
+		});
 		
 //		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
 		return ret;

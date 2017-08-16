@@ -168,66 +168,71 @@ public class TransportAddressAgent implements ITransportAddressService
 	public IFuture<List<TransportAddress>> resolveAddresses(final IComponentIdentifier platformid, String transporttype)
 	{
 		IFuture<List<TransportAddress>> ret = null;
-		
-		if (freshness.get(platformid) != null &&
-			freshness.get(platformid) + CACHE_VALIDITY_DUR > System.currentTimeMillis());
+		try
 		{
-			List<TransportAddress> addrs = getAddressesFromCache(platformid);
-			addrs = filterAddresses(addrs, transporttype);
-			if (addrs != null)
-				ret = new Future<List<TransportAddress>>(filterAddresses(addrs, transporttype));
-		}
-		
-		if (ret == null)
-		{
-			final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
-			ret = fret;
-			IFuture<List<TransportAddress>> search = searches.get(platformid);
-			if (search == null)
+			if (freshness.get(platformid) != null &&
+				freshness.get(platformid) + CACHE_VALIDITY_DUR > System.currentTimeMillis());
 			{
-				search = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<List<TransportAddress>>()
-				{
-					public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
-					{
-						List<TransportAddress> ret = null;
-						if (hasSuperPeer())
-							 ret = searchAddressesByAskSuperPeer(platformid);
-						
-						if (ret == null && !hasSuperPeer())
-						{
-							ret = searchAddressesByAskRemote(platformid);
-							
-							if (ret == null)
-								ret = searchAddressesByAskAwareness(platformid);
-							
-							if (ret == null)
-								ret = searchAddressesByAskAll(platformid);
-						}
-						
-						ret = getAddressesFromCache(platformid);
-						
-						searches.remove(platformid);
-						
-						return new Future<List<TransportAddress>>(ret);
-					}
-				});
-				searches.put(platformid, search);
+				List<TransportAddress> addrs = getAddressesFromCache(platformid);
+				addrs = filterAddresses(addrs, transporttype);
+				if (addrs != null)
+					ret = new Future<List<TransportAddress>>(filterAddresses(addrs, transporttype));
 			}
 			
-			search.addResultListener(new IResultListener<List<TransportAddress>>()
+			if (ret == null)
 			{
-				public void exceptionOccurred(Exception exception)
+				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
+				ret = fret;
+				IFuture<List<TransportAddress>> search = searches.get(platformid);
+				if (search == null)
 				{
-					resultAvailable(null);
+					search = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<List<TransportAddress>>()
+					{
+						public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
+						{
+							List<TransportAddress> ret = null;
+							if (hasSuperPeer())
+								 ret = searchAddressesByAskSuperPeer(platformid);
+							
+							if (ret == null && !hasSuperPeer())
+							{
+								ret = searchAddressesByAskRemote(platformid);
+								
+								if (ret == null)
+									ret = searchAddressesByAskAwareness(platformid);
+								
+								if (ret == null)
+									ret = searchAddressesByAskAll(platformid);
+							}
+							
+							ret = getAddressesFromCache(platformid);
+							
+							searches.remove(platformid);
+							
+							return new Future<List<TransportAddress>>(ret);
+						}
+					});
+					searches.put(platformid, search);
 				}
 				
-				public void resultAvailable(List<TransportAddress> result)
+				search.addResultListener(new IResultListener<List<TransportAddress>>()
 				{
-					freshness.put(platformid, System.currentTimeMillis());
+					public void exceptionOccurred(Exception exception)
+					{
+						resultAvailable(null);
+					}
 					
-					fret.setResult(result);
-				}
-			});
+					public void resultAvailable(List<TransportAddress> result)
+					{
+						freshness.put(platformid, System.currentTimeMillis());
+						
+						fret.setResult(result);
+					}
+				});
+			}
+		}
+		catch (Exception e)
+		{
 		}
 		return ret;
 	}
@@ -460,8 +465,11 @@ public class TransportAddressAgent implements ITransportAddressService
 		else
 		{
 			ret = addresses.get(platformid);
+			List<TransportAddress> manuals = manualaddresses.get(platformid);
 			if (ret == null)
-				ret = manualaddresses.get(platformid);
+				ret = manuals;
+			else if (manuals != null)
+				ret.addAll(manuals);
 		}
 		return ret;
 	}
