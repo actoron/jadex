@@ -5,6 +5,9 @@ dependencies
 	compile project(':jadex-platform')
 	//compile 'org.eclipse.jetty.websocket:websocket-client:9.4.4.v20170414'
 	
+	// NanoHTTPd server
+	compile 'org.nanohttpd:nanohttpd-websocket:2.3.1'
+	
 	// NV client
 	compile 'com.neovisionaries:nv-websocket-client:2.2'
 	
