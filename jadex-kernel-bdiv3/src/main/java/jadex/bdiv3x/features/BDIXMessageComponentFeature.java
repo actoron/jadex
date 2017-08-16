@@ -97,7 +97,9 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			Map<String, BeanProperty>	bprops	= bi.getBeanProperties(body.getClass(), true, false);
 			for(Map.Entry<String, BeanProperty> bprop: bprops.entrySet())
 			{
-				vals.put(bprop.getKey(), bprop.getValue().getPropertyValue(body));
+				Object	value	= bprop.getValue().getPropertyValue(body);
+				vals.put(bprop.getKey(), value);
+				vals.put(SUtil.camelToSnakeCase(bprop.getKey()), value);
 			}
 		}
 
