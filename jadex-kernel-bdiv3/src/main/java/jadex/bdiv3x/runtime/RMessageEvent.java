@@ -28,6 +28,9 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	/** The message. */
 	protected T msg;
 	
+	/** The original message, if this message is a reply. */
+	RMessageEvent<T>	original;
+	
 	//-------- constructors --------
 	
 	/**
@@ -95,10 +98,11 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	 *  
 	 *  Constructor Without parameter init for received messages.
 	 */
-	public RMessageEvent(MMessageEvent modelelement, T msg, IInternalAccess agent)
+	public RMessageEvent(MMessageEvent modelelement, T msg, IInternalAccess agent, RMessageEvent<T> original)
 	{
 		super(modelelement, null, agent, null, null);
 		this.msg = msg;
+		this.original	= original;
 		
 		Map<String, Object>	def	= null;
 		if(msg!=null)
@@ -303,6 +307,14 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	public T getMessage()
 	{
 		return msg;
+	}
+	
+	/**
+	 *  Get the original message event (if this is a reply).
+	 */
+	public RMessageEvent<T> getOriginal()
+	{
+		return original;
 	}
 	
 	/**
