@@ -23,6 +23,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -63,9 +64,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			{
 				if(!mparam.isMulti(agent.getClassLoader()))
 				{
-					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
+					if(vals!=null && (vals.containsKey(mparam.getName()) || vals.containsKey(SUtil.snakeToCamelCase(mparam.getName()))) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
-						addParameter(createParameter(mparam, mparam.getName(), getAgent(), vals.get(mparam.getName())));
+						addParameter(createParameter(mparam, mparam.getName(), getAgent(), vals.containsKey(mparam.getName()) ? vals.get(mparam.getName()) : vals.get(SUtil.snakeToCamelCase(mparam.getName()))));
 					}
 					else
 					{
@@ -74,9 +75,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				}
 				else
 				{
-					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
+					if(vals!=null && (vals.containsKey(mparam.getName()) || vals.containsKey(SUtil.snakeToCamelCase(mparam.getName()))) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
-						addParameterSet(createParameterSet(mparam, mparam.getName(), getAgent(), vals.get(mparam.getName())));
+						addParameterSet(createParameterSet(mparam, mparam.getName(), getAgent(), vals.containsKey(mparam.getName()) ? vals.get(mparam.getName()) : vals.get(SUtil.snakeToCamelCase(mparam.getName()))));
 					}
 					else
 					{

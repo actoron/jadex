@@ -341,14 +341,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			return bdif.dispatchTopLevelGoal(goal);
 		}
 		
-//		/**
-//		 *  Dispatch a message event.
-//		 */
-//		public IFuture<Void> sendMessageEvent(IMessageEvent message)
-//		{
-//			IMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
-//			return mf.sendMessage((Map<String, Object>)message.getMessage(), message.getMessageType());
-//		}
+		/**
+		 *  Dispatch a message event.
+		 */
+		public IFuture<Void> sendMessageEvent(IMessageEvent message)
+		{
+			IMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
+			return mf.sendMessage(null, message.getMessage());
+		}
 		
 		/**
 		 *  Dispatch an internal event.
@@ -610,7 +610,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				{
 					MMessageEvent mmevent = mcapa.getResolvedMessageEvent(null, cpe.getRef());
 					RMessageEvent rmevent = new RMessageEvent(mmevent, component, cpe);
-//					barrier.addFuture(sendMessageEvent(rmevent));
+					barrier.addFuture(sendMessageEvent(rmevent));
 				}
 			}
 			

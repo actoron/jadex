@@ -2,6 +2,7 @@ package jadex.bdiv3x.runtime;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,9 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	/** The message. */
 	protected T msg;
 	
+	/** The original message, if this message is a reply. */
+	RMessageEvent<T>	original;
+	
 	//-------- constructors --------
 	
 	/**
@@ -49,31 +53,33 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 		}
 		
 		// Must be done after msg has been assigned :-(
+		// 1 -> Create parameters from model
 		super.initParameters(null, config);
 		
 		// In case of messages there can be parameters only in the config, not in the model due to underlying message type definition
+		// 2 -> Create parameters from config
+		IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+		Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
 		if(config!=null && config.getParameters()!=null)
 		{
 			for(Map.Entry<String, List<UnparsedExpression>> entry: config.getParameters().entrySet())
 			{
-//				if(!msg.containsKey(entry.getKey()))
-//				{
-//					ParameterSpecification ps = mt.getParameter(entry.getKey());
-//					if(!ps.isSet())
+				if(!hasParameter(entry.getKey()) && !hasParameterSet(entry.getKey()))
+				{
+					if(SReflect.isIterableClass(props.get(entry.getKey()).getType()))
+					{
+						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey())));
+					}
+					else
 					{
 						addParameter(createParameter(null, entry.getKey(), getAgent(), config.getParameter(entry.getKey())));
 					}
-//					else
-//					{
-//						addParameterSet(createParameterSet(null, entry.getKey(), getAgent(), config.getParameters(entry.getKey())));
-//					}
-//				}
+				}
 			}
 		}
 		
 		// Finally add remaining properties from pojo as parameters.
-		IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
-		Map<String, BeanProperty>	props	= bi.getBeanProperties(msg.getClass(), true, false);
+		// 3 -> Create parameters from pojo
 		for(Map.Entry<String, BeanProperty> entry: props.entrySet())
 		{
 			if(!hasParameter(entry.getKey()) && !hasParameterSet(entry.getKey()))
@@ -95,10 +101,11 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	 *  
 	 *  Constructor Without parameter init for received messages.
 	 */
-	public RMessageEvent(MMessageEvent modelelement, T msg, IInternalAccess agent)
+	public RMessageEvent(MMessageEvent modelelement, T msg, IInternalAccess agent, RMessageEvent<T> original)
 	{
 		super(modelelement, null, agent, null, null);
 		this.msg = msg;
+		this.original	= original;
 		
 		Map<String, Object>	def	= null;
 		if(msg!=null)
@@ -306,6 +313,14 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 	}
 	
 	/**
+	 *  Get the original message event (if this is a reply).
+	 */
+	public RMessageEvent<T> getOriginal()
+	{
+		return original;
+	}
+	
+	/**
 	 * 
 	 */
 	public MMessageEvent getMMessageEvent()
@@ -477,11 +492,16 @@ public class RMessageEvent<T> extends RProcessableElement implements IMessageEve
 			Object vals = bp.getPropertyValue(msg);
 			if(vals instanceof Collection)
 			{
+				// TODO: doesn't work if copy is given (should try to find addXXX method???)
 				((Collection<Object>)vals).add(value);
+			}
+			else if(vals==null)
+			{
+				vals	= SReflect.createComposite(bp.getGenericType()!=null ? bp.getGenericType() : bp.getType(), Collections.singleton(value));		
+				bp.setPropertyValue(msg, vals);
 			}
 			else
 			{
-				// TODO
 				throw new UnsupportedOperationException("Composite type not supported: "+vals);
 			}
 		}

@@ -82,7 +82,7 @@ public class REventbase extends RElement implements IEventbase
 			MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
 			// TODO: set parameter values from model???
 			@SuppressWarnings("unchecked")
-			RMessageEvent<T>	ret	= new RMessageEvent<T>(mevent, (T)reply, getAgent());
+			RMessageEvent<T>	ret	= new RMessageEvent<T>(mevent, (T)reply, getAgent(), (RMessageEvent<T>)event);
 			return ret;
 		}
 		else
