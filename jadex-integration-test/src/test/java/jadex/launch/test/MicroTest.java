@@ -20,7 +20,11 @@ public class MicroTest	extends ComponentTestSuite
 		
 		// Hangs due to 5 sec repeat step in simulation
 		"TimeProviderAgent",
-		
+
+		// excluded until maybe remote objects will be supported again
+		"recfutures/User",
+		"recfutures\\User",
+
 		// excluded until new authorization model conceived
 		"authenticate/Initiator",
 		"authenticate\\Initiator",
