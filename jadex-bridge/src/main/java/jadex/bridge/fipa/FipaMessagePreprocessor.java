@@ -35,18 +35,38 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor<FipaMessage
 		// Set/check consistent receiver.
 		Set<IComponentIdentifier>	frec	= msg.getReceivers();
 		IComponentIdentifier	hrec	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-		if(frec==null)
+		if(frec==null && hrec!=null)
 		{
 			msg.addReceiver(hrec);
 		}
-		else if(hrec==null && frec.size()==1)
+		else if(frec!=null)
 		{
-			// TODO: multiple receivers
-			header.addProperty(IMsgHeader.RECEIVER, msg.getReceivers().iterator().next());
-		}
-		else// if(!frec.equals(hrec))
-		{
-			throw new IllegalArgumentException("Inconsistent/unsupported msg/header receivers: "+frec+" vs. "+hrec);
+			// single receiver in msg object
+			if(frec.size()==1)
+			{
+				IComponentIdentifier	next	= frec.iterator().next();
+				if(hrec==null)
+				{
+					header.addProperty(IMsgHeader.RECEIVER, next);
+				}
+				else if(!SUtil.equals(hrec, next))
+				{
+					throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+hrec);				
+				}
+				// else equal -> NOP
+			}
+
+			// use multiple receivers from msg object
+			else if(hrec==null)
+			{
+				header.addProperty(IMsgHeader.RECEIVER, frec);
+			}
+			
+			// msg and header receivers given and not equal
+			else
+			{
+				throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+hrec);
+			}
 		}
 		
 		// Set/check consistent conv id.
@@ -75,8 +95,8 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor<FipaMessage
 	 */
 	public boolean	isReply(FipaMessage message, FipaMessage reply)
 	{
-		return SUtil.safeCollection(message.getReceivers()).contains(reply.getSender())
-			&& SUtil.equals(message.getConversationId(), reply.getConversationId())
+		return //SUtil.safeCollection(message.getReceivers()).contains(reply.getSender())	// Not required, e.g. protocol receiver plans create template w/o sender/receiver 
+			/*&&*/ SUtil.equals(message.getConversationId(), reply.getConversationId())
 			&& SUtil.equals(message.getReplyWith(), reply.getInReplyTo());
 	}
 }
