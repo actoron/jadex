@@ -12,6 +12,7 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
@@ -293,7 +294,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>> subscribeToLocalAddresses()
 	{
-		final SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>> sub = new SubscriptionIntermediateFuture<Tuple2<TransportAddress,Boolean>>();
+		final SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>> sub = (SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>>) SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 		sub.setTerminationCommand(new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
