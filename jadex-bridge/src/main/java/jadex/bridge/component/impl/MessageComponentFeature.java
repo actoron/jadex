@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -41,12 +42,14 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
@@ -697,7 +700,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 *  Send the message with a prepared header.
+	 *  Send the message to potentially multiple receivers.
 	 *  
 	 *  @param header The header.
 	 *  @param message The message.
@@ -705,16 +708,48 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected IFuture<Void> sendMessage(final MsgHeader header, Object message)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
 		preprocessMessage(header, message);
 		
-		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
-		if (receiver == null)
-			return new Future<Void>(new IllegalArgumentException("Messages must have a receiver."));
+		Object rec = header.getProperty(IMsgHeader.RECEIVER);
 		
+		if(SReflect.isIterable(rec))
+		{
+			FutureBarrier<Void>	fubar	= new FutureBarrier<Void>();
+			for(Object orec: SReflect.getIterable(rec))
+			{
+				// Need to copy header, because receiver isn't exposed in transport interface.
+				MsgHeader	copy	= new MsgHeader();
+				copy.setProperties(new LinkedHashMap<String, Object>(header.getProperties()));
+				copy.addProperty(IMsgHeader.RECEIVER, orec);
+				fubar.addFuture(doSendMessage(copy, message));
+			}
+			return fubar.waitFor();
+		}
+		else
+		{
+			return doSendMessage(header, message);
+		}
+	}
 		
-		if (receiver.getRoot().equals(platformid))
+	/**
+	 *  Send the message to a single receiver.
+	 *  
+	 *  @param header The header.
+	 *  @param message The message.
+	 *  @return Null, when sent.
+	 */
+	protected IFuture<Void> doSendMessage(final MsgHeader header, Object message)
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		Object rec = header.getProperty(IMsgHeader.RECEIVER);		
+		if(!(rec instanceof IComponentIdentifier))
+		{
+			return new Future<Void>(new IllegalArgumentException("Messages must have receiver(s) of type IComponentIdentifier: "+message+", "+header));
+		}
+		IComponentIdentifier receiver = (IComponentIdentifier)rec;;
+		
+		if(receiver.getRoot().equals(platformid))
 		{
 			// Direct local delivery.
 			ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);

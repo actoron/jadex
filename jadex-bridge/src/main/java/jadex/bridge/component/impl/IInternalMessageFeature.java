@@ -1,7 +1,6 @@
 package jadex.bridge.component.impl;
 
 import java.util.Map;
-import java.util.UUID;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IConnection;
@@ -10,9 +9,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.streams.InputConnection;
 import jadex.bridge.component.streams.OutputConnection;
-import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -49,6 +46,8 @@ public interface IInternalMessageFeature
 	 */
 	public void messageArrived(IMsgSecurityInfos secinfos, IMsgHeader header, Object body);
 	
+	//-------- streams --------
+	
 	/**
 	 *  Inform the component that a stream has arrived.
 	 *  @param con The stream that arrived.
@@ -74,4 +73,11 @@ public interface IInternalMessageFeature
 	 *  Create a virtual input connection.
 	 */
 	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
+	
+	//-------- monitoring --------
+	//TODO for comanalyzer
+//	/**
+//	 *  Listen to message events (send and receive).
+//	 */
+//	public ISubscriptionIntermediateFuture<MessageEvent>	getMessageEvents();
 }
