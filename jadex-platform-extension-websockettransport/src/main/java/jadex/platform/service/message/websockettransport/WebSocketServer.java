@@ -33,7 +33,7 @@ public class WebSocketServer extends NanoWSD
 	protected WebSocket openWebSocket(IHTTPSession handshake)
 	{
 		WebSocketConnectionServer ret = new WebSocketConnectionServer(handshake, handler);
-		return ret;
+		return ret.getWebSocket();
 	}
 	
 	/**

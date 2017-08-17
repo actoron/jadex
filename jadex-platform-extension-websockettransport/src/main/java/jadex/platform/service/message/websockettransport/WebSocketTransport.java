@@ -1,7 +1,6 @@
 package jadex.platform.service.message.websockettransport;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransport;
@@ -116,15 +115,6 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public IFuture<Void> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
 	{
-		byte[] message = null;
-		try
-		{
-			message = SUtil.mergeData(header, body);
-		}
-		catch (Exception e)
-		{
-			return new Future<Void>(e);
-		}
-		return con.sendMessage(message);
+		return con.sendMessage(header, body);
 	}
 }
