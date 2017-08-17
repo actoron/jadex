@@ -96,4 +96,30 @@ public class TransportAddress
 	{
 		this.address = address;
 	}
+	
+	/**
+	 *  Hash code.
+	 */
+	public int hashCode()
+	{
+		int ret = 31;
+		ret += platformid.hashCode();
+		ret += transporttype.hashCode();
+		ret += address.hashCode();
+		return ret;
+	}
+	
+	/**
+	 *   Equals method.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if (obj instanceof TransportAddress)
+		{
+			TransportAddress ta = (TransportAddress) obj;
+			ret = ta.getPlatformId().equals(platformid) && ta.getTransportType().equals(transporttype) && ta.getAddress().equals(address); 
+		}
+		return ret;
+	}
 }
