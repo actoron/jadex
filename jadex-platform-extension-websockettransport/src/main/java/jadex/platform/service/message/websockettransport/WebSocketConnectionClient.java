@@ -12,7 +12,6 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransportHandler;
@@ -21,19 +20,13 @@ import jadex.platform.service.transport.ITransportHandler;
  *  Client-side websocket connection.
  *
  */
-public class WebSocketConnectionClient implements IWebSocketConnection
+public class WebSocketConnectionClient extends AWebsocketConnection
 {
-	/** The connection target. */
-	protected IComponentIdentifier target;
-	
 	/** The connection address. */
 	protected String address;
 	
 	/** The websocket. */
 	protected WebSocket websocket;
-	
-	/** The handler. */
-	protected ITransportHandler<IWebSocketConnection> handler;
 	
 	/**
 	 *  Creates the connection.
@@ -43,9 +36,8 @@ public class WebSocketConnectionClient implements IWebSocketConnection
 	 */
 	public WebSocketConnectionClient(String address, IComponentIdentifier target, ITransportHandler<IWebSocketConnection> handler)
 	{
+		super(handler);
 		this.address = address;
-		this.target = target;
-		this.handler = handler;
 	}
 	
 	/**
@@ -85,19 +77,7 @@ public class WebSocketConnectionClient implements IWebSocketConnection
 			public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception
 			{
 //				System.out.println("RecClient: " + Arrays.hashCode(binary) + " " + System.currentTimeMillis());
-				try
-				{
-					List<byte[]> splitdata = SUtil.splitData(binary);
-					if (splitdata.size() != 2)
-						throw new IllegalArgumentException("Invalid data detected, closing connection...");
-					
-					handler.messageReceived(WebSocketConnectionClient.this, splitdata.get(0), splitdata.get(1));
-				}
-				catch (Exception e)
-				{
-					handler.connectionClosed(WebSocketConnectionClient.this, e);
-					websocket.disconnect();
-				}
+				handleFramePayload(binary);
 			}
 			
 			public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception
@@ -119,16 +99,18 @@ public class WebSocketConnectionClient implements IWebSocketConnection
 	
 	/**
 	 *  Send bytes using the connection.
-	 *  @param message The message.
+	 *  @param header The message header.
+	 *  @param body The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Void> sendMessage(byte[] message)
+	public IFuture<Void> sendMessage(byte[] header, byte[] body)
 	{
-//		System.out.println("SendClient: " + Arrays.hashCode(message) + " " + System.currentTimeMillis());
+//		System.out.println("SendClient: " + Arrays.hashCode(body) + " " + System.currentTimeMillis());
 		Future<Void> ret = new Future<Void>();
 		try
 		{
-			websocket.sendBinary(message);
+			websocket.sendBinary(header);
+			websocket.sendBinary(body);
 			websocket.flush();
 			ret.setResult(null);
 		}

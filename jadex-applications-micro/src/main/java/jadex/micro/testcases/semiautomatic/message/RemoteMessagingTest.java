@@ -31,6 +31,7 @@ public class RemoteMessagingTest
 		config1.setAwaMechanisms(AWAMECHANISM.local);
 		config1.setAwareness(true);
 		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+//		config1.addComponent("jadex.platform.service.message.websockettransport.WebSocketTransportAgent.class");
 		config1.addComponent(ReceiverAgent.class);
 //		config1.setNetworkName("remotemessagetest");
 //		config1.setNetworkPass(key);
@@ -46,6 +47,7 @@ public class RemoteMessagingTest
 		config2.setAwaMechanisms(AWAMECHANISM.local);
 		config2.setAwareness(true);
 		config2.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+//		config2.addComponent("jadex.platform.service.message.websockettransport.WebSocketTransportAgent.class");
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();

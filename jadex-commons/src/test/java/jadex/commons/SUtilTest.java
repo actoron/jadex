@@ -119,11 +119,11 @@ public class SUtilTest //extends TestCase
 		Assert.assertEquals("diesIstEinTest", SUtil.snakeToCamelCase("dies_ist_ein_test"));
 		Assert.assertEquals("diesISSTEinTest", SUtil.snakeToCamelCase("dies_i_s_s_t_ein_test"));
 		Assert.assertEquals("diesISSTEinTest", SUtil.snakeToCamelCase("dies__i__s__s__t__ein__test"));
-		Assert.assertEquals("dies&/!§%876ISTEinTest", SUtil.snakeToCamelCase("dies_&/!§%876_IST_ein_test"));
+		Assert.assertEquals("dies&/!%876ISTEinTest", SUtil.snakeToCamelCase("dies_&/!%876_IST_ein_test"));
 		
 		Assert.assertEquals("dies_ist_ein_test", SUtil.camelToSnakeCase("diesIstEinTest"));
 		Assert.assertEquals("dies_ist_ein_test", SUtil.camelToSnakeCase("DiesIstEinTest"));
 		Assert.assertEquals("dies_isstein_test", SUtil.camelToSnakeCase("diesISSTEinTest"));
-		Assert.assertEquals("dies&/!§%876_istein_test", SUtil.camelToSnakeCase("dies&/!§%876ISTEinTest"));
+		Assert.assertEquals("dies&/!%876_istein_test", SUtil.camelToSnakeCase("dies&/!%876ISTEinTest"));
 	}
 }
