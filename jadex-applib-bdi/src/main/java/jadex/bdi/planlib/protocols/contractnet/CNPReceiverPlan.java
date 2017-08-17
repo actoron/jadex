@@ -68,8 +68,9 @@ public class CNPReceiverPlan extends AbstractReceiverPlan
 
 			reply = getEventbase().createReply(me, getShortProtocolName()+"_propose");
 			reply.getParameter(SFipa.CONTENT).setValue(proposal[0]);
-			getLogger().info("Receiver sent proposal: "+reply);
+			getLogger().info("Receiver sending proposal: "+reply);
 			me = sendMessageAndWait(reply, timeout);
+			getLogger().info("Receiver received response: "+me);
 		}
 
 		if(me.getType().equals(getShortProtocolName()+"_accept"))

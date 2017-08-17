@@ -52,6 +52,7 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
@@ -570,17 +571,32 @@ public abstract class Plan
 
 		rplan.setWaitAbstraction(wa);
 		
-		sendMessage(me);
+		final Future<IMessageEvent<T>>	replyfut	= new Future<IMessageEvent<T>>();
+		sendMessage(me).addResultListener(new IResultListener<Void>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				// Cannot use blocking get, because wait abstraction is cleared after resume.
+				replyfut.setExceptionIfUndone(exception);
+			}
+			@Override
+			public void resultAvailable(Void result)
+			{
+			}
+		});
 		
-		Future<IMessageEvent<T>> ret = new Future<IMessageEvent<T>>();
+		@SuppressWarnings("unchecked")
+		RMessageEvent<Object>	rme	= (RMessageEvent<Object>)me;
 		try
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent<T>)me);
-			return ret.get(timeout);
+			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent(rme);
+			IMessageEvent<T>	reply	= replyfut.get(timeout);
+			return reply;
 		}
 		finally
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent<T>)me);
+			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent(rme);
 		}
 	}
 

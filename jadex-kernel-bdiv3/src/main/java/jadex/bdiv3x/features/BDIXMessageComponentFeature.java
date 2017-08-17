@@ -28,6 +28,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakList;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
@@ -49,6 +50,9 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	/** Sent message tracking (msg->cnt). */
 	protected Map<RMessageEvent<Object>, Integer> sent_mevents;
 	
+	/** Sent message tracking (insertion order). */
+	protected List<RMessageEvent<Object>> sent_meventlist;
+	
 	/** The maximum number of outstanding messages. */
 	protected long mevents_max;
 	
@@ -62,6 +66,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		super(component, cinfo);
 		
 		this.sent_mevents = new WeakHashMap<RMessageEvent<Object>, Integer>();
+		this.sent_meventlist = new WeakList<RMessageEvent<Object>>();
 	}
 	
 	//-------- IInternalMessageFeature interface --------
@@ -328,8 +333,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  to send back answers to the source capability.
 	 *  @param msgevent The message event.
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> void registerMessageEvent(RMessageEvent<T> msgevent)
+	public void registerMessageEvent(RMessageEvent<Object> msgevent)
 	{
 		if(mevents_max!=0 && sent_mevents.size()>mevents_max)
 		{
@@ -338,7 +342,15 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		}
 		else
 		{
-			sent_mevents.put((RMessageEvent<Object>)msgevent, sent_mevents.containsKey(msgevent) ? sent_mevents.get(msgevent)+1 : 1);
+			if(sent_mevents.containsKey(msgevent))
+			{
+				sent_mevents.put(msgevent, sent_mevents.get(msgevent)+1);
+			}
+			else
+			{
+				sent_mevents.put(msgevent, 1);
+				sent_meventlist.add(msgevent);
+			}
 		}
 	}
 	
@@ -346,8 +358,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  Deregister a conversation or reply-with.
 	 *  @param msgevent The message event.
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> void deregisterMessageEvent(RMessageEvent<T> msgevent)
+	public void deregisterMessageEvent(RMessageEvent<Object> msgevent)
 	{
 		if(sent_mevents.containsKey(msgevent))
 		{
@@ -359,6 +370,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			else
 			{
 				sent_mevents.remove(msgevent);
+				sent_meventlist.remove(msgevent);
 			}
 		}
 	}
@@ -373,7 +385,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		
 		RMessageEvent<Object>	ret	= null;
 		@SuppressWarnings("unchecked")
-		RMessageEvent<Object>[] smes = (RMessageEvent[])sent_mevents.keySet().toArray(new RMessageEvent[0]);
+		RMessageEvent<Object>[] smes = (RMessageEvent[])sent_meventlist.toArray(new RMessageEvent[0]);
 
 		// Reverse loop -> prefer the newest messages for finding replies.
 		// todo: conversations should be better supported
@@ -391,6 +403,8 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 				}
 			}
 		}
+		
+//		System.out.println("is reply? "+message+", "+ret+", "+sent_mevents);
 		
 		return ret;
 	}
