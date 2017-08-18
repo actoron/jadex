@@ -7,7 +7,8 @@ import java.util.Map;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IMessageAdapter;
+import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.MessageEvent;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
@@ -102,7 +103,7 @@ public class Message extends ParameterElement
 	protected int uniqueId;
 
 	/** The original message. */
-	protected IMessageAdapter message;
+	protected MessageEvent message;
 //	protected Map msgmap;
 
 	/**
@@ -120,7 +121,7 @@ public class Message extends ParameterElement
 	 * @param arguments The parameters of the message.
 	 * @param sequence The sequence number of the message.
 	 */
-	public Message(IMessageAdapter msg, int sequence, IComponentIdentifier receiver)
+	public Message(MessageEvent msg, int sequence, IComponentIdentifier receiver)
 	{
 		assert receiver != null;
 
@@ -142,7 +143,7 @@ public class Message extends ParameterElement
 
 		// parameters for element panel
 		//		this.parameters.put(NAME, parameters.get(ID));
-		this.parameters.put(NAME, message.getParameterMap().get(SFipa.X_MESSAGE_ID));
+		this.parameters.put(NAME, message.getHeader().getProperty(IMsgHeader.XID));
 		this.parameters.put(CLASS, Message.class.getSimpleName());
 		this.parameters.put(RECEIVER, receiver);
 	}
@@ -331,13 +332,13 @@ public class Message extends ParameterElement
 	public Object getParameter(String name)
 	{
 		Object ret = super.getParameter(name);
-		if(ret == null)
-		{
-//			if(msgmap!=null)
-//				ret = (String)msgmap.get(XID);
-			if(message!=null)
-				ret = message.getValue(name);
-		}
+//		if(ret == null)
+//		{
+////			if(msgmap!=null)
+////				ret = (String)msgmap.get(XID);
+//			if(message!=null)
+//				ret = message.getValue(name);
+//		}
 		return ret;
 	}
 
@@ -348,9 +349,9 @@ public class Message extends ParameterElement
 	public Map getParameters()
 	{
 		Map ret = new HashMap();
-		ret.putAll(parameters);
-		if(message!=null)
-			ret.putAll(message.getParameterMap());
+//		ret.putAll(parameters);
+//		if(message!=null)
+//			ret.putAll(message.getParameterMap());
 		return ret;
 	}
 	
@@ -362,8 +363,8 @@ public class Message extends ParameterElement
 	public boolean hasParameter(String name)
 	{
 		boolean ret=parameters.containsKey(name);
-		if (ret==false) 
-			ret=message.getParameterMap().containsKey(name);
+//		if (ret==false) 
+//			ret=message.getParameterMap().containsKey(name);
 		return ret;
 	}
 	

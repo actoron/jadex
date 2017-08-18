@@ -1,12 +1,12 @@
 package jadex.tools.convcenter;
 
 import java.awt.Dimension;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,7 +32,6 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.fipa.FipaMessage;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
@@ -119,18 +118,15 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					// Use clone, as added component id might be modified by user.
 					IComponentIdentifier receiver = new BasicComponentIdentifier(rec.getName());
 					FipaMessage	message	= convcenter.getMessagePanel().getMessage();
-//					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());
-//					List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
-//					if(lrecs.contains(receiver))
-//					{
-//						lrecs.remove(receiver);
-//					}
-//					else
-//					{
-//						lrecs.add(receiver);
-//					}
-//					message.put(mt.getReceiverIdentifier(), (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));				
-					message.setReceiver(receiver);
+					Set<IComponentIdentifier>	recs	= message.getReceivers();
+					if(recs!=null && recs.contains(receiver))
+					{
+						message.removeReceiver(receiver);
+					}
+					else
+					{
+						message.addReceiver(receiver);
+					}
 					convcenter.getMessagePanel().setMessage(message);
 					
 					comptree.getModel().fireNodeChanged(node);

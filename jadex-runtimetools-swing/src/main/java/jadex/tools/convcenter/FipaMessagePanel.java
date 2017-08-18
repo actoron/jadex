@@ -7,6 +7,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -77,8 +80,7 @@ public class FipaMessagePanel extends JPanel
 
 	protected IComponentIdentifier	sender;
 //	protected IComponentIdentifier	replyto;
-//	protected IComponentIdentifier[]	receivers;
-	protected IComponentIdentifier	receiver;
+	protected Set<IComponentIdentifier>	receivers;
 	
 	//-------- constructors --------
 
@@ -343,21 +345,18 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier[]	aids	= agentselector.selectAgents(new IComponentIdentifier[]{receiver});
+				IComponentIdentifier[]	aids	= agentselector.selectAgents(receivers.toArray(new IComponentIdentifier[receivers.size()]));
 				if(aids!=null)
 				{
 					if(aids.length>0)
 					{
-						receiver	= aids[0];
-						tfreceivers.setText(receiver.toString());
-//						receivers	= aids;
-//						tfreceivers.setText(SUtil.arrayToString(receivers));
+						tfreceivers.setText(receivers.toString());
+						receivers	= new LinkedHashSet<IComponentIdentifier>(Arrays.asList(aids));
 						tfreceivers.setCaretPosition(0);
 					}
 					else
 					{
-						receiver	= null;
-//						receivers	= null;
+						receivers	= new LinkedHashSet<IComponentIdentifier>();
 						tfreceivers.setText("");
 					}
 				}
@@ -369,9 +368,9 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				receiver	= null;
+				receivers	= new LinkedHashSet<IComponentIdentifier>();
 				tfreceivers.setText("");
-				FipaMessagePanel.this.message.setReceiver(null);
+				FipaMessagePanel.this.message.setReceivers(null);
 				if(comptree!=null)
 					comptree.repaint();
 			}
@@ -392,7 +391,7 @@ public class FipaMessagePanel extends JPanel
 		performative.setSelectedItem(message.getPerformative());
 		tfsender.setText(""+message.getSender());
 //		tfreplyto.setText(getParameter(SFipa.REPLY_TO));
-		tfreceivers.setText(""+message.getReceiver());
+		tfreceivers.setText(""+message.getReceivers());
 		content.setText(""+message.getContent());
 //		language.setText(getParameter(SFipa.LANGUAGE));
 //		encoding.setText(getParameter(SFipa.ENCODING));
@@ -417,7 +416,7 @@ public class FipaMessagePanel extends JPanel
 		
 		// Extract sender / replyto
 		sender	= message.getSender();
-		receiver	= message.getReceiver();
+		receivers	= message.getReceivers()!=null ? message.getReceivers() : new LinkedHashSet<IComponentIdentifier>();
 //		replyto	= (IComponentIdentifier)message.get(SFipa.REPLY_TO);					
 //		Object	recs	= message.getReceiver();
 //		if(recs instanceof IComponentIdentifier)
@@ -456,7 +455,7 @@ public class FipaMessagePanel extends JPanel
 //		setParameter(SFipa.REPLY_TO, replyto);
 
 		// Add receivers.
-		message.setReceiver(receiver);
+		message.setReceivers(receivers);
 
 //		// Parse reply-by field.
 //		Object	replybyval	= null;
@@ -521,6 +520,6 @@ public class FipaMessagePanel extends JPanel
 	 */
 	public IComponentIdentifier[] getReceivers()
 	{
-		return new IComponentIdentifier[]{receiver};
+		return receivers.toArray(new IComponentIdentifier[receivers.size()]);
 	}
 }

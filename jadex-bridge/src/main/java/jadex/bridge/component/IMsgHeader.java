@@ -14,7 +14,11 @@ public interface IMsgHeader
 	
 	/** Message header key for conversation IDs (optional). */
 	public static final String CONVERSATION_ID = "convid";
-	
+
+	/** Message header key for internal message id (optional).
+	 *  Added automatically when monitoring is active on sender side. */
+	public static final String XID = "x_message_id";
+
 	/**
 	 *  Gets a property stored in the header.
 	 *  

@@ -139,7 +139,7 @@ public class FipaMessage	implements IFilter<Object>
 		receivers.add(receiver);
 	}
 	/** Denotes the identity of the intended recipients of the message. */
-	public void	removeReceiver(Set<IComponentIdentifier> receiver)
+	public void	removeReceiver(IComponentIdentifier receiver)
 	{
 		if(receivers!=null)
 			receivers.remove(receiver);

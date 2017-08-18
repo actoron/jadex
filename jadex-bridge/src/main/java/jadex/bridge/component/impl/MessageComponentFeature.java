@@ -735,6 +735,12 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		preprocessMessage(header, message);
 		
+		if(subscriptions!=null && !subscriptions.isEmpty()
+			&& header.getProperty(IMsgHeader.XID)==null)
+		{
+			header.addProperty(IMsgHeader.XID, SUtil.createUniqueId(null));
+		}
+		
 		Object rec = header.getProperty(IMsgHeader.RECEIVER);
 		
 		if(SReflect.isIterable(rec))
