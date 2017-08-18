@@ -132,21 +132,21 @@ public class SFipa
 		PERFORMATIVES.add(UNKNOWN);
 	}
 
-	// Names of the various fields of an ACL messages.
-	// Not FIPA compliant, "receivers" should be "receiver" and camel case should be "-"'s.
+	// Names of the various fields of an ACL message.
+	// Not FIPA compliant, "receivers" should be "receiver" and "_"'s should be "-"'s.
 	public static final String ENCODING = "encoding";
-	public static final String IN_REPLY_TO = "inReplyTo";
+	public static final String IN_REPLY_TO = "in_reply_to";
 	public static final String LANGUAGE = "language";
 	public static final String ONTOLOGY = "ontology";
 	public static final String PROTOCOL = "protocol";
-	public static final String REPLY_BY = "replyBy";
-	public static final String REPLY_WITH = "replyWith";
+	public static final String REPLY_BY = "reply_by";
+	public static final String REPLY_WITH = "reply_with";
 	public static final String RECEIVERS = "receivers";
-	public static final String REPLY_TO = "replyTo";
+	public static final String REPLY_TO = "reply_to";
 	public static final String PERFORMATIVE = "performative";
 	public static final String CONTENT = "content";
 	public static final String SENDER = "sender";
-	public static final String CONVERSATION_ID = "conversationId";
+	public static final String CONVERSATION_ID = "conversation_id";
 
 	public static final String X_MESSAGE_ID = "x_message_id";
 	public static final String X_TIMESTAMP = "x_timestamp";
