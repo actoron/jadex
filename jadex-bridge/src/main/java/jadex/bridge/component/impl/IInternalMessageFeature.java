@@ -11,6 +11,7 @@ import jadex.bridge.component.streams.InputConnection;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  A component feature for message-based communication.
@@ -75,9 +76,9 @@ public interface IInternalMessageFeature
 	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
 	
 	//-------- monitoring --------
-	//TODO for comanalyzer
-//	/**
-//	 *  Listen to message events (send and receive).
-//	 */
-//	public ISubscriptionIntermediateFuture<MessageEvent>	getMessageEvents();
+	
+	/**
+	 *  Listen to message events (send and receive).
+	 */
+	public ISubscriptionIntermediateFuture<MessageEvent>	getMessageEvents();
 }

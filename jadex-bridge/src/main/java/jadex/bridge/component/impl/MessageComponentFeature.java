@@ -21,6 +21,7 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -52,6 +53,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.SCloner;
 
@@ -86,13 +90,18 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/** Messages awaiting reply. */
 	protected Map<String, Future<Object>> awaitingmessages;
 	
+	//-------- stream attributes --------
 	
 	/** The initiator connections. */
 	protected Map<Integer, AbstractConnectionHandler> icons = new HashMap<Integer, AbstractConnectionHandler>();
 
 	/** The participant connections. */
 	protected Map<Integer, AbstractConnectionHandler> pcons = new HashMap<Integer, AbstractConnectionHandler>();
-
+	
+	//-------- monitoring attributes --------
+	
+	/** The current subscriptions. */
+	protected Set<SubscriptionIntermediateFuture<MessageEvent>>	subscriptions;
 	
 	//-------- constructors --------
 	
@@ -114,6 +123,20 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public boolean	hasUserBody()
 	{
 		return false;
+	}
+	
+	/**
+	 *  Cleanup on shutdown.
+	 */
+	@Override
+	public IFuture<Void> shutdown()
+	{
+		for(SubscriptionIntermediateFuture<MessageEvent> sub: SUtil.safeSet(subscriptions))
+		{
+			sub.setFinished();
+		}
+		
+		return IFuture.DONE;
 	}
 	
 	//-------- IMessageFeature interface --------
@@ -391,6 +414,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void messageArrived(final IMsgSecurityInfos secinfos, final IMsgHeader header, Object body)
 	{
+		notifyMessageReceived(secinfos, header, body);
+		
 		if(Boolean.TRUE.equals(header.getProperty(SENDREPLY)))
 		{
 			// send-reply message, check if reply.
@@ -747,7 +772,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 			return new Future<Void>(new IllegalArgumentException("Messages must have receiver(s) of type IComponentIdentifier: "+message+", "+header));
 		}
-		IComponentIdentifier receiver = (IComponentIdentifier)rec;;
+		IComponentIdentifier receiver = (IComponentIdentifier)rec;
 		
 		if(receiver.getRoot().equals(platformid))
 		{
@@ -1565,6 +1590,63 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			throw SUtil.throwUnchecked(t);
 		}
 		
+		return ret;
+	}
+	
+	//-------- monitoring --------
+	
+	/**
+	 *  Called for each sent message.
+	 */
+	protected void	notifyMessageSent(IMsgHeader header, Object body)
+	{
+		if(subscriptions!=null)
+		{
+			MessageEvent	event	= new MessageEvent(MessageEvent.Type.SENT, null, header, body);
+			for(SubscriptionIntermediateFuture<MessageEvent> sub: subscriptions)
+			{
+				sub.addIntermediateResult(event);
+			}
+		}
+	}
+	
+	/**
+	 *  Called for each received message.
+	 */
+	protected void	notifyMessageReceived(IMsgSecurityInfos secinfos, IMsgHeader header, Object body)
+	{
+		if(subscriptions!=null)
+		{
+			MessageEvent	event	= new MessageEvent(MessageEvent.Type.RECEIVED, secinfos, header, body);
+			for(SubscriptionIntermediateFuture<MessageEvent> sub: subscriptions)
+			{
+				sub.addIntermediateResult(event);
+			}
+		}		
+	}
+
+	/**
+	 *  Listen to message events (send and receive).
+	 */
+	// Todo: message matching?
+	public ISubscriptionIntermediateFuture<MessageEvent>	getMessageEvents()
+	{
+		if(subscriptions==null)
+		{
+			subscriptions	= new LinkedHashSet<SubscriptionIntermediateFuture<MessageEvent>>();
+		}
+		@SuppressWarnings("unchecked")
+		final SubscriptionIntermediateFuture<MessageEvent>	ret	= (SubscriptionIntermediateFuture<MessageEvent>)
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent());
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				subscriptions.remove(ret);
+			}
+		});
+		subscriptions.add(ret);
 		return ret;
 	}
 }
