@@ -49,6 +49,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageEvent;
@@ -67,6 +68,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -1796,7 +1798,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					fut.addResultListener(crl);
 					Component	comp	= (Component)added.get(i);
 					final IComponentIdentifier	cid	= comp.getDescription().getName();
-					cms.getExternalAccess(cid).addResultListener(new SwingDelegationResultListener(fut)
+					cms.getExternalAccess(cid).addResultListener(new SwingDelegationResultListener<IExternalAccess>(fut)
 					{
 						public void customResultAvailable(IExternalAccess ea)
 						{
@@ -1806,7 +1808,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 								@Override
 								public ISubscriptionIntermediateFuture<MessageEvent> execute(IInternalAccess ia)
 								{
-									return ((IInternalMessageFeature)ia.getComponentFeature(IInternalMessageFeature.class))
+									return ((IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class))
 										.getMessageEvents();
 								}
 							});
