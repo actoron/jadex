@@ -354,8 +354,8 @@ public class JPlaceholderTextField extends JTextField
 					if (origtext != null)
 					{
 						setPlaceholderColor(phcolor);
-						setText(origtext);
 						setPlaceholder(ph);
+						setText(origtext);
 					}
 					
 					animtimer = null;

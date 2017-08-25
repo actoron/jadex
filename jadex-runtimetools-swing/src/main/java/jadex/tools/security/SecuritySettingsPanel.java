@@ -177,8 +177,6 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected JPanel createGeneralPanel()
 	{
-		JPanel general = new JPanel();
-		
 		usesecret = new JCheckBox(new AbstractAction("Use Secret")
 		{
 			public void actionPerformed(ActionEvent e)
@@ -262,6 +260,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { setsecret }, true, true);
 		SGUI.createVerticalGroupLayout(pfspanel, new JComponent[] { cbpanel, pfscroll, buttonpanel }, true);
 		
+		JPanel general = new JPanel();
 		SGUI.createVerticalGroupLayout(general, new JComponent[] { pfspanel }, false);
 		
 		refreshPlatformSecretState();

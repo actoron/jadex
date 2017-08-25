@@ -49,6 +49,10 @@ import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.security.SCertStore;
 import jadex.commons.security.SSecurity;
 
+/**
+ *  Certificate tree.
+ *
+ */
 public class CertTree extends JTree implements TreeModel
 {
 	/** CA Certificate Icon. */
@@ -239,8 +243,10 @@ public class CertTree extends JTree implements TreeModel
 		{
 			public void mousePressed(MouseEvent e)
 			{
+				System.out.println("mouse pressed");
 				if (e.isPopupTrigger())
 				{
+					System.out.println("mouse pressed, popup event");
 					JPopupMenu menu = new JPopupMenu();
 					menu.setLightWeightPopupEnabled(false);
 					
