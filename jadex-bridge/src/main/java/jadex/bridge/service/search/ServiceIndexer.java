@@ -19,7 +19,7 @@ public class ServiceIndexer<T> extends Indexer<T>
 	/**
 	 *  Create a new Indexer.
 	 */
-	public ServiceIndexer(IKeyExtractor keyextractor, String... indextypes)
+	public ServiceIndexer(IKeyExtractor<T> keyextractor, String... indextypes)
 	{
 		super(keyextractor, indextypes);
 	}

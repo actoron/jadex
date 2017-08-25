@@ -50,7 +50,7 @@ public class ExcludeProcessor implements ITraverseProcessor
 		String[] reflectionclasses = new String[] { "java.time.chrono.ChronoLocalDate",
 													"java.time.LocalTime",
 													"java.time.chrono.ChronoLocalDateTime" };
-		for (int i = 0; i < reflectionclasses.length; ++i)
+		for(int i = 0; i < reflectionclasses.length; ++i)
 		{
 			try
 			{
@@ -61,6 +61,9 @@ public class ExcludeProcessor implements ITraverseProcessor
 			{
 			}
 		}
+		
+		// Only used when serializing
+		types.add(ITransformableObject.class);
 		
 		excludedsupertypes = types.toArray(new Class<?>[types.size()]);
 	}

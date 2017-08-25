@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.Reference;

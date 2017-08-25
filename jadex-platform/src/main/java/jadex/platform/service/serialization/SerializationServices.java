@@ -45,6 +45,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
+import jadex.commons.transformation.traverser.TransformProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.platform.service.serialization.codecs.GZIPCodec;
@@ -309,6 +310,9 @@ public class SerializationServices implements ISerializationServices
 	{
 		// Equivalent pre- and postprocessors for binary mode.
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
+		
+		// Preprocessor to copy the networknames cache object (used by security service and all service ids)
+		procs.add(new TransformProcessor());
 		
 		// Proxy reference -> proxy object
 		ITraverseProcessor rmipostproc = new ITraverseProcessor()

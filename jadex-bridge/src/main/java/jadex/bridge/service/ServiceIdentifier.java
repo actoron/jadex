@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -36,6 +37,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/** The scope. */
 	protected String scope;
 	
+	/** The network names (shared object with security service). */
+	protected Set<String> networknames;
+	
 	/** The string representation (cached for reducing memory consumption). */
 	protected String tostring;
 	
@@ -51,7 +55,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope)
+	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames)
 	{
 		List<ClassInfo> superinfos = new ArrayList<ClassInfo>();
 		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
@@ -67,12 +71,13 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.servicename = servicename;
 		this.rid = rid;
 		this.scope = scope;
+		this.networknames = networknames;
 	}
 	
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope)
+	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames)
 	{
 		this.providerid = providerid;
 		this.type	= type;
@@ -80,6 +85,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.servicename = servicename;
 		this.rid = rid;
 		this.scope = scope;
+		this.networknames = networknames;
 	}
 	
 	//-------- methods --------
@@ -193,6 +199,24 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.scope = scope;
 	}
 	
+	/**
+	 *  Get the network names.
+	 *  @return the network names
+	 */
+	public Set<String> getNetworkNames()
+	{
+		return networknames;
+	}
+
+	/**
+	 *  Set the network names.
+	 *  @param networknames The network names to set
+	 */
+	public void setNetworkNames(Set<String> networknames)
+	{
+		this.networknames = networknames;
+	}
+
 	/**
 	 *  Test if the service is a system service.
 	 *  Checks wether the system property is set in properties annotation.
