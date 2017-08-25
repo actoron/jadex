@@ -3,12 +3,12 @@ package jadex.tools.security;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.IdentityHashMap;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -17,8 +17,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -30,7 +28,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
-import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.auth.PasswordSecret;
@@ -147,7 +144,6 @@ public class SecretWizard extends JWizard
 			public void actionPerformed(ActionEvent e)
 			{
 				final JButton pwbutton = (JButton) e.getSource();
-//				String pw = JOptionPane.showInputDialog("Enter Password (Min. " + minsize + " characters)");
 				final String pw = pwfield.getText();
 				if (pw != null)
 				{
@@ -196,12 +192,6 @@ public class SecretWizard extends JWizard
 				}
 			}
 		});
-		
-//		JPanel bpanel = new JPanel();
-//		SGUI.createVerticalGroupLayout(bpanel, new JComponent[] { randbutton, pwbutton }, true);
-		
-//		JPanel inner = new JPanel();
-//		SGUI.createHorizontalGroupLayout(inner, new JComponent[] { fieldpanel, bpanel }, true);
 		
 		SGUI.adjustComponentSizes(new JComponent[] { randbutton, pwbutton });
 		JPanel inner = new JPanel();

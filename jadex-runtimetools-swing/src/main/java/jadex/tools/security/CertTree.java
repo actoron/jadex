@@ -281,6 +281,7 @@ public class CertTree extends JTree implements TreeModel
 							addwindow.getRootPane().add(certpanel, BorderLayout.CENTER);
 							addwindow.setSize(800, 600);
 							addwindow.setMinimumSize(addwindow.getRootPane().getPreferredSize());
+							addwindow.setLocation(SGUI.calculateMiddlePosition(addwindow));
 							addwindow.setVisible(true);
 							addwindow.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 						}
