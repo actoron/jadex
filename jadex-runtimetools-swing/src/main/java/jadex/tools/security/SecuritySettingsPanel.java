@@ -249,19 +249,43 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		pfsecret.setEditable(false);
 		SGUI.addCopyPasteMenu(pfsecret);
 		JScrollPane pfscroll = new JScrollPane(pfsecret);
-		SGUI.setMinimumSize(pfscroll, 400, 200);
-		
-		JPanel cbpanel = new JPanel();
-		SGUI.createEdgelessHorizontalGroupLayout(cbpanel, new JComponent[] { usesecret, printsecret }, true);
-		
-		JPanel pfspanel = new JPanel();
-		pfspanel.setBorder(BorderFactory.createTitledBorder("Platform Secret"));
-		JPanel buttonpanel = new JPanel();
-		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { setsecret }, true, true);
-		SGUI.createVerticalGroupLayout(pfspanel, new JComponent[] { cbpanel, pfscroll, buttonpanel }, true);
 		
 		JPanel general = new JPanel();
-		SGUI.createVerticalGroupLayout(general, new JComponent[] { pfspanel }, false);
+		GroupLayout l = new GroupLayout(general);
+		general.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		
+		SequentialGroup shgroup = l.createSequentialGroup();
+		ParallelGroup svgroup = l.createParallelGroup();
+		for (JComponent comp : new JComponent[] { usesecret, printsecret })
+		{
+			shgroup.addComponent(comp);
+			svgroup.addComponent(comp);
+		}
+		
+		SequentialGroup bhgroup = l.createSequentialGroup();
+		bhgroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE);
+		ParallelGroup bvgroup = l.createParallelGroup();
+		for (JComponent comp : new JComponent[] { setsecret })
+		{
+			bhgroup.addComponent(comp);
+			bvgroup.addComponent(comp);
+		}
+		
+		ParallelGroup hgroup = l.createParallelGroup();
+		hgroup.addGroup(shgroup);
+		hgroup.addComponent(pfscroll);
+		hgroup.addGroup(bhgroup);
+		SequentialGroup vgroup = l.createSequentialGroup();
+		vgroup.addGroup(svgroup);
+		vgroup.addComponent(pfscroll);
+		vgroup.addGroup(bvgroup);
+		
+		l.linkSize(SwingConstants.VERTICAL, usesecret, printsecret);
+		
+		l.setVerticalGroup(vgroup);
+		l.setHorizontalGroup(hgroup);
 		
 		refreshPlatformSecretState();
 		
