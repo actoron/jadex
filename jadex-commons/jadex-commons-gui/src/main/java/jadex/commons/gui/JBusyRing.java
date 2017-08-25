@@ -1,5 +1,6 @@
 package jadex.commons.gui;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -123,7 +124,10 @@ public class JBusyRing extends JComponent
 	public void paint(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
-		g.clearRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
+//		g.clearRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
+//		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+//		g.setColor(new Color(1.0f, 1.0f, 1.0f, 0.0f));
+//		g.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
 		
 		if (!active)
 			return;

@@ -192,7 +192,7 @@ public class CertTree extends JTree implements TreeModel
 		setEditable(false);
 		setShowsRootHandles(true);
 		setLargeModel(true);
-		setRootVisible(false);
+		setRootVisible(true);
 //		setBorder(BorderFactory.createTitledBorder("Certificates"));
 		
 		certmodel = new HashMap<String, Tuple2<String,String>>();		
@@ -287,6 +287,8 @@ public class CertTree extends JTree implements TreeModel
 						public void actionPerformed(ActionEvent e)
 						{
 							Tuple2<String, String> cert = getSelectedCert();
+							if (cert == null)
+								return;
 							String name = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
 							certmodel.put(name, new Tuple2<String, String>(cert.getFirstEntity(), null));
 							
@@ -299,6 +301,8 @@ public class CertTree extends JTree implements TreeModel
 						public void actionPerformed(ActionEvent e)
 						{
 							Tuple2<String, String> cert = getSelectedCert();
+							if (cert == null)
+								return;
 							String name = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
 							certmodel.remove(name);
 							
@@ -570,7 +574,10 @@ public class CertTree extends JTree implements TreeModel
 		
 		if (getSelectionCount() > 0)
 		{
-			CertTreeNode node = (CertTreeNode) getSelectionModel().getSelectionPath().getLastPathComponent();
+			Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+			if (onode == root)
+				return null;
+			CertTreeNode node = (CertTreeNode) onode;
 			ret = certmodel.get(node.getSubjectId());
 		}
 		

@@ -252,7 +252,9 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JPanel pfspanel = new JPanel();
 		pfspanel.setBorder(BorderFactory.createTitledBorder("Platform Secret"));
-		SGUI.createVerticalGroupLayout(pfspanel, new JComponent[] { cbpanel, pfscroll, setsecret }, true);
+		JPanel buttonpanel = new JPanel();
+		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { setsecret }, true);
+		SGUI.createVerticalGroupLayout(pfspanel, new JComponent[] { cbpanel, pfscroll, buttonpanel }, true);
 		
 		SGUI.createVerticalGroupLayout(general, new JComponent[] { pfspanel }, false);
 		
@@ -338,7 +340,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		SGUI.adjustComponentSizes(new JComponent[] { nwname, add, change, remove, refresh } );
 		
-		SGUI.createHorizontalGroupLayout(buttonpanel, new JComponent[] { nwname, add, change, remove, refresh }, true);
+		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { nwname, add, change, remove, refresh }, true);
 		
 		SGUI.setMinimumSize(nwname, 200, -1);
 		
@@ -507,10 +509,10 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			}
 		});
 		
-		SGUI.adjustComponentSizes(new JComponent[] { add, remove, refresh } );
+		SGUI.adjustComponentSizes(new JComponent[] { entityname, rolename, add, remove, refresh } );
 		
 		JPanel buttonpanel = new JPanel();
-		SGUI.createHorizontalGroupLayout(buttonpanel, new JComponent[] { entityname, rolename, add, remove, refresh }, true);
+		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { entityname, rolename, add, remove, refresh }, true);
 		
 		SGUI.setMinimumSize(entityname, 200, -1);
 		SGUI.setMinimumSize(rolename, 200, -1);

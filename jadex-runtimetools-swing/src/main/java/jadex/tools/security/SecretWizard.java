@@ -42,10 +42,10 @@ public class SecretWizard extends JWizard
 //	protected ButtonGroup secrettypes;
 	
 	/** SCrypt work factor / hardness for password strengthening. */
-	protected static final int SCRYPT_N = 524288;
+	protected static final int SCRYPT_N = 131072;
 	
 	/** SCrypt block size. */
-	protected static final int SCRYPT_R = 16;
+	protected static final int SCRYPT_R = 8;
 	
 	/** SCrypt parallelization. */
 	protected static final int SCRYPT_P = 4;
@@ -197,6 +197,8 @@ public class SecretWizard extends JWizard
 		
 		JPanel inner = new JPanel();
 		SGUI.createHorizontalGroupLayout(inner, new JComponent[] { fieldpanel, bpanel }, true);
+		
+		SGUI.adjustComponentVerticalSizes(new JComponent[] { randbutton, pwbutton, keyfield, pwfield });
 		
 		final WizardNode node = new WizardNode()
 		{

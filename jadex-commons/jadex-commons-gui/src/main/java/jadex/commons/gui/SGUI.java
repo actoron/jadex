@@ -533,6 +533,40 @@ public class SGUI
 			components[i].setPreferredSize(preferred);
 		}
 	}
+	
+	/**
+	 *  Adjust components to equal sizes according to their
+	 *  miminum, maximum, and preferred sizes vertically.
+	 */
+	public static void	adjustComponentVerticalSizes(JComponent[] components)
+	{
+		int minimumheight	= 0;
+		int maximumheight	= 0;
+		int preferredheight	= 0;
+
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension	minimum	= components[i].getMinimumSize();
+			Dimension	maximum	= components[i].getMaximumSize();
+			Dimension	preferred	= components[i].getPreferredSize();
+			minimumheight = Math.max(minimumheight, minimum.height);
+			maximumheight = Math.max(maximumheight, maximum.height);
+			preferredheight = Math.max(preferredheight, preferred.height);
+		}
+		
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension minimum	= components[i].getMinimumSize();
+			Dimension maximum	= components[i].getMaximumSize();
+			Dimension preferred	= components[i].getPreferredSize();
+			minimum		= new Dimension(minimum.width, minimumheight);
+			maximum		= new Dimension(maximum.width, maximumheight);
+			preferred	= new Dimension(preferred.width, preferredheight);
+			components[i].setMinimumSize(minimum);
+			components[i].setMaximumSize(maximum);
+			components[i].setPreferredSize(preferred);
+		}
+	}
 
 	/**
 	 *  Adjust all marked components to equal sizes according to their
@@ -647,6 +681,50 @@ public class SGUI
 	{
 		GroupLayout l = new GroupLayout(container);
 		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		container.setLayout(l);
+		
+		SequentialGroup hgroup = l.createSequentialGroup();
+		l.setVerticalGroup(hgroup);
+		
+		SequentialGroup rvgroup = l.createSequentialGroup();
+		ParallelGroup vgroup = l.createParallelGroup();
+		rvgroup.addGroup(vgroup);
+		
+		for (int i = 0; i < components.length; ++i)
+		{
+			container.add(components[i]);
+			
+			if (fixedsize)
+			{
+				hgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				vgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+			}
+			else
+			{
+				hgroup.addComponent(components[i]);
+				vgroup.addComponent(components[i]);
+			}
+		}
+		
+		if (fixedsize)
+			SGUI.adjustComponentHorizontalSizes(components);
+		
+		l.setHorizontalGroup(hgroup);
+		l.setVerticalGroup(rvgroup);
+	}
+	
+	/**
+	 *  Creates a simple edgeless, vertical arrangement using group layout.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createEdgelessHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
+	{
+		GroupLayout l = new GroupLayout(container);
+		l.setAutoCreateContainerGaps(false);
 		l.setAutoCreateGaps(true);
 		container.setLayout(l);
 		
