@@ -269,20 +269,41 @@ public class JPlaceholderTextField extends JTextField
 	 */
 	public void showInvalid()
 	{
+		showInvalid(null);
+	}
+	
+	/**
+	 *  Highlights an invalid field.
+	 */
+	public void showInvalid(String error)
+	{
 		if (animtimer != null)
 		{
-			animtimer.stop();
-			
-			if (border != null)
-				border.setColor(origcolor);
-			else
-				setBackground(origcolor);
+			return;
+//			animtimer.stop();
+//			
+//			if (border != null)
+//				border.setColor(origcolor);
+//			else
+//				setBackground(origcolor);
 		}
+		
+		String torigtext = null;
+		final Color phcolor = placeholdercolor; 
+		final String ph = placeholder;
+		if (error != null)
+		{
+			torigtext = getText();
+			setPlaceholderColor(Color.BLACK);
+			setPlaceholder(error);
+			setText("");
+		}
+		final String origtext = torigtext;
 		
 		AbstractAction anim = new AbstractAction()
 		{
 			/** Number of animation steps. */
-			protected static final int STEPS = 30;
+			protected static final int STEPS = 35;
 			
 			/** Animation step. */
 			protected int step = 0;
@@ -329,6 +350,15 @@ public class JPlaceholderTextField extends JTextField
 						border.setColor(origcolor);
 					else
 						setBackground(origcolor);
+					
+					if (origtext != null)
+					{
+						setPlaceholderColor(phcolor);
+						setText(origtext);
+						setPlaceholder(ph);
+					}
+					
+					animtimer = null;
 				}
 			}
 		};

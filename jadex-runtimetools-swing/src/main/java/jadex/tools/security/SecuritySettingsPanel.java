@@ -1,6 +1,7 @@
 package jadex.tools.security;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -20,8 +22,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -248,12 +254,12 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		SGUI.setMinimumSize(pfscroll, 400, 200);
 		
 		JPanel cbpanel = new JPanel();
-		SGUI.createHorizontalGroupLayout(cbpanel, new JComponent[] { usesecret, printsecret }, true);
+		SGUI.createEdgelessHorizontalGroupLayout(cbpanel, new JComponent[] { usesecret, printsecret }, true);
 		
 		JPanel pfspanel = new JPanel();
 		pfspanel.setBorder(BorderFactory.createTitledBorder("Platform Secret"));
 		JPanel buttonpanel = new JPanel();
-		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { setsecret }, true);
+		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { setsecret }, true, true);
 		SGUI.createVerticalGroupLayout(pfspanel, new JComponent[] { cbpanel, pfscroll, buttonpanel }, true);
 		
 		SGUI.createVerticalGroupLayout(general, new JComponent[] { pfspanel }, false);
@@ -270,15 +276,12 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected JPanel createNetworkPanel()
 	{
-		JPanel nwpanel = new JPanel();
-		
 		nwtable = new JTable();
 		JScrollPane scroll = new JScrollPane(nwtable);
 		
-		JPanel buttonpanel = new JPanel();
-		
 		final JPlaceholderTextField nwname = new JPlaceholderTextField();
 		nwname.setPlaceholder("Network Name");
+//		nwname.setMaximumSize(new Dimension(Short.MAX_VALUE, nwname.getMaximumSize().height));
 		
 		JButton add = new JButton(new AbstractAction("Add...")
 		{
@@ -338,13 +341,43 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			}
 		});
 		
-		SGUI.adjustComponentSizes(new JComponent[] { nwname, add, change, remove, refresh } );
+		// start button panel layout
+		JPanel buttonpanel = new JPanel();
+		GroupLayout l = new GroupLayout(buttonpanel);
+		buttonpanel.setLayout(l);
+//		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		SequentialGroup hgroup = l.createSequentialGroup();
 		
-		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { nwname, add, change, remove, refresh }, true);
+		ParallelGroup vgroup = l.createParallelGroup();
 		
-		SGUI.setMinimumSize(nwname, 200, -1);
+		for (JComponent comp : new JComponent[] { nwname, add, change, remove, refresh })
+		{
+			vgroup.addComponent(comp);
+			hgroup.addComponent(comp);
+		}
+		l.linkSize(SwingConstants.VERTICAL, nwname, add, change, remove, refresh);
 		
-		SGUI.createVerticalGroupLayout(nwpanel, new JComponent[] { scroll, buttonpanel }, false);
+		l.setVerticalGroup(vgroup);
+		l.setHorizontalGroup(hgroup);
+		// end button panel layout
+		
+		JPanel nwpanel = new JPanel();
+		l = new GroupLayout(nwpanel);
+		nwpanel.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		ParallelGroup ohgroup = l.createParallelGroup();
+		SequentialGroup ovgroup = l.createSequentialGroup();
+		
+		for (JComponent comp : new JComponent[] { scroll, buttonpanel })
+		{
+			ovgroup.addComponent(comp);
+			ohgroup.addComponent(comp);
+		}
+		
+		l.setHorizontalGroup(ohgroup);
+		l.setVerticalGroup(ovgroup);
 		
 		refreshNetworks();
 		
@@ -358,8 +391,6 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected JPanel createRolePanel()
 	{
-		JPanel rolepanel = new JPanel();
-		
 		roletable = new JTable();
 		
 		JScrollPane scroll = new JScrollPane(roletable);
@@ -509,15 +540,42 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			}
 		});
 		
-		SGUI.adjustComponentSizes(new JComponent[] { entityname, rolename, add, remove, refresh } );
+//		SGUI.adjustComponentSizes(new JComponent[] { entityname, rolename, add, remove, refresh } );
 		
 		JPanel buttonpanel = new JPanel();
-		SGUI.createEdgelessHorizontalGroupLayout(buttonpanel, new JComponent[] { entityname, rolename, add, remove, refresh }, true);
+		GroupLayout l = new GroupLayout(buttonpanel);
+		buttonpanel.setLayout(l);
+//		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		SequentialGroup hgroup = l.createSequentialGroup();
+		ParallelGroup vgroup = l.createParallelGroup();
 		
-		SGUI.setMinimumSize(entityname, 200, -1);
-		SGUI.setMinimumSize(rolename, 200, -1);
+		for (JComponent comp : new JComponent[] { entityname, rolename, add, remove, refresh })
+		{
+			vgroup.addComponent(comp);
+			hgroup.addComponent(comp);
+		}
+		l.linkSize(SwingConstants.VERTICAL, entityname, rolename, add, remove, refresh);
 		
-		SGUI.createVerticalGroupLayout(rolepanel, new JComponent[] { scroll, buttonpanel }, false);
+		l.setVerticalGroup(vgroup);
+		l.setHorizontalGroup(hgroup);
+		
+		JPanel rolepanel = new JPanel();
+		l = new GroupLayout(rolepanel);
+		rolepanel.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		ParallelGroup ohgroup = l.createParallelGroup();
+		SequentialGroup ovgroup = l.createSequentialGroup();
+		
+		for (JComponent comp : new JComponent[] { scroll, buttonpanel })
+		{
+			ovgroup.addComponent(comp);
+			ohgroup.addComponent(comp);
+		}
+		
+		l.setHorizontalGroup(ohgroup);
+		l.setVerticalGroup(ovgroup);
 		
 		refreshRoles();
 		

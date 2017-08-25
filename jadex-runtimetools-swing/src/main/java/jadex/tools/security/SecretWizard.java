@@ -8,13 +8,17 @@ import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -120,15 +124,15 @@ public class SecretWizard extends JWizard
 		final JPlaceholderTextField pwfield = new JPlaceholderTextField();
 		
 		keyfield.setPlaceholder("Key...");
-		keyfield.setMinimumSize(new Dimension(400, keyfield.getMinimumSize().height));
+//		keyfield.setMinimumSize(new Dimension(400, keyfield.getMinimumSize().height));
 		keyfield.setPreferredSize(keyfield.getMinimumSize());
 		
-		final int minsize = 12;
+		final int minsize = 16;
 		int recsize = 24;
 		pwfield.setPlaceholder("Password (Min. " + minsize + " characters, " + recsize + " recommended)...");
 		
-		JPanel fieldpanel = new JPanel();
-		SGUI.createVerticalGroupLayout(fieldpanel, new JComponent[] { keyfield, pwfield }, true);
+//		JPanel fieldpanel = new JPanel();
+//		SGUI.createVerticalGroupLayout(fieldpanel, new JComponent[] { keyfield, pwfield }, true);
 		
 		final JButton randbutton = new JButton(new AbstractAction("Generate Random")
 		{
@@ -150,7 +154,7 @@ public class SecretWizard extends JWizard
 					if (pw.length() < minsize)
 					{
 //						JOptionPane.showMessageDialog(SecretWizard.this, "This password is too short to generate a key. Please enter a longer password.");
-						pwfield.showInvalid();
+						pwfield.showInvalid("Password must be at least " + minsize + " characters.");
 					}
 					else
 					{
@@ -192,13 +196,49 @@ public class SecretWizard extends JWizard
 				}
 			}
 		});
-		JPanel bpanel = new JPanel();
-		SGUI.createVerticalGroupLayout(bpanel, new JComponent[] { randbutton, pwbutton }, true);
 		
+//		JPanel bpanel = new JPanel();
+//		SGUI.createVerticalGroupLayout(bpanel, new JComponent[] { randbutton, pwbutton }, true);
+		
+//		JPanel inner = new JPanel();
+//		SGUI.createHorizontalGroupLayout(inner, new JComponent[] { fieldpanel, bpanel }, true);
+		
+		SGUI.adjustComponentSizes(new JComponent[] { randbutton, pwbutton });
 		JPanel inner = new JPanel();
-		SGUI.createHorizontalGroupLayout(inner, new JComponent[] { fieldpanel, bpanel }, true);
+		GroupLayout l = new GroupLayout(inner);
+		inner.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
 		
-		SGUI.adjustComponentVerticalSizes(new JComponent[] { randbutton, pwbutton, keyfield, pwfield });
+		SequentialGroup khgroup = l.createSequentialGroup();
+		ParallelGroup kvgroup = l.createParallelGroup();
+		for (JComponent comp : new JComponent[] { keyfield, randbutton })
+		{
+			kvgroup.addComponent(comp);
+			khgroup.addComponent(comp);
+		}
+		
+		SequentialGroup phgroup = l.createSequentialGroup();
+		ParallelGroup pvgroup = l.createParallelGroup();
+		for (JComponent comp : new JComponent[] { pwfield, pwbutton })
+		{
+			pvgroup.addComponent(comp);
+			phgroup.addComponent(comp);
+		}
+		
+		ParallelGroup hgroup = l.createParallelGroup();
+		hgroup.addGroup(khgroup);
+		hgroup.addGroup(phgroup);
+		SequentialGroup vgroup = l.createSequentialGroup();
+		vgroup.addGroup(kvgroup);
+		vgroup.addGroup(pvgroup);
+		
+		l.linkSize(SwingConstants.VERTICAL, keyfield, randbutton, pwfield, pwbutton);
+		
+		l.setVerticalGroup(vgroup);
+		l.setHorizontalGroup(hgroup);
+		
+//		SGUI.adjustComponentVerticalSizes(new JComponent[] { randbutton, pwbutton, keyfield, pwfield });
 		
 		final WizardNode node = new WizardNode()
 		{

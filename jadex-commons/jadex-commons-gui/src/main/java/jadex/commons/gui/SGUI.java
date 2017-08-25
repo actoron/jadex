@@ -63,6 +63,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.LayoutStyle;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
@@ -645,7 +646,6 @@ public class SGUI
 		rhgroup.addGroup(hgroup);
 		
 		SequentialGroup vgroup = l.createSequentialGroup();
-		l.setVerticalGroup(vgroup);
 		
 		for (int i = 0; i < components.length; ++i)
 		{
@@ -685,7 +685,6 @@ public class SGUI
 		container.setLayout(l);
 		
 		SequentialGroup hgroup = l.createSequentialGroup();
-		l.setVerticalGroup(hgroup);
 		
 		SequentialGroup rvgroup = l.createSequentialGroup();
 		ParallelGroup vgroup = l.createParallelGroup();
@@ -723,13 +722,26 @@ public class SGUI
 	 */
 	public static void createEdgelessHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
 	{
+		createEdgelessHorizontalGroupLayout(container, components, fixedsize, false);
+	}
+	
+	/**
+	 *  Creates a simple edgeless, vertical arrangement using group layout.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createEdgelessHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize, boolean rightalign)
+	{
 		GroupLayout l = new GroupLayout(container);
 		l.setAutoCreateContainerGaps(false);
 		l.setAutoCreateGaps(true);
 		container.setLayout(l);
 		
 		SequentialGroup hgroup = l.createSequentialGroup();
-		l.setVerticalGroup(hgroup);
+		if (rightalign)
+			hgroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE);
 		
 		SequentialGroup rvgroup = l.createSequentialGroup();
 		ParallelGroup vgroup = l.createParallelGroup();
@@ -750,6 +762,9 @@ public class SGUI
 				vgroup.addComponent(components[i]);
 			}
 		}
+		
+		if (!rightalign)
+			hgroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE);
 		
 		if (fixedsize)
 			SGUI.adjustComponentHorizontalSizes(components);

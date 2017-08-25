@@ -1,6 +1,5 @@
 package jadex.commons.gui;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,7 +28,7 @@ public class JBusyRing extends JComponent
 	protected Dimension size;
 	
 	/** Color of the ring. */
-	protected Color ringcolor = Color.WHITE; // new Color(120, 190, 255);
+	protected Color ringcolor = Color.GRAY; //Color.WHITE; // new Color(120, 190, 255);
 	
 	/** Start frame time stamp. */
 	protected long startframe = System.currentTimeMillis();
@@ -124,6 +123,8 @@ public class JBusyRing extends JComponent
 	public void paint(Graphics g)
 	{
 		Graphics2D g2 = (Graphics2D) g;
+		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 //		g.clearRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
 //		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 //		g.setColor(new Color(1.0f, 1.0f, 1.0f, 0.0f));

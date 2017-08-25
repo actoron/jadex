@@ -329,6 +329,7 @@ public class JWizard extends JPanel
 		buttonpanel.add(nextbutton);
 		buttonpanel.add(Box.createHorizontalStrut(10));
 		buttonpanel.add(cancelbutton);
+		buttonpanel.add(Box.createHorizontalStrut(10));
 		
 		add(buttonpanel, BorderLayout.SOUTH);
 		invalidate();

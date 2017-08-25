@@ -230,7 +230,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			
 			public void intermediateResultAvailable(Tuple2<TransportAddress, Boolean> result)
 			{
-				System.out.println("new result " + result.getFirstEntity());
+//				System.out.println("new result " + result.getFirstEntity());
 				postInfo();
 			}
 			
