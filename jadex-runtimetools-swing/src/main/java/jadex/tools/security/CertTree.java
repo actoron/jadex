@@ -243,10 +243,8 @@ public class CertTree extends JTree implements TreeModel
 		{
 			public void mousePressed(MouseEvent e)
 			{
-				System.out.println("mouse pressed");
-				if (e.isPopupTrigger())
+				if (e.getButton() == MouseEvent.BUTTON3)
 				{
-					System.out.println("mouse pressed, popup event");
 					JPopupMenu menu = new JPopupMenu();
 					menu.setLightWeightPopupEnabled(false);
 					
