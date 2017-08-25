@@ -299,7 +299,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				int row = nwtable.getSelectedRow();
-				if (row > 0)
+				if (row >= 0)
 				{
 					String nwn = (String) nwtable.getModel().getValueAt(row, 0);
 					setNetwork(nwn);
@@ -312,7 +312,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				int row = nwtable.getSelectedRow();
-				if (row > 0)
+				if (row >= 0)
 				{
 					final String nwname = (String) nwtable.getModel().getValueAt(row, 0);
 					jccaccess.scheduleStep(new IComponentStep<Void>()
