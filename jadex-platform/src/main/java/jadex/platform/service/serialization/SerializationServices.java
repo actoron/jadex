@@ -304,16 +304,13 @@ public class SerializationServices implements ISerializationServices
 	}
 	
 	/**
-	 * 
+	 *  Create the preprocessors.
 	 */
 	public List<ITraverseProcessor> createPostprocessors()
 	{
 		// Equivalent pre- and postprocessors for binary mode.
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
-		
-		// Preprocessor to copy the networknames cache object (used by security service and all service ids)
-		procs.add(new TransformProcessor());
-		
+				
 		// Proxy reference -> proxy object
 		ITraverseProcessor rmipostproc = new ITraverseProcessor()
 		{
@@ -397,6 +394,9 @@ public class SerializationServices implements ISerializationServices
 	public List<ITraverseProcessor> createPreprocessors()
 	{
 		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
+		
+		// Preprocessor to copy the networknames cache object (used by security service and all service ids)
+		procs.add(new TransformProcessor());
 		
 		// Update component identifiers with addresses
 //		ITraverseProcessor bpreproc = new ITraverseProcessor()

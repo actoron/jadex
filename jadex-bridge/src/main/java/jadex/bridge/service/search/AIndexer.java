@@ -73,7 +73,7 @@ public abstract class AIndexer<T>
 		{
 			for(T val: values)
 			{
-				Set<String> keys = keyextractor.getKeys(keytype, val);
+				Set<String> keys = keyextractor.getKeyValues(keytype, val);
 				if(keys != null && keys.contains(key))
 				{
 					if (ret == null)
@@ -109,7 +109,7 @@ public abstract class AIndexer<T>
 			for(Map.Entry<String, Map<String, Set<T>>> entry: indexedvalues.entrySet())
 			{
 				// Fetch all keys used 
-				Set<String> keys = keyextractor.getKeys(entry.getKey(), value);
+				Set<String> keys = keyextractor.getKeyValues(entry.getKey(), value);
 				
 				if(keys != null)
 				{
@@ -142,7 +142,7 @@ public abstract class AIndexer<T>
 		{
 			for(Map.Entry<String, Map<String, Set<T>>> entry : indexedvalues.entrySet())
 			{
-				Set<String> keys = keyextractor.getKeys(entry.getKey(), value);
+				Set<String> keys = keyextractor.getKeyValues(entry.getKey(), value);
 				if (keys != null)
 				{
 					for(String key : keys)

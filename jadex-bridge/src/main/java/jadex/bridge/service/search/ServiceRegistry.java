@@ -63,10 +63,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected ReadWriteLock rwlock;
 	
 	/** The service indexer. */
-	protected ServiceIndexer<IService> indexer;
+	protected Indexer<IService> indexer;
 	
 	/** The persistent service queries. */
-	protected QueryIndexer<ServiceQueryInfo<IService>> queries;
+	protected Indexer<ServiceQueryInfo<IService>> queries;
 	
 	/** The excluded services cache. */
 	protected Map<IComponentIdentifier, Set<IService>> excludedservices;
@@ -95,8 +95,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		this.cid = cid;
 		this.rwlock = new ReentrantReadWriteLock(true);
-		this.indexer = new ServiceIndexer<IService>(new ServiceKeyExtractor(), ServiceKeyExtractor.SERVICE_KEY_TYPES);
-		this.queries = new QueryIndexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
+		this.indexer = new Indexer<IService>(new ServiceKeyExtractor(), ServiceKeyExtractor.SERVICE_KEY_TYPES);
+		this.queries = new Indexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.delay = delay;
 	}
 	
@@ -2349,7 +2349,7 @@ Ende Lars-Version */
 	 *  Get the indexer.
 	 *  @return the indexer
 	 */
-	public ServiceIndexer<IService> getIndexer()
+	public Indexer<IService> getIndexer()
 	{
 		return indexer;
 	}

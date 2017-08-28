@@ -19,7 +19,8 @@ public class TransformProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
-		return object instanceof ITransformableObject;
+		boolean ret = object instanceof ITransformableObject;
+		return ret;
 	}
 	
 	/**
