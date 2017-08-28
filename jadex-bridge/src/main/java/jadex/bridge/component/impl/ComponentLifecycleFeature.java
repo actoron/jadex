@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jadex.bridge.IComponentStep;
@@ -39,6 +40,16 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 	{
 		super(component, cinfo);
 	}
+	
+	/**
+	 *  Run body on separate thread if there are initial (user) steps in model. 
+	 */
+	@Override
+	public boolean hasUserBody()
+	{
+		UnparsedExpression[]	upes	= getInitialSteps();		
+		return upes!=null && upes.length>0;
+	}
 
 	/**
 	 *  Execute the functional body of the component.
@@ -46,63 +57,67 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Void> body()
 	{
-		IFuture<Void>	ret	= IFuture.DONE;
+		IFuture<Void>	ret;
 		
-		ConfigurationInfo	ci	= getComponent().getConfiguration()!=null
-			? getComponent().getModel().getConfiguration(getComponent().getConfiguration())
-			: getComponent().getModel().getConfigurations().length>0 ? getComponent().getModel().getConfigurations()[0] : null;
-		
-		if(ci!=null)
+		UnparsedExpression[]	upes	= getInitialSteps();		
+		if(upes!=null && upes.length>0)
 		{
-			UnparsedExpression[]	upes	= ci.getInitialSteps();
-			if(upes.length>0)
+			Future<Void>	fut	= new Future<Void>();
+			ret	= fut;
+			List<IComponentStep>	steps	= new ArrayList<IComponentStep>();
+			
+			for(int i=0; !fut.isDone() && i<upes.length; i++)
 			{
-				Future<Void>	fut	= new Future<Void>();
-				ret	= fut;
-				List<IComponentStep>	steps	= new ArrayList<IComponentStep>();
-				
-				for(int i=0; !fut.isDone() && i<upes.length; i++)
+				Object	step	= null;
+				if(upes[i].getValue()!=null)
 				{
-					Object	step	= null;
-					if(upes[i].getValue()!=null)
+					step	= SJavaParser.getParsedValue(upes[i], getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader());
+				}
+				else
+				{
+					Class<?> clazz = upes[i].getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
+					try
 					{
-						step	= SJavaParser.getParsedValue(upes[i], getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader());
+						step	= clazz.newInstance();
 					}
-					else
+					catch(Exception e)
 					{
-						Class<?> clazz = upes[i].getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-						try
-						{
-							step	= clazz.newInstance();
-						}
-						catch(Exception e)
-						{
-							fut.setException(e);
-						}
-					}
-					
-					if(step instanceof IComponentStep)
-					{
-						steps.add((IComponentStep)step);
-					}
-					else if(step!=null)
-					{
-						fut.setException(new RuntimeException("Unsupported initial component step, class="+upes[i].getClazz()+", value="+upes[i].getValue()));
+						fut.setException(e);
 					}
 				}
 				
-				if(!fut.isDone())
+				if(step instanceof IComponentStep)
 				{
-					IResultListener	crl	= new CounterResultListener(steps.size(), new DelegationResultListener<Void>(fut));
-					for(IComponentStep step: steps)
+					steps.add((IComponentStep)step);
+				}
+				else if(step!=null)
+				{
+					fut.setException(new RuntimeException("Unsupported initial component step, class="+upes[i].getClazz()+", value="+upes[i].getValue()));
+				}
+			}
+			
+			if(!fut.isDone())
+			{
+				IResultListener	crl	= new CounterResultListener(steps.size(), new DelegationResultListener<Void>(fut)
 					{
-						getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(step)
-							.addResultListener(crl);
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
 					}
+					});
+				for(IComponentStep step: steps)
+				{
+					getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(step)
+						.addResultListener(crl);
 				}
 			}
 		}
-		
+		else
+		{
+			ret = IFuture.DONE;
+		}
+
 		return ret;
 	}
 
@@ -169,5 +184,17 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the initial steps from the model.
+	 */
+	protected UnparsedExpression[]	getInitialSteps()
+	{
+		ConfigurationInfo	ci	= getComponent().getConfiguration()!=null
+			? getComponent().getModel().getConfiguration(getComponent().getConfiguration())
+			: getComponent().getModel().getConfigurations().length>0 ? getComponent().getModel().getConfigurations()[0] : null;
+		
+		return ci!=null ? ci.getInitialSteps() : null;
 	}
 }
