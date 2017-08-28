@@ -99,6 +99,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		return super.init();
 	}
 	
+	/**
+	 *  Has no user body.
+	 */
+	@Override
+	public boolean hasUserBody()
+	{
+		return false;
+	}
 	
 	/**
 	 *  Execute a command on a remote agent.

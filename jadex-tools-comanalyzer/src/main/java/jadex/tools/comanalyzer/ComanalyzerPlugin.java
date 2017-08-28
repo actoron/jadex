@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -63,17 +62,14 @@ import jadex.commons.IFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
@@ -161,8 +157,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 
 	protected ToolTab chart;
 
-	/** The currently registered listeners (listener->ComanalyzerListener). */
-	protected Map listeners;
+//	/** The currently registered listeners (listener->ComanalyzerListener). */
+//	protected Map listeners;
 
 	/** The global list of recognized agents. */
 	protected ComponentList componentlist;
@@ -189,7 +185,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	protected PaintMaps paintmaps;
 	
 	/** The set of registered agent adapters. */
-	protected Set observed;
+	protected Set<IComponentIdentifier> observed;
 	
 	/** The observed components. */
 	protected Map<IComponentIdentifier, ISubscriptionIntermediateFuture<MessageEvent>>	subscriptions;
@@ -205,13 +201,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	public ComanalyzerPlugin()
 	{
 		this.messagenr = 1;
-		this.listeners = new HashMap();
+//		this.listeners = new HashMap();
 		this.componentlist = new ComponentList();
 		this.agentfilter = new ComponentFilter[]{ComponentFilter.EMPTY};
 		this.messagelist = new MessageList();
 		this.messagefilter = new MessageFilter[]{MessageFilter.EMPTY};
 		this.timer = new Timer(true);
-		this.observed = new HashSet();
+		this.observed = new HashSet<IComponentIdentifier>();
 		this.paintmaps = new PaintMaps();
 		this.subscriptions	= new LinkedHashMap<IComponentIdentifier, ISubscriptionIntermediateFuture<MessageEvent>>();
 
@@ -263,7 +259,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	/**
 	 * Get plugin properties to be saved in a project.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
 		for(int i=0; i<checkboxes.length; i++)
@@ -271,14 +267,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //			System.out.println(""+checkboxes[i].getText()+" "+checkboxes[i].isSelected());
 			props.addProperty(new Property(checkboxes[i].getText(), ""+checkboxes[i].isSelected()));
 		}
-		return new Future(props);
+		return new Future<Properties>(props);
 	}
 	
 
 	/**
 	 * Set plugin properties loaded from a project.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		for(int i = 0; i < checkboxes.length; i++)
 		{
@@ -342,7 +338,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent[] createToolBar()
 	{
-		List components = new ArrayList();
+		List<JComponent> components = new ArrayList<JComponent>();
 
 		components.add(new JMenuButton(START_OBSERVING));
 		components.add(new JMenuButton(STOP_OBSERVING));
@@ -361,7 +357,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	public JMenu[] createMenuBar()
 	{
-		List components = new ArrayList();
+		List<JMenu> components = new ArrayList<JMenu>();
 
 		JMenu m1 = new JMenu("Agents");
 		m1.add(new JMenuItem(IGNORE_ALL));
@@ -408,16 +404,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		components.add(m4);
 
 		// iterate menu items of all menus to get checkbox items for properties
-		List checkboxes = new ArrayList();
-		for(Iterator iter = components.iterator(); iter.hasNext();)
+		List<JCheckBoxMenuItem> checkboxes = new ArrayList<JCheckBoxMenuItem>();
+		for(Iterator<JMenu> iter = components.iterator(); iter.hasNext();)
 		{
-			JMenu menu = (JMenu)iter.next();
+			JMenu menu = iter.next();
 			for(int i = 0; i < menu.getItemCount(); i++)
 			{
 				JMenuItem comp = menu.getItem(i);
 				if(comp instanceof JCheckBoxMenuItem)
 				{
-					checkboxes.add(comp);
+					checkboxes.add((JCheckBoxMenuItem)comp);
 				}
 			}
 		}
@@ -1048,8 +1044,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	}
 
 	/**
-	 * Entry point for agent notifications, i.e. method is called from
-	 * external thread. Hence, it is scheduled on swing thread.
+	 * Entry point for agent notifications, called from swing thread.
 	 * Iterates the list of message attributes and creates message objects. The
 	 * new messages are checked against the existing list of messages to skip
 	 * such that are already in the system (like a message was first recorded
@@ -1058,63 +1053,57 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	protected void addMessage(final MessageEvent message)//, String direction)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		if(isAddMessage(message))
 		{
-			public void run()
+			final List<Message> messages_added = new ArrayList<Message>();
+			IComponentIdentifier sid	= (IComponentIdentifier)message.getHeader().getProperty(IMsgHeader.SENDER);
+			Object recs = message.getHeader().getProperty(IMsgHeader.RECEIVER);
+			
+			if(recs instanceof IComponentIdentifier)
 			{
-				if(isAddMessage(message))
+				IComponentIdentifier rid = (IComponentIdentifier)recs;
+				if(!isDuplicate(message, rid))
 				{
-					final List messages_added = new ArrayList();
-					IComponentIdentifier sid	= (IComponentIdentifier)message.getHeader().getProperty(IMsgHeader.SENDER);
-					Object recs = message.getHeader().getProperty(IMsgHeader.SENDER);
-					
-					if(recs instanceof IComponentIdentifier)
+					Message msg = createMessage(message, sid, rid);
+//						System.out.println("Added: "+msg);
+					messages_added.add(msg);
+				}
+			}
+			else
+			{
+				Iterator<IComponentIdentifier> rids = SReflect.getIterator(recs);
+				while(rids.hasNext())
+				{
+					IComponentIdentifier rid = rids.next();
+					if(!isDuplicate(message, rid))
 					{
-						IComponentIdentifier rid = (IComponentIdentifier)recs;
-						if(!isDuplicate(message, rid))
-						{
-							Message msg = createMessage(message, sid, rid);
-	//						System.out.println("Added: "+msg);
-							messages_added.add(msg);
-						}
-					}
-					else
-					{
-						Iterator rids = SReflect.getIterator(recs);
-						while(rids.hasNext())
-						{
-							IComponentIdentifier rid = (IComponentIdentifier)rids.next();
-							if(!isDuplicate(message, rid))
-							{
-								Message msg = createMessage(message, sid, rid);
-		//						System.out.println("Added: "+msg);
-								messages_added.add(msg);
-							}
-						}
-					}
-					
-					// return if there are no messages to add
-					if(!messages_added.isEmpty())
-					{
-						// delegate to refresh task or just fire the update
-						if(sleep != REFRESHI && refresh_task != null)
-						{
-							if(sleep == REFRESHA)
-							{
-								// experimental auto refresh
-								// the refresh task is initialized inside
-								scheduleAutoRefresh();
-							}
-							refresh_task.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
-						}
-						else
-						{
-							messagelist.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
-						}
+						Message msg = createMessage(message, sid, rid);
+//						System.out.println("Added: "+msg);
+						messages_added.add(msg);
 					}
 				}
 			}
-		});	
+			
+			// return if there are no messages to add
+			if(!messages_added.isEmpty())
+			{
+				// delegate to refresh task or just fire the update
+				if(sleep != REFRESHI && refresh_task != null)
+				{
+					if(sleep == REFRESHA)
+					{
+						// experimental auto refresh
+						// the refresh task is initialized inside
+						scheduleAutoRefresh();
+					}
+					refresh_task.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
+				}
+				else
+				{
+					messagelist.fireMessagesAdded((Message[])messages_added.toArray(new Message[messages_added.size()]));
+				}
+			}
+		}
 	}
 	
 	/**
@@ -1760,45 +1749,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */	
 	protected void addMessageListener(final List<Component> added)
 	{
-//		final Map	services	= new HashMap();
-//		final CounterResultListener	crl	= new CounterResultListener(added.size(), true, new SwingDefaultResultListener()
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				for(Iterator it=services.keySet().iterator(); it.hasNext(); )
-//				{
-//					IServiceIdentifier	id	= (IServiceIdentifier)it.next();
-//					Object[]	newentry	= (Object[])services.get(id);
-//					Object[]	oldentry	= (Object[])msgservices.get(id);
-//					
-//					// Do nothing if both sets are the same (e.g. when updates happen asynchronously)
-//					if(oldentry==null || !oldentry[1].equals(newentry[1]))
-//					{
-//						if(oldentry!=null)
-//						{
-//							((IMessageService)oldentry[0]).removeMessageListener(listener);
-//						}
-//						msgservices.put(id, newentry);
-////						System.out.println("Listening on "+id+", "+newentry[1]);
-//						((IMessageService)newentry[0]).addMessageListener(listener, createMessageFilter((Set)newentry[1]));
-//					}
-//				}
-//			}
-//		});
-		
 		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener()
+			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
 				for(int i=0; i<added.size(); i++)
 				{
-					final Future	fut	= new Future();
-//					fut.addResultListener(crl);
 					Component	comp	= (Component)added.get(i);
 					final IComponentIdentifier	cid	= comp.getDescription().getName();
-					cms.getExternalAccess(cid).addResultListener(new SwingDelegationResultListener<IExternalAccess>(fut)
+					cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
 					{
 						public void customResultAvailable(IExternalAccess ea)
 						{
@@ -1813,61 +1773,29 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 								}
 							});
 							
-							sub.addResultListener(new IIntermediateResultListener<MessageEvent>()
+							subscriptions.put(cid, sub);
+							
+							sub.addResultListener(new SwingIntermediateDefaultResultListener<MessageEvent>()
 							{
 								@Override
-								public void exceptionOccurred(Exception exception)
+								public void customIntermediateResultAvailable(MessageEvent result)
 								{
-									System.out.println("ex: "+SUtil.getExceptionStacktrace(exception));
+									addMessage(result);
 								}
 								
 								@Override
-								public void resultAvailable(Collection<MessageEvent> result)
+								public void customFinished()
 								{
-									System.out.println("result: "+result);
+									subscriptions.remove(cid);
 								}
 								
 								@Override
-								public void intermediateResultAvailable(MessageEvent result)
+								public void customExceptionOccurred(Exception exception)
 								{
-									System.out.println("message: "+result);
-								}
-								
-								@Override
-								public void finished()
-								{
-									System.out.println("finished: "+cid);
+									subscriptions.remove(cid);
+									super.customExceptionOccurred(exception);
 								}
 							});
-							
-//							SServiceProvider.getService(ea, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//								.addResultListener(new SwingDelegationResultListener(fut)
-//							{
-//								public void customResultAvailable(Object result)
-//								{
-//									IMessageService	ms	= (IMessageService)result;
-//									Object[]	newentry;
-//									if(!services.containsKey(ms.getServiceIdentifier()))
-//									{
-//										if(msgservices.containsKey(ms.getServiceIdentifier()))
-//										{
-//											Object[]	oldentry	= (Object[])msgservices.get(ms.getServiceIdentifier());
-//											newentry	= new Object[]{ms, new HashSet((Collection)oldentry[1])};
-//										}
-//										else
-//										{
-//											newentry	= new Object[]{ms, new HashSet()};
-//										}
-//										services.put(ms.getServiceIdentifier(), newentry);
-//									}
-//									else
-//									{
-//										newentry	= (Object[])services.get(ms.getServiceIdentifier());
-//									}
-//									((Set)newentry[1]).add(cid);
-//									fut.setResult(null);
-//								}
-//							});
 						}	
 					});
 				}

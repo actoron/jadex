@@ -144,8 +144,25 @@ public class Message extends ParameterElement
 		// parameters for element panel
 		//		this.parameters.put(NAME, parameters.get(ID));
 		this.parameters.put(NAME, message.getHeader().getProperty(IMsgHeader.XID));
+		this.parameters.put(XID, message.getHeader().getProperty(IMsgHeader.XID));
 		this.parameters.put(CLASS, Message.class.getSimpleName());
 		this.parameters.put(RECEIVER, receiver);
+		this.parameters.put(SENDER, message.getHeader().getProperty(IMsgHeader.SENDER));
+		
+//		public static final String DATE = SFipa.X_TIMESTAMP;
+//		public static final String DURATION = "duration";
+
+//		public static final String CONTENT = SFipa.CONTENT;
+//		public static final String ONTOLOGY = SFipa.ONTOLOGY;
+//		public static final String ENCODING = SFipa.ENCODING;
+//		public static final String IN_REPLY_TO = SFipa.IN_REPLY_TO;
+//		public static final String LANGUAGE = SFipa.LANGUAGE;
+//		public static final String PROTOCOL = SFipa.PROTOCOL;
+//		public static final String REPLY_BY = SFipa.REPLY_BY;
+//		public static final String REPLY_WITH = SFipa.REPLY_WITH;
+//		public static final String REPLY_TO = SFipa.REPLY_TO;
+//		public static final String CONVERSATION_ID = SFipa.CONVERSATION_ID;
+
 	}
 
 	/**
