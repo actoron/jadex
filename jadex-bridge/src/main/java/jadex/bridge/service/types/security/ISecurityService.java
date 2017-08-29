@@ -1,10 +1,12 @@
 package jadex.bridge.service.types.security;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Reference;
@@ -154,4 +156,10 @@ public interface ISecurityService
 	 *  @return Copy of the role map.
 	 */
 	public IFuture<Map<String, Set<String>>> getRoleMap();
+	
+	/**
+	 *  Gets the current network names. 
+	 *  @return The current networks names.
+	 */
+	public IFuture<Set<String>> getNetworkNames();
 }

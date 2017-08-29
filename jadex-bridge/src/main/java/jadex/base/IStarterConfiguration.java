@@ -36,6 +36,9 @@ public interface IStarterConfiguration {
     /** The transport cache used to . */
     String DATA_TRANSPORTCACHE = "transportcache";
     
+    /** The used to store the current network names. */
+    String DATA_NETWORKNAMESCACHE = "networknamescache";
+    
     /** The CMS component map. */
     String DATA_COMPONENTMAP = "componentmap";
     

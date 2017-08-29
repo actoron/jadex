@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import java.util.Set;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -45,4 +47,10 @@ public interface IServiceIdentifier
 	 *  @return The visibility scope.
 	 */
 	public String getScope();
+	
+	/**
+	 *  Get the network names.
+	 *  @return The network names.
+	 */
+	public Set<String> getNetworkNames();
 }

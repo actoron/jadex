@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -483,7 +485,20 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
 		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
 	{
-		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope);
+		Set<String> networknames = (Set<String>)PlatformConfiguration.getPlatformValue(providerid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		return createServiceIdentifier(providerid, servicename, servicetype, serviceimpl, rid, scope, networknames);
+	}
+	
+	/**
+	 *  Create a new service identifier.
+	 *  @param providerid The provider id.
+	 *  @param servicename The service name.
+	 *  @return A service identifier.
+	 */
+	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, Set<String> networknames)
+	{
+		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope, networknames);
 	}
 	
 	/**

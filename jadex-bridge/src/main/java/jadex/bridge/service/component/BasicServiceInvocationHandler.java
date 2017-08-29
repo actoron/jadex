@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
@@ -46,6 +47,7 @@ import jadex.bridge.service.component.interceptors.NFRequiredServicePropertyProv
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -493,7 +495,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			return (IInternalService)service;
 		}
 		
-		IInternalService	ret;
+		IInternalService ret;
 		
 		if(!SReflect.isSupertype(type, service.getClass()))
 		{

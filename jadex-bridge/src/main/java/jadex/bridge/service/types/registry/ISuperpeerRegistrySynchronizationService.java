@@ -13,7 +13,7 @@ public interface ISuperpeerRegistrySynchronizationService
 {
 	/**
 	 *  Subscribe to change events of the registry. 
-	 *  This is used by super-peers to exchange and replicate the gloabl registry content.
+	 *  This is used by super-peers to exchange and replicate the global registry content.
 	 */
 	public ISubscriptionIntermediateFuture<IRegistryEvent> subscribeToEvents();
 	

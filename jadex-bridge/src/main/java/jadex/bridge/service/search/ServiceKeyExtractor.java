@@ -17,7 +17,7 @@ import jadex.bridge.service.IService;
 /**
  *  Responsible for extracting values.
  */
-public class ServiceKeyExtractor implements IKeyExtractor
+public class ServiceKeyExtractor implements IKeyExtractor<IService>
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -64,7 +64,7 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	 *  @param service The service.
 	 *  @return The keys matching the type.
 	 */
-	public Set<String> getKeys(String keytype, Object serv)
+	public Set<String> getKeyValues(String keytype, IService serv)
 	{
 		return getKeysStatic(keytype, serv);
 	}
@@ -87,7 +87,7 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	 *  @return The keys matching the type.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final Set<String> getKeysStatic(String keytype, Object serv)
+	public static final Set<String> getKeysStatic(String keytype, IService serv)
 	{
 //		if(serv instanceof IService)
 //		{
@@ -127,6 +127,21 @@ public class ServiceKeyExtractor implements IKeyExtractor
 			ret = new SetWrapper<String>(service.getServiceIdentifier().toString());
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Extracts the matching mode from a multivalued term.
+	 *  true = AND, false = OR
+	 *  
+	 *  @param keytype The type of key being extracted.
+	 *  @param value The value.
+	 *  @return The key matching mode.
+	 */
+	public Boolean getKeyMatchingMode(String keytype, IService value)
+	{
+		if(KEY_TYPE_TAGS.equals(keytype))
+			return Boolean.TRUE;
+		return null;
 	}
 	
 	/**
