@@ -17,12 +17,10 @@ def nodeWithVersion(String label = '', version, cl) {
     node(label) {
         timeout(time:1, unit: 'HOURS') {
             withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
-                try {
+                catchError {
                     cl()
-                } catch (Exception e) {
-                    println "Build Exception: ${e.getMessage()}"
-                    throw e
                 }
+                step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de', sendToIndividuals: true])
             }
         }
     }
