@@ -17,10 +17,15 @@ def nodeWithVersion(String label = '', version, cl) {
     node(label) {
         timeout(time:1, unit: 'HOURS') {
             withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
-                catchError {
+                try {
                     cl()
+                    currentBuild.result = 'SUCCESS'
+                } catch (any) {
+                    currentBuild.result = 'FAILURE'
+                    throw any;
+                } finally {
+                    step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de', sendToIndividuals: true])
                 }
-                step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de', sendToIndividuals: true])
             }
         }
     }
