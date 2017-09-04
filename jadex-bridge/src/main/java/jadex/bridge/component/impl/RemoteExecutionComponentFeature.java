@@ -216,10 +216,10 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
 	{
 		Long timeout	= null;	// TODO: custom search timeout?
-		@SuppressWarnings("unchecked")
-		Class<? extends IFuture<Collection<T>>>	clazz	= query.getFilter() instanceof IAsyncFilter
-			? (Class<? extends IFuture<Collection<T>>>) IIntermediateFuture.class	// TODO: subscription for persistent queries?
-			: (Class<? extends IFuture<Collection<T>>>) IFuture.class;
+		@SuppressWarnings({"rawtypes"})
+		Class	clazz	= query.getFilter() instanceof IAsyncFilter
+			? IIntermediateFuture.class	// TODO: subscription for persistent queries?
+			: IFuture.class;
 		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
 	}
 
