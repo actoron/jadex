@@ -426,7 +426,7 @@ public class ServiceInvocationContext
 //			System.out.println("call method init");
 		
 //		if(SReflect.isSupertype(IFuture.class, getMethod().getReturnType()) && !(result instanceof Future))
-//			System.out.println("h‰‰‰‰‰‰‰‰‰‰‰‰");
+//			System.out.println("h√§√§√§√§√§√§√§√§√§√§");
 		
 		this.result.set(used.size()-1, result);
 	}
