@@ -5,11 +5,6 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import jadex.commons.SUtil;
 
@@ -108,18 +103,18 @@ public class TransformSet<E> extends HashSet<E> implements ITransformableObject
     
 //    // Override default methods in Collection
 //    @Override
-	  public void forEach(Consumer<? super E> consumer) 
-	  {
-		  throw new UnsupportedOperationException();
+//	  public void forEach(Consumer<? super E> consumer) 
+//	  {
+//		  throw new UnsupportedOperationException();
 //		  synchronized (mutex) {c.forEach(consumer);}
-	  }
+//	  }
 //    
 //    @Override
-	  public boolean removeIf(Predicate<? super E> filter) 
-	  {
-	  	throw new UnsupportedOperationException();
+//	  public boolean removeIf(Predicate<? super E> filter) 
+//	  {
+//	  	throw new UnsupportedOperationException();
 //        synchronized (mutex) {return c.removeIf(filter);}
-	  }
+//	  }
     
     
 //    @Override
