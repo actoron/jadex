@@ -374,7 +374,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
 						// Only accept messages we trust.
-						if(secinf.isAuthenticated() || allowuntrusted)
+						if(isTrusted(secinf) || allowuntrusted)
 						{
 							Object message;
 							try
@@ -417,287 +417,36 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		notifyMessageReceived(secinfos, header, body);
 		
-		if (isTrusted(secinfos))
+		if(Boolean.TRUE.equals(header.getProperty(SENDREPLY)))
 		{
-			if(Boolean.TRUE.equals(header.getProperty(SENDREPLY)))
+			// send-reply message, check if reply.
+			String convid = (String) header.getProperty(IMsgHeader.CONVERSATION_ID);
+			Future<Object> fut = awaitingmessages != null ? awaitingmessages.remove(convid) : null;
+			if(fut != null)
 			{
-				// send-reply message, check if reply.
-				String convid = (String) header.getProperty(IMsgHeader.CONVERSATION_ID);
-				Future<Object> fut = awaitingmessages != null ? awaitingmessages.remove(convid) : null;
-				if(fut != null)
-				{
-					Exception exception = (Exception) header.getProperty(EXCEPTION);
-					if(exception != null)
-						fut.setException(exception);
-					else
-						fut.setResult(body);
-					return;
-				}
+				Exception exception = (Exception) header.getProperty(EXCEPTION);
+				if(exception != null)
+					fut.setException(exception);
 				else
-				{
-					handleMessage(secinfos, header, body);
-				}
-			}
-			else if(body instanceof StreamPacket)
-			{
-				handleStreamPacket((StreamPacket) body);
+					fut.setResult(body);
+				return;
 			}
 			else
 			{
 				handleMessage(secinfos, header, body);
 			}
 		}
+		else if(body instanceof StreamPacket)
+		{
+			handleStreamPacket((StreamPacket) body);
+		}
+		else
+		{
+			handleMessage(secinfos, header, body);
+		}
 	}
 	
-	/**
-	 *  Handles a stream packet.
-	 *  
-	 *  @param packet A stream packet.
-	 */
-	protected void handleStreamPacket(StreamPacket packet)
-	{
-		byte type = packet.getType();
-		int conid = packet.getConnectionId().intValue();
-		
-		System.out.println("rec stream msg: "+getComponent().getComponentIdentifier().getLocalName()+" "+type);
-		
-		// Handle output connection participant side
-		if(type==AbstractConnectionHandler.INIT_OUTPUT_INITIATOR)
-		{
-			InitInfo ii = (InitInfo)packet.getData();
-			initInputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
-		}
-		else if(type==AbstractConnectionHandler.ACKINIT_OUTPUT_PARTICIPANT)
-		{
-//				System.out.println("CCC: ack init");
-			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(och!=null)
-			{
-				och.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
-			}
-			else
-			{
-				System.out.println("OutputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.DATA_OUTPUT_INITIATOR)
-		{
-//				System.out.println("received data");
-			InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
-			}
-			else
-			{
-				System.out.println("InputStream not found (dai): "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
-			}
-		}
-		else if(type==AbstractConnectionHandler.CLOSE_OUTPUT_INITIATOR)
-		{
-//				System.out.println("CCC: close");
-			InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
-			}
-			else
-			{
-				System.out.println("InputStream not found (coi): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ACKCLOSE_OUTPUT_PARTICIPANT)
-		{
-//				System.out.println("CCC: ackclose");
-			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(och!=null)
-			{
-				och.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
-			}
-			else
-			{
-				System.out.println("OutputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.CLOSEREQ_OUTPUT_PARTICIPANT)
-		{
-//				System.out.println("CCC: closereq");
-			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(och!=null)
-			{
-				och.closeRequestReceived();
-			}
-			else
-			{
-				System.out.println("OutputStream not found (closereq): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ACKCLOSEREQ_OUTPUT_INITIATOR)
-		{
-//				System.out.println("CCC: ackclosereq");
-			InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
-//					ich.ackCloseRequestReceived();
-			}
-			else
-			{
-				System.out.println("OutputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ACKDATA_OUTPUT_PARTICIPANT)
-		{
-			// Handle input connection initiator side
-			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(och!=null)
-			{
-				AckInfo ackinfo = (AckInfo)packet.getData();
-				och.ackDataReceived(ackinfo);
-			}
-			else
-			{
-				System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		
-		else if(type==AbstractConnectionHandler.INIT_INPUT_INITIATOR)
-		{
-			InitInfo ii = (InitInfo)packet.getData();
-			initOutputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
-		}
-		else if(type==AbstractConnectionHandler.ACKINIT_INPUT_PARTICIPANT)
-		{
-			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
-			}
-			else
-			{
-				System.out.println("InputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.DATA_INPUT_PARTICIPANT)
-		{
-			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
-			}
-			else
-			{
-				System.out.println("InputStream not found (data input): "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ACKDATA_INPUT_INITIATOR)
-		{
-			OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(och!=null)
-			{
-				AckInfo ackinfo = (AckInfo)packet.getData();
-				och.ackDataReceived(ackinfo);	
-			}
-			else
-			{
-				System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.CLOSEREQ_INPUT_INITIATOR)
-		{
-			OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(och!=null)
-			{
-				och.closeRequestReceived();
-			}
-			else
-			{
-				System.out.println("InputStream not found (closereq): "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ACKCLOSEREQ_INPUT_PARTICIPANT)
-		{
-			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
-			}
-			else
-			{
-				System.out.println("InputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.CLOSE_INPUT_PARTICIPANT)
-		{
-			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
-			}
-			else
-			{
-				System.out.println("OutputStream not found (closeinput): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ACKCLOSE_INPUT_INITIATOR)
-		{
-			OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(ich!=null)
-			{
-				ich.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
-			}
-			else
-			{
-				System.out.println("InputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		
-		// Handle lease time update
-		else if(type==AbstractConnectionHandler.ALIVE_INITIATOR)
-		{
-//				System.out.println("alive initiator");
-			AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(Integer.valueOf(conid));
-			if(con!=null)
-			{
-				con.setAliveTime(System.currentTimeMillis());
-			}
-			else
-			{
-				System.out.println("Stream not found (alive ini): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-		else if(type==AbstractConnectionHandler.ALIVE_PARTICIPANT)
-		{
-//				System.out.println("alive particpant");
-			AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(Integer.valueOf(conid));
-			if(con!=null)
-			{
-				con.setAliveTime(System.currentTimeMillis());
-			}
-			else
-			{
-				System.out.println("Stream not found (alive par): "+component+", "+System.currentTimeMillis()+", "+conid);
-			}
-		}
-//	
-////		System.out.println("bbbb: "+mycnt+" "+getComponent().getComponentIdentifier());
-//			}
-////					catch(Throwable e)
-//					catch(final Exception e)
-//					{
-////						e.printStackTrace();
-//						getComponent().scheduleStep(new IComponentStep<Void>()
-//						{
-//							public IFuture<Void> execute(IInternalAccess ia)
-//							{
-//								ia.getLogger().warning("Exception in stream: "+e.getMessage());
-//								return IFuture.DONE;
-//							}
-//						});
-//					}
-//				}
-//			}
-	}
+	
 	
 	/**
 	 *  Handle message with user message handlers.
@@ -860,17 +609,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	protected Object deserializeMessage(IMsgHeader header, byte[] serializedmsg)
 	{
 		return getSerializationServices(platformid).decode(header, component, serializedmsg);
-	}
-	
-	/**
-	 *  Tests if a message is considered "trusted".
-	 *  
-	 *  @param secinfos The security infos of the message.
-	 *  @return True, if trusted.
-	 */
-	protected boolean isTrusted(IMsgSecurityInfos secinfos)
-	{
-		return secinfos.isAuthenticated();
 	}
 	
 	/**
@@ -1656,6 +1394,267 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				sub.addIntermediateResult(event);
 			}
 		}		
+	}
+	
+	/**
+	 *  Handles a stream packet.
+	 *  
+	 *  @param packet A stream packet.
+	 */
+	protected void handleStreamPacket(StreamPacket packet)
+	{
+		byte type = packet.getType();
+		int conid = packet.getConnectionId().intValue();
+		
+		System.out.println("rec stream msg: "+getComponent().getComponentIdentifier().getLocalName()+" "+type);
+		
+		// Handle output connection participant side
+		if(type==AbstractConnectionHandler.INIT_OUTPUT_INITIATOR)
+		{
+			InitInfo ii = (InitInfo)packet.getData();
+			initInputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
+		}
+		else if(type==AbstractConnectionHandler.ACKINIT_OUTPUT_PARTICIPANT)
+		{
+//				System.out.println("CCC: ack init");
+			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(och!=null)
+			{
+				och.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
+			}
+			else
+			{
+				System.out.println("OutputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.DATA_OUTPUT_INITIATOR)
+		{
+//				System.out.println("received data");
+			InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
+			}
+			else
+			{
+				System.out.println("InputStream not found (dai): "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+			}
+		}
+		else if(type==AbstractConnectionHandler.CLOSE_OUTPUT_INITIATOR)
+		{
+//				System.out.println("CCC: close");
+			InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
+			}
+			else
+			{
+				System.out.println("InputStream not found (coi): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ACKCLOSE_OUTPUT_PARTICIPANT)
+		{
+//				System.out.println("CCC: ackclose");
+			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(och!=null)
+			{
+				och.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
+			}
+			else
+			{
+				System.out.println("OutputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.CLOSEREQ_OUTPUT_PARTICIPANT)
+		{
+//				System.out.println("CCC: closereq");
+			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(och!=null)
+			{
+				och.closeRequestReceived();
+			}
+			else
+			{
+				System.out.println("OutputStream not found (closereq): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ACKCLOSEREQ_OUTPUT_INITIATOR)
+		{
+//				System.out.println("CCC: ackclosereq");
+			InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
+//					ich.ackCloseRequestReceived();
+			}
+			else
+			{
+				System.out.println("OutputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ACKDATA_OUTPUT_PARTICIPANT)
+		{
+			// Handle input connection initiator side
+			OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(och!=null)
+			{
+				AckInfo ackinfo = (AckInfo)packet.getData();
+				och.ackDataReceived(ackinfo);
+			}
+			else
+			{
+				System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		
+		else if(type==AbstractConnectionHandler.INIT_INPUT_INITIATOR)
+		{
+			InitInfo ii = (InitInfo)packet.getData();
+			initOutputConnection(conid, ii.getInitiator(), ii.getParticipant(), ii.getNonFunctionalProperties());
+		}
+		else if(type==AbstractConnectionHandler.ACKINIT_INPUT_PARTICIPANT)
+		{
+			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
+			}
+			else
+			{
+				System.out.println("InputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.DATA_INPUT_PARTICIPANT)
+		{
+			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
+			}
+			else
+			{
+				System.out.println("InputStream not found (data input): "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ACKDATA_INPUT_INITIATOR)
+		{
+			OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(och!=null)
+			{
+				AckInfo ackinfo = (AckInfo)packet.getData();
+				och.ackDataReceived(ackinfo);	
+			}
+			else
+			{
+				System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.CLOSEREQ_INPUT_INITIATOR)
+		{
+			OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(och!=null)
+			{
+				och.closeRequestReceived();
+			}
+			else
+			{
+				System.out.println("InputStream not found (closereq): "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ACKCLOSEREQ_INPUT_PARTICIPANT)
+		{
+			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
+			}
+			else
+			{
+				System.out.println("InputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.CLOSE_INPUT_PARTICIPANT)
+		{
+			InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
+			}
+			else
+			{
+				System.out.println("OutputStream not found (closeinput): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ACKCLOSE_INPUT_INITIATOR)
+		{
+			OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(ich!=null)
+			{
+				ich.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
+			}
+			else
+			{
+				System.out.println("InputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		
+		// Handle lease time update
+		else if(type==AbstractConnectionHandler.ALIVE_INITIATOR)
+		{
+//				System.out.println("alive initiator");
+			AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(Integer.valueOf(conid));
+			if(con!=null)
+			{
+				con.setAliveTime(System.currentTimeMillis());
+			}
+			else
+			{
+				System.out.println("Stream not found (alive ini): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+		else if(type==AbstractConnectionHandler.ALIVE_PARTICIPANT)
+		{
+//				System.out.println("alive particpant");
+			AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(Integer.valueOf(conid));
+			if(con!=null)
+			{
+				con.setAliveTime(System.currentTimeMillis());
+			}
+			else
+			{
+				System.out.println("Stream not found (alive par): "+component+", "+System.currentTimeMillis()+", "+conid);
+			}
+		}
+//	
+////		System.out.println("bbbb: "+mycnt+" "+getComponent().getComponentIdentifier());
+//			}
+////					catch(Throwable e)
+//					catch(final Exception e)
+//					{
+////						e.printStackTrace();
+//						getComponent().scheduleStep(new IComponentStep<Void>()
+//						{
+//							public IFuture<Void> execute(IInternalAccess ia)
+//							{
+//								ia.getLogger().warning("Exception in stream: "+e.getMessage());
+//								return IFuture.DONE;
+//							}
+//						});
+//					}
+//				}
+//			}
+	}
+	
+	/**
+	 *  Tests if a message is considered "trusted".
+	 *  
+	 *  @param secinfos The security infos of the message.
+	 *  @return True, if trusted.
+	 */
+	protected boolean isTrusted(IMsgSecurityInfos secinfos)
+	{
+		return secinfos.isAuthenticated();
 	}
 
 	/**

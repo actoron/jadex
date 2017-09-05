@@ -129,6 +129,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Initialization.
 	 */
+	@SuppressWarnings("unchecked")
 	@AgentCreated
 	public IFuture<Void> start()
 	{
