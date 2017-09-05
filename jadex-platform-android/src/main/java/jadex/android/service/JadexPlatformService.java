@@ -6,21 +6,18 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -167,11 +164,6 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		return startJadexPlatform(platformConfiguration);
 	}
 	
-	public IFuture<IMessageService> getMS()
-	{
-		return getMS(platformId);
-	}
-
 	public IFuture<IComponentManagementService> getCMS()
 	{
 		return getCMS(platformId);
@@ -269,45 +261,22 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	//---------------- helper ----------------
 	
 	/**
-	 * Sends a FIPA Message to the specified receiver. The Sender is
-	 * automatically set to the Platform.
-	 * 
-	 * @param message
-	 * @param receiver
-	 * @return Future<Void>
-	 */
-	protected Future<Void> sendMessage(final Map<String, Object> message, IComponentIdentifier receiver)
-	{
-		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
-		IComponentIdentifier cid = jadexPlatformManager.getExternalPlatformAccess(receiver.getRoot()).getComponentIdentifier();
-		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
-		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE, receiver);
-	}
-
-	/**
 	 * Sends a Message to a Component on the Jadex Platform.
 	 * 
 	 * @param message
-	 * @param type
 	 * @return Future<Void>
 	 */
-	protected Future<Void> sendMessage(final Map<String, Object> message, final MessageType type, final IComponentIdentifier receiver)
+	protected IFuture<Void> sendMessage(final Map<String, Object> message, final IComponentIdentifier receiver)
 	{
-		final IComponentIdentifier platform = receiver.getRoot();
-		checkIfPlatformIsRunning(platform, "sendMessage");
+		checkIfPlatformIsRunning(platformId, "sendMessage");
 
-		final Future<Void> ret = new Future<Void>();
-
-		getMS(platform).addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
-		{
-			public void customResultAvailable(IMessageService ms)
-			{
-				ms.sendMessage(message, type, jadexPlatformManager.getExternalPlatformAccess(platform).getComponentIdentifier(), null, receiver, null)
-						.addResultListener(new DelegationResultListener<Void>(ret));
+		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
 
-		return ret;
 	}
 
 }

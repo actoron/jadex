@@ -8,23 +8,16 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.fipa.SFipa;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.bridge.service.types.platform.IJadexPlatformInterface;
-import jadex.bridge.service.types.platform.IJadexPlatformManager;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
@@ -284,45 +277,23 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		return platformService.dispatchEvent(event);
 	}
 	
-	
-
-	/**
-	 * Sends a FIPA Message to the specified receiver. The Sender is
-	 * automatically set to the Platform.
-	 * 
-	 * @param message
-	 * @param receiver
-	 * @return Future<Void>
-	 */
-	protected Future<Void> sendMessage(final Map<String, Object> message, IComponentIdentifier receiver)
-	{
-		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
-		IComponentIdentifier cid = platformId;
-		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
-		message.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE, receiver);
-	}
-
 	/**
 	 * Sends a Message to a Component on the Jadex Platform.
 	 * 
 	 * @param message
-	 * @param type
 	 * @return Future<Void>
 	 */
-	protected Future<Void> sendMessage(final Map<String, Object> message, final MessageType type, final IComponentIdentifier receiver)
+	protected IFuture<Void> sendMessage(final Map<String, Object> message, final IComponentIdentifier receiver)
 	{
 		checkIfJadexIsRunning("sendMessage");
 
-		final Future<Void> ret = new Future<Void>();
-
-		getService(IMessageService.class).addResultListener(new DefaultResultListener<IMessageService>() {
-			public void resultAvailable(final IMessageService ms) {
-				ms.sendMessage(message, type, getExternalPlatformAccess().getComponentIdentifier(), getExternalPlatformAccess().getModel().getResourceIdentifier(), null, null).addResultListener(new DelegationResultListener<Void>(ret));
+		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
 
-		return ret;
 	}
 
 	private void checkIfJadexIsRunning(String caller)
@@ -331,16 +302,6 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		{
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}
-	}
-	
-	/**
-	 * @deprecated use getPlatformService().getSservice() instead.
-	 * @return
-	 */
-	protected IFuture<IMessageService> getMS()
-	{
-		checkIfJadexIsRunning("getMS");
-		return platformService.getMS(platformId);
 	}
 	
 	/**

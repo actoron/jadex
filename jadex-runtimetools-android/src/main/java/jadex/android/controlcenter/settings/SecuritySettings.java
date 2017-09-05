@@ -6,7 +6,6 @@ import jadex.android.controlcenter.preference.LongClickablePreference;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -70,9 +69,9 @@ public class SecuritySettings extends AServiceSettings
 	private Map<String, String> networkPasswords;
 
 	// UI members
-	private JadexBooleanPreference usePw;
-	private JadexStringPreference password;
-	private JadexBooleanPreference trulan;
+	private JadexBooleanPreference usePlatformSecret;
+	private JadexStringPreference platformSecret;
+//	private JadexBooleanPreference trulan;
 	private PreferenceCategory platformPasswordsCat;
 	private PreferenceCategory networkPasswordsCat;
 
@@ -91,7 +90,7 @@ public class SecuritySettings extends AServiceSettings
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuItem addRemotePw = menu.add(0, OPTIONS_ADD_REMOTE_PW, 0, "Add remote platform password");
+		MenuItem addRemotePw = menu.add(0, OPTIONS_ADD_REMOTE_PW, 0, "Add remote platform platformSecret");
 		addRemotePw.setIcon(android.R.drawable.ic_menu_add);
 		MenuItem addTrustedNet = menu.add(0, OPTIONS_ADD_TRUSTED_NET, 1, "Add trusted network");
 		addTrustedNet.setIcon(android.R.drawable.ic_menu_add);
@@ -140,7 +139,7 @@ public class SecuritySettings extends AServiceSettings
 								});
 							} else
 							{
-								builder.setTitle("Choose platform to add password for");
+								builder.setTitle("Choose platform to add platformSecret for");
 								builder.setItems(items.toArray(new String[0]), new DialogInterface.OnClickListener()
 								{
 									public void onClick(DialogInterface dialog, final int item)
@@ -148,14 +147,14 @@ public class SecuritySettings extends AServiceSettings
 										final IComponentIdentifier cid = platformList.get(item).getComponentIdentifier();
 										String platformPrefix = cid.getPlatformPrefix();
 										final EditTextDialog pwDialog = new EditTextDialog(platformPasswordsCat.getContext());
-										pwDialog.setTitle("Enter password for platform " + platformPrefix);
+										pwDialog.setTitle("Enter platformSecret for platform " + platformPrefix);
 										pwDialog.show();
 										pwDialog.setOnApplyListener(new OnClickListener()
 										{
 											public void onClick(View v)
 											{
 												String password = pwDialog.getText();
-												secService.setPlatformPassword(cid, password);
+												secService.setPlatformSecret(cid, password);
 											}
 										});
 
@@ -193,7 +192,7 @@ public class SecuritySettings extends AServiceSettings
 				public void onClick(View v)
 				{
 					String netName = netNameDialog.getText();
-					secService.setNetworkPassword(netName, "");
+					secService.setNetwork(netName, "");
 				}
 			});
 			result = true;
@@ -227,20 +226,20 @@ public class SecuritySettings extends AServiceSettings
 		localCat.setTitle("Local Password Settings");
 		screen.addPreference(localCat);
 
-		usePw = new JadexBooleanPreference(screen.getContext());
-		usePw.setTitle("Use Password");
-		usePw.setEnabled(false);
-		localCat.addPreference(usePw);
+		usePlatformSecret = new JadexBooleanPreference(screen.getContext());
+		usePlatformSecret.setTitle("Use Password");
+		usePlatformSecret.setEnabled(false);
+		localCat.addPreference(usePlatformSecret);
 
-		password = new JadexStringPreference(screen.getContext());
-		password.setTitle("Password");
-		password.setEnabled(false);
-		password.setDialogTitle("Set new password");
-		localCat.addPreference(password);
+		platformSecret = new JadexStringPreference(screen.getContext());
+		platformSecret.setTitle("Password");
+		platformSecret.setEnabled(false);
+		platformSecret.setDialogTitle("Set new platformSecret");
+		localCat.addPreference(platformSecret);
 
-		trulan = new JadexBooleanPreference(screen.getContext());
-		trulan.setTitle("Trust local networks");
-		localCat.addPreference(trulan);
+//		trulan = new JadexBooleanPreference(screen.getContext());
+//		trulan.setTitle("Trust local networks");
+//		localCat.addPreference(trulan);
 
 		platformPasswordsCat = new PreferenceCategory(screen.getContext());
 		platformPasswordsCat.setTitle("Remote Passwords");
@@ -250,147 +249,147 @@ public class SecuritySettings extends AServiceSettings
 		networkPasswordsCat.setTitle("Network Names");
 		screen.addPreference(networkPasswordsCat);
 
-		usePw.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+		usePlatformSecret.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 		{
 			public boolean onPreferenceChange(Preference preference, Object newValue)
 			{
-				secService.setUsePassword((Boolean) newValue);
+				secService.setUsePlatformSecret((Boolean) newValue);
 				return true;
 			}
 		});
 
-		password.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+		platformSecret.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
 		{
 			public boolean onPreferenceChange(Preference preference, Object newValue)
 			{
-				secService.setLocalPassword((String) newValue);
+				secService.setPlatformSecret(platformId, (String) newValue);
 				return true;
 			}
 		});
 
-		trulan.setOnPreferenceClickListener(new OnPreferenceClickListener()
-		{
-			public boolean onPreferenceClick(Preference preference)
-			{
+//		trulan.setOnPreferenceClickListener(new OnPreferenceClickListener()
+//		{
+//			public boolean onPreferenceClick(Preference preference)
+//			{
+//
+//				return true;
+//			}
+//		});
+//
+//		trulan.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+//		{
+//			public boolean onPreferenceChange(Preference preference, Object newValue)
+//			{
+//				final Boolean newState = (Boolean) newValue;
+//				if (newState)
+//				{
+//					Builder builder = new AlertDialog.Builder(screen.getContext());
+//					builder.setMessage("Access from trusted Platforms is not platformSecret protected by default!\n You can set a platformSecret manually.")
+//							.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+//							{
+//								public void onClick(DialogInterface dialog, int which)
+//								{
+//									secService.setTrustedLanMode(newState);
+//									refresh();
+//								}
+//
+//							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+//							{
+//								public void onClick(DialogInterface dialog, int which)
+//								{
+//									trulan.setChecked(false);
+//								}
+//							}).create().show();
+//				} else
+//				{
+//					secService.setTrustedLanMode(newState);
+//					refresh();
+//				}
+//				return true;
+//			}
+//		});
 
-				return true;
-			}
-		});
-
-		trulan.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
-		{
-			public boolean onPreferenceChange(Preference preference, Object newValue)
-			{
-				final Boolean newState = (Boolean) newValue;
-				if (newState)
-				{
-					Builder builder = new AlertDialog.Builder(screen.getContext());
-					builder.setMessage("Access from trusted Platforms is not password protected by default!\n You can set a password manually.")
-							.setPositiveButton("Ok", new DialogInterface.OnClickListener()
-							{
-								public void onClick(DialogInterface dialog, int which)
-								{
-									secService.setTrustedLanMode(newState);
-									refresh();
-								}
-
-							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-							{
-								public void onClick(DialogInterface dialog, int which)
-								{
-									trulan.setChecked(false);
-								}
-							}).create().show();
-				} else
-				{
-					secService.setTrustedLanMode(newState);
-					refresh();
-				}
-				return true;
-			}
-		});
-
-		subscribtion = secService.subscribeToEvents();
-		subscribtion.addResultListener(refreshListener);
+//		subscribtion = secService.subscribeToEvents();
+//		subscribtion.addResultListener(refreshListener);
 		refresh();
 	}
 
-	private IIntermediateResultListener<ChangeEvent<Object>> refreshListener = new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
-	{
-
-		public void exceptionOccurred(Exception exception)
-		{
-		}
-
-		public void resultAvailable(Collection<ChangeEvent<Object>> result)
-		{
-		}
-
-		public void intermediateResultAvailable(final ChangeEvent<Object> event)
-		{
-			if (event == null) {
-				return;
-			}
-			System.out.println("event: " + event.getType() + " " + event.getValue());
-			uiHandler.post(new Runnable()
-			{
-				@SuppressWarnings("unchecked")
-				public void run()
-				{
-					if (ISecurityService.PROPERTY_USEPASS.equals(event.getType()))
-					{
-						usePw.setValue((Boolean) event.getValue());
-
-					} else if (ISecurityService.PROPERTY_TRUSTEDLAN.equals(event.getType()))
-					{
-						trulan.setChecked((Boolean) event.getValue());
-					} else if (ISecurityService.PROPERTY_LOCALPASS.equals(event.getType()))
-					{
-						password.setText((String)event.getValue());
-					} else if (ISecurityService.PROPERTY_PLATFORMPASS.equals(event.getType()))
-					{
-						setPlatformPasswords((Map<String, String>) event.getValue());
-					} else if (ISecurityService.PROPERTY_NETWORKPASS.equals(event.getType()))
-					{
-						setNetworkPasswords((Map<String, String>) event.getValue());
-					} else if (ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
-					{
-//						String[] info = (String[]) event.getValue();
-//						tfstorepath.setText(info[0]);
-//						tfstorepass.setText(info[1]);
-//						tfkeypass.setText(info[2]);
-					} else if (ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
-					{
-//						String[] info = (String[]) event.getValue();
-//						tfstorepath.setText(info[0]);
-//						tfstorepass.setText(info[1]);
-//						tfkeypass.setText(info[2]);
-					} else if (ISecurityService.PROPERTY_KEYSTOREENTRIES.equals(event.getType()))
-					{
-						// Map<String, KeyStoreEntry> entries = (Map<String,
-						// KeyStoreEntry>)event.getValue();
-//						updateact.run();
-					} else if (ISecurityService.PROPERTY_SELECTEDMECHANISM.equals(event.getType()))
-					{
-//						acp.setSelectedMechanism(((Integer) event.getValue()).intValue());
-					} else if (ISecurityService.PROPERTY_MECHANISMPARAMETER.equals(event.getType()))
-					{
-//						Object[] data = (Object[]) event.getValue();
-//						acp.setParameterValue(((Class<?>) event.getSource()).getName(), (String) data[0], data[1]);
-					}
-				}
-			});
-		}
-
-		public void finished()
-		{
-		}
-
-	};
+//	private IIntermediateResultListener<ChangeEvent<Object>> refreshListener = new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
+//	{
+//
+//		public void exceptionOccurred(Exception exception)
+//		{
+//		}
+//
+//		public void resultAvailable(Collection<ChangeEvent<Object>> result)
+//		{
+//		}
+//
+//		public void intermediateResultAvailable(final ChangeEvent<Object> event)
+//		{
+//			if (event == null) {
+//				return;
+//			}
+//			System.out.println("event: " + event.getType() + " " + event.getValue());
+//			uiHandler.post(new Runnable()
+//			{
+//				@SuppressWarnings("unchecked")
+//				public void run()
+//				{
+//					if (ISecurityService.PROPERTY_USEPASS.equals(event.getType()))
+//					{
+//						usePlatformSecret.setValue((Boolean) event.getValue());
+//
+//					} else if (ISecurityService.PROPERTY_TRUSTEDLAN.equals(event.getType()))
+//					{
+//						trulan.setChecked((Boolean) event.getValue());
+//					} else if (ISecurityService.PROPERTY_LOCALPASS.equals(event.getType()))
+//					{
+//						platformSecret.setText((String)event.getValue());
+//					} else if (ISecurityService.PROPERTY_PLATFORMPASS.equals(event.getType()))
+//					{
+//						setPlatformPasswords((Map<String, String>) event.getValue());
+//					} else if (ISecurityService.PROPERTY_NETWORKPASS.equals(event.getType()))
+//					{
+//						setNetworkPasswords((Map<String, String>) event.getValue());
+//					} else if (ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
+//					{
+////						String[] info = (String[]) event.getValue();
+////						tfstorepath.setText(info[0]);
+////						tfstorepass.setText(info[1]);
+////						tfkeypass.setText(info[2]);
+//					} else if (ISecurityService.PROPERTY_KEYSTORESETTINGS.equals(event.getType()))
+//					{
+////						String[] info = (String[]) event.getValue();
+////						tfstorepath.setText(info[0]);
+////						tfstorepass.setText(info[1]);
+////						tfkeypass.setText(info[2]);
+//					} else if (ISecurityService.PROPERTY_KEYSTOREENTRIES.equals(event.getType()))
+//					{
+//						// Map<String, KeyStoreEntry> entries = (Map<String,
+//						// KeyStoreEntry>)event.getValue();
+////						updateact.run();
+//					} else if (ISecurityService.PROPERTY_SELECTEDMECHANISM.equals(event.getType()))
+//					{
+////						acp.setSelectedMechanism(((Integer) event.getValue()).intValue());
+//					} else if (ISecurityService.PROPERTY_MECHANISMPARAMETER.equals(event.getType()))
+//					{
+////						Object[] data = (Object[]) event.getValue();
+////						acp.setParameterValue(((Class<?>) event.getSource()).getName(), (String) data[0], data[1]);
+//					}
+//				}
+//			});
+//		}
+//
+//		public void finished()
+//		{
+//		}
+//
+//	};
 
 	private void refresh()
 	{
-		secService.isUsePassword().addResultListener(new DefaultResultListener<Boolean>()
+		secService.isUsePlatformSecret().addResultListener(new DefaultResultListener<Boolean>()
 		{
 			public void resultAvailable(final Boolean result)
 			{
@@ -398,14 +397,14 @@ public class SecuritySettings extends AServiceSettings
 				{
 					public void run()
 					{
-						usePw.setValue(result);
-						usePw.setEnabled(true);
+						usePlatformSecret.setValue(result);
+						usePlatformSecret.setEnabled(true);
 					}
 				});
 			}
 		});
 
-		secService.getLocalPassword().addResultListener(new DefaultResultListener<String>()
+		secService.getPlatformSecret(platformId).addResultListener(new DefaultResultListener<String>()
 		{
 			public void resultAvailable(final String result)
 			{
@@ -413,36 +412,39 @@ public class SecuritySettings extends AServiceSettings
 				{
 					public void run()
 					{
-						password.setValue(result);
-						password.setEnabled(true);
+						platformSecret.setValue(result);
+						platformSecret.setEnabled(true);
 					}
 				});
 			}
 		});
 
-		secService.getPlatformPasswords().addResultListener(new DefaultResultListener<Map<String, String>>()
-		{
-			public void resultAvailable(Map<String, String> result)
-			{
-				setPlatformPasswords(result);
-			}
-		});
+		// TODO: refresh all platform passwords
 
-		secService.getNetworkPasswords().addResultListener(new DefaultResultListener<Map<String, String>>()
-		{
-			public void resultAvailable(Map<String, String> result)
-			{
-				setNetworkPasswords(result);
-			}
-		});
 
-		secService.isTrustedLanMode().addResultListener(new DefaultResultListener<Boolean>()
-		{
-			public void resultAvailable(Boolean result)
-			{
-				trulan.setChecked(result);
-			}
-		});
+//		secService.getPlatformPasswords().addResultListener(new DefaultResultListener<Map<String, String>>()
+//		{
+//			public void resultAvailable(Map<String, String> result)
+//			{
+//				setPlatformPasswords(result);
+//			}
+//		});
+//
+//		secService.getNetworkPasswords().addResultListener(new DefaultResultListener<Map<String, String>>()
+//		{
+//			public void resultAvailable(Map<String, String> result)
+//			{
+//				setNetworkPasswords(result);
+//			}
+//		});
+//
+//		secService.isTrustedLanMode().addResultListener(new DefaultResultListener<Boolean>()
+//		{
+//			public void resultAvailable(Boolean result)
+//			{
+//				trulan.setChecked(result);
+//			}
+//		});
 	}
 
 	protected void setNetworkPasswords(Map<String, String> result)
@@ -478,7 +480,7 @@ public class SecuritySettings extends AServiceSettings
 		{
 			Preference dummyPref = new Preference(platformPasswordsCat.getContext());
 			dummyPref.setTitle("No passwords set");
-			dummyPref.setSummary("Press menu to add a new remote platform password.");
+			dummyPref.setSummary("Press menu to add a new remote platform platformSecret.");
 			platformPasswordsCat.addPreference(dummyPref);
 		} else
 		{
@@ -495,7 +497,7 @@ public class SecuritySettings extends AServiceSettings
 	}
 
 	/**
-	 * Creates a dialog to ask the user for a new password for a platform.
+	 * Creates a dialog to ask the user for a new platformSecret for a platform.
 	 */
 	protected OnPreferenceClickListener onPlatformPasswordClickListener = new OnPreferenceClickListener()
 	{
@@ -503,7 +505,7 @@ public class SecuritySettings extends AServiceSettings
 		{
 			final CharSequence platformPrefix = preference.getTitle();
 			final EditTextDialog pwDialog = new EditTextDialog(preference.getContext());
-			pwDialog.setTitle("Enter new password for platform:\n" + platformPrefix);
+			pwDialog.setTitle("Enter new platformSecret for platform:\n" + platformPrefix);
 
 			String oldPw = platformPasswords.get(platformPrefix);
 			if (oldPw != null)
@@ -515,7 +517,7 @@ public class SecuritySettings extends AServiceSettings
 				public void onClick(View v)
 				{
 					BasicComponentIdentifier cid = new BasicComponentIdentifier(platformPrefix.toString());
-					secService.setPlatformPassword(cid, pwDialog.getText());
+					secService.setPlatformSecret(cid, pwDialog.getText());
 				}
 			});
 			pwDialog.show();
@@ -524,7 +526,7 @@ public class SecuritySettings extends AServiceSettings
 	};
 
 	/**
-	 * Creates a dialog to confirm the deletion of a remote platform password.
+	 * Creates a dialog to confirm the deletion of a remote platform platformSecret.
 	 */
 	protected OnPreferenceClickListener onPlatformPasswordLongClickListener = new OnPreferenceClickListener()
 	{
@@ -532,13 +534,13 @@ public class SecuritySettings extends AServiceSettings
 		{
 			Builder builder = new AlertDialog.Builder(p.getContext());
 			final CharSequence platformPrefix = p.getTitle();
-			builder.setMessage("Delete password for " + platformPrefix + "?").setCancelable(false)
+			builder.setMessage("Delete platformSecret for " + platformPrefix + "?").setCancelable(false)
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener()
 					{
 						public void onClick(DialogInterface dialog, int id)
 						{
 							BasicComponentIdentifier cid = new BasicComponentIdentifier(platformPrefix.toString());
-							secService.setPlatformPassword(cid, null);
+							secService.setPlatformSecret(cid, null);
 						}
 					}).setNegativeButton("No", new DialogInterface.OnClickListener()
 					{
@@ -568,7 +570,7 @@ public class SecuritySettings extends AServiceSettings
 			{
 				public void onClick(DialogInterface dialog, int id)
 				{
-					secService.setNetworkPassword(networkName.toString(), null);
+					secService.setNetwork(networkName.toString(), null);
 				}
 			}).setNegativeButton("No", new DialogInterface.OnClickListener()
 			{
@@ -586,7 +588,7 @@ public class SecuritySettings extends AServiceSettings
 	};
 
 	/**
-	 * Creates a dialog to ask the user for a new password for a network.
+	 * Creates a dialog to ask the user for a new platformSecret for a network.
 	 */
 	protected OnPreferenceClickListener onNetworkPasswordClickListener = new OnPreferenceClickListener()
 	{
@@ -594,7 +596,7 @@ public class SecuritySettings extends AServiceSettings
 		{
 			final CharSequence network = preference.getTitle();
 			final EditTextDialog pwDialog = new EditTextDialog(preference.getContext());
-			pwDialog.setTitle("Enter new password for network: " + network);
+			pwDialog.setTitle("Enter new platformSecret for network: " + network);
 
 			String oldPw = networkPasswords.get(network);
 			if (oldPw != null)
@@ -606,7 +608,7 @@ public class SecuritySettings extends AServiceSettings
 			{
 				public void onClick(View v)
 				{
-					secService.setNetworkPassword(network.toString(), pwDialog.getText());
+					secService.setNetwork(network.toString(), pwDialog.getText());
 				}
 			});
 			pwDialog.show();
@@ -679,9 +681,9 @@ public class SecuritySettings extends AServiceSettings
 		}
 
 		/**
-		 * Return the password entered in the Dialog.
+		 * Return the platformSecret entered in the Dialog.
 		 * 
-		 * @return the password
+		 * @return the platformSecret
 		 */
 		public String getText()
 		{
@@ -689,10 +691,10 @@ public class SecuritySettings extends AServiceSettings
 		}
 
 		/**
-		 * Sets a password to be displayed.
+		 * Sets a platformSecret to be displayed.
 		 * 
 		 * @param pw
-		 *            the new password
+		 *            the new platformSecret
 		 */
 		public void setText(String pw)
 		{
