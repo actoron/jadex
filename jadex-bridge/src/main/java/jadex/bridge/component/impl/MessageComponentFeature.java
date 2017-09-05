@@ -1268,7 +1268,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		final long lt = getMinLeaseTime(getComponent().getComponentIdentifier());
 		if(lt!=Timeout.NONE)
 		{
-			getComponent().scheduleStep(new IComponentStep<Void>()
+			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("sendAlive")
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -1308,7 +1308,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //		System.out.println("to is: "+lt);
 		if(lt!=Timeout.NONE)
 		{
-			getComponent().scheduleStep(new IComponentStep<Void>()
+			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("checkAlive")
 				public IFuture<Void> execute(IInternalAccess ia)
