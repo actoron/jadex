@@ -523,7 +523,7 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(final ISecurityService sec)
 							{
-								sec.getEncodedPlatformSecret(cid)
+								sec.getPlatformSecret(cid)
 									.addResultListener(new SwingDefaultResultListener<String>(ComponentTreePanel.this)
 								{
 									public void customResultAvailable(String pass)
@@ -572,7 +572,7 @@ public class ComponentTreePanel extends JSplitPane
 										if(ok==JOptionPane.OK_OPTION)
 										{
 //											sec.setPlatformPassword(cid, new String(tfpass.getPassword()))
-											sec.setEncodedPlatformSecret(cid, "pw:" + new String(tfpass.getPassword()))
+											sec.setPlatformSecret(cid, "pw:" + new String(tfpass.getPassword()))
 												.addResultListener(new SwingDefaultResultListener<Void>()
 											{
 												public void	customResultAvailable(Void result)

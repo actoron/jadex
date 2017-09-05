@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -17,17 +16,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.security.DefaultAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.Base64;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 
 /**
@@ -129,39 +124,41 @@ public class EmailClientPluginPanel extends JPanel
 				{
 					public void resultAvailable(ISecurityService sser)
 					{
-						final DefaultAuthorizable da = new DefaultAuthorizable();
+//						final DefaultAuthorizable da = new DefaultAuthorizable();
 						
-						da.setDigestContent(modintxt);
-						da.setValidityDuration(vd); 
+//						da.setDigestContent(modintxt);
+//						da.setValidityDuration(vd); 
 						
-						sser.preprocessRequest(da, null).addResultListener(new DefaultResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-								final StringBuffer buf = new StringBuffer();
-								
-								buf.append(intxt).append(SUtil.LF);
-								buf.append("#").append(da.getTimestamp()).append("#").append(SUtil.LF);
-								buf.append("#").append(da.getValidityDuration()).append("#").append(SUtil.LF);
-
-								List<byte[]> dgs = da.getAuthenticationData();
-								for(byte[] dg: dgs)
-								{
-//									System.out.println("authdata: "+SUtil.arrayToString(dg));
-									String txt = new String(Base64.encode(dg));
-									buf.append("#");
-									buf.append(txt).append("#").append(SUtil.LF);
-								}	
-								
-								SwingUtilities.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										taout.setText(buf.toString());
-									}
-								});
-							}
-						});
+						throw new UnsupportedOperationException("todo: long term authentication");
+						
+//						sser.preprocessRequest(da, null).addResultListener(new DefaultResultListener<Void>()
+//						{
+//							public void resultAvailable(Void result)
+//							{
+//								final StringBuffer buf = new StringBuffer();
+//								
+//								buf.append(intxt).append(SUtil.LF);
+//								buf.append("#").append(da.getTimestamp()).append("#").append(SUtil.LF);
+//								buf.append("#").append(da.getValidityDuration()).append("#").append(SUtil.LF);
+//
+//								List<byte[]> dgs = da.getAuthenticationData();
+//								for(byte[] dg: dgs)
+//								{
+////									System.out.println("authdata: "+SUtil.arrayToString(dg));
+//									String txt = new String(Base64.encode(dg));
+//									buf.append("#");
+//									buf.append(txt).append("#").append(SUtil.LF);
+//								}	
+//								
+//								SwingUtilities.invokeLater(new Runnable()
+//								{
+//									public void run()
+//									{
+//										taout.setText(buf.toString());
+//									}
+//								});
+//							}
+//						});
 					}
 				});
 			}

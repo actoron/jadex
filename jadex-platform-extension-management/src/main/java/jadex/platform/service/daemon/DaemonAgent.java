@@ -10,7 +10,6 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Binding;
@@ -43,12 +42,9 @@ public class DaemonAgent
 	 *  Handle messages from responder agents.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg)
 	{
-		if(SFipa.FIPA_MESSAGE_TYPE.equals(mt))
-		{
-			DaemonService	ds	= (DaemonService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IDaemonService.class);
-			ds.messageReceived((IComponentIdentifier)msg.get(SFipa.SENDER), (String)msg.get(SFipa.CONTENT));
-		}
+		DaemonService	ds	= (DaemonService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IDaemonService.class);
+		ds.messageReceived((IComponentIdentifier)msg.get(SFipa.SENDER), (String)msg.get(SFipa.CONTENT));
 	}
 }
