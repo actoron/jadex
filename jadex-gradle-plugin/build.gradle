@@ -5,7 +5,7 @@ description 'Gradle plugin for generating BDIV3 runtime code from agent annotati
 
 apply plugin: 'groovy'
 
-def androidToolsVersion = '2.0.0';
+def androidToolsVersion = android_gradlePluginVersion;
 dependencies {
     testCompile gradleTestKit()
 
