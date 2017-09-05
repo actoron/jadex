@@ -452,7 +452,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.ACKINIT_OUTPUT_PARTICIPANT)
 			{
 //				System.out.println("CCC: ack init");
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				OutputConnectionHandler och = getOutputConnection(Integer.valueOf(conid));
+//					(OutputConnectionHandler)icons.get(Integer.valueOf(conid));
 				if(och!=null)
 				{
 					och.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
@@ -465,20 +466,22 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.DATA_OUTPUT_INITIATOR)
 			{
 //				System.out.println("received data");
-				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
 				}
 				else
 				{
-					System.out.println("InputStream not found (dai): "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+					System.out.println("InputStream not found (dai): "+conid+" "+getParticipantConnections()+" "+getComponent().getComponentIdentifier());
 				}
 			}
 			else if(type==AbstractConnectionHandler.CLOSE_OUTPUT_INITIATOR)
 			{
 //				System.out.println("CCC: close");
-				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
@@ -491,7 +494,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.ACKCLOSE_OUTPUT_PARTICIPANT)
 			{
 //				System.out.println("CCC: ackclose");
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				OutputConnectionHandler och = getOutputConnection(Integer.valueOf(conid));
+//				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
 				if(och!=null)
 				{
 					och.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
@@ -504,7 +508,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.CLOSEREQ_OUTPUT_PARTICIPANT)
 			{
 //				System.out.println("CCC: closereq");
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+//				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				OutputConnectionHandler och = getOutputConnection(Integer.valueOf(conid));
 				if(och!=null)
 				{
 					och.closeRequestReceived();
@@ -517,7 +522,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.ACKCLOSEREQ_OUTPUT_INITIATOR)
 			{
 //				System.out.println("CCC: ackclosereq");
-				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
@@ -531,7 +537,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.ACKDATA_OUTPUT_PARTICIPANT)
 			{
 				// Handle input connection initiator side
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+//				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(Integer.valueOf(conid));
+				OutputConnectionHandler och = getOutputConnection(Integer.valueOf(conid));
 				if(och!=null)
 				{
 					AckInfo ackinfo = (AckInfo)packet.getData();
@@ -550,7 +557,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.ACKINIT_INPUT_PARTICIPANT)
 			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.ackReceived(AbstractConnectionHandler.INIT, packet.getData());
@@ -562,7 +570,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.DATA_INPUT_PARTICIPANT)
 			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.addData(packet.getSequenceNumber(), (byte[])packet.getData());
@@ -574,7 +583,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.ACKDATA_INPUT_INITIATOR)
 			{
-				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				OutputConnectionHandler och = getOutputConnection(Integer.valueOf(conid));
 				if(och!=null)
 				{
 					AckInfo ackinfo = (AckInfo)packet.getData();
@@ -587,7 +597,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.CLOSEREQ_INPUT_INITIATOR)
 			{
-				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				OutputConnectionHandler och = getOutputConnection(Integer.valueOf(conid));
 				if(och!=null)
 				{
 					och.closeRequestReceived();
@@ -599,7 +610,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.ACKCLOSEREQ_INPUT_PARTICIPANT)
 			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.ackReceived(AbstractConnectionHandler.CLOSEREQ, packet.getData());
@@ -611,7 +623,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.CLOSE_INPUT_PARTICIPANT)
 			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+//				InputConnectionHandler ich = (InputConnectionHandler)icons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.closeReceived(SUtil.bytesToInt((byte[])packet.getData()));
@@ -623,7 +636,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else if(type==AbstractConnectionHandler.ACKCLOSE_INPUT_INITIATOR)
 			{
-				OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+				InputConnectionHandler ich = getInputConnection(Integer.valueOf(conid));
 				if(ich!=null)
 				{
 					ich.ackReceived(AbstractConnectionHandler.CLOSE, packet.getData());
@@ -638,7 +652,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.ALIVE_INITIATOR)
 			{
 //				System.out.println("alive initiator");
-				AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(Integer.valueOf(conid));
+//				AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(Integer.valueOf(conid));
+				OutputConnectionHandler con = getOutputConnection(Integer.valueOf(conid));
 				if(con!=null)
 				{
 					con.setAliveTime(System.currentTimeMillis());
@@ -651,7 +666,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			else if(type==AbstractConnectionHandler.ALIVE_PARTICIPANT)
 			{
 //				System.out.println("alive particpant");
-				AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(Integer.valueOf(conid));
+//				AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(Integer.valueOf(conid));
+				InputConnectionHandler con = getInputConnection(Integer.valueOf(conid));
 				if(con!=null)
 				{
 					con.setAliveTime(System.currentTimeMillis());
@@ -1048,7 +1064,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		OutputConnectionHandler och = new OutputConnectionHandler(getComponent(), nonfunc);
-		icons.put(conid, och);
+		addOutputConnection(conid, och);
+//		icons.put(conid, och);
 		OutputConnection con = new OutputConnection(sender, receiver, conid, true, och);
 //			System.out.println("created ocon: "+component+", "+System.currentTimeMillis()+", "+och.getConnectionId());
 		return con;
@@ -1070,7 +1087,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		InputConnectionHandler ich = new InputConnectionHandler(getComponent(), nonfunc);
-		icons.put(conid, ich);
+		addInputConnection(conid, ich);
+//		icons.put(conid, ich);
 		InputConnection con = new InputConnection(sender, receiver, conid, true, ich);
 //			System.out.println("created icon: "+component+", "+System.currentTimeMillis()+", "+ich.getConnectionId());
 		return con;
@@ -1096,12 +1114,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		InputConnection con	= null;
 		synchronized(this)
 		{
-			ich	= (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+//			ich	= (InputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			ich = getInputConnection(Integer.valueOf(conid));
 			if(ich==null)
 			{
 				ich = new InputConnectionHandler(getComponent(), nonfunc);
 				con = new InputConnection(initiator, participant, conid, false, ich);
-				pcons.put(Integer.valueOf(conid), ich);
+				addInputConnection(Integer.valueOf(conid), ich);
+//				pcons.put(Integer.valueOf(conid), ich);
 //				System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
 				created	= true;
 			}
@@ -1184,12 +1204,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		OutputConnection con	= null;
 		synchronized(this)
 		{
-			och	= (OutputConnectionHandler) pcons.get(Integer.valueOf(conid));
+//			och	= (OutputConnectionHandler)pcons.get(Integer.valueOf(conid));
+			och = getOutputConnection(Integer.valueOf(conid));
+			
 			if(och==null)
 			{
 				och = new OutputConnectionHandler(getComponent(), nonfunc);
 				con = new OutputConnection(initiator, participant, conid, false, och);
-				pcons.put(Integer.valueOf(conid), och);
+				addOutputConnection(Integer.valueOf(conid), och);
+//				pcons.put(Integer.valueOf(conid), och);
 //				System.out.println("created: "+con.hashCode());
 				created	= true;
 			}
@@ -1261,6 +1284,89 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
+	 *  Get a input connection.
+	 *  @param id The id.
+	 *  @return The input connection.
+	 */
+	protected InputConnectionHandler getInputConnection(int id)
+	{
+		return (InputConnectionHandler)(pcons!=null? pcons.get(id): null);
+	}
+	
+	/**
+	 *  Get a output connection.
+	 *  @param id The id.
+	 *  @return The output connection.
+	 */
+	protected OutputConnectionHandler getOutputConnection(int id)
+	{
+		return (OutputConnectionHandler)(icons!=null? icons.get(id): null);
+	}
+	
+	/**
+	 *  Add an output connection.
+	 *  @param id The id.
+	 *  @param och The handler. 
+	 */
+	protected void addOutputConnection(int id, OutputConnectionHandler och)
+	{
+		if(icons==null)
+			icons = new HashMap<Integer, AbstractConnectionHandler>();
+		icons.put(id, och);
+	}
+	
+	/**
+	 *  Add an input connection.
+	 *  @param id The id.
+	 *  @param ich The handler. 
+	 */
+	protected void addInputConnection(int id, InputConnectionHandler ich)
+	{
+		if(pcons==null)
+			pcons = new HashMap<Integer, AbstractConnectionHandler>();
+		pcons.put(id, ich);
+	}
+	
+	/**
+	 *  Remove an output connection.
+	 *  @param id The id.
+	 */
+	protected void removeOutputConnection(int id)
+	{
+		if(icons!=null)
+			icons.remove(id);
+	}
+	
+	/**
+	 *  Remove an input connection.
+	 *  @param id The id.
+	 *  @param ich The handler. 
+	 */
+	protected void removeInputConnection(int id)
+	{
+		if(pcons!=null)
+			pcons.remove(id);
+	}
+	
+	protected static final AbstractConnectionHandler[] EMPTY_HANDLER_ARRAY = new AbstractConnectionHandler[0];
+	
+	/**
+	 *  Get all participant connections.
+	 */
+	protected AbstractConnectionHandler[] getParticipantConnections()
+	{
+		 return pcons==null? EMPTY_HANDLER_ARRAY: (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+	}
+	
+	/**
+	 *  Get all initiator connections.
+	 */
+	protected AbstractConnectionHandler[] getInitiatorConnections()
+	{
+		 return icons==null? EMPTY_HANDLER_ARRAY: (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+	}
+	
+	/**
 	 * 
 	 */
 	public void startStreamSendAliveBehavior()
@@ -1274,7 +1380,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 	//				System.out.println("sendAlive: "+pcons+" "+icons);
-					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+//					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					AbstractConnectionHandler[] mypcons = getParticipantConnections();
 					for(int i=0; i<mypcons.length; i++)
 					{
 						if(!mypcons[i].isClosed())
@@ -1282,7 +1389,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							mypcons[i].sendAlive();
 						}
 					}
-					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+//					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					AbstractConnectionHandler[] myicons = getInitiatorConnections();
 					for(int i=0; i<myicons.length; i++)
 					{
 						if(!myicons[i].isClosed())
@@ -1316,24 +1424,28 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	//				final IComponentStep<Void> step = this;
 	//				final Future<Void> ret = new Future<Void>();
 					
-					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+//					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					AbstractConnectionHandler[] mypcons = getParticipantConnections();
 					for(int i=0; i<mypcons.length; i++)
 					{
 						if(!mypcons[i].isConnectionAlive())
 						{
 	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
 							mypcons[i].close();
-							pcons.remove(Integer.valueOf(mypcons[i].getConnectionId()));
+							removeInputConnection(Integer.valueOf(mypcons[i].getConnectionId()));
+//							pcons.remove(Integer.valueOf(mypcons[i].getConnectionId()));
 						}
 					}
-					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+//					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					AbstractConnectionHandler[] myicons = getInitiatorConnections();
 					for(int i=0; i<myicons.length; i++)
 					{
 						if(!myicons[i].isConnectionAlive())
 						{
 	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
 							myicons[i].close();
-							icons.remove(Integer.valueOf(myicons[i].getConnectionId()));
+//							icons.remove(Integer.valueOf(myicons[i].getConnectionId()));
+							removeOutputConnection(Integer.valueOf(mypcons[i].getConnectionId()));
 						}
 					}
 					
@@ -1513,7 +1625,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected static void	preprocessMessage(IMsgHeader header, Object msg)
 	{
-		IMessagePreprocessor<Object>	proc= getPreprocessor(msg);			
+		IMessagePreprocessor<Object> proc= getPreprocessor(msg);			
 		if(proc!=null)
 		{
 			proc.preprocessMessage(header, msg);
