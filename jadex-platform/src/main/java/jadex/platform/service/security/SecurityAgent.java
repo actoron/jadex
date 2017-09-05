@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -122,13 +123,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Task for cleanup duties. */
 	protected volatile IFuture<Void> cleanuptask;
 	
+	/** The list of network names (used by all service identifiers). */
+	protected Set<String> networknames;
+	
 	/**
 	 *  Initialization.
 	 */
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		if (!agent.getComponentIdentifier().getLocalName().equals("security"))
+		if(!agent.getComponentIdentifier().getLocalName().equals("security"))
 			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
 		
 		Map<String, String> activeprops = new HashMap<String, String>();
@@ -255,8 +259,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		networks = new HashMap<String, AbstractAuthenticationSecret>();
-		for (Map.Entry<String, String> entry : networkprops.entrySet())
+		networknames = (Set<String>)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		for(Map.Entry<String, String> entry : networkprops.entrySet())
+		{
 			networks.put(entry.getKey(), AbstractAuthenticationSecret.fromString(entry.getValue()));
+			networknames.add(entry.getKey());
+		}
 		
 		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
 		for (Map.Entry<String, String> entry : remotepfprops.entrySet())
@@ -586,14 +594,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if (secret == null)
+				if(secret == null)
 				{
 					networks.remove(networkname);
+					networknames.remove(networkname);
 				}
 				else
 				{
 					AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
 					networks.put(networkname, asecret);
+					networknames.add(networkname);
 				}
 				
 				saveSettings();
@@ -620,7 +630,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				Map<String, String> ret = new HashMap<String, String>();
 				
-				for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+				for(Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
 				{
 					ret.put(entry.getKey(), entry.getValue().toString());
 				}
@@ -628,6 +638,38 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return new Future<Map<String,String>>(ret);
 			}
 		});
+	}
+	
+//	/**
+//	 *  Gets the current network names. 
+//	 *  @return The current networks names.
+//	 */
+//	public IFuture<String[]> getNetworkNames()
+//	{
+//		return agent.getExternalAccess().scheduleStep(new IComponentStep<String[]>()
+//		{
+//			public IFuture<String[]> execute(IInternalAccess ia)
+//			{
+//				String[] ret = new String[networks.size()];
+//				
+//				int i=0;
+//				for(Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+//				{
+//					ret[i++] = entry.getKey(); 
+//				}
+//				
+//				return new Future<String[]>(ret);
+//			}
+//		});
+//	}
+	
+	/**
+	 *  Gets the current network names. 
+	 *  @return The current networks names.
+	 */
+	public IFuture<Set<String>> getNetworkNames()
+	{
+		return new Future<Set<String>>(networknames);
 	}
 	
 	/**
@@ -1044,7 +1086,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (platformsecret != null)
 			settings.addProperty(new Property(ISecurityService.PROPERTY_PLATFORMSECRET, platformsecret.toString()));
 		
-		if (networks != null && networks.size() > 0)
+		if(networks != null && networks.size() > 0)
 		{
 			for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
 				settings.addProperty(new Property(entry.getKey(), "networks", entry.getValue().toString()));

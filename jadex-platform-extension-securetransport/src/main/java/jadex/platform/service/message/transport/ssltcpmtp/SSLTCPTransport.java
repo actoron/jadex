@@ -127,6 +127,7 @@ public class SSLTCPTransport extends TCPTransport
 				// possibly create a new keystore on disk
 //				System.out.println("Using keystore: "+storepath+" "+storepass+" "+keypass);
 //				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, "jadex");
+				
 				KeyStore ks = SSecurity.getKeystore(storepath, storepass, keypass, component.getComponentIdentifier().getPlatformPrefix());
 				
 				kmf.init(ks, keypass.toCharArray());

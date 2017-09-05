@@ -48,7 +48,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
  *  
  *  Has two behaviors:
  *  a) allows others to subscribe and sends updates according to local service registry
- *  b) uses awareness to detect new platform and searches the IRegistrySynchronizationService for them. Subscribes at those.
+ *  b) uses awareness to detect new platform and searches the ISuperpeerRegistrySynchronizationService for them. Subscribes at those.
  */
 public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegistrySynchronizationService
 {

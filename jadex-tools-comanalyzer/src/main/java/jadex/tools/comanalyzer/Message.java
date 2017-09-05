@@ -12,7 +12,11 @@ import jadex.bridge.component.impl.MessageEvent;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 
 /**
@@ -104,7 +108,6 @@ public class Message extends ParameterElement
 
 	/** The original message. */
 	protected MessageEvent message;
-//	protected Map msgmap;
 
 	/**
 	 * For loading from file.
@@ -127,15 +130,23 @@ public class Message extends ParameterElement
 
 		this.uniqueId = sequence;
 
-//		MessageType mt = msg.getMessageType();
-		//		String[] pnames = mt.getParameterNames();
-		//		for(int i = 0; i < pnames.length; i++)
-		//			this.parameters.put(pnames[i], msg.getValue(pnames[i]));
-		//		String[] psnames = mt.getParameterSetNames();
-		//		for(int i = 0; i < psnames.length; i++)
-		//			this.parameters.put(psnames[i], msg.getValue(psnames[i]));
+		Object	body	= msg.getBody();
+		if(body!=null)
+		{
+			IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+			Map<String, BeanProperty>	props	= bi.getBeanProperties(body.getClass(), true, false);
+			for(Map.Entry<String, BeanProperty> entry: props.entrySet())
+			{
+				Object	val	= entry.getValue().getPropertyValue(body);
+				if(val!=null)
+				{
+					// Use snake_case for FIPA backwards compatibility (hack?) 
+					parameters.put(SUtil.camelToSnakeCase(entry.getKey()), val);
+				}
+			}
+		}
+
 		this.message = msg;
-		//		this.msgmap = msg.getParameterMap();
 
 		this.parameters.put(SEQ_NO, Integer.valueOf(sequence));
 		//		this.parameters.put(EVENT_DIRECTION, direction);
@@ -151,18 +162,6 @@ public class Message extends ParameterElement
 		
 //		public static final String DATE = SFipa.X_TIMESTAMP;
 //		public static final String DURATION = "duration";
-
-//		public static final String CONTENT = SFipa.CONTENT;
-//		public static final String ONTOLOGY = SFipa.ONTOLOGY;
-//		public static final String ENCODING = SFipa.ENCODING;
-//		public static final String IN_REPLY_TO = SFipa.IN_REPLY_TO;
-//		public static final String LANGUAGE = SFipa.LANGUAGE;
-//		public static final String PROTOCOL = SFipa.PROTOCOL;
-//		public static final String REPLY_BY = SFipa.REPLY_BY;
-//		public static final String REPLY_WITH = SFipa.REPLY_WITH;
-//		public static final String REPLY_TO = SFipa.REPLY_TO;
-//		public static final String CONVERSATION_ID = SFipa.CONVERSATION_ID;
-
 	}
 
 	/**

@@ -50,8 +50,8 @@ public class DaemonResponderAgent
 		agent.getLogger().info("Sending message "+content+" to "+cid);//+", "+SUtil.arrayToString(cid.getAddresses()));
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
-		msg.put(SFipa.RECEIVERS, cid);
+//		msg.put(SFipa.RECEIVERS, cid);
 		msg.put(SFipa.CONTENT, content);
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
+		return agent.getComponentFeature(IMessageFeature.class).sendMessage(cid, msg);
 	}
 }

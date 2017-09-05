@@ -1,27 +1,5 @@
 package jadex.platform.service.security;
 
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.bridge.service.types.security.MechanismInfo;
-import jadex.bridge.service.types.security.ParameterInfo;
-import jadex.commons.ChangeEvent;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-
 /**
  *  The decentralized acquisition mechanism is based on a peer to peer scheme. It
  *  asks all available platforms for the certificate of a specific caller.

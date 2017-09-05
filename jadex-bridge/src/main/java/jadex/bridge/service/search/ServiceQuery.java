@@ -2,7 +2,9 @@ package jadex.bridge.service.search;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.ClassInfo;
@@ -17,6 +19,7 @@ import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -55,14 +58,14 @@ public class ServiceQuery<T>
 	/** The query id. */
 	protected String id;
 	
-	/** 
-	 *  Filter for checking further service attributes.
-	 *  Either IAsyncFilter<T> or IFilter<T>.
-	 */
+	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
 	protected Object filter;
 	
 	/** The multiple flag. */
 	protected boolean multiple;
+	
+	/** The matching mode for multivalued termns. */
+	protected Map<String, Boolean> matchingmodes;
 	
 	/**
 	 *  Create a new service query.
@@ -481,28 +484,50 @@ public class ServiceQuery<T>
 	 *  
 	 *  @return The specification for the indexer.
 	 */
-	public List<Tuple2<String, String[]>> getIndexerSearchSpec()
+	public List<Tuple3<String, String[], Boolean>> getIndexerSearchSpec()
 	{
-		List<Tuple2<String, String[]>> ret = new ArrayList<Tuple2<String,String[]>>();
+		List<Tuple3<String, String[], Boolean>> ret = new ArrayList<Tuple3<String,String[],Boolean>>();
 		
 		if(platform != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
 		if(provider != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{provider.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
 		
 		if(servicetype != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{servicetype.getGenericTypeName()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_INTERFACE)));
 		
 		if(servicetags != null && servicetags.length > 0)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_TAGS, servicetags, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_TAGS)));
 		
 		if(serviceidentifier != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_SID, new String[] { serviceidentifier.toString() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
 		
 		return ret;
 	}
 		
+	/**
+	 *  Get the matching mode for a key.
+	 *  @param key The key name.
+	 *  @return True for and, false for or.
+	 */
+	public Boolean getMatchingMode(String key)
+	{
+		return matchingmodes!=null? matchingmodes.get(key): null;
+	}
+	
+	/**
+	 *  Set a matching mode.
+	 *  @param key The key name.
+	 *  @param and True for and.
+	 */
+	public void setMatchingMode(String key, Boolean and)
+	{
+		if(matchingmodes==null)
+			matchingmodes = new HashMap<String, Boolean>();
+		matchingmodes.put(key, and);
+	}
+	
 	/**
 	 *  Tests if the query matches a service.
 	 *  

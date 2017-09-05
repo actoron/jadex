@@ -794,6 +794,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		IComponentIdentifier receiver = (IComponentIdentifier)rec;
 		
+		notifyMessageSent(header, message);
+		
 		if(receiver.getRoot().equals(platformid))
 		{
 			// Direct local delivery.
