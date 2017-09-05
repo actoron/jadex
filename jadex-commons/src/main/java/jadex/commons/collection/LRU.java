@@ -1,5 +1,6 @@
 package jadex.commons.collection;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,6 +44,18 @@ public class LRU<K, V> extends LinkedHashMap<K, V>
 	 */
 	public LRU(int max, ILRUEntryCleaner cleaner)
 	{
+		this(max, cleaner, false);
+	}
+	
+	/**
+	 *  Create a new LRU.
+	 *  @param max The maximum number of entries.
+	 *  @param cleaner Optional cleaner.
+	 *  @param accessorder If true, entry use is refreshed on read as well as write.
+	 */
+	public LRU(int max, ILRUEntryCleaner cleaner, boolean accessorder)
+	{
+		super(16, 0.75f, accessorder);
 		this.max = max;
 		this.cleaner = cleaner;
 	}
