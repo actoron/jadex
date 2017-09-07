@@ -26,3 +26,6 @@ dependencies
     testCompile libraries.robolectric
     testCompile libraries.robotium
 }
+android {
+    buildToolsVersion '25.0.0'
+}
