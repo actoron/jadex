@@ -11,7 +11,7 @@ import android.os.Parcelable;
  * @author Julian Kalinowski
  */
 public class BluetoothMessage implements Parcelable {
-	private String remoteAdress;
+	private String remoteAddress;
 	private byte[] data;
 	private byte type;
 
@@ -55,7 +55,7 @@ public class BluetoothMessage implements Parcelable {
 	 */
 	public BluetoothMessage(IBluetoothDevice remoteDevice, byte[] data,
 			byte type) {
-		this.remoteAdress = remoteDevice.getAddress();
+		this.remoteAddress = remoteDevice.getAddress();
 		this.data = data;
 		this.type = type;
 	}
@@ -68,7 +68,7 @@ public class BluetoothMessage implements Parcelable {
 	 *            {@link DataPacket}
 	 */
 	public BluetoothMessage(String remoteDeviceAdress, byte[] data, byte type) {
-		this.remoteAdress = remoteDeviceAdress;
+		this.remoteAddress = remoteDeviceAdress;
 		this.data = data;
 		this.type = type;
 	}
@@ -93,8 +93,8 @@ public class BluetoothMessage implements Parcelable {
 	 * Returns the remote address
 	 * @return String
 	 */
-	public String getRemoteAdress() {
-		return remoteAdress;
+	public String getRemoteAddress() {
+		return remoteAddress;
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class BluetoothMessage implements Parcelable {
 	 * @param adr String
 	 */
 	public void setRemoteAddress(String adr) {
-		this.remoteAdress = adr;
+		this.remoteAddress = adr;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class BluetoothMessage implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		// dest.writeParcelable(remoteDevice, 0);
-		dest.writeString(remoteAdress);
+		dest.writeString(remoteAddress);
 		dest.writeInt(data.length);
 		dest.writeByteArray(data);
 		dest.writeByte(getType());
@@ -132,7 +132,7 @@ public class BluetoothMessage implements Parcelable {
 		StringBuilder sb = new StringBuilder();
 		sb.append("BluetoothMessage\n");
 		sb.append("Receiver: ");
-		sb.append(remoteAdress);
+		sb.append(remoteAddress);
 		sb.append(", Type: ");
 		sb.append(type);
 		sb.append("\nData (first 20 bytes):\n");

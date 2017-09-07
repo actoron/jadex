@@ -29,12 +29,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Android Service for Applications that want to use the Bluetooth Connection
@@ -127,7 +124,7 @@ public class ConnectionService extends Service implements
 								}
 							} else if (msgCallback != null) {
 								// showToast(msg.getDataAsString());
-								msgCallback.messageReceived(msg.getData());
+								msgCallback.messageReceived(msg.getRemoteAddress(), msg.getData());
 							}
 						} catch (RemoteException e) {
 							e.printStackTrace();
@@ -212,14 +209,12 @@ public class ConnectionService extends Service implements
 		@Override
 		public void registerAwarenessInfoCallback(
 				IBTP2PAwarenessInfoCallback callback) throws RemoteException {
-			// TODO: allow multiple awareness callbacks
 			ConnectionService.this.awarenessCallback = callback;
 		}
 
 		@Override
 		public void registerMessageCallback(IBTP2PMessageCallback callback)
 				throws RemoteException {
-			// TODO: allow multiple message callbacks
 			ConnectionService.this.msgCallback = callback;
 		}
 
