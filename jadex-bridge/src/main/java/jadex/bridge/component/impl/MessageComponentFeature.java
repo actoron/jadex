@@ -1290,7 +1290,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected InputConnectionHandler getInputConnection(int id)
 	{
-		return (InputConnectionHandler)(pcons!=null? pcons.get(id): null);
+		return (InputConnectionHandler)(pcons!=null? pcons.get(id): null); 
 	}
 	
 	/**
