@@ -94,11 +94,11 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setLocalTransport(true);
         rootConfig.setTcpTransport(true);
         rootConfig.setTcpPort(0);
-        rootConfig.setRelayTransport(true);
+//        rootConfig.setRelayTransport(true);
 //		rootConfig.setRelayAddress("jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS");
 //			rootConfig.setRelaySecurity(true);
-        rootConfig.setSslTcpTransport(false);
-        rootConfig.setSslTcpPort(0);
+//        rootConfig.setSslTcpTransport(false);
+//        rootConfig.setSslTcpPort(0);
 
         rootConfig.setWsPublish(false);
         rootConfig.setRsPublish(false);
@@ -111,7 +111,7 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setMonitoringComp(true);
         rootConfig.setDf(true);
         rootConfig.setClock(true);
-        rootConfig.setMessage(true);
+//        rootConfig.setMessage(true);
         rootConfig.setSimul(true);
         rootConfig.setFiletransfer(true);
         rootConfig.setMarshal(true);
@@ -171,8 +171,8 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
 
         rootConfig.setLocalTransport(true); // needed by message
         rootConfig.setTcpTransport(false);
-        rootConfig.setRelayTransport(false);
-        rootConfig.setSslTcpTransport(false);
+//        rootConfig.setRelayTransport(false);
+//        rootConfig.setSslTcpTransport(false);
 
         rootConfig.setKernels(RootComponentConfiguration.KERNEL.micro);
 //		rootConfig.setThreadpoolClass(null);
@@ -181,7 +181,7 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setMonitoringComp(false);
         rootConfig.setDf(false);
         rootConfig.setClock(true);
-        rootConfig.setMessage(true); // needed by rms
+//        rootConfig.setMessage(true); // needed by rms
         rootConfig.setSimul(false);
         rootConfig.setFiletransfer(false);
         rootConfig.setMarshal(true);
@@ -208,7 +208,7 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         rootConfig.setAwareness(true);
         rootConfig.setAwaMechanisms(RootComponentConfiguration.AWAMECHANISM.relay);
         rootConfig.setAwaFast(true);	// Make sure awareness finds other platforms quickly
-        rootConfig.setRelayTransport(true);
+//        rootConfig.setRelayTransport(true);
 
         rootConfig.setSecurity(true);	// enable security when remote comm.
 
