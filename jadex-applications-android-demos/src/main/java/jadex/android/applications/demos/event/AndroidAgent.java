@@ -1,24 +1,19 @@
 package jadex.android.applications.demos.event;
 
-import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.context.IContextService;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.AbstractMessageHandler;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentMessageArrived;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -46,7 +41,7 @@ public class AndroidAgent
 	@AgentFeature
 	protected IMessageFeature messageFeature;
 
-	@AgentService
+	@AgentServiceSearch
 	protected IContextService androidcontext;
 
 	//-------- methods --------
@@ -64,7 +59,7 @@ public class AndroidAgent
 
 
 	@AgentMessageArrived
-	public void handleMessage(Map<String, Object> msg, MessageType type) {
+	public void handleMessage(Map<String, Object> msg) {
 		if (msg.get(SFipa.CONTENT).equals("ping")) {
 			showAndroidMessage(agent.getComponentIdentifier().getLocalName()  + ": pong");
 		}

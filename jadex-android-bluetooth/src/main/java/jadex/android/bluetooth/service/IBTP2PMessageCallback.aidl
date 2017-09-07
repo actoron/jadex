@@ -12,5 +12,5 @@ oneway interface IBTP2PMessageCallback {
 	
 //	void knownDevicesChanged(in IBluetoothDevice[] knownDevices);
 	
-	void messageReceived(in byte[] data);
+	void messageReceived(in String remoteAddress, in byte[] data);
 }

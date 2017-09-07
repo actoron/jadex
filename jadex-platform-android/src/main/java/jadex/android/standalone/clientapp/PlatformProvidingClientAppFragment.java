@@ -9,15 +9,14 @@ import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.service.JadexPlatformManager;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import android.app.Service;
 import android.content.ComponentName;
@@ -200,43 +199,22 @@ public class PlatformProvidingClientAppFragment extends ClientAppMainFragment im
 	}
 	
 	/**
-	 * Sends a FIPA Message to the specified receiver. The Sender is
-	 * automatically set to the Platform.
-	 * 
-	 * @param message
-	 * @param receiver
-	 * @return Future<Void>
-	 */
-	protected Future<Void> sendMessage(final Map<String, Object> message, IComponentIdentifier receiver)
-	{
-		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
-		IComponentIdentifier cid = platformId;
-		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
-		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE, receiver);
-	}
-
-	/**
 	 * Sends a Message to a Component on the Jadex Platform.
 	 * 
 	 * @param message
-	 * @param type
 	 * @return Future<Void>
 	 */
-	protected Future<Void> sendMessage(final Map<String, Object> message, final MessageType type, final IComponentIdentifier receiver)
+	protected IFuture<Void> sendMessage(final Map<String, Object> message, final IComponentIdentifier receiver)
 	{
 		checkIfJadexIsRunning("sendMessage");
 
-		final Future<Void> ret = new Future<Void>();
 
-		platformService.getMS().addResultListener(new DefaultResultListener<IMessageService>()
-		{
-			public void resultAvailable(IMessageService ms)
-			{
-				ms.sendMessage(message, type, platformId, null, receiver, null).addResultListener(new DelegationResultListener<Void>(ret));
+		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia) {
+				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
-
-		return ret;
 	}
 	
 	private void checkIfJadexIsRunning(String caller)

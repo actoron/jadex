@@ -435,7 +435,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		BluetoothMessage bluetoothMessage = new BluetoothMessage(
 				packet.getSource(), packet.getData(), packet.getType());
 		List<MessageListener> list = listeners.get(bluetoothMessage
-				.getRemoteAdress());
+				.getRemoteAddress());
 		if (list != null) {
 			synchronized (list) {
 				for (MessageListener btClientListener : list) {
