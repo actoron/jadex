@@ -299,6 +299,98 @@ public abstract class TestAgent
 	/**
 	 * 
 	 */
+	public static IFuture<IExternalAccess> createPlatform(final IInternalAccess agent, final String[] args)
+	{
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		
+		// Fetch own arguments
+		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
+			.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+		{
+			public void customResultAvailable(IExternalAccess root)
+			{
+				root.getArguments()
+					.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, IExternalAccess>(ret)
+				{
+					public void customResultAvailable(Map<String,Object> rootargs)
+					{
+						Map<String, String> argsmap = new HashMap<String, String>();
+						String[]	progargs	= (String[])rootargs.get(RootComponentConfiguration.PROGRAM_ARGUMENTS);
+						String[]	defargs	= new String[]
+						{
+//							"-libpath", url,
+							"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+							"-saveonexit", "false",
+							"-welcome", "false",
+							"-autoshutdown", "false",
+							"-awareness", "false",
+							"-gui", "false",
+							"-cli", "false",
+							"-simulation", "false",
+							"-printpass", "false"
+//							"-logging", "true",
+////							"-relaytransport", "false",
+//							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
+//							"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
+//							"-gui", "false", "-usepass", "false", "-simulation", "false"
+//							"-binarymessages", "false",
+						};
+						
+						// Build argsmap as program args (e.g. relay address) overridden by defargs, overridden by supplied args.
+						for(int i=0; progargs!=null && i<progargs.length; i++)
+						{
+							argsmap.put(progargs[i], progargs[++i]);
+						}
+						for(int i=0; i<defargs.length; i++)
+						{
+							argsmap.put(defargs[i], defargs[++i]);
+						}
+						for(int i=0; args!=null && i<args.length; i++)
+						{
+							argsmap.put(args[i], args[++i]);
+						}
+						
+						defargs = new String[argsmap.size()*2];
+						int i=0;
+						for(String key: argsmap.keySet())
+						{
+							defargs[i*2]= key; 
+							defargs[i*2+1] = argsmap.get(key);
+							i++;
+						}
+
+//						System.out.println("platform args: "+SUtil.arrayToString(defargs));
+						
+						// Start platform
+						Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+							new DelegationResultListener<IExternalAccess>(ret)
+						{
+							public void customResultAvailable(IExternalAccess result)
+							{
+								try
+								{
+									Thread.sleep(5000);
+								}
+								catch(InterruptedException e)
+								{
+								}
+								
+//								platforms.add(result);
+								super.customResultAvailable(result);
+							}
+						}));
+					}
+				});
+			}
+		});
+				
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename,
 		final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
 	{
@@ -320,6 +412,45 @@ public abstract class TestAgent
 			{
 //				IResourceIdentifier	rid	= new ResourceIdentifier(
 //					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
+				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, agent.getModel().getResourceIdentifier());
+				ci.setArguments(args);
+				ci.setConfiguration(config);
+				cms.createComponent(null, filename, ci, reslis)
+					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						super.customResultAvailable(result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						super.exceptionOccurred(exception);
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static IFuture<IComponentIdentifier> createComponent(final IInternalAccess agent, final String filename, final Map<String, Object> args, 
+		final String config, final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IComponentManagementService cms)
+			{
+//					IResourceIdentifier	rid	= new ResourceIdentifier(
+//						new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, agent.getModel().getResourceIdentifier());
 				ci.setArguments(args);

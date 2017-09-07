@@ -25,6 +25,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.testcases.TestAgent;
 
 /**
  *  Simple test agent with one service.
@@ -42,11 +43,14 @@ public class StarterAgent
 	@AgentCreated
 	public IFuture<Void> test()
 	{
-		PlatformConfiguration config = PlatformConfiguration.getDefault();
-		config.addComponent(FirstAgent.class.getName()+".class");
-		config.addComponent(SecondAgent.class.getName()+".class");
-		final IExternalAccess plat = jadex.base.Starter.createPlatform(config).get();
-
+//		PlatformConfiguration config = PlatformConfiguration.getDefault();
+//		config.addComponent(FirstAgent.class.getName()+".class");
+//		config.addComponent(SecondAgent.class.getName()+".class");
+//		final IExternalAccess plat = jadex.base.Starter.createPlatform(config).get();
+		final IExternalAccess plat = TestAgent.createPlatform(agent, null).get();// new String[]{"-component", FirstAgent.class.getName()+".class", "-component", SecondAgent.class.getName()+".class"}).get();
+		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null);
+		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null);
+		
 		IComponentManagementService cms = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);
