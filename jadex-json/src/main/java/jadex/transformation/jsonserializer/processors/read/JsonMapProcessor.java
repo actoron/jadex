@@ -114,7 +114,7 @@ public class JsonMapProcessor implements ITraverseProcessor
 	 */
 	public Class<?> getValueClass(Object val, Object context)
 	{
-		Class<?> valclazz = val!=null? val.getClass(): null;
+		Class<?> valclazz = val!=null && !(val instanceof JsonObject)? val.getClass(): null;
 		return valclazz;
 	}
 	
