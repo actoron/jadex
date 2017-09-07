@@ -46,8 +46,9 @@ def withJUnit(cl){
     try {
         cl()
     } catch (Exception e) {
-        junit '**/test-results/*.xml'
         throw e
+    } finally {
+        junit '**/test-results/test/*.xml,**/test-results/*.xml'
     }
 }
 
