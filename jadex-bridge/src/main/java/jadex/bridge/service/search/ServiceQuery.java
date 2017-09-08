@@ -18,7 +18,6 @@ import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,44 +27,54 @@ import jadex.commons.future.IFuture;
  */
 public class ServiceQuery<T>
 {
-	/** The return type. */
-	protected ClassInfo returntype;
-	
 	/** The service type. */
 	protected ClassInfo servicetype;
 	
 	/** Tags of the service. */
 	protected String[] servicetags;
 	
+	/** The service provider. (rename serviceowner?) */
+	protected IComponentIdentifier provider;
+	
+	/** The service platform. (Find a service from another known platform, e.g. cms) */
+	protected IComponentIdentifier platform;
+	
+	/** The service ID of the target service. Fast lookup of a service by id. */
+	protected IServiceIdentifier serviceidentifier;
+	
+	/** The network names. */
+	protected String[] networknames;
+	
+	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
+	// todo: should be removed or replaced with a more declarative variant
+	protected Object filter;
+	
+	
 	/** The search scope. */
 	protected String scope;
 	
-	/** The service ID of the target service. */
-	protected IServiceIdentifier serviceidentifier;
-	
-	/** The query owner. */
+	/** The query owner. (rename queryowner?) */
 	protected IComponentIdentifier owner;
 	
-	/** The service provider. */
-	protected IComponentIdentifier provider;
+	//-------- influence the result --------
 	
-	/** The service platform. */
-	protected IComponentIdentifier platform;
-	
-	/** Flag, if service by the owner should be excluded. */
+	/** Flag, if service by the query owner should be excluded, i.e. do not return my own service. */
 	protected boolean excludeowner;
 	
-	/** The query id. */
-	protected String id;
-	
-	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
-	protected Object filter;
-	
-	/** The multiple flag. */
+	/** The multiple flag. Search for multiple services */
 	protected boolean multiple;
 	
-	/** The matching mode for multivalued termns. */
+	/** The return type. Tell registry to return services or service events. */
+	protected ClassInfo returntype;
+	
+	/** The matching mode for multivalued terms. True is and and false is or. */
 	protected Map<String, Boolean> matchingmodes;
+	
+	//-------- identification of a query --------
+	
+	/** The query id. Id is used for hashcode and equals and the same is used by servicequeryinfo class.
+	    Allows for hashing queryies and use a queryinfo object for lookup. */
+	protected String id;
 	
 	/**
 	 *  Create a new service query.
@@ -503,6 +512,9 @@ public class ServiceQuery<T>
 		if(serviceidentifier != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
 		
+		if(networknames != null)
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
+		
 		return ret;
 	}
 		
@@ -527,6 +539,8 @@ public class ServiceQuery<T>
 			matchingmodes = new HashMap<String, Boolean>();
 		matchingmodes.put(key, and);
 	}
+	
+	
 	
 	/**
 	 *  Tests if the query matches a service.
