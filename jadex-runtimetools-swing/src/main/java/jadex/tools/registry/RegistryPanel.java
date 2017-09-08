@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -43,6 +44,7 @@ import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -163,6 +165,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 		};
 		jtreg.setAutoCreateRowSorter(true);
+		jtreg.setRowSelectionAllowed(true);
 		
 //		jtdis.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -189,7 +192,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		panel.add(psp, BorderLayout.NORTH);
 		panel.add(preginfos, BorderLayout.CENTER);
 		
-		final float[] perc = new float[]{6.0f, 23.5f, 23.5f, 23.5f, 23.5f};
+		final float[] perc = new float[]{10f, 15f, 15f, 15f, 15f, 15f, 15f};
 		
 		panel.addComponentListener(new ComponentAdapter()
 		{
@@ -362,7 +365,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 
 		public int getColumnCount()
 		{
-			return 5;
+			return 7;
 		}
 
 		public String getColumnName(int column)
@@ -379,6 +382,10 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 					return "Platform";
 				case 4:
 					return "Service Id";
+				case 5:
+					return "Tags";
+				case 6:
+					return "Networks";
 				default:
 					return "";
 			}
@@ -413,6 +420,16 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				value = ser.getServiceIdentifier();
 			}
+			else if(column == 5)
+			{
+				Map<String, Object> sprops = ser.getPropertyMap();
+				if(sprops != null)
+					value = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+			}
+			else if(column == 6)
+			{
+				value = ser.getServiceIdentifier().getNetworkNames();
+			}
 			return value;
 		}
 		
@@ -442,6 +459,14 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			else if(column == 4)
 			{
 				ret = IServiceIdentifier.class;
+			}
+			else if(column == 5)
+			{
+				ret = Set.class;
+			}
+			else if(column == 6)
+			{
+				ret = Set.class;
 			}
 			return ret;
 		}	
