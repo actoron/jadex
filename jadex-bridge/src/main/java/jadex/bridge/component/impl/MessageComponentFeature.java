@@ -98,6 +98,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/** The participant connections. */
 	protected Map<Integer, AbstractConnectionHandler> pcons = new HashMap<Integer, AbstractConnectionHandler>();
 	
+	/** The alive checker. */
+	protected IComponentStep<Void> checker;
+	
 	//-------- monitoring attributes --------
 	
 	/** The current subscriptions. */
@@ -1313,6 +1316,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if(icons==null)
 			icons = new HashMap<Integer, AbstractConnectionHandler>();
 		icons.put(id, och);
+		if(getStreamCount()==1)
+			startStreamCheckAliveBehavior();
 	}
 	
 	/**
@@ -1325,6 +1330,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if(pcons==null)
 			pcons = new HashMap<Integer, AbstractConnectionHandler>();
 		pcons.put(id, ich);
+		if(getStreamCount()==1)
+			startStreamCheckAliveBehavior();
 	}
 	
 	/**
@@ -1335,6 +1342,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		if(icons!=null)
 			icons.remove(id);
+		if(getStreamCount()==0)
+			stopStreamCheckAliveBehavior();
 	}
 	
 	/**
@@ -1346,7 +1355,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		if(pcons!=null)
 			pcons.remove(id);
+		if(getStreamCount()==0)
+			stopStreamCheckAliveBehavior();
 	}
+	
+	/**
+	 *  Get the stream count.
+	 *  @return The number of streams.
+	 */
+	protected int getStreamCount()
+	{
+		return (icons!=null? icons.size(): 0)+(pcons!=null? pcons.size(): 0);
+	}
+	
 	
 	protected static final AbstractConnectionHandler[] EMPTY_HANDLER_ARRAY = new AbstractConnectionHandler[0];
 	
@@ -1367,64 +1388,26 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 * 
-	 */
-	public void startStreamSendAliveBehavior()
-	{
-		final long lt = getMinLeaseTime(getComponent().getComponentIdentifier());
-		if(lt!=Timeout.NONE)
-		{
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-			{
-				@Classname("sendAlive")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-	//				System.out.println("sendAlive: "+pcons+" "+icons);
-//					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
-					AbstractConnectionHandler[] mypcons = getParticipantConnections();
-					for(int i=0; i<mypcons.length; i++)
-					{
-						if(!mypcons[i].isClosed())
-						{
-							mypcons[i].sendAlive();
-						}
-					}
-//					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
-					AbstractConnectionHandler[] myicons = getInitiatorConnections();
-					for(int i=0; i<myicons.length; i++)
-					{
-						if(!myicons[i].isClosed())
-						{
-							myicons[i].sendAlive();
-						}
-					}
-					
-					getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
-					
-					return IFuture.DONE;
-				}
-			});
-		}
-	}
-	
-	/**
-	 * 
+	 *  Start the checker.
 	 */
 	public void startStreamCheckAliveBehavior()
 	{
 		final long lt = getMinLeaseTime(getComponent().getComponentIdentifier());
 //		System.out.println("to is: "+lt);
-		if(lt!=Timeout.NONE)
+		if(lt==Timeout.NONE)
+			return;
+			
+		if(checker==null)
 		{
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			checker = new IComponentStep<Void>()
 			{
 				@Classname("checkAlive")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-	//				final IComponentStep<Void> step = this;
-	//				final Future<Void> ret = new Future<Void>();
+					// End when I am not the current checker
+					if(checker!=this)
+						return IFuture.DONE;
 					
-//					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
 					AbstractConnectionHandler[] mypcons = getParticipantConnections();
 					for(int i=0; i<mypcons.length; i++)
 					{
@@ -1436,7 +1419,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //							pcons.remove(Integer.valueOf(mypcons[i].getConnectionId()));
 						}
 					}
-//					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
 					AbstractConnectionHandler[] myicons = getInitiatorConnections();
 					for(int i=0; i<myicons.length; i++)
 					{
@@ -1449,12 +1431,43 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						}
 					}
 					
+	//				System.out.println("sendAlive: "+pcons+" "+icons);
+//					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					mypcons = getParticipantConnections();
+					for(int i=0; i<mypcons.length; i++)
+					{
+						if(!mypcons[i].isClosed())
+						{
+							mypcons[i].sendAlive();
+						}
+					}
+//					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					myicons = getInitiatorConnections();
+					for(int i=0; i<myicons.length; i++)
+					{
+						if(!myicons[i].isClosed())
+						{
+							myicons[i].sendAlive();
+						}
+					}
+					
 					getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
 					
 					return IFuture.DONE;
 				}
-			});
+			};
+			
+			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(checker);
 		}
+	}
+	
+
+	/**
+	 *  Stop the checker.
+	 */
+	public void stopStreamCheckAliveBehavior()
+	{
+		checker = null;
 	}
 	
 	/**
