@@ -14,18 +14,20 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.transport.ITransport;
+import jadex.platform.service.transport.ITransport;
+import jadex.platform.service.transport.ITransportHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
@@ -43,7 +45,7 @@ import android.util.Log;
  * 
  * It will start the Service if its not already running.
  */
-public class BTTransport implements ITransport, AndroidContextChangeListener {
+public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeListener {
 	// -------- constants --------
 
 	/** The schema names. */
@@ -67,7 +69,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	protected IInternalAccess container;
 
 	/** The addresses. */
-	protected String[] addresses;
+//	protected String[] addresses;
 
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -77,9 +79,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	public IBTP2PMessageCallback msgCallback = new IBTP2PMessageCallback.Stub() {
 
 		@Override
-		public void messageReceived(final byte[] data) throws RemoteException {
-			receiveMessage(data);
+		public void messageReceived(String remoteAddress, byte[] data) throws RemoteException {
+			receiveMessage(remoteAddress, data);
 		}
+
 	};
 
 	private BTServiceConnection sc;
@@ -89,6 +92,8 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	private Context context;
 
 	private boolean started;
+	private ITransportHandler<BTChannel> handler;
+	private Map<String, BTChannel> connections;
 
 	// -------- constructors --------
 
@@ -97,40 +102,40 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 */
 	public BTTransport(IInternalAccess container) {
 		this.container = container;
+		this.connections = new HashMap<>();
 		AndroidContextManager.getInstance().addContextChangeListener(this);
 	}
 
 	/**
 	 * Start the transport.
 	 */
-	public IFuture<Void> start() {
+	@Override
+	public void init(ITransportHandler<BTChannel> handler) {
+		this.handler = handler;
+
 		started = true;
-		final Future<Void> ret = new Future<Void>();
-		
+
 		try {
 			if (context != null && binder == null) {
 				Intent intent = new Intent(context, ConnectionService.class);
 				Log.d(Helper.LOG_TAG, "(BTTransport) Trying to bind BT Service...");
-				sc = new BTServiceConnection(ret);
+				sc = new BTServiceConnection();
+				sc.init();
 				context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
 			} else {
 				throw new ActivityIsNotJadexBluetoothActivityException();
 			}
 
 		} catch (Exception e) {
-			// e.printStackTrace();
-			ret.setException(new RuntimeException(
-					"(BTTransport) Transport initialization error: " + e.getMessage()));
-			// throw new
-			// RuntimeException("Transport initialization error: "+e.getMessage());
+			throw new RuntimeException(
+					"(BTTransport) Transport initialization error: " + e.getMessage());
 		}
-		return ret;
 	}
 
 	/**
 	 * Perform cleanup operations (if any).
 	 */
-	public IFuture shutdown() {
+	public void shutdown() {
 		started = false;
 		if (binder != null && context != null) {
 			try {
@@ -145,9 +150,76 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 				context.unbindService(sc);
 			}
 		}
-		return new Future(null);
 	}
-	
+
+	@Override
+	public String getProtocolName() {
+		return "bt";
+	}
+
+	@Override
+	public IFuture<Integer> openPort(int port) {
+		return new Future(0); // TODO start listening here?
+	}
+
+	@Override
+	public IFuture<BTChannel> createConnection(String address, IComponentIdentifier target) {
+		Future<BTChannel> res = new Future<>();
+
+		BTChannel btChannel = new BTChannel(address, target);
+
+		this.connections.put(address, btChannel);
+		System.out.println("Adding bt connection: " + address);
+		res.setResult(btChannel);
+		return res;
+	}
+
+	@Override
+	public void closeConnection(BTChannel btChannel) {
+		System.out.println("removing bt connection: " + btChannel.getAddress());
+		this.connections.remove(btChannel.getAddress());
+	}
+
+	@Override
+	public IFuture<Void> sendMessage(final BTChannel btChannel, final byte[] header, final byte[] body) {
+		IFuture<Void>	ret	= null;
+
+		IComponentIdentifier receiver = btChannel.getReceiver();
+
+		boolean delivered = false;
+		BluetoothMessage bluetoothMessage;
+		ByteArrayOutputStream stream = new ByteArrayOutputStream(header.length
+				+ body.length);
+
+		try {
+			stream.write(header);
+			stream.write(body);
+		} catch (IOException e1) {
+			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e1.toString());
+		}
+		byte[] msgData = stream.toByteArray();
+//				for (int i = 0; !delivered && i < addrs.length; i++) {
+
+		bluetoothMessage = new BluetoothMessage(btChannel.getAddress(), msgData, DataPacket.TYPE_DATA);
+
+		try {
+			binder.sendMessage(bluetoothMessage);
+			ret	= IFuture.DONE;
+		} catch (RemoteException e) {
+			ret	= new Future<Void>(new RuntimeException("Send failed: "+bluetoothMessage));
+			e.printStackTrace();
+		}
+
+//				}
+
+		if(ret==null)
+		{
+			ret	= new Future<Void>(new RuntimeException("No working connection."));
+		}
+
+		return ret;
+	}
+
 	@Override
 	public void onContextCreate(Context ctx) {
 		context = ctx;
@@ -168,78 +240,8 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 
 	// -------- methods --------
 
-	/**
-	 * Send a message.
-	 * 
-	 * 	@param address The address to send to.
-	 *  @param task A task representing the message to send.
-	 *  
-	 */
-	public void sendMessage(final String address, final ISendTask task) {
 
-		IResultCommand<IFuture<Void>, Void> send = new IResultCommand<IFuture<Void>, Void>() {
-
-			@Override
-			public IFuture<Void> execute(Void args) {
-				IFuture<Void>	ret	= null;
-				
-				IComponentIdentifier[] receivers = task.getReceivers();
-
-				// Fetch all addresses
-//				Set<String> addresses = new LinkedHashSet<String>();
-//				for (int i = 0; i < receivers.length; i++) {
-//					String[] raddrs = receivers[i].getAddresses();
-//					for (int j = 0; j < raddrs.length; j++) {
-//						if (isApplicable(raddrs[j])) {
-//							addresses.add(raddrs[j]);
-//						}
-//					}
-//				}
-
-				// Iterate over all different addresses and try to send
-				// to missing and appropriate receivers
-//				String[] addrs = addresses.toArray(new String[addresses.size()]);
-
-				boolean delivered = false;
-				BluetoothMessage bluetoothMessage;
-				ByteArrayOutputStream stream = new ByteArrayOutputStream(task.getProlog().length
-						+ task.getData().length);
-
-				try {
-					stream.write(task.getProlog());
-					stream.write(task.getData());
-				} catch (IOException e1) {
-					Log.e(Helper.LOG_TAG, "Could not encode Message: " + e1.toString());
-				}
-				byte[] msgData = stream.toByteArray();
-//				for (int i = 0; !delivered && i < addrs.length; i++) {
-
-				bluetoothMessage = new BluetoothMessage(address, msgData, DataPacket.TYPE_DATA);
-
-				try {
-					binder.sendMessage(bluetoothMessage);
-					ret	= IFuture.DONE;
-				} catch (RemoteException e) {
-					ret	= new Future<Void>(new RuntimeException("Send failed: "+bluetoothMessage));
-					e.printStackTrace();
-				}
-				
-//				}
-				
-				if(ret==null)
-				{
-					ret	= new Future<Void>(new RuntimeException("No working connection."));			
-				}
-				
-				return ret;
-			}
-		};
-		
-		task.ready(send);
-
-	}
-	
-	protected void receiveMessage(final byte[] data) {
+	protected void receiveMessage(final String remoteAddress, final byte[] data) {
 		final Future<IThreadPoolService> fut = new Future<IThreadPoolService>();
 		SServiceProvider.getService(container, IThreadPoolService.class,
 				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
@@ -249,46 +251,18 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 						final IThreadPoolService tp = result;
 						tp.execute(new Runnable() {
 							public void run() {
-								BTTransport.this
-										.deliverMessage(data);
+								List<byte[]> bytes = SUtil.splitData(data);
+								handler.messageReceived(connections.get(remoteAddress), bytes.get(0), bytes.get(1));
 							}
 						});
 					}
 				});
 	}
 
-	/**
-	 * Returns the prefix of this transport
-	 * 
-	 * @return Transport prefix.
-	 */
-	@Override
-	public String[] getServiceSchemas() {
-		return SCHEMAS;
-	}
 
-	/**
-	 * Get the adresses of this transport.
-	 * 
-	 * @return An array of strings representing the addresses of this message
-	 *         transport mechanism.
-	 */
-	public String[] getAddresses() {
-		return addresses;
-	}
 
 	// -------- helper methods --------
 
-	/**
-	 * Get the address of this transport.
-	 * 
-	 * @param hostname
-	 *            The hostname.
-	 * @return <scheme><hostname>
-	 */
-	public String getAddress(String hostname) {
-		return getServiceSchemas() + hostname;
-	}
 
 //	protected MessageEnvelope decodeMessage(byte[] data) {
 //		
@@ -336,28 +310,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 //		return ret;
 //	}
 
-	/**
-	 * Deliver messages to local message service for dispatching to the
-	 * components.
-	 * 
-	 * @param con
-	 *            The connection.
-	 */
-	protected IFuture deliverMessage(final byte[] rawmsg) {
-		final Future ret = new Future();
-		SServiceProvider.getService(container, IMessageService.class,
-				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-				new DefaultResultListener<IMessageService>() {
-					public void resultAvailable(IMessageService ms) {
-//						ms.deliverMessage(msg.getMessage(), msg.getTypeName(),
-//								msg.getReceivers());
-						ms.deliverMessage(rawmsg);
-						ret.setResult(null);
-					}
-				});
-		return ret;
-	}
-	
+
 //	/**
 //	 *  Get the address of this transport.
 //	 *  @param hostname The hostname.
@@ -374,32 +327,25 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 *  
 	 *  @return True, if the transport is applicable for the address.
 	 */
-	@Override
-	public boolean isApplicable(String address) {
-		boolean ret = false;
-		for (String schema : SCHEMAS) {
-			if (address.startsWith(schema)) {
-				int schemalen = address.length();
-				if (address.length() == schemalen + ADDRESS_LENGTH) {
-					ret = true;
-				}
-			}
-		}
-		return ret;
-	}
-	
-	@Override
-	public boolean isNonFunctionalSatisfied(Map<String, Object> nonfunc,
-			String address) {
-		return false;
-	}
+//	@Override
+//	public boolean isApplicable(String address) {
+//		boolean ret = false;
+//		for (String schema : SCHEMAS) {
+//			if (address.startsWith(schema)) {
+//				int schemalen = address.length();
+//				if (address.length() == schemalen + ADDRESS_LENGTH) {
+//					ret = true;
+//				}
+//			}
+//		}
+//		return ret;
+//	}
 
 	class BTServiceConnection implements ServiceConnection {
 
-		private Future<Void> fut;
-
-		public BTServiceConnection(Future<Void> fut) {
-			this.fut = fut;
+		Future<Void> future;
+		public BTServiceConnection() {
+			future = new Future<>();
 		}
 
 		@Override
@@ -432,14 +378,14 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 													"(BTTransport) Classloader set. Starting Autoconnect...");
 
 											try {
-												addresses = new String[] { getAddress(binder
-														.getBTAddress()) };
+//												addresses = new String[] { getAddress(binder
+//														.getBTAddress()) };
 												binder.registerMessageCallback(msgCallback);
 												binder.startAutoConnect();
-												fut.setResult(null);
+												future.setResult(null);
 											} catch (RemoteException e) {
 												e.printStackTrace();
-												fut.setException(e);
+												future.setException(e);
 											}
 										}
 									});
@@ -458,6 +404,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 //									"(BTTransport) CodecFactory set.");
 //						}
 //					});
+		}
+
+		public void init() {
+			future.get();
 		}
 	}
 

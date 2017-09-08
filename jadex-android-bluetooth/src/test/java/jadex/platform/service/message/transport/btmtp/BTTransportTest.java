@@ -20,7 +20,6 @@ import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.cms.PlatformComponent;
-import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.Writer;
 
@@ -42,7 +41,7 @@ import android.os.RemoteException;
 public class BTTransportTest {
 
 	private BTTransport btTransport;
-	private MessageEnvelope message;
+//	private MessageEnvelope message;
 	private Writer writer;
 	private ComponentIdentifier sender;
 
@@ -65,8 +64,8 @@ public class BTTransportTest {
 				new String[] { "bt-mtp://"
 						+ TestConstants.defaultAdapterAddress }));
 
-		message = new MessageEnvelope(map, receivers,
-				SFipa.FIPA_MESSAGE_TYPE.getName());
+//		message = new MessageEnvelope(map, receivers,
+//				SFipa.FIPA_MESSAGE_TYPE.getName());
 		
 		btTransport.classLoader = BTTransport.class.getClassLoader();
 

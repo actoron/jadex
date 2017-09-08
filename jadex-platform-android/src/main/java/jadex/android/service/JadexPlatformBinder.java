@@ -7,7 +7,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.IFuture;
 
@@ -84,11 +83,6 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 	public void setPlatformId(IComponentIdentifier platformId)
 	{
 		service.setPlatformId(platformId);
-	}
-
-	public IFuture<IMessageService> getMS()
-	{
-		return service.getMS();
 	}
 
 	public IFuture<IComponentManagementService> getCMS()

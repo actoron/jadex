@@ -21,7 +21,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -130,11 +129,6 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformId)
 	{
 		return getService(platformId, IComponentManagementService.class);
-	}
-
-	public IFuture<IMessageService> getMS(IComponentIdentifier platformId)
-	{
-		return getService(platformId, IMessageService.class);
 	}
 
 	public <S> S getsService(IComponentIdentifier platformId, Class<S> serviceClazz)

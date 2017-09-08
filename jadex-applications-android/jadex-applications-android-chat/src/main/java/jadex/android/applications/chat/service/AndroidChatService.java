@@ -105,7 +105,6 @@ public class AndroidChatService extends JadexPlatformService
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		rootConfig.setChat(true);
 		rootConfig.setLogging(false);
-		rootConfig.setNioTcpTransport(false);
 		rootConfig.setNetworkName("jadexnetwork");
 		rootConfig.setNetworkPass("laxlax");
 		rootConfig.setAwaMechanisms(

@@ -8,8 +8,6 @@ import jadex.android.bluetooth.util.Helper;
 import java.util.Arrays;
 import java.util.UUID;
 
-import android.util.Log;
-
 /**
  * The Message Format which is sent via Bluetooth RFComm Channels.
  * 
@@ -102,7 +100,7 @@ public class DataPacket {
 	 */
 	public DataPacket(BluetoothMessage msg, byte type)
 			throws MessageConvertException {
-		this(msg.getRemoteAdress(), msg.getData(), type);
+		this(msg.getRemoteAddress(), msg.getData(), type);
 	}
 
 	/**

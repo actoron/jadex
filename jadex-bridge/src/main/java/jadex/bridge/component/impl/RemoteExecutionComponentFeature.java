@@ -235,6 +235,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		ServiceCall invoc = ServiceCall.getNextInvocation();
 		Long timeout = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): null;
 		Map<String, Object>	nonfunc	= invoc!=null ? invoc.getProperties() : null;
+		CallAccess.resetNextInvocation();
 		
 		@SuppressWarnings("unchecked")
 		Class<IFuture<T>>	clazz	= (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
@@ -311,6 +312,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					final ServiceCall	fsc	= sc;
 					
 					final IFuture<?> retfut = cmd.execute(component, secinfos);
+					CallAccess.resetNextInvocation();
 					if(incommands == null)
 					{
 						incommands = new HashMap<String, IFuture<?>>();

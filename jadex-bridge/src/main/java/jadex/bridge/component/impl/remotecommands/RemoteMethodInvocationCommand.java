@@ -5,9 +5,11 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
