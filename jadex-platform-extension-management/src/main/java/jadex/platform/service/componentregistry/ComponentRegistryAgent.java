@@ -74,7 +74,7 @@ import jadex.micro.annotation.ProvidedServices;
 			+ "new CreationInfo(\"jadex/platform/service/monitoring/MonitoringAgent.class\"), "
       		+ "new CreationInfo(\"jadex/platform/service/settings/SettingsAgent.class\"), "
       		+ "new CreationInfo(\"%{$args.paargs.rspublishcomponent}\"), "
-      		+ "new CreationInfo(\"jadex/platform/service/context/ContextAgent.class\", null, jadex.commons.SUtil.createHashMap(new String[]{\"contextserviceclass\"}, new Object[]{$args.paargs.contextserviceclass})) "
+      		+ "new CreationInfo(\"jadex/platform/service/context/ContextAgent.class\", null, (java.util.Map)($args.paargs!=null ? jadex.commons.SUtil.createHashMap(new String[]{\"contextserviceclass\"}, new Object[]{$args.paargs.contextserviceclass}): null)) "
 //      		+ "new CreationInfo(\"jadex/platform/service/remote/RemoteServiceManagementAgent.class\")" // has no service :-(
     		+ "}")
 })
