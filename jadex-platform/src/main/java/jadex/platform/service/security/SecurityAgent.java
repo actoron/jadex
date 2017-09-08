@@ -22,8 +22,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
@@ -129,6 +129,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Initialization.
 	 */
+	@SuppressWarnings("unchecked")
 	@AgentCreated
 	public IFuture<Void> start()
 	{
@@ -1141,7 +1142,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Security service message handler.
 	 *
 	 */
-	protected class SecurityMessageHandler implements IMessageHandler
+	protected class SecurityMessageHandler implements IUntrustedMessageHandler
 	{
 		/**
 		 *  Test if handler should handle a message.
