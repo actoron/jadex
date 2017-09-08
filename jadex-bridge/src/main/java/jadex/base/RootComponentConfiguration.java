@@ -538,77 +538,77 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 		setValue(TCPPORT, value);
 	}
 
-	@Override
-	public boolean getRelayTransport()
-	{
-		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
-	}
-
-	@Override
-	public void setRelayTransport(boolean value)
-	{
-		setValue(RELAYTRANSPORT, value);
-	}
-
-	@Override
-	public String getRelayAddress()
-	{
-		return (String)getValue(RELAYADDRESS);
-	}
-
-	@Override
-	public void setRelayAddress(String value)
-	{
-		setValue(RELAYADDRESS, value);
-	}
-
-	@Override
-	public boolean getRelaySecurity()
-	{
-		return Boolean.TRUE.equals(getValue(RELAYSECURITY));
-	}
-
-	@Override
-	public void setRelaySecurity(boolean value)
-	{
-		setValue(RELAYSECURITY, value);
-	}
-
-	@Override
-	public boolean getRelayAwaonly()
-	{
-		return Boolean.TRUE.equals(getValue(RELAYAWAONLY));
-	}
-
-	@Override
-	public void setRelayAwaonly(boolean value)
-	{
-		setValue(RELAYAWAONLY, value);
-	}
-
-	@Override
-	public boolean getSslTcpTransport()
-	{
-		return Boolean.TRUE.equals(getValue(SSLTCPTRANSPORT));
-	}
-
-	@Override
-	public void setSslTcpTransport(boolean value)
-	{
-		setValue(SSLTCPTRANSPORT, value);
-	}
-
-	@Override
-	public int getSslTcpPort()
-	{
-		return (Integer)getValue(SSLTCPPORT);
-	}
-
-	@Override
-	public void setSslTcpPort(int value)
-	{
-		setValue(SSLTCPPORT, value);
-	}
+//	@Override
+//	public boolean getRelayTransport()
+//	{
+//		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
+//	}
+//
+//	@Override
+//	public void setRelayTransport(boolean value)
+//	{
+//		setValue(RELAYTRANSPORT, value);
+//	}
+//
+//	@Override
+//	public String getRelayAddress()
+//	{
+//		return (String)getValue(RELAYADDRESS);
+//	}
+//
+//	@Override
+//	public void setRelayAddress(String value)
+//	{
+//		setValue(RELAYADDRESS, value);
+//	}
+//
+//	@Override
+//	public boolean getRelaySecurity()
+//	{
+//		return Boolean.TRUE.equals(getValue(RELAYSECURITY));
+//	}
+//
+//	@Override
+//	public void setRelaySecurity(boolean value)
+//	{
+//		setValue(RELAYSECURITY, value);
+//	}
+//
+//	@Override
+//	public boolean getRelayAwaonly()
+//	{
+//		return Boolean.TRUE.equals(getValue(RELAYAWAONLY));
+//	}
+//
+//	@Override
+//	public void setRelayAwaonly(boolean value)
+//	{
+//		setValue(RELAYAWAONLY, value);
+//	}
+//
+//	@Override
+//	public boolean getSslTcpTransport()
+//	{
+//		return Boolean.TRUE.equals(getValue(SSLTCPTRANSPORT));
+//	}
+//
+//	@Override
+//	public void setSslTcpTransport(boolean value)
+//	{
+//		setValue(SSLTCPTRANSPORT, value);
+//	}
+//
+//	@Override
+//	public int getSslTcpPort()
+//	{
+//		return (Integer)getValue(SSLTCPPORT);
+//	}
+//
+//	@Override
+//	public void setSslTcpPort(int value)
+//	{
+//		setValue(SSLTCPPORT, value);
+//	}
 
 	@Override
 	public boolean getWsPublish()
@@ -763,17 +763,17 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 		setValue(CLOCK, value);
 	}
 
-	@Override
-	public boolean getMessage()
-	{
-		return Boolean.TRUE.equals(getValue(MESSAGE));
-	}
-
-	@Override
-	public void setMessage(boolean value)
-	{
-		setValue(MESSAGE, value);
-	}
+//	@Override
+//	public boolean getMessage()
+//	{
+//		return Boolean.TRUE.equals(getValue(MESSAGE));
+//	}
+//
+//	@Override
+//	public void setMessage(boolean value)
+//	{
+//		setValue(MESSAGE, value);
+//	}
 
 	@Override
 	public boolean getSimul()
@@ -881,6 +881,18 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 	public void setSuperpeer(boolean value)
 	{
 		setValue(SUPERPEER, value);
+	}
+
+	@Override
+	public boolean getSuperpeerClient()
+	{
+		return Boolean.TRUE.equals(getValue(SUPERPEERCLIENT));
+	}
+
+	@Override
+	public void setSuperpeerClient(boolean value)
+	{
+		setValue(SUPERPEERCLIENT, value);
 	}
 
 	/**

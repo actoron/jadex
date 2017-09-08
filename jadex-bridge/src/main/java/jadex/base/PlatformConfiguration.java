@@ -453,65 +453,65 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 		getRootConfig().setTcpPort(value);
 	}
 
-	@Override
-	public boolean getRelayTransport() {
-		return getRootConfig().getRelayTransport();
-	}
-
-	@Override
-	public void setRelayTransport(boolean value) {
-		getRootConfig().setRelayTransport(value);
-	}
-
-	@Override
-	public String getRelayAddress() {
-		return getRootConfig().getRelayAddress();
-	}
-
-	@Override
-	public void setRelayAddress(String value) {
-		getRootConfig().setRelayAddress(value);
-	}
-
-	@Override
-	public boolean getRelaySecurity() {
-		return getRootConfig().getRelaySecurity();
-	}
-
-	@Override
-	public void setRelaySecurity(boolean value) {
-		getRootConfig().setRelaySecurity(value);
-	}
-
-	@Override
-	public boolean getRelayAwaonly() {
-		return getRootConfig().getRelayAwaonly();
-	}
-
-	@Override
-	public void setRelayAwaonly(boolean value) {
-		getRootConfig().setRelayAwaonly(value);
-	}
-
-	@Override
-	public boolean getSslTcpTransport() {
-		return getRootConfig().getSslTcpTransport();
-	}
-
-	@Override
-	public void setSslTcpTransport(boolean value) {
-		getRootConfig().setSslTcpTransport(value);
-	}
-
-	@Override
-	public int getSslTcpPort() {
-		return getRootConfig().getSslTcpPort();
-	}
-
-	@Override
-	public void setSslTcpPort(int value) {
-		getRootConfig().setSslTcpPort(value);
-	}
+//	@Override
+//	public boolean getRelayTransport() {
+//		return getRootConfig().getRelayTransport();
+//	}
+//
+//	@Override
+//	public void setRelayTransport(boolean value) {
+//		getRootConfig().setRelayTransport(value);
+//	}
+//
+//	@Override
+//	public String getRelayAddress() {
+//		return getRootConfig().getRelayAddress();
+//	}
+//
+//	@Override
+//	public void setRelayAddress(String value) {
+//		getRootConfig().setRelayAddress(value);
+//	}
+//
+//	@Override
+//	public boolean getRelaySecurity() {
+//		return getRootConfig().getRelaySecurity();
+//	}
+//
+//	@Override
+//	public void setRelaySecurity(boolean value) {
+//		getRootConfig().setRelaySecurity(value);
+//	}
+//
+//	@Override
+//	public boolean getRelayAwaonly() {
+//		return getRootConfig().getRelayAwaonly();
+//	}
+//
+//	@Override
+//	public void setRelayAwaonly(boolean value) {
+//		getRootConfig().setRelayAwaonly(value);
+//	}
+//
+//	@Override
+//	public boolean getSslTcpTransport() {
+//		return getRootConfig().getSslTcpTransport();
+//	}
+//
+//	@Override
+//	public void setSslTcpTransport(boolean value) {
+//		getRootConfig().setSslTcpTransport(value);
+//	}
+//
+//	@Override
+//	public int getSslTcpPort() {
+//		return getRootConfig().getSslTcpPort();
+//	}
+//
+//	@Override
+//	public void setSslTcpPort(int value) {
+//		getRootConfig().setSslTcpPort(value);
+//	}
 
 	@Override
 	public boolean getWsPublish() {
@@ -628,15 +628,15 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 		getRootConfig().setClock(value);
 	}
 
-	@Override
-	public boolean getMessage() {
-		return getRootConfig().getMessage();
-	}
-
-	@Override
-	public void setMessage(boolean value) {
-		getRootConfig().setMessage(value);
-	}
+//	@Override
+//	public boolean getMessage() {
+//		return getRootConfig().getMessage();
+//	}
+//
+//	@Override
+//	public void setMessage(boolean value) {
+//		getRootConfig().setMessage(value);
+//	}
 
 	@Override
 	public boolean getSimul() {
@@ -726,6 +726,16 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 	@Override
 	public void setSuperpeer(boolean value) {
 		getRootConfig().setSuperpeer(value);
+	}
+
+	@Override
+	public boolean getSuperpeerClient() {
+		return getRootConfig().getSuperpeerClient();
+	}
+
+	@Override
+	public void setSuperpeerClient(boolean value) {
+		getRootConfig().setSuperpeerClient(value);
 	}
 
 	//---- DELEGATES for StarterConfiguration -----//

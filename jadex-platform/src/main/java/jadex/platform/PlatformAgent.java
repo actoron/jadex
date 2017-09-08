@@ -42,8 +42,6 @@ import static jadex.base.IRootComponentConfiguration.SENSORS;
 import static jadex.base.IRootComponentConfiguration.SETTINGS;
 import static jadex.base.IRootComponentConfiguration.SIMUL;
 import static jadex.base.IRootComponentConfiguration.SIMULATION;
-import static jadex.base.IRootComponentConfiguration.SSLTCPPORT;
-import static jadex.base.IRootComponentConfiguration.SSLTCPTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.STRICTCOM;
 import static jadex.base.IRootComponentConfiguration.SUPERPEER;
 import static jadex.base.IRootComponentConfiguration.SUPERPEERCLIENT;
@@ -162,8 +160,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
+//	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
+//	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
 
 	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	
@@ -268,7 +266,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 {
 	@Configuration(name="auto", arguments={
 		@NameValue(name=TCPPORT, value="0"),
-		@NameValue(name=SSLTCPPORT, value="0"),
+//		@NameValue(name=SSLTCPPORT, value="0"),
 		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 //		@Component(name="system", type="system", daemon=Boolean3.TRUE),
@@ -407,7 +405,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	}),
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
-		@NameValue(name=SSLTCPPORT, value="0"),
+//		@NameValue(name=SSLTCPPORT, value="0"),
 		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={

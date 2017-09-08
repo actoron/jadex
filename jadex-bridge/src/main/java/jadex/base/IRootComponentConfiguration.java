@@ -296,48 +296,48 @@ public interface IRootComponentConfiguration {
     // default:
     // 8765
 
-    /** Flag if relay transport is enabled. **/
-    public static final String	RELAYTRANSPORT		= "relaytransport";							// class:
-    // boolean
-    // default:
-    // true
+//    /** Flag if relay transport is enabled. **/
+//    public static final String	RELAYTRANSPORT		= "relaytransport";							// class:
+//    // boolean
+//    // default:
+//    // true
 
-    /**
-     * Address(es) for relay transport (one or more addresses separated by
-     * commas).
-     **/
-    public static final String	RELAYADDRESS		= "relayaddress";							// class:
-    // String
-    // default:
-    // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
+//    /**
+//     * Address(es) for relay transport (one or more addresses separated by
+//     * commas).
+//     **/
+//    public static final String	RELAYADDRESS		= "relayaddress";							// class:
+//    // String
+//    // default:
+//    // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
 
-    /** Flag if relay should use HTTPS for receiving messages. **/
-    public static final String	RELAYSECURITY		= "relaysecurity";							// class:
-    // boolean
-    // default:
-    // $args.relayaddress.indexOf("https://")==-1
-    // ?
-    // false
-    // :
-    // true
+//    /** Flag if relay should use HTTPS for receiving messages. **/
+//    public static final String	RELAYSECURITY		= "relaysecurity";							// class:
+//    // boolean
+//    // default:
+//    // $args.relayaddress.indexOf("https://")==-1
+//    // ?
+//    // false
+//    // :
+//    // true
 
-    /** Flag if only awareness messages should be sent through relay. **/
-    public static final String	RELAYAWAONLY		= "relayawaonly";							// class:
-    // boolean
-    // default:
-    // false
+//    /** Flag if only awareness messages should be sent through relay. **/
+//    public static final String	RELAYAWAONLY		= "relayawaonly";							// class:
+//    // boolean
+//    // default:
+//    // false
 
-    /** Flag if ssltcp transport should enabled (requires Jadex Pro add-on). **/
-    public static final String	SSLTCPTRANSPORT		= "ssltcptransport";						// class:
-    // boolean
-    // default:
-    // false
-
-    /** Port for SSL TCP transport. **/
-    public static final String	SSLTCPPORT			= "ssltcpport";								// class:
-    // int
-    // default:
-    // 44334
+//    /** Flag if ssltcp transport should enabled (requires Jadex Pro add-on). **/
+//    public static final String	SSLTCPTRANSPORT		= "ssltcptransport";						// class:
+//    // boolean
+//    // default:
+//    // false
+//
+//    /** Port for SSL TCP transport. **/
+//    public static final String	SSLTCPPORT			= "ssltcpport";								// class:
+//    // int
+//    // default:
+//    // 44334
 
     /** Flag if web service publishing is enabled. **/
     public static final String	WSPUBLISH			= "wspublish";								// class:
@@ -420,11 +420,11 @@ public interface IRootComponentConfiguration {
     // default:
     // true
 
-    /** Flag if message component and service should be started. **/
-    public static final String	MESSAGE				= "message";								// class:
-    // boolean
-    // default:
-    // true
+//    /** Flag if message component and service should be started. **/
+//    public static final String	MESSAGE				= "message";								// class:
+//    // boolean
+//    // default:
+//    // true
 
     /** Flag if simulation component and service should be started. **/
     public static final String	SIMUL				= "simul";									// class:
@@ -491,9 +491,14 @@ public interface IRootComponentConfiguration {
     public static final String[] BOOLEAN_ARGS = {
             WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
             UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
-            PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT, RELAYTRANSPORT,
-            RELAYSECURITY, RELAYAWAONLY, SSLTCPTRANSPORT, WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
-            MONITORINGCOMP, SENSORS, DF, CLOCK, MESSAGE, SIMUL, FILETRANSFER, MARSHAL, SECURITY,
+            PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT,
+//            RELAYTRANSPORT,
+//            RELAYSECURITY, RELAYAWAONLY,
+//            SSLTCPTRANSPORT,
+            WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
+            MONITORINGCOMP, SENSORS, DF, CLOCK,
+//            MESSAGE,
+            SIMUL, FILETRANSFER, MARSHAL, SECURITY,
             LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER, SUPERPEERCLIENT
     };
 
@@ -658,29 +663,29 @@ public interface IRootComponentConfiguration {
 
     void setTcpPort(int value);
 
-    boolean getRelayTransport();
-
-    void setRelayTransport(boolean value);
-
-    String getRelayAddress();
-
-    void setRelayAddress(String value);
-
-    boolean getRelaySecurity();
-
-    void setRelaySecurity(boolean value);
-
-    boolean getRelayAwaonly();
-
-    void setRelayAwaonly(boolean value);
-
-    boolean getSslTcpTransport();
-
-    void setSslTcpTransport(boolean value);
-
-    int getSslTcpPort();
-
-    void setSslTcpPort(int value);
+//    boolean getRelayTransport();
+//
+//    void setRelayTransport(boolean value);
+//
+//    String getRelayAddress();
+//
+//    void setRelayAddress(String value);
+//
+//    boolean getRelaySecurity();
+//
+//    void setRelaySecurity(boolean value);
+//
+//    boolean getRelayAwaonly();
+//
+//    void setRelayAwaonly(boolean value);
+//
+//    boolean getSslTcpTransport();
+//
+//    void setSslTcpTransport(boolean value);
+//
+//    int getSslTcpPort();
+//
+//    void setSslTcpPort(int value);
 
     boolean getWsPublish();
 
@@ -728,9 +733,9 @@ public interface IRootComponentConfiguration {
 
     void setClock(boolean value);
 
-    boolean getMessage();
-
-    void setMessage(boolean value);
+//    boolean getMessage();
+//
+//    void setMessage(boolean value);
 
     boolean getSimul();
 
@@ -767,4 +772,8 @@ public interface IRootComponentConfiguration {
     boolean getSuperpeer();
 
     void setSuperpeer(boolean value);
+    
+    boolean getSuperpeerClient();
+
+    void setSuperpeerClient(boolean value);
 }

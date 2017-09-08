@@ -2,7 +2,6 @@ package jadex.transformation.jsonserializer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -315,7 +314,7 @@ public class JsonTraverser extends Traverser
 	 */
 	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes)
 	{
-		return objectToString(val, classloader, writeclass, null, null);
+		return objectToString(val, classloader, writeclass, excludes, null);
 	}
 	
 	/**
@@ -337,7 +336,7 @@ public class JsonTraverser extends Traverser
 		
 		try
 		{
-			traverser.traverse(val, null, preprocessors, processors, Traverser.MODE.PREPROCESS, classloader, wr);
+			traverser.traverse(val, null, preprocessors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
 			ret = wr.getString();
 			return ret;
 		}

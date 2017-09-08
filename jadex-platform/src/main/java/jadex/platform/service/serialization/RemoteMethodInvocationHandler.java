@@ -186,7 +186,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //			}
 //		}
 		
-//		CallAccess.resetNextInvocation();
+//		CallAccess.resetNextInvocation(); // done in feature
 		// todo: also set last call in future
 		
 		return ((IInternalRemoteExecutionFeature)comp.getComponentFeature(IRemoteExecutionFeature.class))
