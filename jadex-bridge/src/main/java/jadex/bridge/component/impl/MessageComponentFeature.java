@@ -1779,7 +1779,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected boolean isTrusted(IMsgSecurityInfos secinfos)
 	{
-		return secinfos.isAuthenticated();
+		return secinfos == null || secinfos.isAuthenticated();
 	}
 
 	/**
