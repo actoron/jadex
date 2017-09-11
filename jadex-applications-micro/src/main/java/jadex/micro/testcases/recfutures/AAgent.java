@@ -42,11 +42,11 @@ public class AAgent implements IAService
 						return IFuture.DONE;
 					}
 				};
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step2);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, step2);
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step1);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, step1);
 		
 		return ret1;
 	}
@@ -73,7 +73,7 @@ public class AAgent implements IAService
 						ret2.addIntermediateResult(""+cnt[0]++);
 						if(cnt[0]<3)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
+							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, this);
 						}
 						else
 						{
@@ -82,11 +82,11 @@ public class AAgent implements IAService
 						return IFuture.DONE;
 					}
 				};
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step2);
+				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, step2);
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step1);
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, step1);
 		
 		return ret1;
 	}
