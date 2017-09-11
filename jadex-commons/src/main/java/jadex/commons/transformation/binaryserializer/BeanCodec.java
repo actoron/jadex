@@ -3,6 +3,7 @@ package jadex.commons.transformation.binaryserializer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -97,7 +98,13 @@ public class BeanCodec extends AbstractCodec
 			{
 				try
 				{
-					bean = clazz.newInstance();
+					// Allow non-public bean constructors
+					Constructor<?>	c	= clazz.getDeclaredConstructor();
+					if(!Modifier.isPublic(c.getModifiers()) || !Modifier.isPublic(clazz.getModifiers()))
+					{
+						c.setAccessible(true);
+					}
+					bean = c.newInstance();
 				}
 				catch (Exception e)
 				{
