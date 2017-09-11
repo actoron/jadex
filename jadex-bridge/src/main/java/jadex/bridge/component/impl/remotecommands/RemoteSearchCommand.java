@@ -94,6 +94,6 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	{
 		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
 		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-		return secreq!=null ? secreq.value() : null;
+		return secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
 	}
 }

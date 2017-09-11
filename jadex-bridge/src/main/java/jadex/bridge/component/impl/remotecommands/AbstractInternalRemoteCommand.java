@@ -62,7 +62,7 @@ public abstract class AbstractInternalRemoteCommand
 	 */
 	protected String	getSecurityLevel(IInternalAccess access)
 	{
-		return Security.PASSWORD;
+		return Security.DEFAULT;
 	}
 	
 	/**
