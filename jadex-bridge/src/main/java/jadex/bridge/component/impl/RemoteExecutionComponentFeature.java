@@ -16,10 +16,10 @@ import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.component.impl.remotecommands.AbstractInternalRemoteCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
@@ -261,7 +261,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		return component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
 	}
 	
-	protected class RxHandler implements IMessageHandler
+	/**
+	 *  Handle RX Messages.
+	 *  Also handles untrusted messages and does its own security checks.
+	 *
+	 */
+	protected class RxHandler implements IUntrustedMessageHandler
 	{
 		/**
 		 *  Test if handler should handle a message.
@@ -488,7 +493,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
 				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
 					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
-						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
+						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(getComponent(), secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
 		}
 	}
 }

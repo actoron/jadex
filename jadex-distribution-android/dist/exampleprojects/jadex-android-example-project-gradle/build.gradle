@@ -34,6 +34,7 @@ android {
         targetSdkVersion 16
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -52,6 +53,7 @@ android {
 
     dexOptions {
         jumboMode = true
+        javaMaxHeapSize "4g"
     }
 }
 

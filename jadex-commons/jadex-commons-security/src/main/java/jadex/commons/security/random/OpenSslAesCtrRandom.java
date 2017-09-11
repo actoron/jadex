@@ -4,6 +4,10 @@ import java.security.SecureRandom;
 
 import jadex.commons.security.SSecurity;
 
+/**
+ *  Access to OpenSSL AES counter mode random.
+ *
+ */
 public class OpenSslAesCtrRandom extends SecureRandom
 {
 	/** ID */

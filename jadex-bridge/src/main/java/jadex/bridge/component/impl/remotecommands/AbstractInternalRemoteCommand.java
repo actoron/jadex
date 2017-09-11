@@ -2,7 +2,9 @@ package jadex.bridge.component.impl.remotecommands;
 
 import java.util.Map;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 
 /**
@@ -34,7 +36,7 @@ public abstract class AbstractInternalRemoteCommand
 		this.nonfunc	= nonfunc;
 	}
 	
-	//-------- methods --------
+	//-------- bean property methods --------
 
 	/**
 	 *  Get the non-functional properties.
@@ -52,12 +54,24 @@ public abstract class AbstractInternalRemoteCommand
 		this.nonfunc	= nonfunc;
 	}
 	
+	//-------- security methods --------
+	
+	/**
+	 *  Method to provide the required security level.
+	 *  Overridden by subclasses.
+	 */
+	protected String	getSecurityLevel(IInternalAccess access)
+	{
+		return Security.PASSWORD;
+	}
+	
 	/**
 	 *  Check if it is ok to execute the command.
 	 *  Override for specific checks.
 	 */
-	public boolean checkSecurity(IMsgSecurityInfos secinfos, IMsgHeader header)
+	public boolean checkSecurity(IInternalAccess access, IMsgSecurityInfos secinfos, IMsgHeader header)
 	{
-		return true;
+		String	seclevel	= getSecurityLevel(access);
+		return Security.UNRESTRICTED.equals(seclevel) || secinfos.isAuthenticated();
 	}
 }

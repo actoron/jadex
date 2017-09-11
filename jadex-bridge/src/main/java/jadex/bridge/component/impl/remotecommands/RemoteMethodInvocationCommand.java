@@ -5,11 +5,10 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
@@ -106,7 +105,6 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	{
 //		System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
 		
-		// TODO: security checks
 		Object	ret	= null;
 		if(target instanceof IServiceIdentifier)
 		{
@@ -153,5 +151,25 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		@SuppressWarnings("unchecked")
 		IFuture<T>	fret	= ret instanceof IFuture<?> ? (IFuture<T>)ret : new Future<T>((T)ret);
 		return fret;
+	}
+	
+	/**
+	 *  Method to provide the required security level.
+	 *  Overridden by subclasses.
+	 */
+	@Override
+	protected String	getSecurityLevel(IInternalAccess access)
+	{
+		if(target instanceof IServiceIdentifier)
+		{
+			IServiceIdentifier	sid	= (IServiceIdentifier)target;
+			Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
+			Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
+			return secreq!=null ? secreq.value() : null;
+		}
+		else
+		{
+			return super.getSecurityLevel(access);
+		}
 	}
 }

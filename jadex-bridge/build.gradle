@@ -6,6 +6,6 @@ dependencies
 	compile project(':jadex-javaparser')
 	compile project(':jadex-bytecode-tools')
 	compile project(':jadex-rules-eca') // Remove this stuff, don't know how :-(
-	
-	compileNoAndroidRuntime 'junit:junit:4.11'	// required for component test suite classes
+
+	compile 'junit:junit:4.11'	// required for component test suite classes
 }

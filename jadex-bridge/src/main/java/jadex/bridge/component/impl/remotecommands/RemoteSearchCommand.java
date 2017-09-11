@@ -16,7 +16,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Search for remote services.
  */
-public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
+public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implements IRemoteCommand<Collection<T>>
 {
 	/** The query. */
 	private ServiceQuery<T> query;
@@ -62,37 +62,38 @@ public class RemoteSearchCommand<T> implements IRemoteCommand<Collection<T>>
 //		if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
 		
-		final IFuture<Collection<T>>	ret;
-		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
-		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-		String	seclevel	= secreq!=null ? secreq.value() : null;
-		
-		if(Security.UNRESTRICTED.equals(seclevel) || secinf.isAuthenticated())
+		// No recursive global search -> change global scope to platform, and owner to local platform.
+		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
 		{
-			// No recursive global search -> change global scope to platform, and owner to local platform.
-			if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
+			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
 			{
-				if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
-				{
-					query.setOwner(access.getComponentIdentifier().getRoot());
-				}
-				query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+				query.setOwner(access.getComponentIdentifier().getRoot());
 			}
-			
-			if(query.getFilter() instanceof IAsyncFilter)
-			{
-				ret	= ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesAsync(query);
-			}
-			else
-			{
-				ret	= new Future<Collection<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query));				
-			}
+			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+		}
+		
+		final IFuture<Collection<T>>	ret;
+		if(query.getFilter() instanceof IAsyncFilter)
+		{
+			ret	= ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesAsync(query);
 		}
 		else
 		{
-			ret	= new Future<Collection<T>>(new SecurityException("Not allowed to search for type "+type));
+			ret	= new Future<Collection<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query));				
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Method to provide the required security level.
+	 *  Overridden by subclasses.
+	 */
+	@Override
+	protected String	getSecurityLevel(IInternalAccess access)
+	{
+		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
+		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
+		return secreq!=null ? secreq.value() : null;
 	}
 }
