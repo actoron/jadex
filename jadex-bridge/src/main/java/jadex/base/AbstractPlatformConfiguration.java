@@ -275,7 +275,7 @@ public abstract class AbstractPlatformConfiguration implements IStarterConfigura
         PlatformConfiguration config = new PlatformConfiguration(args);
         if(args!=null)
         {
-            for(int i=0; args!=null && i<args.length; i+=2)
+            for(int i=0; args!=null && i+1<args.length; i+=2)
             {
                 parseArg(args[i], args[i+1], config);
             }
