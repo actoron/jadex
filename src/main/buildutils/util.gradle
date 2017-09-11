@@ -165,7 +165,7 @@ def addParentScopeMappings(Task task, Configuration configuration) {
  * @return
  */
 def addSchemaTasks(Project project) {
-    project.tasks.create('schemadocs') << {
+    project.tasks.create('schemadocs').doLast {
         ant.xslt(
                 basedir: "${project.projectDir}/src/main/schema/",
                 destdir: "${project.buildDir}/schemadocs/",
@@ -177,7 +177,7 @@ def addSchemaTasks(Project project) {
         )
     }
     project.assemble.dependsOn += project.schemadocs
-    project.tasks.create('processSchemas') << {
+    project.tasks.create('processSchemas').doLast {
         ant.copy todir: file("$project.buildDir/tmp/schemas"),
                 {
                     resources
