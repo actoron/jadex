@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -213,7 +214,9 @@ public class SSecurity
 								{
 									try
 									{
-										ret = WinCrypt.getRandomFromWindows(ret.length);
+										Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
+										Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
+										ret = (byte[]) getrandomfromwindows.invoke(null, ret.length);
 										noseed = false;
 									}
 									catch(Throwable e)

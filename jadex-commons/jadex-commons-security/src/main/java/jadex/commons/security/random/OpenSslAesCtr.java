@@ -5,6 +5,10 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
+/**
+ *  Access to OpenSSL AES counter mode.
+ *
+ */
 public class OpenSslAesCtr
 {
 	/** OpenSSL Crypto lib name. */
