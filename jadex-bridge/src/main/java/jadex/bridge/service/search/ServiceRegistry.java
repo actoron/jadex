@@ -28,7 +28,9 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.ChangeEvent;
 import jadex.commons.IAsyncFilter;
+import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.future.CounterResultListener;
@@ -48,6 +50,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.UnlimitedIntermediateDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.traverser.TransformSet;
 
 /**
  *  Local service registry. 
@@ -98,6 +101,25 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		this.indexer = new Indexer<IService>(new ServiceKeyExtractor(), ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.delay = delay;
+		
+		TransformSet<String> nnames = (TransformSet<String>)PlatformConfiguration.getPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		nnames.addChangeListener(new IChangeListener<String>()
+		{
+			public void changeOccurred(ChangeEvent<String> event)
+			{
+				System.out.println("Network names change: "+event);
+				
+				rwlock.writeLock().lock();
+				try
+				{
+					indexer.updateIndex(ServiceKeyExtractor.KEY_TYPE_NETWORKS);
+				}
+				finally
+				{
+					rwlock.writeLock().unlock();
+				}
+			}
+		});
 	}
 	
 	/**
@@ -538,7 +560,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IFilter<T> filter = (IFilter<T>)query.getFilter();
 			filter = (IFilter<T>)(filter == null? IFilter.ALWAYS : filter);
 			
-			Set<IService> ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			Set<IService> ownerservices = null;
+			rwlock.readLock().lock();
+			try
+			{
+				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			}
+			finally
+			{
+				rwlock.readLock().unlock();
+			}
 			
 			if(sers!=null && !sers.isEmpty())
 			{
@@ -576,7 +607,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IFilter<T> filter = (IFilter<T>) query.getFilter();
 			filter = (IFilter<T>)(filter==null? IFilter.ALWAYS : filter);
 			
-			Set<IService> ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			Set<IService> ownerservices = null;
+			rwlock.readLock().lock();
+			try
+			{
+				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+			}
+			finally
+			{
+				rwlock.readLock().unlock();
+			}
 			
 			if(sers!=null && !sers.isEmpty())
 			{
@@ -604,7 +644,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public Set<IService> getAllServices()
 	{
-		return indexer.getAllValues();
+		rwlock.readLock().lock();
+		try
+		{
+			return indexer.getAllValues();
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
 	}
 	
 	/**
@@ -909,7 +957,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 			return null;
-		
+			
 		T ret = null;
 		Set<IService> sers = getServices(query);
 		if(sers!=null)
@@ -1273,8 +1321,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITime")!=-1)
-			System.out.println("hhh");
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITime")!=-1)
+//			System.out.println("hhh");
 		
 		if(it.hasNext())
 		{
@@ -1736,7 +1784,18 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			
 			if(query.isExcludeOwner())
 			{
-				Set<IService> ownerservices = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString());
+				Set<IService> ownerservices = null;
+				
+				rwlock.readLock().lock();
+				try
+				{
+					ownerservices = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString());
+				}
+				finally
+				{
+					rwlock.readLock().unlock();
+				}
+				
 				sers.removeAll(ownerservices);
 			}
 			
@@ -1784,7 +1843,18 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 						
 						final ICommand<Iterator<IService>> cmd = this;
 						
-						Set<IService> ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+						Set<IService> ownerservices = null;
+						
+						rwlock.readLock().lock();
+						try
+						{
+							ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+						}
+						finally
+						{
+							rwlock.readLock().unlock();
+						}
+//						Set<IService> ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
 						
 						boolean passes = checkSearchScope(query.getOwner(), ser, query.getScope(), false);
 						passes &= checkPublicationScope(query.getOwner(), ser);

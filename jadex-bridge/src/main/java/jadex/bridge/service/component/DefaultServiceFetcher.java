@@ -369,12 +369,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //						if(type.toString().indexOf("Test")!=-1)
 //							System.out.println("result: "+result);
 						
-						ServiceQuery<T> query = new ServiceQuery<T>();
-						query.setOwner(ia.getComponentIdentifier());
-						query.setServiceType(new ClassInfo(type));
-						query.setReturnType(query.getServiceType());
-						query.setScope(binding.getScope());
-						query.setAsyncFilter(ffilter);
+						ServiceQuery<T> query = new ServiceQuery<T>(new ClassInfo(type), binding.getScope(), null, ia.getComponentIdentifier(), ffilter, new ClassInfo(type));
+						
+//						ServiceQuery<T> query = new ServiceQuery<T>();
+//						query.setServiceType(new ClassInfo(type));
+//						query.setScope(binding.getScope());
+//						query.setOwner(ia.getComponentIdentifier());
+//						query.setAsyncFilter(ffilter);
+//						query.setReturnType(query.getServiceType());
+
 						query.setServiceTags(tags, ia.getExternalAccess());
 						
 //						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);

@@ -302,7 +302,7 @@ public class Indexer<T>
 		{
 			for(Map.Entry<String, Map<String, Set<T>>> entry: indexedvalues.entrySet())
 			{
-				// Fetch all keys used 
+				// Fetch all key values used 
 				Set<String> keys = keyextractor.getKeyValues(entry.getKey(), value);
 				
 				if(keys != null)
@@ -465,6 +465,30 @@ public class Indexer<T>
 		for(Map<String, Set<T>> index : indexedvalues.values())
 			index.clear();
 		values.clear();
+	}
+	
+	/**
+	 *  Update an index for all values.
+	 */
+	public void updateIndex(String indexname)
+	{
+		Map<String, Set<T>> index = new HashMap<String, Set<T>>();
+		for(T value: values)
+		{
+			Set<String> keys = keyextractor.getKeyValues(indexname, value);
+		
+			for(String key: keys)
+			{
+				Set<T> valset = index.get(key);
+				if(valset == null)
+				{
+					valset = new HashSet<T>();
+					index.put(key, valset);
+				}
+				valset.add(value);
+			}
+		}
+		indexedvalues.put(indexname, index);
 	}
 	
 	/**

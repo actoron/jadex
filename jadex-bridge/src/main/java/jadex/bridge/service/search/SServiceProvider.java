@@ -223,6 +223,7 @@ public class SServiceProvider
 		checkThreadAccess(component, proxy);
 		
 		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
+		
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());

@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.security;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -162,4 +161,11 @@ public interface ISecurityService
 	 *  @return The current networks names.
 	 */
 	public IFuture<Set<String>> getNetworkNames();
+	
+//	/**
+//	 *  Gets the current network names. 
+//	 *  @return The current networks names.
+//	 */
+//	@Excluded
+//	public Set<String> getNetworkNamesSync();
 }
