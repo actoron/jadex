@@ -6,9 +6,11 @@ import java.util.Map;
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -21,6 +23,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -36,6 +39,7 @@ import jadex.micro.testcases.TestAgent;
 })
 @Agent
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class ServiceCallAgent	extends TestAgent
 {
 	//-------- constants --------
