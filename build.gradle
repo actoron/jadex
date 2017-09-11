@@ -120,12 +120,7 @@ subprojects
 
 	configurations {
 		// compileNoAndroidRuntime will exclude the artifact in Android APKs
-		runtimeAndroid.extendsFrom runtime
-		compileNoAndroidRuntime {
-			dependencies.all { dep ->
-				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
-			}
-		}
+		compileNoAndroidRuntime
 		compile.extendsFrom compileNoAndroidRuntime
 	}
 
@@ -165,7 +160,8 @@ subprojects
                 targetSdkVersion android_targetSdkVersion
                 versionCode 1
 				versionName jadex_build_version
-            }
+				multiDexEnabled true
+			}
 
             sourceSets {
                 main {
@@ -195,6 +191,7 @@ subprojects
 
 			dexOptions {
 				jumboMode = true
+				javaMaxHeapSize "4g"
 			}
         }
 
@@ -208,13 +205,14 @@ subprojects
         }
 
 		configurations {
-			// exclude transitive deps that are not supported on android
 			all {
-				dependencies.all { dep ->
-					excludeNonAndroidRuntime(project, dep)
+				dependencies.all {
+					dep -> excludeNonAndroidRuntimeFromApk(project, dep)
 				}
 			}
 		}
+
+
     }
     else
     {

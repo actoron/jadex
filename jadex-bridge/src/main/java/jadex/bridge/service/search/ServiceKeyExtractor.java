@@ -34,6 +34,9 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 	/** Key type for the service id. */
 	public static final String KEY_TYPE_SID = "serviceid";
 	
+	/** Key type for the networks. */
+	public static final String KEY_TYPE_NETWORKS = "networks";
+	
 	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
 	
@@ -125,6 +128,10 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 		else if(KEY_TYPE_SID.equals(keytype))
 		{
 			ret = new SetWrapper<String>(service.getServiceIdentifier().toString());
+		}
+		else if(KEY_TYPE_NETWORKS.equals(keytype))
+		{
+			ret = new HashSet<String>(service.getServiceIdentifier().getNetworkNames());
 		}
 		return ret;
 	}
