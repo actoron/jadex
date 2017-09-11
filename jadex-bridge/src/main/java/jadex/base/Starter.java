@@ -401,6 +401,8 @@ public class Starter
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
+					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE, new TransformSet<String>());
+
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
 //					if(config.getRegistrySync())
 //					{
@@ -425,8 +427,6 @@ public class Starter
 					
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_TRANSPORTCACHE, new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000));
 					
-					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE, new TransformSet<String>());
-
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
 					

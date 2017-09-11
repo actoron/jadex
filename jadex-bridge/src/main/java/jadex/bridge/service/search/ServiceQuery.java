@@ -7,18 +7,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -76,11 +80,16 @@ public class ServiceQuery<T>
 	    Allows for hashing queryies and use a queryinfo object for lookup. */
 	protected String id;
 	
+//	/** Is the query prepared? Prepared means that the query is ready to be processed by the registry. */ 
+//	protected boolean prepared;
+	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery()
+	protected ServiceQuery()
 	{
+		// Not public to not encourage user to use it.
+		// Here it does NOT set the networknames automatically because used for serialization.
 	}
 	
 //	/**
@@ -220,6 +229,7 @@ public class ServiceQuery<T>
 		this.returntype = returntype;
 		
 		this.id = SUtil.createUniqueId(""+servicetype);
+		this.networknames = getNetworkNames(owner); // Set the networknames to the current set of network names.
 	}
 	
 	/**
@@ -235,6 +245,8 @@ public class ServiceQuery<T>
 		this.filter = original.filter;
 		this.owner = original.owner;
 		this.id = original.id;
+		this.networknames = original.networknames;
+		this.matchingmodes = original.matchingmodes;
 	}
 
 	/**
@@ -608,6 +620,47 @@ public class ServiceQuery<T>
 		return true;
 	}
 	
+//	/**
+//	 *  Get the prepared.
+//	 *  @return the prepared
+//	 */
+//	public boolean isPrepared()
+//	{
+//		return prepared;
+//	}
+//
+//	/**
+//	 *  Set the prepared.
+//	 *  @param prepared The prepared to set
+//	 */
+//	public void setPrepared(boolean prepared)
+//	{
+//		this.prepared = prepared;
+//	}
+	
+//	/**
+//	 *  Prepare the query.
+//	 */
+//	public void prepare(IComponentIdentifier cid)
+//	{
+//		if(!prepared)
+//		{
+//			networknames = getNetworkNames(cid);
+//			prepared = true;
+//		}
+//	}
+	
+	/**
+	 *  Static helper method to get the current network names.
+	 *  @param cid The platform cid.
+	 *  @return The current network names.
+	 */
+	public static String[] getNetworkNames(IComponentIdentifier cid)
+	{
+		Set<String> nnames = (Set<String>)PlatformConfiguration.getPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		return nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY;
+	}
+
 	/**
 	 *  Get the hashcode.
 	 */

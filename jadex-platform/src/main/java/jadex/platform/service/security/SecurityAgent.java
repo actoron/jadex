@@ -28,6 +28,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
@@ -671,6 +672,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public IFuture<Set<String>> getNetworkNames()
 	{
 		return new Future<Set<String>>(networknames);
+	}
+	
+	/**
+	 *  Gets the current network names. 
+	 *  @return The current networks names.
+	 */
+	@Excluded
+	public Set<String> getNetworkNamesSync()
+	{
+		Set<String> ret = Collections.EMPTY_SET;
+		
+		if(networknames!=null)
+		{
+			String[] nnames = networknames.toArray(new String[0]);
+			ret = SUtil.arrayToSet(nnames);
+		}	
+		
+		return ret;
 	}
 	
 	/**
@@ -1384,4 +1403,5 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		return ret;
 	}
+
 }
