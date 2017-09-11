@@ -36,6 +36,8 @@ publishCommercial = publishCommercial.toBoolean()
 
 resetPatchVersion = resetPatchVersion.toBoolean()
 
+try {
+
 stage('preparation') {
     node { // a node is a step with workspace, can be distributed
         try {
@@ -365,6 +367,13 @@ if (performanceTests) {
             }
         }
     }
+}
+
+} catch (any) {
+    currentBuild.result = 'FAILURE'
+    throw any;
+} finally {
+    step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de,braubach@informatik.uni-hamburg.de,pokahr@informatik.uni-hamburg.de,jander@informatik.uni-hamburg.de', sendToIndividuals: true])
 }
 
 

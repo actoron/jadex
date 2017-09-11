@@ -24,7 +24,7 @@ def nodeWithVersion(String label = '', version, cl) {
                     currentBuild.result = 'FAILURE'
                     throw any;
                 } finally {
-                    step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de,braubach@informatik.uni-hamburg.de,pokahr@informatik.uni-hamburg.de,jander@informatik.uni-hamburg.de', sendToIndividuals: true])
+//                    step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de,braubach@informatik.uni-hamburg.de,pokahr@informatik.uni-hamburg.de,jander@informatik.uni-hamburg.de', sendToIndividuals: true])
                 }
             }
         }
