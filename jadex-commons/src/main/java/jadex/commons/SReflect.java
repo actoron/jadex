@@ -1607,7 +1607,7 @@ public class SReflect
 	 */
 	public static Class<?>[] scanForClasses(URL[] urls, ClassLoader classloader, IFilter filefilter, IFilter classfilter)
 	{
-		List<Class<?>>	ret	= new ArrayList<Class<?>>();
+		Set<Class<?>>	ret	= new HashSet<Class<?>>();
 		String[] facs = scanForFiles(urls, filefilter);
 		try
 		{
@@ -1643,7 +1643,7 @@ public class SReflect
 	 */
 	public static String[] scanForFiles(URL[] urls, IFilter filter)
 	{
-		List<String>	ret	= new ArrayList<String>();
+		Set<String>	ret	= new HashSet<String>();
 		for(int i=0; i<urls.length; i++)
 		{
 //			System.out.println("Scanning: "+entry);
@@ -1698,7 +1698,7 @@ public class SReflect
 	/**
 	 *  Scan directories.
 	 */
-	public static void scanDir(URL[] urls, File file, IFilter filter, List<String> results, List<String> donedirs)
+	public static void scanDir(URL[] urls, File file, IFilter filter, Collection<String> results, List<String> donedirs)
 	{
 		File[] files = file.listFiles(new FileFilter()
 		{
