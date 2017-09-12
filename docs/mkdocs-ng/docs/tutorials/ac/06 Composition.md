@@ -1,5 +1,7 @@
 # Composition
 
+${SorryOutdated}
+
 In this chapter we will introduce composite components, i.e. components that are composed of subcomponents. As these subcomponents may also be primitive components or composites actually a hierarchy of components emerges. One important reason for creating components out of others is that one often wants to create *self contained* components, i.e. components with few outbound required services. Self contained components can provide most of their functionality out of the box in varying application contexts.
 
 # Exercise E1 - Composite components and configurations
