@@ -39,21 +39,29 @@ stage('preparation') {
     }
 }
 
-stage('build and upload to nexus') {
+stage('build') {
     util.nodeWithVersion(versionSuffix) {
     	unstash 'sources'
         sh """./gradlew ${defaultGradleArgs} \
-        -P repo_commercial=https://nexus.actoron.com/content/repositories/pro/ \
-        -P repo_noncommercial=https://nexus.actoron.com/content/repositories/oss/ \
-        -P xrepo_commercial=https://nexus.actoron.com/content/repositories/dummy/ \
-        -P xrepo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ \
-        clean build uploadArchives """
+        clean build"""
         stash name: 'built'
 	}
 }
 
+stage('upload to nexus') {
+	util.nodeWithVersionHighTimeout(versionSuffix) {
+    	unstash 'built'
+		sh """./gradlew ${defaultGradleArgs} \
+		-P repo_commercial=https://nexus.actoron.com/content/repositories/pro/ \
+		-P repo_noncommercial=https://nexus.actoron.com/content/repositories/oss/ \
+		-P xrepo_commercial=https://nexus.actoron.com/content/repositories/dummy/ \
+		-P xrepo_noncommercial=https://nexus.actoron.com/content/repositories/dummy/ \
+		uploadArchives"""
+	}
+}
+
 stage('upload to central') {
-    util.nodeWithVersion(versionSuffix) {
+    util.nodeWithVersionHighTimeout(versionSuffix) {
     	unstash 'built'
         sh """./gradlew ${defaultGradleArgs} \
         -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2/ \

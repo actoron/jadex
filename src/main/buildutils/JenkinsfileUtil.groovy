@@ -23,8 +23,22 @@ def nodeWithVersion(String label = '', version, cl) {
                 } catch (any) {
                     currentBuild.result = 'FAILURE'
                     throw any;
-                } finally {
-//                    step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de,braubach@informatik.uni-hamburg.de,pokahr@informatik.uni-hamburg.de,jander@informatik.uni-hamburg.de', sendToIndividuals: true])
+                }
+            }
+        }
+    }
+}
+
+def nodeWithVersionHighTimeout(String label = '', version, cl) {
+    node(label) {
+        timeout(time:10, unit: 'HOURS') {
+            withEnv(['BUILD_VERSION_SUFFIX=' + version]) {
+                try {
+                    cl()
+                    currentBuild.result = 'SUCCESS'
+                } catch (any) {
+                    currentBuild.result = 'FAILURE'
+                    throw any;
                 }
             }
         }
