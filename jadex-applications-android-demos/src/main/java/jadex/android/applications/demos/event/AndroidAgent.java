@@ -18,7 +18,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentMessageArrived;
-import jadex.micro.annotation.AgentService;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
@@ -46,7 +46,7 @@ public class AndroidAgent
 	@AgentFeature
 	protected IMessageFeature messageFeature;
 
-	@AgentService
+	@AgentServiceSearch
 	protected IContextService androidcontext;
 
 	//-------- methods --------
