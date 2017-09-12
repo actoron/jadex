@@ -8,6 +8,8 @@ apply plugin: 'maven' // use gradle install to install in local .m2
 //apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
 
+apply from: "$rootDir/src/main/buildutils/versioning.gradle"
+
 def date = new Date()
 def timestamp = date.format('yyyyMMdd.HHmmss')
 
@@ -52,8 +54,7 @@ buildscript
 
 allprojects
 {
-	apply from: "$rootDir/src/main/buildutils/versioning.gradle"
-
+	version = rootProject.version
     if(isCommercial(project))
     {
 	    group = 'com.actoron.jadex'

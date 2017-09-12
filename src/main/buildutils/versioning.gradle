@@ -6,6 +6,10 @@ class VersionLoader {
 
     static String workspaceRootDir
 
+    static void cleanVersion() {
+        version = null;
+    }
+
     static ProjectVersion getVersion(Project rootProject) {
         if (version == null) {
             def propFile = new File("$rootProject.rootDir/src/main/buildutils/jadexversion.properties")
@@ -41,6 +45,7 @@ if (project.hasProperty('workspaceRootDir')) {
     VersionLoader.workspaceRootDir = ext.workspaceRootDir
 }
 
+VersionLoader.cleanVersion()
 version = VersionLoader.getVersion(project.rootProject)
 project.ext.jadex_build_version = version.toString()
 
