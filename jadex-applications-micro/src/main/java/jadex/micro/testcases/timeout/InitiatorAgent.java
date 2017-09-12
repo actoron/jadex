@@ -10,6 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -22,6 +23,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -34,6 +36,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class InitiatorAgent extends TestAgent
 {
 	/**

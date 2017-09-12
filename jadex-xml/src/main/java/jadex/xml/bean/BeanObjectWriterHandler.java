@@ -338,6 +338,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				{
 					try
 					{	
+						if(!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(object.getClass().getModifiers()))
+						{
+							method.setAccessible(true);
+						}
 						value = method.invoke(object, new Object[0]);
 					}
 					catch(Exception e)
@@ -349,7 +353,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				{
 					try
 					{
-						if(!Modifier.isPublic(field.getModifiers()))
+						if(!Modifier.isPublic(field.getModifiers()) || !Modifier.isPublic(object.getClass().getModifiers()))
 						{
 							field.setAccessible(true);
 						}
