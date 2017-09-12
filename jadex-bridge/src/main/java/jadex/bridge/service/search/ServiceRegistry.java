@@ -2076,12 +2076,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 									{
 										try
 										{
+											final ServiceQuery fQuery = query; // needed for remote access
 											result.scheduleStep(new IComponentStep<Set<T>>()
 											{
 												@Classname("GlobalQueryRegSearch")
 												public IFuture<Set<T>> execute(IInternalAccess ia)
 												{
-													Set<T> remres = ServiceRegistry.getRegistry(ia.getComponentIdentifier()).searchServicesSync(query);
+													IServiceRegistry registry = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+													Set<T> remres = registry.searchServicesSync(fQuery);
 													return new Future<Set<T>>(remres);
 												}
 											}).addResultListener(new DelegationResultListener<Set<T>>(remotesearch));
