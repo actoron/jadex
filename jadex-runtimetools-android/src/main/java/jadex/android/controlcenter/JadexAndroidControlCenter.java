@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
@@ -240,7 +241,11 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 			public IFuture<Void> execute(IInternalAccess ia) {
 				final Future<Void> ret = new Future<>();
 				IServiceRegistry registry = ServiceRegistry.getRegistry(ia);
-				ISubscriptionIntermediateFuture services = registry.searchServices(null, extAcc.getComponentIdentifier(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
+				ServiceQuery<IService> query = new ServiceQuery<>();
+				query.setFilter(ViewableFilter.VIEWABLE_FILTER);
+				query.setScope(Binding.SCOPE_PLATFORM);
+				ISubscriptionIntermediateFuture<IService> services = registry.searchServicesAsync(query);
+//				ISubscriptionIntermediateFuture services = registry.searchServicesAsync(null, extAcc.getComponentIdentifier(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
 
 				services.addResultListener(new IntermediateExceptionDelegationResultListener<IService, Void>(ret) {
 

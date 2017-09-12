@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
     }
 }
 
@@ -94,43 +94,48 @@ def getReleaseVariant(project) {
 }
 
 /**
- * Recursively check for dependencies with compileNoAndroidRuntime scope and exclude them from the dependency
+ * Recursively check for dependencies with compileNoAndroidRuntime scope and exclude them from the project
  * @param project
  * @param dep
  * @param alreadyChecked
  * @return
  */
-def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [], parentDep = null) {
-        if (parentDep == null) {
-            parentDep = project
-        } else if (parentDep == project) {
-            parentDep = dep
-        }
-        if (dep instanceof DefaultProjectDependency && !alreadyChecked.contains(dep)) {
-            DefaultProjectDependency pdep = dep
-            alreadyChecked.add(pdep)
-            pdep.dependencyProject.configurations.all {
-                dependencies.all { innerDep ->
-                    if (innerDep instanceof DefaultProjectDependency)
-                    {
-                        excludeNonAndroidRuntime(project, innerDep, alreadyChecked, parentDep)
-                    }
-                }
+def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alreadyChecked = [], parentDep = null) {
+//    configurations.'default'.exclude group: 'org.ow2.asm', module: 'asm-all'
+    if (parentDep == null) {
+        parentDep = dep;
+    }
+    if (!(dep instanceof DefaultProjectDependency) || alreadyChecked.contains(dep)) {
+        // terminate
+    } else {
+        alreadyChecked.add(dep)
+        // recurse to children
+        dep.dependencyProject.configurations.all {conf ->
+            conf.dependencies.all {
+                childDep ->
+                    excludeNonAndroidRuntimeFromApk(project, childDep, alreadyChecked, parentDep)
             }
-            pdep.dependencyProject.configurations.compileNoAndroidRuntime {
-                dependencies.all { innerDep ->
-//                    println "excluding $innerDep.group:$innerDep.name, found in $pdep.dependencyProject.name from $project.name"
-//                    project.configurations.default.exclude group: innerDep.group, module: innerDep.name
-//                    project.configurations.compile.exclude group: innerDep.group, module: innerDep.name
+        }
 
-                    if (parentDep instanceof DefaultProjectDependency) {
-//                        println "excluding transitive dep: $parentDep.name / $innerDep.group:$innerDep.name in $project.name"
-                        ((DefaultProjectDependency)parentDep).exclude(group: innerDep.group, module: innerDep.name)
+//        println "recursed to: $dep.name"
+//        println "android deps: $dep.dependencyProject.configurations.compileNoAndroidRuntime.dependencies"
+        // exclude direct children
+        dep.dependencyProject.configurations.compileNoAndroidRuntime.dependencies.all {
+            exDep ->
+//                println "excluding $exDep.group:$exDep.name"
+                project.configurations.all { conf ->
+                    def relevantName = conf.name.toLowerCase()
+                    if (relevantName.contains('apk') || relevantName.contains('runtime')) {
+                        conf.exclude(group: exDep.group, module: exDep.name)
                     }
                 }
-            }
+//                project.configurations.'default'.exclude(group: exDep.group, module: exDep.name)
+//                project.configurations.'runtime'.exclude(group: exDep.group, module: exDep.name)
         }
+    }
+
 }
+
 
 /**
  * Add scope mapping for parent configurations of given configuration.
@@ -521,7 +526,7 @@ ext {
     onVariantOutput = this.&onVariantOutput
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
-    excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
+    excludeNonAndroidRuntimeFromApk = this.&excludeNonAndroidRuntimeFromApk
     addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
     addJavaDocJarTask = this.&addJavaDocJarTask

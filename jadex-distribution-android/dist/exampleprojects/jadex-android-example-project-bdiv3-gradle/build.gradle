@@ -16,7 +16,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath "org.activecomponents.jadex:jadex-gradle-plugin:${jadex_build_version}"
     }
 }
@@ -42,7 +42,7 @@ repositories {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "org.activecomponents.jadex.android.bdiv3example"
@@ -50,6 +50,7 @@ android {
         targetSdkVersion 16
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -68,6 +69,7 @@ android {
 
     dexOptions {
         jumboMode = true
+        javaMaxHeapSize "4g"
     }
 }
 

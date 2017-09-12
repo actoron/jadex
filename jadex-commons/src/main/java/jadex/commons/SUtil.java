@@ -81,8 +81,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import org.spongycastle.util.Pack;
-
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.ErrorException;
@@ -4832,11 +4830,6 @@ public class SUtil
 		 * @return true, if current thread is ui main thread.
 		 */
 		boolean runningOnUiThread();
-		
-		/**
-		 * Get the network ips.
-		 */
-		public List<InetAddress> getNetworkIps();
 	}
 	
 //	/**

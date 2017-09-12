@@ -10,6 +10,10 @@ import com.sun.jna.platform.win32.WinDef.BOOL;
 import com.sun.jna.platform.win32.WinDef.ULONG;
 import com.sun.jna.platform.win32.WinDef.ULONGByReference;
 
+/**
+ *  Access to windows cryptography API.
+ *
+ */
 public class WinCrypt
 {
 	public static final String JNA_LIBRARY_NAME = "Advapi32";
@@ -56,30 +60,4 @@ public class WinCrypt
 		}
 		return ret;
 	}
-	
-//	public static void main(String[] args)
-//	{
-//		System.out.println(System.getProperty("os.version"));
-//		String osversion = System.getProperty("os.version");
-//		if (Platform.isWindows() && osversion != null && osversion.contains(".") && Integer.parseInt(osversion.substring(0, osversion.indexOf('.'))) > 7)
-//		{
-//			System.out.println("Yes");
-//		}
-//		else
-//		{
-//			System.out.println("No");
-//		}
-//		ULONGByReference hProv = new WinDef.ULONGByReference();
-//		BOOL res = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
-//		System.out.println("Acquire: " + res.booleanValue());
-//		System.out.println(hProv.getValue().longValue());
-//		System.out.println(Kernel32.INSTANCE.GetLastError());
-//		Memory buf = new Memory(32);
-//		System.out.println("Gen: " + CryptGenRandom(hProv.getValue(), 32, buf).booleanValue());
-//		System.out.println(Kernel32.INSTANCE.GetLastError());
-//		System.out.println("Release " + CryptReleaseContext(hProv.getValue(), 0).booleanValue());
-//		System.out.println(Kernel32.INSTANCE.GetLastError());
-//		byte[] rnd = getRandomFromWindows(64);
-//		System.out.println(Arrays.toString(rnd));
-//	}
 }

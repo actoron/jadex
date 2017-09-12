@@ -8,6 +8,8 @@ apply plugin: 'maven' // use gradle install to install in local .m2
 //apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
 
+apply from: "$rootDir/src/main/buildutils/versioning.gradle"
+
 def date = new Date()
 def timestamp = date.format('yyyyMMdd.HHmmss')
 
@@ -46,14 +48,13 @@ buildscript
     
     dependencies
     {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
     }
 }
 
 allprojects
 {
-	apply from: "$rootDir/src/main/buildutils/versioning.gradle"
-
+	version = rootProject.version
     if(isCommercial(project))
     {
 	    group = 'com.actoron.jadex'
@@ -120,12 +121,7 @@ subprojects
 
 	configurations {
 		// compileNoAndroidRuntime will exclude the artifact in Android APKs
-		runtimeAndroid.extendsFrom runtime
-		compileNoAndroidRuntime {
-			dependencies.all { dep ->
-				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
-			}
-		}
+		compileNoAndroidRuntime
 		compile.extendsFrom compileNoAndroidRuntime
 	}
 
@@ -165,7 +161,8 @@ subprojects
                 targetSdkVersion android_targetSdkVersion
                 versionCode 1
 				versionName jadex_build_version
-            }
+				multiDexEnabled true
+			}
 
             sourceSets {
                 main {
@@ -195,6 +192,7 @@ subprojects
 
 			dexOptions {
 				jumboMode = true
+				javaMaxHeapSize "4g"
 			}
         }
 
@@ -208,13 +206,14 @@ subprojects
         }
 
 		configurations {
-			// exclude transitive deps that are not supported on android
 			all {
-				dependencies.all { dep ->
-					excludeNonAndroidRuntime(project, dep)
+				dependencies.all {
+					dep -> excludeNonAndroidRuntimeFromApk(project, dep)
 				}
 			}
 		}
+
+
     }
     else
     {
