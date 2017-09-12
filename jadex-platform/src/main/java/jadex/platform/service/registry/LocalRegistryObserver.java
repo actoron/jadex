@@ -67,10 +67,13 @@ public abstract class LocalRegistryObserver
 		{
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
+				System.out.println("Local registry changed: "+event);
+				
 				if(registryevent==null)
 					registryevent= new RegistryEvent(true);
 				
-				if(event.getType() == ServiceEvent.SERVICE_ADDED)
+				if(event.getType() == ServiceEvent.SERVICE_ADDED 
+					|| event.getType() == ServiceEvent.SERVICE_CHANGED)
 				{
 					registryevent.addAddedService(event.getService());
 				}
@@ -104,6 +107,8 @@ public abstract class LocalRegistryObserver
 		this.registryevent = new RegistryEvent(true);
 		
 		restartTimer();
+		
+		System.out.println("local registry observer started");
 	}
 	
 	/**

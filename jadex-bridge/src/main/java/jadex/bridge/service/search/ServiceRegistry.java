@@ -119,6 +119,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				{
 					rwlock.writeLock().unlock();
 				}
+				
+				checkQueriesForAllServices(ServiceEvent.SERVICE_CHANGED);
 			}
 		});
 	}
@@ -406,7 +408,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		lock.lock();
 		try
 		{
-			indexer.addValue(service);
+			indexer.addValue(service, false);
 			
 			// If services belongs to excluded component cache them
 			IComponentIdentifier cid = service.getServiceIdentifier().getProviderId();
@@ -427,7 +429,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				lock.unlock();
 				lock = null;
 				
-				ret = checkQueries(service, false);
+				ret = checkQueries(service, ServiceEvent.SERVICE_ADDED);
 			}
 		}
 		finally
@@ -455,7 +457,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			lock.unlock();
 			lock = null;
 			
-			checkQueries(service, true);
+			checkQueries(service, ServiceEvent.SERVICE_REMOVED);
 		}
 		finally
 		{
@@ -492,7 +494,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			if(pservs!=null)
 			{
 				for(IService serv : pservs)
-					checkQueries(serv, true);
+					checkQueries(serv,  ServiceEvent.SERVICE_REMOVED);
 			}
 		}
 		finally
@@ -534,7 +536,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				for(IService serv : pservs)
 				{
 					if(!serv.getServiceIdentifier().getProviderId().getRoot().equals(platform))
-						checkQueries(serv, true);
+						checkQueries(serv, ServiceEvent.SERVICE_REMOVED);
 				}
 			}
 		}
@@ -818,7 +820,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		try
 		{
 			ret = new ServiceQueryInfo<T>(query, fut);
-			queries.addValue((ServiceQueryInfo)ret);
+			queries.addValue((ServiceQueryInfo)ret, true);
 			
 			// We need the write lock during read for consistency
 			// This works because rwlock is reentrant.
@@ -863,7 +865,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				public void intermediateResultAvailable(T result)
 				{
-					super.intermediateResultAvailable((T)wrapServiceForQuery(query, result, false));
+					super.intermediateResultAvailable((T)wrapServiceForQuery(query, result, ServiceEvent.SERVICE_ADDED));
 				}
 			});
 		}
@@ -1246,7 +1248,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					lis = new CounterResultListener<Void>(exs.size(), new DelegationResultListener<Void>(ret));
 					for(IService ser: exs)
 					{
-						checkQueries(ser, false).addResultListener(lis);
+						checkQueries(ser, ServiceEvent.SERVICE_ADDED).addResultListener(lis);
 					}
 				}
 			}
@@ -1298,12 +1300,17 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param removed Indicates if the query was removed. 
 	 */
 	// read
-	protected IFuture<Void> checkQueries(IService ser, boolean removed)
+	protected IFuture<Void> checkQueries(IService ser, int type)
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		Set<ServiceQueryInfo<IService>> sqis = null;
-		sqis = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceIdentifier().getServiceType().toString());
+		Set<ServiceQueryInfo<IService>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceIdentifier().getServiceType().toString());
+		Set<ServiceQueryInfo<IService>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
+		Set<ServiceQueryInfo<IService>> sqis = r1;
+		if(sqis!=null)
+			sqis.addAll(r2);
+		else
+			sqis=r2;
 		
 //		if(removed)
 //		{
@@ -1319,7 +1326,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			// Clone the data to not need to synchronize async
 			Set<ServiceQueryInfo<?>> clone = new LinkedHashSet<ServiceQueryInfo<?>>(sqis);
 			
-			checkQueriesLoop(clone.iterator(), ser, removed).addResultListener(new DelegationResultListener<Void>(ret));
+			checkQueriesLoop(clone.iterator(), ser, type).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -1330,12 +1337,38 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Check all services on all queries.
+	 */
+	protected IFuture<Void> checkQueriesForAllServices(int type)
+	{
+		FutureBarrier<Void> ret = new FutureBarrier<Void>();
+		
+		Set<IService> services;
+		
+		rwlock.writeLock().lock();
+		try
+		{
+			services = indexer.getAllValues();
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+		
+		// Call check queries without lock
+		for(IService service: services)
+			checkQueries(service, type);
+	
+		return ret.waitFor();
+	}
+	
+	/**
 	 *  Check the persistent queries against a new service.
 	 *  @param it The queries.
 	 *  @param service the service.
 	 */
 	// read
-	protected IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service, final boolean removed)
+	protected IFuture<Void> checkQueriesLoop(final Iterator<ServiceQueryInfo<?>> it, final IService service, final int type)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -1349,14 +1382,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //			String scope = sqi.getQuery().getScope();
 //			IAsyncFilter<IService> filter = (IAsyncFilter)sqi.getQuery().getFilter();
 			
-			checkQuery(sqi, service, removed).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+			checkQuery(sqi, service, type).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 			{
-				@SuppressWarnings({ "unchecked", "rawtypes" })
+				@SuppressWarnings({"unchecked", "rawtypes"})
 				public void customResultAvailable(Boolean result) throws Exception
 				{
 					if(result.booleanValue())
-						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(wrapServiceForQuery(sqi.getQuery(), service, removed));
-					checkQueriesLoop(it, service, removed).addResultListener(new DelegationResultListener<Void>(ret));
+						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(wrapServiceForQuery(sqi.getQuery(), service, type));
+					checkQueriesLoop(it, service, type).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -1371,12 +1404,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Wrap the service as serviceevent (sometimes) for queries.
 	 */
-	protected <T> Object wrapServiceForQuery(ServiceQuery<T> query, Object service, boolean removed)
+	protected <T> Object wrapServiceForQuery(ServiceQuery<T> query, Object service, int type)
 	{
 		Object ret = null;
 		if(query.getReturnType()!=null && ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
 		{
-			ret = new ServiceEvent(service, removed ? ServiceEvent.SERVICE_REMOVED : ServiceEvent.SERVICE_ADDED);
+			ret = new ServiceEvent(service, type);// removed ? ServiceEvent.SERVICE_REMOVED : ServiceEvent.SERVICE_ADDED);
 		}
 		else
 		{
@@ -1453,14 +1486,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	// read
 //	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service, final boolean removed)
+	protected IFuture<Boolean> checkQuery(final ServiceQueryInfo<?> queryinfo, final IService service, final int type)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 //		IComponentIdentifier cid = queryinfo.getQuery().getOwner();
 //		String scope = queryinfo.getQuery().getScope();
 //		@SuppressWarnings("unchecked")
 		
-		if(removed && !ServiceEvent.CLASSINFO.getTypeName().equals(queryinfo.getQuery().getReturnType().getTypeName()))
+		// Only added events are of interest for observers that are not interested in events
+		if(ServiceEvent.SERVICE_ADDED!=type && !ServiceEvent.CLASSINFO.getTypeName().equals(queryinfo.getQuery().getReturnType().getTypeName()))
 		{	
 			ret.setResult(Boolean.FALSE);
 		}
@@ -1857,7 +1891,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					{
 						IService ser = it.next();
 						
-						final T obj = (T)wrapServiceForQuery(query, ser, false);
+						final T obj = (T)wrapServiceForQuery(query, ser, ServiceEvent.SERVICE_ADDED);
 						
 						final ICommand<Iterator<IService>> cmd = this;
 						

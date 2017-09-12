@@ -194,6 +194,9 @@ public class Indexer<T>
 						if(iset!=null)
 							vals.addAll(iset);
 					}
+					Set<T> iset = index.get("null");
+					if(iset!=null)
+						vals.addAll(iset);
 					
 					if(vals.isEmpty())
 						return null;
@@ -291,8 +294,9 @@ public class Indexer<T>
 	/**
 	 *  Add a value to the indexer.
 	 *  @param value The value.
+	 *  @param includenull Should null values be indexed (necessary for queries)
 	 */
-	public void addValue(T value)
+	public void addValue(T value, boolean includenull)
 	{
 		// Add value to set of all values
 		values.add(value);
@@ -305,7 +309,13 @@ public class Indexer<T>
 				// Fetch all key values used 
 				Set<String> keys = keyextractor.getKeyValues(entry.getKey(), value);
 				
-				if(keys != null)
+				if(includenull && keys==null)
+				{
+					keys = new HashSet<String>();
+					keys.add("null");
+				}	
+				
+				if(keys!=null)
 				{
 					for(String key: keys)
 					{
@@ -573,15 +583,17 @@ public class Indexer<T>
 		
 		}, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
 		
+		ServiceQuery<IService> q0 = new ServiceQuery<IService>((Class<?>)null, null, null, null, null);
+		idx.addValue(q0, true);
 		ServiceQuery<IService> q1 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
-		idx.addValue(q1);
+		idx.addValue(q1, true);
 		ServiceQuery<IService> q2 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q2.setServiceTags(new String[]{"a", "b"});
-		idx.addValue(q2);
+		idx.addValue(q2, true);
 		ServiceQuery<IService> q3 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q3.setServiceTags(new String[]{"a"});
-		idx.addValue(q3);
+		idx.addValue(q3, true);
 		
 		List<Tuple2<String, String[]>> spec = new ArrayList<Tuple2<String,String[]>>();
 		Tuple2<String, String[]> s1 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{IComponentManagementService.class.getName()});
@@ -589,6 +601,11 @@ public class Indexer<T>
 		Tuple2<String, String[]> s2 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, new String[]{"a", "b"});
 		spec.add(s2);
 		
-		System.out.println(idx.getValuesInverted(spec));
+		Set<ServiceQuery<IService>> res = idx.getValuesInverted(spec);
+		if(res!=null)
+		{
+			for(ServiceQuery<IService> r: res)
+				System.out.println(r);
+		}
 	}
 }

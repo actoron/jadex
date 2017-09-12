@@ -656,6 +656,9 @@ public class ServiceQuery<T>
 	 */
 	public static String[] getNetworkNames(IComponentIdentifier cid)
 	{
+		if(cid==null)
+			return SUtil.EMPTY_STRING_ARRAY;
+		
 		Set<String> nnames = (Set<String>)PlatformConfiguration.getPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
 		return nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY;
 	}
