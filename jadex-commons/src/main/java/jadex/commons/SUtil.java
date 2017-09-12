@@ -2045,7 +2045,15 @@ public class SUtil
 	
 	/**
 	 * Create a globally unique conversation id.
-	 * 
+	 * @return The conversation id.
+	 */
+	public static String createUniqueId()
+	{
+		return createUniqueId(null);
+	}
+	
+	/**
+	 * Create a globally unique conversation id.
 	 * @return The conversation id.
 	 */
 	public static String createUniqueId(String name)

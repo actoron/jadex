@@ -50,7 +50,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Debug flag. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 

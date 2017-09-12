@@ -113,6 +113,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				try
 				{
 					indexer.updateIndex(ServiceKeyExtractor.KEY_TYPE_NETWORKS);
+					queries.updateIndex(QueryInfoExtractor.KEY_TYPE_NETWORKS);
 				}
 				finally
 				{
@@ -648,6 +649,23 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		try
 		{
 			return indexer.getAllValues();
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
+	}
+	
+	/**
+	 *  Get all queries.
+	 *  @return All queries (copy).
+	 */
+	public Set<ServiceQueryInfo<IService>> getAllQueries()
+	{
+		rwlock.readLock().lock();
+		try
+		{
+			return queries.getAllValues();
 		}
 		finally
 		{
