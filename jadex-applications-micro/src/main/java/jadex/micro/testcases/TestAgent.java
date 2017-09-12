@@ -246,7 +246,7 @@ public abstract class TestAgent
 						};
 						
 						// Build argsmap as program args (e.g. relay address) overridden by defargs, overridden by supplied args.
-						for(int i=0; progargs!=null && i<progargs.length; i++)
+						for(int i=0; progargs!=null && i+1<progargs.length; i++)
 						{
 							argsmap.put(progargs[i], progargs[++i]);
 						}
