@@ -63,9 +63,10 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	public IFuture<Integer>	openPort(int port)
 	{
 		final Future<Integer>	ret	= new Future<Integer>();
-		System.out.println("Starting with port " + port);
 		if(port<0)
 		{
+//			ret.setResult((int) (Math.random() * 40000));
+			// Does this work?
 			ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
 		}
 		else

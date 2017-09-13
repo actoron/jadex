@@ -111,6 +111,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		{
 			websocket.sendBinary(header);
 			websocket.sendBinary(body);
+//			websocket.sendBinary(SUtil.mergeData(header, body));
 			websocket.flush();
 			ret.setResult(null);
 		}

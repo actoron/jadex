@@ -231,7 +231,9 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
-	@ComponentType(name="tcp", clazz=TcpTransportAgent.class)
+	@ComponentType(name="tcp", clazz=TcpTransportAgent.class),
+	@ComponentType(name="ws", filename="jadex/platform/service/message/websockettransport/WebSocketTransportAgent.class"),
+	@ComponentType(name="rt", filename="jadex/platform/service/message/relaytransport/RelayTransportAgent.class")
 })
 
 @ProvidedServices({
@@ -335,6 +337,11 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			arguments={
 				@NameValue(name="port", value="$args.tcpport")
 			}),
+		//@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="1",
+		//arguments={
+		//	@NameValue(name="port", value="8080")
+		//}),
+		//@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="1"),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),

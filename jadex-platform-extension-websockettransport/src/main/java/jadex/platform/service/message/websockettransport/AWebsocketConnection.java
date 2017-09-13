@@ -11,9 +11,6 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 	/** The handler. */
 	protected ITransportHandler<IWebSocketConnection> handler;
 	
-	/** Flag if the header was saved for handling once body arrives. */
-	protected boolean savedheader;
-	
 	/** Header saved for handling once body arrives. */
 	protected byte[] header;
 	
@@ -32,16 +29,17 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 	 */
 	protected void handleFramePayload(byte[] payload)
 	{
-		if (savedheader)
+//		List<byte[]> msg = SUtil.splitData(payload);
+//		handler.messageReceived(this, msg.get(0), msg.get(1));
+		if (header != null)
 		{
 			handler.messageReceived(this, header, payload);
-			savedheader = false;
+			header = null;
 			
 		}
 		else
 		{
 			header = payload;
-			savedheader = true;
 		}
 	}
 }
