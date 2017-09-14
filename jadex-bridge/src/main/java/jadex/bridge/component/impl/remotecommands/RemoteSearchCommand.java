@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.ServiceQuery;
@@ -12,6 +13,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Search for remote services.
@@ -94,6 +96,8 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	{
 		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
 		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-		return secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+		String	level	= secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+		return level==null ? super.getSecurityLevel(access)
+			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
 	}
 }
