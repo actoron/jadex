@@ -40,6 +40,7 @@ public class ServiceEvent<T>
 	public ServiceEvent(T service, int eventtype)
 	{
 		this.service = service;
+		this.type = eventtype;
 	}
 
 	/**

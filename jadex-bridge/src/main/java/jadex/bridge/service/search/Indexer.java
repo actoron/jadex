@@ -35,12 +35,16 @@ public class Indexer<T>
 	/** The index of published values. First string is the index key name. */
 	protected Map<String, Map<String, Set<T>>> indexedvalues = new HashMap<String, Map<String, Set<T>>>();
 	
+	/** Include null values during indexing. */
+	protected boolean includenull;
+	
 	/**
 	 *  Create a new ServiceIndexer.
 	 */
-	public Indexer(IKeyExtractor<T> keyextractor, String... indextypes)
+	public Indexer(IKeyExtractor<T> keyextractor, boolean includenull, String... indextypes)
 	{
 		this.keyextractor = keyextractor;
+		this.includenull = includenull;
 		for(String indextype: indextypes)
 			indexedvalues.put(indextype, new HashMap<String, Set<T>>());
 	}
@@ -294,9 +298,8 @@ public class Indexer<T>
 	/**
 	 *  Add a value to the indexer.
 	 *  @param value The value.
-	 *  @param includenull Should null values be indexed (necessary for queries)
 	 */
-	public void addValue(T value, boolean includenull)
+	public void addValue(T value)
 	{
 		// Add value to set of all values
 		values.add(value);
@@ -487,15 +490,24 @@ public class Indexer<T>
 		{
 			Set<String> keys = keyextractor.getKeyValues(indexname, value);
 		
-			for(String key: keys)
+			if(includenull && keys==null)
 			{
-				Set<T> valset = index.get(key);
-				if(valset == null)
+				keys = new HashSet<String>();
+				keys.add("null");
+			}	
+			
+			if(keys!=null)
+			{
+				for(String key: keys)
 				{
-					valset = new HashSet<T>();
-					index.put(key, valset);
+					Set<T> valset = index.get(key);
+					if(valset == null)
+					{
+						valset = new HashSet<T>();
+						index.put(key, valset);
+					}
+					valset.add(value);
 				}
-				valset.add(value);
 			}
 		}
 		indexedvalues.put(indexname, index);
@@ -581,19 +593,19 @@ public class Indexer<T>
 				return ServiceKeyExtractor.SERVICE_KEY_TYPES;
 			}
 		
-		}, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
+		}, true, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
 		
 		ServiceQuery<IService> q0 = new ServiceQuery<IService>((Class<?>)null, null, null, null, null);
-		idx.addValue(q0, true);
+		idx.addValue(q0);
 		ServiceQuery<IService> q1 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
-		idx.addValue(q1, true);
+		idx.addValue(q1);
 		ServiceQuery<IService> q2 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q2.setServiceTags(new String[]{"a", "b"});
-		idx.addValue(q2, true);
+		idx.addValue(q2);
 		ServiceQuery<IService> q3 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q3.setServiceTags(new String[]{"a"});
-		idx.addValue(q3, true);
+		idx.addValue(q3);
 		
 		List<Tuple2<String, String[]>> spec = new ArrayList<Tuple2<String,String[]>>();
 		Tuple2<String, String[]> s1 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{IComponentManagementService.class.getName()});

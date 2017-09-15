@@ -98,8 +98,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		this.cid = cid;
 		this.rwlock = new ReentrantReadWriteLock(true);
-		this.indexer = new Indexer<IService>(new ServiceKeyExtractor(), ServiceKeyExtractor.SERVICE_KEY_TYPES);
-		this.queries = new Indexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
+		this.indexer = new Indexer<IService>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
+		this.queries = new Indexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.delay = delay;
 		
 		TransformSet<String> nnames = (TransformSet<String>)PlatformConfiguration.getPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
@@ -215,12 +215,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //					return query.getSuperpeer()!=null;
 //				}
 //			});
-			
-			for(Iterator<ServiceQueryInfo<IService>> it = qs.iterator(); it.hasNext();)
+			if(qs!=null)
 			{
-				ServiceQueryInfo<IService> query = it.next();
-				ISubscriptionIntermediateFuture<?> rfut = addQueryOnPlatform(superpeer, query);
-				query.setRemoteFuture((ISubscriptionIntermediateFuture)rfut);	
+				for(Iterator<ServiceQueryInfo<IService>> it = qs.iterator(); it.hasNext();)
+				{
+					ServiceQueryInfo<IService> query = it.next();
+					ISubscriptionIntermediateFuture<?> rfut = addQueryOnPlatform(superpeer, query);
+					query.setRemoteFuture((ISubscriptionIntermediateFuture)rfut);	
+				}
 			}
 		}
 	}
@@ -408,7 +410,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		lock.lock();
 		try
 		{
-			indexer.addValue(service, false);
+			indexer.addValue(service);
 			
 			// If services belongs to excluded component cache them
 			IComponentIdentifier cid = service.getServiceIdentifier().getProviderId();
@@ -820,7 +822,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		try
 		{
 			ret = new ServiceQueryInfo<T>(query, fut);
-			queries.addValue((ServiceQueryInfo)ret, true);
+			queries.addValue((ServiceQueryInfo)ret);
 			
 			// We need the write lock during read for consistency
 			// This works because rwlock is reentrant.
@@ -2447,15 +2449,15 @@ Ende Lars-Version */
 			// checkPublicationScope() is used 6 times, 5 times with getOwner(), only here with getProvider().
 			// TODO: Decide on search semantics with provider being set. And do not use getProvider() unconditionally!
 			// if (!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getProvider(), ser)))
-			if (!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getOwner(), ser)))
+			if(!(checkSearchScope(query.getOwner(), ser, query.getScope(), false) && checkPublicationScope(query.getOwner(), ser)))
 			{
 				fret.setResult(Boolean.FALSE);
 			}
-			else if (query.getFilter() instanceof IAsyncFilter)
+			else if(query.getFilter() instanceof IAsyncFilter)
 			{
 				((IAsyncFilter<T>) query.getFilter()).filter(obj).addResultListener(new DelegationResultListener<Boolean>(fret));
 			}
-			else if (query.getFilter() instanceof IFilter)
+			else if(query.getFilter() instanceof IFilter)
 			{
 				fret.setResult(((IFilter<T>) query.getFilter()).filter(obj));
 			}

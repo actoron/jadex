@@ -342,7 +342,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 								// Hack!!!
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
 								IService orig = reg.getIndexer().getValues(ServiceKeyExtractor.KEY_TYPE_SID, getServiceIdentifier().toString()).iterator().next();
-								reg.getIndexer().addValue(orig, false);
+								reg.getIndexer().addValue(orig);
 							}
 							ret.setResult(null);
 						}

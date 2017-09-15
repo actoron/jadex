@@ -67,7 +67,7 @@ public abstract class LocalRegistryObserver
 		{
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
-				System.out.println("Local registry changed: "+event);
+//				System.out.println("Local registry changed: "+event);
 				
 				if(registryevent==null)
 					registryevent= new RegistryEvent(true);

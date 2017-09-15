@@ -84,7 +84,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					
 					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("No superpeer found to send client data to");
+						System.out.println("No superpeer found to send client data to");
 						// Not a problem because on first occurrence sends full data (removeds are lost)
 					}
 				}, component));
