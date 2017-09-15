@@ -21,7 +21,7 @@ import jadex.commons.transformation.annotations.Alias;
  *  cannot be directly created on the remote side and then sent 
  *  per message to the calling side.
  */
-@Alias("jadex.base.service.remote.ProxyInfo")
+//@Alias("jadex.base.service.remote.ProxyInfo")
 public class ProxyInfo
 {
 	//-------- attributes --------

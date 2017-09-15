@@ -9,6 +9,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
@@ -61,16 +62,14 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	@Override
 	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
-//		if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
-//			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
+		if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
+			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
 		
 		// No recursive global search -> change global scope to platform, and owner to local platform.
 		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
 		{
 			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
-			{
 				query.setOwner(access.getComponentIdentifier().getRoot());
-			}
 			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 		}
 		
@@ -81,7 +80,10 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		}
 		else
 		{
-			ret	= new Future<Collection<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query));				
+			Collection<T> res = ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query);
+			ret	= new Future<Collection<T>>(res);				
+			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
+				System.out.println("result is: "+res);
 		}
 		
 		return ret;

@@ -1048,6 +1048,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if (state != null)
 				{

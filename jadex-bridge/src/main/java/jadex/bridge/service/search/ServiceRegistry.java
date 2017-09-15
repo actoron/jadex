@@ -386,15 +386,22 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
 		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
 		{
+			System.out.println("ask all");
 			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
 				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
 				{
+					System.out.println("found: "+result);
 					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
 				}	
 			});
 		}
+		else
+		{
+			ret.setException(new ComponentNotFoundException("No superpeer found."));
+		}
+		
 		return ret;
 	}
 	
@@ -707,6 +714,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //						System.out.println("searchServiceAsync2: "+query);
 					searchServiceAsyncByAskSuperpeer(query, cid).addResultListener(new DelegationResultListener<T>(ret));
 				}
+				// else if search has explicit start point ask there
+				else if(query.getProvider()!=null)
+				{
+					ServiceQuery<T> cp = new ServiceQuery<T>(query);
+					if(RequiredServiceInfo.SCOPE_GLOBAL.equals(cp.getScope()))
+						cp.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+					searchServiceAsyncByAskSuperpeer(cp, cp.getProvider().getRoot()).addResultListener(new DelegationResultListener<T>(ret));
+				}
+				else if(query.getPlatform()!=null)
+				{
+					ServiceQuery<T> cp = new ServiceQuery<T>(query);
+					if(RequiredServiceInfo.SCOPE_GLOBAL.equals(cp.getScope()))
+						cp.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+					searchServiceAsyncByAskSuperpeer(cp, cp.getPlatform()).addResultListener(new DelegationResultListener<T>(ret));
+				}
 				// else need to search by asking all other peer
 				else
 				{
@@ -746,6 +768,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				{
 					// If superpeer is available ask it
 					searchServicesAsyncByAskSuperpeer(query, cid).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				}
+				// else if search has explicit start point ask there
+				else if(query.getProvider()!=null)
+				{
+					ServiceQuery<T> cp = new ServiceQuery<T>(query);
+					if(RequiredServiceInfo.SCOPE_GLOBAL.equals(cp.getScope()))
+						cp.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+					searchServicesAsyncByAskSuperpeer(cp, cp.getProvider().getRoot()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				}
+				else if(query.getPlatform()!=null)
+				{
+					ServiceQuery<T> cp = new ServiceQuery<T>(query);
+					if(RequiredServiceInfo.SCOPE_GLOBAL.equals(cp.getScope()))
+						cp.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+					searchServicesAsyncByAskSuperpeer(cp, cp.getPlatform()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
 				else
 				{
@@ -1994,6 +2031,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								public IFuture<T> execute(IInternalAccess ia)
 								{
 									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+//									if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+//										query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 									return reg.searchServiceAsync(query);
 								}
 							}).addResultListener(new DelegationResultListener<T>(ret));
@@ -2034,8 +2073,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			
 			public void exceptionOccurred(Exception exception)
 			{
-//				if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
-//					System.out.println("searchServiceAsyncByAskAll00: "+query);
+//				if((""+query.getServiceType()).indexOf("ISuper")!=-1)
+//					System.out.println("ex on: "+query+" "+exception);
 				if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 				{
 //					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
@@ -2068,7 +2107,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					});
 				}
 				else
+				{
 					ret.setException(exception);
+				}
 			};
 		});
 		
@@ -2102,6 +2143,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				public void resultAvailable(Collection<IComponentIdentifier> result)
 				{
+					System.out.println("ask all by these: "+result);
+					
 //					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //						System.out.println("searchRemoteServices00: "+result);
 					if(result != null && result.size() > 0)
@@ -2204,6 +2247,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 Ende Lars-Version */
 							}
 							IComponentManagementService	cms	= getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+							final IComponentIdentifier forigin = origin;
 							cms.getExternalAccess(origin).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(remotesearch)
 							{
 								public void customResultAvailable(IExternalAccess result) throws Exception
@@ -2219,21 +2263,28 @@ Ende Lars-Version */
 												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
 													.executeRemoteSearch(platid, query);
 											}
-										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch));
-//										{
-//											@Override
-//											public void customResultAvailable(Collection<T> result)
-//											{
-//												if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
-//												{
-//													System.out.println("Remote results: "+result);
-//												}
-//												super.customResultAvailable(result);
-//											}
-//										});
+										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch)
+										{
+											@Override
+											public void customResultAvailable(Collection<T> result)
+											{
+												if((""+query.getServiceType()).indexOf("ISuper")!=-1)
+												{
+													System.out.println("Remote results: "+result);
+												}
+												super.customResultAvailable(result);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												exception.printStackTrace();
+												super.exceptionOccurred(exception);
+											}
+										});
 									}
 									catch(Exception e)
 									{
+										System.out.println("cannot access: "+forigin);
 										remotesearch.setResult(null);
 									}
 								}
@@ -2310,7 +2361,9 @@ Ende Lars-Version */
 						});
 					}
 					else
+					{
 						ret.setFinishedIfUndone();
+					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
