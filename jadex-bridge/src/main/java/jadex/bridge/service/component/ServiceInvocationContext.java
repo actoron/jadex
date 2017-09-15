@@ -704,6 +704,22 @@ public class ServiceInvocationContext
 	{
 		this.nextcall = call;
 	}
+
+	/**
+	 *  Get the service id.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return sid;
+	}
+	
+	/**
+	 *  Set the service id.
+	 */
+	public void setServiceIdentifier(IServiceIdentifier sid)
+	{
+		this.sid = sid;
+	}
 }
 
 

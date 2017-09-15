@@ -7,8 +7,6 @@ import java.util.Map;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.component.impl.MessageEvent;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
@@ -106,9 +104,6 @@ public class Message extends ParameterElement
 	/** The unique id (sequence nr) saved for quick access */
 	protected int uniqueId;
 
-	/** The original message. */
-	protected MessageEvent message;
-
 	/**
 	 * For loading from file.
 	 * Create a message with given parameters and sequence number.
@@ -124,13 +119,12 @@ public class Message extends ParameterElement
 	 * @param arguments The parameters of the message.
 	 * @param sequence The sequence number of the message.
 	 */
-	public Message(MessageEvent msg, int sequence, IComponentIdentifier receiver)
+	public Message(Object event, int sequence, String xid, IComponentIdentifier sender, IComponentIdentifier receiver, Object body)
 	{
 		assert receiver != null;
 
 		this.uniqueId = sequence;
 
-		Object	body	= msg.getBody();
 		if(body!=null)
 		{
 			IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
@@ -146,19 +140,17 @@ public class Message extends ParameterElement
 			}
 		}
 
-		this.message = msg;
-
 		this.parameters.put(SEQ_NO, Integer.valueOf(sequence));
 		//		this.parameters.put(EVENT_DIRECTION, direction);
 		//		this.parameters.put(EVENT_TYPE, mt.getName());
 
 		// parameters for element panel
 		//		this.parameters.put(NAME, parameters.get(ID));
-		this.parameters.put(NAME, message.getHeader().getProperty(IMsgHeader.XID));
-		this.parameters.put(XID, message.getHeader().getProperty(IMsgHeader.XID));
+		this.parameters.put(NAME, xid);
+		this.parameters.put(XID, xid);
 		this.parameters.put(CLASS, Message.class.getSimpleName());
 		this.parameters.put(RECEIVER, receiver);
-		this.parameters.put(SENDER, message.getHeader().getProperty(IMsgHeader.SENDER));
+		this.parameters.put(SENDER, sender);
 		
 //		public static final String DATE = SFipa.X_TIMESTAMP;
 //		public static final String DURATION = "duration";
