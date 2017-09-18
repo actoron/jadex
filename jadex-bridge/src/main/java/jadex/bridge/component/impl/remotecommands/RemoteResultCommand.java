@@ -94,4 +94,11 @@ public class RemoteResultCommand<T>	extends AbstractInternalRemoteCommand implem
 		this.exception = exception;
 	}
 	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return "RemoteResultCommand("+(exception!=null?"ex: "+exception:result)+")";
+	}
 }
