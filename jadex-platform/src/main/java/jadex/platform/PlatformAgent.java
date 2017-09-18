@@ -158,7 +158,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="8765"),
-	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue=""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
