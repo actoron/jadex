@@ -31,9 +31,11 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.IInternalArgumentsResultsFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -3343,9 +3345,22 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
 		
-		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
-		sq.setPlatform(cid.getRoot());
-		return ServiceRegistry.getRegistry(agent).searchServiceAsync(sq);
+		ServiceQuery<IComponentManagementService> query = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_PLATFORM, null, cid, null);
+		 ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
+			.executeRemoteSearch(cid, query).addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, IComponentManagementService>(ret)
+		{
+			@Override
+			public void customResultAvailable(Collection<IComponentManagementService> result) throws Exception
+			{
+				assert result!=null && !result.isEmpty();
+				ret.setResult(result.iterator().next());
+			}
+		});
+
+		
+//		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
+//		sq.setPlatform(cid.getRoot());
+//		return ServiceRegistry.getRegistry(agent).searchServiceAsync(sq);
 		
 //		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
@@ -3369,7 +3384,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			}
 //		});
 		
-//		return ret;
+		return ret;
 	}
 	
 //	/**
