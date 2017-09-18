@@ -737,7 +737,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				}
 			}
 			else
+			{
 				ret.setException(new ServiceNotFoundException("No transport available."));
+			}
 		}
 		return ret;
 	}

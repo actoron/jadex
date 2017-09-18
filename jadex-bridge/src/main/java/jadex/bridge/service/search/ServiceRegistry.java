@@ -2458,8 +2458,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public <T> IFuture<Collection<T>> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
 	{
+		IComponentIdentifier tcid = cid!=null? cid: query.getTargetPlatform();
 		return ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
-			.executeRemoteSearch(cid, query);
+			.executeRemoteSearch(tcid, query);
 	}
 	
 	/**
@@ -2470,8 +2471,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		final Future<T> ret = new Future<T>();
 		
-		 ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
-			.executeRemoteSearch(cid, query).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
+		IComponentIdentifier tcid = cid!=null? cid: query.getTargetPlatform();
+		
+		((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
+			.executeRemoteSearch(tcid, query).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
 		{
 			@Override
 			public void customResultAvailable(Collection<T> result) throws Exception
