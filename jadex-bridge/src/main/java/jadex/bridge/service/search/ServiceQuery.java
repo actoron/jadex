@@ -244,6 +244,7 @@ public class ServiceQuery<T>
 		this.id = original.id;
 		this.networknames = original.networknames;
 		this.matchingmodes = original.matchingmodes;
+		this.platform	= original.platform;
 	}
 
 	/**
