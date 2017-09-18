@@ -56,6 +56,8 @@ import static jadex.base.IRootComponentConfiguration.VALIDITYDURATION;
 import static jadex.base.IRootComponentConfiguration.VIRTUALNAMES;
 import static jadex.base.IRootComponentConfiguration.WELCOME;
 import static jadex.base.IRootComponentConfiguration.WSPUBLISH;
+import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -156,8 +158,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="8765"),
-//	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
+	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue=""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
 //	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
@@ -341,7 +343,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		//arguments={
 		//	@NameValue(name="port", value="8080")
 		//}),
-		//@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="1"),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+			arguments={
+			@NameValue(name="relays", value="$args.relayaddress")
+			}),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -409,6 +414,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			arguments={
 				@NameValue(name="port", value="$args.tcpport")
 			}),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+			arguments={
+				@NameValue(name="relays", value="$args.relayaddress")
+			}),
 	}),
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
@@ -456,6 +465,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 			arguments={
 				@NameValue(name="port", value="$args.tcpport")
+			}),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+			arguments={
+				@NameValue(name="relays", value="$args.relayaddress")
 			}),
 	}),
 })
