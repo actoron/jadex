@@ -703,6 +703,15 @@ public class ServiceQuery<T>
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the target platform if specified (using platform and provider).
+	 *  @return The target platform.
+	 */
+	public IComponentIdentifier getTargetPlatform()
+	{
+		return getPlatform()!=null? getPlatform().getRoot(): getProvider()!=null? getProvider().getRoot(): null;
+	}
 
 	/**
 	 *  Get the string representation.

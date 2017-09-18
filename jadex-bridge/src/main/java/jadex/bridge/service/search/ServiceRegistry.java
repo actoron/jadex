@@ -40,7 +40,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -713,19 +712,18 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				{
 //					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //						System.out.println("searchServiceAsync2: "+query);
+					// Do not adapt query when searching superpeer because it only searches its own database
 					searchServiceAsyncByAskOnePlatform(query, cid).addResultListener(new DelegationResultListener<T>(ret));
 				}
 				// else if search has explicit start point ask there
 				else if(query.getProvider()!=null)
 				{
-					ServiceQuery<T> cp = new ServiceQuery<T>(query);
-					adaptQuery(cp);
+					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServiceAsyncByAskOnePlatform(cp, cp.getProvider().getRoot()).addResultListener(new DelegationResultListener<T>(ret));
 				}
 				else if(query.getPlatform()!=null)
 				{
-					ServiceQuery<T> cp = new ServiceQuery<T>(query);
-					adaptQuery(cp);
+					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServiceAsyncByAskOnePlatform(cp, cp.getPlatform()).addResultListener(new DelegationResultListener<T>(ret));
 				}
 				// else need to search by asking all other peer
@@ -771,14 +769,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				// else if search has explicit start point ask there
 				else if(query.getProvider()!=null)
 				{
-					ServiceQuery<T> cp = new ServiceQuery<T>(query);
-					adaptQuery(cp);
+					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServicesAsyncByOnePlatform(cp, cp.getProvider().getRoot()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
 				else if(query.getPlatform()!=null)
 				{
-					ServiceQuery<T> cp = new ServiceQuery<T>(query);
-					adaptQuery(cp);
+					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServicesAsyncByOnePlatform(cp, cp.getPlatform()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
 				else
@@ -1811,7 +1807,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								@Classname("searchServicesAsyncByAskSuperpeer")
 								public IFuture<Collection<T>> execute(IInternalAccess ia)
 								{
-									return performRemoteSearchServices(ia, query);
+									return performRemoteSearchServices(ia, query, null);
 								}
 							}).addResultListener(new IntermediateDelegationResultListener<T>(ret)
 							{
@@ -2038,7 +2034,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								@Classname("searchByAskOne")
 								public IFuture<T> execute(IInternalAccess ia)
 								{
-									return performRemoteSearchService(ia, query);
+									return performRemoteSearchService(ia, query, null);
 //									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
 ////									if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
 ////										query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
@@ -2184,7 +2180,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 											public IFuture<Collection<T>> execute(IInternalAccess ia)
 											{
 												return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
-													.executeRemoteSearch(platid, query);
+													.executeRemoteSearch(platid, adaptQuery(query, platid));
 											}
 										}).addResultListener(new DelegationResultListener<Collection<T>>(remotesearch)
 										{
@@ -2460,7 +2456,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Perform a remote search via remote search command.
 	 *  @param agent
 	 */
-	public <T> IFuture<Collection<T>> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query)
+	public <T> IFuture<Collection<T>> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
 	{
 		return ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
 			.executeRemoteSearch(cid, query);
@@ -2470,7 +2466,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Perform a remote search via remote search command.
 	 *  @param agent
 	 */
-	public <T> IFuture<T> performRemoteSearchService(IInternalAccess agent, ServiceQuery<T> query)
+	public <T> IFuture<T> performRemoteSearchService(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -2491,12 +2487,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Adapt the query to be performed with platform scope on remote platform.
 	 */
-	public void adaptQuery(ServiceQuery<?> query)
+	public <T> ServiceQuery<T> adaptQuery(ServiceQuery<T> query, IComponentIdentifier targetpl)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
-			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-		if(query.getOwner()!=null && !query.getProvider().getRoot().equals(query.getOwner().getRoot()))
-			query.setOwner(query.getProvider().getRoot());
+		IComponentIdentifier target = targetpl!=null? targetpl: query.getTargetPlatform();
+		
+		ServiceQuery<T> ret = new ServiceQuery<T>(query);
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(ret.getScope()))
+			ret.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+		if(ret.getOwner()!=null && !target.equals(ret.getOwner().getRoot()))
+			ret.setOwner(target);
+		return ret;
 	}
 
 }
