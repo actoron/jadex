@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -176,5 +177,14 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		
 		return level==null ? super.getSecurityLevel(access)
 			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+	}
+
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return "RemoteMethodInvocationCommand("+method.getName()+Arrays.asList(args)+")";
 	}
 }

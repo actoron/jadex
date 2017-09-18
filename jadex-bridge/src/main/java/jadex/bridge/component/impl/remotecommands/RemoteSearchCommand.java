@@ -102,4 +102,12 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		return level==null ? super.getSecurityLevel(access)
 			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
 	}
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return "RemoteSearchCommand("+query+")";
+	}
 }
