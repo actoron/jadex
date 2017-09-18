@@ -37,13 +37,16 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	 */
 	public RemoteSearchCommand(ServiceQuery<T> query)
 	{
+		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+			System.out.println("Global query");
+		
 		this.query = query;
 	}
 	
 	/**
 	 *  Get the query.
 	 */
-	public ServiceQuery<T>	getQuery()
+	public ServiceQuery<T> getQuery()
 	{
 		return query;
 	}
@@ -68,9 +71,10 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		// No recursive global search -> change global scope to platform, and owner to local platform.
 		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
 		{
-			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
-				query.setOwner(access.getComponentIdentifier().getRoot());
-			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+			System.out.println("Performing remote global search (should only happen on superpeers)");
+//			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
+//				query.setOwner(access.getComponentIdentifier().getRoot());
+//			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 		}
 		
 		final IFuture<Collection<T>>	ret;
