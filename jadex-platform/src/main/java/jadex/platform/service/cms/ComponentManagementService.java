@@ -2169,24 +2169,24 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-		ret.addResultListener(new IResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(IExternalAccess result)
-			{
-				if(cid.toString().indexOf("Killer")!=-1)
-				{
-					System.out.println("getExternalAccess: "+cid+", "+result+", "+agent);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(cid.toString().indexOf("Killer")!=-1)
-				{
-					System.out.println("getExternalAccess: "+cid+", "+exception+", "+agent);
-				}
-			}
-		});
+//		ret.addResultListener(new IResultListener<IExternalAccess>()
+//		{
+//			public void resultAvailable(IExternalAccess result)
+//			{
+//				if(cid.toString().indexOf("Killer")!=-1)
+//				{
+//					System.out.println("getExternalAccess: "+cid+", "+result+", "+agent);
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				if(cid.toString().indexOf("Killer")!=-1)
+//				{
+//					System.out.println("getExternalAccess: "+cid+", "+exception+", "+agent);
+//				}
+//			}
+//		});
 		
 		if(cid==null)
 		{
@@ -3357,7 +3357,6 @@ public class ComponentManagementService implements IComponentManagementService
 			}
 		});
 
-		
 //		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
 //		sq.setPlatform(cid.getRoot());
 //		return ServiceRegistry.getRegistry(agent).searchServiceAsync(sq);
