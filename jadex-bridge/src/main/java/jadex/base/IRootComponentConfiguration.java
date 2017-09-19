@@ -492,7 +492,7 @@ public interface IRootComponentConfiguration {
             WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
             UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
             PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT,
-//            RELAYTRANSPORT,
+            RELAYTRANSPORT,
 //            RELAYSECURITY, RELAYAWAONLY,
 //            SSLTCPTRANSPORT,
             WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
@@ -663,14 +663,14 @@ public interface IRootComponentConfiguration {
 
     void setTcpPort(int value);
 
-//    boolean getRelayTransport();
-//
-//    void setRelayTransport(boolean value);
-//
-//    String getRelayAddress();
-//
-//    void setRelayAddress(String value);
-//
+    boolean getRelayTransport();
+
+    void setRelayTransport(boolean value);
+
+    String getRelayAddress();
+
+    void setRelayAddress(String value);
+
 //    boolean getRelaySecurity();
 //
 //    void setRelaySecurity(boolean value);

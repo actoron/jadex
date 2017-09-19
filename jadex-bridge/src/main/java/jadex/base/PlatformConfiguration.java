@@ -453,26 +453,26 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 		getRootConfig().setTcpPort(value);
 	}
 
-//	@Override
-//	public boolean getRelayTransport() {
-//		return getRootConfig().getRelayTransport();
-//	}
-//
-//	@Override
-//	public void setRelayTransport(boolean value) {
-//		getRootConfig().setRelayTransport(value);
-//	}
-//
-//	@Override
-//	public String getRelayAddress() {
-//		return getRootConfig().getRelayAddress();
-//	}
-//
-//	@Override
-//	public void setRelayAddress(String value) {
-//		getRootConfig().setRelayAddress(value);
-//	}
-//
+	@Override
+	public boolean getRelayTransport() {
+		return getRootConfig().getRelayTransport();
+	}
+
+	@Override
+	public void setRelayTransport(boolean value) {
+		getRootConfig().setRelayTransport(value);
+	}
+
+	@Override
+	public String getRelayAddress() {
+		return getRootConfig().getRelayAddress();
+	}
+
+	@Override
+	public void setRelayAddress(String value) {
+		getRootConfig().setRelayAddress(value);
+	}
+
 //	@Override
 //	public boolean getRelaySecurity() {
 //		return getRootConfig().getRelaySecurity();
