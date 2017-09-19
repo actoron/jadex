@@ -1,7 +1,6 @@
 package jadex.platform.service.cms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -335,7 +334,7 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			public void intermediateResultAvailable(Tuple2<String, Object> result)
 			{
-				ret.addIntermediateResultIfUndone(new CMSIntermediateResultEvent(mycid[0], result.getFirstEntity(), result.getSecondEntity()));
+				ret.addIntermediateResultIfUndone(new CMSIntermediateResultEvent(getDescription(mycid[0]), result.getFirstEntity(), result.getSecondEntity()));
 				results.put(result.getFirstEntity(), result.getSecondEntity());
 			}
 			
@@ -353,7 +352,7 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			public void finished()
 			{
-				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(mycid[0], results));
+				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(getDescription(mycid[0]), results));
 				ret.setFinishedIfUndone();
 			}
 			
@@ -366,7 +365,7 @@ public class ComponentManagementService implements IComponentManagementService
 			public void resultAvailable(IComponentIdentifier cid)
 			{
 				mycid[0] = cid;
-				ret.addIntermediateResultIfUndone(new CMSCreatedEvent(cid));
+				ret.addIntermediateResultIfUndone(new CMSCreatedEvent(getDescription(cid)));
 				if(terminate[0])
 				{
 					destroyComponent(cid);
