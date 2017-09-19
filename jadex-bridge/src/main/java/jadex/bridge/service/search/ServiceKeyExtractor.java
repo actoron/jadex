@@ -97,9 +97,12 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 //			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
 //				System.out.println("sdhgfsdh");
 //		}
-		
-		IService service = (IService) serv;
 		Set<String> ret = null;
+		
+		try
+		{
+			IService service = (IService)serv;
+		
 		if(KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			ret = new HashSet<String>();
@@ -132,6 +135,12 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 		else if(KEY_TYPE_NETWORKS.equals(keytype))
 		{
 			ret = new HashSet<String>(service.getServiceIdentifier().getNetworkNames());
+		}
+		}
+		catch(NullPointerException e)
+		{
+			e.printStackTrace();
+			return getKeysStatic(keytype, serv);
 		}
 		return ret;
 	}

@@ -7,7 +7,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -387,15 +386,17 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					
 					if(lastpostedfile != null)
 					{
-						try
-						{
-							java.nio.file.Files.delete(Paths.get(lastpostedfile.getAbsolutePath()));
-						}
-						catch(Exception e)
-						{
-//							e.printStackTrace();
+						if(!lastpostedfile.delete())
 							undeleted.add(lastpostedfile);
-						}
+//						try
+//						{
+//							java.nio.file.Files.delete(Paths.get(lastpostedfile.getAbsolutePath()));
+//						}
+//						catch(Exception e)
+//						{
+////							e.printStackTrace();
+//							undeleted.add(lastpostedfile);
+//						}
 //						if(!lastpostedfile.delete())
 //							System.out.println("Could not delete old file: "+lastpostedfile.getName());
 					}
