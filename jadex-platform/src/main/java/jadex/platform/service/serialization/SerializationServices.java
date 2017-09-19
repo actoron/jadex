@@ -60,38 +60,8 @@ import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
  */
 public class SerializationServices implements ISerializationServices
 {
-	//-------- constants --------
-	
-	/** The predefined reference settings (clazz->boolean (is reference)). */
-	public static final Map<Class<?>, boolean[]> REFERENCES;
-	
-	static
-	{
-		Map<Class<?>, boolean[]>	refs	= new HashMap<Class<?>, boolean[]>();
-		boolean[] tt = new boolean[]{true, true};
-		refs.put(IRemotable.class, tt);
-		refs.put(IResultListener.class, tt);
-		refs.put(IIntermediateResultListener.class, tt);
-		refs.put(IFuture.class, tt);
-		refs.put(IIntermediateFuture.class, tt);
-		refs.put(IChangeListener.class, tt);
-		refs.put(IRemoteChangeListener.class, tt);
-		refs.put(ClassLoader.class, tt);
+	//-------- attributes --------
 		
-		boolean[] tf = new boolean[]{true, false};
-		refs.put(URL.class, tf);
-		refs.put(InetAddress.class, tf);
-		refs.put(Inet4Address.class, tf);
-		refs.put(Inet6Address.class, tf);
-		refs.put(IComponentIdentifier.class, tf);
-		refs.put(BasicComponentIdentifier.class, tf);
-		Class<?>	ti	= SReflect.classForName0("jadex.xml.TypeInfo", SerializationServices.class.getClassLoader());
-		if(ti!=null)
-			refs.put(ti, tf);
-		
-		REFERENCES = Collections.unmodifiableMap(refs);
-	}
-	
 	/** The remote reference module */
 	protected RemoteReferenceModule rrm;
 	
