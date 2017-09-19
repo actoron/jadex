@@ -2,6 +2,7 @@ package jadex.platform.service.registry;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -108,7 +109,7 @@ public abstract class LocalRegistryObserver
 		
 		restartTimer();
 		
-		System.out.println("local registry observer started");
+//		System.out.println("local registry observer started");
 	}
 	
 	/**
@@ -189,7 +190,10 @@ public abstract class LocalRegistryObserver
 	{
 		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
 		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, cid, null);
-		RegistryEvent event = new RegistryEvent(new HashSet<IService>(reg.searchServicesSync(query)), null, eventslimit, timelimit, false);
+		Set<IService> added = reg.searchServicesSync(query);
+		if(added.contains(null))
+			System.out.println("schrott");
+		RegistryEvent event = new RegistryEvent(added, null, eventslimit, timelimit, false);
 		return event;
 	}
 }

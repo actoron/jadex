@@ -66,7 +66,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
  *  Agent that provides the security service.
  */
 @Agent
-@Service
+//@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService

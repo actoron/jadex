@@ -323,7 +323,7 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
-					Object ret= ((RemoteReferenceModule) rrm).getProxy((ProxyReference)object, targetcl);
+					Object ret= ((RemoteReferenceModule)rrm).getProxy((ProxyReference)object, targetcl);
 					return ret;
 				}
 				catch(Exception e)
@@ -436,7 +436,7 @@ public class SerializationServices implements ISerializationServices
 		{
 			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
+				return object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
 			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
@@ -461,6 +461,9 @@ public class SerializationServices implements ISerializationServices
 			{
 //				if(marshal.isRemoteReference(object))
 //					System.out.println("rr: "+object);
+//				if(object!=null && object.toString().indexOf("Security")!=-1 && !(object instanceof String))
+//					System.out.println("hererer");
+				
 				return rrm.isRemoteReference(object);
 			}
 			
@@ -468,6 +471,7 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
+//					System.out.println("remoteob: "+object);
 					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
 					MsgHeader header = (MsgHeader)ctx.get("header");
 					IComponentIdentifier receiver = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);

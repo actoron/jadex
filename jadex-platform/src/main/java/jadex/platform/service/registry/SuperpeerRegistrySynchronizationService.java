@@ -402,8 +402,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		}
 		clients.put(cid, ci);
 		
-		if(event.size()>0)
-			System.out.println("Client update request from: "+cid+" size:"+event.size()+" delta: "+event.isDelta());
+//		if(event.size()>0)
+//			System.out.println("Client update request from: "+cid+" size:"+event.size()+" delta: "+event.isDelta());
 		
 		handleRegistryEvent(event);
 		
