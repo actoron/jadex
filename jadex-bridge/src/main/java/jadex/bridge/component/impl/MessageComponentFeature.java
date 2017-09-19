@@ -725,12 +725,12 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							--counter[0];
 							if (counter[0] == 0)
 							{
-								String error = "Could not find working transport for receiver " + receiverplatform + ", tried:";
+								String error = component.getComponentIdentifier()+" could not find working transport for receiver " + receiverplatform + ", tried:";
 								for (ITransportService tp : coll)
 								{
 									error += " " + tp.toString();
 								}
-								ret.setException(new RuntimeException(error));
+								ret.setException(new RuntimeException(error, exception));
 							}
 						}
 					});
