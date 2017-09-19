@@ -504,6 +504,10 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		{
 			Object value = null;
 			IService ser = list.get(row);
+			
+			if(ser==null)
+				return null;
+			
 			if(column == 0)
 			{
 				value = row;
@@ -603,7 +607,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+//				throw new RuntimeException(e);
 			}
 			return ret;
 		}
