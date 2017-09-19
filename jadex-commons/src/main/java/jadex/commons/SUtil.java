@@ -4351,7 +4351,7 @@ public class SUtil
 			    baos.write(buf, 0, readbytes);
 			}
 		}
-		catch (IOException e)
+		catch(IOException e)
 		{
 			try
 			{
@@ -4367,11 +4367,13 @@ public class SUtil
 		{
 			fis.close();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 		}
 		
-		return baos.toByteArray();
+		byte[] ret = baos.toByteArray();
+		
+		return ret;
 	}
 	
 	/**
