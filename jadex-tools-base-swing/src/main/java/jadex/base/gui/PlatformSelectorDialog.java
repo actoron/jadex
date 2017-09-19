@@ -23,12 +23,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
@@ -43,7 +45,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	protected Map<IComponentIdentifier, IComponentIdentifier> valmap;
 	
 	/** The registered cms listener. */
-	protected ICMSComponentListener cmslistener;
+	protected ISubscriptionIntermediateFuture<CMSStatusEvent> cmslistener;
 	
 	//-------- constructors --------
 
@@ -99,66 +101,77 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			}
 		});
 		
-		this.cmslistener = new ICMSComponentListener()
+		cmslistener	= cmshandler.addCMSListener(access.getComponentIdentifier().getRoot());
+		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
-			public IFuture<Void> componentRemoved(final IComponentDescription desc, Map<String, Object> results)
+			@Override
+			public void exceptionOccurred(Exception exception)
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-//						System.out.println("removed: "+desc.getName()+" "+desc.getModelName());
-						IComponentIdentifier cid = valmap.remove(desc.getName());
-						if(cid!=null)
-						{
-							((DefaultListModel)pllist.getModel()).removeElement(cid);
-						}
-						else
-						{
-							System.out.println("Could not remove: "+desc.getName());
-						}
-					}
-				});
-				return IFuture.DONE;
 			}
-			
-			public IFuture<Void> componentChanged(IComponentDescription desc)
+
+			@Override
+			public void resultAvailable(Collection<CMSStatusEvent> result)
 			{
-				return IFuture.DONE;
 			}
-			
-			public IFuture<Void> componentAdded(final IComponentDescription desc)
+
+			@Override
+			public void intermediateResultAvailable(CMSStatusEvent event)
 			{
-//				System.out.println("added: "+desc);
-				
-				SwingUtilities.invokeLater(new Runnable()
+				final IComponentDescription	desc	= event.getComponentDescription();
+				if(event instanceof CMSTerminatedEvent)
 				{
-					public void run()
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						// Hack for speed
-						if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
+						public void run()
 						{
-							SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
-								.addResultListener(new IResultListener<IProxyAgentService>()
+//							System.out.println("removed: "+desc.getName()+" "+desc.getModelName());
+							IComponentIdentifier cid = valmap.remove(desc.getName());
+							if(cid!=null)
 							{
-								public void resultAvailable(IProxyAgentService ser)
-								{
-									addPlatform(ser);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-								}
-							});
+								((DefaultListModel)pllist.getModel()).removeElement(cid);
+							}
+							else
+							{
+								System.out.println("Could not remove: "+desc.getName());
+							}
 						}
-					}
-				});
-				
-				return IFuture.DONE;
+					});
+				}
+
+				else if(event instanceof CMSCreatedEvent)
+				{
+//					System.out.println("added: "+desc);
+					
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							// Hack for speed
+							if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
+							{
+								SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+									.addResultListener(new IResultListener<IProxyAgentService>()
+								{
+									public void resultAvailable(IProxyAgentService ser)
+									{
+										addPlatform(ser);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								});
+							}
+						}
+					});
+				}
 			}
-		};
-		
-		cmshandler.addCMSListener(access.getComponentIdentifier().getRoot(), cmslistener);
+
+			@Override
+			public void finished()
+			{
+			}
+		});
 		
 		final Runnable action = new Runnable()
 		{
@@ -252,7 +265,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	 */
 	protected void disposeTreeView()
 	{
-		cmshandler.removeCMSListener(access.getComponentIdentifier().getRoot(), cmslistener);
+		cmslistener.terminate();
 		valmap.clear();
 	}
 	

@@ -185,133 +185,133 @@ public class SRemoteGui
 		throw new UnsupportedOperationException();
 	}
 	
-	/**
-	 *  Install the remote listener.
-	 *  @param cid	The remote component id.
-	 */
-	public static IFuture<Void>	installRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final IRemoteChangeListener rcl0, final String id0)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		
-		try
-		{
-			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-			{
-				public void customResultAvailable(IComponentManagementService	cms)
-				{
-	//				IComponentManagementService	cms	= (IComponentManagementService)result;
-					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-					{
-						public void customResultAvailable(IExternalAccess exta)
-						{
-	//						IExternalAccess	exta	= (IExternalAccess)result;
-							final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
-							final String	id	= id0;
-							final IRemoteChangeListener	rcl	= rcl0;
-							exta.scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("installListener")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									final Future<Void>	ret	= new Future<Void>();
-									try
-									{
-										SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-											.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-										{
-											public void customResultAvailable(IComponentManagementService cms)
-											{
-												RemoteCMSListener	rcmsl	= new RemoteCMSListener(icid, id, cms, rcl);
-												cms.addComponentListener(null, rcmsl);
-												ret.setResult(null);
-											}
-										}));
-									}
-									catch(Exception e)
-									{
-										// Protect remote platform from execution errors.
-										Thread.dumpStack();
-										e.printStackTrace();
-										ret.setException(e);
-									}
-									return ret;
-								}
-							}).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-					});
-				}
-			});
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
-		
-		return ret;
-	}
-
-	/**
-	 *  Deregister the remote listener.
-	 */
-	public static IFuture<Void>	deregisterRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final String id0)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-				{
-					public void customResultAvailable(IExternalAccess exta)
-					{
-						final String	id	= id0;
-						exta.scheduleStep(new IComponentStep<Void>()
-						{
-							@Classname("deregisterListener")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								final Future<Void>	ret	= new Future<Void>();
-								try
-								{
-									SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-									{
-										public void customResultAvailable(IComponentManagementService cms)
-										{
-	//										System.out.println("Removing listener: "+id);
-											try
-											{
-												if(cms!=null)
-												{
-													cms.removeComponentListener(null, new RemoteCMSListener(cid, id, cms, null));
-												}
-											}
-											catch(RuntimeException e)
-											{
-			//									System.out.println("Listener already removed: "+id);
-											}
-											ret.setResult(null);
-										}
-									}));
-								}
-								catch(Exception e)
-								{
-									// Protect remote platform from execution errors.
-									Thread.dumpStack();
-									e.printStackTrace();
-									ret.setException(e);
-								}
-								return ret;
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Install the remote listener.
+//	 *  @param cid	The remote component id.
+//	 */
+//	public static IFuture<Void>	installRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final IRemoteChangeListener rcl0, final String id0)
+//	{
+//		final Future<Void>	ret	= new Future<Void>();
+//		
+//		try
+//		{
+//			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService	cms)
+//				{
+//	//				IComponentManagementService	cms	= (IComponentManagementService)result;
+//					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//					{
+//						public void customResultAvailable(IExternalAccess exta)
+//						{
+//	//						IExternalAccess	exta	= (IExternalAccess)result;
+//							final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
+//							final String	id	= id0;
+//							final IRemoteChangeListener	rcl	= rcl0;
+//							exta.scheduleStep(new IComponentStep<Void>()
+//							{
+//								@Classname("installListener")
+//								public IFuture<Void> execute(IInternalAccess ia)
+//								{
+//									final Future<Void>	ret	= new Future<Void>();
+//									try
+//									{
+//										SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//											.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//										{
+//											public void customResultAvailable(IComponentManagementService cms)
+//											{
+//												RemoteCMSListener	rcmsl	= new RemoteCMSListener(icid, id, cms, rcl);
+//												cms.addComponentListener(null, rcmsl);
+//												ret.setResult(null);
+//											}
+//										}));
+//									}
+//									catch(Exception e)
+//									{
+//										// Protect remote platform from execution errors.
+//										Thread.dumpStack();
+//										e.printStackTrace();
+//										ret.setException(e);
+//									}
+//									return ret;
+//								}
+//							}).addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//					});
+//				}
+//			});
+//		}
+//		catch(Exception e)
+//		{
+//			ret.setException(e);
+//		}
+//		
+//		return ret;
+//	}
+//
+//	/**
+//	 *  Deregister the remote listener.
+//	 */
+//	public static IFuture<Void>	deregisterRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final String id0)
+//	{
+//		final Future<Void>	ret	= new Future<Void>();
+//		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
+//				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//				{
+//					public void customResultAvailable(IExternalAccess exta)
+//					{
+//						final String	id	= id0;
+//						exta.scheduleStep(new IComponentStep<Void>()
+//						{
+//							@Classname("deregisterListener")
+//							public IFuture<Void> execute(IInternalAccess ia)
+//							{
+//								final Future<Void>	ret	= new Future<Void>();
+//								try
+//								{
+//									SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//										.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//									{
+//										public void customResultAvailable(IComponentManagementService cms)
+//										{
+//	//										System.out.println("Removing listener: "+id);
+//											try
+//											{
+//												if(cms!=null)
+//												{
+//													cms.removeComponentListener(null, new RemoteCMSListener(cid, id, cms, null));
+//												}
+//											}
+//											catch(RuntimeException e)
+//											{
+//			//									System.out.println("Listener already removed: "+id);
+//											}
+//											ret.setResult(null);
+//										}
+//									}));
+//								}
+//								catch(Exception e)
+//								{
+//									// Protect remote platform from execution errors.
+//									Thread.dumpStack();
+//									e.printStackTrace();
+//									ret.setException(e);
+//								}
+//								return ret;
+//							}
+//						}).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Localize a model name.

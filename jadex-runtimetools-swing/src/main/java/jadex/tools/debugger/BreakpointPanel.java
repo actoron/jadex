@@ -6,8 +6,8 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JCheckBox;
@@ -31,14 +31,15 @@ import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.TableSorter;
@@ -72,6 +73,9 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	
 	/** The listeners (if any). */
 	protected List	listeners;
+	
+	/** The cms subscription. */
+	protected ISubscriptionIntermediateFuture<CMSStatusEvent>	sub;
 		
 	//-------- constructors --------
 	
@@ -84,29 +88,38 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		this.description	= description;
 		this.access = access;
 	
-		cmshandler.addCMSListener(access.getComponentIdentifier(), new ICMSComponentListener()
+		sub	= cmshandler.addCMSListener(access.getComponentIdentifier());
+		sub.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
-			public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+			@Override
+			public void exceptionOccurred(Exception exception)
 			{
-				return IFuture.DONE;
 			}
-			
-			public IFuture<Void> componentChanged(IComponentDescription desc)
+
+			@Override
+			public void resultAvailable(Collection<CMSStatusEvent> result)
 			{
-				BreakpointPanel.this.description = desc;
-				SwingUtilities.invokeLater(new Runnable()
+			}
+
+			@Override
+			public void intermediateResultAvailable(CMSStatusEvent result)
+			{
+				if(result.getComponentIdentifier().equals(description.getName()))
 				{
-					public void run()
+					BreakpointPanel.this.description = result.getComponentDescription();
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						((AbstractTableModel)list.getModel()).fireTableDataChanged();
-					}
-				});
-				return IFuture.DONE;
+						public void run()
+						{
+							((AbstractTableModel)list.getModel()).fireTableDataChanged();
+						}
+					});
+				}
 			}
-			
-			public IFuture<Void> componentAdded(IComponentDescription desc)
+
+			@Override
+			public void finished()
 			{
-				return IFuture.DONE;
 			}
 		});
 		
@@ -186,7 +199,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	 */
 	public void	dispose()
 	{
-		
+		sub.terminate();
 	}
 	
 	/**

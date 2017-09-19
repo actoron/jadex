@@ -2,10 +2,10 @@ package jadex.base.gui.componenttree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -26,14 +26,18 @@ import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
@@ -74,10 +78,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	protected ComponentProperties	propcomp;
 	
 	/** The cms listener (if any). */
-	protected ICMSComponentListener	cmslistener;
-	
-	/** The component id for listening (if any). */
-	protected IComponentIdentifier	listenercid;
+	protected ISubscriptionIntermediateFuture<CMSStatusEvent>	cmslistener;
 	
 	/** Flag indicating a broken node (e.g. children could not be searched due to network problems). */
 	protected boolean	broken;
@@ -637,115 +638,131 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	{
 		assert cmslistener==null;
 		CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
-		this.listenercid	= cid;
-		this.cmslistener	= new ICMSComponentListener()
+		this.cmslistener	= cmshandler.addCMSListener(cid);
+		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
-			public IFuture<Void> componentRemoved(final IComponentDescription desc, Map<String, Object> results)
+			@Override
+			public void exceptionOccurred(Exception exception)
 			{
-				final ISwingTreeNode node = getModel().getNodeOrAddZombie(desc.getName());
-//				if(desc.getName().toString().startsWith("ANDTest@"))
-//				System.out.println("Component removed0: "+desc.getName().getName()+", zombie="+(node==null));
-				if(node!=null)
+			}
+
+			@Override
+			public void resultAvailable(Collection<CMSStatusEvent> result)
+			{
+			}
+
+			@Override
+			public void intermediateResultAvailable(CMSStatusEvent event)
+			{
+				final IComponentDescription desc	= event.getComponentDescription();
+				
+				if(event instanceof CMSTerminatedEvent)
+				{
+					final ISwingTreeNode node = getModel().getNodeOrAddZombie(desc.getName());
+//					if(desc.getName().toString().startsWith("ANDTest@"))
+//					System.out.println("Component removed0: "+desc.getName().getName()+", zombie="+(node==null));
+					if(node!=null)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								if(getModel().getNodeOrAddZombie(desc.getName())!=null)
+								{
+//									if(desc.getName().toString().startsWith("ANDTest@"))
+//										System.out.println("Component removed: "+desc.getName().getName());
+									((AbstractSwingTreeNode)node.getParent()).removeChild(node);
+								}
+							}
+						});
+					}
+				}
+				
+				else if(event instanceof CMSCreatedEvent)
+				{
+//					System.out.println("Component added0: "+desc.getName().getName());
+//					System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
+					
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+//							System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
+							final ComponentTreeNode	parentnode = desc.getName().getParent()==null ? null
+									: desc.getName().getParent().equals(getComponentIdentifier()) ? ComponentTreeNode.this	// For proxy nodes.
+									: (ComponentTreeNode)getModel().getAddedNode(desc.getName().getParent());
+							if(parentnode!=null)
+							{
+								ISwingTreeNode	node = (ISwingTreeNode)parentnode.createComponentNode(desc);
+//								System.out.println("addChild: "+parentnode+", "+node);
+								try
+								{
+									if(parentnode.getIndexOfChild(node)==-1)
+									{
+//										if(desc.getName().toString().startsWith("ANDTest@"))
+//											System.out.println("Component added: "+desc.getName().getName());
+//										System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
+										boolean ins = false;
+										for(int i=0; i<parentnode.getChildCount() && !ins; i++)
+										{
+											ISwingTreeNode child = parentnode.getChild(i);
+											if(child instanceof ServiceContainerNode || child instanceof NFPropertyContainerNode)
+												continue;
+											if(child.toString().toLowerCase().compareTo(node.toString().toLowerCase())>=0)
+											{
+												parentnode.addChild(i, node);
+												ins = true;
+											}
+										}
+										if(!ins)
+										{
+											parentnode.addChild(node);
+										}
+									}
+//									else
+//									{
+//										if(desc.getName().toString().startsWith("ANDTest@"))
+//											System.out.println("Not added: "+desc.getName().getName());
+//									}
+								}
+								catch(Exception e)
+								{
+									System.err.println(""+getModel().hashCode()+" Broken node: "+node);
+									System.err.println(""+getModel().hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
+									e.printStackTrace();
+//									model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
+								}
+							}
+//							else
+//							{
+//								System.out.println("no parent, addChild: "+desc.getName()+", "+desc.getParent());
+//							}
+						}
+					});
+				}
+				
+				else	// Changed
 				{
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
 						{
-							if(getModel().getNodeOrAddZombie(desc.getName())!=null)
+							ComponentTreeNode	node	= (ComponentTreeNode)getModel().getAddedNode(desc.getName());
+							if(node!=null)
 							{
-//								if(desc.getName().toString().startsWith("ANDTest@"))
-//									System.out.println("Component removed: "+desc.getName().getName());
-								((AbstractSwingTreeNode)node.getParent()).removeChild(node);
+								node.setDescription(desc);
+								getModel().fireNodeChanged(node);
 							}
 						}
 					});
-				}
-				return IFuture.DONE;
+				}				
 			}
-			
-			public IFuture<Void> componentChanged(final IComponentDescription desc)
+
+			@Override
+			public void finished()
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						ComponentTreeNode	node	= (ComponentTreeNode)getModel().getAddedNode(desc.getName());
-						if(node!=null)
-						{
-							node.setDescription(desc);
-							getModel().fireNodeChanged(node);
-						}
-					}
-				});
-				return IFuture.DONE;
 			}
-			
-			public IFuture<Void> componentAdded(final IComponentDescription desc)
-			{
-//				System.out.println("Component added0: "+desc.getName().getName());
-//				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
-				
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-//						System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
-						final ComponentTreeNode	parentnode = desc.getName().getParent()==null ? null
-								: desc.getName().getParent().equals(getComponentIdentifier()) ? ComponentTreeNode.this	// For proxy nodes.
-								: (ComponentTreeNode)getModel().getAddedNode(desc.getName().getParent());
-						if(parentnode!=null)
-						{
-							ISwingTreeNode	node = (ISwingTreeNode)parentnode.createComponentNode(desc);
-//							System.out.println("addChild: "+parentnode+", "+node);
-							try
-							{
-								if(parentnode.getIndexOfChild(node)==-1)
-								{
-//									if(desc.getName().toString().startsWith("ANDTest@"))
-//										System.out.println("Component added: "+desc.getName().getName());
-//									System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
-									boolean ins = false;
-									for(int i=0; i<parentnode.getChildCount() && !ins; i++)
-									{
-										ISwingTreeNode child = parentnode.getChild(i);
-										if(child instanceof ServiceContainerNode || child instanceof NFPropertyContainerNode)
-											continue;
-										if(child.toString().toLowerCase().compareTo(node.toString().toLowerCase())>=0)
-										{
-											parentnode.addChild(i, node);
-											ins = true;
-										}
-									}
-									if(!ins)
-									{
-										parentnode.addChild(node);
-									}
-								}
-//								else
-//								{
-//									if(desc.getName().toString().startsWith("ANDTest@"))
-//										System.out.println("Not added: "+desc.getName().getName());
-//								}
-							}
-							catch(Exception e)
-							{
-								System.err.println(""+getModel().hashCode()+" Broken node: "+node);
-								System.err.println(""+getModel().hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
-								e.printStackTrace();
-//								model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
-							}
-						}
-//						else
-//						{
-//							System.out.println("no parent, addChild: "+desc.getName()+", "+desc.getParent());
-//						}
-					}
-				});
-				
-				return IFuture.DONE;
-			}
-		};
-		cmshandler.addCMSListener(listenercid, cmslistener);
+		});
 	}
 
 	/**
@@ -755,8 +772,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	{
 		if(cmslistener!=null)
 		{
-			CMSUpdateHandler	cmshandler	= (CMSUpdateHandler)getTree().getClientProperty(CMSUpdateHandler.class);
-			cmshandler.removeCMSListener(listenercid, cmslistener);
+			cmslistener.terminate();
 		}
 	}
 }

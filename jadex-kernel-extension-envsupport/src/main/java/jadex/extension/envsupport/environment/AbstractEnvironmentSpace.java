@@ -28,6 +28,8 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -40,6 +42,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.meta.IPropertyMetaDataSet;
@@ -645,29 +648,37 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					{
 						public void resultAvailable(final Object result)
 						{
-							((IComponentManagementService)result).addComponentListener(getExternalAccess().getComponentIdentifier(), new ICMSComponentListener()
+							((IComponentManagementService)result).listenToComponent(getExternalAccess().getComponentIdentifier())
+								.addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 							{
-								public IFuture componentRemoved(IComponentDescription desc, Map results)
+								@Override
+								public void exceptionOccurred(Exception exception)
 								{
-									((IComponentManagementService)result).removeComponentListener(getExternalAccess().getComponentIdentifier(), this);
-									SwingUtilities.invokeLater(new Runnable()
+								}
+								
+								@Override
+								public void resultAvailable(Collection<CMSStatusEvent> result)
+								{
+								}
+								
+								@Override
+								public void intermediateResultAvailable(CMSStatusEvent result)
+								{
+									if(result instanceof CMSTerminatedEvent)
 									{
-										public void run()
+										SwingUtilities.invokeLater(new Runnable()
 										{
-											oc.dispose();
-										}
-									});
-									return IFuture.DONE;
+											public void run()
+											{
+												oc.dispose();
+											}
+										});
+									}
 								}
 								
-								public IFuture componentChanged(IComponentDescription desc)
+								@Override
+								public void finished()
 								{
-									return IFuture.DONE;
-								}
-								
-								public IFuture componentAdded(IComponentDescription desc)
-								{
-									return IFuture.DONE;
 								}
 							});
 						}

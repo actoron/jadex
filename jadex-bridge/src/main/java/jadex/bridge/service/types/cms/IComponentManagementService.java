@@ -152,20 +152,18 @@ public interface IComponentManagementService
 	//-------- listener methods --------
 	
 	/**
-     *  Add an component listener.
+     *  Add a component listener for all components.
      *  The listener is registered for component changes.
-     *  @param comp  The component to be listened on (or null for listening on all components).
-     *  @param listener  The listener to be added.
      */
-    public IFuture<Void> addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
+    public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll();
     
-    /**
-     *  Remove a listener.
-     *  @param comp  The component to be listened on (or null for listening on all components).
-     *  @param listener  The listener to be removed.
+	/**
+     *  Add a component listener for a specific component.
+     *  The listener is registered for component changes.
+     *  @param cid	The component to be listened.
      */
-    public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
-
+    public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid);
+    
     //-------- external access methods --------
     
 	/**
