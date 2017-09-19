@@ -7,8 +7,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.swing.JButton;
@@ -23,13 +23,15 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
@@ -70,7 +72,7 @@ public class DebuggerMainPanel extends JSplitPane
 	protected List<IDebuggerPanel> debuggerpanels;
 	
 	/** The cms listener. */
-	protected ICMSComponentListener listener;
+	protected ISubscriptionIntermediateFuture<CMSStatusEvent> listener;
 	
 	//-------- constructors --------
 	
@@ -334,26 +336,31 @@ public class DebuggerMainPanel extends JSplitPane
 				
 				updatePanel((IComponentDescription)desc);
 
-				listener = new ICMSComponentListener()
-				{			
-					public IFuture<Void> componentChanged(IComponentDescription desc)
+				listener	= jcc.getCMSHandler().addCMSListener(desc.getName().getRoot());
+				listener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				{
+					@Override
+					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("changed: "+desc.getName());
-						if(desc.getName().equals(DebuggerMainPanel.this.desc.getName()))
-							updatePanel(desc);
-						return IFuture.DONE;
 					}
-					public IFuture<Void> componentRemoved(IComponentDescription desc, Map results)
+
+					@Override
+					public void resultAvailable(Collection<CMSStatusEvent> result)
 					{
-						return IFuture.DONE;
-					}			
-					public IFuture<Void> componentAdded(IComponentDescription desc)
-					{
-						return IFuture.DONE;
 					}
-				};		
-//				jcc.getPlatformAccess().getComponentIdentifier()
-				jcc.getCMSHandler().addCMSListener(desc.getName().getRoot(), listener);
+
+					@Override
+					public void intermediateResultAvailable(CMSStatusEvent event)
+					{
+						if(event.getComponentDescription().getName().equals(DebuggerMainPanel.this.desc.getName()))
+							updatePanel(event.getComponentDescription());
+					}
+
+					@Override
+					public void finished()
+					{
+					}
+				});
 			}
 		});
 	}
@@ -374,7 +381,7 @@ public class DebuggerMainPanel extends JSplitPane
 				}
 				if(listener!=null)
 				{
-					jcc.getCMSHandler().removeCMSListener(desc.getName().getRoot(), listener);
+					listener.terminate();
 				}
 			}
 		});

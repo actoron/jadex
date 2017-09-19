@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,12 +18,12 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -124,22 +125,32 @@ public class PlatformsTest //extends TestCase
 			
 			final Future<Void>	fut	= new Future<Void>();
 			IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
-			cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
+			cms.listenToComponent(platform.getComponentIdentifier()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 			{
-				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+				@Override
+				public void exceptionOccurred(Exception exception)
 				{
-					fut.setResult(null);
-					return IFuture.DONE;
 				}
-				public IFuture<Void> componentAdded(IComponentDescription desc)
+				
+				@Override
+				public void resultAvailable(Collection<CMSStatusEvent> result)
 				{
-					return IFuture.DONE;
 				}
-				public IFuture<Void> componentChanged(IComponentDescription desc)
+				
+				@Override
+				public void intermediateResultAvailable(CMSStatusEvent result)
 				{
-					return IFuture.DONE;
+					if(result instanceof CMSTerminatedEvent)
+					{
+						fut.setResult(null);
+					}
 				}
-			}).get(timeout);
+				
+				@Override
+				public void finished()
+				{
+				}
+			});
 			
 //			// Test CTRL-C shutdown behavior.
 //			Timer	timer	= new Timer();

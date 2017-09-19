@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,9 +67,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
@@ -79,6 +80,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -583,15 +585,28 @@ public class VisualProcessViewPanel extends JPanel
 				}
 			});
 			
-			cmshandler.addCMSListener(access.getComponentIdentifier(), new ICMSComponentListener()
+			cmshandler.addCMSListener(access.getComponentIdentifier())
+				.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
-				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+
+				@Override
+				public void exceptionOccurred(Exception exception)
 				{
-					return IFuture.DONE;
+					// TODO Auto-generated method stub
+					
 				}
-				
-				public IFuture<Void> componentChanged(final IComponentDescription desc)
+
+				@Override
+				public void resultAvailable(Collection<CMSStatusEvent> result)
 				{
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void intermediateResultAvailable(CMSStatusEvent result)
+				{
+					IComponentDescription	desc	= result.getComponentDescription();
 					try
 					{
 						final String[] bps = access.getModel().getBreakpoints();
@@ -680,13 +695,15 @@ public class VisualProcessViewPanel extends JPanel
 					{
 						// nop, component can be terminated
 					}
-					return IFuture.DONE;
+				}
+
+				@Override
+				public void finished()
+				{
+					// TODO Auto-generated method stub
+					
 				}
 				
-				public IFuture<Void> componentAdded(IComponentDescription desc)
-				{
-					return IFuture.DONE;
-				}
 			});
 		}
 		catch(Exception e)
