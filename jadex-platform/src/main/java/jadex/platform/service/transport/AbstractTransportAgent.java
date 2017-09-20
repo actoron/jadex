@@ -1109,8 +1109,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
 	{
-		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
+		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope, unrestricted);
 	}
 }

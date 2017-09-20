@@ -37,9 +37,6 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	 */
 	public RemoteSearchCommand(ServiceQuery<T> query)
 	{
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
-			System.out.println("Global query");
-		
 		this.query = query;
 	}
 	

@@ -60,7 +60,7 @@ public abstract class AbstractInternalRemoteCommand
 	 *  Method to provide the required security level.
 	 *  Overridden by subclasses.
 	 */
-	protected String	getSecurityLevel(IInternalAccess access)
+	protected String getSecurityLevel(IInternalAccess access)
 	{
 		return Security.DEFAULT;
 	}

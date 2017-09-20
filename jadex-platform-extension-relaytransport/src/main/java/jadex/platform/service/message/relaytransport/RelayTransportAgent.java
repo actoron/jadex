@@ -50,6 +50,10 @@ import jadex.micro.annotation.ProvidedServices;
  *  Agent implementing relay routing.
  */
 @Agent(autoprovide=Boolean3.TRUE)
+// todo: see SuperpeerRegistrySynchronizationAgent
+//@Arguments({
+//	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
+//})
 @ProvidedServices({
 //		@ProvidedService(type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
 		@ProvidedService(type=ITransportService.class),

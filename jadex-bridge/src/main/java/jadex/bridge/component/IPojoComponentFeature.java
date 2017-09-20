@@ -10,4 +10,10 @@ public interface IPojoComponentFeature
 	 *  @return The pojo agent.
 	 */
 	public Object getPojoAgent();
+	
+	/**
+	 *  Get the POJO agent object casted to the pojo class.
+	 *  @return The pojo agent.
+	 */
+	public <T> T getPojoAgent(Class<T> pojoclass);
 }

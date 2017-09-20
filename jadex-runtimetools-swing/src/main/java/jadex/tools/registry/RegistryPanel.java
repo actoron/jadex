@@ -235,11 +235,11 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		{
 			public void componentResized(ComponentEvent e) 
 			{
-				resizeColumns(jtservices, new float[]{10f, 15f, 15f, 15f, 15f, 15f, 15f});
+				resizeColumns(jtservices, new float[]{10f, 10f, 10f, 15f, 15f, 15f, 15f, 10f});
 				resizeColumns(jtqueries, new float[]{10f, 10f, 10f, 10f, 10f, 10f, 15f, 15f});
 		    }
 		});
-		resizeColumns(jtservices, new float[]{10f, 15f, 15f, 15f, 15f, 15f, 15f});
+		resizeColumns(jtservices, new float[]{10f, 10f, 10f, 15f, 15f, 15f, 15f, 10f});
 		resizeColumns(jtqueries, new float[]{10f, 10f, 10f, 10f, 10f, 10f, 15f, 15f});
 		
 		tpane.addTab("Services", pserinfos);
@@ -469,7 +469,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 
 		public int getColumnCount()
 		{
-			return 7;
+			return 8;
 		}
 
 		public String getColumnName(int column)
@@ -490,6 +490,8 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 					return "Tags";
 				case 6:
 					return "Networks";
+				case 7:
+					return "Unrestricted";
 				default:
 					return "";
 			}
@@ -538,6 +540,10 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				value = ser.getServiceIdentifier().getNetworkNames();
 			}
+			else if(column == 7)
+			{
+				value = ser.getServiceIdentifier().isUnrestricted();
+			}
 			return value;
 		}
 		
@@ -575,6 +581,10 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			else if(column == 6)
 			{
 				ret = Set.class;
+			}
+			else if(column == 7)
+			{
+				ret = Boolean.class;
 			}
 			return ret;
 		}	

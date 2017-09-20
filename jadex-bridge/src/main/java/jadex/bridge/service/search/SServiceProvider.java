@@ -2018,7 +2018,7 @@ public class SServiceProvider
 			{
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 				IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot());
-				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, cid, null);
+				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, cid, component.getComponentIdentifier(), null);
 				reg.searchServiceAsync(query).addResultListener(lis);
 				
 //				// component itself?
@@ -2397,6 +2397,8 @@ public class SServiceProvider
 	{
 		return ServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot()).addQuery(query);
 	}
+	
+	
 }
 
 

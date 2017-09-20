@@ -33,6 +33,7 @@ import jadex.commons.IAsyncFilter;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.DuplicateRemovalIntermediateResultListener;
@@ -698,8 +699,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
+			boolean locallyavailable = query.getTargetPlatform()==null || SUtil.safeCollection(indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, query.getTargetPlatform().toString())).size()>0;
+			
 			// When this node is superpeer or the search scope is platform or below
-			if(isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
+			if(locallyavailable && (isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope())))
 			{
 //				if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //					System.out.println("searchServiceAsync1: "+query);
@@ -753,8 +756,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
+			boolean locallyavailable = query.getTargetPlatform()==null || SUtil.safeCollection(indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, query.getTargetPlatform().toString())).size()>0;
+
 			// When this node is superpeer or the search scope is platform or below
-			if(isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
+			if(locallyavailable && (isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope())))
 			{
 				searchServicesAsyncByAskMe(query).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 			}
@@ -1978,7 +1983,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								});
 							}
 							else
+							{
 								ret.setResult(obj);
+							}
 						}
 						else
 						{
@@ -2194,7 +2201,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												exception.printStackTrace();
+//												exception.printStackTrace();
 												super.exceptionOccurred(exception);
 											}
 										});
@@ -2465,7 +2472,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Perform a remote search via remote search command.
 	 *  @param agent
 	 */
-	public <T> IFuture<T> performRemoteSearchService(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
+	public <T> IFuture<T> performRemoteSearchService(IInternalAccess agent, final ServiceQuery<T> query, IComponentIdentifier cid)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -2477,8 +2484,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			@Override
 			public void customResultAvailable(Collection<T> result) throws Exception
 			{
-				assert result!=null && !result.isEmpty();
-				ret.setResult(result.iterator().next());
+				// ???
+//				assert result!=null && !result.isEmpty();
+				if(result==null || result.size()==0)
+					ret.setExceptionIfUndone(new ServiceNotFoundException(""+query.getServiceType()));
+				else
+					ret.setResult(result.iterator().next());
 			}
 		});
 		 

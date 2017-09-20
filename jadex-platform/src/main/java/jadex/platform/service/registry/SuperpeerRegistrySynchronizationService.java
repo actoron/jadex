@@ -9,10 +9,10 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -21,6 +21,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -48,7 +49,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
  *  
  *  Has two behaviors:
  *  a) allows others to subscribe and sends updates according to local service registry
- *  b) uses awareness to detect new platform and searches the ISuperpeerRegistrySynchronizationService for them. Subscribes at those.
+ *  b) uses awareness to detect new platforms and searches the ISuperpeerRegistrySynchronizationService for them. Subscribes at those.
  */
 public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegistrySynchronizationService
 {
@@ -189,20 +190,27 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			addKnownPlatform(cid);
 			
-			// Try to get IRegistrySynchronizationService from newly found platform
+			// Try to get ISuperpeerRegistrySynchronizationService from newly found platform
+			
+			boolean ssp = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(SuperpeerRegistrySynchronizationAgent.class).isSupersuperpeer();
+			
+			final ServiceQuery<ISuperpeerRegistrySynchronizationService> query = new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, null, null);
+			query.setUnrestricted(ssp); // ssp means offers unrestricted
+			
 			SServiceProvider.waitForService(component, new IResultCommand<IFuture<ISuperpeerRegistrySynchronizationService>, Void>()
 			{
 				public IFuture<ISuperpeerRegistrySynchronizationService> execute(Void args)
 				{
 					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
+//					return SServiceProvider.getService(component, query);
 				}
 			}, 3, 10000).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 			{
 				public void resultAvailable(ISuperpeerRegistrySynchronizationService regser)
 				{
 					// Subscribe to the new remote registry
-					
-					System.out.println("Found registry service on: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+					boolean unr = ((IService)regser).getServiceIdentifier().isUnrestricted();
+					System.out.println("Found registry service on: "+cid+(unr? "unrestricted": "default")+" (I am: "+component.getComponentIdentifier()+")");
 					
 					ISubscriptionIntermediateFuture<IRegistryEvent> fut = regser.subscribeToEvents();
 					final SubscriptionInfo info = new SubscriptionInfo(cid, fut);
@@ -260,7 +268,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Found no registry service on: "+cid);
+					System.out.println("Found no superpeer registry service on: "+cid);
 				}
 			});
 		}

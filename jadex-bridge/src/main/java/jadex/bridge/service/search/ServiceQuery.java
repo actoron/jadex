@@ -46,6 +46,9 @@ public class ServiceQuery<T>
 	/** The network names. */
 	protected String[] networknames;
 	
+	/** Should the service be unrestricted. */
+	protected Boolean unrestricted;
+	
 	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
 	// todo: should be removed or replaced with a more declarative variant
 	protected Object filter;
@@ -246,6 +249,7 @@ public class ServiceQuery<T>
 		this.matchingmodes = original.matchingmodes;
 		this.platform	= original.platform;
 		this.provider	= original.provider;
+		this.unrestricted = original.unrestricted;
 	}
 
 	/**
@@ -552,7 +556,24 @@ public class ServiceQuery<T>
 	}
 	
 	
-	
+	/**
+	 *  Get the unrestricted mode.
+	 *  @return The unrestricted mode.
+	 */
+	public Boolean isUnrestricted()
+	{
+		return unrestricted;
+	}
+
+	/**
+	 *  Set the unrestricted mode.
+	 *  @param unrestricted the unrestricted to set
+	 */
+	public void setUnrestricted(Boolean unrestricted)
+	{
+		this.unrestricted = unrestricted;
+	}
+
 	/**
 	 *  Tests if the query matches a service.
 	 *  

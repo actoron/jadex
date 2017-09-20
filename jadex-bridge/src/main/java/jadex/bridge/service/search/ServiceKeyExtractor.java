@@ -37,6 +37,10 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 	/** Key type for the networks. */
 	public static final String KEY_TYPE_NETWORKS = "networks";
 	
+	/** Key type for the unrestricted mode. */
+	public static final String KEY_TYPE_UNRESTRICTED = "unrestricted";
+
+	
 	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
 	
@@ -99,9 +103,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 //		}
 		Set<String> ret = null;
 		
-		try
-		{
-			IService service = (IService)serv;
+		IService service = (IService)serv;
 		
 		if(KEY_TYPE_INTERFACE.equals(keytype))
 		{
@@ -136,11 +138,9 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 		{
 			ret = new HashSet<String>(service.getServiceIdentifier().getNetworkNames());
 		}
-		}
-		catch(NullPointerException e)
+		else if(KEY_TYPE_UNRESTRICTED.equals(keytype))
 		{
-			e.printStackTrace();
-			return getKeysStatic(keytype, serv);
+			ret = new SetWrapper<String>(""+service.getServiceIdentifier().isUnrestricted());
 		}
 		return ret;
 	}

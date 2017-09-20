@@ -1048,11 +1048,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if (state != null)
 				{
-					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake."));
+					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake.")
+					{
+						@Override
+						public void printStackTrace()
+						{
+							// TODO Auto-generated method stub
+							super.printStackTrace();
+						}
+					});
 				}
 			}
 			
@@ -1321,7 +1329,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 					catch (Exception e)
 					{
-						e.printStackTrace();
+//						e.printStackTrace();
 						state.getResultFuture().setException(e);
 						initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 					}
@@ -1382,9 +1390,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
 	{
-		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
+		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope, unrestricted);
 	}
 	
 	/**

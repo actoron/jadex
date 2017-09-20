@@ -27,6 +27,7 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -145,7 +146,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	{
 		this.provider = component;
 		this.providerid = component.getComponentIdentifier();
-		createServiceIdentifier("Bootstrap Factory", IComponentFactory.class, rid, IComponentFactory.class, null);
+		createServiceIdentifier("Bootstrap Factory", IComponentFactory.class, rid, IComponentFactory.class, null, ServiceIdentifier.isUnrestricted(component, IComponentFactory.class));
 		return startService();
 	}
 	

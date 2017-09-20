@@ -6,9 +6,12 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
 
 
 /**
@@ -40,6 +43,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/** The network names (shared object with security service). */
 	protected Set<String> networknames;
 	
+	/** Is the service unrestricted. */
+	protected boolean unrestricted;
+	
 	/** The string representation (cached for reducing memory consumption). */
 	protected String tostring;
 	
@@ -55,7 +61,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames)
+	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
 	{
 		List<ClassInfo> superinfos = new ArrayList<ClassInfo>();
 		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
@@ -72,12 +78,13 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.rid = rid;
 		this.scope = scope;
 		this.networknames = networknames;
+		this.unrestricted = unrestricted;
 	}
 	
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames)
+	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
 	{
 		this.providerid = providerid;
 		this.type	= type;
@@ -86,6 +93,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.rid = rid;
 		this.scope = scope;
 		this.networknames = networknames;
+		this.unrestricted = unrestricted;
 	}
 	
 	//-------- methods --------
@@ -216,6 +224,24 @@ public class ServiceIdentifier implements IServiceIdentifier
 	{
 		this.networknames = networknames;
 	}
+	
+	/**
+	 *  Check if the service has unrestricted access. 
+	 *  @return True, if it is unrestricted.
+	 */
+	public boolean isUnrestricted()
+	{
+		return unrestricted;
+	}
+	
+	/**
+	 *  Set the unrestricted flag.
+	 *  @param unrestricted The unrestricted flag.
+	 */
+	public void setUnrestricted(boolean unrestricted) 
+	{
+		this.unrestricted = unrestricted;
+	}
 
 	/**
 	 *  Test if the service is a system service.
@@ -251,6 +277,47 @@ public class ServiceIdentifier implements IServiceIdentifier
 //			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Method to provide the security level.
+	 */
+	public static String getSecurityLevel(IInternalAccess access, ClassInfo ctype)
+	{
+		Class<?> type = ctype!=null? ctype.getType(access.getClassLoader(), access.getModel().getAllImports()) : null;
+		return getSecurityLevel(access, type);
+	}
+	
+	/**
+	 *  Method to provide the security level.
+	 */
+	public static String getSecurityLevel(IInternalAccess access, Class<?> ctype)
+	{
+		Security secreq	= ctype!=null ? ctype.getAnnotation(Security.class) : null;
+		String	level = secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+		return (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+	}
+	
+	/**
+	 *  Is the service unrestricted.
+	 *  @param access The access.
+	 *  @param ctype The service interface.
+	 *  @return True, if is unrestricted.
+	 */
+	public static boolean isUnrestricted(IInternalAccess access, ClassInfo ctype)
+	{
+		return Security.UNRESTRICTED.equals(getSecurityLevel(access, ctype));
+	}
+	
+	/**
+	 *  Is the service unrestricted.
+	 *  @param access The access.
+	 *  @param ctype The service interface.
+	 *  @return True, if is unrestricted.
+	 */
+	public static boolean isUnrestricted(IInternalAccess access, Class<?> ctype)
+	{
+		return Security.UNRESTRICTED.equals(getSecurityLevel(access, ctype));
 	}
 
 	/**

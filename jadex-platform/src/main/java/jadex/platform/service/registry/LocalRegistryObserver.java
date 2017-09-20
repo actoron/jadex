@@ -191,8 +191,6 @@ public abstract class LocalRegistryObserver
 		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
 		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, cid, null);
 		Set<IService> added = reg.searchServicesSync(query);
-		if(added.contains(null))
-			System.out.println("schrott");
 		RegistryEvent event = new RegistryEvent(added, null, eventslimit, timelimit, false);
 		return event;
 	}

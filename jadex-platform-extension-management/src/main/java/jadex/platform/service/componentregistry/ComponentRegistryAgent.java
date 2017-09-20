@@ -22,12 +22,14 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
@@ -165,7 +167,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         	                for(ProvidedServiceInfo psi: psis)
         	                {
         	                    final Class<?> servicetype = psi.getType().getType(cl);
-        	                    final IServiceIdentifier fsid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), SUtil.createUniqueId(servicetype.getName(), 3), servicetype, null, model.getResourceIdentifier(), null);
+        	                    final IServiceIdentifier fsid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), SUtil.createUniqueId(servicetype.getName(), 3), servicetype, null, model.getResourceIdentifier(), null, ServiceIdentifier.isUnrestricted(agent, servicetype));
         	                    
         	                    Object serviceproxy = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, new InvocationHandler()
         	                    {

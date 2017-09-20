@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.registry;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -9,6 +10,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  and following the state of the registry.
  */
 @Service(system=true)
+// Depending on the supersuperpeer setting make the service unrestricted or default accessible
+@Security("%{$args.supersuperpeer? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
 public interface ISuperpeerRegistrySynchronizationService
 {
 	/**

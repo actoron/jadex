@@ -1,6 +1,13 @@
 package jadex.bridge.service.types.address;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
 
 /**
  *  Class representing a transport address of a specific platform.
@@ -121,5 +128,56 @@ public class TransportAddress
 			ret = ta.getPlatformId().equals(platformid) && ta.getTransportType().equals(transporttype) && ta.getAddress().equals(address); 
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the string rep.
+	 */
+	public String toString()
+	{
+		return "TransportAddress [platformid=" + platformid + ", transporttype=" + transporttype + ", address=" + address + "]";
+	}
+
+	/**
+	 *  Convert a string to transport addresses.
+	 *  Format is: platformname{scheme1://addi1,scheme2://addi2}
+	 */
+	public static TransportAddress[] fromString(String str)
+	{
+		List<TransportAddress> ret = new ArrayList<TransportAddress>();
+		if(str != null)
+		{
+			StringTokenizer stok = new StringTokenizer(str, "}");
+			while(stok.hasMoreTokens())
+			{
+				String part = stok.nextToken();
+				if(part.startsWith(","))
+					part = part.substring(1);
+				int idxs = part.indexOf("{");
+				if(idxs!=-1)
+				{
+					String name = part.substring(0, idxs);
+					String rest = part.substring(idxs+1, part.length());
+					StringTokenizer stok2 = new StringTokenizer(rest, ",");
+					while(stok2.hasMoreTokens())
+					{
+						String all = stok2.nextToken();
+						int idx = all.indexOf("://");
+						String scheme = all.substring(0, idx);
+						String addi = all.substring(idx+3);
+						ret.add(new TransportAddress(new BasicComponentIdentifier(name), scheme, addi));
+					}
+				}
+			}
+		}
+		return ret.toArray(new TransportAddress[ret.size()]);
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		System.out.println(Arrays.toString(fromString("platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}")));
 	}
 }
