@@ -28,6 +28,7 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
+import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
@@ -1237,8 +1238,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else
 				{
-					getComponent().getLogger().warning(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
-					ex = new StepInvalidException(step.getStep());
+					getComponent().getLogger().warning(!stateok? "Step aborted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
+					ex = new StepAbortedException(step.getStep());
 					//ex = new StepAborted();
 //					{
 //						public void printStackTrace() 
