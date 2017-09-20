@@ -48,13 +48,13 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		{
 			public void notifyObservers(final RegistryEvent event)
 			{
-				System.out.println("notify obs");
+//				System.out.println("notify obs");
 				
 				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
-						System.out.println("spser !!!!!!");
+//						System.out.println("spser !!!!!!");
 						
 						IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
 						{

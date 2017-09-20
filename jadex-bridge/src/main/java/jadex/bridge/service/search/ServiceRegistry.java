@@ -343,7 +343,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					{
 						public void resultAvailable(IComponentIdentifier result)
 						{
-							System.out.println("Found superpeer: "+result);
+//							System.out.println("Found superpeer: "+result);
 							superpeer = result;
 							addQueriesToNewSuperpeer();
 							// initiating 
@@ -386,13 +386,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
 		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
 		{
-			System.out.println("ask all");
+//			System.out.println("ask all");
 			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
 				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
 				{
-					System.out.println("found: "+result);
+//					System.out.println("found: "+result);
 					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
 				}	
 			});
@@ -2148,7 +2148,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				public void resultAvailable(Collection<IComponentIdentifier> result)
 				{
-					System.out.println("ask all by these: "+result);
+//					System.out.println("ask all by these: "+result);
 					
 //					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //						System.out.println("searchRemoteServices00: "+result);
@@ -2187,10 +2187,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 											@Override
 											public void customResultAvailable(Collection<T> result)
 											{
-												if((""+query.getServiceType()).indexOf("ISuper")!=-1)
-												{
-													System.out.println("Remote results: "+result);
-												}
+//												if((""+query.getServiceType()).indexOf("ISuper")!=-1)
+//													System.out.println("Remote results: "+result);
 												super.customResultAvailable(result);
 											}
 											

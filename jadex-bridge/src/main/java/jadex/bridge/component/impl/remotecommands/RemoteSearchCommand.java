@@ -65,8 +65,8 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	@Override
 	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
-		if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
-			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
+//		if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
+//			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
 		
 		// No recursive global search -> change global scope to platform, and owner to local platform.
 		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
@@ -86,8 +86,8 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		{
 			Collection<T> res = ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query);
 			ret	= new Future<Collection<T>>(res);				
-			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
-				System.out.println("result is: "+res);
+//			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
+//				System.out.println("result is: "+res);
 		}
 		
 		return ret;
