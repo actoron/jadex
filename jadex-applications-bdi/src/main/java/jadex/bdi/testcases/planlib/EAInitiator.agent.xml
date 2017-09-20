@@ -108,6 +108,9 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
+				<initialbelief ref="timeout">
+					<fact>jadex.base.Starter.getScaledLocalDefaultTimeout($scope.getComponentIdentifier(), 3)</fact>
+				</initialbelief>
 				<initialbelief cref="testcap.testcase_cnt">
 					<fact>3</fact>
 				</initialbelief>

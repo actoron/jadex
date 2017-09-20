@@ -69,7 +69,7 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 			}
 			catch(GoalFailureException e)
 			{
-				tr.setFailed("Exception occurred: " + e);
+				tr.setFailed("Exception occurred: " + SUtil.getExceptionStacktrace(e));
 			}
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
@@ -105,7 +105,7 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 			}
 			catch(GoalFailureException e)
 			{
-				tr.setFailed("Exception occurred: " + e);
+				tr.setFailed("Exception occurred: " + SUtil.getExceptionStacktrace(e));
 			}
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
@@ -120,6 +120,4 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 		// Add the last report, so that the testcase can terminate.
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
-	
-	
 }

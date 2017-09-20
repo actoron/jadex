@@ -550,25 +550,33 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		if(receiver.getRoot().equals(platformid))
 		{
-			// Direct local delivery.
-			ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
-			final Object clonedmsg = SCloner.clone(message, cl);
-			
-			SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
+			try
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				// Direct local delivery.
+				ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
+				final Object clonedmsg = SCloner.clone(message, cl);
+				
+				SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
 				{
-					IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
-					
-					if (imf instanceof IInternalMessageFeature)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
-						return IFuture.DONE;
+						IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
+						
+						if (imf instanceof IInternalMessageFeature)
+						{
+							((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
+							return IFuture.DONE;
+						}
+						
+						return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
 					}
-					
-					return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
-				}
-			}).addResultListener(new DelegationResultListener<Void>(ret));
+				}).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			catch(RuntimeException e)
+			{
+				// E.g. when receiver not found.
+				ret.setException(e);
+			}
 		}
 		else
 		{
