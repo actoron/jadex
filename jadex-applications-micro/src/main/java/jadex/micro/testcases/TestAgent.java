@@ -67,18 +67,18 @@ public abstract class TestAgent
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		agent.getLogger().severe("Testagent kill: "+agent.getComponentIdentifier());
+		agent.getLogger().severe("Testagent kill: "+agent.getComponentDescription());
 		ret.addResultListener(new IResultListener<Void>()
 		{
 			@Override
 			public void resultAvailable(Void result)
 			{
-				agent.getLogger().severe("Testagent killed: "+agent.getComponentIdentifier());
+				agent.getLogger().severe("Testagent killed: "+agent.getComponentDescription());
 			}
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getLogger().severe("Testagent kill exception: "+agent.getComponentIdentifier()+", "+exception);
+				agent.getLogger().severe("Testagent kill exception: "+agent.getComponentDescription()+", "+exception);
 			}
 		});
 		final IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
