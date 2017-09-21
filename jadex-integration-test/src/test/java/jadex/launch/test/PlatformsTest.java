@@ -51,6 +51,7 @@ public class PlatformsTest //extends TestCase
 		"-welcome", "false",
 		"-autoshutdown", "false",
 		"-printpass", "false",
+		"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 //		"-deftimeout", ""+TIMEOUT
 	};
 	
@@ -104,7 +105,7 @@ public class PlatformsTest //extends TestCase
 				args	= (String[])SUtil.joinArrays(args, new String[]
 				{
 					"-componentfactory", PLATFORMS[(i-1)*2],
-					"-conf", PLATFORMS[(i-1)*2+1]
+					"-conf", PLATFORMS[(i-1)*2+1],
 				});
 			}
 			

@@ -144,6 +144,7 @@ public class InvokerAgent
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
 				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 				"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class"
 			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
