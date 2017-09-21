@@ -39,16 +39,18 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				System.out.println("test local fini");
+				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -131,11 +133,13 @@ public class InitiatorAgent extends TestAgent
 		
 		System.out.println("create component started with: "+CallAccess.getCurrentInvocation());
 		
+		agent.getLogger().severe("Testagent create provider: "+agent.getComponentDescription());
 		createComponent("jadex/micro/testcases/tracing/ProviderAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+				agent.getLogger().severe("Testagent create provider done: "+agent.getComponentDescription());
 				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			

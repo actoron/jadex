@@ -226,7 +226,13 @@ public class SServiceProvider
 		
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
-			throw new ServiceNotFoundException(type.getName());
+		{
+			if(type.getName().indexOf("IComponentManagementService")!=-1)
+			{
+				System.out.println("ogesjyph");
+			}
+			throw new ServiceNotFoundException("No registry to search for service: "+type.getName());
+		}
 		return proxy? createRequiredProxy(component, ret, type): ret;
 	}
 	

@@ -50,6 +50,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -912,7 +913,9 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
 																			
-																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			IServiceRegistry	reg	= access!=null ? ServiceRegistry.getRegistry(access.getInternalAccess()) : null;
+																			if(reg!=null)	// TODO: why null? -> platform shutdown, superpeer fail?
+																				reg.removeExcludedComponent(cid);
 																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();

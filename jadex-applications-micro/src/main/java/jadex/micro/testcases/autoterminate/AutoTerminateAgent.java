@@ -65,6 +65,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			tc.setTestCount(3);
 		}
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
@@ -72,11 +73,13 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			{
 				if(!SReflect.isAndroid()) 
 				{
+					agent.getLogger().severe("Testagent test remote1: "+agent.getComponentDescription());
 					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
+							agent.getLogger().severe("Testagent test remote2: "+agent.getComponentDescription());
 							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
 							// keep future open -> is set in check finished.
 						}
