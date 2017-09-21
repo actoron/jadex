@@ -50,7 +50,7 @@ Remember the ```IExternalAccess platform``` object that you got when starting a 
 
 ```java
 IExternalAccess platform = Starter...
-IFuture<> fut = SServiceProvider.getService(platform, IComponentManagementService.class);
+IFuture<IComponentManagementService> fut = SServiceProvider.getService(platform, IComponentManagementService.class);
 
 IComponentManagementService cms = fut.get();
 ```

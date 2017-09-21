@@ -19,7 +19,7 @@ For more information and motivation, please refer to [Asynchronous Programming](
 
 # Working with Futures
 
-The typical case of working with futures is calling a method from the Jadex framework which returns a ```IFuture<>``` type.
+The typical case of working with futures is calling a method from the Jadex framework which returns a ```IFuture<...>``` type.
 In this case, you can either call *get()* on the future, which will block until the result is available, or **add a result listener** (which will be the default case in this chapter from now on):
 
 ```java
@@ -368,5 +368,5 @@ fut.addResultListener(res -> ... , SResultListener.delegate(myFut));
 fut.addResultListener(SResultListener.delegate(myFut), ex -> ...);
 
 // count results
-CounterResultListener<> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
+CounterResultListener<?> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
 ```

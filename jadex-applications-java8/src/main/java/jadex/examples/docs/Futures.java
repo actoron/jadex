@@ -84,7 +84,7 @@ public class Futures {
         fut.addResultListener(SResultListener.delegate(myFut), ex -> threeDots(ex));
 
 // count results
-        CounterResultListener<Object> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
+        CounterResultListener<?> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
 
     }
 
