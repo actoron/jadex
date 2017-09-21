@@ -6,7 +6,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
@@ -83,12 +85,12 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		{
 			Collection<T> res = ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query);
 			ret	= new Future<Collection<T>>(res);				
-			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
-			{
-				System.out.println("result is: "+res+" "+query);
-				if(res==null || res.size()==0)
-					System.out.println("not found");
-			}
+//			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
+//			{
+//				System.out.println("result is: "+res+" "+query);
+//				if(res==null || res.size()==0)
+//					System.out.println("not found");
+//			}
 		}
 		
 		return ret;
@@ -99,13 +101,29 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	 *  Overridden by subclasses.
 	 */
 	@Override
-	protected String	getSecurityLevel(IInternalAccess access)
+	protected String getSecurityLevel(IInternalAccess access)
 	{
-		Class<?>	type	= query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
-		Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-		String	level	= secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
-		return level==null ? super.getSecurityLevel(access)
-			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+//		Class<?> type = query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
+//		Security secreq	= type!=null ? type.getAnnotation(Security.class) : null;
+//		String	level	= secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+//		return level==null ? super.getSecurityLevel(access)
+//			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+		
+		// Search access depends on the (imaginary) registry service access
+		// Because no explicit service is available it checks if a global-superpeer is used
+		// This is checked by fetching the level of ISuperpeerRegistrySynchronizationService.class (if available)
+		String ret = null;
+		IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
+		ISuperpeerRegistrySynchronizationService srss = reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
+		if(srss!=null)
+		{
+			ret = ServiceIdentifier.getSecurityLevel(access, ISuperpeerRegistrySynchronizationService.class);
+		}
+		else
+		{
+			ret = Security.DEFAULT;
+		}
+		return ret;
 	}
 	
 	/**

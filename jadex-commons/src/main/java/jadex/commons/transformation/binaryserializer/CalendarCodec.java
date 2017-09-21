@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;

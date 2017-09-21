@@ -1,8 +1,10 @@
 package jadex.platform.service.registry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -273,6 +275,28 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				}
 			});
 		}
+	}
+	
+	/**
+	 *  Get the current partner superpeers.
+	 */
+	public IFuture<Collection<IComponentIdentifier>> getPartnerSuperpeers()
+	{
+		return new Future<Collection<IComponentIdentifier>>(subscriptions.keySet());
+	}
+	
+	/**
+	 *  Get the current clients.
+	 */
+	public IFuture<Collection<IComponentIdentifier>> getClients()
+	{
+		List<IComponentIdentifier> ret = new ArrayList<IComponentIdentifier>();
+		Collection<ClientInfo> cis = clients.values();
+		for(ClientInfo ci: cis)
+		{
+			ret.add(ci.getPlatformId());
+		}
+		return new Future<Collection<IComponentIdentifier>>(ret);
 	}
 		
 	/**

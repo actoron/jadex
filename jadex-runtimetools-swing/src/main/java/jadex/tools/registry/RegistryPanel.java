@@ -14,6 +14,7 @@ import java.awt.event.ComponentEvent;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,18 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	
 	/** The table model. */
 	protected QueryTableModel querymodel;
+	
+	/** The table of partner platforms. */
+	protected JTable jtpartners;
+	
+	/** The table model. */
+	protected CidTableModel partnermodel;
+	
+	/** The table of client platforms. */
+	protected JTable jtclients;
+	
+	/** The table model. */
+	protected CidTableModel clientmodel;
 	
 	/** The timer. */
 	protected Timer timer;
@@ -231,21 +244,58 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		});
 		
 		
+		// create panel with partner table
+		JPanel ppartners = new JPanel(new BorderLayout());
+		ppartners.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Partner Platforms "));
+		partnermodel = new CidTableModel();
+		jtpartners = new JTable(partnermodel);
+		jtpartners.setAutoCreateRowSorter(true);
+		jtpartners.setRowSelectionAllowed(true);
+		jtpartners.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		jtpartners.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		ppartners.add(BorderLayout.CENTER, new JScrollPane(jtpartners));
+		jtpartners.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		
+		// create panel with partner table
+		JPanel pclients = new JPanel(new BorderLayout());
+		pclients.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Client Platforms "));
+		clientmodel = new CidTableModel();
+		jtclients = new JTable(clientmodel);
+		jtclients.setAutoCreateRowSorter(true);
+		jtclients.setRowSelectionAllowed(true);
+		jtclients.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		jtclients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		pclients.add(BorderLayout.CENTER, new JScrollPane(jtclients));
+		jtclients.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		
+		tpane.addTab("Services", pserinfos);
+		tpane.addTab("Queries", pqueryinfos);
+		tpane.addTab("Partners", ppartners);
+		tpane.addTab("Clients", pclients);
+		
+		updateAll();
+		
+		final Runnable updatesizes = new Runnable()
+		{
+			public void run()
+			{
+				resizeColumns(jtservices, new float[]{10f, 10f, 10f, 15f, 15f, 15f, 15f, 10f});
+				resizeColumns(jtqueries, new float[]{10f, 10f, 10f, 10f, 10f, 10f, 15f, 15f});
+				resizeColumns(jtpartners, new float[]{10f, 90f});
+				resizeColumns(jtclients, new float[]{10f, 90f});
+			}
+		};
+		
 		panel.addComponentListener(new ComponentAdapter()
 		{
 			public void componentResized(ComponentEvent e) 
 			{
-				resizeColumns(jtservices, new float[]{10f, 10f, 10f, 15f, 15f, 15f, 15f, 10f});
-				resizeColumns(jtqueries, new float[]{10f, 10f, 10f, 10f, 10f, 10f, 15f, 15f});
+				updatesizes.run();
 		    }
 		});
-		resizeColumns(jtservices, new float[]{10f, 10f, 10f, 15f, 15f, 15f, 15f, 10f});
-		resizeColumns(jtqueries, new float[]{10f, 10f, 10f, 10f, 10f, 10f, 15f, 15f});
-		
-		tpane.addTab("Services", pserinfos);
-		tpane.addTab("Queries", pqueryinfos);
-		
-		updateAll();
+		updatesizes.run();
 		
 		timer = new Timer(timerdelay, new ActionListener()
 		{
@@ -270,6 +320,8 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		updateServiceInfos();
 		updateQueryInfos();
 		updateSuperpeerInfo();
+		updatePartners();
+		updateClients();
 	}
 	
 	/**
@@ -353,7 +405,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				
 				sermodel.fireTableDataChanged();
 				if(sel!=-1 && sel<alls.size())
-					((DefaultListSelectionModel)jtservices.getSelectionModel()).setSelectionInterval(sel, sel);
+					((DefaultListSelectionModel)jtqueries.getSelectionModel()).setSelectionInterval(sel, sel);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -412,6 +464,90 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 						buswitchpeer.setEnabled(true);
 					}
 				}));
+			}
+		});
+	}
+	
+	/**
+	 *  Update the superpeer partners.
+	 */
+	protected void updatePartners()
+	{
+//		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
+		
+//		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
+		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+		{
+			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
+			{
+				sps.getPartnerSuperpeers().addResultListener(new SwingResultListener<Collection<IComponentIdentifier>>(new IResultListener<Collection<IComponentIdentifier>>()
+				{
+					public void resultAvailable(Collection<IComponentIdentifier> result) 
+					{
+						int sel = jtpartners.getSelectedRow();
+						List<IComponentIdentifier> vals = partnermodel.getList();
+						vals.clear();
+						for(Iterator<IComponentIdentifier> it=result.iterator(); it.hasNext(); )
+						{
+							vals.add(it.next());
+						}
+						
+						partnermodel.fireTableDataChanged();
+						if(sel!=-1 && sel<result.size())
+							((DefaultListSelectionModel)jtpartners.getSelectionModel()).setSelectionInterval(sel, sel);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				}));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
+	}
+	
+	/**
+	 *  Update the superpeer clients.
+	 */
+	protected void updateClients()
+	{
+//		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
+		
+//		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
+		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+		{
+			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
+			{
+				sps.getClients().addResultListener(new SwingResultListener<Collection<IComponentIdentifier>>(new IResultListener<Collection<IComponentIdentifier>>()
+				{
+					public void resultAvailable(Collection<IComponentIdentifier> result) 
+					{
+						int sel = jtclients.getSelectedRow();
+						List<IComponentIdentifier> vals = clientmodel.getList();
+						vals.clear();
+						for(Iterator<IComponentIdentifier> it=result.iterator(); it.hasNext(); )
+						{
+							vals.add(it.next());
+						}
+						
+						clientmodel.fireTableDataChanged();
+						if(sel!=-1 && sel<result.size())
+							((DefaultListSelectionModel)jtclients.getSelectionModel()).setSelectionInterval(sel, sel);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				}));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
 			}
 		});
 	}
@@ -792,10 +928,95 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+				//throw new RuntimeException(e);
 			}
 			return ret;
 		}
+	};
+	
+	class CidTableModel extends AbstractTableModel
+	{
+		protected List<IComponentIdentifier> list;
+		
+		public CidTableModel()
+		{
+			this(new ArrayList<IComponentIdentifier>());
+		}
+		
+		public CidTableModel(List<IComponentIdentifier> list)
+		{
+			this.list = list;
+		}
+		
+		public List<IComponentIdentifier> getList()
+		{
+			return list;
+		}
+
+		public int getRowCount()
+		{
+			return list.size();
+		}
+
+		public int getColumnCount()
+		{
+			return 2;
+		}
+
+		public String getColumnName(int column)
+		{
+			switch(column)
+			{
+				case 0:
+					return "No";
+				case 1:
+					return "Component ID";
+				default:
+					return "";
+			}
+		}
+
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+
+		public Object getValueAt(int row, int column)
+		{
+			Object value = null;
+			IComponentIdentifier cid = list.get(row);
+			
+			if(cid==null)
+				return null;
+			
+			if(column == 0)
+			{
+				value = row;
+			}
+			else if(column == 1)
+			{
+				value = cid;
+			}
+			return value;
+		}
+		
+		public void setValueAt(Object val, int row, int column)
+		{
+		}
+		
+		public Class<?> getColumnClass(int column)
+		{
+			Class<?> ret = Object.class;
+			if(column == 0)
+			{
+				ret = Integer.class;
+			}
+			else if(column == 1)
+			{
+				ret = ComponentIdentifier.class;
+			}
+			return ret;
+		}	
 	};
 	
 	@Override

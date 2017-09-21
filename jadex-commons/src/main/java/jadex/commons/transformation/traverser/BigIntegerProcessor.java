@@ -3,7 +3,6 @@ package jadex.commons.transformation.traverser;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
