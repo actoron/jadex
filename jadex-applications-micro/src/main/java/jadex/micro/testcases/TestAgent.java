@@ -114,6 +114,7 @@ public abstract class TestAgent
 	@AgentBody
 	public IFuture<Void> body()
 	{
+		agent.getLogger().severe("Testagent start: "+agent.getComponentDescription());
 		final Future<Void> ret = new Future<Void>();
 		
 		final Testcase tc = new Testcase();
@@ -158,10 +159,12 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
+				agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 				test(cms, true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent test local finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						setupRemotePlatform(false)
 							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
@@ -173,10 +176,12 @@ public abstract class TestAgent
 								{
 									public void customResultAvailable(IComponentManagementService cms2)
 									{
+										agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 										test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
+												agent.getLogger().severe("Testagent test remote finished: "+agent.getComponentDescription());
 												tc.addReport(result);
 												ret.setResult(null);
 											}
@@ -206,6 +211,7 @@ public abstract class TestAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
+		agent.getLogger().severe("Testagent create platform: "+agent.getComponentDescription());
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		// Fetch own arguments
@@ -273,6 +279,7 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(IExternalAccess result)
 							{
+								agent.getLogger().severe("Testagent create platform done: "+agent.getComponentDescription());
 								platforms.add(result);
 								super.customResultAvailable(result);
 							}
@@ -396,6 +403,7 @@ public abstract class TestAgent
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		
+		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
 		createPlatform(null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
@@ -409,13 +417,14 @@ public abstract class TestAgent
 					{
 						// inverse proxy from remote to local.
 						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(IComponentIdentifier result)
 							{
+								agent.getLogger().severe("Testagent setup remote platform done: "+agent.getComponentDescription());
 								ret.setResult(exta);
 							}
-						});
+						}));
 					}
 				});
 			}

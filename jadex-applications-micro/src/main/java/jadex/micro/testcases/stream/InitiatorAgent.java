@@ -41,6 +41,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
@@ -53,10 +54,12 @@ public class InitiatorAgent extends TestAgent
 				} 
 				else 
 				{
+					agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 					testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(TestReport result)
 						{
+							agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 							tc.addReport(result);
 							ret.setResult(null);
 						}
@@ -83,26 +86,12 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+		setupRemotePlatform(false).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-						// inverse proxy from remote to local.
-						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
-		                    	performTest(exta.getComponentIdentifier(), testno)
-	                    		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-							}
-						});
-					}
-				});
+	        	performTest(exta.getComponentIdentifier(), testno)
+	        		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -131,13 +120,29 @@ public class InitiatorAgent extends TestAgent
 		});
 		
 		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
-		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut)
+		{
+			@Override
+			public void customResultAvailable(Map<String, Object> result)
+			{
+				agent.getLogger().severe("Testagent receiver finished: "+agent.getComponentDescription());
+				super.customResultAvailable(result);
+			}
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getLogger().severe("Testagent receiver failed: "+agent.getComponentDescription()+", "+exception);
+				super.exceptionOccurred(exception);
+			}
+		};
 		
+		agent.getLogger().severe("Testagent setup receiver: "+agent.getComponentDescription());
 		createComponent("jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+				agent.getLogger().severe("Testagent setup receiver done: "+agent.getComponentDescription());
 				IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
 				mf.createOutputConnection(agent.getComponentIdentifier(), cid, null)
 					.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)

@@ -63,6 +63,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(Collection<TestReport> result)
@@ -91,6 +92,7 @@ public class InitiatorAgent extends TestAgent
 				} 
 				else 
 				{
+					agent.getLogger().severe("Testagent test rmeote: "+agent.getComponentDescription());
 					testRemote(3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(Collection<TestReport> result)
@@ -102,6 +104,7 @@ public class InitiatorAgent extends TestAgent
 						
 						public void finished()
 						{
+							agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 							ret.setResult(null);
 						}
 						
@@ -137,26 +140,12 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+		setupRemotePlatform(false).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-						// inverse proxy from remote to local.
-						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
-								performTests(exta.getComponentIdentifier(), testno, false)
-									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
-							}
-						});
-					}
-				});
+				performTests(exta.getComponentIdentifier(), testno, false)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 			}
 		});
 
