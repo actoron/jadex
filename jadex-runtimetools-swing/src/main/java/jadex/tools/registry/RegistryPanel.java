@@ -396,6 +396,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 					{
 						IComponentIdentifier cid = (IComponentIdentifier)result;
 						tfsuperpeer.setText(cid.getName());
+						buswitchpeer.setEnabled(true);
 					}
 					
 					public void exceptionOccurred(Exception exception)

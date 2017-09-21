@@ -527,7 +527,7 @@ public class ServiceQuery<T>
 		if(serviceidentifier != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
 		
-		if(networknames != null)
+		if(networknames != null && networknames.length>0)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
 		
 		return ret;
@@ -740,7 +740,8 @@ public class ServiceQuery<T>
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(returntype=" + returntype + ", servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", scope=" + scope + ", owner=" + owner + ", provider="
-			+ provider + ", platform=" + platform + ", excludeowner=" + excludeowner + ", filter=" + filter + ")";
+		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", provider=" + provider + ", platform=" + platform 
+			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", filter=" + filter + ", scope=" + scope + ", owner=" + owner
+			+ ", id=" + id + ")";
 	}
 }

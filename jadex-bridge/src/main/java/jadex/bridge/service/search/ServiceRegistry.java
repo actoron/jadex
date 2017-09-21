@@ -711,15 +711,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			else
 			{
 				IComponentIdentifier cid = getSuperpeerSync();
-				if(cid!=null)
-				{
-//					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
-//						System.out.println("searchServiceAsync2: "+query);
-					// Do not adapt query when searching superpeer because it only searches its own database
-					searchServiceAsyncByAskOnePlatform(query, cid).addResultListener(new DelegationResultListener<T>(ret));
-				}
-				// else if search has explicit start point ask there
-				else if(query.getProvider()!=null)
+				// Search has explicit start point ask there
+				if(query.getProvider()!=null)
 				{
 					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServiceAsyncByAskOnePlatform(cp, cp.getProvider().getRoot()).addResultListener(new DelegationResultListener<T>(ret));
@@ -728,6 +721,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				{
 					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServiceAsyncByAskOnePlatform(cp, cp.getPlatform()).addResultListener(new DelegationResultListener<T>(ret));
+				}
+				// Ask superpeer if available
+				else if(cid!=null)
+				{
+//					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
+//						System.out.println("searchServiceAsync2: "+query);
+					// Do not adapt query when searching superpeer because it only searches its own database
+					searchServiceAsyncByAskOnePlatform(query, cid).addResultListener(new DelegationResultListener<T>(ret));
 				}
 				// else need to search by asking all other peer
 				else
@@ -766,13 +767,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			else
 			{
 				IComponentIdentifier cid = getSuperpeerSync();
-				if(cid!=null)
-				{
-					// If superpeer is available ask it
-					searchServicesAsyncByOnePlatform(query, cid).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-				}
-				// else if search has explicit start point ask there
-				else if(query.getProvider()!=null)
+				// if search has explicit start point ask there
+				if(query.getProvider()!=null)
 				{
 					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServicesAsyncByOnePlatform(cp, cp.getProvider().getRoot()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
@@ -781,6 +777,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				{
 					ServiceQuery<T> cp = adaptQuery(query, null);
 					searchServicesAsyncByOnePlatform(cp, cp.getPlatform()).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+				}
+				else if(cid!=null)
+				{
+					// If superpeer is available ask it
+					searchServicesAsyncByOnePlatform(query, cid).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
 				else
 				{
@@ -1561,6 +1562,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected boolean checkSearchScope(IComponentIdentifier cid, IService ser, String scope, boolean excluded)
 	{
 		boolean ret = false;
+		
+		if(cid==null)
+			throw new RuntimeException("Cid must not null, no owner in query specified.");
 		
 		if(!excluded && !isIncluded(cid, ser))
 			return ret;
@@ -2478,6 +2482,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 		IComponentIdentifier tcid = cid!=null? cid: query.getTargetPlatform();
 		
+//		if(query.getPlatform()!=null && !query.getOwner().getRoot().equals(query.getPlatform()))
+//			System.out.println("sdgfsdfgjsdfj");
+		
 		((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
 			.executeRemoteSearch(tcid, query).addResultListener(new ExceptionDelegationResultListener<Collection<T>, T>(ret)
 		{
@@ -2487,7 +2494,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				// ???
 //				assert result!=null && !result.isEmpty();
 				if(result==null || result.size()==0)
-					ret.setExceptionIfUndone(new ServiceNotFoundException(""+query.getServiceType()));
+					ret.setException(new ServiceNotFoundException(""+query.getServiceType()));
 				else
 					ret.setResult(result.iterator().next());
 			}

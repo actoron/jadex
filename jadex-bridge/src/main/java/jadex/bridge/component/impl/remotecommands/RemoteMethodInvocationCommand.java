@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
@@ -185,6 +186,6 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	 */
 	public String	toString()
 	{
-		return "RemoteMethodInvocationCommand("+method.getName()+Arrays.asList(args)+")";
+		return "RemoteMethodInvocationCommand("+method.getName()+SUtil.arrayToString(args)+")";
 	}
 }

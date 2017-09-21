@@ -194,15 +194,16 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			
 			boolean ssp = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(SuperpeerRegistrySynchronizationAgent.class).isSupersuperpeer();
 			
-			final ServiceQuery<ISuperpeerRegistrySynchronizationService> query = new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, null, null);
+			final ServiceQuery<ISuperpeerRegistrySynchronizationService> query = new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
 			query.setUnrestricted(ssp); // ssp means offers unrestricted
+			query.setPlatform(cid); // target platform on which to search
 			
 			SServiceProvider.waitForService(component, new IResultCommand<IFuture<ISuperpeerRegistrySynchronizationService>, Void>()
 			{
 				public IFuture<ISuperpeerRegistrySynchronizationService> execute(Void args)
 				{
-					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
-//					return SServiceProvider.getService(component, query);
+//					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
+					return SServiceProvider.getService(component, query);
 				}
 			}, 3, 10000).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 			{
@@ -210,7 +211,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				{
 					// Subscribe to the new remote registry
 					boolean unr = ((IService)regser).getServiceIdentifier().isUnrestricted();
-					System.out.println("Found registry service on: "+cid+(unr? "unrestricted": "default")+" (I am: "+component.getComponentIdentifier()+")");
+					System.out.println("Found registry service on: "+cid+(unr? " unrestricted": " default")+" (I am: "+component.getComponentIdentifier()+")");
 					
 					ISubscriptionIntermediateFuture<IRegistryEvent> fut = regser.subscribeToEvents();
 					final SubscriptionInfo info = new SubscriptionInfo(cid, fut);
