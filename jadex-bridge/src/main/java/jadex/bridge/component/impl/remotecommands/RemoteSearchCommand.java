@@ -83,8 +83,12 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		{
 			Collection<T> res = ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query);
 			ret	= new Future<Collection<T>>(res);				
-//			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
-//				System.out.println("result is: "+res);
+			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
+			{
+				System.out.println("result is: "+res+" "+query);
+				if(res==null || res.size()==0)
+					System.out.println("not found");
+			}
 		}
 		
 		return ret;
