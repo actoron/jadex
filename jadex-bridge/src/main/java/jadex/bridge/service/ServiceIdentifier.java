@@ -49,6 +49,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/** The string representation (cached for reducing memory consumption). */
 	protected String tostring;
 	
+	/** The tags. */
+	protected Set<String> tags;
+	
 	//-------- constructors --------
 	
 	/**
@@ -241,6 +244,24 @@ public class ServiceIdentifier implements IServiceIdentifier
 	public void setUnrestricted(boolean unrestricted) 
 	{
 		this.unrestricted = unrestricted;
+	}
+	
+	/**
+	 *  Get the service tags.
+	 *  @return The tags.
+	 */
+	public Set<String> getTags()
+	{
+		return tags;
+	}
+	
+	/**
+	 *  Set the tags.
+	 *  @param tags the tags to set
+	 */
+	public void setTags(Set<String> tags)
+	{
+		this.tags = tags;
 	}
 
 	/**

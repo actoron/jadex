@@ -338,8 +338,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 									properties = new HashMap<String, Object>();
 								
 								Set<String> tags = new LinkedHashSet<String>(coll);
-								properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
-								// Hack!!!
+								// Hack!!! save props in service identifier 
+//								properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
+								((ServiceIdentifier)sid).setTags(tags);
+								// Hack!!! re-index
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
 								IService orig = reg.getIndexer().getValues(ServiceKeyExtractor.KEY_TYPE_SID, getServiceIdentifier().toString()).iterator().next();
 								reg.getIndexer().addValue(orig);
