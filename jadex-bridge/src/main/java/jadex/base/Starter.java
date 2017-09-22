@@ -544,13 +544,13 @@ public class Starter
 			String	tok	= stok.nextToken();
 			if(tok.equals("+"))
 			{
-				buf.append(Integer.toHexString(rnd.nextInt(16)));
+				buf.append(Integer.toString(rnd.nextInt(36), 36));
 			}
 			else if(tok.equals("*"))
 			{
-				buf.append(Integer.toHexString(rnd.nextInt(16)));
-				buf.append(Integer.toHexString(rnd.nextInt(16)));
-				buf.append(Integer.toHexString(rnd.nextInt(16)));
+				buf.append(Integer.toString(rnd.nextInt(36), 36));
+				buf.append(Integer.toString(rnd.nextInt(36), 36));
+				buf.append(Integer.toString(rnd.nextInt(36), 36));
 			}
 			else
 			{
