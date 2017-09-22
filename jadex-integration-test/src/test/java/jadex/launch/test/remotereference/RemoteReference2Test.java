@@ -26,7 +26,7 @@ public class RemoteReference2Test //extends TestCase
 		long timeout	= Starter.getLocalDefaultTimeout(null);
 		
 		// Underscore in platform name assures both platforms use same password.
-		String	pid	= SUtil.createUniqueId(name.getMethodName(), 3)+"-*";
+		String	pid	= SUtil.createPlainRandomId(name.getMethodName(), 3)+"-*";
 		
 		// Start platform1 used for remote access.
 		final IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", pid,
