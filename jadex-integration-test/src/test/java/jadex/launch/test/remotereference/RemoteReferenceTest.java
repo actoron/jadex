@@ -29,6 +29,7 @@ public class RemoteReferenceTest //extends TestCase
 			"-gui", "false",
 //			"-logging", "true",
 			"-awareness", "false", "-printpass", "false",
+			"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
@@ -40,6 +41,7 @@ public class RemoteReferenceTest //extends TestCase
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 //			"-logging", "true",
+			"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
 		
 		// Connect platforms by creating proxy agents.

@@ -240,7 +240,6 @@ public abstract class TestAgent
 							"-cli", "false",
 							"-simulation", "false",
 							"-printpass", "false",
-							"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class",
 							"-superpeerclient", "false"
 //							"-logging", "true",
 ////							"-relaytransport", "false",
