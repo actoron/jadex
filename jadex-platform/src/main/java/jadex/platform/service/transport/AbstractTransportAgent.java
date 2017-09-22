@@ -70,16 +70,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentArgument
 	protected int	port	= 0;
 
-//	/**
-//	 * The keep-alive (group), i.e. an address, to which the transport should
-//	 * stay connected or a group of addresses (comma separated), where the
-//	 * transport should stay connected one of the group. If the connection
-//	 * fails, the transport will try to reconnect, possibly after a timeout.
-//	 */
-//	@AgentArgument
-//	// TODO: move to different layer (platform connections)
-//	protected String	keepalivegroup	= null;
-
 	// -------- internal attributes --------
 
 	/** The agent. */
@@ -331,7 +321,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							}
 							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
-						agent.getLogger().info("Listening to port " + port + " for " + impl.getProtocolName() + " transport.");
+						
+						agent.getLogger().info("Platform "+agent.getComponentIdentifier().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
 
 //						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 //						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
