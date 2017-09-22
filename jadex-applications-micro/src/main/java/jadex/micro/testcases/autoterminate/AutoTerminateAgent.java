@@ -190,7 +190,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		config1.setSecurity(true);
 //		config1.setAwaMechanisms(AWAMECHANISM.local);
 //		config1.setAwareness(true);
-		config1.addComponent("jadex.platform.service.transport.tcp.TcpTransportAgent.class");
+		config1.setTcpTransport(true);
 		config1.addComponent(AutoTerminateAgent.class);
 		Starter.createPlatform(config1).get();
 	}
