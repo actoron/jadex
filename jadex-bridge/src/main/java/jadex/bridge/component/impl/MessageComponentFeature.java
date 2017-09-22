@@ -367,6 +367,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		if(header != null && bodydata != null)
 		{
+//			System.out.println("Received message: "+header);
+			
 			getSecurityService().decryptAndAuth((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
@@ -386,16 +388,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							}
 							catch(Exception e)
 							{
+								getComponent().getLogger().warning("Could not decode message: "+header+", "+e);
 								// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
 								message = null;
 								header.addProperty(EXCEPTION, e);
 							}
 							messageArrived(secinf, header, message);
 						}
-					}
-					else
-					{
-						System.out.println("Message problem: "+header);
 					}
 				};
 				
