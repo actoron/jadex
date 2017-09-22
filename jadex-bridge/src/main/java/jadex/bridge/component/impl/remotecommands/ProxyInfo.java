@@ -13,7 +13,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITargetResolver;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.annotations.Alias;
 
 /**
  *  Info struct that holds all necessary model information to generate

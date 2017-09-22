@@ -5,7 +5,6 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.future.IFuture;
 
 
 /**
@@ -61,4 +60,10 @@ public interface IServiceIdentifier
 	 *  @return True, if it is unrestricted.
 	 */
 	public boolean isUnrestricted();
+	
+	/**
+	 *  Get the service tags.
+	 *  @return The tags.
+	 */
+	public Set<String> getTags();
 }

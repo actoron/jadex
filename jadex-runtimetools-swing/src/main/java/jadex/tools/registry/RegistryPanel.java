@@ -673,9 +673,10 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			else if(column == 5)
 			{
-				Map<String, Object> sprops = ser.getPropertyMap();
-				if(sprops != null)
-					value = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+//				Map<String, Object> sprops = ser.getPropertyMap();
+//				if(sprops != null)
+//					value = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+				value = ser.getServiceIdentifier().getTags();
 			}
 			else if(column == 6)
 			{
