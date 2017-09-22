@@ -1239,7 +1239,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				else
 				{
 					getComponent().getLogger().warning(!stateok? "Step aborted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
-					ex = new StepAbortedException(step.getStep());
+					if(!stateok)
+					{
+						ex = new StepAbortedException(step.getStep());
+					}
+					else
+					{
+						ex = new StepInvalidException(step.getStep());
+					}
 					//ex = new StepAborted();
 //					{
 //						public void printStackTrace() 

@@ -178,6 +178,14 @@ public class RegistryEvent implements IRegistryEvent
 		// so an empty event at least renews the lease
 		return size>=eventslimit || (System.currentTimeMillis()-timestamp>timelimit);// && size>0);
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "RegistryEvent(addedservices=" + addedservices + ", removedservices=" + removedservices + ", delta=" + delta + ")";
+	}
 	
 //	/**
 //	 *  Get the addedservices.

@@ -94,6 +94,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			{
 				if(subscriptions!=null)
 				{
+					System.out.println("Sending sync update: "+event);
 					for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
 					{
 						fut.addIntermediateResult(event);
