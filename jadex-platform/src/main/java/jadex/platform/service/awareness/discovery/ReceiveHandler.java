@@ -4,6 +4,7 @@ import java.net.InetAddress;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -90,7 +91,7 @@ public abstract class ReceiveHandler
 									final Object[] packet = receive();
 									if(packet!=null)
 									{
-										agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+										agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IConditionalComponentStep<Void>()
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
@@ -108,6 +109,19 @@ public abstract class ReceiveHandler
 												}
 												return IFuture.DONE;
 											}
+
+											@Override
+											public boolean isValid()
+											{
+												return !agent.isKilled();
+											}
+											
+											@Override
+											public String toString()
+											{
+												return super.toString()+", valid="+isValid();
+											}
+											
 										}).addResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void result)
