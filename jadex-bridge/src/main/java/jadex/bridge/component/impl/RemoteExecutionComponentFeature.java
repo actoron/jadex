@@ -254,11 +254,24 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  
 	 *  @return Null, when sent.
 	 */
-	protected IFuture<Void> sendRxMessage(IComponentIdentifier receiver, String rxid, Object msg)
+	protected IFuture<Void> sendRxMessage(IComponentIdentifier receiver, String rxid, final Object msg)
 	{
 		Map<String, Object> header = new HashMap<String, Object>();
 		header.put(RX_ID, rxid);
-		return component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
+		
+		IFuture<Void> ret = component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("not sent: "+exception+" "+msg);
+//			}
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("sent: "+msg);
+//			}
+//		});
+		return ret;
 	}
 	
 	/**

@@ -47,7 +47,7 @@ public abstract class LocalRegistryObserver
 	 */
 	public LocalRegistryObserver(IComponentIdentifier cid, final IDelayRunner timer)
 	{
-		this(cid, timer, 50, 5000);
+		this(cid, timer, 50, 10000);
 	}
 	
 	/**
@@ -126,13 +126,19 @@ public abstract class LocalRegistryObserver
 		{
 			public void run()
 			{
-//				System.out.println("notifyObservers");
-				if(registryevent!=null && registryevent.isDue())
+//				System.out.println("notifyObservers: "+System.currentTimeMillis()+" "+hashCode());
+				
+				// uses timelimit for event and for waiting
+				if(registryevent!=null)
 				{
-					notifyObservers(registryevent);
-					registryevent = new RegistryEvent(true);
+					if(registryevent.isDue())
+					{
+						notifyObservers(registryevent);
+						registryevent = new RegistryEvent(true, timelimit);
+					}
+					// do not wait below 10ms
+					canceltimer = timer.waitForDelay(Math.max(10, registryevent.getTimeUntilDue()), this);
 				}
-				canceltimer = timer.waitForDelay(getTimeLimit(), this);
 			}
 		});
 	}
@@ -177,6 +183,7 @@ public abstract class LocalRegistryObserver
 	{
 		if(timelimit!=this.timelimit)
 		{
+//			System.out.println("Timelimit is: "+timelimit);
 			this.timelimit = timelimit;
 			restartTimer();
 		}

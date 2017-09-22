@@ -1787,7 +1787,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Search for services.
 	 */
 	// read
-	protected <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByOnePlatform(final ServiceQuery<T> query, IComponentIdentifier cid)
+	protected <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier cid)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
@@ -1816,7 +1816,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								@Classname("searchServicesAsyncByAskSuperpeer")
 								public IFuture<Collection<T>> execute(IInternalAccess ia)
 								{
-									return performRemoteSearchServices(ia, query, null);
+									return performRemoteSearchServices(ia, query, cid);
 								}
 							}).addResultListener(new IntermediateDelegationResultListener<T>(ret)
 							{
@@ -1825,6 +1825,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 									System.out.println("received by ask superpeer: "+result);
 									super.customIntermediateResultAvailable(result);
 								}
+								
 								public void finished()
 								{
 //									System.out.println("finifini");
@@ -1839,7 +1840,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									System.out.println("ex: "+exception);
+									System.out.println("ex in search by ask another platform: "+exception);
 									super.exceptionOccurred(exception);
 								}
 							});

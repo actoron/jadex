@@ -48,13 +48,13 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		{
 			public void notifyObservers(final RegistryEvent event)
 			{
-//				System.out.println("notify obs");
+//				System.out.println("notify obs: "+lrobs.hashCode());
 				
 				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
-//						System.out.println("spser !!!!!!");
+//						System.out.println("spser !!!!!!"+lrobs.hashCode());
 						
 						IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
 						{
@@ -82,9 +82,13 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 							}
 						};
 						
+//						System.out.println("updateCientData called: "+System.currentTimeMillis());
 						spser.updateClientData(event).addResultListener(lis);
 						if(event.size()>0)
+						{
 							System.out.println("Send client delta update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+							System.out.println("Event is: "+event);
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)

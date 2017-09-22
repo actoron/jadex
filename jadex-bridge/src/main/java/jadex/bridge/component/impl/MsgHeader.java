@@ -65,4 +65,13 @@ public class MsgHeader implements IMsgHeader
 			properties = new HashMap<String, Object>();
 		properties.put(propname, propval);
 	}
+
+	/**
+	 *  Get the string rep.
+	 */
+	public String toString()
+	{
+		return "MsgHeader(properties=" + properties + ")";
+	}
+	
 }

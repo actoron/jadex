@@ -233,9 +233,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					{
 						public void intermediateResultAvailable(IRegistryEvent event)
 						{
-							if(event.size()>0)
-								System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode()
-									+" at: "+System.currentTimeMillis()+"(I am: "+component.getComponentIdentifier()+")");
+//							if(event.size()>0)
+//								System.out.println("Received an update event from: "+cid+", size="+event.size()+" "+event.hashCode()
+//									+" at: "+System.currentTimeMillis()+"(I am: "+component.getComponentIdentifier()+")");
 							
 							// Update meta-data (lease time removal) and content in registry
 							
@@ -419,6 +419,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		Future<RegistryUpdateEvent> ret = new Future<RegistryUpdateEvent>();
 		
+		System.out.println("received event from client: "+event);
+		
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 
 		if(clients==null)
@@ -444,6 +446,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			ci = new ClientInfo(cid);
 			existed = false;
 		}
+		System.out.println("new lease time for: "+cid+" "+System.currentTimeMillis()+"  "+lrobs.getTimeLimit());
 		clients.put(cid, ci);
 		
 //		if(event.size()>0)

@@ -393,6 +393,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							messageArrived(secinf, header, message);
 						}
 					}
+					else
+					{
+						System.out.println("Message problem: "+header);
+					}
 				};
 				
 				public void exceptionOccurred(Exception exception)
@@ -541,9 +545,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 
 		Object rec = header.getProperty(IMsgHeader.RECEIVER);		
 		if(!(rec instanceof IComponentIdentifier))
-		{
 			return new Future<Void>(new IllegalArgumentException("Messages must have receiver(s) of type IComponentIdentifier: "+message+", "+header));
-		}
 		IComponentIdentifier receiver = (IComponentIdentifier)rec;
 		
 		notifyMessageSent(header, message);

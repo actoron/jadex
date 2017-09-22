@@ -48,6 +48,14 @@ public class RegistryEvent implements IRegistryEvent
 	
 	/**
 	 *  Create a new registry event.
+	 */
+	public RegistryEvent(boolean delta, long timelimit)
+	{
+		this(null, null, 50, timelimit, delta);
+	}
+	
+	/**
+	 *  Create a new registry event.
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
@@ -117,6 +125,8 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public boolean addAddedService(IService service)
 	{
+		if(service==null)
+			throw new IllegalArgumentException("Service must not be null");
 		if(addedservices==null)
 			addedservices = new HashSet<IService>();
 		return addedservices.add(service);
@@ -128,6 +138,8 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public boolean addRemovedService(IService service)
 	{
+		if(service==null)
+			throw new IllegalArgumentException("Service must not be null");
 		if(removedservices==null)
 			removedservices = new HashSet<IService>();
 		return removedservices.add(service);
@@ -176,9 +188,20 @@ public class RegistryEvent implements IRegistryEvent
 		// timeout has been reached (AND and at least one event has been collected)
 		// The last aspect is not used because lease times are used
 		// so an empty event at least renews the lease
-		return size>=eventslimit || (System.currentTimeMillis()-timestamp>timelimit);// && size>0);
+		return size>=eventslimit || (System.currentTimeMillis()-timestamp>=timelimit);// && size>0);
 	}
 
+	/**
+	 *  Get the time until this event is due.
+	 *  @return The time until the event is due.
+	 */
+	public long getTimeUntilDue()
+	{
+		long wait = timelimit-(System.currentTimeMillis()-timestamp);
+		return wait>0? wait: 0;
+	}
+	
+	
 	/**
 	 *  Get the string representation.
 	 */
