@@ -89,7 +89,8 @@ public class SuperpeerRegistrySynchronizationAgent
 		// Remove all remote services handled by the registry 
 		reg.removeServicesExcept(component.getComponentIdentifier().getRoot());
 		
-		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
+		// Produces problems in platform shutdown
+//		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
 	}
 }

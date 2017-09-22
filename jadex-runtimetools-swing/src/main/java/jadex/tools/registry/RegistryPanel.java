@@ -68,6 +68,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ClassInfoRenderer;
 import jadex.commons.gui.jtable.DateTimeRenderer;
+import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
+import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 
 /**
  *  Panel to view the registry.
@@ -146,6 +148,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 							public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
 							{
 								cms.destroyComponent(((IService)sps).getServiceIdentifier().getProviderId());
+								cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -156,6 +159,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 									public void resultAvailable(IPeerRegistrySynchronizationService ps)
 									{
 										cms.destroyComponent(((IService)ps).getServiceIdentifier().getProviderId());
+										cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
 									}
 									
 									public void exceptionOccurred(Exception exception)
