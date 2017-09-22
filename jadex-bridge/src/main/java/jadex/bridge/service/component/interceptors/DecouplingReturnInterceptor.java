@@ -103,13 +103,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 												}
 												else
 												{
-													getLogger().warning("Future receiver already dead: "+exception);
+													getLogger().warning("Future receiver already dead: "+exception+", "+com+", "+res);
 												}
 											}
 											else
 											{
 												// shouldn't happen?
-												System.err.println("Unexpected Exception");
+												System.err.println("Unexpected Exception"+", "+com);
 												exception.printStackTrace();
 											}
 										}

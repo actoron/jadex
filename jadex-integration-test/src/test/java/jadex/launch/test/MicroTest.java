@@ -18,6 +18,9 @@ public class MicroTest	extends ComponentTestSuite
 		// Broken, please fix (cf. David Georg Reichelt)
 		"remotestepinservicecall",
 		
+		// Race condition. inner BlockAgent killed before body -> body fails -> shutdown fails (TODO fail after kill)
+		"ShutdownAgent",
+		
 		// Hangs due to 5 sec repeat step in simulation
 		"TimeProviderAgent",
 
