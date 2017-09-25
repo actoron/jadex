@@ -1256,20 +1256,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						getComponent().getLogger().info("Step invalid "+" "+step.getStep());
 						ex = new StepInvalidException(step.getStep());
 					}
-					//ex = new StepAborted();
-//					{
-//						public void printStackTrace() 
-//						{
-//							super.printStackTrace();
-//						}
-//					};
 				}
 			}
 			catch(Throwable t)
 			{
 				ex = t;
 				
-				if(!(t instanceof StepAborted))
+				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
 				{
 					StringWriter	sw	= new StringWriter();
 					t.printStackTrace(new PrintWriter(sw));
