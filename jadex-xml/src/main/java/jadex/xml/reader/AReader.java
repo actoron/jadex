@@ -372,7 +372,8 @@ public abstract class AReader
 
 			Object object = null;
 
-//			System.out.println("here: "+parser.getPrefix()+" "+parser.getNamespaceURI()+" "+parser.getLocalName()+" "+parser.getName());
+//			if(parser.getName().toString().indexOf("preco")!=-1)
+//				System.out.println("here: "+parser.getLocalName()+" "+parser.getName());
 			jadex.xml.stax.QName localname = parser.getName();
 
 //			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())

@@ -230,6 +230,16 @@ public class SBDIModel
 					}
 				}
 				
+				// Copy pre and context condition.
+				if(plan.getPrecondition()!=null)
+				{
+					plan2.setPrecondition(copyExpression(capaname, plan.getPrecondition()));
+				}
+				if(plan.getContextCondition()!=null)
+				{
+					plan2.setContextCondition(copyCondition(bdimodel, capaname, plan.getContextCondition()));
+				}
+				
 				bdimodel.getCapability().addPlan(plan2);
 			}
 			

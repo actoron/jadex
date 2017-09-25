@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -1244,10 +1245,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						ex = new StepAbortedException(step.getStep())
 						{
 							@Override
-							public void printStackTrace()
+							public void printStackTrace(PrintStream s)
 							{
 								Thread.dumpStack();
-								super.printStackTrace();
+								super.printStackTrace(s);
+							}
+							
+							@Override
+							public void printStackTrace(PrintWriter s)
+							{
+								Thread.dumpStack();
+								super.printStackTrace(s);
 							}
 						};
 					}
@@ -1290,7 +1298,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
 					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier()))
-					&& !(ex instanceof StepInvalidException))
+					&& !(ex instanceof StepInvalidException) && !(ex instanceof StepAbortedException))
 				{
 					final Throwable fex = ex;
 					// No wait for delayed listener addition for hard failures to print errors immediately.
