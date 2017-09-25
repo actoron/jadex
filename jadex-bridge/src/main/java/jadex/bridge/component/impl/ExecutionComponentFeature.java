@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -1241,27 +1242,35 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					if(valid)
 					{
 						getComponent().getLogger().warning("Step aborted due to endstate:"+" "+step.getStep());
-						ex = new StepAbortedException(step.getStep());
+						ex = new StepAbortedException(step.getStep())
+						{
+							@Override
+							public void printStackTrace(PrintStream s)
+							{
+								Thread.dumpStack();
+								super.printStackTrace(s);
+							}
+							
+							@Override
+							public void printStackTrace(PrintWriter s)
+							{
+								Thread.dumpStack();
+								super.printStackTrace(s);
+							}
+						};
 					}
 					else
 					{
 						getComponent().getLogger().info("Step invalid "+" "+step.getStep());
 						ex = new StepInvalidException(step.getStep());
 					}
-					//ex = new StepAborted();
-//					{
-//						public void printStackTrace() 
-//						{
-//							super.printStackTrace();
-//						}
-//					};
 				}
 			}
 			catch(Throwable t)
 			{
 				ex = t;
 				
-				if(!(t instanceof StepAborted))
+				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
 				{
 					StringWriter	sw	= new StringWriter();
 					t.printStackTrace(new PrintWriter(sw));
@@ -1289,7 +1298,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
 					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier()))
-					&& !(ex instanceof StepInvalidException))
+					&& !(ex instanceof StepInvalidException) && !(ex instanceof StepAbortedException))
 				{
 					final Throwable fex = ex;
 					// No wait for delayed listener addition for hard failures to print errors immediately.
