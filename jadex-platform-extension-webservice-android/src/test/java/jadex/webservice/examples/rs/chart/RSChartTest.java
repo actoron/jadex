@@ -12,8 +12,12 @@ import jadex.commons.future.ThreadSuspendable;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.robolectric.RobolectricTestRunner;
+import org.junit.runner.RunWith;
+
 import android.graphics.Color;
 
+@RunWith(RobolectricTestRunner.class)
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
@@ -21,7 +25,7 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
-		new SReflectSub().setIsAndroid(false);
+		new SReflectSub().setIsAndroid(true);
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 		{
 				"-gui", "false",

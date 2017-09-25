@@ -19,7 +19,7 @@ public class ProxyFactory
      */
     public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h)
     {
-    	if(useasm)
+    	if(useasm && !SReflect.isAndroid())
     	{
     		try
     		{

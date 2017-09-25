@@ -19,10 +19,16 @@ dependencies
     testCompile project(':jadex-platform')
     testCompile project(':jadex-kernel-component')
     testCompile project(':jadex-platform-android')
-    testCompile 'com.sun.jersey:jersey-grizzly2:' + jersey_version
-    testCompile 'com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version
-    testCompile 'com.sun.jersey:jersey-bundle:' + jersey_version
-    //testCompile libraries.android
+    testCompile ('com.sun.jersey:jersey-grizzly2:' + jersey_version) {
+		exclude group: 'asm', module: 'asm'
+    }
+//    testCompile ('com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version) {
+//		exclude group: 'asm', module: 'asm'
+//    }
+    testCompile ('com.sun.jersey:jersey-bundle:' + jersey_version) {
+		exclude group: 'asm', module: 'asm'
+    }
+	//testCompile ('com.sun.jersey:jersey-api:' + jersey_version)
     testCompile libraries.robolectric
     testCompile libraries.robotium
 }

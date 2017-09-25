@@ -27,13 +27,17 @@ import com.sun.jersey.api.core.ResourceConfig;
  * a Jadex Service.
  *
  */
+import org.robolectric.RobolectricTestRunner;
+import org.junit.runner.RunWith;
+
+@RunWith(RobolectricTestRunner.class)
 public class RSHelloTest
 {
 
 	private static final String BASE_URI = "http://localhost";
 	private int basePort = 9123;
 	private Hello hello;
-	private HttpServer httpServer;
+	private Object httpServer;
 	private IExternalAccess extAcc;
 //	private DefaultRestServicePublishService pservice;
 	private IServiceIdentifier sid;
@@ -60,7 +64,7 @@ public class RSHelloTest
 	public void setUp() throws Exception
 	{
 		SReflectSub sReflectSub = new SReflectSub();
-		sReflectSub.setIsAndroid(false);
+		sReflectSub.setIsAndroid(true);
 		
 		hello = new Hello();
 		System.out.println("Starting grizzly...");
@@ -95,7 +99,7 @@ public class RSHelloTest
 	public void tearDown() throws Exception
 	{
 //		pservice.unpublishService(sid);
-		httpServer.stop();
+		httpServer.getClass().getMethod("stop").invoke(httpServer); // references to HttpServer not working because of conflicting classloaders (robolectric/AppLoader)
 	}
 
     @Test
