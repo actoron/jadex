@@ -11,9 +11,11 @@ import jadex.commons.future.ThreadSuspendable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
-import android.graphics.Color;
 
+@RunWith(RobolectricTestRunner.class)
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
@@ -21,7 +23,7 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
-		new SReflectSub().setIsAndroid(false);
+		new SReflectSub().setIsAndroid(true);
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 		{
 				"-gui", "false",
@@ -42,7 +44,7 @@ public class RSChartTest
 		IFuture<IChartService> fut = SServiceProvider.getService(extAcc, IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IChartService hs = fut.get();
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
-		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get();
+		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{0xFF000000, 0xFF0000FF, 0xFF00FFFF, 0xFFFFFF00}).get();
 		
 		
 //		RestTemplate rt = new RestTemplate();

@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import org.junit.runner.RunWith;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
@@ -19,7 +21,7 @@ public class ProxyFactory
      */
     public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h)
     {
-    	if(useasm)
+    	if(useasm && !SReflect.isAndroid())
     	{
     		try
     		{

@@ -11,10 +11,11 @@ import jadex.commons.future.ThreadSuspendable;
 
 import java.net.BindException;
 
-import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
@@ -27,13 +28,14 @@ import com.sun.jersey.api.core.ResourceConfig;
  * a Jadex Service.
  *
  */
+@RunWith(RobolectricTestRunner.class)
 public class RSHelloTest
 {
 
 	private static final String BASE_URI = "http://localhost";
 	private int basePort = 9123;
 	private Hello hello;
-	private HttpServer httpServer;
+	private Object httpServer;
 	private IExternalAccess extAcc;
 //	private DefaultRestServicePublishService pservice;
 	private IServiceIdentifier sid;
@@ -60,7 +62,7 @@ public class RSHelloTest
 	public void setUp() throws Exception
 	{
 		SReflectSub sReflectSub = new SReflectSub();
-		sReflectSub.setIsAndroid(false);
+		sReflectSub.setIsAndroid(true);
 		
 		hello = new Hello();
 		System.out.println("Starting grizzly...");
@@ -85,7 +87,7 @@ public class RSHelloTest
 
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false", "kernels", "micro",
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get();
@@ -95,7 +97,7 @@ public class RSHelloTest
 	public void tearDown() throws Exception
 	{
 //		pservice.unpublishService(sid);
-		httpServer.stop();
+		httpServer.getClass().getMethod("stop").invoke(httpServer);
 	}
 
     @Test

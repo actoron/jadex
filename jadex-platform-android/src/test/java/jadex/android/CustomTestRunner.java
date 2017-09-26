@@ -6,9 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.runners.model.InitializationError;
-import org.robolectric.AndroidManifest;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.res.ActivityData;
+import org.robolectric.manifest.AndroidManifest;
 import org.robolectric.res.Fs;
 import org.robolectric.res.FsFile;
 
@@ -42,13 +41,15 @@ public class CustomTestRunner extends RobolectricTestRunner {
 			org.robolectric.annotation.Config arg0) {
 		String manifestProperty = "src/main/AndroidManifest.xml";
 		String resProperty = "src/main/res";
+		String assProperty = "src/main/assets";
 		
 		// calls that could potentially fail later:
 		FsFile resDir = Fs.fileFromPath(resProperty);
+		FsFile assDir = Fs.fileFromPath(assProperty);
 		FsFile parent = resDir.getParent();
 		FsFile join = parent.join(new String[] { "assets" });
 		
-		return new AndroidManifest(Fs.fileFromPath(manifestProperty), resDir) {
+		return new AndroidManifest(Fs.fileFromPath(manifestProperty), resDir, assDir) {
 			@Override
 			public int getTargetSdkVersion() {
 				return MAX_SDK_SUPPORTED_BY_ROBOLECTRIC;

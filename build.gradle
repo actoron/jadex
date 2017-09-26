@@ -116,7 +116,7 @@ subprojects
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
-            robolectric: 'org.robolectric:robolectric:2.2'
+            robolectric: 'org.robolectric:robolectric:3.4.2'
     ]
 
 	configurations {
