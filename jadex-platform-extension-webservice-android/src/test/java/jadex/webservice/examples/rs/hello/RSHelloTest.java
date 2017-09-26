@@ -7,7 +7,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.net.BindException;
 
@@ -61,8 +60,7 @@ public class RSHelloTest
     @Before
 	public void setUp() throws Exception
 	{
-		SReflectSub sReflectSub = new SReflectSub();
-		sReflectSub.setIsAndroid(true);
+		new SReflectSub().setIsAndroid(true, true);
 		
 		hello = new Hello();
 		System.out.println("Starting grizzly...");
@@ -87,7 +85,7 @@ public class RSHelloTest
 
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false", "kernels", "micro",
+		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get();
@@ -112,10 +110,10 @@ public class RSHelloTest
 		assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);
 	}
-	
+
 	private class SReflectSub extends SReflect {
-		public void setIsAndroid(Boolean b) {
-			isAndroid = b;
+		public void setIsAndroid(Boolean isAndroidFlag, Boolean isAndroidTestingFlag) {
+			SReflect.setAndroid(isAndroidFlag, isAndroidTestingFlag);
 		}
 	}
 }

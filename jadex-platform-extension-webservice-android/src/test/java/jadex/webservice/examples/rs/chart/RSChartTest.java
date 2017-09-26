@@ -24,7 +24,8 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
-		new SReflectSub().setIsAndroid(true);
+		new SReflectSub().setIsAndroid(true, true);
+
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 		{
 				"-gui", "false",
@@ -71,8 +72,8 @@ public class RSChartTest
 	}
 	
 	private class SReflectSub extends SReflect {
-		public void setIsAndroid(Boolean b) {
-			isAndroid = b;
+		public void setIsAndroid(Boolean isAndroidFlag, Boolean isAndroidTestingFlag) {
+			SReflect.setAndroid(isAndroidFlag, isAndroidTestingFlag);
 		}
 	}
 }

@@ -245,6 +245,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	if(suspend)
 		{
 			if (SReflect.isAndroid()
+					&& !SReflect.isAndroidTesting()
 					&& ISuspendable.SUSPENDABLE.get() == null
 					&& SUtil.androidUtils().runningOnUiThread()) {
 				new Exception("Should not suspend Android UI main thread. Try executing your calls from a different thread! (see stacktrace)").printStackTrace();

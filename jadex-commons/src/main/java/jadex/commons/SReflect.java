@@ -2101,11 +2101,19 @@ public class SReflect
 	/** Cached flag for android check. */
 	protected static volatile Boolean isAndroid;
 
+	/** Flag set by testcases that indicates we're testing android projects in a desktop environment. **/
+	protected static Boolean isAndroidTesting;
+
 	/** private setter that can be made accessible for robolectric testcases. **/
-	private static void setAndroid(boolean value) {
+	protected static void setAndroid(boolean isAndroidFlag, boolean isAndroidTestingFlag) {
 		synchronized (SReflect.class) {
-			isAndroid = value;
+			isAndroid = isAndroidFlag;
+			isAndroidTesting = isAndroidTestingFlag;
 		}
+	}
+
+	public static Boolean isAndroidTesting() {
+		return isAndroidTesting;
 	}
 
 	/**
