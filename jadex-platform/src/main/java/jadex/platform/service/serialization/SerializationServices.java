@@ -1,24 +1,17 @@
 package jadex.platform.service.serialization;
 
 import java.lang.reflect.Type;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MsgHeader;
@@ -33,16 +26,7 @@ import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.bridge.service.types.serialization.ISerializationServices;
-import jadex.commons.IChangeListener;
-import jadex.commons.IRemotable;
-import jadex.commons.IRemoteChangeListener;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.binaryserializer.IEncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.TransformProcessor;
@@ -60,38 +44,8 @@ import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
  */
 public class SerializationServices implements ISerializationServices
 {
-	//-------- constants --------
-	
-	/** The predefined reference settings (clazz->boolean (is reference)). */
-	public static final Map<Class<?>, boolean[]> REFERENCES;
-	
-	static
-	{
-		Map<Class<?>, boolean[]>	refs	= new HashMap<Class<?>, boolean[]>();
-		boolean[] tt = new boolean[]{true, true};
-		refs.put(IRemotable.class, tt);
-		refs.put(IResultListener.class, tt);
-		refs.put(IIntermediateResultListener.class, tt);
-		refs.put(IFuture.class, tt);
-		refs.put(IIntermediateFuture.class, tt);
-		refs.put(IChangeListener.class, tt);
-		refs.put(IRemoteChangeListener.class, tt);
-		refs.put(ClassLoader.class, tt);
+	//-------- attributes --------
 		
-		boolean[] tf = new boolean[]{true, false};
-		refs.put(URL.class, tf);
-		refs.put(InetAddress.class, tf);
-		refs.put(Inet4Address.class, tf);
-		refs.put(Inet6Address.class, tf);
-		refs.put(IComponentIdentifier.class, tf);
-		refs.put(BasicComponentIdentifier.class, tf);
-		Class<?>	ti	= SReflect.classForName0("jadex.xml.TypeInfo", SerializationServices.class.getClassLoader());
-		if(ti!=null)
-			refs.put(ti, tf);
-		
-		REFERENCES = Collections.unmodifiableMap(refs);
-	}
-	
 	/** The remote reference module */
 	protected RemoteReferenceModule rrm;
 	
@@ -323,7 +277,7 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
-					Object ret= ((RemoteReferenceModule) rrm).getProxy((ProxyReference)object, targetcl);
+					Object ret= ((RemoteReferenceModule)rrm).getProxy((ProxyReference)object, targetcl);
 					return ret;
 				}
 				catch(Exception e)
@@ -436,7 +390,7 @@ public class SerializationServices implements ISerializationServices
 		{
 			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
+				return object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
 			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
@@ -461,6 +415,9 @@ public class SerializationServices implements ISerializationServices
 			{
 //				if(marshal.isRemoteReference(object))
 //					System.out.println("rr: "+object);
+//				if(object!=null && object.toString().indexOf("Security")!=-1 && !(object instanceof String))
+//					System.out.println("hererer");
+				
 				return rrm.isRemoteReference(object);
 			}
 			
@@ -468,6 +425,7 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
+//					System.out.println("remoteob: "+object);
 					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
 					MsgHeader header = (MsgHeader)ctx.get("header");
 					IComponentIdentifier receiver = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);

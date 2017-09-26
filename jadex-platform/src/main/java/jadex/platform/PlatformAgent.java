@@ -56,6 +56,8 @@ import static jadex.base.IRootComponentConfiguration.VALIDITYDURATION;
 import static jadex.base.IRootComponentConfiguration.VIRTUALNAMES;
 import static jadex.base.IRootComponentConfiguration.WELCOME;
 import static jadex.base.IRootComponentConfiguration.WSPUBLISH;
+import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -156,8 +158,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="8765"),
-//	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
+	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue=""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
 //	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
@@ -191,7 +193,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="!\"true\".equals($args.superpeer)")
+	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="$args.superpeer==null? true: !$args.superpeer")
 })
 
 @ComponentTypes({
@@ -231,7 +233,9 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
-	@ComponentType(name="tcp", clazz=TcpTransportAgent.class)
+	@ComponentType(name="tcp", clazz=TcpTransportAgent.class),
+	@ComponentType(name="ws", filename="jadex/platform/service/message/websockettransport/WebSocketTransportAgent.class"),
+	@ComponentType(name="rt", filename="jadex/platform/service/message/relaytransport/RelayTransportAgent.class")
 })
 
 @ProvidedServices({
@@ -335,6 +339,14 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			arguments={
 				@NameValue(name="port", value="$args.tcpport")
 			}),
+		//@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="1",
+		//arguments={
+		//	@NameValue(name="port", value="8080")
+		//}),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+			arguments={
+			@NameValue(name="relays", value="$args.relayaddress")
+			}),
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -402,6 +414,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			arguments={
 				@NameValue(name="port", value="$args.tcpport")
 			}),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+			arguments={
+				@NameValue(name="relays", value="$args.relayaddress")
+			}),
 	}),
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
@@ -449,6 +465,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 			arguments={
 				@NameValue(name="port", value="$args.tcpport")
+			}),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+			arguments={
+				@NameValue(name="relays", value="$args.relayaddress")
 			}),
 	}),
 })

@@ -1,15 +1,17 @@
 package jadex.bridge.service.component;
 
-import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -31,13 +33,15 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 
 /**
  *  Feature for provided services.
  */
 // Todo: synchronous or asynchronous (for search)?
-public class RequiredServicesComponentFeature	extends AbstractComponentFeature implements IRequiredServicesFeature
+public class RequiredServicesComponentFeature	extends AbstractComponentFeature implements IRequiredServicesFeature, IInternalServiceMonitoringFeature
 {
 	//-------- attributes --------
 	
@@ -46,6 +50,11 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 
 	/** The required service infos. */
 	protected Map<String, RequiredServiceInfo> requiredserviceinfos;
+	
+	//-------- monitoring attributes --------
+	
+	/** The current subscriptions. */
+	protected Set<SubscriptionIntermediateFuture<ServiceCallEvent>>	subscriptions;
 	
 	//-------- constructors --------
 	
@@ -669,5 +678,58 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, getComponent().getComponentIdentifier(), filter);
 		return ServiceRegistry.getRegistry(getComponent()).addQuery(query);
+	}
+
+	/**
+	 *  Listen to service call events (call, result and commands).
+	 */
+	// Todo: only match specific calls?
+	// Todo: Commands
+	public ISubscriptionIntermediateFuture<ServiceCallEvent>	getServiceEvents()
+	{
+		if(subscriptions==null)
+		{
+			subscriptions	= new LinkedHashSet<SubscriptionIntermediateFuture<ServiceCallEvent>>();
+		}
+		@SuppressWarnings("unchecked")
+		final SubscriptionIntermediateFuture<ServiceCallEvent>	ret	= (SubscriptionIntermediateFuture<ServiceCallEvent>)
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent());
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				subscriptions.remove(ret);
+				if(subscriptions.isEmpty())
+				{
+					subscriptions	= null;
+				}
+			}
+		});
+		subscriptions.add(ret);
+		return ret;
+	}
+	
+	/**
+	 *  Post a service call event.
+	 */
+	public void	postServiceEvent(ServiceCallEvent event)
+	{
+		if(subscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<ServiceCallEvent> sub: subscriptions)
+			{
+				sub.addIntermediateResult(event);
+			}
+		}	
+	}
+
+	/**
+	 *  Check if there is someone monitoring.
+	 *  To Avoid posting when nobody is listening.
+	 */
+	public boolean isMonitoring()
+	{
+		return subscriptions!=null;
 	}
 }

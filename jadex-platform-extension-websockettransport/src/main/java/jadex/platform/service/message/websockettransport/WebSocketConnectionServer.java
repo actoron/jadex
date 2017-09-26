@@ -92,12 +92,13 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	 */
 	public IFuture<Void> sendMessage(byte[] header, byte[] body)
 	{
-//		System.out.println("SendServer: " + Arrays.hashCode(message) + " " + System.currentTimeMillis());
+//		System.out.println("SendServer: " + Arrays.hashCode(body) + " " + System.currentTimeMillis());
 		Future<Void> ret = new Future<Void>();
 		try
 		{
 			websocket.send(header);
 			websocket.send(body);
+//			websocket.send(SUtil.mergeData(header, body));
 			ret.setResult(null);
 		}
 		catch(Exception e)

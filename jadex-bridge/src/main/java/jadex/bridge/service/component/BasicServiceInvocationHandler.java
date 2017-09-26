@@ -504,7 +504,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
+			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope, jadex.bridge.service.ServiceIdentifier.isUnrestricted(ia, type));
 		}
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
@@ -619,7 +619,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
-			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope);
+			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope, jadex.bridge.service.ServiceIdentifier.isUnrestricted(ia, type));
 			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
 			

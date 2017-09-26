@@ -43,7 +43,14 @@ public class AgentDelayRunner implements IDelayRunner
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				step.run();
+				try
+				{
+					step.run();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				return IFuture.DONE;
 			}
 			

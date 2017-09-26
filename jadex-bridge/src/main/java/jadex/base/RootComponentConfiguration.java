@@ -538,30 +538,30 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 		setValue(TCPPORT, value);
 	}
 
-//	@Override
-//	public boolean getRelayTransport()
-//	{
-//		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
-//	}
-//
-//	@Override
-//	public void setRelayTransport(boolean value)
-//	{
-//		setValue(RELAYTRANSPORT, value);
-//	}
-//
-//	@Override
-//	public String getRelayAddress()
-//	{
-//		return (String)getValue(RELAYADDRESS);
-//	}
-//
-//	@Override
-//	public void setRelayAddress(String value)
-//	{
-//		setValue(RELAYADDRESS, value);
-//	}
-//
+	@Override
+	public boolean getRelayTransport()
+	{
+		return Boolean.TRUE.equals(getValue(RELAYTRANSPORT));
+	}
+
+	@Override
+	public void setRelayTransport(boolean value)
+	{
+		setValue(RELAYTRANSPORT, value);
+	}
+
+	@Override
+	public String getRelayAddress()
+	{
+		return (String)getValue(RELAYADDRESS);
+	}
+
+	@Override
+	public void setRelayAddress(String value)
+	{
+		setValue(RELAYADDRESS, value);
+	}
+
 //	@Override
 //	public boolean getRelaySecurity()
 //	{

@@ -140,4 +140,10 @@ public interface IServiceRegistry
 	 *  @return All services (copy).
 	 */
 	public Set<IService> getAllServices();
+	
+	/**
+	 *  Get all queries.
+	 *  @return All queries (copy).
+	 */
+	public Set<ServiceQueryInfo<IService>> getAllQueries();
 }

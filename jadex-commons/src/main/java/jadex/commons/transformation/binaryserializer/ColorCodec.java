@@ -2,7 +2,6 @@ package jadex.commons.transformation.binaryserializer;
 
 import java.awt.Color;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;

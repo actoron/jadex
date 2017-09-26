@@ -48,11 +48,15 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageEvent;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.ServiceCallEvent;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -65,7 +69,9 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
@@ -188,7 +194,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	protected Set<IComponentIdentifier> observed;
 	
 	/** The observed components. */
-	protected Map<IComponentIdentifier, ISubscriptionIntermediateFuture<MessageEvent>>	subscriptions;
+	protected Map<IComponentIdentifier, ISubscriptionIntermediateFuture<Object>>	subscriptions;
 	
 	/** The clock service. */
 	protected IClockService clockservice;
@@ -209,7 +215,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		this.timer = new Timer(true);
 		this.observed = new HashSet<IComponentIdentifier>();
 		this.paintmaps = new PaintMaps();
-		this.subscriptions	= new LinkedHashMap<IComponentIdentifier, ISubscriptionIntermediateFuture<MessageEvent>>();
+		this.subscriptions	= new LinkedHashMap<IComponentIdentifier, ISubscriptionIntermediateFuture<Object>>();
 
 	}
 	
@@ -246,7 +252,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		final Future<Void> ret = new Future<Void>();
 		comptree.dispose();
 		
-		for(ISubscriptionIntermediateFuture<MessageEvent> sub: subscriptions.values())
+		for(ISubscriptionIntermediateFuture<Object> sub: subscriptions.values())
 		{
 			sub.terminate();
 		}
@@ -1051,20 +1057,52 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 * form the sender than the message recorded from the receiver is skipped)
 	 * @param message_maps The list of attribute maps for creating messages.
 	 */
-	protected void addMessage(final MessageEvent message)//, String direction)
+	protected void addEvent(final Object event)//, String direction)
 	{
-		if(isAddMessage(message))
+		IComponentIdentifier sid;
+		Object recs;
+		String	xid;
+		Object	body;
+		if(event instanceof MessageEvent)
+		{
+			sid = (IComponentIdentifier)((MessageEvent)event).getHeader().getProperty(IMsgHeader.SENDER);
+			recs = ((MessageEvent)event).getHeader().getProperty(IMsgHeader.RECEIVER);
+			xid	= (String)((MessageEvent)event).getHeader().getProperty(IMsgHeader.XID);
+			body	= ((MessageEvent)event).getBody();
+		}
+		else if(event instanceof ServiceCallEvent)
+		{
+			if(((ServiceCallEvent)event).getType()==ServiceCallEvent.Type.CALL)
+			{
+				// For initial event, caller is sender.
+				sid = ((ServiceCallEvent)event).getCaller();
+				recs = ((ServiceCallEvent)event).getService().getProviderId();
+			}
+			else
+			{
+				// For remaining events (e.g. result), provider is sender.
+				// TODO: Commands (cancel, alive, ...)
+				recs = ((ServiceCallEvent)event).getCaller();
+				sid = ((ServiceCallEvent)event).getService().getProviderId();				
+			}
+			xid	= null; // TODO
+			body	= ((ServiceCallEvent)event).getBody();
+		}
+		else
+		{
+			throw new UnsupportedOperationException("Unknown event type: "+event);
+		}
+		
+		if(isAddMessage(sid, recs))
 		{
 			final List<Message> messages_added = new ArrayList<Message>();
-			IComponentIdentifier sid	= (IComponentIdentifier)message.getHeader().getProperty(IMsgHeader.SENDER);
-			Object recs = message.getHeader().getProperty(IMsgHeader.RECEIVER);
 			
 			if(recs instanceof IComponentIdentifier)
 			{
 				IComponentIdentifier rid = (IComponentIdentifier)recs;
-				if(!isDuplicate(message, rid))
+				if(!isDuplicate(xid, rid))
 				{
-					Message msg = createMessage(message, sid, rid);
+					Message msg = createMessage(event, xid, sid, rid, body);
 //						System.out.println("Added: "+msg);
 					messages_added.add(msg);
 				}
@@ -1075,9 +1113,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 				while(rids.hasNext())
 				{
 					IComponentIdentifier rid = rids.next();
-					if(!isDuplicate(message, rid))
+					if(!isDuplicate(xid, rid))
 					{
-						Message msg = createMessage(message, sid, rid);
+						Message msg = createMessage(event, xid, sid, rid, body);
 //						System.out.println("Added: "+msg);
 						messages_added.add(msg);
 					}
@@ -1112,14 +1150,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 * @param source The attribute map for the message.
 	 * @return <code>true</code> if the message is already in the messagelist.
 	 */
-	protected boolean isDuplicate(MessageEvent newmsg, IComponentIdentifier rec)
+	protected boolean isDuplicate(String xid, IComponentIdentifier rec)
 	{
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
 		for(int i=0; i<messages.length && !ret; i++)
 		{
 			Object xid1 = messages[i].getParameter(Message.XID);
-			Object xid2 = newmsg.getHeader().getProperty(IMsgHeader.XID);
+			Object xid2 = xid;
 			if(xid1!=null && xid2!=null && xid1.equals(xid2))
 			{
 				IComponentIdentifier oldrec = (IComponentIdentifier)messages[i].getParameter(Message.RECEIVER);
@@ -1152,9 +1190,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 * @param rid The receivers agent id.
 	 * @return
 	 */
-	protected Message createMessage(MessageEvent msg, IComponentIdentifier sid, IComponentIdentifier rid)//, String direction)
+	protected Message createMessage(Object event, String xid, IComponentIdentifier sid, IComponentIdentifier rid, Object body)
 	{
-		final Message message = new Message(msg, messagenr++, rid);
+		final Message message = new Message(event, messagenr++, xid, sid, rid, body);
 		message.applyFilter(messagefilter);
 
 		// add to messagelist
@@ -1198,6 +1236,20 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		// save sender and receiver to message
 		message.setSender(sender);
 		message.setReceiver(receiver);
+		
+		// Hack!!! make some infos on service calls available fipa style
+		if(event instanceof ServiceCallEvent)
+		{
+			if(((ServiceCallEvent)event).getType()==ServiceCallEvent.Type.CALL)
+			{
+				message.setParameter(Message.PERFORMATIVE, ((ServiceCallEvent)event).getMethod().getName());				
+			}
+			else
+			{
+				message.setParameter(Message.PERFORMATIVE, String.valueOf(((ServiceCallEvent)event).getType()));
+			}
+			message.setParameter(Message.CONTENT, String.valueOf(((ServiceCallEvent)event).getBody()));
+		}
 
 		// create paint map
 		paintmaps.createColor(message);
@@ -1714,10 +1766,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 *  Invoked when a message event has been received.
 	 *  @param msg The message adapter.
 	 */
-	public boolean isAddMessage(MessageEvent msg)
+	public boolean isAddMessage(IComponentIdentifier s, Object rs)
 	{
-		IComponentIdentifier s = (IComponentIdentifier)msg.getHeader().getProperty(IMsgHeader.SENDER);
-		
 		boolean add = false;
 		if(observe_all_new || observed.contains(s))
 		{
@@ -1725,7 +1775,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		}
 		else
 		{
-			Object rs = msg.getHeader().getProperty(IMsgHeader.RECEIVER);
 			if(rs instanceof IComponentIdentifier)
 			{
 				if(observed.contains(rs))
@@ -1762,25 +1811,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					{
 						public void customResultAvailable(IExternalAccess ea)
 						{
-							ISubscriptionIntermediateFuture<MessageEvent>	sub	= (ISubscriptionIntermediateFuture<MessageEvent>)
-								ea.scheduleStep(new IComponentStep<Collection<MessageEvent>>()
+							// Generic listener
+							IIntermediateResultListener<Object>	lis	= new SwingIntermediateDefaultResultListener<Object>()
 							{
 								@Override
-								public ISubscriptionIntermediateFuture<MessageEvent> execute(IInternalAccess ia)
+								public void customIntermediateResultAvailable(Object result)
 								{
-									return ((IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class))
-										.getMessageEvents();
-								}
-							});
-							
-							subscriptions.put(cid, sub);
-							
-							sub.addResultListener(new SwingIntermediateDefaultResultListener<MessageEvent>()
-							{
-								@Override
-								public void customIntermediateResultAvailable(MessageEvent result)
-								{
-									addMessage(result);
+									addEvent(result);
 								}
 								
 								@Override
@@ -1795,7 +1832,49 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 									subscriptions.remove(cid);
 									super.customExceptionOccurred(exception);
 								}
+							};
+							
+							// Messages
+							ISubscriptionIntermediateFuture<Object>	sub	= (ISubscriptionIntermediateFuture<Object>)
+								ea.scheduleStep(new IComponentStep<Collection<Object>>()
+							{
+								@SuppressWarnings({"rawtypes", "unchecked"})
+								@Override
+								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
+								{
+									return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class))
+										.getMessageEvents();
+								}
 							});
+							subscriptions.put(cid, sub);
+							sub.addResultListener(lis);
+							
+							// Service calls
+							sub	= (ISubscriptionIntermediateFuture<Object>)
+								ea.scheduleStep(new IComponentStep<Collection<Object>>()
+							{
+								@SuppressWarnings({"rawtypes", "unchecked"})
+								@Override
+								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
+								{
+									final IRequiredServicesFeature	feat	= ia.getComponentFeature0(IRequiredServicesFeature.class);
+									if(feat instanceof IInternalServiceMonitoringFeature)
+									{
+										return (ISubscriptionIntermediateFuture)((IInternalServiceMonitoringFeature)feat).getServiceEvents();
+									}
+									else
+									{
+										@SuppressWarnings("unchecked")
+										SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getFuture(SubscriptionIntermediateFuture.class);
+										ret.setFinished();
+										return ret;
+									}
+								}
+							});
+							subscriptions.put(cid, sub);
+							sub.addResultListener(lis);
+							
+							// Todo: provided
 						}	
 					});
 				}

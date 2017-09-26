@@ -1,10 +1,7 @@
 package jadex.commons.transformation.binaryserializer;
 
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
-import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;

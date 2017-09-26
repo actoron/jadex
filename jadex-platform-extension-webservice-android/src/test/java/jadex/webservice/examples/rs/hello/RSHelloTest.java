@@ -97,7 +97,7 @@ public class RSHelloTest
 	public void tearDown() throws Exception
 	{
 //		pservice.unpublishService(sid);
-		httpServer.getClass().getMethod("stop").invoke(httpServer);
+		httpServer.getClass().getMethod("stop").invoke(httpServer); // references to HttpServer not working because of conflicting classloaders (robolectric/AppLoader)
 	}
 
     @Test

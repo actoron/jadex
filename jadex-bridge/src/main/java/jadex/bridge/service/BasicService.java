@@ -258,9 +258,9 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
 	{
-		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid, scope);
+		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid, scope, unrestricted);
 	}
 	
 	/**
@@ -338,8 +338,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 									properties = new HashMap<String, Object>();
 								
 								Set<String> tags = new LinkedHashSet<String>(coll);
-								properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
-								// Hack!!!
+								// Hack!!! save props in service identifier 
+//								properties.put(TagProperty.SERVICE_PROPERTY_NAME, tags);
+								((ServiceIdentifier)sid).setTags(tags);
+								// Hack!!! re-index
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
 								IService orig = reg.getIndexer().getValues(ServiceKeyExtractor.KEY_TYPE_SID, getServiceIdentifier().toString()).iterator().next();
 								reg.getIndexer().addValue(orig);
@@ -483,10 +485,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  @return A service identifier.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, boolean unrestricted)
 	{
 		Set<String> networknames = (Set<String>)PlatformConfiguration.getPlatformValue(providerid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
-		return createServiceIdentifier(providerid, servicename, servicetype, serviceimpl, rid, scope, networknames);
+		return createServiceIdentifier(providerid, servicename, servicetype, serviceimpl, rid, scope, networknames, unrestricted);
 	}
 	
 	/**
@@ -496,9 +498,9 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  @return A service identifier.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, Set<String> networknames)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
 	{
-		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope, networknames);
+		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope, networknames, unrestricted);
 	}
 	
 	/**

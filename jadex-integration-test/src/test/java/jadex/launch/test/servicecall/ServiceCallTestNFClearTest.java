@@ -63,7 +63,7 @@ public class ServiceCallTestNFClearTest
 	{
 		timeout = Starter.getLocalDefaultTimeout(null);
 
-		String pid = SUtil.createUniqueId(name.getMethodName(), 3) + "-*";
+		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
 		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
 //		config.setLogging(true);

@@ -2045,7 +2045,15 @@ public class SUtil
 	
 	/**
 	 * Create a globally unique conversation id.
-	 * 
+	 * @return The conversation id.
+	 */
+	public static String createUniqueId()
+	{
+		return createUniqueId(null);
+	}
+	
+	/**
+	 * Create a globally unique conversation id.
 	 * @return The conversation id.
 	 */
 	public static String createUniqueId(String name)
@@ -2097,18 +2105,19 @@ public class SUtil
 //	}
 
 	/**
-	 * Create a globally unique conversation id.
+	 * Create a random id with only alphanumeric chars.
 	 * 
-	 * @return The conversation id.
+	 * @return The id.
 	 */
-	public static String createUniqueId(String name, int length)
+	public static String createPlainRandomId(String name, int length)
 	{
-		String rand = createUniqueId(name);
-		return rand.substring(0, name.length() + length + 1);
+//		String rand = createUniqueId(name);
+//		return rand.substring(0, name.length() + length + 1);
 
-		// String rand = ""+Math.random();
-		// rand = rand.substring(2, 2+Math.min(length-2, rand.length()-2));
-		// return name+"_"+rand+(++convidcnt%100);
+		double	rnd	= Math.random();
+		rnd	= rnd * Math.pow(36, length);
+		String rand = Integer.toString((int)rnd, 36);
+		return name+"_"+rand;
 	}
 	
 	/**
@@ -4343,7 +4352,7 @@ public class SUtil
 			    baos.write(buf, 0, readbytes);
 			}
 		}
-		catch (IOException e)
+		catch(IOException e)
 		{
 			try
 			{
@@ -4359,11 +4368,13 @@ public class SUtil
 		{
 			fis.close();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 		}
 		
-		return baos.toByteArray();
+		byte[] ret = baos.toByteArray();
+		
+		return ret;
 	}
 	
 	/**

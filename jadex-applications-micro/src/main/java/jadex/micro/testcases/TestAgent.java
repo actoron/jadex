@@ -67,42 +67,43 @@ public abstract class TestAgent
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
-//		{
-//			@Override
-//			public void resultAvailable(Map<String, Object> result)
-//			{
-//				System.out.println("result: "+result);
-//				super.resultAvailable(result);
-//			}
-//			
-//			@Override
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("exception: "+exception);
-//				super.exceptionOccurred(exception);
-//			}
-//		};
-		
-		for(IExternalAccess platform: platforms)
+		agent.getLogger().severe("Testagent kill: "+agent.getComponentDescription());
+		ret.addResultListener(new IResultListener<Void>()
 		{
-//			System.out.println("kill: "+platform.getComponentIdentifier());
-			platform.killComponent().addResultListener(crl);
+			@Override
+			public void resultAvailable(Void result)
+			{
+				agent.getLogger().severe("Testagent killed: "+agent.getComponentDescription());
+			}
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getLogger().severe("Testagent kill exception: "+agent.getComponentDescription()+", "+exception);
+			}
+		});
+		final IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
+		
+		for(final IExternalAccess platform: platforms)
+		{
+			agent.getLogger().severe("kill platform: "+platform.getComponentIdentifier());
+			platform.killComponent().addResultListener(new IResultListener<Map<String,Object>>()
+			{
+				@Override
+				public void resultAvailable(Map<String, Object> result)
+				{
+					agent.getLogger().severe("Test platform killed: "+platform.getComponentIdentifier());
+					crl.resultAvailable(result);
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().severe("Test platform kill exception: "+platform.getComponentIdentifier()+", "+exception);
+					crl.exceptionOccurred(exception);
+				}
+			});
 		}
 		platforms	= null;
-		
-//		ret.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				System.out.println("finiii");
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("exxx");
-//			}
-//		});
 		
 		return ret;
 	}
@@ -113,6 +114,7 @@ public abstract class TestAgent
 	@AgentBody
 	public IFuture<Void> body()
 	{
+		agent.getLogger().severe("Testagent start: "+agent.getComponentDescription());
 		final Future<Void> ret = new Future<Void>();
 		
 		final Testcase tc = new Testcase();
@@ -157,10 +159,12 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
+				agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 				test(cms, true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent test local finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						setupRemotePlatform(false)
 							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
@@ -172,10 +176,12 @@ public abstract class TestAgent
 								{
 									public void customResultAvailable(IComponentManagementService cms2)
 									{
+										agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 										test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
+												agent.getLogger().severe("Testagent test remote finished: "+agent.getComponentDescription());
 												tc.addReport(result);
 												ret.setResult(null);
 											}
@@ -205,6 +211,7 @@ public abstract class TestAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
+		agent.getLogger().severe("Testagent create platform: "+agent.getComponentDescription());
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		// Fetch own arguments
@@ -233,7 +240,6 @@ public abstract class TestAgent
 							"-cli", "false",
 							"-simulation", "false",
 							"-printpass", "false",
-							"-component", "jadex.platform.service.transport.tcp.TcpTransportAgent.class",
 							"-superpeerclient", "false"
 //							"-logging", "true",
 ////							"-relaytransport", "false",
@@ -272,6 +278,7 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(IExternalAccess result)
 							{
+								agent.getLogger().severe("Testagent create platform done: "+agent.getComponentDescription());
 								platforms.add(result);
 								super.customResultAvailable(result);
 							}
@@ -395,6 +402,7 @@ public abstract class TestAgent
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		
+		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
 		createPlatform(null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
@@ -408,13 +416,14 @@ public abstract class TestAgent
 					{
 						// inverse proxy from remote to local.
 						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(IComponentIdentifier result)
 							{
+								agent.getLogger().severe("Testagent setup remote platform done: "+agent.getComponentDescription());
 								ret.setResult(exta);
 							}
-						});
+						}));
 					}
 				});
 			}

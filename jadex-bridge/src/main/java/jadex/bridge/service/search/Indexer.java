@@ -35,12 +35,16 @@ public class Indexer<T>
 	/** The index of published values. First string is the index key name. */
 	protected Map<String, Map<String, Set<T>>> indexedvalues = new HashMap<String, Map<String, Set<T>>>();
 	
+	/** Include null values during indexing. */
+	protected boolean includenull;
+	
 	/**
 	 *  Create a new ServiceIndexer.
 	 */
-	public Indexer(IKeyExtractor<T> keyextractor, String... indextypes)
+	public Indexer(IKeyExtractor<T> keyextractor, boolean includenull, String... indextypes)
 	{
 		this.keyextractor = keyextractor;
+		this.includenull = includenull;
 		for(String indextype: indextypes)
 			indexedvalues.put(indextype, new HashMap<String, Set<T>>());
 	}
@@ -194,6 +198,9 @@ public class Indexer<T>
 						if(iset!=null)
 							vals.addAll(iset);
 					}
+					Set<T> iset = index.get("null");
+					if(iset!=null)
+						vals.addAll(iset);
 					
 					if(vals.isEmpty())
 						return null;
@@ -305,7 +312,13 @@ public class Indexer<T>
 				// Fetch all key values used 
 				Set<String> keys = keyextractor.getKeyValues(entry.getKey(), value);
 				
-				if(keys != null)
+				if(includenull && keys==null)
+				{
+					keys = new HashSet<String>();
+					keys.add("null");
+				}	
+				
+				if(keys!=null)
 				{
 					for(String key: keys)
 					{
@@ -477,15 +490,24 @@ public class Indexer<T>
 		{
 			Set<String> keys = keyextractor.getKeyValues(indexname, value);
 		
-			for(String key: keys)
+			if(includenull && keys==null)
 			{
-				Set<T> valset = index.get(key);
-				if(valset == null)
+				keys = new HashSet<String>();
+				keys.add("null");
+			}	
+			
+			if(keys!=null)
+			{
+				for(String key: keys)
 				{
-					valset = new HashSet<T>();
-					index.put(key, valset);
+					Set<T> valset = index.get(key);
+					if(valset == null)
+					{
+						valset = new HashSet<T>();
+						index.put(key, valset);
+					}
+					valset.add(value);
 				}
-				valset.add(value);
 			}
 		}
 		indexedvalues.put(indexname, index);
@@ -571,8 +593,10 @@ public class Indexer<T>
 				return ServiceKeyExtractor.SERVICE_KEY_TYPES;
 			}
 		
-		}, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
+		}, true, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
 		
+		ServiceQuery<IService> q0 = new ServiceQuery<IService>((Class<?>)null, null, null, null, null);
+		idx.addValue(q0);
 		ServiceQuery<IService> q1 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
 		idx.addValue(q1);
@@ -589,6 +613,11 @@ public class Indexer<T>
 		Tuple2<String, String[]> s2 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, new String[]{"a", "b"});
 		spec.add(s2);
 		
-		System.out.println(idx.getValuesInverted(spec));
+		Set<ServiceQuery<IService>> res = idx.getValuesInverted(spec);
+		if(res!=null)
+		{
+			for(ServiceQuery<IService> r: res)
+				System.out.println(r);
+		}
 	}
 }

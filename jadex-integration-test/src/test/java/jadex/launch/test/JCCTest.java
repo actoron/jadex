@@ -35,7 +35,9 @@ public class JCCTest //extends TestCase
 //		System.err.println("starting platform");
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 //			"-logging", "true",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"});
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false",
+			"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
+			});
 		
 		long timeout = Starter.getLocalDefaultTimeout(null);
 //		ISuspendable	sus	= 	new ThreadSuspendable();

@@ -2078,6 +2078,10 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				vals.add(new ChangeInfoEntryMapper((ChangeInfo<?>)event.getValue()));
 				vals.add(((ChangeInfo<?>)event.getValue()).getValue());
 			}
+			else if(event.getValue() instanceof RGoal)
+			{
+				vals.add(((RGoal)event.getValue()).getPojoElement());
+			}
 		}
 
 		// Add processable element values if any (for plan and APL).

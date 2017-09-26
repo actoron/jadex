@@ -367,6 +367,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		if(header != null && bodydata != null)
 		{
+//			System.out.println("Received message: "+header);
+			
 			getSecurityService().decryptAndAuth((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
@@ -386,6 +388,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							}
 							catch(Exception e)
 							{
+								getComponent().getLogger().warning("Could not decode message: "+header+", "+e);
 								// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
 								message = null;
 								header.addProperty(EXCEPTION, e);
@@ -541,34 +544,40 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 
 		Object rec = header.getProperty(IMsgHeader.RECEIVER);		
 		if(!(rec instanceof IComponentIdentifier))
-		{
 			return new Future<Void>(new IllegalArgumentException("Messages must have receiver(s) of type IComponentIdentifier: "+message+", "+header));
-		}
 		IComponentIdentifier receiver = (IComponentIdentifier)rec;
 		
 		notifyMessageSent(header, message);
 		
 		if(receiver.getRoot().equals(platformid))
 		{
-			// Direct local delivery.
-			ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
-			final Object clonedmsg = SCloner.clone(message, cl);
-			
-			SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
+			try
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				// Direct local delivery.
+				ClassLoader cl = SComponentManagementService.getLocalClassLoader(receiver);
+				final Object clonedmsg = SCloner.clone(message, cl);
+				
+				SComponentManagementService.getLocalExternalAccess(receiver).scheduleStep(new IComponentStep<Void>()
 				{
-					IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
-					
-					if (imf instanceof IInternalMessageFeature)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
-						return IFuture.DONE;
+						IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
+						
+						if (imf instanceof IInternalMessageFeature)
+						{
+							((IInternalMessageFeature)imf).messageArrived(null, header, clonedmsg);
+							return IFuture.DONE;
+						}
+						
+						return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
 					}
-					
-					return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
-				}
-			}).addResultListener(new DelegationResultListener<Void>(ret));
+				}).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			catch(RuntimeException e)
+			{
+				// E.g. when receiver not found.
+				ret.setException(e);
+			}
 		}
 		else
 		{
@@ -725,19 +734,21 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							--counter[0];
 							if (counter[0] == 0)
 							{
-								String error = "Could not find working transport for receiver " + receiverplatform + ", tried:";
+								String error = component.getComponentIdentifier()+" could not find working transport for receiver " + receiverplatform + ", tried:";
 								for (ITransportService tp : coll)
 								{
 									error += " " + tp.toString();
 								}
-								ret.setException(new RuntimeException(error));
+								ret.setException(new RuntimeException(error, exception));
 							}
 						}
 					});
 				}
 			}
 			else
+			{
 				ret.setException(new ServiceNotFoundException("No transport available."));
+			}
 		}
 		return ret;
 	}

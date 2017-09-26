@@ -296,20 +296,20 @@ public interface IRootComponentConfiguration {
     // default:
     // 8765
 
-//    /** Flag if relay transport is enabled. **/
-//    public static final String	RELAYTRANSPORT		= "relaytransport";							// class:
-//    // boolean
-//    // default:
-//    // true
+    /** Flag if relay transport is enabled. **/
+    public static final String	RELAYTRANSPORT		= "relaytransport";							// class:
+    // boolean
+    // default:
+    // true
 
-//    /**
-//     * Address(es) for relay transport (one or more addresses separated by
-//     * commas).
-//     **/
-//    public static final String	RELAYADDRESS		= "relayaddress";							// class:
-//    // String
-//    // default:
-//    // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
+    /**
+     * Address(es) for relay transport (one or more addresses separated by
+     * commas).
+     **/
+    public static final String	RELAYADDRESS		= "relayaddress";							// class:
+    // String
+    // default:
+    // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
 
 //    /** Flag if relay should use HTTPS for receiving messages. **/
 //    public static final String	RELAYSECURITY		= "relaysecurity";							// class:
@@ -492,7 +492,7 @@ public interface IRootComponentConfiguration {
             WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
             UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
             PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT,
-//            RELAYTRANSPORT,
+            RELAYTRANSPORT,
 //            RELAYSECURITY, RELAYAWAONLY,
 //            SSLTCPTRANSPORT,
             WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
@@ -663,14 +663,14 @@ public interface IRootComponentConfiguration {
 
     void setTcpPort(int value);
 
-//    boolean getRelayTransport();
-//
-//    void setRelayTransport(boolean value);
-//
-//    String getRelayAddress();
-//
-//    void setRelayAddress(String value);
-//
+    boolean getRelayTransport();
+
+    void setRelayTransport(boolean value);
+
+    String getRelayAddress();
+
+    void setRelayAddress(String value);
+
 //    boolean getRelaySecurity();
 //
 //    void setRelaySecurity(boolean value);

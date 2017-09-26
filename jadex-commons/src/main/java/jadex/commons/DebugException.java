@@ -1,8 +1,5 @@
 package jadex.commons;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 /**
  *  Helper class to remember stack traces.
  *  Prints out a warning, when used.

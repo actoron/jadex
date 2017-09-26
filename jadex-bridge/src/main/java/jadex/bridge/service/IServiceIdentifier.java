@@ -49,8 +49,21 @@ public interface IServiceIdentifier
 	public String getScope();
 	
 	/**
-	 *  Get the network names.
+	 *  Get the (security) network names.
+	 *  Determines how it is accessible.
 	 *  @return The network names.
 	 */
 	public Set<String> getNetworkNames();
+	
+	/**
+	 *  Check if the service has unrestricted access. 
+	 *  @return True, if it is unrestricted.
+	 */
+	public boolean isUnrestricted();
+	
+	/**
+	 *  Get the service tags.
+	 *  @return The tags.
+	 */
+	public Set<String> getTags();
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -112,37 +111,44 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		}
 		else
 		{
-			// Can not register channel while selecting -> do asynchronously on selector thread.
-			// Causes deadlocks otherwise: https://stackoverflow.com/questions/12822298/nio-selector-how-to-properly-register-new-channel-while-selecting
-			schedule(new Runnable()
+			try
 			{
-				@Override
-				public void run()
+				// Can not register channel while selecting -> do asynchronously on selector thread.
+				// Causes deadlocks otherwise: https://stackoverflow.com/questions/12822298/nio-selector-how-to-properly-register-new-channel-while-selecting
+				schedule(new Runnable()
 				{
-					ServerSocketChannel	ssc	= null;
-					try
+					@Override
+					public void run()
 					{
-						ssc = ServerSocketChannel.open();
-						ssc.configureBlocking(false);
-						ServerSocket serversocket = ssc.socket();
-						serversocket.bind(new InetSocketAddress(port));
-						ssc.register(selector, SelectionKey.OP_ACCEPT);
-						int port = serversocket.getLocalPort();
-						ret.setResult(port);
-					}
-					catch(Exception e)
-					{
-						if(ssc!=null)
+						ServerSocketChannel	ssc	= null;
+						try
 						{
-							try
-							{
-								ssc.close();
-							}catch(IOException e2){}
+							ssc = ServerSocketChannel.open();
+							ssc.configureBlocking(false);
+							ServerSocket serversocket = ssc.socket();
+							serversocket.bind(new InetSocketAddress(port));
+							ssc.register(selector, SelectionKey.OP_ACCEPT);
+							int port = serversocket.getLocalPort();
+							ret.setResult(port);
 						}
-						ret.setException(e);
+						catch(Exception e)
+						{
+							if(ssc!=null)
+							{
+								try
+								{
+									ssc.close();
+								}catch(IOException e2){}
+							}
+							ret.setException(e);
+						}
 					}
-				}
-			});
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		
 		return ret;
@@ -193,7 +199,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 				}			
 			});
 		}
-		catch(URISyntaxException ex)
+		catch(Exception ex)
 		{
 			ret.setException(ex);
 		}
@@ -207,16 +213,23 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 */
 	public void closeConnection(final SocketChannel sc)
 	{
-		schedule(new Runnable()
+		try
 		{
-			@Override
-			public void run()
+			schedule(new Runnable()
 			{
-				SelectionKey	sk	= sc.keyFor(selector);
-				assert sk!=null;
-				closeConnection(sk, null, true);
-			}
-		});
+				@Override
+				public void run()
+				{
+					SelectionKey	sk	= sc.keyFor(selector);
+					assert sk!=null;
+					closeConnection(sk, null, true);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			handler.getAccess().getLogger().warning("Closing connection failed: "+e);
+		}
 	}
 	
 	/**
@@ -230,63 +243,70 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		schedule(new Runnable()
+		try
 		{
-			public void run()
+			schedule(new Runnable()
 			{
-				SelectionKey key = null;
-				try
+				public void run()
 				{
-					key = sc.keyFor(selector);
-					if(key!=null && key.isValid() && sc.isOpen())
+					SelectionKey key = null;
+					try
 					{
-						// Convert message into buffer.
-						ByteBuffer buf = ByteBuffer.allocateDirect(8 + header.length + body.length);
-						buf.put(SUtil.intToBytes(header.length));
-						buf.put(header);
-						buf.put(SUtil.intToBytes(body.length));
-						buf.put(body);
-						buf.rewind();
-						
-						// Add buffer as new write task.
-						if(writetasks==null)
+						key = sc.keyFor(selector);
+						if(key!=null && key.isValid() && sc.isOpen())
 						{
-							writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<ByteBuffer,Future<Void>>>>();
+							// Convert message into buffer.
+							ByteBuffer buf = ByteBuffer.allocateDirect(8 + header.length + body.length);
+							buf.put(SUtil.intToBytes(header.length));
+							buf.put(header);
+							buf.put(SUtil.intToBytes(body.length));
+							buf.put(body);
+							buf.rewind();
+							
+							// Add buffer as new write task.
+							if(writetasks==null)
+							{
+								writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<ByteBuffer,Future<Void>>>>();
+							}
+							Tuple2<ByteBuffer, Future<Void>>	task	= new Tuple2<ByteBuffer, Future<Void>>(buf, ret);
+							List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>)writetasks.get(sc);
+							if(queue==null)
+							{
+								queue	= new LinkedList<Tuple2<ByteBuffer, Future<Void>>>();
+								writetasks.put(sc, queue);
+		//						System.out.println("writetasks0: "+writetasks.size());
+							}
+							queue.add(task);
+							
+							// Inform NIO that we want to write data.
+							key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
 						}
-						Tuple2<ByteBuffer, Future<Void>>	task	= new Tuple2<ByteBuffer, Future<Void>>(buf, ret);
-						List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>)writetasks.get(sc);
-						if(queue==null)
-						{
-							queue	= new LinkedList<Tuple2<ByteBuffer, Future<Void>>>();
-							writetasks.put(sc, queue);
-	//						System.out.println("writetasks0: "+writetasks.size());
+						else
+						{						
+	//						System.err.println("writetasks6: "+writetasks.get(con.getSocketChannel()));
+							ret.setException(new RuntimeException("Invalid connection: "+sc+", "+key));
 						}
-						queue.add(task);
-						
-						// Inform NIO that we want to write data.
-						key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
 					}
-					else
-					{						
-//						System.err.println("writetasks6: "+writetasks.get(con.getSocketChannel()));
-						ret.setException(new RuntimeException("Invalid connection: "+sc+", "+key));
-					}
-				}
-				catch(RuntimeException e)
-				{
-					if(key!=null)
+					catch(RuntimeException e)
 					{
-						closeConnection(key, e, true);
+						if(key!=null)
+						{
+							closeConnection(key, e, true);
+						}
+						
+	//					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
+	//					e.printStackTrace();
+						
+						// Set exception when failed before added to task list.
+						ret.setExceptionIfUndone(e);
 					}
-					
-//					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
-//					e.printStackTrace();
-					
-					// Set exception when failed before added to task list.
-					ret.setExceptionIfUndone(e);
-				}
-			}			
-		});
+				}			
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 
 		
 		return ret;
@@ -356,7 +376,10 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		Selector	selector	= null;
 		synchronized(this)
 		{
-			assert !shutdown;
+			if(shutdown)
+			{
+				throw new IllegalStateException("Transport already shut down: "+this+", "+handler.getAccess().getComponentIdentifier());
+			}
 			if(!running)
 			{
 				start	= true;

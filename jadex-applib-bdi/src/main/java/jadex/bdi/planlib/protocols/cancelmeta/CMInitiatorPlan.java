@@ -1,5 +1,6 @@
 package jadex.bdi.planlib.protocols.cancelmeta;
 
+import java.util.Iterator;
 import java.util.List;
 
 import jadex.bdi.planlib.protocols.InteractionState;
@@ -90,19 +91,19 @@ public class CMInitiatorPlan extends Plan
 					{
 						// Check, if components still exist
 						// Hack!!! Avoids deadlock on exit when deftimeout == -1
-						for(Object arec: rec)
+						for(Iterator<Object> it=rec.iterator(); it.hasNext(); )
 						{
 //							System.out.println("cancel retry checking if exists: "+arec);
 							try
 							{
 								SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, Binding.SCOPE_PLATFORM)
-									.getComponentDescription((IComponentIdentifier)arec).get(10000);
+									.getComponentDescription((IComponentIdentifier)it.next()).get(10000);
 //								System.out.println("cancel retry not removed: "+arec);
 							}
 							catch(ComponentNotFoundException ce)
 							{
 //								System.out.println("cancel retry removed: "+arec);
-								rec.remove(arec);
+								it.remove();
 							}
 							catch(Exception e)
 							{

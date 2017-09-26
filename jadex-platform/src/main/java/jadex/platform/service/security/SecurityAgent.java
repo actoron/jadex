@@ -17,7 +17,9 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -66,7 +68,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
  *  Agent that provides the security service.
  */
 @Agent
-@Service
+//@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
@@ -1048,10 +1050,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
+//				exception.printStackTrace();
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if (state != null)
 				{
-					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake."));
+					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake.")
+					{
+						@Override
+						public void printStackTrace()
+						{
+							// TODO Auto-generated method stub
+							super.printStackTrace();
+						}
+					});
 				}
 			}
 			
@@ -1292,7 +1303,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							state.setCryptoSuite(suite);
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-								System.out.println("Finished handshake: " + fm.getSender());
+								System.out.println(agent.getComponentIdentifier()+" finished handshake: " + fm.getSender());
 								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1312,7 +1323,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
-							System.out.println("Finished handshake: " + secmsg.getSender());
+							System.out.println(agent.getComponentIdentifier()+" finished handshake: " + secmsg.getSender());
 							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1320,7 +1331,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 					catch (Exception e)
 					{
-						e.printStackTrace();
+//						e.printStackTrace();
 						state.getResultFuture().setException(e);
 						initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 					}
@@ -1381,9 +1392,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
 	{
-		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
+		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope, unrestricted);
 	}
 	
 	/**

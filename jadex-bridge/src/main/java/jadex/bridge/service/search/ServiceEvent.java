@@ -18,6 +18,9 @@ public class ServiceEvent<T>
 	/** Service was removed event. */
 	public static final int SERVICE_REMOVED = 1;
 	
+	/** Service changed. */
+	public static final int SERVICE_CHANGED = 2;
+	
 	/** Event type. */
 	protected int type;
 	
@@ -37,6 +40,7 @@ public class ServiceEvent<T>
 	public ServiceEvent(T service, int eventtype)
 	{
 		this.service = service;
+		this.type = eventtype;
 	}
 
 	/**
@@ -77,5 +81,13 @@ public class ServiceEvent<T>
 	public void setService(T service)
 	{
 		this.service = service;
+	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ServiceEvent [type=" + type + ", service=" + service + "]";
 	}
 }

@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -11,8 +12,10 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Invoke a remote method.
@@ -160,16 +163,29 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	@Override
 	protected String	getSecurityLevel(IInternalAccess access)
 	{
+		String	level;
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
 			Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-			return secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+			level	= secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
 		}
 		else
 		{
-			return super.getSecurityLevel(access);
+			level	= super.getSecurityLevel(access);
 		}
+		
+		return level==null ? super.getSecurityLevel(access)
+			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+	}
+
+	
+	/**
+	 *  Get a string representation.
+	 */
+	public String	toString()
+	{
+		return "RemoteMethodInvocationCommand("+method.getName()+SUtil.arrayToString(args)+")";
 	}
 }

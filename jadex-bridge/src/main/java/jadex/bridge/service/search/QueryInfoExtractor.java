@@ -31,6 +31,11 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	
 	/** Key type for the service scope. */
 	public static final String KEY_TYPE_SCOPE = "scope";
+
+	/** Key type for the id. */
+	public static final String KEY_TYPE_NETWORKS = "networks";
+
+	
 	
 	/** Key type for the owner. */
 	public static final String KEY_TYPE_OWNER_PLATORM = "owner";
@@ -40,13 +45,14 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	
 	/** Key type for the id. */
 	public static final String KEY_TYPE_ID = "id";
+	
 
 	
 	/** The key types. */
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_NETWORKS};
 	
 	static
 	{

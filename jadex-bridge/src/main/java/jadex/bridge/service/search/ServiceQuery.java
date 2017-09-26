@@ -11,18 +11,15 @@ import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
-import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -48,6 +45,9 @@ public class ServiceQuery<T>
 	
 	/** The network names. */
 	protected String[] networknames;
+	
+	/** Should the service be unrestricted. */
+	protected Boolean unrestricted;
 	
 	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
 	// todo: should be removed or replaced with a more declarative variant
@@ -228,7 +228,7 @@ public class ServiceQuery<T>
 		this.filter = filter;
 		this.returntype = returntype;
 		
-		this.id = SUtil.createUniqueId(""+servicetype);
+		this.id = SUtil.createUniqueId();
 		this.networknames = getNetworkNames(owner); // Set the networknames to the current set of network names.
 	}
 	
@@ -247,6 +247,9 @@ public class ServiceQuery<T>
 		this.id = original.id;
 		this.networknames = original.networknames;
 		this.matchingmodes = original.matchingmodes;
+		this.platform	= original.platform;
+		this.provider	= original.provider;
+		this.unrestricted = original.unrestricted;
 	}
 
 	/**
@@ -524,7 +527,7 @@ public class ServiceQuery<T>
 		if(serviceidentifier != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
 		
-		if(networknames != null)
+		if(networknames != null && networknames.length>0)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
 		
 		return ret;
@@ -553,7 +556,24 @@ public class ServiceQuery<T>
 	}
 	
 	
-	
+	/**
+	 *  Get the unrestricted mode.
+	 *  @return The unrestricted mode.
+	 */
+	public Boolean isUnrestricted()
+	{
+		return unrestricted;
+	}
+
+	/**
+	 *  Set the unrestricted mode.
+	 *  @param unrestricted the unrestricted to set
+	 */
+	public void setUnrestricted(Boolean unrestricted)
+	{
+		this.unrestricted = unrestricted;
+	}
+
 	/**
 	 *  Tests if the query matches a service.
 	 *  
@@ -650,6 +670,8 @@ public class ServiceQuery<T>
 //		}
 //	}
 	
+	
+	
 	/**
 	 *  Static helper method to get the current network names.
 	 *  @param cid The platform cid.
@@ -657,8 +679,29 @@ public class ServiceQuery<T>
 	 */
 	public static String[] getNetworkNames(IComponentIdentifier cid)
 	{
+		if(cid==null)
+			return SUtil.EMPTY_STRING_ARRAY;
+		
 		Set<String> nnames = (Set<String>)PlatformConfiguration.getPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
 		return nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY;
+	}
+
+	/**
+	 *  Get the networknames.
+	 *  @return the networknames
+	 */
+	public String[] getNetworkNames()
+	{
+		return networknames;
+	}
+
+	/**
+	 *  Set the networknames.
+	 *  @param networknames The networknames to set
+	 */
+	public void setNetworkNames(String[] networknames)
+	{
+		this.networknames = networknames;
 	}
 
 	/**
@@ -682,13 +725,23 @@ public class ServiceQuery<T>
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the target platform if specified (using platform and provider).
+	 *  @return The target platform.
+	 */
+	public IComponentIdentifier getTargetPlatform()
+	{
+		return getPlatform()!=null? getPlatform().getRoot(): getProvider()!=null? getProvider().getRoot(): null;
+	}
 
 	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(returntype=" + returntype + ", servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", scope=" + scope + ", owner=" + owner + ", provider="
-			+ provider + ", platform=" + platform + ", excludeowner=" + excludeowner + ", filter=" + filter + ")";
+		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", provider=" + provider + ", platform=" + platform 
+			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", filter=" + filter + ", scope=" + scope + ", owner=" + owner
+			+ ", id=" + id + ")";
 	}
 }

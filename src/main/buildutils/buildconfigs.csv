@@ -59,6 +59,7 @@ jadex-platform,X,X,X,X,,,,,,,,,X
 jadex-platform-android,,,,X,,,,,,,,,X
 jadex-platform-extension-management,,,X,,,,,X,,,,,X
 jadex-platform-extension-maven,,,X,,,,X,,,,,,X
+jadex-platform-extension-relaytransport,X,X,X,,,,,,,,,,X
 jadex-platform-extension-websockettransport,X,X,X,,,,,,,,,,X
 jadex-platform-extension-webservice,,,X,X,,X,,,,,,X,X
 jadex-platform-extension-webservice-android,,,,X,,,,,,,,,X

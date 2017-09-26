@@ -46,7 +46,7 @@ public class ManualUserAgent extends UserAgent
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						final String callid = SUtil.createUniqueId("ma1", 3);
+						final String callid = SUtil.createPlainRandomId("ma1", 3);
 						System.out.println("service called: "+callid);
 						aser.ma2().addResultListener(new IResultListener<Collection<Integer>>()
 						{

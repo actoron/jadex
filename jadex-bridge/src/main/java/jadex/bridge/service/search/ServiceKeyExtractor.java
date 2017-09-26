@@ -37,6 +37,10 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 	/** Key type for the networks. */
 	public static final String KEY_TYPE_NETWORKS = "networks";
 	
+	/** Key type for the unrestricted mode. */
+	public static final String KEY_TYPE_UNRESTRICTED = "unrestricted";
+
+	
 	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
 	
@@ -97,9 +101,10 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 //			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
 //				System.out.println("sdhgfsdh");
 //		}
-		
-		IService service = (IService) serv;
 		Set<String> ret = null;
+		
+		IService service = (IService)serv;
+		
 		if(KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			ret = new HashSet<String>();
@@ -113,9 +118,10 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 		}
 		else if(KEY_TYPE_TAGS.equals(keytype))
 		{
-			Map<String, Object> sprops = service.getPropertyMap();
-			if(sprops != null)
-				ret = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+//			Map<String, Object> sprops = service.getPropertyMap();
+//			if(sprops != null)
+//				ret = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+			ret = service.getServiceIdentifier().getTags();
 		}
 		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
@@ -132,6 +138,10 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 		else if(KEY_TYPE_NETWORKS.equals(keytype))
 		{
 			ret = new HashSet<String>(service.getServiceIdentifier().getNetworkNames());
+		}
+		else if(KEY_TYPE_UNRESTRICTED.equals(keytype))
+		{
+			ret = new SetWrapper<String>(""+service.getServiceIdentifier().isUnrestricted());
 		}
 		return ret;
 	}

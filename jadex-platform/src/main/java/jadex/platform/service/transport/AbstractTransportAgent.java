@@ -70,16 +70,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentArgument
 	protected int	port	= 0;
 
-//	/**
-//	 * The keep-alive (group), i.e. an address, to which the transport should
-//	 * stay connected or a group of addresses (comma separated), where the
-//	 * transport should stay connected one of the group. If the connection
-//	 * fails, the transport will try to reconnect, possibly after a timeout.
-//	 */
-//	@AgentArgument
-//	// TODO: move to different layer (platform connections)
-//	protected String	keepalivegroup	= null;
-
 	// -------- internal attributes --------
 
 	/** The agent. */
@@ -137,18 +127,15 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void messageReceived(final Con con, final byte[] header, final byte[] body)
 	{
-		// TODO Lars: "NPE when testing streams!", Alex: "cand==null -> race condition between agent and transport?"
 		ConnectionCandidate cand = getConnectionCandidate(con);
+		
+		// Race condition between con result future in handleConnect and received CID from server.
 		if(cand==null)
 		{
-			// HACK!!! future result from createConnections will put ConnectionCandidate
-			FutureHelper.notifyStackedListeners();
-			cand = getConnectionCandidate(con);
-			if(cand!=null)
-			{
-				System.out.println("INFO: adapted to race condition in messageReceived: "+con);
-			}
+			// thread safe create -> only create if not exists and if client con (shouldn't happen for server con).
+			cand	= createConnectionCandidate(con, true);
 		}
+		
 		final IComponentIdentifier source = cand.getTarget();
 
 		// First msg is CID from handshake.
@@ -331,7 +318,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							}
 							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
-						agent.getLogger().info("Listening to port " + port + " for " + impl.getProtocolName() + " transport.");
+						
+						agent.getLogger().info("Platform "+agent.getComponentIdentifier().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
 
 //						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 //						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
@@ -592,22 +580,34 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/**
 	 * Create a connection candidate.
 	 */
-	protected void	createConnectionCandidate(final Con con, final boolean clientcon)
+	protected ConnectionCandidate	createConnectionCandidate(final Con con, final boolean clientcon)
 	{
-		ConnectionCandidate cand = new ConnectionCandidate(con, clientcon);
+		ConnectionCandidate cand;
 		synchronized(this)
 		{
 			if(candidates==null)
 			{
 				candidates = new HashMap<Con, ConnectionCandidate>();
 			}
-			ConnectionCandidate prev = candidates.put(con, cand);
-			assert prev == null;
+			
+			if(candidates.containsKey(con))
+			{
+				// eager creation hack only for client con.
+				assert clientcon;
+				cand	= candidates.get(con);
+			}
+			else
+			{
+				cand = new ConnectionCandidate(con, clientcon);
+				candidates.put(con, cand);
+			}
 		}
 
 		// Start handshake by sending id.
 		agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
 		impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+		
+		return cand;
 	}
 	
 	/**
@@ -1109,8 +1109,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope)
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
 	{
-		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope);
+		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope, unrestricted);
 	}
 }

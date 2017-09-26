@@ -38,6 +38,7 @@ public class ProxyFactory
     		return java.lang.reflect.Proxy.newProxyInstance(loader, interfaces, h);
     	}
     }
+   
     
     /**
      *  Get the invocation handler of a proxy.

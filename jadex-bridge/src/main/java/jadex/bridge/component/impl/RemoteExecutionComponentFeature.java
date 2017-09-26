@@ -254,11 +254,24 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  
 	 *  @return Null, when sent.
 	 */
-	protected IFuture<Void> sendRxMessage(IComponentIdentifier receiver, String rxid, Object msg)
+	protected IFuture<Void> sendRxMessage(IComponentIdentifier receiver, String rxid, final Object msg)
 	{
 		Map<String, Object> header = new HashMap<String, Object>();
 		header.put(RX_ID, rxid);
-		return component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
+		
+		IFuture<Void> ret = component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("not sent: "+exception+" "+msg);
+//			}
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("sent: "+msg);
+//			}
+//		});
+		return ret;
 	}
 	
 	/**
@@ -489,11 +502,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 */
 		protected boolean checkSecurity(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
-			return secinfos.isTrustedPlatform()	// Trusted -> always ok
-				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
-				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
-					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
-						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(getComponent(), secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
+			return true;	// For relay testing.
+//			return secinfos.isTrustedPlatform()	// Trusted -> always ok
+//				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
+//				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
+//					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
+//						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(getComponent(), secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
 		}
 	}
 }

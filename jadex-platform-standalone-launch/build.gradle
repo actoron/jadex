@@ -24,6 +24,7 @@ dependencies
 //										   ':jadex-platform-extension-maven',
 										   ':jadex-kernel-extension-envsupport-jmonkey',' :jadex-platform-extension-webservice',
 										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
+										   ':jadex-platform-extension-relaytransport',
 										   ':jadex-platform-extension-websockettransport',
 										   ':jadex-platform-extension-webservice-desktop',
 										   // For IDEs: include manually to choose impl.

@@ -47,15 +47,18 @@ public class InitiatorAgent extends TestAgent
 			maxLocal /=100;
 			maxRemote /=100;
 		}
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1, maxLocal).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
+				agent.getLogger().severe("Testagent test rmeote: "+agent.getComponentDescription());
 				tc.addReport(result);
 				testRemote(2, maxRemote).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}

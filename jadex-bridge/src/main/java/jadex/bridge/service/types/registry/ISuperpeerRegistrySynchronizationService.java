@@ -1,5 +1,9 @@
 package jadex.bridge.service.types.registry;
 
+import java.util.Collection;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -9,7 +13,9 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  and following the state of the registry.
  */
 @Service(system=true)
-public interface ISuperpeerRegistrySynchronizationService
+// Depending on the supersuperpeer setting make the service unrestricted or default accessible
+@Security("%{$args.supersuperpeer? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
+public interface ISuperpeerRegistrySynchronizationService 
 {
 	/**
 	 *  Subscribe to change events of the registry. 
@@ -25,4 +31,13 @@ public interface ISuperpeerRegistrySynchronizationService
 	 */
 	public IFuture<RegistryUpdateEvent> updateClientData(IRegistryEvent event); 
 	
+	/**
+	 *  Get the current partner superpeers.
+	 */
+	public IFuture<Collection<IComponentIdentifier>> getPartnerSuperpeers();
+	
+	/**
+	 *  Get the current clients.
+	 */
+	public IFuture<Collection<IComponentIdentifier>> getClients();
 }

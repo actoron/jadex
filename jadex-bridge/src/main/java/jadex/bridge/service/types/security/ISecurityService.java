@@ -5,10 +5,10 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 
@@ -26,6 +26,7 @@ import jadex.commons.future.IFuture;
 	@GuiClassName("jadex.tools.security.SecuritySettingsPanel"),
 	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettings")
 })
+@Service(system=true)
 public interface ISecurityService
 {
 	/** Allow the use of the local platform secret. */

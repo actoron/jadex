@@ -82,7 +82,14 @@ public class ComponentStartTest extends	ComponentTest
 					{
 //						if(cid.getName().indexOf("ParentProcess")!=-1)
 //							System.out.println("destroying1 "+cid);
-						mycms.destroyComponent(cid).get();
+						try
+						{
+							mycms.destroyComponent(cid).get();
+						}
+						catch(ComponentTerminatedException e)
+						{
+							// ignore, if agent killed itself already
+						}
 //						if(cid.getName().indexOf("ParentProcess")!=-1)
 //							System.out.println("destroying2 "+cid);
 					}
