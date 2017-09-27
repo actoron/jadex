@@ -19,6 +19,9 @@ import jadex.commons.SReflect;
  */
 public class ClassInfo
 {
+	/** Empty class info array. */
+	public static final ClassInfo[] EMPYT_CLASSINFO_ARRAY = new ClassInfo[0];
+	
 	//-------- attributes --------
 	
 	/** The service interface type as string. */
@@ -128,9 +131,7 @@ public class ClassInfo
 	public Class<?> getType(ClassLoader cl)
 	{
 		if(cl==null)
-		{
 			throw new IllegalArgumentException("Not allowed with cl==null, use getType0() instead!");
-		}
 		
 		if(classloader!=cl)
 		{
@@ -138,9 +139,7 @@ public class ClassInfo
 			// Todo: assert that classloader is always the same -> currently reload required for bdi class rewriting?
 			assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
 			if(type!=null)
-			{
 				classloader = cl;
-			}
 		}
 		return type;
 	}
@@ -152,9 +151,7 @@ public class ClassInfo
 	public Class<?> getType(ClassLoader cl, String[] imports)
 	{
 		if(cl==null)
-		{
 			throw new IllegalArgumentException("Not allowed with cl==null, use getType0() instead!");
-		}
 		
 		if(classloader!=cl)
 		{
@@ -162,9 +159,7 @@ public class ClassInfo
 			// Todo: assert that classloader is always the same -> currently reload required for bdi class rewriting?
 			assert type!=null || classloader==null : "Try to load type :"+getTypeName()+" with wrong classloader: "+classloader+", "+cl;
 			if(type!=null)
-			{
 				classloader = cl;
-			}
 		}
 		return type;
 	}

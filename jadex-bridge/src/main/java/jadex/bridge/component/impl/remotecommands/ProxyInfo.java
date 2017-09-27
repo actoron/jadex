@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITargetResolver;
 import jadex.commons.MethodInfo;
@@ -26,7 +27,8 @@ public class ProxyInfo
 	//-------- attributes --------
 	
 	/** The target class. */
-	protected List<Class<?>> targetinterfaces;
+//	protected List<Class<?>> targetinterfaces;
+	protected List<ClassInfo> targetinterfaces;
 		
 	/** The excluded methods. */
 	protected Set<MethodInfo> excluded;
@@ -63,7 +65,14 @@ public class ProxyInfo
 	 */
 	public ProxyInfo(Class<?>[] targetinterfaces)
 	{
-		setTargetInterfaces(targetinterfaces);
+		if(targetinterfaces!=null)
+		{
+			for(Class<?> c: targetinterfaces)
+			{
+				addTargetInterface(new ClassInfo(c));
+			}
+		}
+//		setTargetInterfaces(targetinterfaces);
 	}
 	
 	//-------- methods --------
@@ -189,16 +198,16 @@ public class ProxyInfo
 	 *  Get the target remote interfaces.
 	 *  @return the target remote interfaces.
 	 */
-	public Class<?>[] getTargetInterfaces()
+	public ClassInfo[] getTargetInterfaces()
 	{
-		return targetinterfaces==null? SUtil.EMPTY_CLASS_ARRAY: (Class[])targetinterfaces.toArray(new Class[targetinterfaces.size()]);
+		return targetinterfaces==null? ClassInfo.EMPYT_CLASSINFO_ARRAY: (ClassInfo[])targetinterfaces.toArray(new ClassInfo[targetinterfaces.size()]);
 	}
 
 	/**
 	 *  Set the target remote interfaces.
 	 *  @param targetinterfaces The targetinterfaces to set.
 	 */
-	public void setTargetInterfaces(Class<?>[] targetinterfaces)
+	public void setTargetInterfaces(ClassInfo[] targetinterfaces)
 	{
 		if(this.targetinterfaces!=null)
 			this.targetinterfaces.clear();
@@ -215,15 +224,18 @@ public class ProxyInfo
 	 *  Add a target interface.
 	 *  @param targetinterface The target interface.
 	 */
-	public void addTargetInterface(Class<?> targetinterface)
+	public void addTargetInterface(ClassInfo targetinterface)
 	{
+		if(targetinterface==null)
+			throw new IllegalArgumentException("Must not be null");
+		
 		// Might be null, when class not available locally.
-		if(targetinterface!=null)
-		{
+//		if(targetinterface!=null)
+//		{
 			if(targetinterfaces==null)
-				targetinterfaces = new ArrayList<Class<?>>();
+				targetinterfaces = new ArrayList<ClassInfo>();
 			targetinterfaces.add(targetinterface);
-		}
+//		}
 	}
 
 	/**

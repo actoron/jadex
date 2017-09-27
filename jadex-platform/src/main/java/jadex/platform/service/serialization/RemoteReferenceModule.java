@@ -19,6 +19,7 @@ import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -54,6 +55,7 @@ import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -962,7 +964,26 @@ public class RemoteReferenceModule
 //			Class<?>[] interfaces = new Class[tmp.length+1];
 //			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
 //			interfaces[tmp.length] = IFinalize.class;
-			Class<?>[]	interfaces	=  pr.getProxyInfo().getTargetInterfaces();
+//			Class<?>[]	interfaces	=  pr.getProxyInfo().getTargetInterfaces();
+			ClassInfo[]	ifaces	=  pr.getProxyInfo().getTargetInterfaces();
+			List<Class<?>> tmp = new ArrayList<Class<?>>();
+			for(ClassInfo ci: ifaces)
+			{
+				Class<?> cl = ci.getType(classloader);
+				if(cl!=null)
+				{
+					tmp.add(cl);
+				}
+				else
+				{
+					throw new RuntimeException("Class could not be loaded: "+ci);
+				}
+			}
+			Class<?>[] interfaces = new Class<?>[tmp.size()];
+			for(int i=0; i<tmp.size(); i++)
+			{
+				interfaces[i] = tmp.get(i);
+			}
 			
 			// Which classloader to use for proxy creation?
 			// a) from sender: allows receiver to have all (also implementations) what sender has
