@@ -336,6 +336,12 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info)
 	{
+		// Reject infos without addresses.
+		if (info.getAddresses() == null || info.getAddresses().isEmpty())
+		{
+			return new Future<Boolean>(false);
+		}
+		
 //		System.out.println("new info " + info);
 		// Return if inital discovery.
 		boolean ret = false;
