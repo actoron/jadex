@@ -6,7 +6,7 @@ import jadex.commons.SReflect;
 
 import org.junit.runners.model.InitializationError;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.bytecode.ShadowMap;
+import org.robolectric.internal.bytecode.ShadowMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
