@@ -34,6 +34,7 @@ import jadex.bridge.component.streams.LocalInputConnectionHandler;
 import jadex.bridge.component.streams.LocalOutputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IBrokenProxy;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
@@ -62,6 +63,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.javaparser.SJavaParser;
@@ -244,14 +246,23 @@ public class RemoteReferenceModule
 
 		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
 		ProxyInfo pi;
-		synchronized(this)
+		
+		// Use saved proxyinfo if the proxy itself is broken 
+		if(target instanceof IBrokenProxy)
 		{
-			pi = (ProxyInfo)proxyinfos.get(tcid);
-			if(pi==null)
+			pi = ((IBrokenProxy)target).getProxyInfo();
+		}
+		else
+		{
+			synchronized(this)
 			{
-				pi = createProxyInfo(target, remoteinterfaces, cl, platform);
-				proxyinfos.put(tcid, pi);
-	//			System.out.println("add: "+tcid+" "+pi);
+				pi = (ProxyInfo)proxyinfos.get(tcid);
+				if(pi==null)
+				{
+					pi = createProxyInfo(target, remoteinterfaces, cl, platform);
+					proxyinfos.put(tcid, pi);
+		//			System.out.println("add: "+tcid+" "+pi);
+				}
 			}
 		}
 		
@@ -932,7 +943,7 @@ public class RemoteReferenceModule
 	 *  Get a proxy for a proxy reference.
 	 *  @param pr The proxy reference.
 	 */
-	public Object getProxy(ProxyReference pr, ClassLoader classloader)
+	public Object getProxy(ProxyReference pr, ClassLoader classloader, boolean tolerant)
 	{
 		Object ret;
 		
@@ -974,7 +985,12 @@ public class RemoteReferenceModule
 				{
 					tmp.add(cl);
 				}
-				else
+				else if(tolerant)
+				{
+					if(!tmp.contains(IBrokenProxy.class))
+						tmp.add(IBrokenProxy.class);
+				}
+				else 
 				{
 					throw new RuntimeException("Class could not be loaded: "+ci);
 				}
@@ -1751,6 +1767,29 @@ public class RemoteReferenceModule
 			// Problem: if micro agent implements a service it cannot
 			// be determined if the service or the agent should be transferred.
 			// Per default a service is assumed.
+
+			// All proxies?!
+			processors.add(new ImmutableProcessor()
+			{
+				@Override
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					return Proxy.isProxyClass(object.getClass());
+				}
+			});
+			
+			processors.add(new ITraverseProcessor()
+			{
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					return object instanceof IBrokenProxy;
+				}
+				
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				{
+					return getProxyReference(object, null, targetcl);
+				}
+			});
 			
 			// Insert before FieldProcessor that is always applicable
 			processors.add(processors.size()-1, new ITraverseProcessor()

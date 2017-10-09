@@ -73,6 +73,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		if(pi.isExcluded(method)) 
 			throw new UnsupportedOperationException("The method is excluded for remote: " + method);
 		
+		if(method.getName().equals("getProxyInfo"))
+			return pi;
+		
 		// Determine if call goes to
 		// a) cached method
 		// b) method replacement
