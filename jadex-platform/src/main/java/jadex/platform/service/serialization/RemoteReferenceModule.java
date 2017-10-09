@@ -1010,9 +1010,7 @@ public class RemoteReferenceModule
 			
 			IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
 			if(access==null)
-			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
-			}
 			ret = Proxy.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(access, pr));
 			

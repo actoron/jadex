@@ -199,8 +199,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 //		if(method.getName().indexOf("start")!=-1 && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
 //			System.out.println("call method start");
-		if(method.getName().indexOf("updateClientData")!=-1 && args[0]==null)// && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
-			System.out.println("call method init");
+//		if(method.getName().indexOf("updateClientData")!=-1 && args[0]==null)// && getServiceIdentifier().getServiceType().getTypeName().indexOf("Peer")!=-1)
+//			System.out.println("call method init");
 		
 //		ServiceInvocationContext sicon = null;
 		
@@ -213,6 +213,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Object	cmp	= ProxyFactory.isProxyClass(args[0].getClass()) ? ProxyFactory.getInvocationHandler(args[0]) : args[0];
 			ret	= equals(cmp);
 		}
+//		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
+//		{
+//			System.out.println("hashcode on proxy: "+proxy);
+//			ret	= hashCode();
+//		}
 		else
 		{
 			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, getInterceptors(), 
