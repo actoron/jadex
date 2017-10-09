@@ -241,12 +241,13 @@ public class RemoteReferenceModule
 		
 
 		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
-		ProxyInfo pi;
+//		ProxyInfo pi;
+		ProxyReference ret;
 		
 		// Use saved proxyinfo if the proxy itself is broken 
 		if(target instanceof IBrokenProxy)
 		{
-			pi = ((IBrokenProxy)target).getProxyInfo();
+			ret = ((IBrokenProxy)target).getProxyReference();
 		}
 		else
 		{
@@ -255,6 +256,7 @@ public class RemoteReferenceModule
 			if(remoteinterfaces.length==0)
 				throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
 			
+			ProxyInfo pi;
 			synchronized(this)
 			{
 				pi = (ProxyInfo)proxyinfos.get(tcid);
@@ -265,25 +267,25 @@ public class RemoteReferenceModule
 		//			System.out.println("add: "+tcid+" "+pi);
 				}
 			}
-		}
-		
-		ProxyReference	ret	= new ProxyReference(pi, rr);
+			
+			ret	= new ProxyReference(pi, rr);
 
-		// Check interface methods and possibly cache constant calls.
-		Class<?>[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
-		for(int i=0; i<allinterfaces.length; i++)
-		{
-			Method[] methods = allinterfaces[i].getMethods();
-			for(int j=0; j<methods.length; j++)
+			// Check interface methods and possibly cache constant calls.
+			Class<?>[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
+			for(int i=0; i<allinterfaces.length; i++)
 			{
-				addCachedMethodValue(ret, pi, methods[j], target);
+				Method[] methods = allinterfaces[i].getMethods();
+				for(int j=0; j<methods.length; j++)
+				{
+					addCachedMethodValue(ret, pi, methods[j], target);
+				}
 			}
-		}
-		// Check object methods and possibly cache constant calls.
-		Method[] methods = Object.class.getMethods();
-		for(int i=0; i<methods.length; i++)
-		{
-			addCachedMethodValue(ret, pi, methods[i], target);
+			// Check object methods and possibly cache constant calls.
+			Method[] methods = Object.class.getMethods();
+			for(int i=0; i<methods.length; i++)
+			{
+				addCachedMethodValue(ret, pi, methods[i], target);
+			}
 		}
 		
 		return ret;
