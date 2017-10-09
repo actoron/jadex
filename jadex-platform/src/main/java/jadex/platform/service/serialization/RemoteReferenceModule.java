@@ -239,10 +239,6 @@ public class RemoteReferenceModule
 		// via synchronized block and rechecking if proxy was already created.
 		// -> not necessary due to only single threaded access via agent thread
 		
-		Class<?>[] remoteinterfaces = getRemoteInterfaces(target, cl);
-		
-		if(remoteinterfaces.length==0)
-			throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
 
 		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
 		ProxyInfo pi;
@@ -254,6 +250,11 @@ public class RemoteReferenceModule
 		}
 		else
 		{
+			Class<?>[] remoteinterfaces = getRemoteInterfaces(target, cl);
+			
+			if(remoteinterfaces.length==0)
+				throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
+			
 			synchronized(this)
 			{
 				pi = (ProxyInfo)proxyinfos.get(tcid);
