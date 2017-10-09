@@ -4,8 +4,6 @@ jadex-android-bluetooth,,,,X,,,,,,,,,X
 jadex-android-commons,,,,X,,,,,,,,,X
 jadex-android-integration-test,,,,,,,,,,,,,
 jadex-android-maven-plugin,,,,,,,,,,,,,
-jadex-android-platformapp,,,,,,,,,,,,,
-jadex-android-platformclient,,,,,,,,,,,,,
 jadex-android-testlauncher,,,,,,,,,,,,,
 jadex-android-xmlpull,,,,X,,,,,,,,,X
 jadex-applib-bdi,,X,X,,,,,,,,,X,X
