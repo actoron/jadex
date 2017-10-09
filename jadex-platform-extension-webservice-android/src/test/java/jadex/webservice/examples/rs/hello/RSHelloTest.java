@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
@@ -28,6 +29,7 @@ import com.sun.jersey.api.core.ResourceConfig;
  *
  */
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class RSHelloTest
 {
 
