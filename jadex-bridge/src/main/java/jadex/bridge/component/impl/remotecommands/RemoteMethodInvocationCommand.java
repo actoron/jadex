@@ -50,6 +50,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		this.target	= target;
 		this.method	= new MethodInfo(method);
 		this.args	= args;
+//		System.out.println("created rmi command: "+target+" "+method.getName());
 	}
 	
 	/**

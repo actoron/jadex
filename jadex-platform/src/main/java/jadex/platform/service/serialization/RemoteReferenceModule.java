@@ -1770,7 +1770,7 @@ public class RemoteReferenceModule
 			// Per default a service is assumed.
 
 			// All proxies?!
-			processors.add(new ImmutableProcessor()
+			processors.add(processors.size()-1, new ImmutableProcessor()
 			{
 				@Override
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
@@ -1779,7 +1779,7 @@ public class RemoteReferenceModule
 				}
 			});
 			
-			processors.add(new ITraverseProcessor()
+			processors.add(processors.size()-1, new ITraverseProcessor()
 			{
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
