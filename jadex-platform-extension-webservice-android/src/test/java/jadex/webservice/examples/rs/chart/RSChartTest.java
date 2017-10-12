@@ -2,6 +2,8 @@ package jadex.webservice.examples.rs.chart;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.security.Security;
+
 import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
@@ -27,6 +29,7 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
+		System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_GCM_SHA256");	// Hack: workaround for java 8 problem with ECDH key exchange
 		new SReflectSub().setIsAndroid(true, true);
 
 		PlatformConfiguration config = PlatformConfiguration.getMinimal();
