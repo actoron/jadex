@@ -116,12 +116,17 @@ subprojects
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
-            robolectric: 'org.robolectric:robolectric:3.4.2'
+            robolectric: 'org.robolectric:robolectric:3.3.2'
     ]
 
 	configurations {
 		// compileNoAndroidRuntime will exclude the artifact in Android APKs
-		compileNoAndroidRuntime
+		runtimeAndroid.extendsFrom runtime
+		compileNoAndroidRuntime {
+			dependencies.all { dep ->
+				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
+			}
+		}
 		compile.extendsFrom compileNoAndroidRuntime
 	}
 

@@ -19,13 +19,17 @@ import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.component.streams.InputConnection;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
+import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
+import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
@@ -277,7 +281,20 @@ public class SerializationServices implements ISerializationServices
 			{
 				try
 				{
-					Object ret= ((RemoteReferenceModule)rrm).getProxy((ProxyReference)object, targetcl);
+					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					IInternalAccess ia = (IInternalAccess)ctx.get("component");
+					ProvidedServiceInfo[] sers = ia.getModel().getProvidedServices();
+					boolean tolerant = false; // only registry is tolerant until now
+					for(ProvidedServiceInfo psi: sers)
+					{
+						if(psi.getType().getTypeName().indexOf(SReflect.getUnqualifiedClassName(IPeerRegistrySynchronizationService.class))!=-1
+							|| psi.getType().getTypeName().indexOf(SReflect.getUnqualifiedClassName(ISuperpeerRegistrySynchronizationService.class))!=-1)
+						{
+							tolerant = true;
+							break;
+						}
+					}
+					Object ret= ((RemoteReferenceModule)rrm).getProxy((ProxyReference)object, targetcl, tolerant);
 					return ret;
 				}
 				catch(Exception e)

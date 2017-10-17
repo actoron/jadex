@@ -34,6 +34,7 @@ import jadex.bridge.component.streams.LocalInputConnectionHandler;
 import jadex.bridge.component.streams.LocalOutputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IBrokenProxy;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
@@ -62,6 +63,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.javaparser.SJavaParser;
@@ -237,41 +239,53 @@ public class RemoteReferenceModule
 		// via synchronized block and rechecking if proxy was already created.
 		// -> not necessary due to only single threaded access via agent thread
 		
-		Class<?>[] remoteinterfaces = getRemoteInterfaces(target, cl);
-		
-		if(remoteinterfaces.length==0)
-			throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
 
 		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
-		ProxyInfo pi;
-		synchronized(this)
-		{
-			pi = (ProxyInfo)proxyinfos.get(tcid);
-			if(pi==null)
-			{
-				pi = createProxyInfo(target, remoteinterfaces, cl, platform);
-				proxyinfos.put(tcid, pi);
-	//			System.out.println("add: "+tcid+" "+pi);
-			}
-		}
+//		ProxyInfo pi;
+		ProxyReference ret;
 		
-		ProxyReference	ret	= new ProxyReference(pi, rr);
-
-		// Check interface methods and possibly cache constant calls.
-		Class<?>[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
-		for(int i=0; i<allinterfaces.length; i++)
+		// Use saved proxyinfo if the proxy itself is broken 
+		if(target instanceof IBrokenProxy)
 		{
-			Method[] methods = allinterfaces[i].getMethods();
-			for(int j=0; j<methods.length; j++)
-			{
-				addCachedMethodValue(ret, pi, methods[j], target);
-			}
+			ret = ((IBrokenProxy)target).getProxyReference();
 		}
-		// Check object methods and possibly cache constant calls.
-		Method[] methods = Object.class.getMethods();
-		for(int i=0; i<methods.length; i++)
+		else
 		{
-			addCachedMethodValue(ret, pi, methods[i], target);
+			Class<?>[] remoteinterfaces = getRemoteInterfaces(target, cl);
+			
+			if(remoteinterfaces.length==0)
+				throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
+			
+			ProxyInfo pi;
+			synchronized(this)
+			{
+				pi = (ProxyInfo)proxyinfos.get(tcid);
+				if(pi==null)
+				{
+					pi = createProxyInfo(target, remoteinterfaces, cl, platform);
+					proxyinfos.put(tcid, pi);
+		//			System.out.println("add: "+tcid+" "+pi);
+				}
+			}
+			
+			ret	= new ProxyReference(pi, rr);
+
+			// Check interface methods and possibly cache constant calls.
+			Class<?>[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
+			for(int i=0; i<allinterfaces.length; i++)
+			{
+				Method[] methods = allinterfaces[i].getMethods();
+				for(int j=0; j<methods.length; j++)
+				{
+					addCachedMethodValue(ret, pi, methods[j], target);
+				}
+			}
+			// Check object methods and possibly cache constant calls.
+			Method[] methods = Object.class.getMethods();
+			for(int i=0; i<methods.length; i++)
+			{
+				addCachedMethodValue(ret, pi, methods[i], target);
+			}
 		}
 		
 		return ret;
@@ -932,7 +946,7 @@ public class RemoteReferenceModule
 	 *  Get a proxy for a proxy reference.
 	 *  @param pr The proxy reference.
 	 */
-	public Object getProxy(ProxyReference pr, ClassLoader classloader)
+	public Object getProxy(ProxyReference pr, ClassLoader classloader, boolean tolerant)
 	{
 		Object ret;
 		
@@ -974,7 +988,12 @@ public class RemoteReferenceModule
 				{
 					tmp.add(cl);
 				}
-				else
+				else if(tolerant)
+				{
+					if(!tmp.contains(IBrokenProxy.class))
+						tmp.add(IBrokenProxy.class);
+				}
+				else 
 				{
 					throw new RuntimeException("Class could not be loaded: "+ci);
 				}
@@ -994,9 +1013,7 @@ public class RemoteReferenceModule
 			
 			IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
 			if(access==null)
-			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
-			}
 			ret = Proxy.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(access, pr));
 			
@@ -1751,6 +1768,29 @@ public class RemoteReferenceModule
 			// Problem: if micro agent implements a service it cannot
 			// be determined if the service or the agent should be transferred.
 			// Per default a service is assumed.
+
+			// All proxies?!
+			processors.add(processors.size()-1, new ImmutableProcessor()
+			{
+				@Override
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					return Proxy.isProxyClass(object.getClass());
+				}
+			});
+			
+			processors.add(processors.size()-1, new ITraverseProcessor()
+			{
+				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+				{
+					return object instanceof IBrokenProxy;
+				}
+				
+				public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+				{
+					return getProxyReference(object, null, targetcl);
+				}
+			});
 			
 			// Insert before FieldProcessor that is always applicable
 			processors.add(processors.size()-1, new ITraverseProcessor()

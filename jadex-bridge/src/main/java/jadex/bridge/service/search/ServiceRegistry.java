@@ -2402,7 +2402,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	}
 	
 	/**
-	 *  Async filter for checking queries in one go.
+	 *  Checks the following:
+	 *  a) search scope
+	 *  b) publication scope
+	 *  c) filter
 	 */
 	protected class QueryFilter<T> implements IAsyncFilter<T>
 	{
@@ -2426,7 +2429,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			Future<Boolean> fret = new Future<Boolean>();
 			
-			IService ser = (IService) obj;
+			IService ser = (IService)obj;
 
 			// checkPublicationScope() is used 6 times, 5 times with getOwner(), only here with getProvider().
 			// TODO: Decide on search semantics with provider being set. And do not use getProvider() unconditionally!

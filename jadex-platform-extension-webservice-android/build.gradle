@@ -9,7 +9,7 @@ configurations
 
 dependencies
 {
-    ext.spring_android_version = '1.0.0.RELEASE'
+    ext.spring_android_version = '1.0.1.RELEASE'
     ext.jersey_version = '1.19.4'
 
 //    def withoutAsm = { exclude group: 'asm', module: 'asm'
@@ -20,12 +20,16 @@ dependencies
 
     testCompile 'org.springframework:spring-web:3.1.2.RELEASE'
     compile project(':jadex-platform-extension-webservice')
+
+    // rest client:
     compile 'org.springframework.android:spring-android-rest-template:' + spring_android_version
     compile 'org.springframework.android:spring-android-core:' + spring_android_version
+
     testCompile project(':jadex-platform')
     testCompile project(':jadex-kernel-component')
     testCompile project(':jadex-platform-android')
 
+    // rest server:
     testCompile 'com.sun.jersey:jersey-server:' + jersey_version
     testCompile 'com.sun.jersey:jersey-grizzly2:' + jersey_version
     testCompile 'com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version

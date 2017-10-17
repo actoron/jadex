@@ -271,7 +271,7 @@ public class JadexBinarySerializer implements ISerializer
 		
 		InputStream is = new ByteArrayInputStream((byte[]) bytes);
 		
-		return decode(is, classloader, postprocs, rep);
+		return decode(is, classloader, postprocs, rep, usercontext);
 	}
 	
 	/**
