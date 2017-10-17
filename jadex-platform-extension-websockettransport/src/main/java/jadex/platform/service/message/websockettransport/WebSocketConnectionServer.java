@@ -1,12 +1,12 @@
 package jadex.platform.service.message.websockettransport;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoWSD.WebSocket;
 import fi.iki.elonen.NanoWSD.WebSocketFrame;
 import fi.iki.elonen.NanoWSD.WebSocketFrame.CloseCode;
+import fi.iki.elonen.NanoWSD.WebSocketFrame.OpCode;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -34,8 +34,8 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			 */
 			protected void onOpen()
 			{
-				
 				handler.connectionEstablished(WebSocketConnectionServer.this);
+//				System.out.println("srv conn open");
 			}
 
 			/**
@@ -44,20 +44,25 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			protected void onClose(CloseCode code, String reason, boolean initiatedByRemote)
 			{
 				handler.connectionClosed(WebSocketConnectionServer.this, null);
+//				System.out.println("srv conn closed: " + reason);
 			}
-
+			
 			/**
 			 *  Called on message.
 			 */
 			protected void onMessage(WebSocketFrame message)
 			{
+//				System.out.println("srv frame op: " + message.getOpCode() + " " + message.isFin());
 				byte[] payload = null;
-				try
+				if (message.getOpCode().equals(OpCode.Binary))
 				{
-					payload = message.getBinaryPayload();
-				}
-				catch(Exception e)
-				{
+					try
+					{
+						payload = message.getBinaryPayload();
+					}
+					catch(Exception e)
+					{
+					}
 				}
 				
 				if (payload != null)
@@ -96,10 +101,17 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 		Future<Void> ret = new Future<Void>();
 		try
 		{
-			websocket.send(header);
-			websocket.send(body);
-//			websocket.send(SUtil.mergeData(header, body));
-			ret.setResult(null);
+			synchronized(this)
+			{
+//				WebSocketFrame wsf = new WebSocketFrame(WebSocketFrame.OpCode.Binary, true, header);
+//				websocket.sendFrame(wsf);
+//				wsf = new WebSocketFrame(WebSocketFrame.OpCode.Binary, true, body);
+//				websocket.sendFrame(wsf);
+//				websocket.send(SUtil.mergeData(header, body));
+				sendAsFrames(header);
+				sendAsFrames(body);
+				ret.setResult(null);
+			}
 		}
 		catch(Exception e)
 		{
@@ -131,5 +143,47 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	public WebSocket getWebSocket()
 	{
 		return websocket;
+	}
+	
+	/**
+	 *  Fragment and send data as websocket frames.
+	 *  
+	 *  @param data The data.
+	 *  @throws IOException On communication failure. 
+	 */
+	protected void sendAsFrames(byte[] data) throws IOException
+	{
+		if (data == null)
+		{
+			WebSocketFrame wsf = new WebSocketFrame(WebSocketFrame.OpCode.Binary, true, data);
+			websocket.sendFrame(wsf);
+		}
+		else
+		{
+			int offset = 0;
+			int count = data.length / maxpayload + 1;
+			
+			for (int i = 0; i < count; ++i)
+			{
+				OpCode opcode = null;
+				if (i == 0)
+					opcode = WebSocketFrame.OpCode.Binary;
+				else
+					opcode = WebSocketFrame.OpCode.Continuation;
+				
+				boolean fin = false;
+				if (i + 1 == count)
+					fin = true;
+				
+				int psize = Math.min(maxpayload, data.length - offset);
+				byte[] payload = new byte[psize];
+				System.arraycopy(data, offset, payload, 0, psize);
+				offset += psize;
+				
+//				System.out.println("frame totalsize: " + data.length + " count " + count + " " + i + " " + opcode + " " + fin);
+				WebSocketFrame wsf = new WebSocketFrame(opcode, fin, payload);
+				websocket.sendFrame(wsf);
+			}
+		}
 	}
 }

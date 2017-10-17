@@ -295,6 +295,18 @@ public interface IRootComponentConfiguration {
     // int
     // default:
     // 8765
+    
+    /** Flag if ws transport is enabled. **/
+    public static final String	WSTRANSPORT		= "wstransport";							// class:
+    // boolean
+    // default:
+    // true
+
+    /** Port for WS transport. **/
+    public static final String	WSPORT				= "wsport";								// class:
+    // int
+    // default:
+    // -1 (none)
 
     /** Flag if relay transport is enabled. **/
     public static final String	RELAYTRANSPORT		= "relaytransport";							// class:

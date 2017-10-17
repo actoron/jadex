@@ -147,99 +147,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 		else
 		{
-			// First decrypt.
-			secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
-			{
-				@Override
-				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
-				{
-					if(tup.getSecondEntity() != null)
-					{
-						// Then decode header and deliver to receiver agent.
-						final IMsgHeader header = (IMsgHeader)codec.decode(null, agent, tup.getSecondEntity());
-						final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-						
-						cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
-						{
-							@Override
-							public void resultAvailable(IExternalAccess exta)
-							{
-								exta.scheduleStep(new IComponentStep<Void>()
-								{
-									@Override
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										IMessageFeature mf = ia.getComponentFeature0(IMessageFeature.class);
-										if(mf instanceof IInternalMessageFeature)
-										{
-											((IInternalMessageFeature)mf).messageArrived(header, body);
-										}
-										return IFuture.DONE;
-									}
-								}).addResultListener(new IResultListener<Void>()
-								{
-									@Override
-									public void resultAvailable(Void result)
-									{
-										// NOP
-									}
-
-									@Override
-									public void exceptionOccurred(Exception exception)
-									{
-										getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
-									}
-								});
-							}
-
-							@Override
-							public void exceptionOccurred(final Exception exception)
-							{
-								getLogger().warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
-								
-								// For undeliverable conversation messages -> send error reply (only for non-error messages). 
-								if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)
-									&& header.getProperty(MessageComponentFeature.EXCEPTION)==null)
-								{
-									agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-									{
-										@Override
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
-											addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
-											ia.getComponentFeature(IMessageFeature.class)
-												.sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields)
-												.addResultListener(new IResultListener<Void>()
-												{
-													@Override
-													public void exceptionOccurred(Exception exception)
-													{
-														getLogger().warning("Could send error message to " + header.getProperty(IMsgHeader.SENDER) + ": " + exception);
-													}
-													
-													@Override
-													public void resultAvailable(Void result)
-													{
-														// OK -> ignore
-//														System.out.println("Sent error message: "+header.getProperty(IMsgHeader.SENDER) + ", "+exception);
-													}
-												});
-											return IFuture.DONE;
-										}
-									});
-								}
-							}
-						});
-					}
-				}
-
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					getLogger().warning("Could not deliver message from platform " + source + ": " + exception);
-				}
-			});
+			deliverRemoteMessage(agent, secser, cms, codec, source, header, body);
 		}
 	}
 
@@ -761,6 +669,115 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		
 //		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
 		return ret;
+	}
+	
+	/**
+	 *  Delivers a remote message to a component.
+	 * 
+	 *  @param agent Agent performing the delivery.
+	 *  @param secser The security service.
+	 *  @param cms The component management service.
+	 *  @param serser The serialization services.
+	 *  @param source Source ID of the message.
+	 *  @param header The header of the message.
+	 *  @param body The body of the message.
+	 */
+	public static final void deliverRemoteMessage(final IInternalAccess agent, ISecurityService secser, final IComponentManagementService cms, final ISerializationServices serser, final IComponentIdentifier source, byte[] header, final byte[] body)
+	{
+		final Logger logger = agent.getLogger();
+		// First decrypt.
+		secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
+		{
+			@Override
+			public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
+			{
+				if(tup.getSecondEntity() != null)
+				{
+					// Then decode header and deliver to receiver agent.
+					final IMsgHeader header = (IMsgHeader)serser.decode(null, agent, tup.getSecondEntity());
+					final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
+					
+					cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
+					{
+						@Override
+						public void resultAvailable(IExternalAccess exta)
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Override
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IMessageFeature mf = ia.getComponentFeature0(IMessageFeature.class);
+									if(mf instanceof IInternalMessageFeature)
+									{
+										((IInternalMessageFeature)mf).messageArrived(header, body);
+									}
+									return IFuture.DONE;
+								}
+							}).addResultListener(new IResultListener<Void>()
+							{
+								@Override
+								public void resultAvailable(Void result)
+								{
+									// NOP
+								}
+
+								@Override
+								public void exceptionOccurred(Exception exception)
+								{
+									logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+								}
+							});
+						}
+
+						@Override
+						public void exceptionOccurred(final Exception exception)
+						{
+							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+							
+							// For undeliverable conversation messages -> send error reply (only for non-error messages). 
+							if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)
+								&& header.getProperty(MessageComponentFeature.EXCEPTION)==null)
+							{
+								agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+								{
+									@Override
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
+										addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
+										ia.getComponentFeature(IMessageFeature.class)
+											.sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields)
+											.addResultListener(new IResultListener<Void>()
+											{
+												@Override
+												public void exceptionOccurred(Exception exception)
+												{
+													logger.warning("Could send error message to " + header.getProperty(IMsgHeader.SENDER) + ": " + exception);
+												}
+												
+												@Override
+												public void resultAvailable(Void result)
+												{
+													// OK -> ignore
+//																System.out.println("Sent error message: "+header.getProperty(IMsgHeader.SENDER) + ", "+exception);
+												}
+											});
+										return IFuture.DONE;
+									}
+								});
+							}
+						}
+					});
+				}
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				logger.warning("Could not deliver message from platform " + source + ": " + exception);
+			}
+		});
 	}
 
 	// -------- helper classes --------

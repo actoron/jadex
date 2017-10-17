@@ -1,5 +1,6 @@
 package jadex.platform.service.message.websockettransport;
 
+import jadex.micro.annotation.AgentArgument;
 import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.ITransport;
 
@@ -9,11 +10,38 @@ import jadex.platform.service.transport.ITransport;
  */
 public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketConnection>
 {
-	 	/**
-	 	 *  Get the transport implementation
-	 	 */
-	 	public ITransport<IWebSocketConnection> createTransportImpl()
-	 	{
-	 		return new WebSocketTransport();
-	 	}
+	/** Maximum size of websocket frame payloads. */
+	@AgentArgument
+	protected int maxpayload = 4096;
+	
+	/** Idle connection timeout. */
+	@AgentArgument
+	protected int idletimeout = 60000;
+	
+ 	/**
+ 	 *  Get the transport implementation
+ 	 */
+ 	public ITransport<IWebSocketConnection> createTransportImpl()
+ 	{
+ 		return new WebSocketTransport();
+ 	}
+ 	/**
+ 	 *  Gets the maximum size of websocket frame payloads.
+ 	 * 
+ 	 *  @return Maximum size of websocket frame payloads. 
+ 	 */
+ 	public int getMaximumPayloadSize()
+ 	{
+ 		return maxpayload;
+ 	}
+ 	
+ 	/**
+ 	 *  Gets the idle timeout.
+ 	 * 
+ 	 *  @return The idle timeout. 
+ 	 */
+ 	public int getIdleTimeout()
+ 	{
+ 		return idletimeout;
+ 	}
 }

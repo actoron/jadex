@@ -1,6 +1,7 @@
 package jadex.platform.service.message.websockettransport;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransport;
@@ -73,8 +74,10 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 		{
 			try
 			{
+				WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		 		int idletimeout = pojo.getIdleTimeout();
 				server = new WebSocketServer(port, handler);
-				server.start();
+				server.start(idletimeout, true);
 				System.out.println("Started websocket server: " + server.getListeningPort());
 				ret.setResult(server.getListeningPort());
 			}
@@ -116,6 +119,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public IFuture<Void> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
 	{
+//		System.out.println("send: " + Arrays.hashCode(header) + " " + Arrays.hashCode(body));
 		return con.sendMessage(header, body);
 	}
 }
