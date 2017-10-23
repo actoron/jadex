@@ -207,7 +207,7 @@ public class SComponentFactory
 	public static IFuture<IModelInfo> loadModel(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		if(model==null)
-			throw new NullPointerException();
+			throw new IllegalArgumentException("Model must not be null.");
 		if(model.length()==0)
 			throw new IllegalArgumentException();
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()

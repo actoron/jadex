@@ -8,6 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jadex.base.IStarterConfiguration;
 import jadex.base.PlatformConfiguration;
@@ -44,7 +46,6 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.PassiveLeaseTimeSet;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -93,16 +94,17 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	/** Routing table cache size. */
 	public static final String PROPERTY_ROUTING_CACHE_SIZE = "routingsize";
 	
-	/** Transport priority = low */
-	protected static final int PRIORITY = (Integer.MIN_VALUE >>> 1);
-	
 	/** ID of sender of forwarding messages. */
 	public static final String FORWARD_SENDER = "__fw_sender__";
 	
 	/** ID of forwarding messages. */
 	public static final String FORWARD_DEST = "__fw_dest__";
 
+	/** Maximum time spent on finding routing services. */
+	protected static final long MAX_ROUTING_SERVICE_DELAY = 3000;
 	
+	/** Transport priority = low */
+	protected static final int PRIORITY = (Integer.MIN_VALUE >>> 1);
 	
 	/** The agent. */
 	@Agent
@@ -117,8 +119,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	/** Relay transport agent's internal message feature. */
 	protected IInternalMessageFeature intmsgfeat;
 	
-	/** Flag if the platform is itself a relay. */
-//	protected boolean isrelay;
+	/** Flag if the transport allows forwarding. */
+	protected boolean forwarding;
 	
 	/** Maintain a connection to at least this number of relays. */
 	protected int keepalivecount = 1;
@@ -142,7 +144,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected LRU<IComponentIdentifier, IRoutingService> routingservicecache;
 	
 	/** Directly connected platforms. */
-	protected PassiveLeaseTimeSet<IComponentIdentifier> directconnections;
+	protected PassiveLeaseTimeSet<IComponentIdentifier> directconns;
 	
 	/** Routing information (target platform / next route hop + cost). */
 	protected LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>> routes;
@@ -176,23 +178,43 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		int cachesize = SConfigParser.getIntValue(PROPERTY_ROUTING_CACHE_SIZE, 5000);
 		routes = new LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>>(cachesize, null, true);
 		
-		directconnections = new PassiveLeaseTimeSet<IComponentIdentifier>(relayping << 2);
+		directconns = new PassiveLeaseTimeSet<IComponentIdentifier>(relayping << 2);
 		
 		String setstr = (String) args.get(PROPERTY_RELAYS);
-//		setstr="relay,ws,127.0.0.1:8080";
-		
 		List<TransportAddress> relayaddrs = new ArrayList<TransportAddress>();
 		if (setstr != null)
 		{
 //			System.out.println("addr: " + setstr);
+			Pattern urlpat = Pattern.compile("[a-zA-Z]+://[a-zA-Z0-9]+@.+:[0-9]+");
 			String[] ids = setstr.split(",");
-			int max = ids.length / 3;
-			for (int i = 0; i < max; ++i)
+//			int max = ids.length / 3;
+//			for (int i = 0; i < max; ++i)
+			for (int i = 0; i < ids.length; ++i)
 			{
-				int off = i * 3;
-				relays.add(new BasicComponentIdentifier("rt@" + ids[off]));
-				TransportAddress addr = new TransportAddress(new BasicComponentIdentifier(ids[off]), ids[off+1], ids[off+2]);
-				relayaddrs.add(addr);
+//				int off = i * 3;
+//				relays.add(new BasicComponentIdentifier("rt@" + ids[off]));
+//				TransportAddress addr = new TransportAddress(new BasicComponentIdentifier(ids[off]), ids[off+1], ids[off+2]);
+//				relayaddrs.add(addr);
+				
+				String url = ids[i].trim();
+				Matcher m = urlpat.matcher(url);
+				if (m.matches())
+				{
+					int protend = url.indexOf(':');
+					String prot = url.substring(0, protend);
+					int nameend = url.indexOf('@', protend + 1);
+					String name = url.substring(protend + 3, nameend);
+					String addr = url.substring(nameend + 1);
+//					System.out.println("Relay: " + prot + " " + name + " " + addr);
+					relays.add(new BasicComponentIdentifier("rt@" + name));
+					TransportAddress ta = new TransportAddress(new BasicComponentIdentifier(name), prot, addr);
+					relayaddrs.add(ta);
+				}
+				else
+				{
+//					System.out.println("Unknown relay specification: " + ids[i] + ". Format: transport://platformname@hostname:port");
+					agent.getLogger().warning("Unknown relay specification: " + ids[i] + ". Format: transport://platformname@hostname:port");
+				}
 			}
 			if (relayaddrs.size() > 0)
 			{
@@ -203,8 +225,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
 		msgfeat.setAllowUntrusted(true);
-		boolean isforwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));
-		if (isforwarding)
+		forwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));
+		if (forwarding)
 		{
 			System.out.println("Relay transport in forwarding mode.");
 			
@@ -217,17 +239,19 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				
 				public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 				{
-//					System.out.println("ishandling: " + msg);
 					return msg instanceof Ping || (msg instanceof byte[] && header.getProperty(FORWARD_DEST) != null);
 				}
 				
 				public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 				{
-//					System.out.println("relay rcvd: " + msg);
 					if (msg instanceof Ping)
 					{
-						directconnections.add(((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot());
-						directconnections.checkStale();
+						synchronized(directconns)
+						{
+//							System.out.println("State: dc=" + directconns.size() + " rsc=" + routingservicecache.size() + " routes=" + routes.size());
+							directconns.add(((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot());
+							directconns.checkStale();
+						}
 //						System.out.println("Got ping, dc size: " + directconnections.size());
 						
 						Ack ack = new Ack();
@@ -275,10 +299,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						keepaliveconnections.clear();
 						for (final IComponentIdentifier id : relays)
 						{
+							System.out.println("Sending to " + id);
 							msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
 							{
 								public void resultAvailable(Object result)
 								{
+									System.out.println("Got answer " + id);
 									if (keepaliveconnections.size() < keepalivecount)
 										keepaliveconnections.add(id);
 								}
@@ -311,104 +337,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				}
 			});
 		}
-//			reconnect();
-//			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(5000, new IComponentStep<Void>()
-//			{
-//				public IFuture<Void> execute(IInternalAccess ia)
-//				{
-////					if (checkReconnect())
-////					{
-////						reconnect();
-////					}
-////					else
-////					{
-////						IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
-////						for (final IComponentIdentifier con : keepaliveconnections)
-////						{
-////							msgfeat.sendMessageAndWait(con, new Ping()).addResultListener(new IResultListener<Object>()
-////							{
-////								public void resultAvailable(Object result)
-////								{
-////								}
-////								
-////								public void exceptionOccurred(Exception exception)
-////								{
-////									exception.printStackTrace();
-////									if (checkReconnect())
-////									{
-////										keepaliveconnections.remove(con);
-////										reconnect();
-////									}
-////								}
-////							});
-////						}
-////					}
-//					
-//					IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
-//					for (final IComponentIdentifier con : relays)
-//					{
-//						msgfeat.sendMessageAndWait(con, new Ping()).addResultListener(new IResultListener<Object>()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//								if (result instanceof Ack)
-//								{
-//								}
-//							}
-//							
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								exception.printStackTrace();
-////								if (checkReconnect())
-////								{
-////									keepaliveconnections.remove(con);
-////									reconnect();
-////								}
-//							}
-//						});
-//					}
-//					
-//					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(relayping, this);
-//					
-//					return IFuture.DONE;
-//				}
-//			});
-//		}
 		
 		return IFuture.DONE;
-	}
-	
-	/**
-	 *  (Re-)connect to a keep-alive set.
-	 * 
-	 */
-	protected IFuture<Void> reconnect()
-	{
-		final Future<Void> ret = new Future<Void>();
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IMessageFeature msgfeat = ia.getComponentFeature(IMessageFeature.class);
-				for (final IComponentIdentifier id : relays)
-				{
-					msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
-					{
-						public void resultAvailable(Object result)
-						{
-							if (!checkReconnect())
-								keepaliveconnections.add(id);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-				}
-				return IFuture.DONE;
-			}
-		});
-		return ret;
 	}
 	
 	/**
@@ -505,23 +435,15 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			return IFuture.DONE;
 		}
 		
-		if (directconnections.contains(fwdest))
+		if (hasDirectConnection(fwdest))
 		{
-//			List<byte[]> unpacked = SUtil.splitData(newbody);
-//			byte[] bheader = unpacked.get(0);
-//			ISerializationServices serserv = (ISerializationServices) PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier().getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
-//			newheader = (IMsgHeader) serserv.decode(null, agent, bheader);
-//			newheader.addProperty(FORWARD_DEST, newheader.getProperty(IMsgHeader.RECEIVER));
-//			newbody = unpacked.get(1);
-			
-//			System.out.println("Direct connection, sending to final receiver: " + body);
 			newheader.addProperty(IMsgHeader.RECEIVER, new BasicComponentIdentifier("rt@" + fwdest));
 			return intmsgfeat.sendToTransports(newheader, newbody);
 		}
 		
 		newheader.addProperty(IMsgHeader.SENDER, agent.getComponentIdentifier());
 		
-		Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
+		Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(destination);
 		if (route != null)
 		{
 			newheader.addProperty(IMsgHeader.RECEIVER, route.getFirstEntity());
@@ -546,7 +468,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			
 			public void intermediateResultAvailable(Integer result)
 			{
-				Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
+				Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(destination);
 				if (route != null)
 				{
 					fnewheader.addProperty(IMsgHeader.RECEIVER, route.getFirstEntity());
@@ -578,20 +500,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
-//		ret.addResultListener(new IResultListener<Collection<Integer>>()
-//		{
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.err.println("NO ROUTE: " + destination);
-//				exception.printStackTrace();
-//			}
-//			
-//			public void resultAvailable(Collection<Integer> result)
-//			{
-//				System.out.println("routes: " + Arrays.toString(result.toArray()));
-//			}
-//		});
-		
 		if (hops.contains(agent.getComponentIdentifier()) || hops.size() + 1 > maxhops)
 		{
 			ret.setException(new IllegalStateException("Loop detected or TTL exceeded."));
@@ -599,14 +507,14 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			return ret;
 		}
 		
-		if (directconnections.contains(destination))
+		if (hasDirectConnection(destination))
 		{
 			ret.addIntermediateResult(0);
 			ret.setFinished();
 			return ret;
 		}
 		
-		Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
+		Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(destination);
 		if (route != null)
 		{
 			ret.addIntermediateResult(route.getSecondEntity());
@@ -620,15 +528,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				FutureBarrier<IRoutingService> bar = new FutureBarrier<IRoutingService>();
-				
-				if (keepaliveconnections == null || keepaliveconnections.size() == 0)
-				{
-					ret.setException(new IllegalStateException("No available relays."));
-					return IFuture.DONE;
-				}
-				
-				Map<IComponentIdentifier, IRoutingService> routingservices = new HashMap<IComponentIdentifier, IRoutingService>();
+				final Map<IComponentIdentifier, IRoutingService> routingservices = new HashMap<IComponentIdentifier, IRoutingService>();
 				for (IComponentIdentifier relayid : keepaliveconnections)
 				{
 					IRoutingService rs = getRoutingService(relayid);
@@ -636,49 +536,142 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						routingservices.put(relayid, rs);
 				}
 				
-//				for (IComponentIdentifier relayid : relays)
-//					bar.addFuture(SServiceProvider.getService(agent, relayid, IRoutingService.class));
-//				Collection<IRoutingService> routingservices = bar.waitForResultsIgnoreFailures(null).get();
-//				System.out.println("routing services: " + routingservices.size());
-				
+				final Future<Void> directroute = new Future<Void>();
 				if (routingservices == null || routingservices.size() == 0)
 				{
-					ret.setException(new IllegalStateException("No rooute to receiver found."));
-					return IFuture.DONE;
+					directroute.setException(new IllegalStateException("No routing services found, could not establish route to receiver."));
+				}
+				else
+				{
+					final int[] count = new int[1];
+					count[0] = routingservices.size();
+					
+					for (Map.Entry<IComponentIdentifier, IRoutingService> routingsrv : routingservices.entrySet())
+					{
+						final IComponentIdentifier routetarget = routingsrv.getKey();
+						routingsrv.getValue().discoverRoute(destination, newhops).addIntermediateResultListener(new IIntermediateResultListener<Integer>()
+						{
+							/** Flag if a route was found. */
+							protected boolean routefound = false;
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+							
+							public void resultAvailable(Collection<Integer> result)
+							{
+							}
+							
+							public void intermediateResultAvailable(Integer result)
+							{
+								++result;
+								routefound = true;
+								synchronized(routes)
+								{
+									Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
+									if (route == null || route.getSecondEntity() > result)
+										routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
+								}
+								ret.addIntermediateResult(result);
+							}
+							
+							public void finished()
+							{
+								--count[0];
+								if (count[0] == 0)
+								{
+									if (routefound)
+										directroute.setResult(null);
+									else
+										directroute.setException(new RuntimeException("No direct connection found."));
+								}
+							}
+						});
+					}
 				}
 				
-				final int[] count = new int[1];
-				count[0] = routingservices.size();
-				for (Map.Entry<IComponentIdentifier, IRoutingService> routingsrv : routingservices.entrySet())
+				directroute.addResultListener(new IResultListener<Void>()
 				{
-					final IComponentIdentifier routetarget = routingsrv.getKey();
-					routingsrv.getValue().discoverRoute(destination, newhops).addIntermediateResultListener(new IIntermediateResultListener<Integer>()
+					public void resultAvailable(Void result)
 					{
-						public void exceptionOccurred(Exception exception)
+						ret.setFinished();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if (!forwarding)
+						{
+							ret.setException(new RuntimeException("No route found."));
+							ret.setFinished();
+							return;
+						}
+						
+						// Try to acquire more relays with service search.
+						
+						List<IRoutingService> filteredaddrs = new ArrayList<IRoutingService>();
+						try
+						{
+							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY);
+							for (IRoutingService rs : addrs)
+							{
+								IComponentIdentifier rsprov = ((IService) rs).getServiceIdentifier().getProviderId();
+								if (!routingservices.containsKey(rsprov) && !agent.getComponentIdentifier().equals(rsprov))
+								{
+									filteredaddrs.add(rs);
+								}
+								
+							}
+							
+							
+						}
+						catch (Exception e)
 						{
 						}
 						
-						public void resultAvailable(Collection<Integer> result)
+						if (filteredaddrs.size() > 0)
 						{
+							final int[] count = new int[1];
+							count[0] = routingservices.size();
+							for (IRoutingService rs : filteredaddrs)
+							{
+								final IComponentIdentifier routetarget = ((IService) rs).getServiceIdentifier().getProviderId();
+								rs.discoverRoute(destination, newhops).addIntermediateResultListener(new IIntermediateResultListener<Integer>()
+								{
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+									
+									public void resultAvailable(Collection<Integer> result)
+									{
+									}
+									
+									public void intermediateResultAvailable(Integer result)
+									{
+										++result;
+										synchronized(routes)
+										{
+											Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
+											if (route == null || route.getSecondEntity() > result)
+												routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
+										}
+										ret.addIntermediateResult(result);
+									}
+									
+									public void finished()
+									{
+										--count[0];
+										if (count[0] == 0)
+											ret.setFinished();
+									}
+								});
+							}
 						}
-						
-						public void intermediateResultAvailable(Integer result)
+						else
 						{
-							++result;
-							Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
-							if (route == null || route.getSecondEntity() > result)
-								routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
-							ret.addIntermediateResult(result);
+							ret.setFinished();
 						}
-						
-						public void finished()
-						{
-							--count[0];
-							if (count[0] == 0)
-								ret.setFinished();
-						}
-					});
-				}
+					}
+				});
 				
 				return IFuture.DONE;
 			}
@@ -716,13 +709,39 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	}
 	
 	/**
-	 *  Checks if the number of keepalive connections is incorrect.
+	 *  Gets a route from cache.
 	 *  
-	 *  @return True, if incorrect
+	 *  @param target The target.
+	 *  @return The route, or null if not found.
 	 */
-	protected boolean checkReconnect()
+	protected Tuple2<IComponentIdentifier, Integer> getRouteFromCache(IComponentIdentifier target)
 	{
-		return keepaliveconnections.size() < keepalivecount || (keepalivecount < 0 && keepaliveconnections.size() < relays.size());
+		Tuple2<IComponentIdentifier, Integer> ret = null;
+		synchronized(routes)
+		{
+			ret = routes.get(target);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Checks if a direct connection to target exists.
+	 *  
+	 *  @param target The target.
+	 *  @return True, if connection exists.
+	 */
+	protected boolean hasDirectConnection(IComponentIdentifier target)
+	{
+		if (target == null)
+			return false;
+		
+		boolean ret = false;
+		synchronized(directconns)
+		{
+			directconns.checkStale();
+			ret = directconns.contains(target.getRoot());
+		}
+		return ret;
 	}
 	
 	/** Ping message. */
