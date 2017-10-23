@@ -1,5 +1,8 @@
 package jadex.webservice.examples.rs.hello;
 import static org.junit.Assert.assertEquals;
+
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -85,10 +88,15 @@ public class RSHelloTest
 			}
 		}
 
+		PlatformConfiguration config = PlatformConfiguration.getMinimal();
+		config.setKernels(IRootComponentConfiguration.KERNEL.component, IRootComponentConfiguration.KERNEL.micro);
+		config.setTcpTransport(false);
+		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
-				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
+//		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+//				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get();
 	}
