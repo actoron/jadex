@@ -114,6 +114,8 @@ public class PlatformConfigurationTest
 	public void testMinimalPlatform() 
 	{
 		PlatformConfiguration minimal = PlatformConfiguration.getMinimal();
+		minimal.setRelayTransport(false);
+		minimal.setWsTransport(false);
 		Starter.createPlatform(minimal).get();
 	}
 

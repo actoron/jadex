@@ -679,6 +679,14 @@ public interface IRootComponentConfiguration {
 
     void setRelayTransport(boolean value);
 
+    boolean getWsTransport();
+
+    void setWsTransport(boolean value);
+
+    int getWsPort();
+
+    void setWsPort(int value);
+
     String getRelayAddress();
 
     void setRelayAddress(String value);

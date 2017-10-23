@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
 
 
@@ -551,6 +552,28 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 	}
 
 	@Override
+	public boolean getWsTransport()
+	{
+		return Boolean.TRUE.equals(getValue(WSTRANSPORT));
+	}
+
+	@Override
+	public void setWsTransport(boolean value)
+	{
+		setValue(WSTRANSPORT, value);
+	}
+
+	@Override
+	public int getWsPort() {
+		return (Integer)getValue(TCPPORT);
+	}
+
+	@Override
+	public void setWsPort(int value) {
+		setValue(TCPPORT, value);
+	}
+
+	@Override
 	public String getRelayAddress()
 	{
 		return (String)getValue(RELAYADDRESS);
@@ -932,6 +955,14 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 			if (!isBoolean(rootargs.get(argName))) {
 				errorText.append(USEPASS + " must be a boolean value (or null), but is set to: " + getValue(USEPASS));
 			}
+		}
+
+		if (getRelayTransport() && SReflect.classForName0("jadex.platform.service.message.relaytransport.RelayTransportAgent",  this.getClass().getClassLoader()) == null) {
+			errorText.append(RELAYTRANSPORT + " set to true, but 'jadex.platform.service.message.relaytransport.RelayTransportAgent' is not in classpath (maybe include module jadex-platform-extension-relaytransport in dependencies?)");
+		}
+
+		if (getWsTransport() && SReflect.classForName0("jadex.platform.service.message.websockettransport.WebSocketTransportAgent",  this.getClass().getClassLoader()) == null) {
+			errorText.append(RELAYTRANSPORT + " set to true, but 'jadex.platform.service.message.websockettransport.WebSocketTransportAgent' is not in classpath (maybe include module jadex-platform-extension-websockettransport in dependencies?)");
 		}
 
 		if(errorText.length() != 0)
