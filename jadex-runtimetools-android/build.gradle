@@ -6,3 +6,6 @@ dependencies
     compile project(':jadex-android-commons')
     compile project(':jadex-tools-base')
 }
+android {
+    buildToolsVersion '25.0.0'
+}

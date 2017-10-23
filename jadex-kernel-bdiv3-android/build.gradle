@@ -5,3 +5,6 @@ dependencies
     compile project(':jadex-kernel-bdiv3')
     compile project(':jadex-android-commons')
 }
+android {
+    buildToolsVersion '25.0.0'
+}

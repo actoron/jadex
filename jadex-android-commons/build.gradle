@@ -5,3 +5,6 @@ dependencies
     compile libraries.android_support
 	compile(project(':jadex-bridge'))
 }
+android {
+    buildToolsVersion '25.0.0'
+}

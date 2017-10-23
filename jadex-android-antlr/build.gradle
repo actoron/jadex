@@ -3,3 +3,6 @@ description 'ANTLR runtime libraries for android'
 dependencies
 {
 }
+android {
+    buildToolsVersion '25.0.0'
+}
