@@ -79,7 +79,11 @@ selectedstr.split(',').each {
 System.out.println('Selected distributions: ' + gradle.ext.selecteddists.toString())
 gradle.ext.maindistartifacts = new HashSet()
 gradle.ext.selecteddists.each {
-	gradle.ext.maindistartifacts.addAll(gradle.ext.distartmap.get(it))
+	def arts = gradle.ext.distartmap.get(it)
+	if (arts == null) {
+		throw new Error("No artifacts found for dist: " + it + " (check spelling and existence of this dist)");
+	}
+	gradle.ext.maindistartifacts.addAll(arts)
 }
 
 gradle.ext.includeartifacts = new HashSet<String>()
