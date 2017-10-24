@@ -112,6 +112,7 @@ task buildDocsZip (type: Zip, dependsOn: buildDocs) {
  */
 task serveDocs (type: MkDocsTask) {
     action=ACTION.serve
+    dockerImageName = 'andrglo/mkdocs:latest'
 }
 
 /**

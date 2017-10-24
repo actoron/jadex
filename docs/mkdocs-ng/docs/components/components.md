@@ -79,7 +79,7 @@ System.out.println("Started component: " + cid);
 
 <x-hint title="Future types">
 Notice how you get a different Future object this time?
-A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled by the component and is only returned upon termination of the component. Take a look at [Futures](../futures/futures/#future-types) for different future types.
+A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled with results by the component and is only returned upon termination of the component. You can use ```fut.getSecondResult()``` to block until the component is terminated and receive the results. Take a look at [Futures](../futures/futures/#future-types) for different future types.
 </x-hint>
 
 Now that you know how to start your own components, you can read more about [Services](../services/services), as they provide a way for components to interact with each other.
@@ -90,7 +90,7 @@ To destroy a component, the CMS has to be used again. Call ```destroyComponent(c
 ```java
 Map<String,Object> results = cms.destroyComponent(cid).get();
 ```
-If the component has any results, they are contained in the returned map.
+If the component has any results, they are contained in the returned map. This is the same Map that is provided by the ```ITuple2Future``` received upon starting the component. 
 
 ## Component Arguments
 
@@ -98,10 +98,10 @@ If the component has any results, they are contained in the returned map.
 Components can declare arguments that can be passed during creation.
 To declare arguments, use the ```@Arguments``` Annotation:
 ```java
-@Arguments(@Argument(name="myName", description = "Name of this agent", clazz=String.class, defaultvalue = "Hugo"))
+@Arguments(@Argument(name="myName", description = "Name of this agent", clazz=String.class, defaultvalue = "\"Hugo\""))
 public class MyAgent ...
 ```
-
+Because the defaultvalue is parsed, Strings have to be quoted. You can also use other (Java) expressions that are executed to determine the default value. 
 To access this argument from inside the agent, inject it into a field using the ```@AgentArgument``` annotation:
 ```java
 @AgentArgument
@@ -116,7 +116,7 @@ Another way to access the arguments of an agent is by using the [IArgumentsResul
 
 ### Passing Arguments
 When you created a component as explained above, the last parameter of```createComponent``` was null.
-Instead, you can create your own ```CreationInfo``` object containing your component's arguments and pass it in *createComponent*:
+Instead, you can create your own [CreationInfo](${URLJavaDoc}/jadex/micro/annotation/CreationInfo.html) object containing your component's arguments and pass it in *createComponent*:
 ```java
 CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"myName"}, new Object[]{"Harald"}))
 ```
@@ -182,6 +182,18 @@ All annotations also allow for methods with parameters, see [Parameter Guesser](
 # Advanced Topics
 
 This section discusses some of the more advanced topics regarding components.
+
+## Composition
+Components can be in a hierarchy to express compositional relationship.
+To declare subcomponents, you may use the ```@ComponentTypes``` annotation and then create a ```@Configuration``` that includes an instance of the desired subcomponent like this:
+```java
+@Configurations(@Configuration(name = "default", components =  {@Component(type = "MyChildAgent")}))
+@ComponentTypes(@ComponentType(name="MyChildAgent", clazz=ChildAgent.class))
+public class ParentAgent { …
+```
+
+Any services provided by subcomponents using the scope [RequiredServiceInfo.SCOPE_COMPONENT](${URLJavaDoc}/jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
+Please refer to the [AC Tutorial](../tutorials/ac/06 Composition/) for a more complete example.
 
 ## More Annotations
 The most important annotations common to all components were already discussed.

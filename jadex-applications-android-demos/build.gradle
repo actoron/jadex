@@ -13,3 +13,6 @@ dependencies
     compile project(':jadex-android-xmlpull')
     compile project(':jadex-android-antlr')
 }
+android {
+    buildToolsVersion '25.0.0'
+}

@@ -1,5 +1,5 @@
 # Introduction
-
+<!-- TODO: Diesen guide am besten rausschmeißen und alles wichtige schon in den ersten Kapiteln erläutern. -->
 The Active Components project aims at providing programming and execution facilities for distributed and concurrent systems. The general idea is to consider systems to be composed of components acting as service providers and consumers. Hence, it is very similar to the Service Component Architecture (SCA) approach and extends it in the direction of agents. In contrast to SCA, components are always active entities, i.e. they posses autonomy with respect to what they do and when they perform actions making them akin to agents. In contrast to agents communication is preferably done using service invocations.
 
 
