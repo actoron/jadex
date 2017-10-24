@@ -323,6 +323,9 @@ public interface IRootComponentConfiguration {
     // default:
     // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
 
+    public static final String	RELAYFORWARDING		= "relayforwarding";							// class:
+    
+    
 //    /** Flag if relay should use HTTPS for receiving messages. **/
 //    public static final String	RELAYSECURITY		= "relaysecurity";							// class:
 //    // boolean
