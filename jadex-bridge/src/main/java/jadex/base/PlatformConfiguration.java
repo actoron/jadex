@@ -464,6 +464,26 @@ public class PlatformConfiguration extends AbstractPlatformConfiguration
 	}
 
 	@Override
+	public boolean getWsTransport() {
+		return getRootConfig().getWsTransport();
+	}
+
+	@Override
+	public void setWsTransport(boolean value) {
+		getRootConfig().setWsTransport(value);
+	}
+
+	@Override
+	public int getWsPort() {
+		return getRootConfig().getWsPort();
+	}
+
+	@Override
+	public void setWsPort(int value) {
+		getRootConfig().setWsPort(value);
+	}
+
+	@Override
 	public String getRelayAddress() {
 		return getRootConfig().getRelayAddress();
 	}

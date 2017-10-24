@@ -3,6 +3,11 @@ description 'An advanced library service that can retrieve dependencies from mav
 def mavenversion = "3.0.3"
 def wagonversion = "2.2"
 
+configurations {
+	compile.exclude group: "asm", module: "asm"
+	testCompile.exclude group: "asm", module: "asm"
+}
+
 dependencies 
 {
 	compile project(":jadex-bridge")
