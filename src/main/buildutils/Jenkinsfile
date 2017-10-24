@@ -33,7 +33,7 @@ publishArtifacts = publishArtifacts.toBoolean()
 deployDists = deployDists.toBoolean()
 publishToDummy = publishToDummy.toBoolean()
 publishCommercial = publishCommercial.toBoolean()
-
+tagBuild = tagBuild.toBoolean()
 resetPatchVersion = resetPatchVersion.toBoolean()
 
 node {
@@ -80,7 +80,7 @@ stage('preparation') {
                     headIsLastVersionTag = true
                     println "The last tag that was found on this branch points at HEAD, so nothing new happened since then."
                     timeout(time: 1, unit: 'HOURS') {
-                        input(id: 'noNewCommits', message: 'Do you want to proceed anyway? This will lead in publish and/or tag pushing errors!')
+                        input(id: 'noNewCommits', message: 'Do you want to proceed anyway? This may lead in publish and/or tag pushing errors!')
                     }
                 }
             }
@@ -247,11 +247,15 @@ stage ('publish and deploy') {
                 util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'git'
-                    if (!publishToDummy) {
+                    if (tagBuild && !publishToDummy) {
                         sh "git tag -a ${jadexVersion} -m \"build version ${jadexVersion}\""
                         sh "git push origin ${jadexVersion}"
                     } else {
-                        println "not tagging as this is only dummy publishing"
+                        if (publishToDummy) {
+                            println "not tagging as this is only dummy publishing"
+                        } else {
+                            println "not tagging build"
+                        }
                     }
                 }
             }
