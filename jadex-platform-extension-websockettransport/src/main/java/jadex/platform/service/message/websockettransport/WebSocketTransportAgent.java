@@ -18,6 +18,11 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	@AgentArgument
 	protected int idletimeout = 60000;
 	
+	public WebSocketTransportAgent()
+	{
+		priority = 500;
+	}
+	
  	/**
  	 *  Get the transport implementation
  	 */

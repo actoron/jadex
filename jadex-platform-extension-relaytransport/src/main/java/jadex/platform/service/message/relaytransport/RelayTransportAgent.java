@@ -104,7 +104,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected static final long MAX_ROUTING_SERVICE_DELAY = 3000;
 	
 	/** Transport priority = low */
-	protected static final int PRIORITY = (Integer.MIN_VALUE >>> 1);
+	protected static final int PRIORITY = Integer.MIN_VALUE / 2;
 	
 	/** The agent. */
 	@Agent
