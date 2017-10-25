@@ -69,6 +69,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/** The port, the transport should listen to (&lt;0: don't listen, 0: choose random port, >0: use given port). */
 	@AgentArgument
 	protected int	port	= 0;
+	
+	/** Maximum size a message is allowed to have (including header). */
+	@AgentArgument
+	protected int maxmsgsize = 100*1024*1024;
 
 	// -------- internal attributes --------
 
