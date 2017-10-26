@@ -453,7 +453,7 @@ public class SServiceProvider
 			{
 				ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter, null);
 				IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type): new DelegationResultListener<T>(ret);
-				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));;
+				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(proxy ? new ComponentResultListener<T>(lis, component): lis);;
 				
 //				if(!RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 //				{
@@ -1389,7 +1389,7 @@ public class SServiceProvider
 	/**
 	 *  Check access not null and throw exception otherwise.
 	 */
-	protected static IFuture<Void> ensureThreadAccess(IInternalAccess component, boolean proxy)
+	protected static IFuture<Void> ensureThreadAccess(final IInternalAccess component, boolean proxy)
 	{
 		final Future<Void> ret = new Future<Void>();
 		if(component==null)
@@ -1403,10 +1403,12 @@ public class SServiceProvider
 				if(proxy)
 				{
 //					ret.setException(new RuntimeException("Wrong calling thread: "+Thread.currentThread()));
+//					System.out.println("ensureThreadAccess scheduleStep "+component);
 					component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
+//							System.out.println("ensureThreadAccess execute "+component);
 							ret.setResult(null);
 							return IFuture.DONE;
 						}
