@@ -23,6 +23,7 @@ import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -163,9 +164,9 @@ public class TransportAddressAgent implements ITransportAddressService
 	 *  @param transporttype The transport type.
 	 *  @return Addresses of the local platform.
 	 */
-	public IFuture<List<TransportAddress>> resolveAddresses(final IComponentIdentifier platformid, String transporttype)
+	public IFuture<List<TransportAddress>> resolveAddresses(final IComponentIdentifier platformid, final String transporttype)
 	{
-		IFuture<List<TransportAddress>> ret = null;
+		IFuture<List<TransportAddress>> allret = null;
 		try
 		{
 			if (freshness.get(platformid) != null &&
@@ -174,13 +175,13 @@ public class TransportAddressAgent implements ITransportAddressService
 				List<TransportAddress> addrs = getAddressesFromCache(platformid);
 				addrs = filterAddresses(addrs, transporttype);
 				if (addrs != null)
-					ret = new Future<List<TransportAddress>>(filterAddresses(addrs, transporttype));
+					allret = new Future<List<TransportAddress>>(filterAddresses(addrs, transporttype));
 			}
 			
-			if (ret == null)
+			if (allret == null)
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
-				ret = fret;
+				allret = fret;
 				IFuture<List<TransportAddress>> search = searches.get(platformid);
 				if (search == null)
 				{
@@ -232,6 +233,16 @@ public class TransportAddressAgent implements ITransportAddressService
 		catch (Exception e)
 		{
 		}
+		
+		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
+		allret.addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, List<TransportAddress>>(ret)
+		{
+			public void customResultAvailable(List<TransportAddress> result) throws Exception
+			{
+				ret.setResult(filterAddresses(result, transporttype));
+			}
+		});
+		
 		return ret;
 	}
 	
