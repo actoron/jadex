@@ -47,7 +47,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	protected boolean	shutdown;
 	
 	/** Maximum size a message is allowed to have (including header). */
-	protected int maxmsgsize = 100*1024*1024;
+	protected int maxmsgsize;
 	
 	/** The NIO selector. */
 	protected Selector	selector;
