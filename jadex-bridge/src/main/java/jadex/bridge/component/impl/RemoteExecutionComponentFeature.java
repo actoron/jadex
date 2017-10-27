@@ -3,9 +3,11 @@ package jadex.bridge.component.impl;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import jadex.base.PlatformConfiguration;
@@ -21,6 +23,7 @@ import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.component.impl.remotecommands.AbstractInternalRemoteCommand;
+import jadex.bridge.component.impl.remotecommands.AbstractResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
@@ -75,7 +78,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	
 	/** Commands that have been sent to a remote component.
 	 *  Stored to set return value etc. */
-	protected Map<String, IFuture<?>> outcommands;
+	protected Map<String, OutCommand> outcommands;
 	
 	/** Commands that have been received to be executed locally.
 	 *  Stored to allow termination etc.*/
@@ -185,16 +188,18 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 
 		if(outcommands==null)
 		{
-			outcommands	= new HashMap<String, IFuture<?>>();
+			outcommands	= new HashMap<String, OutCommand>();
 		}
-		outcommands.put(rxid, ret);
+		OutCommand outcmd = new OutCommand(ret);
+		outcommands.put(rxid, outcmd);
 		
 		sendRxMessage(target, rxid, command).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
+				OutCommand outcmd = outcommands.remove(rxid);
 				@SuppressWarnings("unchecked")
-				Future<T> ret = (Future<T>) outcommands.remove(rxid);
+				Future<T> ret = (Future<T>) outcmd.getFuture();
 				if (ret != null)
 					ret.setExceptionIfUndone(exception);
 			}
@@ -361,9 +366,13 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					
 					retfut.addResultListener(new IIntermediateFutureCommandResultListener()
 					{
+						/** Result counter. */
+						int counter = Integer.MIN_VALUE;
+						
 						public void intermediateResultAvailable(Object result)
 						{
 							RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
+							rc.setResultCount(counter++);
 							IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
 							if(term!=null)
 							{
@@ -375,6 +384,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						{
 							incommands.remove(rxid);
 							RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
+							rc.setResultCount(counter++);
 							sendRxMessage(remote, rxid, rc);
 						}
 						
@@ -382,6 +392,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						{
 							incommands.remove(rxid);
 							RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
+							final int msgcounter = counter++;
+							rc.setResultCount(msgcounter);
 							sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
 							{
 								@Override
@@ -389,6 +401,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								{
 									// Serialization of result failed -> send back exception.
 									RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
+									rc.setResultCount(msgcounter);
 									sendRxMessage(remote, rxid, rc);
 								}
 								
@@ -409,6 +422,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						{
 							incommands.remove(rxid);
 							RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
+							rc.setResultCount(counter++);
 							sendRxMessage(remote, rxid, rc);
 						}
 						
@@ -429,21 +443,21 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					sendRxMessage(remote, rxid, rc);	
 				}
 			}
-			else if(msg instanceof IRemoteConversationCommand)
+			else if(msg instanceof IRemoteConversationCommand || msg instanceof IRemoteOrderedConversationCommand)
 			{
 				if(checkSecurity(secinfos, header, msg))
 				{
 					// Can be result/exception -> for outcommands
 					// or termination -> for incommands.
-					IFuture<?> fut = outcommands!=null ? outcommands.get(rxid) : null;
+					OutCommand outcmd = outcommands!=null ? outcommands.get(rxid) : null;
+					IFuture<?> fut = outcmd != null ? outcmd.getFuture() : null;
 					fut	= fut!=null ? fut : incommands!=null ? incommands.get(rxid) : null;
 					
 					if(fut!=null)
 					{
-						IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
-						if(cmd instanceof AbstractInternalRemoteCommand)
+						if(msg instanceof AbstractInternalRemoteCommand)
 						{
-							Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
+							Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)msg).getProperties();
 							if(nonfunc!=null)
 							{
 								ServiceCall sc = ServiceCall.getLastInvocation();
@@ -461,7 +475,17 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								}
 							}
 						}
-						cmd.execute(component, (IFuture)fut, secinfos);
+						
+						if (msg instanceof IRemoteConversationCommand)
+						{
+							IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
+							cmd.execute(component, (IFuture)fut, secinfos);
+						}
+						else
+						{
+							IRemoteOrderedConversationCommand cmd = (IRemoteOrderedConversationCommand)msg;
+							cmd.execute(component, outcmd, secinfos);
+						}
 					}
 					else
 					{
@@ -485,9 +509,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				}
 				
 				// Remotely executing command -> set local future to failed (i.e. abort to caller)
-				else if(outcommands!=null && outcommands.get(rxid) instanceof Future)
+				else if(outcommands!=null && outcommands.get(rxid) instanceof OutCommand)
 				{
-					((Future)outcommands.remove(rxid))
+					((Future) ((OutCommand)outcommands.remove(rxid)).getFuture())
 						.setException((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
 				}
 			}
@@ -508,6 +532,74 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 //				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
 //					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
 //						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(getComponent(), secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
+		}
+	}
+	
+	/** Command that has been sent to a remote component.
+	 *  Stored to set return value etc. */
+	protected static class OutCommand implements IOrderedConversation
+	{
+		/** Commands that have been deferred until a prior command arrives. */
+		protected PriorityQueue<AbstractResultCommand> deferredcommands;
+		
+		protected int resultcount = Integer.MIN_VALUE;
+		
+		/** Future for results. */
+		protected IFuture<?> future;
+		
+		/**
+		 *  Creates the command.
+		 */
+		public OutCommand(IFuture<?> future)
+		{
+			this.future = future;
+		}
+		
+		/** Gets the future. */
+		public IFuture<?> getFuture()
+		{
+			return future;
+		}
+		
+		/**
+		 *  Gets the count of the next result.
+		 *  
+		 *  @return The count of the next result.
+		 */
+		public int getNextResultCount()
+		{
+			return resultcount;
+		}
+		
+		/**
+		 *  Increases the next result count. 
+		 */
+		public void incNextResultCount()
+		{
+			++resultcount;
+		}
+		
+		/**
+		 *  Returns queue of commands that have been deferred due to
+		 *  out-of-order arrival.
+		 *  
+		 *  @return Queue of commands, may be null.
+		 */
+		public PriorityQueue<AbstractResultCommand> getDeferredCommands()
+		{
+			if (deferredcommands == null)
+			{
+				deferredcommands = new PriorityQueue<AbstractResultCommand>(new Comparator<AbstractResultCommand>()
+				{
+					public int compare(AbstractResultCommand o1, AbstractResultCommand o2)
+					{
+						return Integer.compare(o1.getResultCount(), o2.getResultCount());
+					}
+				});
+			}
+				
+			
+			return deferredcommands;
 		}
 	}
 }
