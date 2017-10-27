@@ -602,7 +602,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						if (!forwarding)
 						{
 							ret.setException(new RuntimeException("No route found."));
-							ret.setFinished();
 							return;
 						}
 						
