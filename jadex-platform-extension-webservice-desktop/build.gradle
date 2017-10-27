@@ -1,5 +1,7 @@
 description 'The Jadex desktop webservice platform extension package contains functionality for using and providing WSDL web services and REST web services. It uses dependencies which are only available for Java SE.'
 
+sourceCompatibility	= 1.8
+
 dependencies
 {
 	compile project(':jadex-platform')
