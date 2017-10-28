@@ -589,11 +589,11 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			if (deferredcommands == null)
 			{
-				deferredcommands = new PriorityQueue<AbstractResultCommand>(new Comparator<AbstractResultCommand>()
+				deferredcommands = new PriorityQueue<AbstractResultCommand>(11, new Comparator<AbstractResultCommand>()
 				{
 					public int compare(AbstractResultCommand o1, AbstractResultCommand o2)
 					{
-						return Integer.compare(o1.getResultCount(), o2.getResultCount());
+						return o1.getResultCount().compareTo(o2.getResultCount());
 					}
 				});
 			}
