@@ -199,7 +199,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			{
 				OutCommand outcmd = outcommands.remove(rxid);
 				@SuppressWarnings("unchecked")
-				Future<T> ret = (Future<T>) outcmd.getFuture();
+				Future<T> ret = outcmd!=null ? (Future<T>)outcmd.getFuture() : null;
 				if (ret != null)
 					ret.setExceptionIfUndone(exception);
 			}
