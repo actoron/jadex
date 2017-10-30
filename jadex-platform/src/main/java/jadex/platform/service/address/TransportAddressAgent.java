@@ -166,22 +166,21 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	public IFuture<List<TransportAddress>> resolveAddresses(final IComponentIdentifier platformid, final String transporttype)
 	{
-		IFuture<List<TransportAddress>> allret = null;
+		Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
 		try
 		{
-			if (freshness.get(platformid) != null &&
-				freshness.get(platformid) + CACHE_VALIDITY_DUR > System.currentTimeMillis());
-			{
-				List<TransportAddress> addrs = getAddressesFromCache(platformid);
-				addrs = filterAddresses(addrs, transporttype);
-				if (addrs != null)
-					allret = new Future<List<TransportAddress>>(filterAddresses(addrs, transporttype));
-			}
+			List<TransportAddress> addrs = getAddressesFromCache(platformid);
+			addrs = filterAddresses(addrs, transporttype);
+			ret.setResult(addrs);
 			
-			if (allret == null)
+			if (freshness.get(platformid) != null &&
+				freshness.get(platformid) + CACHE_VALIDITY_DUR > System.currentTimeMillis())
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
-				allret = fret;
+				
+				if (addrs != null && addrs.size() > 0)
+					ret = fret;
+				
 				IFuture<List<TransportAddress>> search = searches.get(platformid);
 				if (search == null)
 				{
@@ -218,6 +217,8 @@ public class TransportAddressAgent implements ITransportAddressService
 				{
 					public void exceptionOccurred(Exception exception)
 					{
+						freshness.put(platformid, System.currentTimeMillis());
+						
 						resultAvailable(null);
 					}
 					
@@ -225,7 +226,7 @@ public class TransportAddressAgent implements ITransportAddressService
 					{
 						freshness.put(platformid, System.currentTimeMillis());
 						
-						fret.setResult(result);
+						fret.setResult(filterAddresses(result, transporttype));
 					}
 				});
 			}
@@ -233,15 +234,6 @@ public class TransportAddressAgent implements ITransportAddressService
 		catch (Exception e)
 		{
 		}
-		
-		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
-		allret.addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, List<TransportAddress>>(ret)
-		{
-			public void customResultAvailable(List<TransportAddress> result) throws Exception
-			{
-				ret.setResult(filterAddresses(result, transporttype));
-			}
-		});
 		
 		return ret;
 	}
