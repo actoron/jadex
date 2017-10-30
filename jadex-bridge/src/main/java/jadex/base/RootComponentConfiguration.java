@@ -958,11 +958,11 @@ public class RootComponentConfiguration implements IRootComponentConfiguration
 		}
 
 		if (getRelayTransport() && SReflect.classForName0("jadex.platform.service.message.relaytransport.RelayTransportAgent",  this.getClass().getClassLoader()) == null) {
-			errorText.append(RELAYTRANSPORT + " set to true, but 'jadex.platform.service.message.relaytransport.RelayTransportAgent' is not in classpath (maybe include module jadex-platform-extension-relaytransport in dependencies?)");
+			errorText.append(RELAYTRANSPORT + " set to true, but 'jadex.platform.service.message.relaytransport.RelayTransportAgent' is not in classpath (maybe include module jadex-platform-extension-relaytransport in dependencies?).\n");
 		}
 
 		if (getWsTransport() && SReflect.classForName0("jadex.platform.service.message.websockettransport.WebSocketTransportAgent",  this.getClass().getClassLoader()) == null) {
-			errorText.append(RELAYTRANSPORT + " set to true, but 'jadex.platform.service.message.websockettransport.WebSocketTransportAgent' is not in classpath (maybe include module jadex-platform-extension-websockettransport in dependencies?)");
+			errorText.append(WSTRANSPORT + " set to true, but 'jadex.platform.service.message.websockettransport.WebSocketTransportAgent' is not in classpath (maybe include module jadex-platform-extension-websockettransport in dependencies?).\n");
 		}
 
 		if(errorText.length() != 0)

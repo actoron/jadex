@@ -10,6 +10,10 @@ dependencies
 	compile project(':jadex-rules-eca')
 	compile project(':jadex-platform')
 	compile project(':jadex-tools-base-swing')
+	
+	// Add transports, otherwise test fails due to consistency check.
+	testCompile project(':jadex-platform-extension-relaytransport')
+	testCompile project(':jadex-platform-extension-websockettransport')
 
 	compile 'commons-daemon:commons-daemon:1.0.10'
 	compileNoAndroidRuntime 'javassist:javassist:3.12.1.GA'
