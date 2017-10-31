@@ -57,7 +57,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			ret.setException(e);
 			return ret;
 		}
@@ -73,6 +73,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 				catch (SocketException e)
 				{
 				}
+//				System.out.println("Connected: " + address);
 				ret.setResult(WebSocketConnectionClient.this);
 			}
 			
@@ -83,7 +84,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 			
 			public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception
 			{
-//				System.out.println("Binary msg size: " + (binary != null ? String.valueOf(binary.length) : "null"));
+//				System.out.println("Client Binary msg size: " + (binary != null ? String.valueOf(binary.length) : "null"));
 				handleMessagePayload(binary);
 			}
 			
@@ -116,7 +117,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 			
 			public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception
 		    {
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				ret.setException(exception);
 		    }
 		});
@@ -149,7 +150,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		catch (Exception e)
 		{
 			ret.setException(e);
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return ret;
 	}
