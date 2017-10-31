@@ -49,6 +49,7 @@ public class RemoteResultCommand<T>	extends AbstractResultCommand
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
+	@SuppressWarnings("unchecked")
 	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
 	{
 		if (exception!=null)

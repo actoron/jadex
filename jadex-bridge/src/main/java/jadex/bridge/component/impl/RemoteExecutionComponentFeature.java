@@ -198,10 +198,15 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			public void exceptionOccurred(Exception exception)
 			{
 				OutCommand outcmd = outcommands.remove(rxid);
-				@SuppressWarnings("unchecked")
-				Future<T> ret = (Future<T>) outcmd.getFuture();
-				if (ret != null)
-					ret.setExceptionIfUndone(exception);
+				if (outcmd != null)
+				{
+					@SuppressWarnings("unchecked")
+					Future<T> ret = (Future<T>) outcmd.getFuture();
+					if (ret != null)
+						ret.setExceptionIfUndone(exception);
+				}
+				else
+					System.out.println("outcommand is NULL!");
 			}
 			
 			public void resultAvailable(Void result)
@@ -428,7 +433,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						
 						public void commandAvailable(Object command)
 						{
-							IFuture<Void>	fut	= sendRxMessage(remote, rxid, new RemoteForwardCmdCommand(command));
+							RemoteForwardCmdCommand fc = new RemoteForwardCmdCommand(command);
+							fc.setResultCount(counter++);
+							IFuture<Void>	fut	= sendRxMessage(remote, rxid, fc);
 							if(term!=null)
 							{
 								fut.addResultListener(term);
