@@ -53,15 +53,22 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		String tooltip = "<b>" + cid.getName() + "</b>";
 		if(platform!=null)
 		{
-			ITransportAddressService	tas	= SServiceProvider.getLocalService(platform, ITransportAddressService.class);
-			IFuture<List<TransportAddress>>	fut	= tas.getAddresses(cid.getRoot());
-			String[] addresses	= fut.isDone() ? fut.get().toArray(new String[0]) : null;
+			TransportAddress[] addresses	= null;
+			try
+			{
+				ITransportAddressService	tas	= SServiceProvider.getLocalService(platform, ITransportAddressService.class);
+				IFuture<List<TransportAddress>>	fut	= tas.getAddresses(cid.getRoot());
+				addresses	= fut.get(100).toArray(new TransportAddress[0]);	// Hack!!! how to fetch addresses synchronously
+			}
+			catch(Exception e)
+			{
+			}
 			
 			if(addresses!=null)
 			{
 				for(int i=0; i<addresses.length; i++)
 				{
-					tooltip += "<br>" + addresses[i];
+					tooltip += "<br>" + addresses[i].getTransportType() + "://" + addresses[i].getAddress();
 				}
 			}
 			else
