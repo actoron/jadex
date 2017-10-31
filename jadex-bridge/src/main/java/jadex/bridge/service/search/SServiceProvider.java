@@ -231,7 +231,7 @@ public class SServiceProvider
 //			{
 //				System.out.println("ogesjyph");
 //			}
-			throw new ServiceNotFoundException("No registry to search for service: "+type.getName());
+			throw new ServiceNotFoundException("Service not found: "+type.getName());
 		}
 		return proxy? createRequiredProxy(component, ret, type): ret;
 	}
