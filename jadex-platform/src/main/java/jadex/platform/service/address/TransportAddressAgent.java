@@ -55,7 +55,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected IInternalAccess agent;
 	
 	/** The local addresses. */
-	protected List<TransportAddress> localaddresses;
+	protected LinkedHashSet<TransportAddress> localaddresses;
 	
 	/** Current active searches. */
 	protected Map<IComponentIdentifier, IFuture<List<TransportAddress>>> searches;
@@ -64,10 +64,10 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected Map<IComponentIdentifier, Long> freshness;
 	
 	/** The managed addresses: target platform -> (transport name -> transport addresses) */
-	protected Map<IComponentIdentifier, List<TransportAddress>> addresses;
+	protected Map<IComponentIdentifier, LinkedHashSet<TransportAddress>> addresses;
 	
 	/** The managed addresses: target platform -> (transport name -> transport addresses) */
-	protected Map<IComponentIdentifier, List<TransportAddress>> manualaddresses;
+	protected Map<IComponentIdentifier, LinkedHashSet<TransportAddress>> manualaddresses;
 	
 	/** Subscription of local address changes. */
 	protected LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>>> addresssubs;
@@ -78,9 +78,9 @@ public class TransportAddressAgent implements ITransportAddressService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		localaddresses = new ArrayList<TransportAddress>();
-		addresses = new HashMap<IComponentIdentifier, List<TransportAddress>>();
-		manualaddresses = new HashMap<IComponentIdentifier, List<TransportAddress>>();
+		localaddresses = new LinkedHashSet<TransportAddress>();
+		addresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();
+		manualaddresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();
 		addresssubs = new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>>>(); 
 		freshness = new HashMap<IComponentIdentifier, Long>();
 		searches = new HashMap<IComponentIdentifier, IFuture<List<TransportAddress>>>();
@@ -173,7 +173,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		{
 			List<TransportAddress> addrs = getAddressesFromCache(platformid);
 			addrs = filterAddresses(addrs, transporttype);
-//			System.out.println("Addrs " + Arrays.toString(addrs.toArray()));
+//			System.out.println("Addrs " + addrs == null ? "null" : Arrays.toString(addrs.toArray()));
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
@@ -469,16 +469,23 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		if (platformid == null || agent.getComponentIdentifier().getRoot().equals(platformid))
 		{
-			ret = localaddresses;
+			ret = new ArrayList<TransportAddress>(localaddresses);
 		}
 		else
 		{
-			ret = addresses.get(platformid);
-			List<TransportAddress> manuals = manualaddresses.get(platformid);
-			if (ret == null)
-				ret = manuals;
-			else if (manuals != null)
-				ret.addAll(manuals);
+			LinkedHashSet<TransportAddress> addrs = addresses.get(platformid);
+			LinkedHashSet<TransportAddress> manuals = manualaddresses.get(platformid);
+			if (addrs == null)
+			{
+				ret = manuals == null ? null : new ArrayList<TransportAddress>(manuals);
+			}
+			else
+			{
+				addrs = new LinkedHashSet<TransportAddress>(addrs);
+				if (manuals != null)
+					addrs.addAll(manuals);
+				ret = new ArrayList<TransportAddress>(addrs);
+			}
 		}
 		return ret;
 	}
@@ -509,7 +516,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	 *  @param addrs The addresses.
 	 *  @param addressmap The map of address that is the target of the operation.
 	 */
-	protected void addAddresses(Collection<TransportAddress> addrs, Map<IComponentIdentifier, List<TransportAddress>> addressmap)
+	protected void addAddresses(Collection<TransportAddress> addrs, Map<IComponentIdentifier, LinkedHashSet<TransportAddress>> addressmap)
 	{
 		if (addrs != null && addrs.size() > 0)
 		{
@@ -536,11 +543,11 @@ public class TransportAddressAgent implements ITransportAddressService
 				}
 				else
 				{
-					List<TransportAddress> tlist = addressmap.get(addr.getPlatformId());
+					LinkedHashSet<TransportAddress> tlist = addressmap.get(addr.getPlatformId());
 					
 					if (tlist == null)
 					{
-						tlist = new ArrayList<TransportAddress>();
+						tlist = new LinkedHashSet<TransportAddress>();
 						addressmap.put(addr.getPlatformId(), tlist);
 					}
 					tlist.add(addr);
