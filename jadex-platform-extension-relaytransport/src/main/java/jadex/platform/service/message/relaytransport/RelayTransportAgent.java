@@ -300,20 +300,23 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					{
 						for (final IComponentIdentifier id : relays)
 						{
-							System.out.println("Sending to " + id);
-							msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
+							if (!keepaliveconnections.contains(id))
 							{
-								public void resultAvailable(Object result)
+								System.out.println("Sending to " + id);
+								msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
 								{
-									System.out.println("Got answer " + id);
-									if (keepaliveconnections.size() < keepalivecount)
-										keepaliveconnections.add(id);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-								}
-							});
+									public void resultAvailable(Object result)
+									{
+										System.out.println("Got answer " + id);
+										if (keepaliveconnections.size() < keepalivecount)
+											keepaliveconnections.add(id);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								});
+							}
 						}
 					}
 					else
