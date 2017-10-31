@@ -30,6 +30,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -74,6 +75,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 		@ProvidedService(type=IRoutingService.class, name="routing")
 })
 @Features(additional=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
+@Service
 public class RelayTransportAgent implements ITransportService, IRoutingService
 {
 	/** True/false if the transport allows forwarding. */
@@ -296,7 +298,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					IMessageFeature msgfeat = ia.getComponentFeature(IMessageFeature.class);
 					if (keepaliveconnections.size() < keepalivecount)
 					{
-						keepaliveconnections.clear();
 						for (final IComponentIdentifier id : relays)
 						{
 							System.out.println("Sending to " + id);
