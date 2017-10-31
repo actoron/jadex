@@ -10,7 +10,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -361,12 +360,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				if (addr == null || addr.isEmpty())
 					return;
 				
-				System.out.println("=====" + agent + "======");
-				for (TransportAddress entry : addr)
-				{
-					System.out.println("POST " + agent + " " + entry);
-				}
-				System.out.println("=====" + agent + "======");
+//				System.out.println("=====" + agent + "======");
+//				for (TransportAddress entry : addr)
+//				{
+//					System.out.println("POST " + agent + " " + entry);
+//				}
+//				System.out.println("=====" + agent + "======");
 				long leasetime = (Long)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
 				AwarenessInfo info = new AwarenessInfo(root, addr, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 				byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
