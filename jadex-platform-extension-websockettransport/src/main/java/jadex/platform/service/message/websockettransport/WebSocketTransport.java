@@ -97,6 +97,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public IFuture<IWebSocketConnection> createConnection(String address, final IComponentIdentifier target)
 	{
+//		System.out.println("WS create connection to " + address);
 		WebSocketConnectionClient con = new WebSocketConnectionClient(address, target, handler);
 		return con.connect();
 	}
