@@ -167,11 +167,13 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	public IFuture<List<TransportAddress>> resolveAddresses(final IComponentIdentifier platformid, final String transporttype)
 	{
+//		System.out.println("RESOLVE CALLED: " + platformid + " " + transporttype);
 		Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
 		try
 		{
 			List<TransportAddress> addrs = getAddressesFromCache(platformid);
 			addrs = filterAddresses(addrs, transporttype);
+//			System.out.println("Addrs " + Arrays.toString(addrs.toArray()));
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
@@ -179,8 +181,11 @@ public class TransportAddressAgent implements ITransportAddressService
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
 				
-				if (addrs != null && addrs.size() > 0)
+				if (addrs == null || addrs.size() == 0)
+				{
+//					System.out.println("RET switcheroo: " + transporttype);
 					ret = fret;
+				}
 				
 				IFuture<List<TransportAddress>> search = searches.get(platformid);
 				if (search == null)
@@ -288,6 +293,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	public IFuture<Void> addManualAddresses(Collection<TransportAddress> addresses)
 	{
+//		System.out.println(agent.getComponentIdentifier().getRoot().toString() + " Manual addresses added: " + Arrays.toString(addresses.toArray()));
 		addToManualAddressesList(addresses);
 		return IFuture.DONE;
 	}
