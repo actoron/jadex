@@ -1,13 +1,17 @@
 package jadex.base.gui.jtable;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 
 
 /**
@@ -18,16 +22,10 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 {
 	/** The local platform. */
 	protected IComponentIdentifier platform;
-	
+		
 	/**
 	 * Create a new ComponentIdentifierRenderer.
-	 */
-	public ComponentIdentifierRenderer()
-	{
-	}
-	
-	/**
-	 * Create a new ComponentIdentifierRenderer.
+	 * @param platform	CID of the local platform, if any. Used to mark local platfor and check for known addresses in tool tip.
 	 */
 	public ComponentIdentifierRenderer(IComponentIdentifier platform)
 	{
@@ -50,18 +48,28 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		return this;
 	}
 
-	public static String getTooltipText(IComponentIdentifier cid)
+	public String getTooltipText(IComponentIdentifier cid)
 	{
-		String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
 		String tooltip = "<b>" + cid.getName() + "</b>";
-		if(addresses!=null)
+		if(platform!=null)
 		{
-			for(int i=0; i<addresses.length; i++)
+			ITransportAddressService	tas	= SServiceProvider.getLocalService(platform, ITransportAddressService.class);
+			IFuture<List<TransportAddress>>	fut	= tas.getAddresses(cid.getRoot());
+			String[] addresses	= fut.isDone() ? fut.get().toArray(new String[0]) : null;
+			
+			if(addresses!=null)
 			{
-				tooltip += "<br>" + addresses[i];
+				for(int i=0; i<addresses.length; i++)
+				{
+					tooltip += "<br>" + addresses[i];
+				}
 			}
+			else
+			{
+				tooltip += "<br>" + "no addresses found";
+			}
+			tooltip	= "<html>" + tooltip + "</html>";
 		}
-		tooltip	= "<html>" + tooltip + "</html>";
 		return tooltip;
 	}
 }

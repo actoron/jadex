@@ -361,12 +361,9 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					return;
 				
 //				System.out.println("=====" + agent + "======");
-//				for (Map.Entry<String, String[]> entry : addr.entrySet())
+//				for (TransportAddress entry : addr)
 //				{
-//					for (String a : entry.getValue())
-//					{
-//						System.out.println("POST " + agent + " " + entry.getKey() + " : " + a);
-//					}
+//					System.out.println("POST " + agent + " " + entry);
 //				}
 //				System.out.println("=====" + agent + "======");
 				long leasetime = (Long)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");

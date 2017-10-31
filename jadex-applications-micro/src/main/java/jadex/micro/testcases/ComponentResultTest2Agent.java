@@ -12,7 +12,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -48,9 +48,9 @@ public class ComponentResultTest2Agent
 		
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1")
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 				tr1.setSucceeded(true);
 				next();
@@ -66,9 +66,9 @@ public class ComponentResultTest2Agent
 			{
 				final TestReport	tr2	= new TestReport("#2", "Custom configuration");
 				testComponentResult("config2", "initial2")
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						tr2.setSucceeded(true);
 						next();
@@ -95,28 +95,28 @@ public class ComponentResultTest2Agent
 	/**
 	 *  Create/destroy subcomponent and check if result is as expected.
 	 */
-	protected IFuture testComponentResult(final String config, final String expected)
+	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
-		final Future	fut	= new Future();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new DelegationResultListener(fut)
+		final Future<Void>	fut	= new Future<Void>();
+		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
 		{
+			@SuppressWarnings("deprecation")
 			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, agent.getComponentIdentifier()), null)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IComponentIdentifier result)
 					{
-						cms.destroyComponent((IComponentIdentifier)result)
-							.addResultListener(new DelegationResultListener(fut)
+						cms.destroyComponent(result)
+							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Map<String, Object> results)
 							{
-								Map	results	= (Map)result;
 								if(results!=null && SUtil.equals(results.get("res"), expected))
 								{
-									super.customResultAvailable(null);
+									fut.setResult(null);
 								}
 								else
 								{

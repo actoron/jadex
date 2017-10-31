@@ -205,8 +205,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					if (ret != null)
 						ret.setExceptionIfUndone(exception);
 				}
-				else
-					System.out.println("outcommand is NULL!");
 			}
 			
 			public void resultAvailable(Void result)

@@ -88,10 +88,10 @@ public class ServiceDescriptionPanel extends JPanel
 		owner.setToolTipText(sd==null? "": sd.getOwnership());
 		component.setText(ad==null? "": ad.getName().getName());
 		
-		if(ad!=null)
-		{
-			component.setToolTipText(ComponentIdentifierRenderer.getTooltipText(ad.getName()));
-		}
+//		if(ad!=null)
+//		{
+//			component.setToolTipText(ComponentIdentifierRenderer.getTooltipText(ad.getName()));
+//		}
 		
 		update(onto, sd==null? new String[0]: sd.getOntologies());
 		update(lang, sd==null? new String[0]: sd.getLanguages());
