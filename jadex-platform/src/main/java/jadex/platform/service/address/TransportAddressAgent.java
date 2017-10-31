@@ -1,6 +1,7 @@
 package jadex.platform.service.address;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -173,7 +174,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			addrs = filterAddresses(addrs, transporttype);
 			ret.setResult(addrs);
 			
-			if (freshness.get(platformid) != null &&
+			if (freshness.get(platformid) == null ||
 				freshness.get(platformid) + CACHE_VALIDITY_DUR > System.currentTimeMillis())
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
@@ -226,6 +227,7 @@ public class TransportAddressAgent implements ITransportAddressService
 					{
 						freshness.put(platformid, System.currentTimeMillis());
 						
+//						System.out.println("Resolved addresses for " + platformid + ": " + Arrays.toString(result.toArray()));
 						fret.setResult(filterAddresses(result, transporttype));
 					}
 				});
@@ -377,9 +379,9 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
 	{
 		List<TransportAddress> ret = null;
-		IAwarenessManagementService awa = SServiceProvider.getLocalService(agent, IAwarenessManagementService.class);
 		try
 		{
+			IAwarenessManagementService awa = SServiceProvider.getLocalService(agent, IAwarenessManagementService.class);
 			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
 			if (info != null)
 				ret = info.getAddresses();
