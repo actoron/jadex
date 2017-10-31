@@ -66,11 +66,13 @@ public abstract class AbstractResultCommand extends AbstractInternalRemoteComman
 		dc.offer(this);
 		
 		AbstractResultCommand next = dc.peek();
-		while (next != null && next.getResultCount() == conv.getNextResultCount())
+		while (next != null && (next.getResultCount() == null || next.getResultCount() == conv.getNextResultCount()))
 		{
 			dc.poll();
 			next.doExecute(access, conv.getFuture(), secinf);
-			conv.incNextResultCount();
+			if (next.getResultCount() != null)
+				conv.incNextResultCount();
+			next = dc.peek();
 		}
 	}
 	

@@ -598,6 +598,10 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				{
 					public int compare(AbstractResultCommand o1, AbstractResultCommand o2)
 					{
+						if (o1.getResultCount() == null)
+							return 1;
+						if (o2.getResultCount() == null)
+							return -1;
 						return o1.getResultCount() - o2.getResultCount();
 					}
 				});
