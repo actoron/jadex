@@ -1,7 +1,10 @@
 package jadex.base.gui.jtable;
 
 import java.awt.Component;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -11,7 +14,9 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.SortedList;
+import jadex.commons.future.IResultListener;
 
 
 /**
@@ -47,36 +52,72 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		}
 		return this;
 	}
+	
+	private Map<IComponentIdentifier, String>	adrcache	= Collections.synchronizedMap(new LRU<IComponentIdentifier, String>());
 
-	public String getTooltipText(IComponentIdentifier cid)
+	public String getTooltipText(final IComponentIdentifier cid)
 	{
 		String tooltip = "<b>" + cid.getName() + "</b>";
 		if(platform!=null)
 		{
-			TransportAddress[] addresses	= null;
+			String	adrtip	= adrcache.get(cid);
+			
+			// On first access display info message.
+			if(adrtip==null)
+			{
+				adrtip	= "<br> fetching addresses, please retry...";
+				adrcache.put(cid, adrtip);
+			}
+			
+			// Try fetching each time to also receive updates
 			try
 			{
 				ITransportAddressService	tas	= SServiceProvider.getLocalService(platform, ITransportAddressService.class);
-				IFuture<List<TransportAddress>>	fut	= tas.getAddresses(cid.getRoot());
-				addresses	= fut.get(100).toArray(new TransportAddress[0]);	// Hack!!! how to fetch addresses synchronously
+				tas.getAddresses(cid.getRoot()).addResultListener(new IResultListener<List<TransportAddress>>()
+				{
+					@Override
+					public void resultAvailable(List<TransportAddress> addresses)
+					{
+						if(addresses!=null && !addresses.isEmpty())
+						{
+							SortedList<TransportAddress>	sl	= new SortedList<TransportAddress>(new Comparator<TransportAddress>()
+							{
+								public int compare(TransportAddress o1, TransportAddress o2)
+								{
+									return (o1.getTransportType() + "://" + o1.getAddress())
+										.compareTo(o2.getTransportType() + "://" + o2.getAddress());
+								};
+							}, true);
+							sl.addAll(addresses);
+							String	adrtip	= "";
+							for(TransportAddress adr: sl)
+							{
+								adrtip += "<br>" + adr.getTransportType() + "://" + adr.getAddress();
+							}
+							adrcache.put(cid, adrtip);
+						}
+						else
+						{
+							adrcache.put(cid, "<br>" + "no addresses found");
+						}
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						adrcache.put(cid, "<br> failed to fetch addresses: "+exception);
+					}
+				});
 			}
 			catch(Exception e)
 			{
+				adrtip	= "<br> failed to fetch addresses: "+e;
+				adrcache.put(cid, adrtip);
 			}
 			
-			if(addresses!=null)
-			{
-				for(int i=0; i<addresses.length; i++)
-				{
-					tooltip += "<br>" + addresses[i].getTransportType() + "://" + addresses[i].getAddress();
-				}
-			}
-			else
-			{
-				tooltip += "<br>" + "no addresses found";
-			}
-			tooltip	= "<html>" + tooltip + "</html>";
+			// Display what we have until now
+			tooltip	+= adrtip;
 		}
-		return tooltip;
+		return "<html>" + tooltip + "</html>";
 	}
 }
