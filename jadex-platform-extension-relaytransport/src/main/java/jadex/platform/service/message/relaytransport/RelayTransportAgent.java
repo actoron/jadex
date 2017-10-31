@@ -30,6 +30,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -74,6 +75,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 		@ProvidedService(type=IRoutingService.class, name="routing")
 })
 @Features(additional=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
+@Service
 public class RelayTransportAgent implements ITransportService, IRoutingService
 {
 	/** True/false if the transport allows forwarding. */
@@ -296,24 +298,26 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					IMessageFeature msgfeat = ia.getComponentFeature(IMessageFeature.class);
 					if (keepaliveconnections.size() < keepalivecount)
 					{
-						keepaliveconnections.clear();
 						for (final IComponentIdentifier id : relays)
 						{
-							System.out.println("Sending to " + id);
-							msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
+							if (!keepaliveconnections.contains(id))
 							{
-								public void resultAvailable(Object result)
+								System.out.println("Sending to " + id);
+								msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
 								{
-									System.out.println("Got answer " + id);
-									if (keepaliveconnections.size() < keepalivecount)
-										keepaliveconnections.add(id);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									System.out.println("Got exception:  " + exception);
-								}
-							});
+									public void resultAvailable(Object result)
+									{
+										System.out.println("Got answer " + id);
+										if (keepaliveconnections.size() < keepalivecount)
+											keepaliveconnections.add(id);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										System.out.println("Got exception:  " + exception);
+									}
+								});
+							}
 						}
 					}
 					else
@@ -562,17 +566,17 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								agent.getLogger().info("Relay "+((IService)routingsrv).getServiceIdentifier()+" routing exception: "+exception);
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" routing exception: "+exception);
 							}
 							
 							public void resultAvailable(Collection<Integer> result)
 							{
-								agent.getLogger().info("Relay "+((IService)routingsrv).getServiceIdentifier()+" result available: "+result);
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" result available: "+result);
 							}
 							
 							public void intermediateResultAvailable(Integer result)
 							{
-								agent.getLogger().info("Relay "+((IService)routingsrv).getServiceIdentifier()+" intermediate result available: "+result);
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" intermediate result available: "+result);
 								++result;
 								routefound = true;
 								synchronized(routes)
@@ -586,7 +590,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							
 							public void finished()
 							{
-								agent.getLogger().info("Relay "+((IService)routingsrv).getServiceIdentifier()+" finished.");
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" finished.");
 								--count[0];
 								if (count[0] == 0)
 								{
