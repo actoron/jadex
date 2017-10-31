@@ -173,7 +173,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		{
 			List<TransportAddress> addrs = getAddressesFromCache(platformid);
 			addrs = filterAddresses(addrs, transporttype);
-//			System.out.println("Addrs " + Arrays.toString(addrs.toArray()));
+//			System.out.println("Addrs " + addrs == null ? "null" : Arrays.toString(addrs.toArray()));
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
