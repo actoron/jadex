@@ -66,9 +66,6 @@ public class RemoteReference2Test //extends TestCase
 //			}
 //		}, 7, 1500).get();
 		
-		// Currently fails/hangs!!! TODO: why?
-		System.out.println("found local: "+service1);
-		
 		// Search for remote search service from local platform
 		System.out.println("searching global");
 		ISearchService	search	= SServiceProvider
