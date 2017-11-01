@@ -34,7 +34,7 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 	 */
 	public ComponentIdentifierRenderer(IComponentIdentifier platform)
 	{
-		this.platform = platform.getRoot();
+		this.platform = platform!=null ? platform.getRoot() : null;
 	}
 	
 	/**

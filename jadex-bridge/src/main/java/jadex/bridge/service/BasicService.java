@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import jadex.base.PlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
 import jadex.bridge.sensor.service.TagProperty;
@@ -22,7 +22,6 @@ import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceKeyExtractor;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.SReflect;
@@ -323,7 +322,9 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			// todo: make internal interface for initProperties
 //			if(type!=null && type.getName().indexOf("ITest")!=-1)
 //				System.out.println("sdfsdf");
-			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype)
+				.addResultListener(getInternalAccess().getComponentFeature(IExecutionFeature.class)	// TODO: why wrong thread (start 2x autoterminate on 6-core) 
+					.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 			{
 				public void customResultAvailable(Void result) throws Exception
 				{
@@ -355,7 +356,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 						}
 					});
 				}
-			});
+			}));
 		}
 		else
 		{
