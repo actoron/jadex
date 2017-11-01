@@ -391,8 +391,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							sendRxMessage(remote, rxid, rc);
 						}
 						
-						public void resultAvailable(Object result)
+						public void resultAvailable(final Object result)
 						{
+//							getComponent().getLogger().severe("sending result: "+rxid+", "+result);
 							incommands.remove(rxid);
 							RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
 							final int msgcounter = counter++;
@@ -402,6 +403,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								@Override
 								public void exceptionOccurred(Exception exception)
 								{
+//									getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
 									// Serialization of result failed -> send back exception.
 									RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
 									rc.setResultCount(msgcounter);
@@ -409,8 +411,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								}
 								
 								@Override
-								public void resultAvailable(Void result)
+								public void resultAvailable(Void v)
 								{
+//									getComponent().getLogger().severe("sending result succeeded: "+rxid+", "+result);
 									// OK -> ignore
 								}
 							});
