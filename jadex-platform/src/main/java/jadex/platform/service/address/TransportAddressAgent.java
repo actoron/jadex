@@ -1,7 +1,6 @@
 package jadex.platform.service.address;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +23,6 @@ import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -172,6 +170,11 @@ public class TransportAddressAgent implements ITransportAddressService
 		try
 		{
 			List<TransportAddress> addrs = getAddressesFromCache(platformid);
+			if (addrs == null || addrs.isEmpty())
+			{
+				updateFromLocalAwareness(platformid);
+				addrs = getAddressesFromCache(platformid);
+			}
 			addrs = filterAddresses(addrs, transporttype);
 //			System.out.println("Addrs " + addrs == null ? "null" : Arrays.toString(addrs.toArray()));
 			ret.setResult(addrs);
@@ -336,6 +339,24 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected boolean hasSuperPeer()
 	{
 		return false;
+	}
+	
+	/**
+	 *  Updates the cache using the local awareness cache.
+	 *  @param platformid The platform ID.
+	 */
+	protected void updateFromLocalAwareness(IComponentIdentifier platformid)
+	{
+		try
+		{
+			IAwarenessManagementService awa = SServiceProvider.getLocalService0(agent, IAwarenessManagementService.class, Binding.SCOPE_PLATFORM, null, true);
+			DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
+			if (info != null)
+				addAddresses(info.getAddresses());
+		}
+		catch (Exception e)
+		{
+		}
 	}
 	
 	/**
