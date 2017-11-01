@@ -356,10 +356,6 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //				Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
 				List<TransportAddress> addr = SServiceProvider.getLocalService(agent, ITransportAddressService.class).getAddresses().get();
 				
-				// Do not post infos without addresses.
-				if (addr == null || addr.isEmpty())
-					return;
-				
 //				System.out.println("=====" + agent + "======");
 //				for (TransportAddress entry : addr)
 //				{
