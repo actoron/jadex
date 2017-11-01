@@ -2,7 +2,6 @@ package jadex.platform.service.serialization;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -24,6 +23,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITargetResolver;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
@@ -56,7 +56,6 @@ import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -207,9 +206,9 @@ public class RemoteReferenceModule
 	public ProxyReference getProxyReference(Object target, IComponentIdentifier tmpholder, final ClassLoader cl)
 	{
 		// Strip required service proxy if any, to avoid exception due to being called from wrong thread.
-		if(Proxy.isProxyClass(target.getClass()))
+		if(ProxyFactory.isProxyClass(target.getClass()))
 		{
-			InvocationHandler	handler	= Proxy.getInvocationHandler(target);
+			InvocationHandler	handler	= ProxyFactory.getInvocationHandler(target);
 			if(handler instanceof BasicServiceInvocationHandler)
 			{
 				if(((BasicServiceInvocationHandler)handler).isRequired())
@@ -256,16 +255,13 @@ public class RemoteReferenceModule
 			if(remoteinterfaces.length==0)
 				throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
 			
-			ProxyInfo pi;
-			synchronized(this)
+			// test and create not synchronized due to service invocation (getPropertyMap) in createProxyInfo() potentially leading to deadlock
+			ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
+			if(pi==null)
 			{
-				pi = (ProxyInfo)proxyinfos.get(tcid);
-				if(pi==null)
-				{
-					pi = createProxyInfo(target, remoteinterfaces, cl, platform);
-					proxyinfos.put(tcid, pi);
-		//			System.out.println("add: "+tcid+" "+pi);
-				}
+				pi = createProxyInfo(target, remoteinterfaces, cl, platform);
+				proxyinfos.put(tcid, pi);
+//				System.out.println("add: "+tcid+" "+pi);
 			}
 			
 			ret	= new ProxyReference(pi, rr);
@@ -697,9 +693,9 @@ public class RemoteReferenceModule
 		// Create a remote reference if not yet available.
 //		if(ret==null)
 		{
-			if(Proxy.isProxyClass(target.getClass()))
+			if(ProxyFactory.isProxyClass(target.getClass()))
 			{
-				Object handler = Proxy.getInvocationHandler(target);
+				Object handler = ProxyFactory.getInvocationHandler(target);
 				if(handler instanceof BasicServiceInvocationHandler)
 				{
 					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
@@ -716,7 +712,7 @@ public class RemoteReferenceModule
 				}
 				else if(handler instanceof RemoteMethodInvocationHandler)
 				{
-					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)Proxy.getInvocationHandler(target);
+					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
 					ret	= rmih.pr.getRemoteReference();
 				}
 				else
@@ -739,7 +735,7 @@ public class RemoteReferenceModule
 			else if(target instanceof ServiceInfo)
 			{
 				ServiceInfo si = (ServiceInfo)target;
-				if(Proxy.isProxyClass(si.getDomainService().getClass()))
+				if(ProxyFactory.isProxyClass(si.getDomainService().getClass()))
 				{
 					ret = getRemoteReference(si.getDomainService(), orig, false);
 				}
@@ -1014,7 +1010,7 @@ public class RemoteReferenceModule
 			IInternalAccess	access	= IInternalExecutionFeature.LOCAL.get();	// TODO: Hack!!! How to inject local component access?
 			if(access==null)
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
-			ret = Proxy.newProxyInstance(classloader, 
+			ret = ProxyFactory.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(access, pr));
 			
 //			incProxyCount(pr.getRemoteReference());
@@ -1543,9 +1539,9 @@ public class RemoteReferenceModule
 	{
 		boolean ret = false;
 		
-		if(Proxy.isProxyClass(target.getClass()))
+		if(ProxyFactory.isProxyClass(target.getClass()))
 		{
-			Object handler = Proxy.getInvocationHandler(target);
+			Object handler = ProxyFactory.getInvocationHandler(target);
 			if(handler instanceof BasicServiceInvocationHandler)
 			{
 				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
@@ -1557,7 +1553,7 @@ public class RemoteReferenceModule
 			else 
 			{
 				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.platform.service.remote
-				ret = Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
+				ret = ProxyFactory.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
 			}
 		}
 		return ret;
@@ -1775,7 +1771,7 @@ public class RemoteReferenceModule
 				@Override
 				public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 				{
-					return Proxy.isProxyClass(object.getClass());
+					return ProxyFactory.isProxyClass(object.getClass());
 				}
 			});
 			

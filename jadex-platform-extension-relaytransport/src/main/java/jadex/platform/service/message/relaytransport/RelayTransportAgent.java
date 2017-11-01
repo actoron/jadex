@@ -1,6 +1,5 @@
 package jadex.platform.service.message.relaytransport;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -712,7 +712,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			RemoteReference rr = new RemoteReference(relay, si);
 			ProxyReference pr = new ProxyReference(pi, rr);
 			
-			ret = (IRoutingService) Proxy.newProxyInstance(agent.getClassLoader(), 
+			ret = (IRoutingService) ProxyFactory.newProxyInstance(agent.getClassLoader(), 
 				interfaces, new RemoteMethodInvocationHandler(agent, pr));
 			
 			routingservicecache.put(relay, ret);
