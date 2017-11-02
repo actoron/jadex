@@ -1,6 +1,7 @@
 package jadex.platform.service.message.websockettransport;
 
 import java.io.IOException;
+import java.net.Socket;
 
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoWSD.WebSocket;
@@ -21,12 +22,17 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	/** The web socket. */
 	protected WebSocket websocket;
 	
+	/** The low-level socket. */
+	protected Socket socket;
+	
 	/**
 	 *  Creates the websocket.
 	 */
-	public WebSocketConnectionServer(IHTTPSession handshakerequest, ITransportHandler<IWebSocketConnection> handlr)
+	public WebSocketConnectionServer(IHTTPSession handshakerequest, ITransportHandler<IWebSocketConnection> handlr, Socket acceptsocket)
 	{
 		super(handlr);
+		socket = acceptsocket;
+		
 		websocket = new WebSocket(handshakerequest)
 		{
 			/** Flag if connected. */
@@ -194,10 +200,26 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 		try
 		{
 			websocket.close(CloseCode.NormalClosure, "Disconnect", false);
+			forceClose();
 		}
 		catch (IOException e)
 		{
 			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Forcibly closes the connection (ignored if already closed).
+	 */
+	public void forceClose()
+	{
+		try
+		{
+			socket.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -227,7 +249,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 		else
 		{
 			int offset = 0;
-			int count = data.length / maxpayload + 1;
+			int count = data.length / pojoagent.getMaximumPayloadSize() + 1;
 			
 			for (int i = 0; i < count; ++i)
 			{
@@ -241,7 +263,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 				if (i + 1 == count)
 					fin = true;
 				
-				int psize = Math.min(maxpayload, data.length - offset);
+				int psize = Math.min(pojoagent.getMaximumPayloadSize(), data.length - offset);
 				byte[] payload = new byte[psize];
 				System.arraycopy(data, offset, payload, 0, psize);
 				offset += psize;
@@ -249,6 +271,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 //				System.out.println("frame totalsize: " + data.length + " count " + count + " " + i + " " + opcode + " " + fin);
 				WebSocketFrame wsf = new WebSocketFrame(opcode, fin, payload);
 				websocket.sendFrame(wsf);
+				socket.getOutputStream().flush();
 			}
 		}
 	}

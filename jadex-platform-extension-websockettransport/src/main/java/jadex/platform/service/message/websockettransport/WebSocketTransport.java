@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.platform.service.transport.ITransport;
 import jadex.platform.service.transport.ITransportHandler;
 
@@ -14,7 +15,7 @@ import jadex.platform.service.transport.ITransportHandler;
 public class WebSocketTransport implements ITransport<IWebSocketConnection>
 {
 	/** Connection handler. */
-	protected ITransportHandler<IWebSocketConnection> handler;
+	protected WebSocketTransportAgent handler;
 	
 	/** The server for incoming connections. */
 	protected WebSocketServer server;
@@ -26,7 +27,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public void	init(ITransportHandler<IWebSocketConnection> handler)
 	{
-		this.handler = handler;
+		this.handler = (WebSocketTransportAgent) handler;
 	}
 	
 	/**
@@ -35,17 +36,24 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public void	shutdown()
 	{
-		try
+		if (server != null)
 		{
-			if (server != null)
+			try
 			{
 				server.closeAllConnections();
+			}
+			catch (Exception e)
+			{
+			}
+			try
+			{
 				server.stop();
 			}
+			catch (Exception e)
+			{
+			}
 		}
-		catch (Exception e)
-		{
-		}
+		
 	}
 
 	/**
