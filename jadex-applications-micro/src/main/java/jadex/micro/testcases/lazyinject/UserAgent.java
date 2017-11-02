@@ -1,15 +1,22 @@
 package jadex.micro.testcases.lazyinject;
 
+import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalIntermediateFinishedListener;
 import jadex.commons.future.IFunctionalIntermediateResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
@@ -24,6 +31,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.servicecall.ServiceCallAgent;
 
 /**
  * Tests whether lazy service calls work together with tuple2 / intermediatefutures.
@@ -175,5 +183,33 @@ public class UserAgent
 				agent.killComponent();
 			}
 		});
+	}
+	
+	/**
+	 *  Starter for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+		config1.setSecurity(true);
+		config1.setTcpTransport(true);
+//		config1.addComponent(UserAgent.class);
+		for (int i = 0; i < 2000; ++i)
+		{
+			IExternalAccess plat = Starter.createPlatform(config1).get();
+			plat.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					SServiceProvider.getLocalService(ia, IComponentManagementService.class).createComponent(UserAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					System.out.println("Step done.");
+					return IFuture.DONE;
+				}
+			}).get();
+			plat.killComponent().get();
+		}
+		System.out.println("Done.");
+		System.exit(0);
 	}
 }
