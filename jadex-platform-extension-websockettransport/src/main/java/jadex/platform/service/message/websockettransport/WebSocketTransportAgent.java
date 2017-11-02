@@ -53,9 +53,12 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 		
 		synchronized(this)
 		{
-			for (IWebSocketConnection con : candidates.keySet())
+			if (candidates != null)
 			{
-				con.forceClose();
+				for (IWebSocketConnection con : candidates.keySet())
+				{
+					con.forceClose();
+				}
 			}
 		}
 	}

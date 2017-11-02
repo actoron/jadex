@@ -215,11 +215,11 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	{
 		try
 		{
-			socket.close();
+			if (socket != null)
+				socket.close();
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
-			e.printStackTrace();
 		}
 	}
 	

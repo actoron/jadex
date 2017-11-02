@@ -185,9 +185,10 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	{
 		try
 		{
-			websocket.getSocket().close();
+			if (websocket != null && websocket.getSocket() != null)
+				websocket.getSocket().close();
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 		}
 	}
