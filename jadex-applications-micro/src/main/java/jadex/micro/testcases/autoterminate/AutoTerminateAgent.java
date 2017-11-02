@@ -170,6 +170,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
 //			agent.getLogger().severe("test5: "+tc);
+			System.out.println("Auto terminate result: "+tc);
 			ret.setResult(null);
 		}
 	}
