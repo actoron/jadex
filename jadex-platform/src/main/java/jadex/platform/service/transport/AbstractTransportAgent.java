@@ -28,6 +28,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -150,7 +151,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 		else
 		{
-			deliverRemoteMessage(agent, secser, cms, codec, source, header, body);
+			if (IComponentDescription.STATE_ACTIVE.equals(agent.getComponentDescription().getState()))
+				deliverRemoteMessage(agent, secser, cms, codec, source, header, body);
 		}
 	}
 
