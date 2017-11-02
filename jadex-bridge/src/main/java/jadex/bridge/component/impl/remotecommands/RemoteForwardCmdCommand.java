@@ -9,7 +9,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Remote command for sending future commands in ICommandFuture.
  */
-public class RemoteForwardCmdCommand implements IRemoteConversationCommand<Object>
+public class RemoteForwardCmdCommand extends AbstractResultCommand //implements IRemoteConversationCommand<Object>
 {
 	/** The Command. */
 	protected Object	command;
@@ -36,7 +36,7 @@ public class RemoteForwardCmdCommand implements IRemoteConversationCommand<Objec
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IFuture<Object> future, IMsgSecurityInfos secinf)
+	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
 	{
 		((IForwardCommandFuture)future).sendForwardCommand(command);
 	}

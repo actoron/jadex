@@ -80,7 +80,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-persist", "true", // for testing persistence
 //		"-deftimeout", "-1",
 		"-printpass", "false",
-		"-superpeerclient", "false"
+		"-superpeerclient", "false",
+		"-wstransport", "false",
+//		"-tcptransport", "false"
 		// Hack!!! include ssl transport if available
 //		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
 	};

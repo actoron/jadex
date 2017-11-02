@@ -1,6 +1,10 @@
 package jadex.webservice.examples.rs.chart;
 
 import static org.junit.Assert.assertNotNull;
+
+import java.security.Security;
+
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -13,10 +17,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-
+import org.robolectric.annotation.Config;
 
 
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
@@ -24,18 +29,25 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
+		System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_GCM_SHA256");	// Hack: workaround for java 8 problem with ECDH key exchange
 		new SReflectSub().setIsAndroid(true, true);
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{
-				"-gui", "false",
-				"-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
-//				"-componentfactory", "jadex.component.ComponentComponentFactory",
-//				"-conf", "jadex/platform/Platform.component.xml",
-//				"-logging", "true",
-//				"-deftimeout", "-1",
-				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"
-		});
+		PlatformConfiguration config = PlatformConfiguration.getMinimal();
+		config.setAwareness(false);
+		config.addComponent(ChartProviderAgent.class);
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
+
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
+//		{
+//				"-gui", "false",
+//				"-awareness", "false", //"-relaytransport", "false", "-tcptransport", "false",
+////				"-componentfactory", "jadex.component.ComponentComponentFactory",
+////				"-conf", "jadex/platform/Platform.component.xml",
+////				"-logging", "true",
+////				"-deftimeout", "-1",
+////				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"
+//				"-component", "jadex/webservice/examples/rs/chart/ChartProviderAgent.class"
+//		});
 
 		extAcc = fut.get();
 	}

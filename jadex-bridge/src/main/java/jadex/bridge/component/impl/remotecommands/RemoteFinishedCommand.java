@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.IRemoteConversationCommand;
+import jadex.bridge.component.impl.IRemoteOrderedConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -12,7 +12,7 @@ import jadex.commons.future.IntermediateFuture;
 /**
  *  Command for finished intermediate futures.
  */
-public class RemoteFinishedCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteConversationCommand<Collection<T>>
+public class RemoteFinishedCommand<T>	extends AbstractResultCommand
 {
 	/**
 	 *  Create the command.
@@ -35,7 +35,8 @@ public class RemoteFinishedCommand<T>	extends AbstractInternalRemoteCommand	impl
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IFuture<Collection<T>> future, IMsgSecurityInfos secinf)
+	@SuppressWarnings("unchecked")
+	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
 	{
 		((IntermediateFuture<T>)future).setFinished();
 	}

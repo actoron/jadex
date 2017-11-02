@@ -1,8 +1,10 @@
 package jadex.platform.service.message.websockettransport;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.platform.service.transport.ITransport;
 import jadex.platform.service.transport.ITransportHandler;
 
@@ -13,7 +15,7 @@ import jadex.platform.service.transport.ITransportHandler;
 public class WebSocketTransport implements ITransport<IWebSocketConnection>
 {
 	/** Connection handler. */
-	protected ITransportHandler<IWebSocketConnection> handler;
+	protected WebSocketTransportAgent handler;
 	
 	/** The server for incoming connections. */
 	protected WebSocketServer server;
@@ -25,7 +27,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public void	init(ITransportHandler<IWebSocketConnection> handler)
 	{
-		this.handler = handler;
+		this.handler = (WebSocketTransportAgent) handler;
 	}
 	
 	/**
@@ -34,17 +36,24 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public void	shutdown()
 	{
-		try
+		if (server != null)
 		{
-			if (server != null)
+			try
 			{
 				server.closeAllConnections();
+			}
+			catch (Exception e)
+			{
+			}
+			try
+			{
 				server.stop();
 			}
+			catch (Exception e)
+			{
+			}
 		}
-		catch (Exception e)
-		{
-		}
+		
 	}
 
 	/**
@@ -73,8 +82,10 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 		{
 			try
 			{
+				WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		 		int idletimeout = pojo.getIdleTimeout();
 				server = new WebSocketServer(port, handler);
-				server.start();
+				server.start(idletimeout, true);
 				System.out.println("Started websocket server: " + server.getListeningPort());
 				ret.setResult(server.getListeningPort());
 			}
@@ -94,6 +105,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public IFuture<IWebSocketConnection> createConnection(String address, final IComponentIdentifier target)
 	{
+//		System.out.println("WS create connection to " + address);
 		WebSocketConnectionClient con = new WebSocketConnectionClient(address, target, handler);
 		return con.connect();
 	}
@@ -116,6 +128,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 */
 	public IFuture<Void> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
 	{
+//		System.out.println("send: " + Arrays.hashCode(header) + " " + Arrays.hashCode(body));
 		return con.sendMessage(header, body);
 	}
 }

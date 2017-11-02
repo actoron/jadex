@@ -3,6 +3,7 @@ package jadex.tools.awareness;
 /**
  *  The security service plugin is used to wrap the security panel as JCC plugin.
  */
+//TODO: duplicate: component vs service plugin? impl uses agent class, so drop service plugin
 public class AwarenessServicePlugin //extends AbstractServicePlugin
 {
 //	//-------- constants --------

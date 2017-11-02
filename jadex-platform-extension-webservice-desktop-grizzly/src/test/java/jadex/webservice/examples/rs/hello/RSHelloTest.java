@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -46,11 +48,17 @@ public class RSHelloTest //extends TestCase
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		publishService.get();
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
-//				"-componentfactory", "jadex.component.ComponentComponentFactory",
-//				"-conf", "jadex/platform/Platform.component.xml",
-				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
+
+		PlatformConfiguration config = PlatformConfiguration.getMinimal();
+		config.setTcpTransport(false);
+		config.setKernels(IRootComponentConfiguration.KERNEL.component, IRootComponentConfiguration.KERNEL.micro);
+		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
+//		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+////				"-componentfactory", "jadex.component.ComponentComponentFactory",
+////				"-conf", "jadex/platform/Platform.component.xml",
+//				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get();
 	}

@@ -3,7 +3,6 @@ package jadex.bridge.component.impl.remotecommands;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.IRemoteConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -11,7 +10,7 @@ import jadex.commons.future.IFuture;
 /**
  * Command for results.
  */
-public class RemoteResultCommand<T>	extends AbstractInternalRemoteCommand implements IRemoteConversationCommand<T>
+public class RemoteResultCommand<T>	extends AbstractResultCommand
 {
 	/** The result. */
 	protected T result;
@@ -50,7 +49,8 @@ public class RemoteResultCommand<T>	extends AbstractInternalRemoteCommand implem
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IFuture<T> future, IMsgSecurityInfos secinf)
+	@SuppressWarnings("unchecked")
+	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
 	{
 		if (exception!=null)
 			((Future<T>) future).setException(exception);

@@ -355,13 +355,11 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
 //				Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
 				List<TransportAddress> addr = SServiceProvider.getLocalService(agent, ITransportAddressService.class).getAddresses().get();
+				
 //				System.out.println("=====" + agent + "======");
-//				for (Map.Entry<String, String[]> entry : addr.entrySet())
+//				for (TransportAddress entry : addr)
 //				{
-//					for (String a : entry.getValue())
-//					{
-//						System.out.println("POST " + agent + " " + entry.getKey() + " : " + a);
-//					}
+//					System.out.println("POST " + agent + " " + entry);
 //				}
 //				System.out.println("=====" + agent + "======");
 				long leasetime = (Long)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");

@@ -37,7 +37,7 @@ jadex-gradle-plugin,,,,,,,,,X,,,,X
 jadex-integration-test,,X,X,,,,,,,,,,X
 jadex-integration-performance-test,,,,,,,,,,,,,X
 jadex-javaparser,X,X,X,X,,,,,,,,X,X
-jadex-json,,X,X,,,,,,,,,,X
+jadex-json,X,X,X,X,,,,,,,,,X
 jadex-kernel-application,,X,X,,,,,,,,,,X
 jadex-kernel-base,X,X,X,X,,,,,,,,,X
 jadex-kernel-bdibpmn,,,,,,,,,,,,,
@@ -55,10 +55,10 @@ jadex-kernel-microservice,X,X,X,X,,,,,,,,X,X
 jadex-model-bpmn,,X,X,X,,,,,,,,,X
 jadex-platform,X,X,X,X,,,,,,,,,X
 jadex-platform-android,,,,X,,,,,,,,,X
-jadex-platform-extension-management,,,X,,,,,X,,,,,X
+jadex-platform-extension-management,,X,X,,,,,X,,,,,X
 jadex-platform-extension-maven,,,X,,,,X,,,,,,X
-jadex-platform-extension-relaytransport,X,X,X,,,,,,,,,,X
-jadex-platform-extension-websockettransport,X,X,X,,,,,,,,,,X
+jadex-platform-extension-relaytransport,X,X,X,X,,,,,,,,,X
+jadex-platform-extension-websockettransport,X,X,X,X,,,,,,,,,X
 jadex-platform-extension-webservice,,,X,X,,X,,,,,,X,X
 jadex-platform-extension-webservice-android,,,,X,,,,,,,,,X
 jadex-platform-extension-webservice-desktop,,,X,,,X,,,,,,,X

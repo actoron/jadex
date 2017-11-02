@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -628,7 +627,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
-			if(!(SReflect.isAndroid() && (service instanceof Proxy))) 
+			if(!(SReflect.isAndroid() && ProxyFactory.isProxyClass(serclass)))
 			{
 				while(!Object.class.equals(serclass))
 				{

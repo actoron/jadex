@@ -35,14 +35,18 @@ public class TcpMessageBuffer
 	
 	/** The amount of data already read in the current array. */
 	protected int pos;
+	
+	/** Maximum message size. */
+	protected int maxsize;
 
 	//-------- constructors --------
 
 	/**
 	 *  Create a message buffer.
 	 */
-	public TcpMessageBuffer()
+	public TcpMessageBuffer(int maxsize)
 	{
+		this.maxsize = maxsize;
 		this.wb = ByteBuffer.allocateDirect(BUFFER_SIZE);
 		this.rb = wb.asReadOnlyBuffer();
 	}
@@ -103,8 +107,9 @@ public class TcpMessageBuffer
 	 *  Also adjusts the pos varaiable.
 	 *  @param data	The already read data, if any.
 	 *  @return	The maybe updated data array.
+	 * @throws IOException 
 	 */
-	protected byte[] readBytes(byte[] data)
+	protected byte[] readBytes(byte[] data) throws IOException
 	{
 		// First try to determine the data size if unknown (array==null)
 		// Need at least 4 size bytes, else NOP until more bytes available.
@@ -116,6 +121,14 @@ public class TcpMessageBuffer
 			bytes[2]	= rb.get();
 			bytes[3]	= rb.get();
 			int	len = SUtil.bytesToInt(bytes);
+			
+			// Size sanity check.
+			int remsize = maxsize;
+			if (header != null)
+				remsize -= header.length;
+			if (len < 0 || len > remsize)
+				throw new IOException("Transmitted message size outside limits: " + len);
+			
 			data	= new byte[len];
 			pos	= 0;
 		}

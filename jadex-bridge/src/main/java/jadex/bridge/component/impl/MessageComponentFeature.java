@@ -34,6 +34,7 @@ import jadex.bridge.component.streams.InputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.component.streams.StreamPacket;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
