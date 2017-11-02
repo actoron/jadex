@@ -1,5 +1,6 @@
 package jadex.platform.service.message.websockettransport;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +12,10 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketOpcode;
+import com.neovisionaries.ws.client.WebSocketState;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.threadpool.JadexExecutorServiceAdapter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransportHandler;
@@ -29,6 +32,9 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	/** The websocket. */
 	protected WebSocket websocket;
 	
+	/** Access to daemon thread pool for WS API */
+	protected JadexExecutorServiceAdapter execservice;
+	
 	/**
 	 *  Creates the connection.
 	 *  
@@ -39,6 +45,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	{
 		super(handler);
 		this.address = address;
+		execservice = new JadexExecutorServiceAdapter(pojoagent.getThreadPoolService());
 	}
 	
 	/**
@@ -53,7 +60,8 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		{
 			WebSocketFactory factory = new WebSocketFactory(); //.setConnectionTimeout(5000);
 			websocket = factory.createSocket("ws://" + address);
-			websocket.setPingInterval(idletimeout >>> 1);
+			websocket.setAutoFlush(true);
+			websocket.setPingInterval(pojoagent.getIdleTimeout() >>> 1);
 		}
 		catch (Exception e)
 		{
@@ -122,7 +130,8 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		    }
 		});
 		
-		websocket.connectAsynchronously();
+//		websocket.connectAsynchronously();
+		websocket.connect(execservice);
 		
 		return ret;
 	}
@@ -135,6 +144,8 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	 */
 	public IFuture<Void> sendMessage(byte[] header, byte[] body)
 	{
+		if (!WebSocketState.OPEN.equals(websocket.getState()))
+			return new Future<Void>(new IOException("Connection is not available."));
 //		System.out.println("SendClient: " + Arrays.hashCode(body) + " " + System.currentTimeMillis());
 		Future<Void> ret = new Future<Void>();
 		try
@@ -163,6 +174,22 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		if (websocket != null)
 		{
 			websocket.disconnect();
+			forceClose();
+		}
+	}
+	
+	/**
+	 *  Forcibly closes the connection (ignored if already closed).
+	 */
+	public void forceClose()
+	{
+		try
+		{
+			if (websocket != null && websocket.getSocket() != null)
+				websocket.getSocket().close();
+		}
+		catch (Exception e)
+		{
 		}
 	}
 	
@@ -184,7 +211,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		else
 		{
 			int offset = 0;
-			int count = data.length / maxpayload + 1;
+			int count = data.length / pojoagent.getMaximumPayloadSize() + 1;
 			
 			for (int i = 0; i < count; ++i)
 			{
@@ -200,7 +227,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 				else
 					wsf.setFin(false);
 				
-				int psize = Math.min(maxpayload, data.length - offset);
+				int psize = Math.min(pojoagent.getMaximumPayloadSize(), data.length - offset);
 				byte[] payload = new byte[psize];
 				System.arraycopy(data, offset, payload, 0, psize);
 				offset += psize;

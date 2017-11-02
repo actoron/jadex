@@ -18,17 +18,11 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 	/** Header saved for handling once body arrives. */
 	protected byte[] header;
 	
-	/** Total maximum message size. */
-	protected int totalmaxmsgsize;
-	
 	/** Current maximum message size. */
 	protected int maxmsgsize;
 	
-	/** Maximum payload size. */
-	protected int maxpayload;
-	
-	/** Idle connection timeout. */
-	protected int idletimeout = 60000;
+	/** The agent. */
+	protected WebSocketTransportAgent pojoagent;
 	
 	/** Current bytes received. */
 	protected int bytesreceived;
@@ -39,11 +33,8 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 	public AWebsocketConnection(ITransportHandler<IWebSocketConnection> handler)
 	{
 		this.handler = handler;
-		WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
- 		maxpayload = pojo.getMaximumPayloadSize();
- 		idletimeout = pojo.getIdleTimeout();
- 		totalmaxmsgsize = pojo.getMaximumMessageSize();
- 		maxmsgsize = totalmaxmsgsize; 
+		pojoagent = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		maxmsgsize = pojoagent.getMaximumMessageSize();
 	}
 	
 	/**
@@ -62,7 +53,7 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 				handler.messageReceived(this, header, payload);
 				header = null;
 				hasheader = false;
-				maxmsgsize = totalmaxmsgsize;
+				maxmsgsize = pojoagent.getMaximumMessageSize();
 			}
 			else
 			{

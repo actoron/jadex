@@ -20,4 +20,9 @@ public interface IWebSocketConnection
 	 *  Closes the connection (ignored if already closed).
 	 */
 	public void close();
+	
+	/**
+	 *  Forcibly closes the connection (ignored if already closed).
+	 */
+	public void forceClose();
 }
