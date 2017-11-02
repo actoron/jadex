@@ -852,18 +852,18 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		public void setTarget(IComponentIdentifier target)
 		{
-			synchronized(this)
+			synchronized(AbstractTransportAgent.this)
 			{
 				assert this.target == null;
 				this.target = target;
-			}
 
-			VirtualConnection virt = getVirtualConnection(target);
-			if(virt == null)
-			{
-				virt = createVirtualConnection(target);
+				VirtualConnection virt = getVirtualConnection(target);
+				if(virt == null)
+				{
+					virt = createVirtualConnection(target);
+				}
+				virt.addConnection(this);
 			}
-			virt.addConnection(this);
 		}
 
 		/**
