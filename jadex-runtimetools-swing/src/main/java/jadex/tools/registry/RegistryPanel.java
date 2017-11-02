@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -48,7 +47,6 @@ import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -203,7 +201,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtservices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pserinfos.add(BorderLayout.CENTER, new JScrollPane(jtservices));
 		jtservices.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtservices.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtservices.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
 		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
 		jtservices.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtservices.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
@@ -229,7 +227,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtqueries.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pqueryinfos.add(BorderLayout.CENTER, new JScrollPane(jtqueries));
 		jtqueries.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtqueries.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtqueries.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
 		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
 		jtqueries.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtqueries.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
@@ -258,7 +256,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtpartners.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		jtpartners.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ppartners.add(BorderLayout.CENTER, new JScrollPane(jtpartners));
-		jtpartners.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtpartners.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
 		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
 		
 		// create panel with partner table
@@ -271,7 +269,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtclients.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		jtclients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pclients.add(BorderLayout.CENTER, new JScrollPane(jtclients));
-		jtclients.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtclients.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
 		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
 		
 		tpane.addTab("Services", pserinfos);

@@ -336,12 +336,6 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	 */
 	public IFuture<Boolean> addAwarenessInfo(AwarenessInfo info)
 	{
-		// Reject infos without addresses.
-		if (info.getAddresses() == null || info.getAddresses().isEmpty())
-		{
-			return new Future<Boolean>(false);
-		}
-		
 //		System.out.println("new info " + info);
 		// Return if inital discovery.
 		boolean ret = false;
@@ -509,12 +503,23 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 	}
 	
 	/**
+	 *  Get the discovery info from local cache , if any.
+	 *  @param cid	The platform id.
+	 *  @return The discovery info.
+	 */
+	public IFuture<DiscoveryInfo> getCachedPlatformInfo(IComponentIdentifier cid)
+	{
+		return new Future<DiscoveryInfo>(discovered.get(cid));
+	}
+	
+	/**
 	 *  Get the discovery info for a platform, if any.
 	 *  @param cid	The platform id.
 	 *  @return The discovery info.
 	 */
 	public IFuture<DiscoveryInfo> getPlatformInfo(IComponentIdentifier cid)
 	{
+		// TODO: Trigger mechanisms.
 		return new Future<DiscoveryInfo>(discovered.get(cid));
 	}
 	

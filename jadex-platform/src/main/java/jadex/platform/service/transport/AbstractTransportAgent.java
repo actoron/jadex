@@ -38,7 +38,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -69,6 +68,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/** The port, the transport should listen to (&lt;0: don't listen, 0: choose random port, >0: use given port). */
 	@AgentArgument
 	protected int	port	= 0;
+	
+	/** Maximum size a message is allowed to have (including header). */
+	@AgentArgument
+	protected int maxmsgsize = 100*1024*1024;
 
 	// -------- internal attributes --------
 
@@ -269,6 +272,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public IFuture<Integer> isReady(final IMsgHeader header)
 	{
+//		agent.getLogger().severe("isReady");
 		final Future<Integer>	ret	= new Future<Integer>();
 		VirtualConnection	handler;
 		final IComponentIdentifier	target	= getTarget(header);
@@ -279,30 +283,36 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 		if(handler==null)
 		{
+//			agent.getLogger().severe("isReady no handler");
 			getAddresses(header).addResultListener(new ExceptionDelegationResultListener<String[], Integer>(ret)
 			{
 				public void customResultAvailable(String[] addresses) throws Exception
 				{
+//					agent.getLogger().severe("isReady got addresses: "+addresses);
+					VirtualConnection handler;
+					boolean	create	= false;
 					synchronized(AbstractTransportAgent.this)
 					{
-						VirtualConnection handler = getVirtualConnection(target);
-						if (handler == null)
+						handler = getVirtualConnection(target);
+						if(handler==null && addresses!=null && addresses.length>0)
 						{
-							if(addresses!=null && addresses.length>0)
-							{
-								handler	= createVirtualConnection(target);
-								handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
-								createConnections(handler, target, addresses);
-							}
-							else
-							{
-								ret.setException(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
-							}
+							handler	= createVirtualConnection(target);
+							create	= true;
 						}
-						else
-						{
-							handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
-						}
+					}
+					
+					if(create)
+					{
+						createConnections(handler, target, addresses);
+					}
+					
+					if(handler!=null)
+					{
+						handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));
+					}
+					else
+					{
+						ret.setException(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
 					}
 				}
 			});
@@ -310,6 +320,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 		else
 		{
+//			agent.getLogger().severe("isReady handler: "+handler);
 			handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
 		}
 		

@@ -23,6 +23,13 @@ public interface IAwarenessManagementService
 	public IFuture<Boolean> addAwarenessInfo(@Reference(local=true, remote=false) AwarenessInfo info);
 	
 	/**
+	 *  Get the discovery info from local cache , if any.
+	 *  @param cid	The platform id.
+	 *  @return The discovery info.
+	 */
+	public IFuture<DiscoveryInfo> getCachedPlatformInfo(IComponentIdentifier cid);
+	
+	/**
 	 *  Get the discovery info for a platform, if any.
 	 *  @param cid	The platform id.
 	 *  @return The discovery info.

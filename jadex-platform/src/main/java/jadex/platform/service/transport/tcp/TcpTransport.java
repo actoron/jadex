@@ -46,6 +46,9 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	/** Flag indicating the transport has been shut down.. */
 	protected boolean	shutdown;
 	
+	/** Maximum size a message is allowed to have (including header). */
+	protected int maxmsgsize;
+	
 	/** The NIO selector. */
 	protected Selector	selector;
 
@@ -54,6 +57,19 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	
 	/** The write tasks of data waiting to be written to a connection. */
 	protected Map<SocketChannel, List<Tuple2<ByteBuffer, Future<Void>>>>	writetasks;
+	
+	/** Daemon thread pool. */
+	protected IDaemonThreadPoolService tps;
+	
+	/**
+	 *  Creates the transport
+	 *  
+	 *  @param maxmsgsize Maximum size a message is allowed to have (including header).
+	 */
+	public TcpTransport(int maxmsgsize)
+	{
+		this.maxmsgsize = maxmsgsize;
+	}
 	
 	//-------- ITransport interface --------	
 
@@ -64,6 +80,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 */
 	public void	init(ITransportHandler<SocketChannel> handler)
 	{
+		tps = SServiceProvider.getLocalService(handler.getAccess(), IDaemonThreadPoolService.class, false);
 		this.handler	= handler;
 	}
 		
@@ -395,7 +412,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		
 		if(start)
 		{
-			IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(handler.getAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//			IDaemonThreadPoolService	tps	= SServiceProvider.getLocalService(handler.getAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 			tps.execute(new Runnable()
 			{
 				public void run()
@@ -563,7 +580,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 			TcpMessageBuffer	buf	= (TcpMessageBuffer)key.attachment();
 			if(buf==null)
 			{
-				buf	= new TcpMessageBuffer();
+				buf	= new TcpMessageBuffer(maxmsgsize);
 				key.attach(buf);
 			}
 			

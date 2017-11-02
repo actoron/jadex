@@ -11,6 +11,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -20,6 +21,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.testcases.TestAgent;
@@ -30,6 +32,7 @@ import jadex.micro.testcases.TestAgent;
 @Service
 @Agent
 @ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateService
 {
 	//-------- attributes --------
@@ -65,7 +68,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			tc.setTestCount(3);
 		}
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
@@ -73,13 +76,13 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			{
 				if(!SReflect.isAndroid()) 
 				{
-					agent.getLogger().severe("Testagent test remote1: "+agent.getComponentDescription());
+//					agent.getLogger().severe("Testagent test remote1: "+agent.getComponentDescription());
 					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
-							agent.getLogger().severe("Testagent test remote2: "+agent.getComponentDescription());
+//							agent.getLogger().severe("Testagent test remote2: "+agent.getComponentDescription());
 							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
 							// keep future open -> is set in check finished.
 						}
@@ -102,9 +105,9 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-//		System.out.println("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
+//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()),
+		waitForRealtimeDelay(Starter.getScaledRemoteDefaultTimeout(agent.getComponentIdentifier(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -122,17 +125,17 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public void terminated(Exception reason)
 			{
-//				System.out.println("test2: "+report.getDescription());
+//				agent.getLogger().severe("test2: "+report.getDescription());
 				
 				if(report.getReason()==null)
 				{
 					report.setSucceeded(true);
-					checkFinished();
 				} 
 				else 
 				{
 					report.setFailed(reason.getMessage());
 				}
+				checkFinished();
 			}
 		});
 		
@@ -155,24 +158,19 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	
 	protected void	checkFinished()
 	{
-		boolean	finished = false;
-		if(SReflect.isAndroid()) 
+		boolean	finished = reports.size()==tc.getTestCount();
+		for(TestReport report: reports)
 		{
-			finished = reports.size()==1 && reports.get(0).isFinished();
-		} 
-		else 
-		{
-			finished = reports.size()==3
-				&& reports.get(0).isFinished()
-				&& reports.get(1).isFinished()
-				&& reports.get(2).isFinished();
+			finished = finished && report.isFinished();
 		}
 
-//		System.out.println("test4: "+reports.size()+", "+finished);
+//		agent.getLogger().severe("test4: "+reports.size()+", "+finished);
 
 		if(finished)
 		{
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
+//			agent.getLogger().severe("test5: "+tc);
+			System.out.println("Auto terminate result: "+tc);
 			ret.setResult(null);
 		}
 	}
@@ -191,6 +189,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 //		config1.setAwaMechanisms(AWAMECHANISM.local);
 //		config1.setAwareness(true);
 		config1.setTcpTransport(true);
+		config1.setWsTransport(true);
 		config1.addComponent(AutoTerminateAgent.class);
 		Starter.createPlatform(config1).get();
 	}

@@ -1,6 +1,5 @@
 package jadex.platform.service.message.relaytransport;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -30,6 +30,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -74,6 +75,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 		@ProvidedService(type=IRoutingService.class, name="routing")
 })
 @Features(additional=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
+@Service
 public class RelayTransportAgent implements ITransportService, IRoutingService
 {
 	/** True/false if the transport allows forwarding. */
@@ -104,7 +106,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected static final long MAX_ROUTING_SERVICE_DELAY = 3000;
 	
 	/** Transport priority = low */
-	protected static final int PRIORITY = (Integer.MIN_VALUE >>> 1);
+	protected static final int PRIORITY = Integer.MIN_VALUE / 2;
 	
 	/** The agent. */
 	@Agent
@@ -296,23 +298,26 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					IMessageFeature msgfeat = ia.getComponentFeature(IMessageFeature.class);
 					if (keepaliveconnections.size() < keepalivecount)
 					{
-						keepaliveconnections.clear();
 						for (final IComponentIdentifier id : relays)
 						{
-							System.out.println("Sending to " + id);
-							msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
+							if (!keepaliveconnections.contains(id))
 							{
-								public void resultAvailable(Object result)
+								System.out.println("Sending to " + id);
+								msgfeat.sendMessageAndWait(id, new Ping()).addResultListener(new IResultListener<Object>()
 								{
-									System.out.println("Got answer " + id);
-									if (keepaliveconnections.size() < keepalivecount)
-										keepaliveconnections.add(id);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-								}
-							});
+									public void resultAvailable(Object result)
+									{
+										System.out.println("Got answer " + id);
+										if (keepaliveconnections.size() < keepalivecount)
+											keepaliveconnections.add(id);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										System.out.println("Got exception:  " + exception);
+									}
+								});
+							}
 						}
 					}
 					else
@@ -353,6 +358,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		IComponentIdentifier sender = (IComponentIdentifier) header.getProperty(IMsgHeader.SENDER);
 		IComponentIdentifier rec = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
+		agent.getLogger().info("Relay is ready: "+rec);
 		if ("relay".equals(rec.getRoot().toString()))
 			return new Future<Integer>(new Exception());
 		if (agent.getComponentIdentifier().equals(sender) || relays.contains(rec.getRoot()))
@@ -365,25 +371,30 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IComponentIdentifier destination = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
+					final IComponentIdentifier destination = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
+					agent.getLogger().info("Relay discover route: "+destination);
 					discoverRoute(destination, new LinkedHashSet<IComponentIdentifier>()).addIntermediateResultListener(new IIntermediateResultListener<Integer>()
 					{
 						public void exceptionOccurred(Exception exception)
 						{
+							agent.getLogger().info("Relay discover route exception: "+destination+", "+exception);
 							ret.setException(exception);
 						}
 						
 						public void resultAvailable(Collection<Integer> result)
 						{
+							agent.getLogger().info("Relay discover route result: "+destination+", "+result);
 						}
 						
 						public void intermediateResultAvailable(Integer result)
 						{
+							agent.getLogger().info("Relay discover route intermediate result: "+destination+", "+result);
 							ret.setResult(PRIORITY);
 						}
 						
 						public void finished()
 						{
+							agent.getLogger().info("Relay discover route finished: "+destination);
 						}
 					});
 					return IFuture.DONE;
@@ -503,7 +514,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (hops.contains(agent.getComponentIdentifier()) || hops.size() + 1 > maxhops)
 		{
 			ret.setException(new IllegalStateException("Loop detected or TTL exceeded."));
-			ret.setFinished();
 			return ret;
 		}
 		
@@ -546,7 +556,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					final int[] count = new int[1];
 					count[0] = routingservices.size();
 					
-					for (Map.Entry<IComponentIdentifier, IRoutingService> routingsrv : routingservices.entrySet())
+					for (final Map.Entry<IComponentIdentifier, IRoutingService> routingsrv : routingservices.entrySet())
 					{
 						final IComponentIdentifier routetarget = routingsrv.getKey();
 						routingsrv.getValue().discoverRoute(destination, newhops).addIntermediateResultListener(new IIntermediateResultListener<Integer>()
@@ -556,14 +566,17 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							
 							public void exceptionOccurred(Exception exception)
 							{
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" routing exception: "+exception);
 							}
 							
 							public void resultAvailable(Collection<Integer> result)
 							{
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" result available: "+result);
 							}
 							
 							public void intermediateResultAvailable(Integer result)
 							{
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" intermediate result available: "+result);
 								++result;
 								routefound = true;
 								synchronized(routes)
@@ -577,6 +590,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							
 							public void finished()
 							{
+								agent.getLogger().info("Relay "/*+routingsrv.getValue()*/+" finished.");
 								--count[0];
 								if (count[0] == 0)
 								{
@@ -601,8 +615,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					{
 						if (!forwarding)
 						{
-							ret.setException(new RuntimeException("No route found."));
-							ret.setFinished();
+							ret.setException(new RuntimeException("No route found: "+exception));
 							return;
 						}
 						
@@ -699,7 +712,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			RemoteReference rr = new RemoteReference(relay, si);
 			ProxyReference pr = new ProxyReference(pi, rr);
 			
-			ret = (IRoutingService) Proxy.newProxyInstance(agent.getClassLoader(), 
+			ret = (IRoutingService) ProxyFactory.newProxyInstance(agent.getClassLoader(), 
 				interfaces, new RemoteMethodInvocationHandler(agent, pr));
 			
 			routingservicecache.put(relay, ret);

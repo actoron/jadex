@@ -12,7 +12,7 @@ import jadex.commons.future.IntermediateFuture;
 /**
  * Command for intermediate results.
  */
-public class RemoteIntermediateResultCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteConversationCommand<Collection<T>>
+public class RemoteIntermediateResultCommand<T>	extends AbstractResultCommand
 {
 	/** The result. */
 	protected T result;
@@ -39,7 +39,8 @@ public class RemoteIntermediateResultCommand<T>	extends AbstractInternalRemoteCo
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IFuture<Collection<T>> future, IMsgSecurityInfos secinf)
+	@SuppressWarnings("unchecked")
+	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
 	{
 		((IntermediateFuture<T>)future).addIntermediateResult(result);
 	}

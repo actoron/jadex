@@ -1,7 +1,6 @@
 package jadex.platform.service.serialization;
 
-import java.lang.reflect.Proxy;
-
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 
 
@@ -16,7 +15,7 @@ public class DefaultEqualsMethodReplacement implements IMethodReplacement
 	public Object invoke(Object obj, Object[] args)
 	{
 		// Todo: compare proxy infos instead of invocation handlers?
-		return Boolean.valueOf(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
-			&& Proxy.getInvocationHandler(obj).equals(Proxy.getInvocationHandler(args[0])));
+		return Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
+			&& ProxyFactory.getInvocationHandler(obj).equals(ProxyFactory.getInvocationHandler(args[0])));
 	}
 }

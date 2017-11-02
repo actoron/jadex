@@ -6,14 +6,13 @@ import java.util.Map;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketCloseCode;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketOpcode;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.commons.SConfigParser;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransportHandler;
@@ -58,7 +57,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			ret.setException(e);
 			return ret;
 		}
@@ -74,6 +73,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 				catch (SocketException e)
 				{
 				}
+//				System.out.println("Connected: " + address);
 				ret.setResult(WebSocketConnectionClient.this);
 			}
 			
@@ -84,39 +84,42 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 			
 			public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception
 			{
-//				System.out.println("Binary msg size: " + (binary != null ? String.valueOf(binary.length) : "null"));
-				handleFramePayload(binary);
+//				System.out.println("Client Binary msg size: " + (binary != null ? String.valueOf(binary.length) : "null"));
+				handleMessagePayload(binary);
 			}
 			
-//			@Override
-//			public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception
-//			{
-//				System.out.println("Cl frame op: " + frame.getOpcode());
-//				super.onFrame(websocket, frame);
-//			}
-//			
-//			public void onBinaryFrame(WebSocket websocket, WebSocketFrame frame) throws Exception
-//			{
-//				System.out.println("cl " + frame.getPayloadLength() + " " + WebSocketConnectionClient.this.hashCode() + " frame op: " + frame.getOpcode());
-//				handleFramePayload(frame.getPayload());
-//			}
-			
-//			public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception
-//			{
-////				System.out.println("RecClient: " + Arrays.hashCode(binary) + " " + System.currentTimeMillis());
-//				handleFramePayload(binary);
-//			}
+			/** Message size check. */
+			public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception
+			{
+				if (frame.getOpcode() == WebSocketOpcode.TEXT)
+				{
+					websocket.disconnect(WebSocketCloseCode.UNACCEPTABLE);
+				}
+				else
+				{
+					if (frame.getOpcode() == WebSocketOpcode.BINARY ||
+						frame.getOpcode() == WebSocketOpcode.CONTINUATION)
+					{
+						bytesreceived += frame.getPayload() == null ? 0 : frame.getPayload().length;
+						
+						if (bytesreceived > maxmsgsize)
+						{
+							websocket.disconnect(WebSocketCloseCode.OVERSIZE);
+						}
+						else
+						{
+							if (frame.getFin())
+								bytesreceived = 0;
+						}
+					}
+				}
+			}
 			
 			public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception
 		    {
-				exception.printStackTrace();
+//				exception.printStackTrace();
 				ret.setException(exception);
 		    }
-			
-//			public void onCloseFrame(WebSocket websocket, WebSocketFrame frame) throws Exception
-//			{
-//				handler.connectionClosed(WebSocketConnectionClient.this, null);
-//			}
 		});
 		
 		websocket.connectAsynchronously();
@@ -138,18 +141,6 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		{
 			synchronized(this)
 			{
-//				System.out.println("Sending cl: " + address);
-//				WebSocketFrame wsf = new WebSocketFrame();
-//				wsf.setOpcode(WebSocketOpcode.BINARY);
-//				wsf.setFin(true);
-//				wsf.setPayload(header);
-//				websocket.sendFrame(wsf);
-//				wsf = new WebSocketFrame();
-//				wsf.setOpcode(WebSocketOpcode.BINARY);
-//				wsf.setFin(true);
-//				wsf.setPayload(body);
-//				websocket.sendFrame(wsf);
-//				websocket.sendBinary(SUtil.mergeData(header, body));
 				sendAsFrames(header);
 				sendAsFrames(body);
 				websocket.flush();
@@ -159,7 +150,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		catch (Exception e)
 		{
 			ret.setException(e);
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return ret;
 	}

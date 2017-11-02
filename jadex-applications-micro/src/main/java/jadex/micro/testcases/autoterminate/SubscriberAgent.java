@@ -51,7 +51,7 @@ public class SubscriberAgent
 	@AgentBody
 	public void	body(final IInternalAccess agent)
 	{
-//		System.out.println("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
+//		agent.getLogger().severe("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
 		SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new IResultListener<IAutoTerminateService>()
@@ -67,16 +67,16 @@ public class SubscriberAgent
 				{
 					public void intermediateResultAvailable(String result)
 					{
-//						System.out.println("subscribed "+agent.getComponentIdentifier());
+//						agent.getLogger().severe("subscribed "+agent.getComponentIdentifier());
 						
 						if("platform".equals(agent.getConfiguration()))
 						{
-//							System.out.println("destroy platform: "+agent.getComponentIdentifier().getRoot());
+//							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
 							cms.destroyComponent(agent.getComponentIdentifier().getRoot());
 						}
 						else
 						{
-//							System.out.println("destroy comp: "+agent.getComponentIdentifier());
+//							agent.getLogger().severe("destroy comp: "+agent.getComponentIdentifier());
 							agent.killComponent();
 						}
 					}

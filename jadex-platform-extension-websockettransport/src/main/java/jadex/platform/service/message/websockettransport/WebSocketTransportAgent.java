@@ -18,6 +18,11 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	@AgentArgument
 	protected int idletimeout = 60000;
 	
+	public WebSocketTransportAgent()
+	{
+		priority = 500;
+	}
+	
  	/**
  	 *  Get the transport implementation
  	 */
@@ -25,6 +30,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
  	{
  		return new WebSocketTransport();
  	}
+ 	
  	/**
  	 *  Gets the maximum size of websocket frame payloads.
  	 * 
@@ -33,6 +39,16 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
  	public int getMaximumPayloadSize()
  	{
  		return maxpayload;
+ 	}
+ 	
+ 	/**
+ 	 *  Gets the maximum message size of websocket messages.
+ 	 * 
+ 	 *  @return Maximum message size of websocket messages. 
+ 	 */
+ 	public int getMaximumMessageSize()
+ 	{
+ 		return maxmsgsize;
  	}
  	
  	/**

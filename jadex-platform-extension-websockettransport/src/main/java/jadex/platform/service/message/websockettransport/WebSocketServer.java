@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import fi.iki.elonen.NanoWSD;
-import fi.iki.elonen.NanoHTTPD.ClientHandler;
 import jadex.platform.service.transport.ITransportHandler;
 
 /**

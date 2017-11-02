@@ -14,6 +14,6 @@ public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 	 */
 	public ITransport<SocketChannel>	createTransportImpl()
 	{
-		return new TcpTransport();
+		return new TcpTransport(maxmsgsize);
 	}
 }

@@ -29,11 +29,60 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 		super(handlr);
 		websocket = new WebSocket(handshakerequest)
 		{
+			/** Flag if connected. */
+			protected boolean connected = false;
+			
+			/**
+			 *  Intercept package to count total received message size.
+			 */
+			protected void debugFrameReceived(WebSocketFrame frame)
+			{
+				if (frame.getOpCode().equals(OpCode.Text))
+				{
+					try
+					{
+						this.close(CloseCode.UnsupportedData, "Text not supported.", false);
+					}
+					catch (IOException e)
+					{
+					}
+				}
+				else
+				{
+					if (frame.getOpCode().equals(OpCode.Binary) ||
+						frame.getOpCode().equals(OpCode.Continuation))
+					{
+						bytesreceived += frame.getBinaryPayload() == null ? 0 : frame.getBinaryPayload().length;
+						
+						if (bytesreceived > maxmsgsize)
+						{
+							try
+							{
+								this.close(CloseCode.MessageTooBig, "Maxmimum message size exceeded.", false);
+							}
+							catch (IOException e)
+							{
+							}
+						}
+						else
+						{
+							if (frame.isFin())
+								bytesreceived = 0;
+						}
+					}
+				}
+				super.debugFrameReceived(frame);
+			}
+			
 			/**
 			 *  Called on open.
 			 */
 			protected void onOpen()
 			{
+				synchronized (this)
+				{
+					connected = true;
+				}
 				handler.connectionEstablished(WebSocketConnectionServer.this);
 //				System.out.println("srv conn open");
 			}
@@ -43,7 +92,17 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			 */
 			protected void onClose(CloseCode code, String reason, boolean initiatedByRemote)
 			{
-				handler.connectionClosed(WebSocketConnectionServer.this, null);
+				boolean notify = false;
+				synchronized (this)
+				{
+					if (connected)
+					{
+						connected = false;
+						notify = true;
+					}
+				}
+				if (notify)
+					handler.connectionClosed(WebSocketConnectionServer.this, null);
 //				System.out.println("srv conn closed: " + reason);
 			}
 			
@@ -52,7 +111,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			 */
 			protected void onMessage(WebSocketFrame message)
 			{
-//				System.out.println("srv frame op: " + message.getOpCode() + " " + message.isFin());
+//				System.out.println("srv msg op: " + message.getOpCode() + " " + message.isFin());
 				byte[] payload = null;
 				if (message.getOpCode().equals(OpCode.Binary))
 				{
@@ -68,7 +127,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 				if (payload != null)
 				{
 //					System.out.println("RecServer: " + Arrays.hashCode(payload) + " " + System.currentTimeMillis());
-					handleFramePayload(payload);
+					handleMessagePayload(payload);
 				}
 			}
 			
@@ -84,7 +143,14 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			 */
 			protected void onException(IOException exception)
 			{
-				handler.connectionClosed(WebSocketConnectionServer.this, exception);
+				try
+				{
+					this.close(CloseCode.AbnormalClosure, exception.toString(), false);
+				}
+				catch (IOException e)
+				{
+				}
+//				handler.connectionClosed(WebSocketConnectionServer.this, exception);
 			}
 		};
 	}
