@@ -1,6 +1,7 @@
 package jadex.platform;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 
 /**
  *  Example specialization of service starter to allow java-based configuration settings
@@ -11,9 +12,9 @@ public class TimeServiceStarter extends ServiceStarter
 	 *  Time provider daemon platform configuration. 
 	 */
 	@Override
-	protected PlatformConfiguration getConfig()
+	protected IPlatformConfiguration getConfig()
 	{
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimalRelayAwareness();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalRelayAwareness();
 		config.addComponent("jadex.micro.quickstart.TimeProviderAgent.class");
 		return config;
 	}

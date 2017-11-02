@@ -6,8 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import jadex.base.IStarterConfiguration;
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -342,7 +341,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		if (header.getProperty(FORWARD_DEST) == null)
 		{
-			ISerializationServices serserv = (ISerializationServices) PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier().getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			byte[] bheader = serserv.encode(header, agent, header);
 			
 			newbody = SUtil.mergeData(bheader, body);
@@ -356,7 +355,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			List<byte[]> unpacked = SUtil.splitData(newbody);
 			byte[] bheader = unpacked.get(0);
-			ISerializationServices serserv = (ISerializationServices) PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier().getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			newheader = (IMsgHeader) serserv.decode(null, agent, bheader);
 			newheader.addProperty(FORWARD_DEST, newheader.getProperty(IMsgHeader.RECEIVER));
 			newbody = unpacked.get(1);

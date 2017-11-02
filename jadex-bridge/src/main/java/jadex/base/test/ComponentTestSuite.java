@@ -23,7 +23,7 @@ import java.util.zip.ZipFile;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -249,7 +249,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			args = newargs;
 		}
 		
-		PlatformConfiguration conf = PlatformConfiguration.processArgs(args);
+		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
 		this.timeout	= conf.getLocalDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();

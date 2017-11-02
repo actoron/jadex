@@ -12,14 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -32,7 +30,6 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -263,7 +260,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		networks = new HashMap<String, AbstractAuthenticationSecret>();
-		networknames = (Set<String>)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		networknames = (Set<String>)Starter.getPlatformValue(agent.getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
 		for(Map.Entry<String, String> entry : networkprops.entrySet())
 		{
 			networks.put(entry.getKey(), AbstractAuthenticationSecret.fromString(entry.getValue()));

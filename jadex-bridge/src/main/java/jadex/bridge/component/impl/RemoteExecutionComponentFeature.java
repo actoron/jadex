@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -120,7 +120,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		final String rxid = SUtil.createUniqueId("");
 //		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
-		final long ftimeout	= timeout!=null ? timeout.longValue() : PlatformConfiguration.getRemoteDefaultTimeout(getComponent().getComponentIdentifier());
+		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier());
 		
 		// TODO: Merge with DecouplingInterceptor code.
 		@SuppressWarnings("unchecked")

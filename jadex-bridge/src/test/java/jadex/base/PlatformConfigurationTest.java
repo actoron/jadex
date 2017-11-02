@@ -4,43 +4,50 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class PlatformConfigurationTest {
 
-    private PlatformConfiguration config;
+public class PlatformConfigurationTest
+{
+	private IPlatformConfiguration config;
 
-    @Before
-    public void setUp() {
-        config = PlatformConfiguration.getDefault();
-    }
+	@Before
+	public void setUp()
+	{
+		config = PlatformConfigurationHandler.getDefault();
+	}
 
-    @Test
-    public void testInitialValue() {
-        boolean gui = config.getGui();
+	@Test
+	public void testInitialValue()
+	{
+		boolean gui = config.getGui();
 
-        assertTrue(gui);
+		assertTrue(gui);
 
-    }
+	}
 
-    @Test
-    public void testSetAndGet() {
-        config.setRsPublish(true);
+	@Test
+	public void testSetAndGet()
+	{
+		config.setRsPublish(true);
 
-        boolean rsPublish = config.getRsPublish();
-        assertTrue(rsPublish);
-    }
+		boolean rsPublish = config.getRsPublish();
+		assertTrue(rsPublish);
+	}
 
 
-    @Test
-    public void testParse() {
-        PlatformConfiguration config = PlatformConfiguration.processArgs(new String[]{"-gui", "false", "-rspublish", "true"});
-        assertTrue(config.getRsPublish());
-        assertFalse(config.getGui());
-    }
+	@Test
+	public void testParse()
+	{
+		IPlatformConfiguration config = Starter.processArgs(new String[]{"-gui", "false", "-rspublish", "true"});
+		assertTrue(config.getRsPublish());
+		assertFalse(config.getGui());
+	}
 
-    @Test
-    public void testKernels() {
-        RootComponentConfiguration.KERNEL[] kernels = config.getRootConfig().getKernels();
-        assertTrue(kernels.length > 0);
-    }
+	@Test
+	public void testKernels()
+	{
+//		IRootComponentConfiguration.KERNEL[] kernels = config.getRootConfig().getKernels();
+		String[] kernels = config.getRootConfig().getKernels();
+		assertTrue(kernels.length > 0);
+	}
 
 }

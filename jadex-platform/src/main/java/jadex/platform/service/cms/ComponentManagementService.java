@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
@@ -179,7 +178,7 @@ public class ComponentManagementService implements IComponentManagementService
 		
 //		this.components = SCollection.createHashMap();
 		components = Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>());
-		PlatformConfiguration.putPlatformValue(access.getInternalAccess().getComponentIdentifier(), PlatformConfiguration.DATA_COMPONENTMAP, components);
+		Starter.putPlatformValue(access.getInternalAccess().getComponentIdentifier(), Starter.DATA_COMPONENTMAP, components);
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
@@ -2156,7 +2155,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(cid.getRoot().equals(cid))
 			{
 //				System.out.println("removed: "+cid);
-				PlatformConfiguration.removePlatformMemory(cid);
+				Starter.removePlatformMemory(cid);
 			}
 //		}
 //		catch(Throwable t)

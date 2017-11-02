@@ -34,6 +34,8 @@ import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
 import static jadex.base.IRootComponentConfiguration.PERSIST;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
+import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
+import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
 import static jadex.base.IRootComponentConfiguration.RSPUBLISHCOMPONENT;
 import static jadex.base.IRootComponentConfiguration.SAVEONEXIT;
@@ -56,13 +58,12 @@ import static jadex.base.IRootComponentConfiguration.VALIDITYDURATION;
 import static jadex.base.IRootComponentConfiguration.VIRTUALNAMES;
 import static jadex.base.IRootComponentConfiguration.WELCOME;
 import static jadex.base.IRootComponentConfiguration.WSPUBLISH;
-import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
-import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
 
 import java.util.Map;
 import java.util.logging.Level;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -110,10 +111,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
  */
 @Arguments(
 {
-	@Argument(name=PlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
-	@Argument(name=PlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name=PlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
-	@Argument(name=PlatformConfiguration.PLATFORM_COMPONENT, clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
+	@Argument(name=IPlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name=IPlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name=IPlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
+	@Argument(name=IPlatformConfiguration.PLATFORM_COMPONENT, clazz=ClassInfo.class, defaultvalue="new jadex.bridge.ClassInfo(jadex.platform.service.cms.PlatformComponent.class)"),
 	@Argument(name=WELCOME, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=PROGRAM_ARGUMENTS, clazz=String[].class),
 	
@@ -271,7 +272,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Configuration(name="auto", arguments={
 		@NameValue(name=TCPPORT, value="0"),
 //		@NameValue(name=SSLTCPPORT, value="0"),
-		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+		@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 //		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 //		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
@@ -422,7 +423,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
 //		@NameValue(name=SSLTCPPORT, value="0"),
-		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+		@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
 			@NameValue(name="libpath", value="$args.libpath"),

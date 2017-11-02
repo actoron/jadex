@@ -1,6 +1,7 @@
 package jadex.examples.docs;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 
 public class GettingStarted {
@@ -12,7 +13,7 @@ public class GettingStarted {
 //    }
 
     public static void main(String[] args) {
-        PlatformConfiguration   config  = PlatformConfiguration.getDefault();
+        IPlatformConfiguration   config  = PlatformConfigurationHandler.getDefault();
         config.addComponent(Components.MyAgent.class);
         Starter.createPlatform(config).get();
     }

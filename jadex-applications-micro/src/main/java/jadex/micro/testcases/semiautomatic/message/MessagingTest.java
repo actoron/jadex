@@ -2,8 +2,9 @@ package jadex.micro.testcases.semiautomatic.message;
 
 import java.util.Collections;
 
-import jadex.base.IRootComponentConfiguration.AWAMECHANISM;
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -26,11 +27,11 @@ public class MessagingTest
 	public static void main(String[] args) throws Exception
 	{
 		// Shared platform config.
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 //		config.setLogging(true);
 //		config.setDefaultTimeout(-1);
 		config.setSecurity(true);
-		config.setAwaMechanisms(AWAMECHANISM.local);
+		config.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_LOCAL);
 		config.setAwareness(true);
 		config.setTcpTransport(true);
 //		config.setNetworkName("remotemessagetest");

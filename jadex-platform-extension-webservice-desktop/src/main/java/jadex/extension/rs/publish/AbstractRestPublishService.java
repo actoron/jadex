@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -41,13 +40,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
-//import org.objectweb.asm.ClassReader;
-//import org.objectweb.asm.Type;
-//import org.objectweb.asm.tree.ClassNode;
-//import org.objectweb.asm.tree.LocalVariableNode;
-//import org.objectweb.asm.tree.MethodNode;
-
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
@@ -75,7 +68,6 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -84,7 +76,6 @@ import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -98,7 +89,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 {
 	/** Async context info. */
 	public static final String ASYNC_CONTEXT_INFO = "__cinfo";
-	
 	
 	/** Http header for the call id. */
 	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
@@ -192,7 +182,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters.add(MediaType.TEXT_PLAIN, tostrc);
 		converters.add("*/*", tostrc);
     	
-    	final Long to = (Long)PlatformConfiguration.getPlatformValue(component.getComponentIdentifier(), PlatformConfiguration.DATA_DEFAULT_REMOTE_TIMEOUT);
+    	final Long to = (Long)Starter.getPlatformValue(component.getComponentIdentifier(), Starter.DATA_DEFAULT_REMOTE_TIMEOUT);
 		System.out.println("Using default client timeout: "+to);
     	
     	requestspercall = new MultiCollection<String, AsyncContext>()

@@ -6,62 +6,84 @@ import java.util.logging.Level;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 
-public interface IRootComponentConfiguration {
+/**
+ *  Interface for configuring the root component, i.e. platform.
+ */
+public interface IRootComponentConfiguration 
+{
+	/** Kernel constants. */
+	public static final String KERNEL_COMPONENT = "component";
+	public static final String KERNEL_APPLICATION = "application";
+	public static final String KERNEL_MICRO = "micro";
+	public static final String KERNEL_BPMN = "bpmn";
+	public static final String KERNEL_BDIV3 = "bdiv3";
+	public static final String KERNEL_BDI = "bdi";
+	public static final String KERNEL_BDIBPMN = "bdibpmn";
+	public static final String KERNEL_MULTI = "multi";
+	
+	/** Awareness mechanisms. */
+	public static final String AWAMECHANISM_BROADCAST = "broadcast";
+	public static final String AWAMECHANISM_MULTICAST = "multicast";
+	public static final String AWAMECHANISM_MESSAGE = "message";
+	public static final String AWAMECHANISM_RELAY = "relay";
+	public static final String AWAMECHANISM_LOCAL = "local";
+	public static final String AWAMECHANISM_REGISTRY = "registry";
+	public static final String AWAMECHANISM_SCANNER = "scanner";
+	
+//    /**
+//     * Kernel names enum.
+//     */
+//    public enum KERNEL
+//    {
+//        component, micro, bpmn, v3, bdi, bdibpmn, multi
+//    }
 
-    /**
-     * Kernel names enum.
-     */
-    public enum KERNEL
-    {
-        component, micro, bpmn, v3, bdi, bdibpmn, multi
-    }
-
-    /**
-     * Discovery names enum.
-     */
-    public enum AWAMECHANISM
-    {
-        /**
-         * Uses IPv4 broadcast to announce awareness infos in local networks.
-         * Default Port used is 55670.
-         */
-        broadcast,
-        /**
-         * Uses IPv4 Multicast to find other platforms.
-         * Default multicast address used is 224.0.0.0, port 5567.
-         */
-        multicast,
-        /**
-         * Message discovery allows detecting other platforms upon message reception.
-         * This helps especially if network connection is assymatric, e.g. one platform can
-         * find the other (and send messages) but not vice versa.
-         */
-        message,
-        /**
-         * The Relay discovery is the most robust discovery variant. It uses an external
-         * web server as relay where each platform registers. It is possible to set-up a self-hosted
-         * relay server, but per default, https://activecomponents.org/relay is used.
-         */
-        relay,
-        /**
-         * The local discovery uses a file-based mechanism to detect platforms running on the same host.
-         */
-        local,
-        /**
-         * The Registry mechanism implements a master-slave mechanism, where one platform is
-         * the registry. Other platforms that have this mechanism enabled register themselves
-         * and the registry distributes awareness info to all registered platforms.
-         * All RegistryDiscoveryAgents have to be parameterized with the same ip address
-         * (of the registry).
-         */
-        registry,
-        /**
-         * The IP-Scanner discovery mechanism sends out awareness infos to all IP addresses within the
-         * local network (using port 55668)
-         */
-        scanner,
-        // bluetooth
-    }
+//    /**
+//     * Discovery names enum.
+//     */
+//    public enum AWAMECHANISM
+//    {
+//        /**
+//         * Uses IPv4 broadcast to announce awareness infos in local networks.
+//         * Default Port used is 55670.
+//         */
+//        broadcast,
+//        /**
+//         * Uses IPv4 Multicast to find other platforms.
+//         * Default multicast address used is 224.0.0.0, port 5567.
+//         */
+//        multicast,
+//        /**
+//         * Message discovery allows detecting other platforms upon message reception.
+//         * This helps especially if network connection is assymatric, e.g. one platform can
+//         * find the other (and send messages) but not vice versa.
+//         */
+//        message,
+//        /**
+//         * The Relay discovery is the most robust discovery variant. It uses an external
+//         * web server as relay where each platform registers. It is possible to set-up a self-hosted
+//         * relay server, but per default, https://activecomponents.org/relay is used.
+//         */
+//        relay,
+//        /**
+//         * The local discovery uses a file-based mechanism to detect platforms running on the same host.
+//         */
+//        local,
+//        /**
+//         * The Registry mechanism implements a master-slave mechanism, where one platform is
+//         * the registry. Other platforms that have this mechanism enabled register themselves
+//         * and the registry distributes awareness info to all registered platforms.
+//         * All RegistryDiscoveryAgents have to be parameterized with the same ip address
+//         * (of the registry).
+//         */
+//        registry,
+//        /**
+//         * The IP-Scanner discovery mechanism sends out awareness infos to all IP addresses within the
+//         * local network (using port 55668)
+//         */
+//        scanner,
+//        // bluetooth
+//    }
 
     /** Tell starter to print welcome message. **/
     public static final String	WELCOME				= "welcome";								// class:
@@ -75,7 +97,7 @@ public interface IRootComponentConfiguration {
     public static final String	PLATFORM_ACCESS		= "platformaccess";
 
     /** The component factory instance. */
-    public static final String	COMPONENT_FACTORY	= StarterConfiguration.COMPONENT_FACTORY;
+    public static final String	COMPONENT_FACTORY	= IStarterConfiguration.COMPONENT_FACTORY;
 
     /** The saved program arguments. **/
     public static final String	PROGRAM_ARGUMENTS	= "programarguments";						// class:
@@ -475,12 +497,12 @@ public interface IRootComponentConfiguration {
     // true
 
     /** Flag if platform should support registry synchronization. **/
-    public static final String	SUPERPEER			= StarterConfiguration.SUPERPEER;		// class:
+    public static final String	SUPERPEER			= IStarterConfiguration.SUPERPEER;		// class:
     // default:
     // false
 
     /** Flag if registry synchronization should be used. **/
-    public static final String	SUPERPEERCLIENT			= StarterConfiguration.SUPERPEERCLIENT;		// class:
+    public static final String	SUPERPEERCLIENT			= IStarterConfiguration.SUPERPEERCLIENT;		// class:
     // default:
     // false
 
@@ -503,173 +525,453 @@ public interface IRootComponentConfiguration {
     };
 
 
-    Map<String, Object> getArgs();
+    public Map<String, Object> getArgs();
 
     /**
-     * Set program arguments to be available at runtime.
-     *
-     * @param args
+     *  Set program arguments to be available at runtime.
+     *  @param args The arguments.
      */
-    void setProgramArguments(String[] args);
-
-    // // internal
-    boolean getWelcome();
-
-    void setWelcome(boolean value);
+    public void setProgramArguments(String[] args);
 
     /**
-     * Set the platform access.
-     *
-     * @param value
+     *  Get the welcome flag.
+     *  @return True means print welcome message.
+     */
+    public boolean getWelcome();
+
+    /**
+     *  Tell starter to print welcome message.
+     *  @param value
+     */
+    public void setWelcome(boolean value);
+
+    /**
+     *  Set the platform access.
+     *  @param value The platform access.
      */
     void setPlatformAccess(IPlatformComponentAccess value);
 
     /**
-     * Set the component factory.
-     *
-     * @param value
+     *  Set the component factory.
+     *  @param value The component factory.
      */
     void setComponentFactory(IComponentFactory value);
 
-    boolean getGui();
+    /**
+     *  Get the flag if gui is opened.
+     *  @return True means start with gui.
+     */
+    public boolean getGui();
 
-    void setGui(boolean value);
+    /**
+     *  Set the gui flag.
+     *  @param value True for starting with gui.
+     */
+    public void setGui(boolean value);
 
-    boolean getCli();
+    /**
+     *  Get the flag if command line interface is opened.
+     *  @return True means start with cli.
+     */
+    public boolean getCli();
 
+    /**
+     *  Set the command line interface flag.
+     *  @param value True for starting with gui.
+     */
     void setCli(boolean value);
 
-    boolean getCliConsole();
-
-    void setCliConsole(boolean value);
-
-    boolean getSaveOnExit();
-
-    void setSaveOnExit(boolean value);
-
-    String getJccPlatforms();
-
-    void setJccPlatforms(String value);
-
-    boolean getLogging();
-
-    void setLogging(boolean value);
-
-    Level getLoggingLevel();
-
-    void setLoggingLevel(Level value);
-
-    boolean getSimulation();
-
-    void setSimulation(boolean value);
-
-    boolean getAsyncExecution();
-
-    void setAsyncExecution(boolean value);
-
-    boolean getPersist();
-
-    void setPersist(boolean value);
-
-    boolean getUniqueIds();
-
-    void setUniqueIds(boolean value);
-
-    boolean getThreadpoolDefer();
-
-    void setThreadpoolDefer(boolean value);
-
-    String getLibPath();
-
-    void setLibPath(String value);
-
-    ClassLoader getBaseClassloader();
-
-    void setBaseClassloader(ClassLoader value);
-
-    boolean getChat();
-
-    void setChat(boolean value);
-
-    boolean getAwareness();
-
-    void setAwareness(boolean value);
-
-    RootComponentConfiguration.AWAMECHANISM[] getAwaMechanisms();
-
-    void setAwaMechanisms(RootComponentConfiguration.AWAMECHANISM... values);
-
-    long getAwaDelay();
-
-    void setAwaDelay(long value);
-
-    boolean isAwaFast();
-
-    void setAwaFast(boolean value);
-
-    String getAwaIncludes();
-
-    void setAwaIncludes(String value);
-
-    String getAwaExcludes();
-
-    void setAwaExcludes(String value);
-
-    boolean getBinaryMessages();
-
-    void setBinaryMessages(boolean value);
-
-    boolean getStrictCom();
-
-    void setStrictCom(boolean value);
-
-    boolean getUsePass();
-
-    void setUsePass(boolean value);
-
-    boolean getPrintPass();
-
-    void setPrintPass(boolean value);
-
-    boolean getTrustedLan();
-
-    void setTrustedLan(boolean value);
-
-    String getNetworkName();
-
-    void setNetworkName(String value);
-
-    String getNetworkPass();
-
-    void setNetworkPass(String value);
-
-    Map getVirtualNames();
-
-    void setVirtualNames(Map value);
-
-    long getValidityDuration();
-
-    void setValidityDuration(long value);
-
-    boolean getLocalTransport();
-
-    void setLocalTransport(boolean value);
-
-    boolean getTcpTransport();
-
-    void setTcpTransport(boolean value);
-
-    int getTcpPort();
-
-    void setTcpPort(int value);
-
-    boolean getRelayTransport();
-
-    void setRelayTransport(boolean value);
-
-    String getRelayAddress();
-
-    void setRelayAddress(String value);
+    /**
+     *  Should the cli console (in jcc) 
+     *  @return Flag if cli console should be active.
+     */
+    public boolean getCliConsole();
+
+    /**
+     *  Set the cli console flag (in jcc).
+     *  @param value Flag if cli console should be active.
+     */
+    public void setCliConsole(boolean value);
+
+    /**
+     *  Get flag for save settings on exit.
+     *  @return True, if settings are saved on exit.
+     */
+    public boolean getSaveOnExit();
+
+    /**
+     *  Set flag for save settings on exit.
+     *  @param True, if settings are saved on exit.
+     */
+    public void setSaveOnExit(boolean value);
+
+    /**
+     *  Get flag for open jcc for specific remote platforms.
+     *  @return The jcc platform names.
+     */
+    public String getJccPlatforms();
+
+    /**
+     *  Set flag for open jcc for specific remote platforms.
+     *  @param value The jcc platform names.
+     */
+    public void setJccPlatforms(String value);
+
+    /**
+     *  Get the logging flag.
+     *  @return The logging flag.
+     */
+    public boolean getLogging();
+
+    /**
+     *  Set the logging flag.
+     *  @param value The logging flag.
+     */
+    public void setLogging(boolean value);
+
+    /**
+     *  Get the logging level.
+     *  @return The logging level.
+     */
+    public Level getLoggingLevel();
+
+    /**
+     *  Set the logging level.
+     *  @param value The logging level.
+     */
+    public void setLoggingLevel(Level value);
+
+    /**
+     *  Get the flag for simulation execution.
+     *  @return True for simulation mode.
+     */
+    public boolean getSimulation();
+
+    /**
+     *  Set the flag for simulation execution.
+     *  @param value True for simulation mode.
+     */
+    public void setSimulation(boolean value);
+
+    /**
+     *  Get the async execution mode flag.
+     *  @return The async execution mode flag.
+     */
+    public boolean getAsyncExecution();
+
+    /**
+     *  Set the async execution mode flag.
+     *  @param value The async execution mode flag.
+     */
+    public void setAsyncExecution(boolean value);
+
+//    public boolean getPersist();
+
+//    public void setPersist(boolean value);
+
+    /**
+     *  Get the unique id flag, i.e. do not reuse ids formerly used by dead components.
+     *  @return True for unique ids.
+     */
+    public boolean getUniqueIds();
+
+    /**
+     *  Set the unique id flag, i.e. do not reuse ids formerly used by dead components.
+     *  @param value True for unique ids.
+     */
+    public void setUniqueIds(boolean value);
+
+    /**
+     *  Get the flag for deferred thread creation/deletion in threadpool.
+     *  @return The defer flag.
+     */
+    public boolean getThreadpoolDefer();
+
+    /**
+     *  Set the flag for deferred thread creation/deletion in threadpool.
+     *  @param value The defer flag.
+     */
+    public void setThreadpoolDefer(boolean value);
+
+    /**
+     *  Get the library path.
+     *  @return The library path.
+     */
+    public String getLibPath();
+
+    /**
+     *  Set the library path.
+     *  @param value The library path.
+     */
+    public void setLibPath(String value);
+
+    /**
+     *  Get the base classloader.
+     *  @return The base classloader.
+     */
+    public ClassLoader getBaseClassloader();
+
+    /**
+     *  Set the base classloader.
+     *  @param value The base classloader.
+     */
+    public void setBaseClassloader(ClassLoader value);
+
+    /**
+     *  Get the flag for starting with chat.
+     *  @return True for starting with chat.
+     */
+    public boolean getChat();
+
+    /**
+     *  Set the flag for starting with chat.
+     *  @param value True for starting with chat.
+     */
+    public void setChat(boolean value);
+
+    /**
+     *  Get the flag for starting with awareness.
+     *  @return True for starting with awareness.
+     */
+    public boolean getAwareness();
+
+    /**
+     *  Set the flag for starting with awareness.
+     *  @param value True for starting with awareness.
+     */
+    public void setAwareness(boolean value);
+
+    /**
+     *  Get the awareness mechanisms.
+     *  @return The awareness mechanisms.
+     */
+//    public IRootComponentConfiguration.AWAMECHANISM[] getAwaMechanisms();
+    public String[] getAwaMechanisms();
+
+    /**
+     *  Set the awareness mechanisms.
+     *  @param values The awareness mechanisms.
+     */
+//    public void setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM... values);
+    public void setAwaMechanisms(String... values);
+
+    /**
+     *  Get the delay between awareness notifications.
+     *  @return The delay in millis.
+     */
+    public long getAwaDelay();
+
+    /**
+     *  Set the delay between awareness notifications.
+     *  @param value The delay in millis.
+     */
+    public void setAwaDelay(long value);
+
+    /**
+     *  Mode in which awareness is blocking startup.
+     *  @return flag for fast awa.
+     */
+    public boolean isAwaFast();
+
+    /**
+     *  Mode in which awareness is blocking startup.
+     *  @return value Flag for fast awa.
+     */
+    public void setAwaFast(boolean value);
+
+    /**
+     *  Get the awareness platform includes.
+     *  @return The awareness platform includes.
+     */
+    public String getAwaIncludes();
+
+    /**
+     *  Set the awareness platform includes.
+     *  @param value The awareness platform includes. 
+     */
+    public void setAwaIncludes(String value);
+
+    /**
+     *  Get the awareness platform excludes.
+     *  @return The awareness platform excludes.
+     */
+    public String getAwaExcludes();
+
+    /**
+     *  Set the awareness platform excludes.
+     *  @param value The awareness platform excludes. 
+     */
+    public void setAwaExcludes(String value);
+
+    /**
+     *  Get the flag for binary messages.
+     *  @return The flag for binary messages.
+     */
+    public boolean getBinaryMessages();
+
+    /**
+     *  Set the flag for binary messages.
+     *  @param value The flag for binary messages.
+     */
+    public void setBinaryMessages(boolean value);
+
+    /**
+     *  Get flag for strict communication.
+     *  Fail on recoverable message decoding errors instead of ignoring
+     *  @return Strict communication flag.
+     */
+    public boolean getStrictCom();
+
+    /**
+     *  Get flag for strict communication.
+     *  Fail on recoverable message decoding errors instead of ignoring
+     *  @return Strict communication flag.
+     */
+    public void setStrictCom(boolean value);
+
+    /**
+     *  Flag if the platform should be protected with password. I
+     *  @return True if protected.
+     */
+    public boolean getUsePass();
+
+    /**
+     *  Flag if the platform should be protected with password. I
+     *  @param value True for protected.
+     */
+    public void setUsePass(boolean value);
+
+    /**
+     *  Get the print password flag on startup.
+     *  @return Flag if password should be printed.
+     */
+    public boolean getPrintPass();
+
+    /**
+     *  Set the print password flag on startup.
+     *  @param value Flag if password should be printed.
+     */
+    public void setPrintPass(boolean value);
+
+    /**
+     *  Flag if trusted lan is activated. (Trusts internal ips)
+     *  @return True if trusted lan is active.
+     */
+    public boolean getTrustedLan();
+
+    /**
+     *  Flag if trusted lan is activated. (Trusts internal ips)
+     *  @param value True if trusted lan is active.
+     */
+    public void setTrustedLan(boolean value);
+
+    /**
+     *  Get the network name (used at startup).
+     *  @return The network name.
+     */
+    public String getNetworkName();
+
+    /**
+     *  Set the network name (used at startup).
+     *  @param value The network name.
+     */
+    public void setNetworkName(String value);
+
+    /**
+     *  Get the network pass (used at startup).
+     *  @return The network pass.
+     */
+    public String getNetworkPass();
+
+    /**
+     *  Set the network pass (used at startup).
+     *  @param value The network pass.
+     */
+    public void setNetworkPass(String value);
+
+    /**
+     *  Get the virtual names (roles).
+     *  @return The virtual names.
+     */
+    public Map<String, String> getVirtualNames();
+
+    /**
+     *  Set the virtual names (roles).
+     *  @param value The virtual names.
+     */
+    public void setVirtualNames(Map<String, String> value);
+
+    /**
+     *  Get the validity duration of messages.
+     *  @return The validity duration.
+     */
+    public long getValidityDuration();
+
+    /**
+     *  Set the validity duration of messages.
+     *  @param value The validity duration.
+     */
+    public void setValidityDuration(long value);
+
+    /**
+     *  Get the flag if the local transport is active.
+     *  @return Flag if the local transport is active.
+     */
+    public boolean getLocalTransport();
+
+    /**
+     *  Set the flag if the local transport is active.
+     *  @param value Flag if the local transport is active.
+     */
+    public void setLocalTransport(boolean value);
+
+    /**
+     *  Get the flag if the tcp transport is active.
+     *  @return Flag if the tcp transport is active.
+     */
+    public boolean getTcpTransport();
+
+    /**
+     *  Set the flag if the tcp transport is active.
+     *  @param value Flag if the tcp transport is active.
+     */
+    public void setTcpTransport(boolean value);
+
+    /**
+     *  Get the tcp port of the tcp transport.
+     *  @return The tcp port.
+     */
+    public int getTcpPort();
+
+    /**
+     *  Set the tcp port of the tcp transport.
+     *  @param value The tcp port.
+     */
+    public void setTcpPort(int value);
+
+    /**
+     *  Get the flag if the relay transport is active.
+     *  @return Flag if the relay transport is active.
+     */
+    public boolean getRelayTransport();
+
+    /**
+     *  Set the flag if the relay transport is active.
+     *  @param value Flag if the relay transport is active.
+     */
+    public void setRelayTransport(boolean value);
+
+    /**
+     *  Get the relay address.
+     *  @return The relay address.
+     */
+    public String getRelayAddress();
+
+    /**
+     *  Set the relay address.
+     *  @param value The relay address.
+     */
+    public void setRelayAddress(String value);
 
 //    boolean getRelaySecurity();
 //
@@ -687,93 +989,280 @@ public interface IRootComponentConfiguration {
 //
 //    void setSslTcpPort(int value);
 
-    boolean getWsPublish();
+    /**
+     *  Get the flag if wsdl publishing is on.
+     *  @return True if wsdl publishing is on.
+     */
+    public boolean getWsPublish();
 
-    void setWsPublish(boolean value);
+    /**
+     *  Set the flag if wsdl publishing is on.
+     *  @param value True if wsdl publishing is on.
+     */
+    public void setWsPublish(boolean value);
 
-    boolean getRsPublish();
+    /**
+     *  Get the flag if rest publishing is on.
+     *  @return True if rest publishing is on.
+     */
+    public boolean getRsPublish();
 
-    void setRsPublish(boolean value);
+    /**
+     *  Set the flag if rest publishing is on.
+     *  @param value True if rest publishing is on.
+     */
+    public void setRsPublish(boolean value);
 
-    String getRsPublishComponent();
+    /**
+     *  Get the rest publish component.
+     *  @return The rest publish component.
+     */
+    public String getRsPublishComponent();
 
-    void setRsPublishComponent(String value);
+    /**
+     *  Set the rest publishing component.
+     *  @param value The rest publishing component.
+     */
+    public void setRsPublishComponent(String value);
 
-    RootComponentConfiguration.KERNEL[] getKernels();
+    /**
+     *  Get the kernel names.
+     *  @return The kernel names.
+     */
+//    public IRootComponentConfiguration.KERNEL[] getKernels();
+    public String[] getKernels();
 
-    void setKernels(String... value);
+    /**
+     *  Set the kernel names.
+     *  @param value The kernel names.
+     */
+    public void setKernels(String... value);
 
-    void setKernels(RootComponentConfiguration.KERNEL... value);
+//    public void setKernels(IRootComponentConfiguration.KERNEL... value);
 
-    boolean getMavenDependencies();
+    /**
+     *  Get the flag if maven dependencies are on.
+     *  @return The maven dependencies.
+     */
+    public boolean getMavenDependencies();
 
-    void setMavenDependencies(boolean value);
+    /**
+     *  Set the maven dependencies flag.
+     *  @param value The maven dependencies.
+     */
+    public void setMavenDependencies(boolean value);
 
-    boolean getMonitoringComp();
+    /**
+     *  Get the monitoring component flag.
+     *  @return The monitoring component flag.
+     */
+    public boolean getMonitoringComp();
 
-    void setMonitoringComp(boolean value);
+    /**
+     *  Set the monitoring component flag.
+     *  @param value The monitoring component flag.
+     */
+    public void setMonitoringComp(boolean value);
 
-    boolean getSensors();
+    /**
+     *  Get the sensors flag. 
+     *  @return The sensors flag.
+     */
+    public boolean getSensors();
 
-    void setSensors(boolean value);
+    /**
+     *  Set the sensors flag.
+     *  @param value The sensors flag.
+     */
+    public void setSensors(boolean value);
 
-    String getThreadpoolClass();
+    /**
+     *  Get the threadpool class.
+     *  @return The threadpool class name.
+     */
+    public String getThreadpoolClass();
 
-    void setThreadpoolClass(String value);
+    /**
+     *  Set the threadpool class name.
+     *  @param value The threadpool class name.
+     */
+    public void setThreadpoolClass(String value);
 
-    String getContextServiceClass();
+    /**
+     *  Get the context service class.
+     *  @return The context service class.
+     */
+    public String getContextServiceClass();
 
-    void setContextServiceClass(String value);
+    /**
+     *  Get the context service class.
+     *  @param value The context service class.
+     */
+    public void setContextServiceClass(String value);
 
-    boolean getDf();
+    /**
+     *  Get the df (directory facilitator) flag.
+     *  @return The df flag.
+     */
+    public boolean getDf();
 
-    void setDf(boolean value);
+    /**
+     *  Get the df (directory facilitator) flag.
+     *  @param value The df flag.
+     */
+    public void setDf(boolean value);
 
-    boolean getClock();
+    /**
+     *  Get the clock flag.
+     *  @return The clock flag.
+     */
+    public boolean getClock();
 
-    void setClock(boolean value);
+    /**
+     *  Set the clock flag.
+     *  @param value The clock flag.
+     */
+    public void setClock(boolean value);
 
 //    boolean getMessage();
 //
 //    void setMessage(boolean value);
 
-    boolean getSimul();
+    /**
+     *  Get the simulation flag.
+     *  @return The simulation flag.
+     */
+    public boolean getSimul();
 
-    void setSimul(boolean value);
+    /**
+     *  Set the simulation flag.
+     *  @param value The simulation flag.
+     */
+    public void setSimul(boolean value);
 
-    boolean getFiletransfer();
+    /**
+     *  Get the file transfer flag.
+     *  @return The file transfer flag.
+     */
+    public boolean getFiletransfer();
 
-    void setFiletransfer(boolean value);
+    /**
+     *  Set the file transfer flag.
+     *  @param value The file transfer flag.
+     */
+    public void setFiletransfer(boolean value);
 
-    boolean getMarshal();
+    /**
+     *  Get the marshal flag.
+     *  @return The marshal flag.
+     */
+    public boolean getMarshal();
 
-    void setMarshal(boolean value);
+    /**
+     *  Set the marshal flag.
+     *  @param value The marshal flag.
+     */
+    public void setMarshal(boolean value);
 
-    boolean getSecurity();
+    /**
+     *  Get the security flag.
+     *  @return The security flag.
+     */
+    public boolean getSecurity();
 
-    void setSecurity(boolean value);
+    /**
+     *  Set the security flag.
+     *  @param value The security flag.
+     */
+    public void setSecurity(boolean value);
 
-    boolean getLibrary();
+    /**
+     *  Get the library flag.
+     *  @return The library flag.
+     */
+    public boolean getLibrary();
 
-    void setLibrary(boolean value);
+    /**
+     *  Set the library flag.
+     *  @param value The library flag.
+     */
+    public void setLibrary(boolean value);
 
-    boolean getSettings();
+    /**
+     *  Get the settings flag.
+     *  @return The settings flag.
+     */
+    public boolean getSettings();
 
-    void setSettings(boolean value);
+    /**
+     *  Set the settings flag.
+     *  @param value The settings flag.
+     */
+    public void setSettings(boolean value);
 
-    boolean getContext();
+    /**
+     *  Get the context flag.
+     *  @return The context flag.
+     */
+    public boolean getContext();
 
-    void setContext(boolean value);
+    /**
+     *  Set the context flag.
+     *  @param value The context flag.
+     */
+    public void setContext(boolean value);
 
-    boolean getAddress();
+    /**
+     *  Get the address flag.
+     *  @return The address flag.
+     */
+    public boolean getAddress();
 
-    void setAddress(boolean value);
+    /**
+     *  Set the address flag.
+     *  @param value The address flag.
+     */
+    public void setAddress(boolean value);
 
-    boolean getSuperpeer();
+    /**
+     *  Get the superpeer flag.
+     *  @return The superpeer flag.
+     */
+    public boolean getSuperpeer();
 
-    void setSuperpeer(boolean value);
+    /**
+     *  Set the superpeer flag.
+     *  @param value The superpeer flag.
+     */
+    public void setSuperpeer(boolean value);
     
+    /**
+     *  Get the superpeer client flag.
+     *  @return The superpeer client flag.
+     */
     boolean getSuperpeerClient();
 
-    void setSuperpeerClient(boolean value);
+    /**
+     *  Set the superpeer client flag.
+     *  @param value The superpeer client flag.
+     */
+    public void setSuperpeerClient(boolean value);
+    
+    /**
+     *  Set a value.
+     *  @param key The key.
+     *  @param value The value
+     */
+    public void setValue(String key, Object value);
+    
+	/**
+	 *  Check the consistency.
+	 */
+	public void checkConsistency();
+	
+	/**
+	 * Enhance this config with given other config. Will overwrite all values
+	 * that are set in the other config.
+	 */
+	public void enhanceWith(IRootComponentConfiguration other);
 }
