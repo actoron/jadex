@@ -11,7 +11,7 @@ import jadex.bridge.service.types.factory.IPlatformComponentAccess;
  */
 public interface IRootComponentConfiguration 
 {
-	/** Kernel constants. */
+	//-------- Kernel constants. --------
 	public static final String KERNEL_COMPONENT = "component";
 	public static final String KERNEL_APPLICATION = "application";
 	public static final String KERNEL_MICRO = "micro";
@@ -21,70 +21,33 @@ public interface IRootComponentConfiguration
 	public static final String KERNEL_BDIBPMN = "bdibpmn";
 	public static final String KERNEL_MULTI = "multi";
 	
-	/** Awareness mechanisms. */
+	//-------- Awareness mechanisms. --------
+	/** Uses IPv4 broadcast to announce awareness infos in local networks.
+	 *  Default Port used is 55670. */
 	public static final String AWAMECHANISM_BROADCAST = "broadcast";
+	/** Uses IPv4 Multicast to find other platforms.
+	 *  Default multicast address used is 224.0.0.0, port 5567. */
 	public static final String AWAMECHANISM_MULTICAST = "multicast";
+	/** Message discovery allows detecting other platforms upon message reception.
+	 *  This helps especially if network connection is asymetric, e.g. one platform
+	 *  can find the other (and send messages) but not vice versa.*/
 	public static final String AWAMECHANISM_MESSAGE = "message";
+	/** The Relay discovery is the most robust discovery variant. It uses an external
+	 *  web server as relay where each platform registers. It is possible to set-up a
+	 *  self-hosted relay server, but per default, https://activecomponents.org/relay is used. */
 	public static final String AWAMECHANISM_RELAY = "relay";
+	/** The local discovery uses a file-based mechanism to detect platforms running on the same host. */
 	public static final String AWAMECHANISM_LOCAL = "local";
+	/** The Registry mechanism implements a master-slave mechanism, where one
+	 *  platform is the registry. Other platforms that have this mechanism enabled
+	 *  register themselves and the registry distributes awareness info to all
+	 *  registered platforms. All RegistryDiscoveryAgents have to be parameterized
+	 *  with the same ip address (of the registry). */
 	public static final String AWAMECHANISM_REGISTRY = "registry";
+	/** The IP-Scanner discovery mechanism sends out awareness infos to all IP
+	 *  addresses within the local network (using port 55668) */
 	public static final String AWAMECHANISM_SCANNER = "scanner";
 	
-//    /**
-//     * Kernel names enum.
-//     */
-//    public enum KERNEL
-//    {
-//        component, micro, bpmn, v3, bdi, bdibpmn, multi
-//    }
-
-//    /**
-//     * Discovery names enum.
-//     */
-//    public enum AWAMECHANISM
-//    {
-//        /**
-//         * Uses IPv4 broadcast to announce awareness infos in local networks.
-//         * Default Port used is 55670.
-//         */
-//        broadcast,
-//        /**
-//         * Uses IPv4 Multicast to find other platforms.
-//         * Default multicast address used is 224.0.0.0, port 5567.
-//         */
-//        multicast,
-//        /**
-//         * Message discovery allows detecting other platforms upon message reception.
-//         * This helps especially if network connection is assymatric, e.g. one platform can
-//         * find the other (and send messages) but not vice versa.
-//         */
-//        message,
-//        /**
-//         * The Relay discovery is the most robust discovery variant. It uses an external
-//         * web server as relay where each platform registers. It is possible to set-up a self-hosted
-//         * relay server, but per default, https://activecomponents.org/relay is used.
-//         */
-//        relay,
-//        /**
-//         * The local discovery uses a file-based mechanism to detect platforms running on the same host.
-//         */
-//        local,
-//        /**
-//         * The Registry mechanism implements a master-slave mechanism, where one platform is
-//         * the registry. Other platforms that have this mechanism enabled register themselves
-//         * and the registry distributes awareness info to all registered platforms.
-//         * All RegistryDiscoveryAgents have to be parameterized with the same ip address
-//         * (of the registry).
-//         */
-//        registry,
-//        /**
-//         * The IP-Scanner discovery mechanism sends out awareness infos to all IP addresses within the
-//         * local network (using port 55668)
-//         */
-//        scanner,
-//        // bluetooth
-//    }
-
     /** Tell starter to print welcome message. **/
     public static final String	WELCOME				= "welcome";								// class:
     // boolean
@@ -164,11 +127,11 @@ public interface IRootComponentConfiguration
     // default:
     // emptyvalue
 
-    /** Flag to enable component persistence. **/
-    public static final String	PERSIST				= "persist";								// class:
-    // boolean
-    // default:
-    // false
+//    /** Flag to enable component persistence. **/
+//    public static final String	PERSIST				= "persist";								// class:
+//    // boolean
+//    // default:
+//    // false
 
     /** Flag if CIDs may be reused (true for not). **/
     public static final String	UNIQUEIDS			= "uniqueids";								// class:
@@ -517,7 +480,8 @@ public interface IRootComponentConfiguration
      * arguments.
      */
     public static final String[] BOOLEAN_ARGS = {
-            WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION, PERSIST,
+            WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION,
+//            PERSIST,
             UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
             PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT,
             RELAYTRANSPORT,
@@ -996,10 +960,28 @@ public interface IRootComponentConfiguration
      *  @param value Flag if the ws transport is active.
      */
     public void setWsTransport(boolean value);
+    
+    /**
+     *  Get the websocket port of the websocket transport.
+     *  @return The websocket port.
+     */
+    public int getWsPort();
 
-//    boolean getRelaySecurity();
-//
-//    void setRelaySecurity(boolean value);
+    /**
+     *  Set the websocket port of the websocket transport.
+     *  @param value The websocket port.
+     */
+    public void setWsPort(int value);
+
+    /**
+     *  Should the platform act as relay, i.e. forward messages from one platform to another platform?
+     */
+    boolean getRelayForwarding();
+
+    /**
+     *  Should the platform act as relay, i.e. forward messages from one platform to another platform?
+     */
+    void setRelayForwarding(boolean value);
 //
 //    boolean getRelayAwaonly();
 //

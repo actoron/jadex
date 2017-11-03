@@ -31,7 +31,6 @@ import static jadex.base.IRootComponentConfiguration.MAVEN_DEPENDENCIES;
 import static jadex.base.IRootComponentConfiguration.MONITORINGCOMP;
 import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
 import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
-import static jadex.base.IRootComponentConfiguration.PERSIST;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
 import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
@@ -71,7 +70,6 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.Boolean3;
@@ -132,7 +130,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=ASYNCEXECUTION, clazz=Boolean.class),
 	@Argument(name=THREADPOOLDEFER, clazz=boolean.class, defaultvalue="true"),
 	
-	@Argument(name=PERSIST, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name=LIBPATH, clazz=String.class),
@@ -198,7 +195,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=LIBRARY, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SETTINGS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="$args.superpeer==null? true: !$args.superpeer")
@@ -237,7 +233,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
-//	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
@@ -256,11 +251,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() : $args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 //	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component, $args.simulation): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component, $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)")),
-	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.bootstrapfactory, $args.persist, $args.uniqueids) : new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.bootstrapfactory, $args.uniqueids)")),
+	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.bootstrapfactory, $args.uniqueids)"))
 //	@ProvidedService(type=IDF.class, implementation=@Implementation(DirectoryFacilitatorService.class)),
 //	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(SimulationService.class)),
 //	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class)),
-	@ProvidedService(type=IPersistenceService.class, implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? $component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.cms.IComponentManagementService.class) : null")),
 })
 
 @RequiredServices(
@@ -292,7 +286,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
-//		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
@@ -373,7 +366,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
-//		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),

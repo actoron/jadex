@@ -106,6 +106,7 @@ public class PlatformConfigurationTest
 							continue;
 						}
 					}
+					if(!contains)
 					assertTrue("RootComponentConfiguration contains parameter that is not in platform model: " + argument, contains);
 			}
 		}
@@ -156,7 +157,9 @@ public class PlatformConfigurationTest
 		Field[] fields = class1.getFields();
 		for(Field field : fields)
 		{
-			if (Modifier.isStatic(field.getModifiers())) {
+			if (!field.getName().startsWith("AWAMECHANISM_")
+					&& !field.getName().startsWith("KERNEL_")
+					&& Modifier.isStatic(field.getModifiers())) {
 				if(String.class.isAssignableFrom(field.getType())) {
 					try
 					{
