@@ -558,10 +558,16 @@ public interface IRootComponentConfiguration
     void setPlatformAccess(IPlatformComponentAccess value);
 
     /**
-     *  Set the component factory.
+     *  Get the component factory.
+     *  @return value The component factory.
+     */
+    IComponentFactory getBootstrapFactory(IComponentFactory value);
+
+    /**
+     *  Set the bootstrap component factory.
      *  @param value The component factory.
      */
-    void setComponentFactory(IComponentFactory value);
+    void setBootstrapFactory(IComponentFactory value);
 
     /**
      *  Get the flag if gui is opened.

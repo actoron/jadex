@@ -363,7 +363,7 @@ public class Starter
 			// after loading the first component model.
 			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
-			rootconf.setComponentFactory(cfac);
+			rootconf.setBootstrapFactory(cfac);
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
 //				"org.activecomponents.jadex:jadex-standalone-launch:2.1");
