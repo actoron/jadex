@@ -156,6 +156,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 				catch (IOException e)
 				{
 				}
+				onClose(null, null, false);
 //				handler.connectionClosed(WebSocketConnectionServer.this, exception);
 			}
 		};

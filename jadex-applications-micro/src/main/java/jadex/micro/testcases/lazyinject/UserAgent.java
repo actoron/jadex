@@ -1,5 +1,8 @@
 package jadex.micro.testcases.lazyinject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -22,6 +25,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
@@ -32,7 +36,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.micro.servicecall.ServiceCallAgent;
 
 /**
  * Tests whether lazy service calls work together with tuple2 / intermediatefutures.
@@ -58,6 +61,9 @@ public class UserAgent
 
 	@AgentServiceSearch(lazy=true)
 	protected ITestService ts;
+	
+	protected List<TestReport>	reports	= new ArrayList<TestReport>();
+	protected Testcase tc	= new Testcase(4);
 
 	/**
 	 *
@@ -74,6 +80,7 @@ public class UserAgent
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
 		final TestReport tr1 = new TestReport("#1", "Test if blocking get works.");
+		reports.add(tr1);
 
 		String res1 = fut.getNextIntermediateResult(); // if broken, this hangs
 
@@ -89,6 +96,7 @@ public class UserAgent
 		}
 
 		final TestReport tr2 = new TestReport("#2", "Test if functional listener works.");
+		reports.add(tr2);
 
 		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() {
 			@Override
@@ -97,29 +105,24 @@ public class UserAgent
 				System.out.println("first: " + result);
 				if ("hello".equals(result)) {
 					tr2.setSucceeded(true);
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-					agent.killComponent();
 				} else {
 					tr2.setFailed("Received wrong results.");
 				}
+				checkFinished();
 			}
 		}, new IFunctionalIntermediateFinishedListener<Void>() {
 			@Override
 			public void finished() {
 				// should not happen as finish is never called
 				tr2.setFailed(new Exception("finish unexpected"));
-
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-				agent.killComponent();
+				checkFinished();
 			}
 		}, new IFunctionalExceptionListener() {
 			@Override
 			public void exceptionOccurred(Exception exception) {
 				System.out.println("ex: "+exception);
 				tr2.setFailed(exception);
-
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-				agent.killComponent();
+				checkFinished();
 			}
 		});
 
@@ -130,6 +133,7 @@ public class UserAgent
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
 		final TestReport tr1 = new TestReport("#1", "Test if blocking get works.");
+		reports.add(tr1);
 
 		String res1 = fut.getFirstResult(); // if broken, this hangs
 
@@ -145,22 +149,21 @@ public class UserAgent
 		}
 
 		final TestReport tr2 = new TestReport("#2", "Test if default tuple2 listener works.");
+		reports.add(tr2);
 
 		fut.addResultListener(new DefaultTuple2ResultListener<String, Integer>()
 		{
-			boolean res =false;
 			public void firstResultAvailable(String result)
 			{
 				System.out.println("first: "+result);
 				if("hello".equals(result)) {
 					tr2.setSucceeded(true);
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-					agent.killComponent();
 				}
 				else
 				{
 					tr2.setFailed("Received wrong results.");
 				}
+				checkFinished();
 			}
 
 			public void secondResultAvailable(Integer result)
@@ -179,12 +182,30 @@ public class UserAgent
 			{
 				System.out.println("ex: "+exception);
 				tr2.setFailed(exception);
-
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-				agent.killComponent();
+				
+				checkFinished();
 			}
 		});
 	}
+	
+	protected void	checkFinished()
+	{
+		boolean	finished = reports.size()==tc.getTestCount();
+		for(TestReport report: reports)
+		{
+			finished = finished && report.isFinished();
+		}
+
+
+		if(finished)
+		{
+			tc.setReports(reports.toArray(new TestReport[reports.size()]));
+			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+			agent.killComponent();
+		}
+	}
+
+
 	
 	/**
 	 *  Starter for testing.

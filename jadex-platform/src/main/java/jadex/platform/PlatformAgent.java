@@ -343,20 +343,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.TCPTRANSPORT ? 1: 0",
-//		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 			arguments={
-				@NameValue(name="port", value="jadex.platform.PlatformAgent.TCPPORT")
-//				@NameValue(name="port", value="$args.tcpport")
+				@NameValue(name="port", value="$args.tcpport")
 			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.WSTRANSPORT ? 1: 0",
-//		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="jadex.platform.PlatformAgent.WSPORT")
-//			@NameValue(name="port", value="$args.wsport")
+			@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.RELAYTRANSPORT ? 1: 0",
-//		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress")
 			}),
@@ -423,20 +418,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.TCPTRANSPORT ? 1: 0",
-//		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-			arguments={
-				@NameValue(name="port", value="jadex.platform.PlatformAgent.TCPPORT")
-//				@NameValue(name="port", value="$args.tcpport")
-			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.WSTRANSPORT ? 1: 0",
-//		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="jadex.platform.PlatformAgent.WSPORT")
-//			@NameValue(name="port", value="$args.wsport")
+			@NameValue(name="port", value="$args.tcpport")
+		}),
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		arguments={
+			@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.RELAYTRANSPORT ? 1: 0",
-//		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress")
 			}),
@@ -484,20 +474,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.TCPTRANSPORT ? 1: 0",
-//		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-			arguments={
-				@NameValue(name="port", value="jadex.platform.PlatformAgent.TCPPORT")
-//				@NameValue(name="port", value="$args.tcpport")
-			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.WSTRANSPORT ? 1: 0",
-//		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="jadex.platform.PlatformAgent.WSPORT")
-//			@NameValue(name="port", value="$args.wsport")
+			@NameValue(name="port", value="$args.tcpport")
+		}),
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		arguments={
+			@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.RELAYTRANSPORT ? 1: 0",
-//		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress")
 			}),
@@ -548,12 +533,12 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				arguments={@NameValue(name="console", value="$args.cliconsole")}),
 			@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 			@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-				arguments={
-					@NameValue(name="port", value="$args.tcpport")
-				}),
+			arguments={
+				@NameValue(name="port", value="$args.tcpport")
+			}),
 			@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
 			arguments={
-				@NameValue(name="port", value="$args.wsport")
+					@NameValue(name="port", value="$args.wsport")
 				}),
 			@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 				arguments={
@@ -564,10 +549,4 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 @Agent
 public class PlatformAgent
 {
-	// hack!!! hard code transports for debugging
-	public static boolean	TCPTRANSPORT	= true;
-	public static boolean	WSTRANSPORT	= true;
-	public static boolean	RELAYTRANSPORT	= false;
-	public static int	TCPPORT	= 0;
-	public static int	WSPORT	= -1;
 }
