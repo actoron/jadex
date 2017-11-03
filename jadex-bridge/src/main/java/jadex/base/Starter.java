@@ -608,7 +608,7 @@ public class Starter
 					String name	= null;
 					String config	= null;
 					String args = null;
-					String comp	= (String)components.get(i);
+					String comp	= components.get(i);
 					Map<String, Object> oargs = null;
 					
 					// check if name:type are both present (to not find last : check that no ( before)

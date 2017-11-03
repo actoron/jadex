@@ -73,6 +73,11 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			ret = proxy;
 		}
+		// Convert class to name.
+		else if(mname.equals("addComponent") && args[0] instanceof Class<?>)
+		{
+			((IStarterConfiguration)proxy).addComponent(((Class<?>)args[0]).getName()+".class");
+		}
 		else if(mname.equals("setValue"))
 		{
 			values.put((String)args[0], args[1]);
@@ -374,7 +379,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public static IPlatformConfiguration getPlatformConfiguration()
 	{
-		return getPlatformConfiguration((ClassLoader)null);
+		return getPlatformConfiguration((ClassLoader)IPlatformConfiguration.class.getClassLoader());
 	}
 	
 	/**
@@ -598,7 +603,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 
 		rootconf.setLocalTransport(true); // needed by message
 		rootconf.setTcpTransport(false);
-		// rootConfig.setRelayTransport(false);
+		rootconf.setWsTransport(false);
+		rootconf.setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
 
 		rootconf.setKernels(IRootComponentConfiguration.KERNEL_MICRO);
