@@ -256,7 +256,6 @@
 				new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.bootstrapfactory, $args.uniqueids)
 			</implementation>
 		</providedservice>
-		</providedservice>
 		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">
 			<binding scope="platform"/>
 		</requiredservice>
