@@ -1,15 +1,23 @@
 package jadex.base;
 
-import org.junit.Before;
-import org.junit.Test;
+import static jadex.base.IRootComponentConfiguration.BOOLEAN_ARGS;
+import static jadex.base.IRootComponentConfiguration.KERNELS;
+import static jadex.base.IRootComponentConfiguration.KERNEL_BDI;
+import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
+import static jadex.base.IRootComponentConfiguration.RSPUBLISHCOMPONENT;
+import static jadex.base.IRootComponentConfiguration.USEPASS;
+import static jadex.base.IRootComponentConfiguration.WSTRANSPORT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.base.IRootComponentConfiguration;
-import static jadex.base.IRootComponentConfiguration.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import jadex.commons.SReflect;
 
 
 
@@ -60,7 +68,7 @@ public class RootComponentConfigurationTest
 		shouldFail(KERNELS, "[]");
 
 		config.setKernels(KERNEL_BDI);
-		config.checkConsistency();
+		checkConsistency((IPlatformConfiguration) config);
 	}
 
 	@Test
@@ -116,7 +124,7 @@ public class RootComponentConfigurationTest
 	{
 		try
 		{
-//			config.checkConsistency();
+			checkConsistency((IPlatformConfiguration) config);
 			fail("Exception expected when setting field " + field + " to " + value + " !");
 		}
 		catch(RuntimeException e)
@@ -127,7 +135,7 @@ public class RootComponentConfigurationTest
 	private void setAsArgsAndExpectError(String field, Object value)
 	{
 		// method 2
-		config.enhanceWith(Starter.processArgs("-" + field + " " + value).getRootConfig());
+		enhanceWith(config, Starter.processArgs("-" + field + " " + value).getRootConfig());
 		shouldFail(field, value);
 	}
 
@@ -135,13 +143,13 @@ public class RootComponentConfigurationTest
 	{
 		// method 1
 		config.setValue(field, value);
-		config.checkConsistency();
+		checkConsistency((IPlatformConfiguration) config);
 		Object result = getters.get(field).get();
 		assertEquals(expected, result);
 
 		// method 2
-		config.enhanceWith(Starter.processArgs("-" + field + " " + value).getRootConfig());
-		config.checkConsistency();
+		enhanceWith(config, Starter.processArgs("-" + field + " " + value).getRootConfig());
+		checkConsistency((IPlatformConfiguration) config);
 		result = getters.get(field).get();
 		assertEquals(expected, result);
 	}
@@ -150,4 +158,75 @@ public class RootComponentConfigurationTest
 	{
 		abstract public Object get();
 	}
+
+	/**
+	 * Checks this config for consistency.
+	 */
+	protected void checkConsistency(IPlatformConfiguration config)
+	{
+		StringBuilder errorText = new StringBuilder();
+		Object publish = config.getValue(RSPUBLISH);
+		Object publishComponent = config.getValue(RSPUBLISHCOMPONENT);
+		
+		if(Boolean.TRUE.equals(publish) && (publishComponent == null || "".equals(publishComponent)))
+		{
+			errorText.append(RSPUBLISH + " set to true, but no " + RSPUBLISHCOMPONENT + " found.");
+		}
+
+		Object kernels = config.getValue(KERNELS); // may need to get value from model
+		if (kernels == null || ((String[]) kernels).length==0) {
+			errorText.append("No Kernels set. Cannot start platform.");
+		}
+
+		for (String argName:BOOLEAN_ARGS) {
+			if (!isBoolean(config.getArgs().get(argName))) {
+				errorText.append(USEPASS + " must be a boolean value (or null), but is set to: " + config.getValue(USEPASS));
+			}
+		}
+
+		if (config.getRelayTransport() && SReflect.classForName0("jadex.platform.service.message.relaytransport.RelayTransportAgent",  this.getClass().getClassLoader()) == null) {
+			errorText.append(RELAYTRANSPORT + " set to true, but 'jadex.platform.service.message.relaytransport.RelayTransportAgent' is not in classpath (maybe include module jadex-platform-extension-relaytransport in dependencies?).\n");
+		}
+
+		if (config.getWsTransport() && SReflect.classForName0("jadex.platform.service.message.websockettransport.WebSocketTransportAgent",  this.getClass().getClassLoader()) == null) {
+			errorText.append(WSTRANSPORT + " set to true, but 'jadex.platform.service.message.websockettransport.WebSocketTransportAgent' is not in classpath (maybe include module jadex-platform-extension-websockettransport in dependencies?).\n");
+		}
+
+		if(errorText.length() != 0)
+		{
+			throw new RuntimeException("Configuration consistency error: \n" + errorText.toString());
+		}
+	}
+
+	/**
+	 * Check whether value can be converted to boolean or not.
+	 * @param value
+	 * @return
+	 */
+	private boolean isBoolean(Object value) {
+		boolean result = false;
+		if (value != null) {
+			if (value instanceof Boolean) {
+				result = true;
+			}
+		} else {
+			result = true;
+		}
+		return result;
+	}
+	
+	/**
+	 * Enhance this config with given other config. Will overwrite all values
+	 * that are set in the other config.
+	 * 
+	 * @param other
+	 */
+	public void enhanceWith(IRootComponentConfiguration config, IRootComponentConfiguration other)
+	{
+		for(Map.Entry<String, Object> entry : other.getArgs().entrySet())
+		{
+			config.setValue(entry.getKey(), entry.getValue());
+		}
+	}
+
 }

@@ -1260,15 +1260,4 @@ public interface IRootComponentConfiguration
      *  @param value The value
      */
     public void setValue(String key, Object value);
-    
-	/**
-	 *  Check the consistency.
-	 */
-	public void checkConsistency();
-	
-	/**
-	 * Enhance this config with given other config. Will overwrite all values
-	 * that are set in the other config.
-	 */
-	public void enhanceWith(IRootComponentConfiguration other);
 }

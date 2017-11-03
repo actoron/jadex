@@ -17,6 +17,8 @@ public class ManagementExtensionTest extends ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
+				"Persistable",	// persistence currently disabled
+				"BPMNRecoveryTest",	// persistence currently disabled
 				"HelloUser",	// cannot be started without hello service
 				"ComponentRegistry",	// cannot be started without some args (rspublish, context service)
 				"DaemonResponder",	// cannot be started without receiver parameter
