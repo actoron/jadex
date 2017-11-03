@@ -85,7 +85,7 @@ public interface IStarterConfiguration
 
     /**  Flag if local timeouts should be realtime (instead of clock dependent). */
     public static final String REALTIMETIMEOUT = "realtimetimeout";
-    
+        
     /** Constant for remote default timeout. */
     public static long DEFAULT_REMOTE_TIMEOUT = PlatformConfigurationHandler.getDefaultTimeout();
 

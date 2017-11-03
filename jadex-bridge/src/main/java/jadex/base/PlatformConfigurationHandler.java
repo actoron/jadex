@@ -62,9 +62,6 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		
 		String mname = method.getName();
 		
-		if(mname.equals("setPlatformComponent"))
-			System.out.println("sdfsd");
-		
 		// from IPlatformConfiguration
 		if(mname.equals("getRootConfig"))
 		{
@@ -132,7 +129,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		if(ret==null && method.getReturnType().equals(boolean.class))
 			ret = false;
 		
-		System.out.println("config: "+method.getName()+" "+hashCode()+" "+method.getDeclaringClass());
+//		System.out.println("config: "+method.getName()+" "+hashCode()+" "+method.getDeclaringClass());
 		
 		return ret;
 	}

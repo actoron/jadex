@@ -507,7 +507,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name=WSPORT, value="8080"),
 			@NameValue(name=RELAYADDRESS, value="\"\""),
 			@NameValue(name=RELAYFORWARDING, value="true"),
-			@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+			@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 		}, components={
 			@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
 				@NameValue(name="libpath", value="$args.libpath"),

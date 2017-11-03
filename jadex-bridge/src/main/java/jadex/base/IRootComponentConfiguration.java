@@ -506,6 +506,12 @@ public interface IRootComponentConfiguration
     // default:
     // false
 
+    public static final String WSPORT = "wsport";
+    
+    public static final String WSTRANSPORT = "wstransport";
+    
+    public static final String RELAYFORWARDING = "relayforwarding";
+    
     /**
      * This is used for consistency checks and includes all argument names which refer to boolean
      * arguments.
@@ -972,6 +978,18 @@ public interface IRootComponentConfiguration
      *  @param value The relay address.
      */
     public void setRelayAddress(String value);
+    
+    /**
+     *  Get the flag if the ws transport is active.
+     *  @return Flag if the ws transport is active.
+     */
+    public boolean getWsTransport();
+
+    /**
+     *  Set the flag if the ws transport is active.
+     *  @param value Flag if the ws transport is active.
+     */
+    public void setWsTransport(boolean value);
 
 //    boolean getRelaySecurity();
 //

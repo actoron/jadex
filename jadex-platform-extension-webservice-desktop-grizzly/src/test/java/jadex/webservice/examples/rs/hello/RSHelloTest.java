@@ -2,10 +2,10 @@ package jadex.webservice.examples.rs.hello;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.IRootComponentConfiguration;
-import jadex.base.PlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -49,9 +49,9 @@ public class RSHelloTest //extends TestCase
 		publishService.get();
 
 
-		PlatformConfiguration config = PlatformConfiguration.getMinimal();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setTcpTransport(false);
-		config.setKernels(IRootComponentConfiguration.KERNEL.component, IRootComponentConfiguration.KERNEL.micro);
+		config.setKernels(IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_MICRO);
 		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 //		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]

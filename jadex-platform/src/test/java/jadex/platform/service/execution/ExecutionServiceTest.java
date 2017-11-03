@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
@@ -19,7 +20,7 @@ public class ExecutionServiceTest
 	@Test
 	public void	testSimpleExecution()
 	{
-		PlatformConfiguration minimal = PlatformConfiguration.getMinimal();
+		IPlatformConfiguration minimal = PlatformConfigurationHandler.getMinimal();
 		minimal.setRelayTransport(false);
 		minimal.setWsTransport(false);
 		IExternalAccess	platform	= Starter.createPlatform(minimal).get();
