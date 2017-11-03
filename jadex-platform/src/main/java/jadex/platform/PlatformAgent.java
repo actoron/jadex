@@ -178,7 +178,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=RSPUBLISHCOMPONENT, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)"),
 
-	@Argument(name=KERNELS, clazz=String.class, defaultvalue="\"multi\""),
+	@Argument(name=KERNELS, clazz=String[].class, defaultvalue="new String[]{\"multi\"}"),
 	
 	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
 		
@@ -295,15 +295,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"application\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"v3\")!=-1 ? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdi\")!=-1 && $args.get(\"kernels\").indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"micro\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"component\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"application\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"v3\")!=-1 ? 1 : 0"),
+		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdi\")!=-1 && java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"gpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
 		
 //		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
@@ -376,15 +376,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"application\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"v3\")!=-1 ? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdi\")!=-1 && $args.get(\"kernels\").indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"micro\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"component\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"application\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"v3\")!=-1 ? 1 : 0"),
+		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdi\")!=-1 && java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"gpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
 //		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
@@ -441,7 +441,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
 			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 		}),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
 
 		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, arguments={
 //			@NameValue(name="paargs", value="new jadex.bridge.NotCopyHashMap($args)")}),
@@ -499,7 +499,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				@NameValue(name="baseclassloader", value="$args.baseclassloader"),
 				@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 			}),
-			@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
+			@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
 
 			@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, arguments={
 //				@NameValue(name="paargs", value="new jadex.bridge.NotCopyHashMap($args)")}),
