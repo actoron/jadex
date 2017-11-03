@@ -18,6 +18,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -100,9 +101,13 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		}
 		else if(mname.startsWith("add"))
 		{
-			Collection<Object> vals = (Collection<Object>)values.get(getKeyForMethodname(mname, 3));
+			String prop	= getKeyForMethodname(SUtil.getPlural(mname), 3);
+			Collection<Object> vals = (Collection<Object>)values.get(prop);
 			if(vals==null)
+			{
 				vals = new ArrayList<Object>();
+				values.put(prop, vals);
+			}
 			vals.add(args[0]);
 		}
 		else if(mname.startsWith("get") || method.getName().startsWith("has"))
@@ -117,7 +122,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		}
 		else if(mname.startsWith("remove"))
 		{
-			Collection<Object> vals = (Collection<Object>)values.get(getKeyForMethodname(mname, 6));
+			String prop	= getKeyForMethodname(SUtil.getPlural(mname), 3);
+			Collection<Object> vals = (Collection<Object>)values.get(prop);
 			if(vals!=null)
 				vals.remove(args[0]);
 		}
