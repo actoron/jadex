@@ -1,19 +1,19 @@
 package jadex.webservice.examples.rs.chart;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
 
 import java.awt.Color;
 
-import jadex.base.PlatformConfiguration;
+import org.junit.Before;
+import org.junit.Test;
+
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-
-import static org.junit.Assert.assertNotNull;
 
 
 public class RSChartTest
@@ -23,7 +23,7 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
-		PlatformConfiguration config = PlatformConfiguration.getMinimal();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);

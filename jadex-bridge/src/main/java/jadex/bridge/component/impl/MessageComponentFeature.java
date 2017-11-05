@@ -12,8 +12,6 @@ import java.util.UUID;
 
 import javax.management.ServiceNotFoundException;
 
-import jadex.base.IStarterConfiguration;
-import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -227,7 +225,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					fut.setException(exception);
 			}
 		});
-		timeout = timeout == null ? PlatformConfiguration.getLocalDefaultTimeout(platformid) : timeout;
+		timeout = timeout == null ? Starter.getLocalDefaultTimeout(platformid) : timeout;
 		component.getComponentFeature0(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -774,7 +772,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public static final ISerializationServices getSerializationServices(IComponentIdentifier platformid)
 	{
-		return (ISerializationServices) PlatformConfiguration.getPlatformValue(platformid.getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices) Starter.getPlatformValue(platformid.getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 	}
 	
 	/**
@@ -786,7 +784,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	@SuppressWarnings("unchecked")
 	public static final Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> getTransportCache(IComponentIdentifier platformid)
 	{
-		return (Map<IComponentIdentifier, Tuple2<ITransportService, Integer>>) PlatformConfiguration.getPlatformValue(platformid.getRoot(), IStarterConfiguration.DATA_TRANSPORTCACHE);
+		return (Map<IComponentIdentifier, Tuple2<ITransportService, Integer>>) Starter.getPlatformValue(platformid.getRoot(), Starter.DATA_TRANSPORTCACHE);
 	}
 	
 	/**

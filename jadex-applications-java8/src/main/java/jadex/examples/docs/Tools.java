@@ -1,14 +1,17 @@
 package jadex.examples.docs;
 
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IRootComponentConfiguration;
+
 
 /**
  * Created by kalinowski on 29.09.16.
  */
 
-public class Tools {
-    private void rootconfig() {
-        RootComponentConfiguration rootConfig = null;
-        rootConfig.setGui(false);
-    }
+public class Tools
+{
+	private void rootconfig()
+	{
+		IRootComponentConfiguration rootConfig = null;
+		rootConfig.setGui(false);
+	}
 }

@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -488,7 +488,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
 		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, boolean unrestricted)
 	{
-		Set<String> networknames = (Set<String>)PlatformConfiguration.getPlatformValue(providerid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		Set<String> networknames = (Set<String>)Starter.getPlatformValue(providerid, Starter.DATA_NETWORKNAMESCACHE);
 		return createServiceIdentifier(providerid, servicename, servicetype, serviceimpl, rid, scope, networknames, unrestricted);
 	}
 	

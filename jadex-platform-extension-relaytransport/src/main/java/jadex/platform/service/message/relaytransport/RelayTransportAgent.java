@@ -10,8 +10,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jadex.base.IStarterConfiguration;
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -420,7 +419,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		if (header.getProperty(FORWARD_DEST) == null)
 		{
-			ISerializationServices serserv = (ISerializationServices) PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier().getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			byte[] bheader = serserv.encode(header, agent, header);
 			bheader = secservice.encryptAndSign(header, bheader).get();
 			
@@ -438,7 +437,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			final List<byte[]> unpacked = SUtil.splitData(newbody);
 			final IComponentIdentifier source = (IComponentIdentifier) header.getProperty(FORWARD_SENDER);
-			final ISerializationServices serser = (ISerializationServices) PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier().getRoot(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+			final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			
 //			System.out.println("Final receiver, delivering to component: " + body);
 			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));

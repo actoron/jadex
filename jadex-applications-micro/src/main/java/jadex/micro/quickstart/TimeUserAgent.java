@@ -1,6 +1,7 @@
 package jadex.micro.quickstart;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.service.IService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -38,7 +39,7 @@ public class TimeUserAgent
 	 */
 	public static void	main(String[] args)
 	{
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimalRelayAwareness();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalRelayAwareness();
 		config.addComponent(TimeUserAgent.class.getName()+".class");
 		Starter.createPlatform(config).get();
 	}

@@ -125,10 +125,6 @@
         <jadex:description>Do not reuse cids.</jadex:description>
         <jadex:value>false</jadex:value>
       </jadex:argument>
-      <jadex:argument name="persist" type="boolean">
-        <jadex:description>Enable persistence (requires addon).</jadex:description>
-        <jadex:value>false</jadex:value>
-      </jadex:argument>
       <jadex:argument name="platformname" type="String">
         <jadex:description>The name of the platform component (null for auto generation).</jadex:description>
         <jadex:value>&quot;jadex&quot;</jadex:value>
@@ -145,7 +141,7 @@
       <jadex:providedservice interface="ILibraryService" proxytype="decoupled" implementation="new LibraryService($args.libpath)"/>
       <jadex:providedservice interface="IClockService" proxytype="raw" implementation="$args.simulation? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, &quot;system_clock&quot;, System.currentTimeMillis(), 100), $component, null): new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, &quot;simulation_clock&quot;, System.currentTimeMillis(), 100), $component, null)"/>
       <jadex:providedservice interface="IMessageService" proxytype="raw" implementation="new jadex.platform.service.message.MessageService($component.getExternalAccess(), $component.getLogger(), new jadex.platform.service.message.transport.ITransport[]{new jadex.platform.service.message.transport.localmtp.LocalTransport($component), new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component, $args.niotcpport, $component.getLogger())}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, jadex.bridge.fipa.SFipa.JADEX_XML, new jadex.platform.service.message.transport.codecs.CodecFactory(), false)"/>
-      <jadex:providedservice interface="IComponentManagementService" proxytype="decoupled" implementation="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.persistence.PersistenceComponentManagementService&quot;,	jadex.platform.service.library.LibraryService.class.getClassLoader())!=null	? jadex.platform.service.persistence.PersistenceComponentManagementService.create($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids) : new jadex.platform.service.cms.ComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)"/>
+      <jadex:providedservice interface="IComponentManagementService" proxytype="decoupled" implementation="new jadex.platform.service.cms.ComponentManagementService($component.getComponentAdapter(), $args.bootstrapfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)"/>
       <jadex:providedservice interface="IDF" proxytype="decoupled" implementation="new DirectoryFacilitatorService()"/>
       <jadex:providedservice interface="ISimulationService" proxytype="decoupled" implementation="new SimulationService()"/>
       <jadex:providedservice interface="IDeploymentService" proxytype="decoupled" implementation="new DeploymentService()"/>

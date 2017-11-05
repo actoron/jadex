@@ -2,8 +2,9 @@ package jadex.examples.presentationtimer.remotecontrol;
 
 import java.util.Map;
 
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -29,8 +30,8 @@ public class ClientMain  {
 	
 	public void setUp()
 	{
-		PlatformConfiguration config = PlatformConfiguration.getMinimalRelayAwareness();
-		RootComponentConfiguration rootConfig = config.getRootConfig();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
+		IRootComponentConfiguration rootConfig = config.getRootConfig();
 
 		config.setPlatformName("presentationtimer-*");
 		rootConfig.setNetworkName("jadexnetwork");

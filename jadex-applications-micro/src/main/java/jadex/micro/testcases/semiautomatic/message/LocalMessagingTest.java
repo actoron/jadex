@@ -2,7 +2,8 @@ package jadex.micro.testcases.semiautomatic.message;
 
 import java.util.HashMap;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -20,7 +21,7 @@ public class LocalMessagingTest
 	 */
 	public static void main(String[] args)
 	{
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 //		config.setLogging(true);
 		config.addComponent(ReceiverAgent.class);
 //		config.addComponent(SenderAgent.class, Collections.singletonMap(...));

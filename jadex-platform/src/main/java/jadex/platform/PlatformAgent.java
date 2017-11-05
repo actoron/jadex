@@ -31,7 +31,6 @@ import static jadex.base.IRootComponentConfiguration.MAVEN_DEPENDENCIES;
 import static jadex.base.IRootComponentConfiguration.MONITORINGCOMP;
 import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
 import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
-import static jadex.base.IRootComponentConfiguration.PERSIST;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
 import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
@@ -65,12 +64,12 @@ import static jadex.base.IRootComponentConfiguration.WSTRANSPORT;
 import java.util.Map;
 import java.util.logging.Level;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.Boolean3;
@@ -113,10 +112,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
  */
 @Arguments(
 {
-	@Argument(name=PlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
-	@Argument(name=PlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name=PlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
-	@Argument(name=PlatformConfiguration.PLATFORM_COMPONENT, clazz=Class.class, defaultvalue="jadex.platform.service.cms.PlatformComponent.class"),
+	@Argument(name=IPlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name=IPlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name=IPlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
+	@Argument(name=IPlatformConfiguration.PLATFORM_COMPONENT, clazz=ClassInfo.class, defaultvalue="new jadex.bridge.ClassInfo(jadex.platform.service.cms.PlatformComponent.class)"),
 	@Argument(name=WELCOME, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=PROGRAM_ARGUMENTS, clazz=String[].class),
 	
@@ -131,7 +130,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=ASYNCEXECUTION, clazz=Boolean.class),
 	@Argument(name=THREADPOOLDEFER, clazz=boolean.class, defaultvalue="true"),
 	
-	@Argument(name=PERSIST, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name=LIBPATH, clazz=String.class),
@@ -177,7 +175,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=RSPUBLISHCOMPONENT, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)"),
 
-	@Argument(name=KERNELS, clazz=String.class, defaultvalue="\"multi\""),
+	@Argument(name=KERNELS, clazz=String[].class, defaultvalue="new String[]{\"multi\"}"),
 	
 	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
 		
@@ -197,7 +195,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=LIBRARY, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SETTINGS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name="persistence", clazz=boolean.class, defaultvalue="true")
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="$args.superpeer==null? true: !$args.superpeer")
@@ -236,7 +233,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
-//	@ComponentType(name="persistence", filename="jadex/platform/service/persistence/PersistenceAgent.class") // problem because the cms is also the persistence service
 	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
 	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
@@ -255,11 +251,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() : $args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 //	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component, $args.simulation): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component, $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)")),
-	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.persist, $args.uniqueids) : new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.uniqueids)")),
+	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.bootstrapfactory, $args.uniqueids)"))
 //	@ProvidedService(type=IDF.class, implementation=@Implementation(DirectoryFacilitatorService.class)),
 //	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(SimulationService.class)),
 //	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class)),
-	@ProvidedService(type=IPersistenceService.class, implementation=@Implementation(expression="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null ? $component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.cms.IComponentManagementService.class) : null")),
 })
 
 @RequiredServices(
@@ -278,7 +273,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Configuration(name="auto", arguments={
 		@NameValue(name=TCPPORT, value="0"),
 //		@NameValue(name=SSLTCPPORT, value="0"),
-		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+		@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 //		@Component(name="system", type="system", daemon=Boolean3.TRUE),
 //		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
@@ -291,18 +286,17 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
-//		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"application\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"v3\")!=-1 ? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdi\")!=-1 && $args.get(\"kernels\").indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"micro\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"component\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"application\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"v3\")!=-1 ? 1 : 0"),
+		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdi\")!=-1 && java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"gpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
 		
 //		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
@@ -342,20 +336,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.TCPTRANSPORT ? 1: 0",
-//		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 			arguments={
-				@NameValue(name="port", value="jadex.platform.PlatformAgent.TCPPORT")
-//				@NameValue(name="port", value="$args.tcpport")
+				@NameValue(name="port", value="$args.tcpport")
 			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.WSTRANSPORT ? 1: 0",
-//		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="jadex.platform.PlatformAgent.WSPORT")
-//			@NameValue(name="port", value="$args.wsport")
+			@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.RELAYTRANSPORT ? 1: 0",
-//		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress")
 			}),
@@ -377,18 +366,17 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
-//		@Component(name="persistence", type="persistence", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.persistence.PersistenceComponentManagementService\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null? 1 : 0"),
 		
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"application\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"v3\")!=-1 ? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdi\")!=-1 && $args.get(\"kernels\").indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"micro\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"component\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"application\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"v3\")!=-1 ? 1 : 0"),
+		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdi\")!=-1 && java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"gpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
 //		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
@@ -422,20 +410,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.TCPTRANSPORT ? 1: 0",
-//		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-			arguments={
-				@NameValue(name="port", value="jadex.platform.PlatformAgent.TCPPORT")
-//				@NameValue(name="port", value="$args.tcpport")
-			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.WSTRANSPORT ? 1: 0",
-//		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="jadex.platform.PlatformAgent.WSPORT")
-//			@NameValue(name="port", value="$args.wsport")
+			@NameValue(name="port", value="$args.tcpport")
+		}),
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		arguments={
+			@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.RELAYTRANSPORT ? 1: 0",
-//		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress")
 			}),
@@ -443,14 +426,14 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
 //		@NameValue(name=SSLTCPPORT, value="0"),
-		@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+		@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
 		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
 			@NameValue(name="libpath", value="$args.libpath"),
 			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
 			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 		}),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
+		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
 
 		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, arguments={
 //			@NameValue(name="paargs", value="new jadex.bridge.NotCopyHashMap($args)")}),
@@ -483,20 +466,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
 			arguments={@NameValue(name="console", value="$args.cliconsole")}),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.TCPTRANSPORT ? 1: 0",
-//		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-			arguments={
-				@NameValue(name="port", value="jadex.platform.PlatformAgent.TCPPORT")
-//				@NameValue(name="port", value="$args.tcpport")
-			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.WSTRANSPORT ? 1: 0",
-//		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="jadex.platform.PlatformAgent.WSPORT")
-//			@NameValue(name="port", value="$args.wsport")
+			@NameValue(name="port", value="$args.tcpport")
+		}),
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
+		arguments={
+			@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="jadex.platform.PlatformAgent.RELAYTRANSPORT ? 1: 0",
-//		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress")
 			}),
@@ -506,14 +484,14 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name=WSPORT, value="8080"),
 			@NameValue(name=RELAYADDRESS, value="\"\""),
 			@NameValue(name=RELAYFORWARDING, value="true"),
-			@NameValue(name=PlatformConfiguration.PLATFORM_NAME, value="null")
+			@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 		}, components={
 			@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
 				@NameValue(name="libpath", value="$args.libpath"),
 				@NameValue(name="baseclassloader", value="$args.baseclassloader"),
 				@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 			}),
-			@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
+			@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
 
 			@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, arguments={
 //				@NameValue(name="paargs", value="new jadex.bridge.NotCopyHashMap($args)")}),
@@ -547,12 +525,12 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				arguments={@NameValue(name="console", value="$args.cliconsole")}),
 			@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 			@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-				arguments={
-					@NameValue(name="port", value="$args.tcpport")
-				}),
+			arguments={
+				@NameValue(name="port", value="$args.tcpport")
+			}),
 			@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
 			arguments={
-				@NameValue(name="port", value="$args.wsport")
+					@NameValue(name="port", value="$args.wsport")
 				}),
 			@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 				arguments={
@@ -563,10 +541,4 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 @Agent
 public class PlatformAgent
 {
-	// hack!!! hard code transports for debugging
-	public static boolean	TCPTRANSPORT	= true;
-	public static boolean	WSTRANSPORT	= true;
-	public static boolean	RELAYTRANSPORT	= false;
-	public static int	TCPPORT	= 0;
-	public static int	WSPORT	= -1;
 }

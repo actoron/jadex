@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IRootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -227,7 +227,7 @@ public abstract class TestAgent
 					public void customResultAvailable(Map<String,Object> rootargs)
 					{
 						Map<String, String> argsmap = new HashMap<String, String>();
-						String[]	progargs	= (String[])rootargs.get(RootComponentConfiguration.PROGRAM_ARGUMENTS);
+						String[]	progargs	= (String[])rootargs.get(IRootComponentConfiguration.PROGRAM_ARGUMENTS);
 						String[]	defargs	= new String[]
 						{
 //							"-libpath", url,

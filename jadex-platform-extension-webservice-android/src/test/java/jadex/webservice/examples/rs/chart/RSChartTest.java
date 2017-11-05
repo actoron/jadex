@@ -4,7 +4,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.security.Security;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -32,7 +33,7 @@ public class RSChartTest
 		System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_GCM_SHA256");	// Hack: workaround for java 8 problem with ECDH key exchange
 		new SReflectSub().setIsAndroid(true, true);
 
-		PlatformConfiguration config = PlatformConfiguration.getMinimal();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);

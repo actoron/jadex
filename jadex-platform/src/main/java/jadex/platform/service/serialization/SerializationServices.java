@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jadex.base.IStarterConfiguration;
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -66,11 +65,10 @@ public class SerializationServices implements ISerializationServices
 	protected Map<Integer, ICodec> codecs;
 	
 	/** Preprocessors for encoding. */
-	ITraverseProcessor[] preprocessors;
+	protected ITraverseProcessor[] preprocessors;
 	
 	/** Postprocessors for decoding. */
-	ITraverseProcessor[] postprocessors;
-	
+	protected ITraverseProcessor[] postprocessors;
 	
 	/** The reference class cache (clazz->boolean (is reference)). */
 	protected Map<Class<?>, boolean[]> references;
@@ -564,6 +562,6 @@ public class SerializationServices implements ISerializationServices
 	 */
 	public static final ISerializationServices getSerializationServices(IComponentIdentifier platform)
 	{
-		return (ISerializationServices)PlatformConfiguration.getPlatformValue(platform, IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices)Starter.getPlatformValue(platform, Starter.DATA_SERIALIZATIONSERVICES);
 	}
 }

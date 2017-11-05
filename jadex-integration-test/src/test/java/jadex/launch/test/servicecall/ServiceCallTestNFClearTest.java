@@ -10,7 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -65,7 +66,7 @@ public class ServiceCallTestNFClearTest
 
 		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimal();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 //		config.setLogging(true);
 //		config.setDefaultTimeout(-1);
 		config.setPlatformName(pid);

@@ -1,6 +1,7 @@
 package jadex.micro.quickstart;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.service.IService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -34,7 +35,7 @@ public class TimeUser2Agent
 	 */
 	public static void main(String[] args)
 	{
-		PlatformConfiguration config = PlatformConfiguration.getDefault();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
 		config.addComponent(TimeUserAgent.class.getName()+".class");
 		Starter.createPlatform(config).get();
 	}

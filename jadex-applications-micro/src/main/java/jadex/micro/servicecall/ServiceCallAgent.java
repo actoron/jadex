@@ -3,7 +3,8 @@ package jadex.micro.servicecall;
 import java.io.IOException;
 import java.util.Map;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -253,7 +254,7 @@ public class ServiceCallAgent	extends TestAgent
 	public static void main(String[] args) throws Exception
 	{
 		// Start platform with agent.
-		PlatformConfiguration	config1	= PlatformConfiguration.getMinimal();
+		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
 		config1.setSecurity(true);

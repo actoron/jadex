@@ -40,3 +40,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /jadex-integration-test/highscore.dmp
 /jadex-integration-test/certstore.zip
 /jadex-platform-standalone-launch/src/main/config/Invoker.launch
+/local.properties

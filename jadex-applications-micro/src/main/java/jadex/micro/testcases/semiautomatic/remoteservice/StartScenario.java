@@ -2,7 +2,8 @@ package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import java.util.Collection;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -45,7 +46,7 @@ public class StartScenario
 		
 		
 //		Starter.createPlatform(createArguments(defargs, libpaths))
-		PlatformConfiguration conf1 = PlatformConfiguration.getMinimal();
+		IPlatformConfiguration conf1 = PlatformConfigurationHandler.getMinimal();
 		conf1.setGui(true);
 		Starter.createPlatform(conf1)
 			.addResultListener(new DefaultResultListener<IExternalAccess>()
@@ -55,7 +56,7 @@ public class StartScenario
 				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-tcpport", "11001", "-printpass", "false", "-networkname", "abc"};
 				
 //				Starter.createPlatform(createArguments(defargs, libpaths))
-				Starter.createPlatform(PlatformConfiguration.getMinimal())
+				Starter.createPlatform(PlatformConfigurationHandler.getMinimal())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(final IExternalAccess rplat)

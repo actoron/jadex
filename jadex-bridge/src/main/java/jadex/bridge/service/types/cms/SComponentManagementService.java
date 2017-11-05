@@ -2,7 +2,7 @@ package jadex.bridge.service.types.cms;
 
 import java.util.Map;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
@@ -58,7 +58,7 @@ public class SComponentManagementService
 	protected static final Map<IComponentIdentifier, IPlatformComponentAccess> getComponentMap(IComponentIdentifier platform)
 	{
 		@SuppressWarnings("unchecked")
-		Map<IComponentIdentifier, IPlatformComponentAccess> ret = (Map<IComponentIdentifier, IPlatformComponentAccess>) PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_COMPONENTMAP);
+		Map<IComponentIdentifier, IPlatformComponentAccess> ret = (Map<IComponentIdentifier, IPlatformComponentAccess>) Starter.getPlatformValue(platform, Starter.DATA_COMPONENTMAP);
 		if (ret == null)
 			throw new IllegalArgumentException("Platform not found: " + platform);
 		return ret;

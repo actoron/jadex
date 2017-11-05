@@ -13,8 +13,9 @@ import jadex.android.AndroidContextManager;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -147,25 +148,25 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	}
 
 	@Override
-	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels) {
-		PlatformConfiguration config = PlatformConfiguration.getDefault();
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels) {
+		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
 		config.getRootConfig().setKernels(kernels);
 		return startJadexPlatform(config);
 	}
 
 	@Override
-	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels, String platformId) {
-		PlatformConfiguration config = PlatformConfiguration.getDefault();
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId) {
+		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
 		config.getRootConfig().setKernels(kernels);
 		config.setPlatformName(platformId);
 		return startJadexPlatform(config);
 	}
 
 	public IFuture<IExternalAccess> startJadexPlatform() {
-		return startJadexPlatform(PlatformConfiguration.getAndroidDefault());
+		return startJadexPlatform(PlatformConfigurationHandler.getAndroidDefault());
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(PlatformConfiguration config)
+	public IFuture<IExternalAccess> startJadexPlatform(IPlatformConfiguration config)
 	{
 		onPlatformStarting();
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();

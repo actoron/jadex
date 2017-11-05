@@ -13,7 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
@@ -103,7 +103,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		this.queries = new Indexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.delay = delay;
 		
-		TransformSet<String> nnames = (TransformSet<String>)PlatformConfiguration.getPlatformValue(cid, PlatformConfiguration.DATA_NETWORKNAMESCACHE);
+		TransformSet<String> nnames = (TransformSet<String>)Starter.getPlatformValue(cid, Starter.DATA_NETWORKNAMESCACHE);
 		nnames.addChangeListener(new IChangeListener<String>()
 		{
 			public void changeOccurred(ChangeEvent<String> event)
@@ -1696,7 +1696,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public static IServiceRegistry getRegistry(IComponentIdentifier platform)
 	{
-		return (IServiceRegistry)PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SERVICEREGISTRY);
+		return (IServiceRegistry)Starter.getPlatformValue(platform, Starter.DATA_SERVICEREGISTRY);
 	}
 	
 	/**

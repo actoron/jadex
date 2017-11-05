@@ -15,8 +15,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -39,10 +40,10 @@ public class PlatformConfigurationTest
 		
 		
 		// only load model
-		Class<?> cfclass = SReflect.classForName(PlatformConfiguration.FALLBACK_COMPONENT_FACTORY, this.getClass().getClassLoader());
+		Class<?> cfclass = SReflect.classForName(IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY, this.getClass().getClassLoader());
 		final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 			.newInstance(new Object[]{"rootid"});
-		final IModelInfo defmodel	= cfac.loadModel(PlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION, null, null).get();	// No execution yet, can only work if method is synchronous.
+		final IModelInfo defmodel	= cfac.loadModel(IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION, null, null).get();	// No execution yet, can only work if method is synchronous.
 		
 		// start whole platfrom
 //		IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(config).get(timeout);
@@ -52,22 +53,22 @@ public class PlatformConfigurationTest
 		
 		IArgument[] arguments = defmodel.getArguments();
 		
-		HashMap<String,Field> staticFieldContents = getStaticFieldContents(RootComponentConfiguration.class);
-		Map<String, Method> setters = getSettersByName(RootComponentConfiguration.class, staticFieldContents.keySet());
+		HashMap<String,Field> staticFieldContents = getStaticFieldContents(IRootComponentConfiguration.class);
+		Map<String, Method> setters = getSettersByName(IRootComponentConfiguration.class, staticFieldContents.keySet());
 		
 		for(IArgument argument : arguments)
 		{
 			String name = argument.getName();
 			// those don't have to be in the root component configuration
-			if (!(name.equals(PlatformConfiguration.PLATFORM_NAME)
-				|| name.equals(PlatformConfiguration.AUTOSHUTDOWN)
-				|| name.equals(PlatformConfiguration.CONFIGURATION_NAME)
-				|| name.equals(PlatformConfiguration.PLATFORM_COMPONENT))) {
+			if (!(name.equals(IPlatformConfiguration.PLATFORM_NAME)
+				|| name.equals(IPlatformConfiguration.AUTOSHUTDOWN)
+				|| name.equals(IPlatformConfiguration.CONFIGURATION_NAME)
+				|| name.equals(IPlatformConfiguration.PLATFORM_COMPONENT))) {
 				Field field = staticFieldContents.get(name);
 				assertTrue("RootComponentConfiguration should contain parameter: " + name,field != null);
 				
 				// this parameter does not have a getter
-				if (!name.equals(RootComponentConfiguration.PROGRAM_ARGUMENTS)) {
+				if (!name.equals(IRootComponentConfiguration.PROGRAM_ARGUMENTS)) {
 					String prettyName = makePrettyName(name);
 					Method method = setters.get(prettyName);
 					assertNotNull("No setter for: " + prettyName, method);
@@ -77,8 +78,8 @@ public class PlatformConfigurationTest
 						setterParamType = SReflect.getWrappedType(setterParamType);
 					}
 					// this parameter has another parameter type in config object
-					if (!(name.equals(RootComponentConfiguration.KERNELS)
-						|| name.equals(RootComponentConfiguration.AWAMECHANISMS))) {
+					if (!(name.equals(IRootComponentConfiguration.KERNELS)
+						|| name.equals(IRootComponentConfiguration.AWAMECHANISMS))) {
 						assertEquals("Field " + name + " has not the same type.", modelParamType, setterParamType);
 					}
 					
@@ -95,8 +96,8 @@ public class PlatformConfigurationTest
 		{
 			boolean contains = false;
 			// those dont have to be in the agent model
-			if (!(argument.equals(RootComponentConfiguration.COMPONENT_FACTORY) 
-				|| argument.equals(RootComponentConfiguration.PLATFORM_ACCESS)))
+			if (!(argument.equals(IRootComponentConfiguration.COMPONENT_FACTORY) 
+				|| argument.equals(IRootComponentConfiguration.PLATFORM_ACCESS)))
 			{
 					for(IArgument iArgument : arguments)
 					{
@@ -105,6 +106,7 @@ public class PlatformConfigurationTest
 							continue;
 						}
 					}
+					if(!contains)
 					assertTrue("RootComponentConfiguration contains parameter that is not in platform model: " + argument, contains);
 			}
 		}
@@ -113,13 +115,13 @@ public class PlatformConfigurationTest
 	@Test
 	public void testMinimalPlatform() 
 	{
-		PlatformConfiguration minimal = PlatformConfiguration.getMinimal();
+		IPlatformConfiguration minimal = PlatformConfigurationHandler.getMinimal();
 		minimal.setRelayTransport(false);
 		minimal.setWsTransport(false);
 		Starter.createPlatform(minimal).get();
 	}
 
-	private Map<String,Method> getSettersByName(Class<RootComponentConfiguration> class1, Set<String> names)
+	private Map<String,Method> getSettersByName(Class<IRootComponentConfiguration> class1, Set<String> names)
 	{
 		HashSet<String> myNames = new HashSet<String>();
 		for(String string : names)
@@ -149,13 +151,15 @@ public class PlatformConfigurationTest
 		return name.toLowerCase().replace("_", "");
 	}
 
-	private HashMap<String, Field> getStaticFieldContents(Class<RootComponentConfiguration> class1)
+	private HashMap<String, Field> getStaticFieldContents(Class<IRootComponentConfiguration> class1)
 	{
 		HashMap<String,Field> hashMap = new HashMap<String, Field>();
 		Field[] fields = class1.getFields();
 		for(Field field : fields)
 		{
-			if (Modifier.isStatic(field.getModifiers())) {
+			if (!field.getName().startsWith("AWAMECHANISM_")
+					&& !field.getName().startsWith("KERNEL_")
+					&& Modifier.isStatic(field.getModifiers())) {
 				if(String.class.isAssignableFrom(field.getType())) {
 					try
 					{

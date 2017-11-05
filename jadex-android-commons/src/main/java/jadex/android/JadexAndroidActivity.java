@@ -3,7 +3,9 @@ package jadex.android;
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.exception.WrongEventClassError;
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -47,7 +49,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	protected IComponentIdentifier platformId;
 	
 	private boolean platformAutostart;
-	private PlatformConfiguration platformConfiguration;
+	private IPlatformConfiguration platformConfiguration;
 
 	/**
 	 * Constructor
@@ -56,7 +58,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	{
 		super();
 		platformAutostart = false;
-		platformConfiguration = PlatformConfiguration.getAndroidDefault();
+		platformConfiguration = PlatformConfigurationHandler.getAndroidDefault();
 	}
 	
 	protected void onCreate(Bundle savedInstanceState)
@@ -100,7 +102,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 * Sets platform configuration.
 	 * @param config
 	 */
-	protected void setPlatformConfiguration(PlatformConfiguration config) {
+	protected void setPlatformConfiguration(IPlatformConfiguration config) {
 		this.platformConfiguration = config;
 	}
 
@@ -108,13 +110,13 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 * Get the platform configuration
 	 * @return
 	 */
-	protected PlatformConfiguration getPlatformConfiguration() {
+	protected IPlatformConfiguration getPlatformConfiguration() {
 		return platformConfiguration;
 	}
 	
 	/**
 	 * Sets the Kernels.
-	 * See {@link jadex.base.RootComponentConfiguration.KERNEL} Constants for available Kernels.
+	 * See {@link jadex.base.IRootComponentConfiguration.KERNELS} Constants for available Kernels.
 	 * @param kernels
 	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
 	 */
@@ -128,7 +130,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 * @deprecated use setPlatformConfiguration
 	 */
 	protected void setPlatformOptions(String options) {
-		this.platformConfiguration.enhanceWith(PlatformConfiguration.processArgs(options));
+		this.platformConfiguration.enhanceWith(Starter.processArgs(options));
 	}
 	
 	/**

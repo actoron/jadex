@@ -4,7 +4,9 @@ import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -31,7 +33,7 @@ import android.os.IBinder;
 public class JadexPlatformService extends JadexMultiPlatformService implements JadexPlatformOptions, IJadexPlatformBinder
 {
 	
-	private PlatformConfiguration platformConfiguration;
+	private IPlatformConfiguration platformConfiguration;
 	private boolean platformAutostart;
 
 	private IComponentIdentifier platformId;
@@ -39,7 +41,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
-		platformConfiguration = PlatformConfiguration.getAndroidDefault();
+		platformConfiguration = PlatformConfigurationHandler.getAndroidDefault();
 	}
 
 	@Override
@@ -107,14 +109,14 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	 * @deprecated use setPlatformConfiguration
 	 */
 	protected void setPlatformOptions(String options) {
-		this.platformConfiguration.enhanceWith(PlatformConfiguration.processArgs(options));
+		this.platformConfiguration.enhanceWith(Starter.processArgs(options));
 	}
 
 	/**
 	 * Sets platform configuration.
 	 * @param config
 	 */
-	protected void setPlatformConfiguration(PlatformConfiguration config) {
+	protected void setPlatformConfiguration(IPlatformConfiguration config) {
 		this.platformConfiguration = config;
 	}
 
@@ -122,7 +124,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	 * Get the platform configuration
 	 * @return
 	 */
-	protected PlatformConfiguration getPlatformConfiguration() {
+	protected IPlatformConfiguration getPlatformConfiguration() {
 		return platformConfiguration;
 	}
 

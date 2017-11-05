@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.IStarterConfiguration;
-import jadex.base.PlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -636,6 +635,6 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 */
 	public final ISerializationServices getSerializationServices()
 	{
-		return (ISerializationServices)PlatformConfiguration.getPlatformValue(ia.getComponentIdentifier(), IStarterConfiguration.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices)Starter.getPlatformValue(ia.getComponentIdentifier(), Starter.DATA_SERIALIZATIONSERVICES);
 	}
 }

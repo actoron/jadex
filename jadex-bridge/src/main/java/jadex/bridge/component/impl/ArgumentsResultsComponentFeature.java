@@ -284,9 +284,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
 	{
 		if(resfuts==null)
-		{
 			resfuts	= new LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
-		}
 		final SubscriptionIntermediateFuture<Tuple2<String, Object>>	ret	= new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
 		resfuts.add(ret);
 		ret.setTerminationCommand(new TerminationCommand()
