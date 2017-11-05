@@ -9,6 +9,9 @@ import jadex.platform.service.transport.ITransportHandler;
  */
 public abstract class AWebsocketConnection implements IWebSocketConnection
 {
+	/** Command to generate a null message (send as Text frame). */
+	protected static final String NULL_MSG_COMMAND = "null";
+	
 	/** The handler. */
 	protected ITransportHandler<IWebSocketConnection> handler;
 	

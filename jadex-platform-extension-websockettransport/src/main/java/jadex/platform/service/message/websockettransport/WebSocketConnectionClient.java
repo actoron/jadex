@@ -60,7 +60,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		{
 			WebSocketFactory factory = new WebSocketFactory(); //.setConnectionTimeout(5000);
 			websocket = factory.createSocket("ws://" + address);
-			websocket.setAutoFlush(true);
+//			websocket.setAutoFlush(true);
 			websocket.setPingInterval(pojoagent.getIdleTimeout() >>> 1);
 		}
 		catch (Exception e)
@@ -92,14 +92,23 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 			
 			public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception
 			{
+				// API bug, zero-sized messages returned as null.
+				if (binary == null)
+					binary = new byte[0];
 //				System.out.println("Client Binary msg size: " + (binary != null ? String.valueOf(binary.length) : "null"));
 				handleMessagePayload(binary);
+			}
+			
+			public void onTextMessage(WebSocket websocket, String text) throws Exception
+			{
+				if (NULL_MSG_COMMAND.equals(text))
+					handleMessagePayload(null);
 			}
 			
 			/** Message size check. */
 			public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception
 			{
-				if (frame.getOpcode() == WebSocketOpcode.TEXT)
+				if (frame.getOpcode() == WebSocketOpcode.TEXT && !frame.getFin())
 				{
 					websocket.disconnect(WebSocketCloseCode.UNACCEPTABLE);
 				}
@@ -146,7 +155,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	{
 		if (!WebSocketState.OPEN.equals(websocket.getState()))
 			return new Future<Void>(new IOException("Connection is not available."));
-//		System.out.println("SendClient: " + Arrays.hashCode(body) + " " + System.currentTimeMillis());
+//		System.out.println("SendClient: " + (header == null ? "null" : String.valueOf(header.length)) + " " + (body == null ? "null" : String.valueOf(body.length)));
 		Future<Void> ret = new Future<Void>();
 		try
 		{
@@ -154,7 +163,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 			{
 				sendAsFrames(header);
 				sendAsFrames(body);
-				websocket.flush();
+//				websocket.flush();
 				ret.setResult(null);
 			}
 		}
@@ -203,9 +212,9 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 		if (data == null)
 		{
 			WebSocketFrame wsf = new WebSocketFrame();
-			wsf.setOpcode(WebSocketOpcode.BINARY);
+			wsf.setOpcode(WebSocketOpcode.TEXT);
 			wsf.setFin(true);
-			wsf.setPayload(data);
+			wsf.setPayload(NULL_MSG_COMMAND);
 			websocket.sendFrame(wsf);
 		}
 		else

@@ -43,11 +43,11 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			 */
 			protected void debugFrameReceived(WebSocketFrame frame)
 			{
-				if (frame.getOpCode().equals(OpCode.Text))
+				if (frame.getOpCode().equals(OpCode.Text) && !frame.isFin())
 				{
 					try
 					{
-						this.close(CloseCode.UnsupportedData, "Text not supported.", false);
+						this.close(CloseCode.UnsupportedData, "Long text not supported.", false);
 					}
 					catch (IOException e)
 					{
@@ -117,10 +117,10 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 			 */
 			protected void onMessage(WebSocketFrame message)
 			{
-//				System.out.println("srv msg op: " + message.getOpCode() + " " + message.isFin());
-				byte[] payload = null;
 				if (message.getOpCode().equals(OpCode.Binary))
 				{
+//					System.out.println("Server Binary msg size: " + (message.getBinaryPayload() == null ? "null" : String.valueOf(message.getBinaryPayload().length)));
+					byte[] payload = null;
 					try
 					{
 						payload = message.getBinaryPayload();
@@ -128,13 +128,22 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 					catch(Exception e)
 					{
 					}
+					
+					// Should never happen, catch just in case.
+					if (payload == null)
+						payload = new byte[0];
+					
+					
+//					System.out.println("RecServer: " + Arrays.hashCode(payload) + " " + System.currentTimeMillis());
+					handleMessagePayload(payload);						
+					
+				}
+				else if (message.getOpCode().equals(OpCode.Text) && NULL_MSG_COMMAND.equals(message.getTextPayload()))
+				{
+					handleMessagePayload(null);
 				}
 				
-				if (payload != null)
-				{
-//					System.out.println("RecServer: " + Arrays.hashCode(payload) + " " + System.currentTimeMillis());
-					handleMessagePayload(payload);
-				}
+				
 			}
 			
 			/**
@@ -170,7 +179,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	 */
 	public IFuture<Void> sendMessage(byte[] header, byte[] body)
 	{
-//		System.out.println("SendServer: " + Arrays.hashCode(body) + " " + System.currentTimeMillis());
+//		System.out.println("SendServer: " + (header == null ? "null" : String.valueOf(header.length)) + " " + (body == null ? "null" : String.valueOf(body.length)));
 		Future<Void> ret = new Future<Void>();
 		try
 		{
@@ -244,7 +253,7 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	{
 		if (data == null)
 		{
-			WebSocketFrame wsf = new WebSocketFrame(WebSocketFrame.OpCode.Binary, true, data);
+			WebSocketFrame wsf = new WebSocketFrame(WebSocketFrame.OpCode.Text, true, NULL_MSG_COMMAND);
 			websocket.sendFrame(wsf);
 		}
 		else
@@ -272,7 +281,6 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 //				System.out.println("frame totalsize: " + data.length + " count " + count + " " + i + " " + opcode + " " + fin);
 				WebSocketFrame wsf = new WebSocketFrame(opcode, fin, payload);
 				websocket.sendFrame(wsf);
-				socket.getOutputStream().flush();
 			}
 		}
 	}
