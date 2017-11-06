@@ -1,6 +1,8 @@
 package jadex.bridge.service.search;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +18,16 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.remotecommands.ProxyInfo;
+import jadex.bridge.component.impl.remotecommands.ProxyReference;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -31,6 +38,8 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -2404,7 +2413,43 @@ public class SServiceProvider
 		return ServiceRegistry.getRegistry(component.getComponentIdentifier().getRoot()).addQuery(query);
 	}
 	
-	
+	/**
+	 *  Gets a proxy for a known service at a target component.
+	 *  @return Service proxy.
+	 */
+	public static <S> S getServiceProxy(IInternalAccess component, IComponentIdentifier providerid, Class<S> servicetype)
+	{				
+		S ret = null;
+		boolean local = component.getComponentIdentifier().getRoot().equals(providerid.getRoot());
+		if(local)
+		{
+			ret = SServiceProvider.getLocalService(component, servicetype, providerid);
+		}
+		else
+		{
+			try
+			{
+				Class<?>[] interfaces = new Class[]{servicetype, IService.class};
+				ProxyInfo pi = new ProxyInfo(interfaces);
+				IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, "NULL", servicetype, null, null, RequiredServiceInfo.SCOPE_GLOBAL, true);
+				RemoteReference rr = new RemoteReference(providerid, sid);
+				ProxyReference pr = new ProxyReference(pi, rr);
+				Class<?> h = SReflect.classForName0("jadex.platform.service.serialization.RemoteMethodInvocationHandler", null);
+				Constructor<?> c = h.getConstructor(new Class[]{IInternalAccess.class, ProxyReference.class});
+				InvocationHandler handler = (InvocationHandler)c.newInstance(new Object[]{component, pr});
+				ret = (S)ProxyFactory.newProxyInstance(component.getClassLoader(), 
+					interfaces, handler);
+//				ret = (S)ProxyFactory.newProxyInstance(component.getClassLoader(), 
+//					interfaces, new RemoteMethodInvocationHandler(component, pr));
+			}
+			catch(Exception e)
+			{
+				SUtil.rethrowAsUnchecked(e);
+			}
+		}
+		
+		return ret;
+	}
 }
 
 

@@ -205,7 +205,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			
 			protected void	proceed()
 			{
-				final String mechas = (String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("mechanisms");
+				final Object mechas = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("mechanisms");
+//				final String mechas = (String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("mechanisms");
 				if(mechas!=null)
 				{
 					IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
@@ -213,9 +214,21 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 					{
 						public void customResultAvailable(IComponentManagementService cms)
 						{
+							List<String> ms = new ArrayList<String>();
 							AwarenessManagementAgent.this.cms = cms;
-							StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
-							CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
+							if(mechas instanceof String)
+							{
+								StringTokenizer	stok	= new StringTokenizer((String)mechas, ", \r\n\t");
+								while(stok.hasMoreTokens())
+									ms.add(stok.nextToken());
+							}
+							else if(mechas instanceof String[])
+							{
+								for(String str: (String[])mechas)
+									ms.add(str);
+							}
+							
+							CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(ms.size(), 
 								false, new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)
@@ -235,10 +248,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 							
 //							System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
 							
-							while(stok.hasMoreTokens())
+							for(String str: ms)
 							{
 	//							System.out.println("mecha: "+mechas[i]);
-								String	mech	= stok.nextToken().toLowerCase();
+								String	mech = str.toLowerCase();
 								cms.createComponent(mech, mech, info, null).addResultListener(lis);
 							}
 						}

@@ -48,7 +48,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		values.put("localdefaulttimeout", IStarterConfiguration.DEFAULT_LOCAL_TIMEOUT);
 		values.put("remotedefaulttimeout", IStarterConfiguration.DEFAULT_REMOTE_TIMEOUT);
 		values.put("components", new ArrayList<String>());
-		System.out.println("PlatformConfigurationHandler: "+values+" "+hashCode());
+//		System.out.println("PlatformConfigurationHandler: "+values+" "+hashCode());
 	}
 	
 	/**

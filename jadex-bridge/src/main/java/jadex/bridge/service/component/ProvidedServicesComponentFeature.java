@@ -808,7 +808,14 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		{
 			for(Object ser: services)
 			{
-				if(((IService)ser).getServiceIdentifier().equals(sid))
+				// Special case for fake proxies, i.e. creating a service proxy for a known component (without knowing cid)
+				if(sid.getServiceName().equals("NULL"))
+				{
+					((IService)ser).getServiceIdentifier().getServiceType().equals(sid.getServiceType());
+					ret = (IService)ser;
+					break;
+				}
+				else if(((IService)ser).getServiceIdentifier().equals(sid))
 				{
 					ret = (IService)ser;
 					break;
