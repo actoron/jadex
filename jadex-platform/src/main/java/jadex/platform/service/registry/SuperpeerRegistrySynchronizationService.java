@@ -11,15 +11,22 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.component.impl.remotecommands.ProxyInfo;
+import jadex.bridge.component.impl.remotecommands.ProxyReference;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -34,6 +41,7 @@ import jadex.bridge.service.types.registry.RegistryUpdateEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
 import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
@@ -43,6 +51,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.micro.annotation.Binding;
+import jadex.platform.service.serialization.RemoteMethodInvocationHandler;
 
 /**
  *  Registry service for synchronization with remote platforms. 
@@ -57,25 +67,31 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	@ServiceComponent
 	protected IInternalAccess component;
 	
-	/** The subscriptions of other platforms (platform cid -> subscription info). */
+	/** The subscriptions of other platforms (superpeers) (platform cid -> subscription info). */
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
-	/** The platforms this registry has subscribed to. The other will send registry updates to me. */
-//	protected ILeaseTimeSet<SubscriptionInfo> subscribedto;
+	/** The platforms this registry has subscribed to. The other superpeers will send registry updates to me. */
 	protected Set<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 
 	/** The client platforms that are managed by this super-peer. */
 	protected LeaseTimeMap<IComponentIdentifier, ClientInfo> clients; 
 	
-//	/** The max number of events to collect before sending a bunch event. */
-//	protected int eventslimit;
-//	
-//	/** The timelimit for sending events even when only few have arrived. */
-//	protected long timelimit;
-
 	/** Local registry observer. */
 	protected LocalRegistryObserver lrobs;
+	
+	/** The registry level.*/
+	protected int level;
+	
+	/** The super-super-peer. */
+	protected IComponentIdentifier supersuperpeer;
+	
+//	/**
+//	 *  Create a new service.
+//	 */
+//	public public SuperpeerRegistrySynchronizationService(List<> )
+//	{
+//	}
 	
 	/**
 	 *  Start of the service.
@@ -83,9 +99,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	@ServiceStart
 	public void init()
 	{
-//		this.eventslimit = 50;
-//		this.timelimit = 5000;
-		
 		// Subscribe to changes of the local registry to inform other platforms
 		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component))//, eventslimit, timelimit)
 		{
@@ -688,4 +701,5 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			this.subscription = subscription;
 		}
 	}
+	
 }

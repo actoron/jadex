@@ -92,9 +92,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/** The logger for errors/warnings. */
 	protected Logger logger;
 
-//	/** The realtime flag for call timeouts. */
-//	protected boolean realtime;
-
 	/** The list of interceptors. */
 	protected List<IServiceInvocationInterceptor> interceptors;
 	
@@ -120,13 +117,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IInternalAccess comp, IServiceIdentifier sid, Logger logger, boolean realtime, Cause cause, boolean required)
+	public BasicServiceInvocationHandler(IInternalAccess comp, IServiceIdentifier sid, Logger logger, Cause cause, boolean required)
 	{
 		assert cause!=null;
 		this.comp = comp;
 		this.sid = sid;
 		this.logger	= logger;
-//		this.realtime	= realtime;
 		this.cause = cause;
 		this.switchcall = true;
 		this.required	= required;
@@ -761,7 +757,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), realtime, ia.getComponentDescription().getCause(), false);
+		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), ia.getComponentDescription().getCause(), false);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
