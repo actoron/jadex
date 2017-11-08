@@ -1,11 +1,13 @@
 package jadex.bridge.component.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +45,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.commons.MultiException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -714,8 +717,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			if (coll != null && coll.size() > 0)
 			{
 				final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
-				final int[] counter = new int[] { coll.size() };
-				for (Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
+				final int[] counter = new int[]{coll.size()};
+				final MultiException mex = new MultiException();
+				for(Iterator<ITransportService> it = coll.iterator(); it.hasNext(); )
 				{
 					final ITransportService tp = it.next();
 					tp.isReady(header).addResultListener(new IResultListener<Integer>()
@@ -730,15 +734,17 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							mex.addCause(exception);
 							--counter[0];
-							if (counter[0] == 0)
+							if(counter[0] == 0)
 							{
 								String error = component.getComponentIdentifier()+" could not find working transport for receiver " + receiverplatform + ", tried:";
 								for (ITransportService tp : coll)
 								{
 									error += " " + tp.toString();
 								}
-								ret.setException(new RuntimeException(error, exception));
+								ret.setException(mex);
+//								ret.setException(new RuntimeException(error, exception));
 							}
 						}
 					});
@@ -746,7 +752,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 			else
 			{
-				ret.setException(new ServiceNotFoundException("No transport available."));
+				ret.setException(new ServiceNotFoundException("No transport available.")
+				{
+					public void printStackTrace()
+					{
+						super.printStackTrace();
+					}
+				});
 			}
 		}
 		return ret;

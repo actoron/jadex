@@ -413,6 +413,10 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 			{
 //				changedaddrs = !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
 				
+//				System.out.println("awa update: "+info);
+				
+				dif.setAddresses(info.getAddresses());
+				
 				dif.setComponentIdentifier(sender);
 				
 				if(awamech!=null)

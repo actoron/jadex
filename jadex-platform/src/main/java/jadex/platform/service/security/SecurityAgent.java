@@ -1049,17 +1049,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 //				exception.printStackTrace();
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
-				if (state != null)
+				if(state != null)
 				{
-					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake.")
-					{
-						@Override
-						public void printStackTrace()
-						{
-							// TODO Auto-generated method stub
-							super.printStackTrace();
-						}
-					});
+					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake."));
+//					{
+//						@Override
+//						public void printStackTrace()
+//						{
+//							super.printStackTrace();
+//						}
+//					});
 				}
 			}
 			

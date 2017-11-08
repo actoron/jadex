@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.awareness;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -270,6 +271,6 @@ public class AwarenessInfo
 	 */
 	public String toString()
 	{
-		return "AwarenessInfo(sender="+sender+", state="+state+", delay="+delay+")";
+		return "AwarenessInfo(sender="+sender+", state="+state+", delay="+delay+", addresses="+addresses+")";
 	}
 }
