@@ -69,7 +69,8 @@ public class UserAgent
 				"-superpeerclient", "false" 
 			}).get();
 			
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000).get();
+			// todo: rebuild using initial proxies
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
 			
 			IComponentManagementService cms = SServiceProvider.getServiceProxy(agent, plat.getComponentIdentifier(), IComponentManagementService.class);
 			IComponentDescription[] descs = cms.getComponentDescriptions().get();
