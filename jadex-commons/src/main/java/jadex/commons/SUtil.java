@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -4458,6 +4459,28 @@ public class SUtil
 		catch (Exception e)
 		{
 			rethrowAsUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Attempt to close a Socket (e.g. on error recovery)
+	 *  ignoring any error.
+	 *  (compatibility for Java versions below 7 where Closeable exists
+	 *   but is not implemented by Socket because stupid)
+	 *  
+	 *  @param socket The socket.
+	 */
+	public static void close(Socket socket)
+	{
+		if (socket != null)
+		{
+			try
+			{
+				socket.close();
+			}
+			catch (IOException e)
+			{
+			}
 		}
 	}
 	
