@@ -1,7 +1,5 @@
 package jadex.platform.service.message.websockettransport;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -15,6 +13,7 @@ import java.util.logging.Logger;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
+import jadex.commons.SUtil;
 import jadex.platform.service.transport.ITransportHandler;
 
 /**
@@ -117,23 +116,6 @@ public class WebSocketServer extends NanoWSD
 	}
 	
 	/**
-	 *  Close a closable.
-	 */
-	protected static final void closableClose(Closeable closeable)
-	{
-        try
-        {
-            if (closeable != null)
-            {
-            	((Closeable) closeable).close();
-            }
-        }
-        catch (IOException e)
-        {
-        }
-    }
-	
-	/**
 	 *  Client handler that disables Nagle's algorithm on the accept socket.
 	 *
 	 */
@@ -183,9 +165,9 @@ public class WebSocketServer extends NanoWSD
             }
             finally
             {
-            	closableClose(outputstream);
-            	closableClose(inputstream);
-            	closableClose(acceptsocket);
+            	SUtil.close(outputstream);
+            	SUtil.close(inputstream);
+            	SUtil.close(acceptsocket);
             	setAsyncRunner(asyncRunner);
                 asyncRunner.closed(this);
             }
