@@ -3,6 +3,7 @@ package jadex.platform.service.registry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.collection.LeaseTimeMap;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
@@ -86,11 +88,53 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	/** The super-super-peer. */
 	protected IComponentIdentifier supersuperpeer;
 	
+	/** Potential superpeers. */
+	protected List<IComponentIdentifier> potentialsupersuperpeers;
+	
 //	/**
 //	 *  Create a new service.
 //	 */
-//	public public SuperpeerRegistrySynchronizationService(List<> )
+//	public SuperpeerRegistrySynchronizationService(List<IComponentIdentifier> ssps)
 //	{
+//		this.potentialsupersuperpeers = ssps;
+//		if(ssps==null || ssps.size()==0)
+//		{
+//			this.level = 0;
+//		}
+//		else
+//		{
+//			this.level = 1;
+//		}
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture<IComponentIdentifier> findSupersuperpeer(Iterator<IComponentIdentifier> ssps)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		if(ssps.hasNext())
+//		{
+//			ssps.next()
+//			ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, ssps.next(), ISuperpeerRegistrySynchronizationService.class);
+//			sps.getLevel().addResultListener(new ExceptionDelegationResultListener<Integer, IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(Integer result) throws Exception
+//				{
+//					if(internalGetLevel()==result.intValue())
+//					{
+//						ret.setResult(result);
+//					}
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setException(exception);
+//		}
+//		
+//		return ret;
 //	}
 	
 	/**
@@ -473,6 +517,24 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		ret.setResult(new RegistryUpdateEvent(event.isDelta() && !existed, lrobs.getTimeLimit()));
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the level (level 0 is the topmost superpeer level).
+	 *  @retrun The level.
+	 */
+	public IFuture<Integer> getLevel()
+	{
+		return new Future<Integer>(level);
+	}
+	
+	/**
+	 *  Get the level (level 0 is the topmost superpeer level).
+	 *  @retrun The level.
+	 */
+	public int internalGetLevel()
+	{
+		return level;
 	}
 
 	/**

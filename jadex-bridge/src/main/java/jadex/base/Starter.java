@@ -840,7 +840,7 @@ public class Starter
 									public void customResultAvailable(Void result) throws Exception
 									{
 										SServiceProvider.getService(local, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)
 											{

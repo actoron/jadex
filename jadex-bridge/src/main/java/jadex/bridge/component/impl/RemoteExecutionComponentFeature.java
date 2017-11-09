@@ -328,12 +328,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
 						Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
-						if(nonfunc!=null)
-						{
+//						if(nonfunc!=null)
+//						{
 							IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
 							sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
-							IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
-						}
+//							IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+//						}
 					}
 					final ServiceCall	fsc	= sc;
 					
