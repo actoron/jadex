@@ -1,5 +1,9 @@
 package jadex.platform.service.message.websockettransport;
 
+import com.neovisionaries.ws.client.WebSocketFactory;
+
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.IFuture;
@@ -24,8 +28,14 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	@AgentArgument
 	protected int idletimeout = 60000;
 	
+	/** Timeout on trying to connect. */
+	@AgentArgument
+	protected long connecttimeout = 8000;
+	
 	/** Daemon thread pool service. */
 	protected IDaemonThreadPoolService threadpoolsrv;
+	
+	protected WebSocketFactory websocketfactory;
 	
 	/**
 	 *  Creates the agent.
@@ -41,6 +51,8 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		websocketfactory = new WebSocketFactory(); //.setConnectionTimeout(5000);
+		websocketfactory.setConnectionTimeout((int) connecttimeout);
 		threadpoolsrv = SServiceProvider.getLocalService0(agent, IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM, null, false);
 //		threadpoolsrv = SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class);
 		return super.init();
@@ -102,6 +114,16 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
  	}
  	
  	/**
+ 	 *  Gets the connect timeout.
+ 	 * 
+ 	 *  @return The connect timeout. 
+ 	 */
+ 	public long getConnectTimeout()
+	{
+		return connecttimeout;
+	}
+ 	
+ 	/**
  	 *  Returns the thread pool service.
  	 * 
  	 *  @return The thread pool service.
@@ -110,4 +132,9 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
  	{
  		return threadpoolsrv;
  	}
+ 	
+ 	public WebSocketFactory getWebSocketFactory()
+	{
+		return websocketfactory;
+	}
 }
