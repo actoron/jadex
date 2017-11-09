@@ -179,7 +179,10 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 	 */
 	public IFuture<Void> sendMessage(byte[] header, byte[] body)
 	{
-//		System.out.println("SendServer: " + (header == null ? "null" : String.valueOf(header.length)) + " " + (body == null ? "null" : String.valueOf(body.length)));
+		if (!websocket.isOpen())
+			return new Future<Void>(new IOException("Connection is not available."));
+		
+//		System.out.println("SendServer: " + + System.identityHashCode(this) + " " + (header == null ? "null" : String.valueOf(header.length)) + " " + (body == null ? "null" : String.valueOf(body.length)));
 		Future<Void> ret = new Future<Void>();
 		try
 		{
@@ -192,8 +195,8 @@ public class WebSocketConnectionServer extends AWebsocketConnection
 //				websocket.send(SUtil.mergeData(header, body));
 				sendAsFrames(header);
 				sendAsFrames(body);
-				ret.setResult(null);
 			}
+			ret.setResult(null);
 		}
 		catch(Exception e)
 		{
