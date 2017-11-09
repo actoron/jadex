@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -501,7 +502,8 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				for(Map.Entry<String, List<Tuple2<AwarenessInfo, Long>>> entry: awas.entrySet())
 				{
 					final List<Tuple2<AwarenessInfo, Long>> es = entry.getValue();
-					es.sort(new Comparator<Tuple2<AwarenessInfo, Long>>()
+					Collections.sort(es, new Comparator<Tuple2<AwarenessInfo, Long>>()
+//					es.sort(new Comparator<Tuple2<AwarenessInfo, Long>>()
 					{
 						public int compare(Tuple2<AwarenessInfo, Long> o1, Tuple2<AwarenessInfo, Long> o2)
 						{
