@@ -10,11 +10,15 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,6 +30,7 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.testcases.TestAgent;
+import jadex.micro.testcases.nfcallreturn.InitiatorAgent;
 
 /**
  *  Test automatic termination of subscriptions, when subscriber dies.
@@ -147,6 +152,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			{
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
+					System.out.println("PING!!!!!");
 					waitForRealtimeDelay(1000, this);
 				}
 				
@@ -175,7 +181,6 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			ret.setResult(null);
 		}
 	}
-
 	
 	/**
 	 *  Starter for testing.
@@ -184,12 +189,45 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	{
 		// Start platform with agent.
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
+		config1.setSecurity(true);
+		config1.setTcpTransport(false);
+		config1.setCli(true);
+//		config1.addComponent(UserAgent.class);
+		for (int i = 0; i < 100; ++i)
+		{
+			System.out.println("======================= Try: " + i);
+			IExternalAccess plat = Starter.createPlatform(config1).get();
+			plat.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					SServiceProvider.getLocalService(ia, IComponentManagementService.class).createComponent(AutoTerminateAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					System.out.println("Step done.");
+					return IFuture.DONE;
+				}
+			}).get();
+			plat.killComponent().get();
+			System.out.println("DONE TRY ==================");
+			SUtil.sleep(1500);
+		}
+		System.out.println("Done.");
+		System.exit(0);
+	}
+
+	
+	/**
+	 *  Starter for testing.
+	 */
+	public static void mainx(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
 		config1.setSecurity(true);
 //		config1.setAwaMechanisms(AWAMECHANISM.local);
 //		config1.setAwareness(true);
-		config1.setTcpTransport(true);
+		config1.setTcpTransport(false);
 		config1.setWsTransport(true);
 		config1.addComponent(AutoTerminateAgent.class);
 		Starter.createPlatform(config1).get();

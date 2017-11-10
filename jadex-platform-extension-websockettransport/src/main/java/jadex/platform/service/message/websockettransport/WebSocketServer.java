@@ -1,19 +1,19 @@
 package jadex.platform.service.message.websockettransport;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoWSD;
+import jadex.commons.SUtil;
 import jadex.platform.service.transport.ITransportHandler;
 
 /**
@@ -24,9 +24,6 @@ public class WebSocketServer extends NanoWSD
 {
 	/** The handler. */
 	protected ITransportHandler<IWebSocketConnection> handler;
-	
-	/** Hack! Map used to recover the server connection sockets from their input streams */
-	protected Map<InputStream, Socket> socketrecoverymap = Collections.synchronizedMap(new HashMap<InputStream, Socket>());
 	
 	/** 
 	 *  Creates the server.
@@ -106,7 +103,7 @@ public class WebSocketServer extends NanoWSD
 	 */
 	protected WebSocket openWebSocket(IHTTPSession handshake)
 	{
-		WebSocketConnectionServer ret = new WebSocketConnectionServer(handshake, handler, socketrecoverymap.remove(handshake.getInputStream()));
+		WebSocketConnectionServer ret = new WebSocketConnectionServer(handshake, handler, ((SocketHttpSession) handshake).getSocket());
 		return ret.getWebSocket();
 	}
 	
@@ -124,13 +121,20 @@ public class WebSocketServer extends NanoWSD
 	 */
 	public class WSTransportClientHandler extends ClientHandler
 	{
+		/** The socket. */
+		protected Socket acceptsocket;
+		
+		/** The input stream. */
+		protected InputStream inputstream;
+		
 		/**
 		 *  Creates the handler.
 		 */
 		public WSTransportClientHandler(InputStream inputstream, Socket acceptsocket)
 		{
 			super(inputstream, acceptsocket);
-			socketrecoverymap.put(inputstream, acceptsocket);
+			this.acceptsocket = acceptsocket;
+			this.inputstream = inputstream;
 			try
 			{
 				acceptsocket.setTcpNoDelay(true);
@@ -139,5 +143,63 @@ public class WebSocketServer extends NanoWSD
 			{
 			}
         }
+		
+		/**
+		 *  Run.
+		 */
+		public void run()
+		{
+			OutputStream outputstream = null;
+            try
+            {
+            	outputstream = this.acceptsocket.getOutputStream();
+                TempFileManager tempFileManager = getTempFileManagerFactory().create();
+                SocketHttpSession session = new SocketHttpSession(tempFileManager, inputstream, outputstream, acceptsocket);
+                while (!this.acceptsocket.isClosed())
+                {
+                    session.execute();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+            finally
+            {
+            	SUtil.close(outputstream);
+            	SUtil.close(inputstream);
+            	SUtil.close(acceptsocket);
+            	setAsyncRunner(asyncRunner);
+                asyncRunner.closed(this);
+            }
+		}
+	}
+	
+	/**
+	 *  Http session containing the socket.
+	 *
+	 */
+	protected class SocketHttpSession extends HTTPSession
+	{
+		/** The connection socket. */
+		protected Socket socket;
+		
+		/**
+		 *  Create the session.
+		 */
+		public SocketHttpSession(TempFileManager tempfilemanager, InputStream inputstream, OutputStream outputstream, Socket socket)
+		{
+			super(tempfilemanager, inputstream, outputstream, socket.getInetAddress());
+			this.socket = socket;
+		}
+		
+		/**
+		 *  Gets the socket.
+		 *  
+		 *  @return The socket.
+		 */
+		public Socket getSocket()
+		{
+			return socket;
+		}
 	}
 }

@@ -304,9 +304,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					}
 					
 					if(create)
-					{
 						createConnections(handler, target, addresses);
-					}
 					
 					if(handler!=null)
 					{

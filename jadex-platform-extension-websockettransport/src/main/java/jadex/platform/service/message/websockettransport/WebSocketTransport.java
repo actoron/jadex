@@ -1,10 +1,13 @@
 package jadex.platform.service.message.websockettransport;
 
+import java.lang.reflect.Field;
+import java.net.ServerSocket;
+
+import fi.iki.elonen.NanoHTTPD;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.platform.service.transport.ITransport;
 import jadex.platform.service.transport.ITransportHandler;
 
@@ -38,6 +41,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	{
 		if (server != null)
 		{
+//			System.out.println("Server shutdown start");
 			try
 			{
 				server.closeAllConnections();
@@ -45,9 +49,23 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 			catch (Exception e)
 			{
 			}
+//			System.out.println("Server shutdown closed all connections");
 			try
 			{
 				server.stop();
+			}
+			catch (Exception e)
+			{
+			}
+//			System.out.println("Server shutdown stopped");
+			
+			try
+			{
+				Field f = NanoHTTPD.class.getField("myServerSocket");
+				f.setAccessible(true);
+				ServerSocket s = (ServerSocket) f.get(server);
+				if (s != null)
+					s.close();
 			}
 			catch (Exception e)
 			{

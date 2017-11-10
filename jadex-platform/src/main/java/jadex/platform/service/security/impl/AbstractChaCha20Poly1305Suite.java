@@ -581,54 +581,62 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 */
 	protected static final byte[] chacha20Poly1305Dec(byte[] content, int[] key, int nonceprefix)
 	{
-		long msgid = Pack.littleEndianToLong(content, 8);
+		byte[] ret = null;
 		
-		int[] state = new int[16];
-		int blockcount = 0;
-		
-		byte[] polykey = new byte[32];
-		setupChaChaState(state, key, blockcount, nonceprefix, msgid);
-		ChaChaEngine.chachaCore(20, state, state);
-		for (int i = 0; i < 8; ++i)
-			Pack.intToLittleEndian(state[i], polykey, i << 2);
-		Poly1305KeyGenerator.clamp(polykey);
-		++blockcount;
-		
-		// Check authentication.
-		byte[] checkpoly = new byte[16];
-		Poly1305 poly1305 = new Poly1305();
-		poly1305.init(new KeyParameter(polykey));
-		poly1305.update(content, 0, content.length - 16);
-		poly1305.doFinal(checkpoly, 0);
-		for (int i = 0; i < checkpoly.length; ++i)
-			if (checkpoly[i] != content[content.length - 16 + i])
-				return null; // Authentication failed.
-		
-		// Decrypt content
-		int pos = 16;
-		while (pos < content.length - 16)
+		try
 		{
+			long msgid = Pack.littleEndianToLong(content, 8);
+			
+			int[] state = new int[16];
+			int blockcount = 0;
+			
+			byte[] polykey = new byte[32];
 			setupChaChaState(state, key, blockcount, nonceprefix, msgid);
 			ChaChaEngine.chachaCore(20, state, state);
+			for (int i = 0; i < 8; ++i)
+				Pack.intToLittleEndian(state[i], polykey, i << 2);
+			Poly1305KeyGenerator.clamp(polykey);
 			++blockcount;
 			
-			for (int i = 0; i < state.length && pos < content.length - 16; ++i)
+			// Check authentication.
+			byte[] checkpoly = new byte[16];
+			Poly1305 poly1305 = new Poly1305();
+			poly1305.init(new KeyParameter(polykey));
+			poly1305.update(content, 0, content.length - 16);
+			poly1305.doFinal(checkpoly, 0);
+			for (int i = 0; i < checkpoly.length; ++i)
+				if (checkpoly[i] != content[content.length - 16 + i])
+					return null; // Authentication failed.
+			
+			// Decrypt content
+			int pos = 16;
+			while (pos < content.length - 16)
 			{
-				int val = Pack.littleEndianToInt(content, pos);
-				val ^= state[i];
-				Pack.intToLittleEndian(val, content, pos);
-				pos += 4;
+				setupChaChaState(state, key, blockcount, nonceprefix, msgid);
+				ChaChaEngine.chachaCore(20, state, state);
+				++blockcount;
+				
+				for (int i = 0; i < state.length && pos < content.length - 16; ++i)
+				{
+					int val = Pack.littleEndianToInt(content, pos);
+					val ^= state[i];
+					Pack.intToLittleEndian(val, content, pos);
+					pos += 4;
+				}
 			}
+			
+			int contentlen = Pack.littleEndianToInt(content, content.length - 20);
+			
+			// Sanity check
+			if (contentlen < 0 || contentlen > content.length - 36)
+				return null;
+			
+			ret = new byte[contentlen];
+			System.arraycopy(content, 16, ret, 0, ret.length);
 		}
-		
-		int contentlen = Pack.littleEndianToInt(content, content.length - 20);
-		
-		// Sanity check
-		if (contentlen < 0 || contentlen > content.length - 36)
-			return null;
-		
-		byte[] ret = new byte[contentlen];
-		System.arraycopy(content, 16, ret, 0, ret.length);
+		catch (Exception e)
+		{
+		}
 		
 		return ret;
 	}

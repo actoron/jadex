@@ -49,11 +49,14 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 	{
 //		List<byte[]> msg = SUtil.splitData(payload);
 //		handler.messageReceived(this, msg.get(0), msg.get(1));
+		byte[] dispatchheader = null;
+		boolean dispatch = false;
 		synchronized(this)
 		{
 			if (hasheader)
 			{
-				handler.messageReceived(this, header, payload);
+				dispatch = true;
+				dispatchheader = header;
 				header = null;
 				hasheader = false;
 				maxmsgsize = pojoagent.getMaximumMessageSize();
@@ -66,5 +69,7 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 				hasheader = true;
 			}
 		}
+		if (dispatch)
+			handler.messageReceived(this, dispatchheader, payload);
 	}
 }

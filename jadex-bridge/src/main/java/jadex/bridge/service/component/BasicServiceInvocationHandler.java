@@ -496,14 +496,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		IInternalService ret;
 		
 		if(!SReflect.isSupertype(type, service.getClass()))
-		{
 			throw new RuntimeException("Service implementation '"+service.getClass().getName()+"' does not implement service interface: "+type.getName());
-		}
 		
 		if(service instanceof IInternalService)
-		{
 			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope, jadex.bridge.service.ServiceIdentifier.isUnrestricted(ia, type));
-		}
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
 //			System.out.println("hijijij");
@@ -727,16 +723,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			
 			if(!(service instanceof IService))
-			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor(ia));
-			}
 			
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
 //			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
-			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, Starter.isParameterCopy(sid.getProviderId()), false));
-			}
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 			handler.addFirstServiceInterceptor(new IntelligentProxyInterceptor(ia.getExternalAccess(), sid));
 		}

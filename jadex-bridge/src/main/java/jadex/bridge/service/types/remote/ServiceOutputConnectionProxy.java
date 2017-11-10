@@ -34,7 +34,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 
 	
 	/**
-	 * 
+	 *  Create a new connection proxy
 	 */
 	public ServiceOutputConnectionProxy()
 	{
@@ -42,7 +42,7 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	}
 	
 	/**
-	 * 
+	 *  Create a new connection proxy
 	 */
 	public ServiceOutputConnectionProxy(ServiceInputConnection con)
 	{

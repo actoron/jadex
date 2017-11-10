@@ -8,8 +8,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -161,12 +166,12 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				Class<?> wekindsclazz = Class.forName("java.nio.file.WatchEvent$Kind", true, agent.getClassLoader());
 				Class<?> standardwatcheventkindsclazz = Class.forName("java.nio.file.StandardWatchEventKinds", true, agent.getClassLoader());
 				Object entrycreate = standardwatcheventkindsclazz.getField("ENTRY_CREATE").get(null);
-				Object entrymodify = standardwatcheventkindsclazz.getField("ENTRY_MODIFY").get(null);
+//				Object entrymodify = standardwatcheventkindsclazz.getField("ENTRY_MODIFY").get(null);
 				
 				// Register WatchService on path.
-				Object kindsarray = Array.newInstance(wekindsclazz, 2);
+				Object kindsarray = Array.newInstance(wekindsclazz, 1);
 				Array.set(kindsarray, 0, entrycreate);
-				Array.set(kindsarray, 1, entrymodify);
+//				Array.set(kindsarray, 1, entrymodify);
 				Method registermethod = pathclazz.getMethod("register", new Class<?>[] { wsclazz, kindsarray.getClass() });
 				registermethod.invoke(path, new Object[]{watchservice, kindsarray});
 				
@@ -362,6 +367,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //					System.out.println("POST " + agent + " " + entry);
 //				}
 //				System.out.println("=====" + agent + "======");
+//				
 				long leasetime = (Long)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
 				AwarenessInfo info = new AwarenessInfo(root, addr, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 				byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
@@ -449,16 +455,19 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //			public IFuture<Void> execute(IInternalAccess ia) 
 //			{
 				File[] files = DISCOVERY_DIR.listFiles();
-		//		System.out.println("FILES of " + agent + ": " + Arrays.toString(files));
+//				System.out.println("FILES of " + agent + ": " + Arrays.toString(files));
+				Map<String, List<Tuple2<AwarenessInfo, Long>>> awas = new HashMap<String, List<Tuple2<AwarenessInfo, Long>>>();
 				for(File file : files)
 				{
 					if(file.getAbsolutePath().endsWith(".awa"))
 					{
 						try
 						{
-							String leasetimestr = file.getAbsolutePath();
+//							String leasetimestr = file.getAbsolutePath();
+							String leasetimestr = file.getName();
 							leasetimestr = leasetimestr.substring(0, leasetimestr.length() - 4);
 							int index = leasetimestr.lastIndexOf('_');
+							String pname = leasetimestr.substring(0, index);
 							leasetimestr = leasetimestr.substring(index + 1);
 							long leasetime = Long.parseLong(leasetimestr);
 							if(leasetime < System.currentTimeMillis())
@@ -472,18 +481,13 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 								final AwarenessInfo awainfo = (AwarenessInfo)SBinarySerializer.readObjectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
 								if(!awainfo.getSender().equals(agent.getComponentIdentifier().getRoot()))
 								{
-									IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
-									msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
+									List<Tuple2<AwarenessInfo, Long>> ls = awas.get(pname);
+									if(ls==null)
 									{
-										public void resultAvailable(IAwarenessManagementService ms)
-										{
-											ms.addAwarenessInfo(awainfo);
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-										}
-									});
+										ls = new ArrayList<Tuple2<AwarenessInfo, Long>>();
+										awas.put(pname, ls);
+									}
+									ls.add(new Tuple2<AwarenessInfo, Long>(awainfo, leasetime));
 								}
 							}
 						}
@@ -491,6 +495,37 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 						{
 						}
 					}
+				}
+				
+				// Using windows it cannot be avoided that entries are cleaned up with some delay
+				// Hence first all entries for a platform are collected and only the newest is advertised
+				for(Map.Entry<String, List<Tuple2<AwarenessInfo, Long>>> entry: awas.entrySet())
+				{
+					final List<Tuple2<AwarenessInfo, Long>> es = entry.getValue();
+					Collections.sort(es, new Comparator<Tuple2<AwarenessInfo, Long>>()
+//					es.sort(new Comparator<Tuple2<AwarenessInfo, Long>>()
+					{
+						public int compare(Tuple2<AwarenessInfo, Long> o1, Tuple2<AwarenessInfo, Long> o2)
+						{
+							return (int)(o2.getSecondEntity()-o1.getSecondEntity());
+						}
+					});
+					
+					final AwarenessInfo ai = es.get(0).getFirstEntity();
+					
+					IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
+					msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
+					{
+						public void resultAvailable(IAwarenessManagementService ms)
+						{
+//							System.out.println("addAware: "+ai+" "+es);
+							ms.addAwarenessInfo(ai);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					});
 				}
 				
 //				return IFuture.DONE;

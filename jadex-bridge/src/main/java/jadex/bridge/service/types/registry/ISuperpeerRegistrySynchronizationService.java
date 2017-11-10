@@ -20,6 +20,7 @@ public interface ISuperpeerRegistrySynchronizationService
 	/**
 	 *  Subscribe to change events of the registry. 
 	 *  This is used by super-peers to exchange and replicate the global registry content.
+	 *  @return The registry events.
 	 */
 	public ISubscriptionIntermediateFuture<IRegistryEvent> subscribeToEvents();
 	
@@ -28,16 +29,26 @@ public interface ISuperpeerRegistrySynchronizationService
 	 *  This is used by clients to let the super-peer know local changes.
 	 *  (This is similar to a reverse subscription. The response tells the client
 	 *  how long the lease time is and is the client was removed).
+	 *  @param event The event.
+	 *  @return The update event.
 	 */
 	public IFuture<RegistryUpdateEvent> updateClientData(IRegistryEvent event); 
 	
 	/**
 	 *  Get the current partner superpeers.
+	 *  @return The partner superpeers of the same level.
 	 */
 	public IFuture<Collection<IComponentIdentifier>> getPartnerSuperpeers();
 	
 	/**
 	 *  Get the current clients.
+	 *  @retrun The clients.
 	 */
 	public IFuture<Collection<IComponentIdentifier>> getClients();
+	
+	/**
+	 *  Get the level (level 0 is the topmost superpeer level).
+	 *  @retrun The level.
+	 */
+	public IFuture<Integer> getLevel();
 }
