@@ -332,7 +332,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 //						{
 							IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
 							sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
-//							IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+							IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
 //						}
 					}
 					final ServiceCall	fsc	= sc;

@@ -182,8 +182,6 @@ public class ServiceInvocationContext
 		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
 		
-		this.caller = IComponentIdentifier.LOCAL.get();
-
 		// Is next call defined by user?
 		this.nextcall = CallAccess.getNextInvocation();
 		this.currentcall = CallAccess.getCurrentInvocation();
@@ -224,7 +222,8 @@ public class ServiceInvocationContext
 				props = new HashMap<String, Object>();
 			}
 //			props.put("method", method.getName());
-			this.nextcall = CallAccess.createServiceCall(caller, props);
+			// If no next call given, assume that we are still on caller thread and use LOCAL as caller
+			this.nextcall = CallAccess.createServiceCall(IComponentIdentifier.LOCAL.get(), props);
 		}
 //		else
 //		{
@@ -279,6 +278,8 @@ public class ServiceInvocationContext
 //					System.out.println("herer: "+cause);
 			}
 		}
+		
+		this.caller = nextcall.getCaller();
 	}
 	
 	/**
