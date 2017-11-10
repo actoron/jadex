@@ -618,6 +618,15 @@ public class RelayHandler
 	{
 		return peers.getPeers();
 	}
+
+	/**
+	 * Specifies the url under which this relay instance is reachable.
+	 * @param url
+	 */
+	public void setUrl(String url)
+	{
+		settings.setUrl(url);
+	}
 	
 	/**
 	 *  Get the available servers as comma-separated list of URLs.
