@@ -53,7 +53,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean NO_STACK_COMPACTION = false;
+	public static boolean NO_STACK_COMPACTION = true;
 	
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
