@@ -69,6 +69,10 @@ public class ServiceCall
 	 */
 	protected ServiceCall(IComponentIdentifier caller, Map<String, Object> props)
 	{
+//		if(caller==null)
+//		{
+//			System.out.println("dflishg");
+//		}
 		this.caller	= caller;
 		this.properties = props!=null? props: new HashMap<String, Object>();
 	}

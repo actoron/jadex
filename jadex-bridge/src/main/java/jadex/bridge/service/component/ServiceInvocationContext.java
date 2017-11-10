@@ -183,7 +183,7 @@ public class ServiceInvocationContext
 		this.interceptors = interceptors;
 		
 		this.caller = ServiceCall.getOrCreateNextInvocation().getCaller();
-		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
+//		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
 //		if(caller!=null && (!caller.equals(caller2)))
 //			System.out.println("Caller different: "+caller+" "+caller2);
 			
