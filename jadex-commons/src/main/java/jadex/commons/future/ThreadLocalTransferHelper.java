@@ -41,6 +41,7 @@ public class ThreadLocalTransferHelper
 			for(Map.Entry<ThreadLocal<Object>, Object> entry: vals.entrySet())
 			{
 				entry.getKey().set(entry.getValue());
+//				System.out.println("restore thread local: "+entry.getValue());
 			}
 		}
 	}

@@ -139,13 +139,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 
 		// Perform argument copy
 		
-//		if(sic.getMethod().getName().indexOf("Stream")!=-1)
-//			System.out.println("sdfsdfsdf");
-		
 		// In case of remote call parameters are copied as part of marshalling.
 		boolean callrem = getSerializationServices().isRemoteObject(sic.getProxy());
 		if(copy && !sic.isRemoteCall() && !callrem)
 		{
+			if(sic.getMethod().getName().indexOf("Stream")!=-1)
+				System.out.println("sdfsdfsdf");
+			
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
 			
