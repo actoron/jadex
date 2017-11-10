@@ -339,9 +339,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					final IFuture<?> retfut = cmd.execute(component, secinfos);
 					CallAccess.resetNextInvocation();
 					if(incommands == null)
-					{
 						incommands = new HashMap<String, IFuture<?>>();
-					}
 					IFuture<?> prev	= incommands.put(rxid, retfut);
 					assert prev==null;
 					

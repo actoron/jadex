@@ -182,8 +182,11 @@ public class ServiceInvocationContext
 		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
 		
-		this.caller = IComponentIdentifier.LOCAL.get();
-
+		this.caller = ServiceCall.getOrCreateNextInvocation().getCaller();
+		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
+		if(caller!=null && (!caller.equals(caller2)))
+			System.out.println("Caller different: "+caller+" "+caller2);
+			
 		// Is next call defined by user?
 		this.nextcall = CallAccess.getNextInvocation();
 		this.currentcall = CallAccess.getCurrentInvocation();

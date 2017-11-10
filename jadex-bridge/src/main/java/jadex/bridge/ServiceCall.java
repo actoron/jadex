@@ -52,10 +52,10 @@ public class ServiceCall
 	//-------- attributes --------
 	
 	/** The calling component. */
-	protected IComponentIdentifier	caller;
+	public IComponentIdentifier	caller;
 	
 	/** The service call properties. */
-	protected Map<String, Object> properties;
+	public Map<String, Object> properties;
 	
 	// hack for debugging concurrent modification
 	public IComponentIdentifier	lastmod;
