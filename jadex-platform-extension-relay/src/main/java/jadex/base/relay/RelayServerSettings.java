@@ -73,6 +73,14 @@ public class RelayServerSettings
 	{
 		return props.getProperty(PROPERTY_URL);
 	}
+
+	/**
+	 * Set the url.
+	 */
+	public void setUrl(String url)
+	{
+		props.setProperty(PROPERTY_URL, url);
+	}
 	
 	/**
 	 *  Get the initial peers.
