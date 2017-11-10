@@ -387,7 +387,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							try
 							{
 								message = deserializeMessage(header, result.getSecondEntity());
-								System.out.println("decoded: "+message);
+//								System.out.println("decoded: "+message);
 							}
 							catch(Exception e)
 							{
@@ -1538,7 +1538,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			byte type = packet.getType();
 			int conid = packet.getConnectionId().intValue();
 			
-			System.out.println("rec stream msg: "+getComponent().getComponentIdentifier().getLocalName()+" "+type);
+//			System.out.println("rec stream msg: "+getComponent().getComponentIdentifier().getLocalName()+" "+type);
 			
 			// Handle output connection participant side
 			if(type==AbstractConnectionHandler.INIT_OUTPUT_INITIATOR)
@@ -1755,10 +1755,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				{
 					con.setAliveTime(System.currentTimeMillis());
 				}
-				else
-				{
-					System.out.println("Stream not found (alive ini): "+component+", "+System.currentTimeMillis()+", "+conid);
-				}
+//				else
+//				{
+//					System.out.println("Stream not found (alive ini): "+component+", "+System.currentTimeMillis()+", "+conid);
+//				}
 			}
 			else if(type==AbstractConnectionHandler.ALIVE_PARTICIPANT)
 			{
@@ -1769,10 +1769,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				{
 					con.setAliveTime(System.currentTimeMillis());
 				}
-				else
-				{
-					System.out.println("Stream not found (alive par): "+component+", "+System.currentTimeMillis()+", "+conid);
-				}
+//				else
+//				{
+//					System.out.println("Stream not found (alive par): "+component+", "+System.currentTimeMillis()+", "+conid);
+//				}
 			}
 //	
 ////		System.out.println("bbbb: "+mycnt+" "+getComponent().getComponentIdentifier());

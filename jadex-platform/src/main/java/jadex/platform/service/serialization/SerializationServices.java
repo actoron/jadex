@@ -273,7 +273,6 @@ public class SerializationServices implements ISerializationServices
 		{
 			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				System.out.println("type1: "+type);
 				return ProxyReference.class.equals(type);
 			}
 			
@@ -310,7 +309,6 @@ public class SerializationServices implements ISerializationServices
 		{
 			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
-				System.out.println("type: "+type);
 				return ServiceInputConnectionProxy.class.equals(type);
 			}
 			
