@@ -189,7 +189,7 @@ public class ServiceInvocationContext
 		// Problem: how to ensure that results are set in lastcall
 		CallAccess.resetNextInvocation();
 		
-//		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
+//		if(nextcall!=null && nextcall.getCaller()==null)
 //		{
 //			System.out.println("hierskdfj");
 //		}
@@ -280,6 +280,14 @@ public class ServiceInvocationContext
 		}
 		
 		this.caller = nextcall.getCaller();
+		
+//		// Check if new caller determination only differs for remote case
+//		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
+//		if(!SUtil.equals(caller, caller2)
+//			&& (caller==null || caller2==null || caller.getRoot().equals(caller2.getRoot())))
+//		{
+//			System.out.println("Local callers different: "+caller+" "+caller2);
+//		}
 	}
 	
 	/**
