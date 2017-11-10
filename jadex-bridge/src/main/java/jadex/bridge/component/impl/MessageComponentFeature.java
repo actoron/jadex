@@ -387,6 +387,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							try
 							{
 								message = deserializeMessage(header, result.getSecondEntity());
+								System.out.println("decoded: "+message);
 							}
 							catch(Exception e)
 							{
@@ -1196,7 +1197,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
 							myicons[i].close();
 //							icons.remove(Integer.valueOf(myicons[i].getConnectionId()));
-							removeOutputConnection(Integer.valueOf(mypcons[i].getConnectionId()));
+							removeOutputConnection(Integer.valueOf(myicons[i].getConnectionId()));
 						}
 					}
 					
