@@ -64,7 +64,10 @@ stage('preparation') {
                 echo "building from tag: " + tagToBuild
                 echo "disabling tagging"
                 tagBuild = false;
-                git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', tag: tagToBuild
+#               git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: "refs/tags/${tagToBuild}"
+		checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${tagToBuild}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], 
+			userRemoteConfigs: 
+			[[url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex']]])
             } else {
                 // build from branch
                 git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
