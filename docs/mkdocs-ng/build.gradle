@@ -68,10 +68,10 @@ task processDocs(type: Copy) {
         into 'docs'
 
     }
-    from('theme') { // everything but md source
+    from('theme') {
         include '**/*'
         into 'theme'
-
+        filter(ExpandProperties, project: ant.project)
     }
     from ('.') { // preprocess md source
         include '**/*.md'

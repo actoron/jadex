@@ -239,6 +239,27 @@ pre code {
 	display: block;
 }
 
+#innertopbar .version-header {
+	font-weight: bold;
+	font-size: 16px;
+	font-family: open sans;
+	text-align: center;
+	color: #2a6699;
+	padding: 2.5px 15px;
+	height: 100%;
+}
+
+.version-header div {
+	padding-top: 15.55px;
+	padding-bottom: 10px;
+}
+
+@media screen and (max-width: 1300px) {
+	.version-header {
+		display: none;
+	}
+}
+
 @media screen and (max-width: 768px) {
 	.wy-nav-side {
 /*		left: -301px;*/
@@ -267,6 +288,10 @@ pre code {
 
     .navbar-brand>img {
     	width: unset;
+    }
+
+    .version-header {
+    	display: none;
     }
 }
 

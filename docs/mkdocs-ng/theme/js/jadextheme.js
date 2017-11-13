@@ -36,6 +36,7 @@
   xdLoader.scheduleLoad['topnavbar.html'] = function (data) {
     var element = navbarLoaded2(data);
     $('#topNavBar').html(element);
+    $("#topNavBar #innertopbar").append('<div class="version-header"><div>Jadex ${jadexversiontitle}</div></div>')
   };
 
   xdLoader.scheduleLoad['bottomnavbar.html'] = function (data) {
