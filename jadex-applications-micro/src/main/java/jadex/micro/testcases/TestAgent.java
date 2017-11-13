@@ -278,11 +278,27 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(IExternalAccess result)
 							{
-//								agent.getLogger().severe("Testagent create platform done: "+agent.getComponentDescription());
+//								final DelegationResultListener<IExternalAccess> self = this;
+								final IExternalAccess myresult = result;
+								agent.getLogger().severe("Testagent create platform done: "+agent.getComponentDescription());
 								platforms.add(result);
+								Starter.createProxy(agent.getExternalAccess(), result).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+								{
+									public void customResultAvailable(IComponentIdentifier result) throws Exception
+									{
+										superCustomResultAvailable(myresult);
+									}
+								});
+//								super.customResultAvailable(result);
+							}
+							
+							public void superCustomResultAvailable(IExternalAccess result)
+							{
 								super.customResultAvailable(result);
 							}
 						}));
+						
+						
 					}
 				});
 			}

@@ -328,21 +328,18 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
 						Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
-						if(nonfunc!=null)
-						{
-							IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
-							sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
-							IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
-						}
+						IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
+						// Local is used to set the caller in the new service call context
+						sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
+						// After call creation it can be reset
+						IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
 					}
 					final ServiceCall	fsc	= sc;
 					
 					final IFuture<?> retfut = cmd.execute(component, secinfos);
 					CallAccess.resetNextInvocation();
 					if(incommands == null)
-					{
 						incommands = new HashMap<String, IFuture<?>>();
-					}
 					IFuture<?> prev	= incommands.put(rxid, retfut);
 					assert prev==null;
 					

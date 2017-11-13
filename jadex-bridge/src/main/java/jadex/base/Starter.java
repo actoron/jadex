@@ -331,24 +331,6 @@ public class Starter
 		Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		final Future<IExternalAccess>	fret	= ret;
 		
-		// Perform manual switch to allow users specify next call properties
-		ServiceCall sc = CallAccess.getCurrentInvocation();
-		ServiceCall scn = CallAccess.getNextInvocation();
-		if(sc==null)
-		{
-			if(scn==null)
-			{
-				scn = CallAccess.getOrCreateNextInvocation();
-			}
-			if(scn.getCause()==null)
-			{
-				scn.setCause(new Cause((String)null, "createPlatform"));
-			}
-			
-			CallAccess.setCurrentInvocation(scn);
-			sc	= scn;
-		}
-		
 		try
 		{
 			// Absolute start time (for testing and benchmarking).
@@ -400,7 +382,27 @@ public class Starter
 //					rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
 					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
 					if(IComponentIdentifier.LOCAL.get()==null)
+					{
 						IComponentIdentifier.LOCAL.set(cid);
+					}
+					
+					// Perform manual switch to allow users specify next call properties
+					ServiceCall sc = CallAccess.getCurrentInvocation();
+					ServiceCall scn = CallAccess.getNextInvocation();
+					if(sc==null)
+					{
+						if(scn==null)
+						{
+							scn = CallAccess.getOrCreateNextInvocation();
+						}
+						if(scn.getCause()==null)
+						{
+							scn.setCause(new Cause((String)null, "createPlatform"));
+						}
+						
+						CallAccess.setCurrentInvocation(scn);
+						sc	= scn;
+					}
 					
 					// Hack: change rid afterwards?!
 					ResourceIdentifier rid = (ResourceIdentifier)model.getResourceIdentifier();
@@ -840,7 +842,7 @@ public class Starter
 									public void customResultAvailable(Void result) throws Exception
 									{
 										SServiceProvider.getService(local, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)
 											{

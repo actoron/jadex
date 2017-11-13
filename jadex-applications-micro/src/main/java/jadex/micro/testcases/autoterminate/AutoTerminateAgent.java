@@ -189,7 +189,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		// Start platform with agent.
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 		config1.setSecurity(true);
-		config1.setTcpTransport(false);
+		config1.setTcpTransport(true);
 		config1.setCli(true);
 //		config1.addComponent(UserAgent.class);
 		for (int i = 0; i < 100; ++i)

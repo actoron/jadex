@@ -143,6 +143,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		boolean callrem = getSerializationServices().isRemoteObject(sic.getProxy());
 		if(copy && !sic.isRemoteCall() && !callrem)
 		{
+			if(sic.getMethod().getName().indexOf("Stream")!=-1)
+				System.out.println("sdfsdfsdf");
+			
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
 			
@@ -382,7 +385,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			final Object	res	= sic.getResult();
 			
-//			if(sic.getMethod().getName().equals("getSecureInputStream"))
+//			if(sic.getMethod().getName().equals("getInputStream"))
 //				System.out.println("decoupling: "+sic.getArguments());
 			
 			if(res instanceof IFuture)

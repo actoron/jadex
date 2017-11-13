@@ -200,15 +200,15 @@ public class Traverser
 	public Object traverse(Object object, Type clazz, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		if(processors == null)
-		{
 			processors = getDefaultProcessors();
-		}
 		
 		Object obj = doTraverse(object, clazz, conversionprocessors, processors, mode, targetcl, context);
 		if(obj == IGNORE_RESULT)
-		{
 			obj = null;
-		}
+		
+//		if(object!=null && !object.getClass().equals(String.class) && !object.getClass().equals(Boolean.class))
+//			System.out.println("traverse: "+object.getClass()+" "+obj.getClass());
+
 		return obj;
 	}
 	
@@ -221,7 +221,7 @@ public class Traverser
 	 */
 	public Object doTraverse(Object object, Type type, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
-		if (mode == null)
+		if(mode == null)
 			throw new IllegalArgumentException("MODE IS NULL");
 		Object ret = preemptProcessing(object, type, context);
 		if (ret == null)

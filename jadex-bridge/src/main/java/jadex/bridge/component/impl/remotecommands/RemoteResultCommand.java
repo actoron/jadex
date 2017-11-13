@@ -31,7 +31,7 @@ public class RemoteResultCommand<T>	extends AbstractResultCommand
 	public RemoteResultCommand(T result, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-		this.result = result;
+		setResult(result);
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class RemoteResultCommand<T>	extends AbstractResultCommand
 	@SuppressWarnings("unchecked")
 	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
 	{
-		if (exception!=null)
+		if(exception!=null)
 			((Future<T>) future).setException(exception);
 		else
 			((Future<T>) future).setResult(result);
@@ -73,6 +73,12 @@ public class RemoteResultCommand<T>	extends AbstractResultCommand
 	 */
 	public void setResult(T result)
 	{
+//		if(result!=null && result.getClass().getName().indexOf("Connection")!=-1)
+//			System.out.println("rescom with: "+result);
+		
+//		if(result!=null)
+//			System.out.println("created rrc: "+result.getClass()+" "+result);
+//		Thread.dumpStack();
 		this.result = result;
 	}
 	

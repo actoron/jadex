@@ -411,15 +411,15 @@ public class SBinarySerializer
 				ITraverseProcessor pp = context.getPostProcessors().get(i);
 				
 				if (pp.isApplicable(context.getLastObject(), clazz, context.getClassloader(), context))
+				{
 					context.setLastObject(pp.process(context.getLastObject(), clazz, null, context.getPostProcessors(), null, Traverser.MODE.POSTPROCESS, context.getClassloader(), context));
-				break;
+					break;
+				}
 			}
 		}
 		
 		if (context.getLastObject() != dobject)
-		{
 			context.setObjectForId(context.getObjectId(dobject), context.getLastObject());
-		}
 		
 		//TODO: Do this with BiHashMap?
 //		if (context.getLastObject() != dobject)

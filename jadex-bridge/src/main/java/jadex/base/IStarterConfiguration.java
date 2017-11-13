@@ -86,11 +86,11 @@ public interface IStarterConfiguration
     /**  Flag if local timeouts should be realtime (instead of clock dependent). */
     public static final String REALTIMETIMEOUT = "realtimetimeout";
         
-    /** Constant for remote default timeout. */
-    public static long DEFAULT_REMOTE_TIMEOUT = PlatformConfigurationHandler.getDefaultTimeout();
-
     /** Constant for local default timeout. */
     public static long DEFAULT_LOCAL_TIMEOUT = PlatformConfigurationHandler.getDefaultTimeout();
+
+    /** Constant for remote default timeout. */
+    public static long DEFAULT_REMOTE_TIMEOUT = DEFAULT_LOCAL_TIMEOUT;
 
     /** The reserved platform parameters. Those are (usually) not handled by the root component. */
     public static final Set<String> RESERVED = PlatformConfigurationHandler.createReserved();
