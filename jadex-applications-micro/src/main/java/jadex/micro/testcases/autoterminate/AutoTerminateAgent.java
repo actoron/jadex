@@ -152,7 +152,6 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			{
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
-					System.out.println("PING!!!!!");
 					waitForRealtimeDelay(1000, this);
 				}
 				
@@ -208,7 +207,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			}).get();
 			plat.killComponent().get();
 			System.out.println("DONE TRY ==================");
-			SUtil.sleep(1500);
+			SUtil.sleep(500);
 		}
 		System.out.println("Done.");
 		System.exit(0);
