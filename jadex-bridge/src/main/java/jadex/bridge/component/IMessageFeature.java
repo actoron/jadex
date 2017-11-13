@@ -71,14 +71,6 @@ public interface IMessageFeature
 	public void removeMessageHandler(IMessageHandler handler);
 	
 	/**
-	 *  Sets whether to allow untrusted messages.
-	 *  Handlers must perform appropriate checks if set to true.
-	 *  
-	 *  @param allowuntrusted Set to true to allow untrusted messages.
-	 */
-	public void setAllowUntrusted(boolean allowuntrusted);
-	
-	/**
 	 *  Create a virtual output connection.
 	 *  @param sender The sender.
 	 *  @param receiver The receiver.

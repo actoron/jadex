@@ -313,7 +313,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return new Future<Void>(e);
 			}
 		}
-		agent.getComponentFeature(IMessageFeature.class).setAllowUntrusted(true);
 		agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
 		return IFuture.DONE;
 	}

@@ -225,7 +225,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
-		msgfeat.setAllowUntrusted(true);
 		forwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));
 		if (forwarding)
 		{

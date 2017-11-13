@@ -87,9 +87,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/** The security service. */
 	protected ISecurityService secservice;
 	
-	/** Flag whether to allow receiving untrusted messages. */
-	protected boolean allowuntrusted;
-	
 	/** Messages awaiting reply. */
 	protected Map<String, Future<Object>> awaitingmessages;
 	
@@ -345,17 +342,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 	}
 	
-	/**
-	 *  Sets whether to allow untrusted messages.
-	 *  Handlers must perform appropriate checks if set to true.
-	 *  
-	 *  @param allowuntrusted Set to true to allow untrusted messages.
-	 */
-	public void setAllowUntrusted(boolean allowuntrusted)
-	{
-		this.allowuntrusted = allowuntrusted;
-	}
-	
 	//-------- IInternalMessageFeature interface --------
 	
 	/**
@@ -380,23 +366,19 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					{
 						final IMsgSecurityInfos secinf = result.getFirstEntity();
 						
-						// Only accept messages we trust.
-						if(isTrusted(secinf) || allowuntrusted)
+						Object message;
+						try
 						{
-							Object message;
-							try
-							{
-								message = deserializeMessage(header, result.getSecondEntity());
-							}
-							catch(Exception e)
-							{
-								getComponent().getLogger().warning("Could not decode message: "+header+", "+e);
-								// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
-								message = null;
-								header.addProperty(EXCEPTION, e);
-							}
-							messageArrived(secinf, header, message);
+							message = deserializeMessage(header, result.getSecondEntity());
 						}
+						catch(Exception e)
+						{
+							getComponent().getLogger().warning("Could not decode message: "+header+", "+e);
+							// When decoding message fails -> allow agent to handle exception (e.g. useful for failed replies)
+							message = null;
+							header.addProperty(EXCEPTION, e);
+						}
+						messageArrived(secinf, header, message);
 					}
 				};
 				
