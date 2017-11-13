@@ -203,7 +203,7 @@ if (deployDists) {
             }
 
             stage('checkDists') {
-                def dists = ['minimal', 'standard', 'pro', 'android', 'relaystandalone']
+                def dists = ['minimal', 'standard', 'pro', 'android']
 //                def dists = ['minimal']
                 def checkDists = [:];
 
