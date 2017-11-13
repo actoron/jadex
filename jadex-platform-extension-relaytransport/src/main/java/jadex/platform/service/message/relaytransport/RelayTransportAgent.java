@@ -52,6 +52,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Feature;
@@ -77,9 +78,6 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 @Service
 public class RelayTransportAgent implements ITransportService, IRoutingService
 {
-	/** True/false if the transport allows forwarding. */
-	public static final String PROPERTY_FORWARDING = "forwarding";
-	
 	/** Maxmimum number of relays to use. */
 	public static final String PROPERTY_RELAY_COUNT = "relaycount";
 	
@@ -121,6 +119,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected IInternalMessageFeature intmsgfeat;
 	
 	/** Flag if the transport allows forwarding. */
+	@AgentArgument
 	protected boolean forwarding;
 	
 	/** Maintain a connection to at least this number of relays. */
@@ -225,7 +224,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
-		forwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));
+//		forwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));
 		if (forwarding)
 		{
 			System.out.println("Relay transport in forwarding mode.");
