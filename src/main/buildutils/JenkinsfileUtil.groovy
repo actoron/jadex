@@ -2,7 +2,7 @@
 def getVersionsFromTag(gittag) {
     def groups = (gittag =~ /(\d+)\.(\d+).(\d+)(?:(\w*)-(\d+))?/)
     if (!groups.matches()) {
-        throw new RuntimeException("Could not find version pattern in last git tag: " + gittag)
+        throw new GradleException("Could not find version pattern in last git tag: " + gittag)
     }
     return [
             major: groups[0][1],
