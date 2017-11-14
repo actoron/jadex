@@ -86,7 +86,7 @@ stage('preparation') {
 
             def versionsFromTag = util.getVersionsFromTag(git_tag);
             if (versionsFromTag == null) {
-            	throw new org.gradle.api.GradleException("Could not determine (last) version from tag: " + git_tag)
+            	throw new GradleException("Could not determine (last) version from tag: " + git_tag)
             }
             def patch = versionsFromTag.patch
 
