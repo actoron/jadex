@@ -82,11 +82,13 @@ stage('preparation') {
 
             // find tag name of HEAD:
             String git_headTag = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
-            println git_headTag
+            println "The HEAD is tagged by: " + git_headTag
 
             def versionsFromTag = util.getVersionsFromTag(git_tag);
+            if (versionsFromTag == null) {
+            	throw new org.gradle.api.GradleException("Could not determine (last) version from tag: " + git_tag)
+            }
             def patch = versionsFromTag.patch
-
 
             if (isTagRebuild) {
                 currentBuild.description = "rebuild of tag: ${git_tag}"
