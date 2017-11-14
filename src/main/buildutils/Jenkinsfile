@@ -303,7 +303,7 @@ stage ('publish and deploy') {
                     sh 'mv **/build/libs/*.war deployment/webapps/'
                     dir('deployment/webapps') {
                         sh 'mv jadex-applications-web-*.war jadex-applications-web.war'
-                        sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
+                        //sh 'mv jadex-platform-extension-relay-web-*.war relay.war'
                         sh 'mv jadex-servletfilter-web-*.war webapi.war'
                     }
 
