@@ -239,23 +239,29 @@ pre code {
 	display: block;
 }
 
-#innertopbar .version-header {
+.version-header {
 	font-weight: bold;
 	font-size: 16px;
 	font-family: open sans;
 	text-align: center;
 	color: #2a6699;
-	padding: 2.5px 15px;
 	height: 100%;
+	display: inline-block;
+	float: inline-end;
+	margin-left: 15px;
 }
 
-.version-header div {
+.version-header-container > span {
+	line-height: 20px;
+}
+
+/*.version-header div {
 	padding-top: 15.55px;
 	padding-bottom: 10px;
-}
+}*/
 
-@media screen and (max-width: 1300px) {
-	.version-header {
+@media screen and (max-width: 1350px) {
+	.version-header .version-header-jadex {
 		display: none;
 	}
 }

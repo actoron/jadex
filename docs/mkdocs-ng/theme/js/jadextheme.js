@@ -36,7 +36,13 @@
   xdLoader.scheduleLoad['topnavbar.html'] = function (data) {
     var element = navbarLoaded2(data);
     $('#topNavBar').html(element);
-    $("#topNavBar #innertopbar").append('<div class="version-header"><div>Jadex ${jadexversiontitle}</div></div>')
+    $("#topNavBar #innertopbar").append('\
+		<div class="version-header auto-padded">\
+			<div class="version-header-container auto-scaled">\
+				<span class="version-header-jadex  auto-scaled" style="padding-right:0px; padding-left:0px">Jadex </span>\
+				<span class="auto-scaled" style="padding-left:0px; padding-right:0px">3.0.72</span>\
+			</div>\
+		</div>')
   };
 
   xdLoader.scheduleLoad['bottomnavbar.html'] = function (data) {
