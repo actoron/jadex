@@ -2,7 +2,8 @@
 def getVersionsFromTag(gittag) {
     def groups = (gittag =~ /(\d+)\.(\d+).(\d+)(?:(\S*)-(\d+))?/)
     if (!groups.matches()) {
-        return null;
+//        return null;
+        error("Could not determine (last) version from tag: " + git_tag)
     }
     return [
             major: groups[0][1],

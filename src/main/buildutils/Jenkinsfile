@@ -85,9 +85,9 @@ stage('preparation') {
             println "The HEAD is tagged by: " + git_headTag
 
             def versionsFromTag = util.getVersionsFromTag(git_tag);
-            if (versionsFromTag == null) {
-            	throw new GradleException("Could not determine (last) version from tag: " + git_tag)
-            }
+//            if (versionsFromTag == null) {
+//            	error("Could not determine (last) version from tag: " + git_tag)
+//            }
             def patch = versionsFromTag.patch
 
             if (isTagRebuild) {
