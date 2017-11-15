@@ -28,6 +28,8 @@ Boolean isTagRebuild
 
 def versionSuffix
 
+def lastVersionTag
+
 util = ""
 
 // convert parameters to booleans:
@@ -79,11 +81,11 @@ stage('preparation') {
             // parse last git tag
             def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
             println "The tag used for generating a new version is: ${git_tag}"
-            def versionsFromTag = util.getVersionsFromTag(git_tag);
-//            if (versionsFromTag == null) {
+            lastVersionTag = util.getVersionsFromTag(git_tag);
+//            if (lastVersionTag == null) {
 //            	error("Could not determine (last) version from tag: " + git_tag)
 //            }
-            def patch = versionsFromTag.patch
+            def patch = lastVersionTag.patch
 
             // find tag name of HEAD:
             String git_headTag = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
@@ -92,7 +94,7 @@ stage('preparation') {
 
             if (isTagRebuild) {
                 currentBuild.description = "rebuild of tag: ${git_tag}"
-                versionSuffix = "${patch}${branchName}-${versionsFromTag.branchPatch}"
+                versionSuffix = "${patch}${lastVersionTag.branchName}-${lastVersionTag.branchPatch}"
             } else {
                 boolean headIsLastVersionTag = false
                 def tags = util.runCmdAndSplit('git tag --points-at HEAD')
@@ -124,11 +126,11 @@ stage('preparation') {
                 } else {
                     // building some other branch
                     Integer branchPatch
-                    if (versionsFromTag.branchName) {
-                        if (!versionsFromTag.branchName.equals(branchName)) {
+                    if (lastVersionTag.branchName) {
+                        if (!lastVersionTag.branchName.equals(branchName)) {
                             error("Something went wrong, expected last tag to be for branch: ${branchName}, but got tag: ${git_tag}")
                         }
-                        branchPatch = versionsFromTag.branchPatch as Integer;
+                        branchPatch = lastVersionTag.branchPatch as Integer;
                         if (!headIsLastVersionTag) {
                             // increase patch level if at least one commit is between last tag and HEAD
                             branchPatch++
@@ -151,10 +153,10 @@ stage('preparation') {
                 jadexVersion = props.jadexversion
 
                 // check plausibility of version:
-                if ((versionsFromTag.major != props.jadexversion_major
-                     || versionsFromTag.minor != props.jadexversion.minor) && !resetPatchVersion) {
+                if ((lastVersionTag.major != props.jadexversion_major
+                     || lastVersionTag.minor != props.jadexversion.minor) && !resetPatchVersion) {
                     println "The major or minor version seems to have changed and resetPatchVersion is not set." +
-                            "old major/minor: ${versionsFromTag.major}.${versionsFromTag.minor}" +
+                            "old major/minor: ${lastVersionTag.major}.${lastVersionTag.minor}" +
                             "new major/minor: ${props.jadexversion_major}.${props.jadexversion_minor}"
                     timeout(time: 1, unit: 'HOURS') {
                         input(id: 'noNewCommits', message: 'Do you want to proceed anyway? When dumping the version, you should build with resetPatchVersion=true!')
