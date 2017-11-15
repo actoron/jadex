@@ -92,7 +92,7 @@ stage('preparation') {
 
             if (isTagRebuild) {
                 currentBuild.description = "rebuild of tag: ${git_tag}"
-                versionSuffix = "${patch}${branchName}-${branchPatch}"
+                versionSuffix = "${patch}${branchName}-${versionsFromTag.branchPatch}"
             } else {
                 boolean headIsLastVersionTag = false
                 def tags = util.runCmdAndSplit('git tag --points-at HEAD')
