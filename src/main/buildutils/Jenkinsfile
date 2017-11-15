@@ -79,20 +79,20 @@ stage('preparation') {
             // parse last git tag
             def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
             println "The tag used for generating a new version is: ${git_tag}"
-
-            // find tag name of HEAD:
-            String git_headTag = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
-            println "The HEAD is tagged by: " + git_headTag
-
             def versionsFromTag = util.getVersionsFromTag(git_tag);
 //            if (versionsFromTag == null) {
 //            	error("Could not determine (last) version from tag: " + git_tag)
 //            }
             def patch = versionsFromTag.patch
 
+            // find tag name of HEAD:
+            String git_headTag = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
+            println "The HEAD is tagged with: " + git_headTag
+
+
             if (isTagRebuild) {
                 currentBuild.description = "rebuild of tag: ${git_tag}"
-                versionSuffix = "${patch}"
+                versionSuffix = "${patch}${branchName}-${branchPatch}"
             } else {
                 boolean headIsLastVersionTag = false
                 def tags = util.runCmdAndSplit('git tag --points-at HEAD')
@@ -112,10 +112,6 @@ stage('preparation') {
 
                 if (isMasterBranch || isStableBranch) {
                     // generate version continuously
-                    //def result = build job: "pipeline-generate-version-${branchName}"
-                    // needs whitelisting, see https://issues.jenkins-ci.org/browse/JENKINS-36528
-                    //genVersion = result.rawBuild.environment.PATCH_VERSION;
-
                     patch = patch as Integer
                     if (resetPatchVersion) {
                         patch = 0;
@@ -146,13 +142,24 @@ stage('preparation') {
                     //versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
                 }
 
-                echo "version suffix:" + versionSuffix
             }
+            echo "Version suffix:" + versionSuffix
 
             withEnv(['BUILD_VERSION_SUFFIX=' + versionSuffix]) {
                 sh "./gradlew createVersionInfo"
                 def props = readProperties file: 'build/jadexversion.properties'
                 jadexVersion = props.jadexversion
+
+                // check plausibility of version:
+                if ((versionsFromTag.major != props.jadexversion_major
+                     || versionsFromTag.minor != props.jadexversion.minor) && !resetPatchVersion) {
+                    println "The major or minor version seems to have changed and resetPatchVersion is not set." +
+                            "old major/minor: ${versionsFromTag.major}.${versionsFromTag.minor}" +
+                            "new major/minor: ${props.jadexversion_major}.${props.jadexversion_minor}"
+                    timeout(time: 1, unit: 'HOURS') {
+                        input(id: 'noNewCommits', message: 'Do you want to proceed anyway? When dumping the version, you should build with resetPatchVersion=true!')
+                    }
+                }
 
                 println "building version: ${jadexVersion}"
                 currentBuild.displayName = "${jadexVersion}"
