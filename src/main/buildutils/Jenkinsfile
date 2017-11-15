@@ -154,7 +154,7 @@ stage('preparation') {
 
                 // check plausibility of version:
                 if ((lastVersionTag.major != props.jadexversion_major
-                     || lastVersionTag.minor != props.jadexversion.minor) && !resetPatchVersion) {
+                     || lastVersionTag.minor != props.jadexversion_minor) && !resetPatchVersion) {
                     println "The major or minor version seems to have changed and resetPatchVersion is not set." +
                             "old major/minor: ${lastVersionTag.major}.${lastVersionTag.minor}" +
                             "new major/minor: ${props.jadexversion_major}.${props.jadexversion_minor}"
@@ -176,7 +176,7 @@ stage('preparation') {
             currentBuild.result = 'FAILURE'
             throw any;
         } finally {
-            step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de,,braubach@informatik.uni-hamburg.de,pokahr@informatik.uni-hamburg.de,jander@informatik.uni-hamburg.de', sendToIndividuals: true])
+            step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'kalinowski@informatik.uni-hamburg.de', sendToIndividuals: true])
         }
     }
 }
