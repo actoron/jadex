@@ -463,6 +463,11 @@ public interface IRootComponentConfiguration
     public static final String	SUPERPEER			= IStarterConfiguration.SUPERPEER;		// class:
     // default:
     // false
+    
+    /** Flag if platform is supersuperpeer. **/
+    public static final String	SUPERSUPERPEER			= IStarterConfiguration.SUPERSUPERPEER;		// class:
+    // default:
+    // false
 
     /** Flag if registry synchronization should be used. **/
     public static final String	SUPERPEERCLIENT			= IStarterConfiguration.SUPERPEERCLIENT;		// class:
@@ -1242,6 +1247,18 @@ public interface IRootComponentConfiguration
      */
     public void setSuperpeer(boolean value);
 
+    /**
+     *  Get the superpeer flag.
+     *  @return The superpeer flag.
+     */
+    public boolean getSupersuperpeer();
+
+    /**
+     *  Set the supersuperpeer flag.
+     *  @param value The supersuperpeer flag.
+     */
+    public void setSupersuperpeer(boolean value);
+    
     /**
      *  Get the superpeer client flag.
      *  @return The superpeer client flag.
