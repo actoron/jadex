@@ -68,10 +68,10 @@ task processDocs(type: Copy) {
         into 'docs'
 
     }
-    from('theme') { // everything but md source
+    from('theme') {
         include '**/*'
         into 'theme'
-
+        filter(ExpandProperties, project: ant.project)
     }
     from ('.') { // preprocess md source
         include '**/*.md'
@@ -299,6 +299,9 @@ class DockerTask extends DefaultTask {
         p.inputStream.eachLine {println it}
         p.errorStream.eachLine {println it}
         p.waitFor();
+        if (p.exitValue() != 0) {
+			throw new Error("Execute failed.")
+        }
     }
 
     def ProcessBuilder getProcessBuilderForCommand(String cmd, String[] args, String[] dockerArgs, boolean pullFirst = true) {

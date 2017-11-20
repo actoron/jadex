@@ -254,13 +254,34 @@ public class Starter
 	{
 		return createPlatform(config, false);
 	}
-
+	
+	/**
+	 *  Create the platform.
+	 *  @param config The PlatformConfiguration object.
+	 *  @param cl ClassLoader used as root class loader.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config, final ClassLoader cl)
+	{
+		return createPlatform(config, cl, false);
+	}
+	
 	/**
 	 *  Create the platform.
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config, boolean printExceptions)
+	{
+		return createPlatform(config, Starter.class.getClassLoader(), printExceptions);
+	}
+
+	/**
+	 *  Create the platform.
+	 *  @param config The PlatformConfiguration object.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(final PlatformConfiguration config, final ClassLoader cl, boolean printExceptions)
 	{
 		RootComponentConfiguration rootConfig = config.getRootConfig();
 		
@@ -311,7 +332,7 @@ public class Starter
 			final long starttime = System.currentTimeMillis();
 		
 			// Load the platform (component) model.
-			final ClassLoader cl = Starter.class.getClassLoader();
+//			final ClassLoader cl = Starter.class.getClassLoader();
 			final String configfile = config.getConfigurationFile();
 			String cfclname = config.getComponentFactory();
 			Class<?> cfclass = SReflect.classForName(cfclname, cl);

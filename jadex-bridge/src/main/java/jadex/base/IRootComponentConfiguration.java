@@ -13,7 +13,7 @@ public interface IRootComponentConfiguration {
      */
     public enum KERNEL
     {
-        component, micro, bpmn, v3, bdi, bdibpmn, multi
+        component, micro, bpmn, v3, bdi, bdibpmn, application, multi
     }
 
     /**

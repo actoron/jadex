@@ -1,7 +1,15 @@
 site_name: Jadex Active Components ${jadexversiontitle} Documentation
-theme_dir: 'theme'
-pages:
 
+theme:
+  name: readthedocs
+  custom_dir: theme
+  
+docs_dir: docs
+
+extra_css: ['jadexstyles.css']
+
+
+pages:
 - 'index.md'
 
 - Getting Started: 'getting-started/getting-started.md'

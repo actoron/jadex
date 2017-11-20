@@ -416,6 +416,7 @@ public class SServiceProvider
 		return getDeclaredServices(component, true);
 	}
 	
+	
 	/**
 	 *  Get one service of a type.
 //	 *  (Returns required service proxy).
@@ -447,6 +448,7 @@ public class SServiceProvider
 	public static <T> IFuture<T> getService(final IInternalAccess component, final Class<T> type, final String scope, final IAsyncFilter<T> filter, final boolean proxy)
 	{
 		final Future<T> ret = new Future<T>();
+		
 		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, T>(ret)
 		{
 			public void customResultAvailable(Void result)
