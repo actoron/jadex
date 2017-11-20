@@ -619,3 +619,9 @@ def addSubproject(proj)
 		addSubproject(sp)
 	}
 }
+
+task copyJars(type: Copy) {
+    from subprojects.collect { it.tasks.withType(AbstractArchiveTask) }
+    exclude '**/*.jar', '**/*.aar'
+    into "$buildDir/apps"
+}
