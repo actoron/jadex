@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -43,7 +44,9 @@ import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.LeaseTimeMap;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
@@ -91,51 +94,114 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	/** Potential superpeers. */
 	protected List<IComponentIdentifier> potentialsupersuperpeers;
 	
-//	/**
-//	 *  Create a new service.
-//	 */
-//	public SuperpeerRegistrySynchronizationService(List<IComponentIdentifier> ssps)
-//	{
-//		this.potentialsupersuperpeers = ssps;
-//		if(ssps==null || ssps.size()==0)
-//		{
-//			this.level = 0;
-//		}
-//		else
-//		{
-//			this.level = 1;
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture<IComponentIdentifier> findSupersuperpeer(Iterator<IComponentIdentifier> ssps)
-//	{
-//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-//		
-//		if(ssps.hasNext())
-//		{
-//			ssps.next()
-//			ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, ssps.next(), ISuperpeerRegistrySynchronizationService.class);
-//			sps.getLevel().addResultListener(new ExceptionDelegationResultListener<Integer, IComponentIdentifier>(ret)
-//			{
-//				public void customResultAvailable(Integer result) throws Exception
-//				{
-//					if(internalGetLevel()==result.intValue())
-//					{
-//						ret.setResult(result);
-//					}
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setException(exception);
-//		}
-//		
-//		return ret;
-//	}
+	/** The delay between searches. */
+	protected long searchdelay = 10000;
+//	protected long lastsearch =
+	
+	public static final IComponentIdentifier[] DEFAULT_SUPERSUPERPEERS = new IComponentIdentifier[]
+	{
+		new ComponentIdentifier("supersuperpeer"),
+	};
+	
+	/**
+	 *  Create a new service.
+	 */
+	public SuperpeerRegistrySynchronizationService()
+	{
+		this(DEFAULT_SUPERSUPERPEERS);
+	}
+	
+	/**
+	 *  Create a new service.
+	 */
+	public SuperpeerRegistrySynchronizationService(IComponentIdentifier[] ssps)
+	{
+		if(ssps==null || ssps.length==0)
+		{
+			this.level = 0;
+		}
+		else
+		{
+			this.potentialsupersuperpeers = SUtil.arrayToList(ssps);
+			this.level = 1;
+		}
+	}
+	
+	/**
+	 *  Find a supersuperpeer from a given list of superpeers.
+	 */
+	protected IFuture<IComponentIdentifier> getSupersuperpeer()
+	{
+		return getSupersuperpeer(false);
+	}
+	
+	/**
+	 *  Find a supersuperpeer from a given list of superpeers.
+	 */
+	protected IFuture<IComponentIdentifier> getSupersuperpeer(boolean force)
+	{
+		Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		if(force)
+			supersuperpeer = null;
+		
+		if(supersuperpeer!=null)
+		{
+			ret.setResult(supersuperpeer);
+		}
+		else if(potentialsupersuperpeers!=null)
+		{
+			findSupersuperpeer(potentialsupersuperpeers.iterator()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+			{
+				public void customResultAvailable(IComponentIdentifier result) 
+				{
+					supersuperpeer = result;
+					super.customResultAvailable(result);
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Find a supersuperpeer from a given list of superpeers.
+	 */
+	protected IFuture<IComponentIdentifier> findSupersuperpeer(final Iterator<IComponentIdentifier> ssps)
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		if(ssps!=null && ssps.hasNext())
+		{
+			final IComponentIdentifier sspcid = ssps.next();
+			ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, ssps.next(), ISuperpeerRegistrySynchronizationService.class);
+			sps.getLevel().addResultListener(new IResultListener<Integer>()
+			{
+				public void resultAvailable(Integer result) 
+				{
+					if(internalGetLevel()==result.intValue())
+					{
+						ret.setResult(sspcid);
+					}
+					else
+					{
+						findSupersuperpeer(ssps);
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception) 
+				{
+					findSupersuperpeer(ssps);
+				}
+			});
+		}
+		else
+		{
+			ret.setException(new ServiceNotFoundException("IISuperpeerRegistrySynchronizationService"));
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Start of the service.
@@ -143,6 +209,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	@ServiceStart
 	public void init()
 	{
+		// toto: search supersuperpeer
+		
 		// Subscribe to changes of the local registry to inform other platforms
 		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component))//, eventslimit, timelimit)
 		{
