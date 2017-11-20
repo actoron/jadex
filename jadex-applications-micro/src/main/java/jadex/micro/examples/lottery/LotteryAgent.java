@@ -7,6 +7,7 @@ import java.util.Random;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 public class LotteryAgent implements ILotteryService
 {

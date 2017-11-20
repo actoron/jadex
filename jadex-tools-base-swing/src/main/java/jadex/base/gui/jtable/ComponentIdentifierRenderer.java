@@ -1,13 +1,22 @@
 package jadex.base.gui.jtable;
 
 import java.awt.Component;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.SortedList;
+import jadex.commons.future.IResultListener;
 
 
 /**
@@ -18,20 +27,14 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 {
 	/** The local platform. */
 	protected IComponentIdentifier platform;
-	
+		
 	/**
 	 * Create a new ComponentIdentifierRenderer.
-	 */
-	public ComponentIdentifierRenderer()
-	{
-	}
-	
-	/**
-	 * Create a new ComponentIdentifierRenderer.
+	 * @param platform	CID of the local platform, if any. Used to mark local platfor and check for known addresses in tool tip.
 	 */
 	public ComponentIdentifierRenderer(IComponentIdentifier platform)
 	{
-		this.platform = platform.getRoot();
+		this.platform = platform!=null ? platform.getRoot() : null;
 	}
 	
 	/**
@@ -49,19 +52,72 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 		}
 		return this;
 	}
+	
+	private Map<IComponentIdentifier, String>	adrcache	= Collections.synchronizedMap(new LRU<IComponentIdentifier, String>());
 
-	public static String getTooltipText(IComponentIdentifier cid)
+	public String getTooltipText(final IComponentIdentifier cid)
 	{
-		String[] addresses = cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null;
 		String tooltip = "<b>" + cid.getName() + "</b>";
-		if(addresses!=null)
+		if(platform!=null)
 		{
-			for(int i=0; i<addresses.length; i++)
+			String	adrtip	= adrcache.get(cid);
+			
+			// On first access display info message.
+			if(adrtip==null)
 			{
-				tooltip += "<br>" + addresses[i];
+				adrtip	= "<br> fetching addresses, please retry...";
+				adrcache.put(cid, adrtip);
 			}
+			
+			// Try fetching each time to also receive updates
+			try
+			{
+				ITransportAddressService	tas	= SServiceProvider.getLocalService(platform, ITransportAddressService.class);
+				tas.getAddresses(cid.getRoot()).addResultListener(new IResultListener<List<TransportAddress>>()
+				{
+					@Override
+					public void resultAvailable(List<TransportAddress> addresses)
+					{
+						if(addresses!=null && !addresses.isEmpty())
+						{
+							SortedList<TransportAddress>	sl	= new SortedList<TransportAddress>(new Comparator<TransportAddress>()
+							{
+								public int compare(TransportAddress o1, TransportAddress o2)
+								{
+									return (o1.getTransportType() + "://" + o1.getAddress())
+										.compareTo(o2.getTransportType() + "://" + o2.getAddress());
+								};
+							}, true);
+							sl.addAll(addresses);
+							String	adrtip	= "";
+							for(TransportAddress adr: sl)
+							{
+								adrtip += "<br>" + adr.getTransportType() + "://" + adr.getAddress();
+							}
+							adrcache.put(cid, adrtip);
+						}
+						else
+						{
+							adrcache.put(cid, "<br>" + "no addresses found");
+						}
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						adrcache.put(cid, "<br> failed to fetch addresses: "+exception);
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				adrtip	= "<br> failed to fetch addresses: "+e;
+				adrcache.put(cid, adrtip);
+			}
+			
+			// Display what we have until now
+			tooltip	+= adrtip;
 		}
-		tooltip	= "<html>" + tooltip + "</html>";
-		return tooltip;
+		return "<html>" + tooltip + "</html>";
 	}
 }

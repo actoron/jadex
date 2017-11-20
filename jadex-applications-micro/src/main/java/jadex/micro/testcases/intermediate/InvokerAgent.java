@@ -5,12 +5,11 @@ import java.util.Collection;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -155,32 +154,34 @@ public class InvokerAgent
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false"
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
-				{
-					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+				{					
+					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 					{
-						public void customResultAvailable(ITransportComponentIdentifier result) 
+						public void customResultAvailable(IComponentIdentifier result)
 						{
-							performTest(result, testno, delay, max)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+							// inverse proxy from remote to local.
+							Starter.createProxy(platform, agent.getExternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 							{
-								public void customResultAvailable(final TestReport result)
+								public void customResultAvailable(IComponentIdentifier result)
 								{
-									platform.killComponent();
-		//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-		//							{
-		//								public void customResultAvailable(Map<String, Object> v)
-		//								{
-		//									ret.setResult(result);
-		//								}
-		//							});
-									ret.setResult(result);
+									performTest(platform.getComponentIdentifier(), testno, delay, max)
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+								{
+									public void customResultAvailable(final TestReport result)
+									{
+										platform.killComponent();
+										ret.setResult(result);
+									}
+								}));
 								}
-							}));
+							});
 						}
 					});
 				}
@@ -222,91 +223,86 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getExternalAccess(root).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+//				System.out.println("root is: "+root);
+				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					public void customResultAvailable(final IClockService clock)
 					{
-						SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
-						{
-							public void customResultAvailable(final IClockService clock)
+//						System.out.println("clock is: "+clock);
+						IResourceIdentifier	rid	= new ResourceIdentifier(
+							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//						System.out.println("Using rid: "+rid);
+						final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
+						CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", ci, null)
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+						{	
+							public void customResultAvailable(final IComponentIdentifier cid)
 							{
-								IResourceIdentifier	rid	= new ResourceIdentifier(
-									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-	//							System.out.println("Using rid: "+rid);
-								final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
-								CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
-								cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", ci, null)
-									.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-								{	
-									public void customResultAvailable(final IComponentIdentifier cid)
+//								System.out.println("cid is: "+cid);
+								SServiceProvider.getService(agent, cid, IIntermediateResultService.class)
+									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
+								{
+									public void customResultAvailable(IIntermediateResultService service)
 									{
-	//									System.out.println("cid is: "+cid);
-										SServiceProvider.getService(agent, cid, IIntermediateResultService.class)
-											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
+										// Invoke service agent
+//										System.out.println("Invoking");
+										final Long[] start = new Long[1];
+										IIntermediateFuture<String> fut = service.getResults(delay, max);
+										fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
 										{
-											public void customResultAvailable(IIntermediateResultService service)
+											public void intermediateResultAvailable(String result)
 											{
-												// Invoke service agent
-	//											System.out.println("Invoking");
-												final Long[] start = new Long[1];
-												IIntermediateFuture<String> fut = service.getResults(delay, max);
-												fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+												if(start[0]==null)
 												{
-													public void intermediateResultAvailable(String result)
-													{
-														if(start[0]==null)
-														{
-															start[0] = 	local ? clock.getTime() : System.currentTimeMillis();
-														}
-	//													System.out.println("intermediateResultAvailable: "+result);
-													}
-													public void finished()
-													{
-														long needed = (local ? clock.getTime() : System.currentTimeMillis())-start[0].longValue();
-	//															System.out.println("finished: "+needed);
-														TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-														long expected = delay*(max-1);
-														// deviation can happen because receival of results is measured
-	//															System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
-														if(needed*1.1>=expected) // 10% deviation allowed
-														{
-															tr.setSucceeded(true);
-														}
-														else
-														{
-															tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
-														}
-														cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-													public void resultAvailable(Collection<String> result)
-													{
-														System.out.println("resultAvailable: "+result);
-														TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-														tr.setReason("resultAvailable was called");
-														cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-													public void exceptionOccurred(Exception exception)
-													{
-														System.out.println("exceptionOccurred: "+exception);
-														TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-														tr.setFailed(exception);
-														ret.setResult(tr);
-													}
-												}));
-				//								System.out.println("Added listener");
-											}		
+													start[0] = 	local ? clock.getTime() : System.currentTimeMillis();
+												}
+//													System.out.println("intermediateResultAvailable: "+result);
+											}
+											public void finished()
+											{
+												long needed = (local ? clock.getTime() : System.currentTimeMillis())-start[0].longValue();
+//															System.out.println("finished: "+needed);
+												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+												long expected = delay*(max-1);
+												// deviation can happen because receival of results is measured
+//												System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
+												
+												if(needed*1.1>=expected) // 10% deviation allowed
+												{
+													tr.setSucceeded(true);
+												}
+												else
+												{
+													tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
+												}
+												cms.destroyComponent(cid);
+												ret.setResult(tr);
+											}
+											public void resultAvailable(Collection<String> result)
+											{
+//												System.out.println("resultAvailable: "+result);
+												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+												tr.setReason("resultAvailable was called");
+												cms.destroyComponent(cid);
+												ret.setResult(tr);
+											}
+											public void exceptionOccurred(Exception exception)
+											{
+//												System.out.println("exceptionOccurred: "+exception);
+												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+												tr.setFailed(exception);
+												ret.setResult(tr);
+											}
 										}));
-									}
-								});
+		//								System.out.println("Added listener");
+									}		
+								}));
 							}
-						}));	
+						});
 					}
-				});
-				
-				
+				}));	
 			}	
 		});
 		

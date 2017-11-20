@@ -255,7 +255,7 @@ public class ConsolePanel extends JPanel
 	 */
 	public void setConsoleEnabled(boolean enable)
 	{
-		final String	id	= jccaccess.getComponentIdentifier().getPlatformName()+"#console@"+hashCode();
+		final String id = jccaccess.getComponentIdentifier().getPlatformName()+"#console@"+hashCode();
 		if(!enable)
 		{
 //			in.setEnabled(false);
@@ -276,7 +276,7 @@ public class ConsolePanel extends JPanel
 				final static String	OUT_OCCURRED	= "out" + RemoteChangeListenerHandler.EVENT_OCCURRED;
 				final static String	ERR_OCCURRED	= "err" + RemoteChangeListenerHandler.EVENT_OCCURRED;
 				
-				@Security(Security.UNRESTRICTED)
+//				@Security(Security.UNRESTRICTED)
 				public IFuture changeOccurred(ChangeEvent event)
 				{
 					IFuture	ret;

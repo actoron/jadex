@@ -2,10 +2,10 @@ package jadex.micro.examples.ping;
 
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
 
@@ -25,17 +25,23 @@ public class PingAgent
 	 *  @param mt The message type.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map<String, Object> msg, final MessageType mt)
+	public void messageArrived(Map<String, Object> msg)
 	{
 		String perf = (String)msg.get(SFipa.PERFORMATIVE);
 		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
-			Map<String, Object> reply = mt.createReply(msg);
+			// transform to reply
+			Map<String, Object> reply = msg;
+			reply.put(SFipa.RECEIVERS, msg.get(SFipa.REPLY_TO)!=null ?  msg.get(SFipa.REPLY_TO) : msg.get(SFipa.SENDER));
+			reply.put(SFipa.IN_REPLY_TO, msg.get(SFipa.REPLY_WITH));
+			reply.remove(SFipa.REPLY_WITH);
+			reply.remove(SFipa.REPLY_TO);
+			
 			reply.put(SFipa.CONTENT, "alive");
 			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
 			reply.put(SFipa.SENDER, agent.getComponentIdentifier());
-			agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, mt);
+			agent.getComponentFeature(IMessageFeature.class).sendMessage((IComponentIdentifier)reply.get(SFipa.RECEIVERS), reply);
 		}
 		else
 		{

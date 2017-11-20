@@ -2,6 +2,7 @@ package jadex.platform.service.registry;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -46,7 +47,7 @@ public abstract class LocalRegistryObserver
 	 */
 	public LocalRegistryObserver(IComponentIdentifier cid, final IDelayRunner timer)
 	{
-		this(cid, timer, 50, 5000);
+		this(cid, timer, 50, 10000);
 	}
 	
 	/**
@@ -67,10 +68,13 @@ public abstract class LocalRegistryObserver
 		{
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
+//				System.out.println("Local registry changed: "+event);
+				
 				if(registryevent==null)
 					registryevent= new RegistryEvent(true);
 				
-				if(event.getType() == ServiceEvent.SERVICE_ADDED)
+				if(event.getType() == ServiceEvent.SERVICE_ADDED 
+					|| event.getType() == ServiceEvent.SERVICE_CHANGED)
 				{
 					registryevent.addAddedService(event.getService());
 				}
@@ -104,6 +108,8 @@ public abstract class LocalRegistryObserver
 		this.registryevent = new RegistryEvent(true);
 		
 		restartTimer();
+		
+//		System.out.println("local registry observer started");
 	}
 	
 	/**
@@ -120,13 +126,19 @@ public abstract class LocalRegistryObserver
 		{
 			public void run()
 			{
-//				System.out.println("notifyObservers");
-				if(registryevent!=null && registryevent.isDue())
+//				System.out.println("notifyObservers: "+System.currentTimeMillis()+" "+hashCode());
+				
+				// uses timelimit for event and for waiting
+				if(registryevent!=null)
 				{
-					notifyObservers(registryevent);
-					registryevent = new RegistryEvent(true);
+					if(registryevent.isDue())
+					{
+						notifyObservers(registryevent);
+						registryevent = new RegistryEvent(true, timelimit);
+					}
+					// do not wait below 10ms
+					canceltimer = timer.waitForDelay(Math.max(10, registryevent.getTimeUntilDue()), this);
 				}
-				canceltimer = timer.waitForDelay(getTimeLimit(), this);
 			}
 		});
 	}
@@ -171,6 +183,7 @@ public abstract class LocalRegistryObserver
 	{
 		if(timelimit!=this.timelimit)
 		{
+//			System.out.println("Timelimit is: "+timelimit);
 			this.timelimit = timelimit;
 			restartTimer();
 		}
@@ -184,7 +197,8 @@ public abstract class LocalRegistryObserver
 	{
 		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
 		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, cid, null);
-		RegistryEvent event = new RegistryEvent(new HashSet<IService>(reg.searchServicesSync(query)), null, eventslimit, timelimit, false);
+		Set<IService> added = reg.searchServicesSync(query);
+		RegistryEvent event = new RegistryEvent(added, null, eventslimit, timelimit, false);
 		return event;
 	}
 }

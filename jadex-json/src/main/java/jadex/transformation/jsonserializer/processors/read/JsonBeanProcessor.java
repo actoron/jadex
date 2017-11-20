@@ -18,6 +18,7 @@ import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -35,7 +36,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return object instanceof JsonObject && (clazz!=null && !SReflect.isSupertype(Map.class, clazz));
@@ -44,12 +45,11 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
@@ -63,7 +63,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		
 		try
 		{
-			traverseProperties(object, clazz, traversed, processors, traverser, clone, targetcl, ret, context, intro);
+			traverseProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
 		}
 		catch(Exception e)
 		{
@@ -76,9 +76,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected static void traverseProperties(Object object, Type type, Map<Object, Object> cloned, 
-		List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, 
-		Object ret, Object context, IBeanIntrospector intro)
+	protected static void traverseProperties(Object object, Type type, List<ITraverseProcessor> postprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, Object ret, Object context, IBeanIntrospector intro)
 	{
 		// Get all declared fields (public, protected and private)
 		
@@ -96,9 +94,19 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					JsonValue val = jval.get(name);
 					if(val!=null && !val.isNull()) 
 					{
-						Object newval = traverser.doTraverse(val, prop.getGenericType()!=null?prop.getGenericType():prop.getType(), cloned, processors, clone, targetcl, context);
+						Type sot = val instanceof JsonObject?JsonTraverser.findClazzOfJsonObject((JsonObject) val, targetcl):prop.getGenericType();
+//						System.out.println("VAL " + ((JsonObject) val).toString());
+//						System.out.println("CL " + ((JsonObject) val).getString(JsonTraverser.CLASSNAME_MARKER, null));
+//						System.out.println("SOT: " +sot);
+						Object newval = traverser.doTraverse(val, sot, postprocessors, processors, mode, targetcl, context);
+//						Object newval = traverser.doTraverse(val, sot, rsionprocessors, postprocessors, mode, targetcl, context)
+//						Object newval = traverser.doTraverse(val, sot, cloned, null, processors, postprocessors, clone, targetcl, context);
+
 						if(newval != Traverser.IGNORE_RESULT && (object!=ret || val!=newval))
 						{
+//							if ("result".equals(prop.getName()))
+//								System.out.println("PROP SET CALLED");
+							
 							prop.setPropertyValue(ret, convertBasicType(newval, prop.getType()));
 						}
 					}
@@ -177,7 +185,6 @@ public class JsonBeanProcessor implements ITraverseProcessor
 		}
 		catch(Exception e)
 		{
-			System.out.println("beanproc ex: "+object+" "+c);
 			throw new RuntimeException(e);
 		}
 		return ret;
@@ -206,7 +213,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+						SUtil.rethrowAsUnchecked(e);
 					}
 				}
 			}
@@ -222,7 +229,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+						SUtil.rethrowAsUnchecked(e);
 					}
 				}
 			}

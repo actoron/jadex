@@ -31,6 +31,7 @@ import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.impl.MonitoringComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
 import jadex.bridge.component.impl.PropertiesComponentFeature;
+import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -73,6 +74,7 @@ public class SComponentFactory
 		def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
 		def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
+		def_features.add(RemoteExecutionComponentFeature.FACTORY);	// After message for adding handler
 		def_features.add(NFPropertyComponentFeature.FACTORY);
 		def_features.add(ComponentLifecycleFeature.FACTORY);
 		DEFAULT_FEATURES	= Collections.unmodifiableCollection(def_features);
@@ -205,7 +207,7 @@ public class SComponentFactory
 	public static IFuture<IModelInfo> loadModel(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		if(model==null)
-			throw new NullPointerException();
+			throw new IllegalArgumentException("Model must not be null.");
 		if(model.length()==0)
 			throw new IllegalArgumentException();
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()

@@ -5,7 +5,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ITuple2Future;
@@ -31,8 +30,10 @@ import jadex.micro.annotation.Results;
 })
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
+	@RequiredService(name="ts", type=ITestService.class,
+		// Hangs with global search during micro tests?
+//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
+	binding=@Binding(create=true, creationinfo=@CreationInfo(type="ta"))),
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Scope global causes search timeouts -> increase test timeout to exceed search timeout

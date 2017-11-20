@@ -1,6 +1,6 @@
 package jadex.commons.transformation.cloner;
 
-import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.SCloner;
 
 /**
  *  Testcases for writer and reader.
@@ -15,7 +15,7 @@ public class ClonerTest extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-		return Traverser.traverseObject(wo, Traverser.getDefaultProcessors(), true, null);
+		return SCloner.clone(wo);
 	}
 	
 	/**

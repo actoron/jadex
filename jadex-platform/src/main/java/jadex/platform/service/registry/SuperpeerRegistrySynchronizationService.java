@@ -1,26 +1,37 @@
 package jadex.platform.service.registry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.component.impl.remotecommands.ProxyInfo;
+import jadex.bridge.component.impl.remotecommands.ProxyReference;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -31,9 +42,9 @@ import jadex.bridge.service.types.registry.RegistryUpdateEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.collection.ILeaseTimeSet;
+import jadex.commons.SReflect;
 import jadex.commons.collection.LeaseTimeMap;
-import jadex.commons.collection.LeaseTimeSet;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
@@ -42,13 +53,15 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.micro.annotation.Binding;
+import jadex.platform.service.serialization.RemoteMethodInvocationHandler;
 
 /**
  *  Registry service for synchronization with remote platforms. 
  *  
  *  Has two behaviors:
  *  a) allows others to subscribe and sends updates according to local service registry
- *  b) uses awareness to detect new platform and searches the IRegistrySynchronizationService for them. Subscribes at those.
+ *  b) uses awareness to detect new platforms and searches the ISuperpeerRegistrySynchronizationService for them. Subscribes at those.
  */
 public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegistrySynchronizationService
 {
@@ -56,24 +69,73 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	@ServiceComponent
 	protected IInternalAccess component;
 	
-	/** The subscriptions of other platforms (platform cid -> subscription info). */
+	/** The subscriptions of other platforms (superpeers) (platform cid -> subscription info). */
 	protected Map<IComponentIdentifier, SubscriptionIntermediateFuture<IRegistryEvent>> subscriptions;
 	
-	/** The platforms this registry has subscribed to. The other will send registry updates to me. */
-	protected ILeaseTimeSet<SubscriptionInfo> subscribedto;
+	/** The platforms this registry has subscribed to. The other superpeers will send registry updates to me. */
+	protected Set<SubscriptionInfo> subscribedto;
 	protected Set<IComponentIdentifier> knownplatforms;
 
 	/** The client platforms that are managed by this super-peer. */
 	protected LeaseTimeMap<IComponentIdentifier, ClientInfo> clients; 
 	
-//	/** The max number of events to collect before sending a bunch event. */
-//	protected int eventslimit;
-//	
-//	/** The timelimit for sending events even when only few have arrived. */
-//	protected long timelimit;
-
 	/** Local registry observer. */
 	protected LocalRegistryObserver lrobs;
+	
+	/** The registry level.*/
+	protected int level;
+	
+	/** The super-super-peer. */
+	protected IComponentIdentifier supersuperpeer;
+	
+	/** Potential superpeers. */
+	protected List<IComponentIdentifier> potentialsupersuperpeers;
+	
+//	/**
+//	 *  Create a new service.
+//	 */
+//	public SuperpeerRegistrySynchronizationService(List<IComponentIdentifier> ssps)
+//	{
+//		this.potentialsupersuperpeers = ssps;
+//		if(ssps==null || ssps.size()==0)
+//		{
+//			this.level = 0;
+//		}
+//		else
+//		{
+//			this.level = 1;
+//		}
+//	}
+//	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture<IComponentIdentifier> findSupersuperpeer(Iterator<IComponentIdentifier> ssps)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		if(ssps.hasNext())
+//		{
+//			ssps.next()
+//			ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, ssps.next(), ISuperpeerRegistrySynchronizationService.class);
+//			sps.getLevel().addResultListener(new ExceptionDelegationResultListener<Integer, IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(Integer result) throws Exception
+//				{
+//					if(internalGetLevel()==result.intValue())
+//					{
+//						ret.setResult(result);
+//					}
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setException(exception);
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Start of the service.
@@ -81,21 +143,13 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	@ServiceStart
 	public void init()
 	{
-//		this.eventslimit = 50;
-//		this.timelimit = 5000;
-		
 		// Subscribe to changes of the local registry to inform other platforms
 		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component))//, eventslimit, timelimit)
 		{
 			public void notifyObservers(RegistryEvent event)
 			{
-				if(subscriptions!=null)
-				{
-					for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
-					{
-						fut.addIntermediateResult(event);
-					}
-				}
+				// Only local changes are propagated (scope in query is platform)
+				forwardRegistryEvent(event);
 			}
 		};
 		
@@ -149,9 +203,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					{
 						for(IProxyAgentService ser: sers)
 						{
-							ser.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
+							ser.getRemoteComponentIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
 							{
-								public void resultAvailable(ITransportComponentIdentifier rcid)
+								public void resultAvailable(IComponentIdentifier rcid)
 								{
 									newPlatformFound(rcid);
 								}
@@ -173,6 +227,21 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	}
 	
 	/**
+	 *  Forward a registry event to all other superpeers.
+	 */
+	protected void forwardRegistryEvent(IRegistryEvent event)
+	{
+		if(subscriptions!=null)
+		{
+//			System.out.println("Sending sync update: "+event);
+			for(SubscriptionIntermediateFuture<IRegistryEvent> fut: subscriptions.values())
+			{
+				fut.addIntermediateResult(event);
+			}
+		}
+	}
+	
+	/**
 	 *  Called when a new platform was found.
 	 */
 	protected void newPlatformFound(final IComponentIdentifier cid)
@@ -189,20 +258,28 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			addKnownPlatform(cid);
 			
-			// Try to get IRegistrySynchronizationService from newly found platform
+			// Try to get ISuperpeerRegistrySynchronizationService from newly found platform
+			
+			boolean ssp = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(SuperpeerRegistrySynchronizationAgent.class).isSupersuperpeer();
+			
+			final ServiceQuery<ISuperpeerRegistrySynchronizationService> query = new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
+			query.setUnrestricted(ssp); // ssp means offers unrestricted
+			query.setPlatform(cid); // target platform on which to search
+			
 			SServiceProvider.waitForService(component, new IResultCommand<IFuture<ISuperpeerRegistrySynchronizationService>, Void>()
 			{
 				public IFuture<ISuperpeerRegistrySynchronizationService> execute(Void args)
 				{
-					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
+//					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
+					return SServiceProvider.getService(component, query);
 				}
 			}, 3, 10000).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 			{
 				public void resultAvailable(ISuperpeerRegistrySynchronizationService regser)
 				{
 					// Subscribe to the new remote registry
-					
-					System.out.println("Found registry service on: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+					boolean unr = ((IService)regser).getServiceIdentifier().isUnrestricted();
+					System.out.println("Found registry service on: "+cid+(unr? " unrestricted": " default")+" (I am: "+component.getComponentIdentifier()+")");
 					
 					ISubscriptionIntermediateFuture<IRegistryEvent> fut = regser.subscribeToEvents();
 					final SubscriptionInfo info = new SubscriptionInfo(cid, fut);
@@ -221,7 +298,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 							
 							// Update the platform subscription info (the other platform will be removed if idle too long)
 							info.setTimestamp(System.currentTimeMillis());
-							subscribedto.update(info);
+//							subscribedto.update(info);
 							
 							handleRegistryEvent(event);
 						}
@@ -260,10 +337,32 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Found no registry service on: "+cid);
+					System.out.println("Found no superpeer registry service on: "+cid);
 				}
 			});
 		}
+	}
+	
+	/**
+	 *  Get the current partner superpeers.
+	 */
+	public IFuture<Collection<IComponentIdentifier>> getPartnerSuperpeers()
+	{
+		return new Future<Collection<IComponentIdentifier>>(subscriptions.keySet());
+	}
+	
+	/**
+	 *  Get the current clients.
+	 */
+	public IFuture<Collection<IComponentIdentifier>> getClients()
+	{
+		List<IComponentIdentifier> ret = new ArrayList<IComponentIdentifier>();
+		Collection<ClientInfo> cis = clients.values();
+		for(ClientInfo ci: cis)
+		{
+			ret.add(ci.getPlatformId());
+		}
+		return new Future<Collection<IComponentIdentifier>>(ret);
 	}
 		
 	/**
@@ -360,7 +459,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		addSubscription(cid, ret);
 		
 		// Forward current state initially
-		ret.addIntermediateResult(lrobs.getCurrentStateEvent());
+		IRegistryEvent ev = lrobs.getCurrentStateEvent();
+		System.out.println("Sending full state: "+component.getComponentIdentifier()+": "+ev);
+		ret.addIntermediateResult(ev);
 		
 		return ret;
 	}
@@ -374,6 +475,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	public IFuture<RegistryUpdateEvent> updateClientData(IRegistryEvent event)
 	{
 		Future<RegistryUpdateEvent> ret = new Future<RegistryUpdateEvent>();
+		
+		System.out.println("received event from client: "+event);
 		
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 
@@ -400,16 +503,38 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			ci = new ClientInfo(cid);
 			existed = false;
 		}
+		System.out.println("new lease time for: "+cid+" "+System.currentTimeMillis()+"  "+lrobs.getTimeLimit());
 		clients.put(cid, ci);
 		
-		if(event.size()>0)
-			System.out.println("Client update request from: "+cid+" size:"+event.size()+" delta: "+event.isDelta());
+//		if(event.size()>0)
+//			System.out.println("Client update request from: "+cid+" size:"+event.size()+" delta: "+event.isDelta());
 		
 		handleRegistryEvent(event);
+		
+		// forward client updates to all other partner superpeers
+		forwardRegistryEvent(event);
 		
 		ret.setResult(new RegistryUpdateEvent(event.isDelta() && !existed, lrobs.getTimeLimit()));
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the level (level 0 is the topmost superpeer level).
+	 *  @retrun The level.
+	 */
+	public IFuture<Integer> getLevel()
+	{
+		return new Future<Integer>(level);
+	}
+	
+	/**
+	 *  Get the level (level 0 is the topmost superpeer level).
+	 *  @retrun The level.
+	 */
+	public int internalGetLevel()
+	{
+		return level;
 	}
 
 	/**
@@ -465,27 +590,29 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		if(subscribedto==null)
 		{
-			subscribedto = LeaseTimeSet.createLeaseTimeCollection((long)(2.2*lrobs.getTimeLimit()), new ICommand<SubscriptionInfo>()
-			{
-				public void execute(SubscriptionInfo entry) 
-				{
-					System.out.println("Remove subscription of: "+entry.getPlatformId());
-//					getRegistry().removeSubregistry(entry.getPlatformId());
-					
-					// Remove services of other superpeer
-					getRegistry().removeServices(entry.getPlatformId());
-					// Necessary?! Should not have queries of other superpeers
-					getRegistry().removeQueriesFromPlatform(entry.getPlatformId()); 
-				}
-			}, new AgentDelayRunner(component), false, null);
+			subscribedto = new HashSet<SuperpeerRegistrySynchronizationService.SubscriptionInfo>();
+//			subscribedto = LeaseTimeSet.createLeaseTimeCollection((long)(2.2*lrobs.getTimeLimit()), new ICommand<SubscriptionInfo>()
+//			{
+//				public void execute(SubscriptionInfo entry) 
+//				{
+//					System.out.println("Remove subscription of: "+entry.getPlatformId());
+////					getRegistry().removeSubregistry(entry.getPlatformId());
+//					
+//					// Remove services of other superpeer
+//					getRegistry().removeServices(entry.getPlatformId());
+//					// Necessary?! Should not have queries of other superpeers
+//					getRegistry().removeQueriesFromPlatform(entry.getPlatformId()); 
+//				}
+//			}, new AgentDelayRunner(component), false, null);
 		}
 		
-		subscribedto.update(info);
+//		subscribedto.update(info);
+		subscribedto.add(info);
 	}
 	
 	/**
 	 *  Remove an existing subscription.
-	 *  @param cid The component id to remove.
+	 *  @param platform The component id to remove.
 	 */
 	protected void removeSubscribedTo(SubscriptionInfo info)
 	{
@@ -636,4 +763,5 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			this.subscription = subscription;
 		}
 	}
+	
 }

@@ -10,9 +10,13 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -31,6 +35,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
 /**
  *  Proxy class allows for generating proxy objects for
@@ -49,7 +54,10 @@ public class Proxy
 		OBJECTMETHODS.add("toString");
 		OBJECTMETHODS.add("hashCode");
 	}
+
+	public static final AtomicInteger COUNTER = new AtomicInteger();
 	
+	public static final Map<Tuple2<ClassLoader, Set<Class<?>>>, Class<?>> CLASSCACHE = Collections.synchronizedMap(new WeakHashMap<Tuple2<ClassLoader,Set<Class<?>>>, Class<?>>());
 	
 	/**
      *  Get the invocation handler of a proxy.
@@ -115,6 +123,29 @@ public class Proxy
 	 */
 	public static Object newProxyInstance(ClassLoader loader, final Class<?> clazz, final Class<?>[] ifaces, InvocationHandler handler) 
 	{
+		Set<Class<?>> def = SUtil.arrayToSet(ifaces);
+		if(clazz!=null)
+			def.add(clazz);
+		loader = loader==null? Proxy.class.getClassLoader(): loader;
+
+		// Try fetch from cache
+		Tuple2<ClassLoader, Set<Class<?>>> key = new Tuple2<ClassLoader, Set<Class<?>>>(loader, def);
+		Class<?> ret = CLASSCACHE.get(key);
+		if(ret!=null)
+		{
+			try
+			{
+//				System.out.println("Cache hit: "+ret+" "+def);
+				Constructor<?> c = ret.getConstructor(new Class[]{InvocationHandler.class});
+				Object o = c.newInstance(handler);
+				return o;
+			}
+			catch(Exception e)
+			{
+				SUtil.rethrowAsUnchecked(e);
+			}
+		}
+		
 		ClassNode cn = new ClassNode();
 		try
 		{
@@ -125,7 +156,7 @@ public class Proxy
 			
 			cn.version = Opcodes.V1_5;
 			cn.access = Opcodes.ACC_PUBLIC;
-			cn.name = clazz!=null? Type.getInternalName(clazz)+"Proxy": SUtil.createUniqueId("Proxy", 5);
+			cn.name = (clazz!=null? Type.getInternalName(clazz)+"Proxy": "Proxy")+COUNTER.getAndIncrement();
 			cn.superName = clazz!=null? Type.getInternalName(clazz): Type.getType(Object.class).getInternalName();
 			cn.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, "handler", "Ljava/lang/reflect/InvocationHandler;", null, null));
 			cn.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, "isproxy", Type.getType(Boolean.class).getDescriptor(), null, Boolean.TRUE));
@@ -167,7 +198,7 @@ public class Proxy
 			{
 				if(OBJECTMETHODS.contains(m.name))
 				{
-					MethodNode nmn = genrateInvocationCode(m, cn.name, null);
+					MethodNode nmn = genrateInvocationCode(m, cn.name, null, loader);
 					if(nmn!=null && !done.contains(nmn.name+nmn.desc))
 					{
 						cn.methods.add(nmn);
@@ -191,7 +222,7 @@ public class Proxy
 				
 				for(MethodNode m: ms)
 				{
-					MethodNode nmn = genrateInvocationCode(m, cn.name, null);
+					MethodNode nmn = genrateInvocationCode(m, cn.name, null, loader);
 					if(nmn!=null && !done.contains(nmn.name+nmn.desc))
 					{
 						cn.methods.add(nmn);
@@ -214,7 +245,7 @@ public class Proxy
 					List<MethodNode> tms = tcn.methods;
 					for(MethodNode m: tms)
 					{
-						MethodNode nmn = genrateInvocationCode(m, cn.name, allifs[i]);
+						MethodNode nmn = genrateInvocationCode(m, cn.name, allifs[i], loader);
 						if(nmn!=null && !done.contains(nmn.name+nmn.desc))
 						{
 							cn.methods.add(nmn);
@@ -239,7 +270,8 @@ public class Proxy
 	//		Class<?> cl = bcl.loadClass(cn.name, cw.toByteArray(), true);
 			Constructor<?> c = cl.getConstructor(new Class[]{InvocationHandler.class});
 			Object o = c.newInstance(handler);
-			
+		
+			CLASSCACHE.put(new Tuple2<ClassLoader, Set<Class<?>>>(loader, def), cl);
 			return o;
 		}
 		catch(Throwable t)
@@ -261,7 +293,7 @@ public class Proxy
 	 *  @param iface The interface (null means the class is owner of the method)
 	 *  @return The new method node (or null).
 	 */
-	protected static MethodNode genrateInvocationCode(MethodNode m, String classname, Class<?> iface) throws Exception
+	protected static MethodNode genrateInvocationCode(MethodNode m, String classname, Class<?> iface, ClassLoader loader) throws Exception
 	{
 		MethodNode ret = null;
 		
@@ -306,7 +338,7 @@ public class Proxy
 			{
 				ret.instructions.add(new InsnNode(Opcodes.DUP));
 				ret.instructions.add(new LdcInsnNode(i));
-				Class<?> cl = SReflect.findClass(ptypes[i].getClassName(), null, null);
+				Class<?> cl = SReflect.findClass(ptypes[i].getClassName(), null, loader);
 				
 				if(cl.isPrimitive())
 				{

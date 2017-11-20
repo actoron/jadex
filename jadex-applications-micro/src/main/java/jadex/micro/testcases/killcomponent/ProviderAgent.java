@@ -1,5 +1,6 @@
 package jadex.micro.testcases.killcomponent;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.future.Future;
@@ -20,8 +21,9 @@ public class ProviderAgent
 	private IArgumentsResultsFeature argResults;
 
 	@AgentCreated
-	private void created() {
-		System.out.println("provider created");
+	public void created(IInternalAccess agent)
+	{
+		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
 	}
 
 	@AgentBody

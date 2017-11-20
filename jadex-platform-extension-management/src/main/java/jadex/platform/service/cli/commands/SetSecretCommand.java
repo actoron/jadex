@@ -19,6 +19,7 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
+import jadex.platform.service.security.auth.PasswordSecret;
 
 /**
  *  Command to set a password or network secret.
@@ -86,17 +87,18 @@ public class SetSecretCommand extends ACliCommand
 				{
 					if(plat!=null)
 					{
-						ss.setPlatformPassword(new BasicComponentIdentifier(plat), pass)
-							.addResultListener(new DelegationResultListener<Void>(ret));
+						ss.setPlatformSecret(new BasicComponentIdentifier(plat), pass);
+//						ss.setPlatformPassword(new BasicComponentIdentifier(plat), pass)
+//							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					else if(net!=null)
 					{
-						ss.setNetworkPassword(net, pass)
-							.addResultListener(new DelegationResultListener<Void>(ret));
+						ss.setNetwork(net, pass);
+//							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					else
 					{
-						ss.setLocalPassword(pass).addResultListener(new DelegationResultListener<Void>(ret));
+						ss.setPlatformSecret(null, pass);//.addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				}
 			});

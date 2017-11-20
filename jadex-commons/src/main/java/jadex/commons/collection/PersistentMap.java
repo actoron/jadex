@@ -1,10 +1,10 @@
 package jadex.commons.collection;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.binaryserializer.VarInt;
 
 /**
@@ -35,7 +35,6 @@ public class PersistentMap<K, V> implements Map<K, V>
 	
 	/** Random access to the persistence file */
 	protected RandomAccessFile raf;
-	protected OutputStream pfilestream;
 	
 	/** Bytes of dirty entries. */
 	protected long dirtybytes;
@@ -139,6 +138,7 @@ public class PersistentMap<K, V> implements Map<K, V>
 		System.out.println();
 		System.out.println("Dirty: " + pm.getDirtyBytes() + ", Map size: " + pm.size());
 		ts = System.currentTimeMillis();
+		System.out.println("File Size: " + file.length());
 		pm.compact();
 		System.out.println("Compaction took: " + (System.currentTimeMillis() - ts));
 		System.out.println("Dirty: " + pm.getDirtyBytes() + ", Map size: " + pm.size());
@@ -229,9 +229,7 @@ public class PersistentMap<K, V> implements Map<K, V>
     	{
 	    	try
 	    	{
-	    		byte[] buf = new byte[vinfo.getSize()];
 	    		raf.seek(vinfo.getPosition());
-	    		raf.readFully(buf);
 //	    		ByteArrayInputStream inbuffer = new ByteArrayInputStream(buf);
 //	    		GZIPInputStream gzipinput = new GZIPInputStream(inbuffer);
 //	    		ByteArrayOutputStream outbuffer = new ByteArrayOutputStream();
@@ -254,7 +252,8 @@ public class PersistentMap<K, V> implements Map<K, V>
 //	    		gzipinput = null;
 //	    		outbuffer = null;
 	    		
-	    		ret = (V) BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
+	    		ret = (V) SBinarySerializer.readObjectFromDataInput(raf, null, null, classloader, null, null);
+//	    		ret = (V) BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
 	    	}
 	    	catch (IOException e)
 	    	{
@@ -555,11 +554,9 @@ public class PersistentMap<K, V> implements Map<K, V>
 				int entrysize = (int) VarInt.decodeWithKnownSize(buf, 0, ext);
 				pos += buf.length;
 				
-				buf = new byte[entrysize];
-				raf.readFully(buf);
-				pos += buf.length;
-				
-				Object okey = BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
+				Object okey = SBinarySerializer.readObjectFromDataInput(raf, null, null, classloader, null, null);
+				pos += entrysize;
+//				Object okey = BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
 				if (okey instanceof PersistentMap.DeletedKey)
 				{
 					ValueInfo valinfo = indexmap.remove(((DeletedKey) okey).getKey());
@@ -614,10 +611,19 @@ public class PersistentMap<K, V> implements Map<K, V>
     	
     	try
     	{
-    		byte[] kbuf = BinarySerializer.objectToByteArray(key, classloader);
+//    		byte[] kbuf = BinarySerializer.objectToByteArray(key, classloader);
+//    		byte[] klbuf = VarInt.encode(kbuf.length);
+//	    	byte[] vbuf = BinarySerializer.objectToByteArray(value, classloader);
+//	    	byte[] vlbuf = VarInt.encode(vbuf.length);
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		SBinarySerializer.writeObjectToStream(baos, key, classloader);
+    		byte[] kbuf = baos.toByteArray();
     		byte[] klbuf = VarInt.encode(kbuf.length);
-	    	byte[] vbuf = BinarySerializer.objectToByteArray(value, classloader);
-	    	byte[] vlbuf = VarInt.encode(vbuf.length);
+    		baos = new ByteArrayOutputStream();
+    		SBinarySerializer.writeObjectToStream(baos, value, classloader);
+    		byte[] vbuf = baos.toByteArray();
+    		byte[] vlbuf = VarInt.encode(vbuf.length);
+    		
 	    	long pos = raf.length();
 	    	int length = klbuf.length + kbuf.length + vlbuf.length;
 	    	ValueInfo vinfo = new ValueInfo(pos + length, vbuf.length, pos, length + vbuf.length);
@@ -635,7 +641,6 @@ public class PersistentMap<K, V> implements Map<K, V>
 	    	raf.setLength(pos + length);
 	    	raf.seek(pos);
 	    	raf.write(buf);
-//	    	pfilestream.write(buf);
 	    	indexmap.put(key, vinfo);
     	}
     	catch (IOException e)
@@ -654,8 +659,6 @@ public class PersistentMap<K, V> implements Map<K, V>
     
     public V doRemove(Object key)
     {
-    	
-    	
     	V ret = null;
     	if (indexmap.containsKey(key))
     	{
@@ -665,7 +668,9 @@ public class PersistentMap<K, V> implements Map<K, V>
     		
     		try
         	{
-        		byte[] kbuf = BinarySerializer.objectToByteArray(dk, classloader);
+    			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    			SBinarySerializer.writeObjectToStream(baos, dk, classloader);
+        		byte[] kbuf = baos.toByteArray();
         		byte[] klbuf = VarInt.encode(kbuf.length);
     	    	long pos = raf.length();
     	    	raf.setLength(pos + klbuf.length + kbuf.length);

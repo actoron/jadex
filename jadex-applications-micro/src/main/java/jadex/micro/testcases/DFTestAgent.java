@@ -21,7 +21,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -197,7 +196,7 @@ public class DFTestAgent
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(agent.getComponentIdentifier(), hlefMessage);
 		
 		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{
@@ -212,7 +211,7 @@ public class DFTestAgent
 	
 	// todo: set body future?!
 	@AgentMessageArrived
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg)
 	{
 		TestReport	tr	= (TestReport)reports.get(reports.size()-1);
 		

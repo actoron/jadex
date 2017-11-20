@@ -8,6 +8,7 @@ gen
 *.prefs
 *.copy
 keystore
+jadex_certstore.zip
 *.settings.xml
 alarmclock_settings.ser
 **/testkeystore
@@ -37,3 +38,7 @@ jadex-platform-standalone-launch/highscore.dmp
 /jadex-platform/.jadex
 .jadex
 /jadex-integration-test/highscore.dmp
+/jadex-integration-test/certstore.zip
+/jadex-platform-standalone-launch/src/main/config/Invoker.launch
+/local.properties
+/jadex-platform/testfile.txt

@@ -26,7 +26,7 @@ import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 
 /**
  *  Class for starting the BPMN editor.
@@ -215,7 +215,7 @@ public class BpmnEditor
 				}
 				while (r != -1);
 				
-				TASK_INFOS = (Map<String, TaskMetaInfo>) BinarySerializer.objectFromByteArray(bytes.toByteArray(), null, null, BpmnEditor.class.getClassLoader(), null);
+				TASK_INFOS = (Map<String, TaskMetaInfo>) SBinarySerializer.readObjectFromByteArray(bytes.toByteArray(), null, null, BpmnEditor.class.getClassLoader(), null);
 			}
 			catch (Exception e)
 			{

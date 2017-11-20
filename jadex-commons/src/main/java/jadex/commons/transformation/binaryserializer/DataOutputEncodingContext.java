@@ -46,11 +46,6 @@ public class DataOutputEncodingContext extends AbstractEncodingContext
 		super(rootobject, usercontext, preprocessors, classloader);
 		this.dato = dato;
 		classidcache = new HashMap<Class<?>, Integer>();
-		stringpool = new HashMap<String, Integer>();
-		//for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
-			//stringpool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
-		classnamepool = new HashMap<String, Integer>();
-		pkgpool = new HashMap<String, Integer>();
 	}
 	
 	/**

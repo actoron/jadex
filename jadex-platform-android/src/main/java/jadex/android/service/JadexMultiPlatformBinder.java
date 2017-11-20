@@ -2,14 +2,13 @@ package jadex.android.service;
 
 import java.util.Map;
 
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -49,12 +48,6 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 		return service.getCMS(platformID);
 	}
 	
-	
-	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
-	{
-		return service.getMS(platformID);
-	}
-
 	public void shutdownJadexPlatforms()
 	{
 		service.shutdownJadexPlatforms();
@@ -118,17 +111,17 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 		return service.startJadexPlatform();
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels)
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
 	{
 		return service.startJadexPlatform(kernels);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(RootComponentConfiguration.KERNEL[] kernels, String platformId)
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
 	{
 		return service.startJadexPlatform(kernels, platformId);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(PlatformConfiguration config)
+	public IFuture<IExternalAccess> startJadexPlatform(IPlatformConfiguration config)
 	{
 		return service.startJadexPlatform(config);
 	}

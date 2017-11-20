@@ -1,5 +1,7 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.UndeclaredThrowableException;
 
 import jadex.commons.transformation.A;
@@ -19,7 +21,9 @@ public class BSTest extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-		return BinarySerializer.objectToByteArray(wo, null, null, null);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		SBinarySerializer.writeObjectToStream(baos, wo, null);
+		return baos.toByteArray();
 	}
 	
 	/**
@@ -27,7 +31,8 @@ public class BSTest extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro) 
 	{
-		return BinarySerializer.objectFromByteArray((byte[])ro, null, null, null, null);
+		ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) ro);
+		return SBinarySerializer.readObjectFromStream(bais, null, null, null, null, null);
 	}
 	
 	/**
@@ -55,9 +60,10 @@ public class BSTest extends jadex.commons.transformation.Test
 		String causemsg = "I'm the throwable used as cause.";
 		UndeclaredThrowableException oute = new UndeclaredThrowableException(new RuntimeException(causemsg), msg);
 		
-		byte[] serialized = BinarySerializer.objectToByteArray(oute, null, null, null);
+//		byte[] serialized = SBinarySerializer2.objectToByteArray(oute, null, null, null);
+		byte[] serialized = (byte[]) doWrite(oute);
 		
-		UndeclaredThrowableException out = (UndeclaredThrowableException) BinarySerializer.objectFromByteArray(serialized, null, null, null, null);
+		UndeclaredThrowableException out = (UndeclaredThrowableException) doRead(serialized);
 		
 		if (!msg.equals(out.getMessage()))
 		{
@@ -75,7 +81,7 @@ public class BSTest extends jadex.commons.transformation.Test
 		System.out.println("Unknown sub-object class test.");
 		A obj = new A(3, "Abc", new B("xyz"), null);
 		
-		byte[] serialized = BinarySerializer.objectToByteArray(obj, null, null, null);
+		byte[] serialized = (byte[]) doWrite(obj);
 		
 		ClassLoader dcl = new ClassLoader()
 		{
@@ -89,13 +95,14 @@ public class BSTest extends jadex.commons.transformation.Test
 			}
 		};
 		
-		Object out = BinarySerializer.objectFromByteArray(serialized, null, null, dcl, new IErrorReporter()
+		ByteArrayInputStream bais = new ByteArrayInputStream(serialized);
+		Object out = SBinarySerializer.readObjectFromStream(bais, null, null, dcl, new IErrorReporter()
 		{
 			public void exceptionOccurred(Exception e)
 			{
 				System.out.println("Decoder reports error: " + e.getMessage() + ", skipping...");
 			}
-		});
+		}, null);
 	}
 	
 	/**

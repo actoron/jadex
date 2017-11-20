@@ -57,6 +57,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.Boolean3;
 import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -289,6 +290,7 @@ public class MicroClassReader
 		boolean addfeat = false;
 		Set<String> configdone = new HashSet<String>();
 		
+		Boolean3	autoprovide	= Boolean3.NULL;
 		Set<Class<?>> serifaces = new HashSet<Class<?>>(); 
 		
 		while(cma!=null && !cma.equals(Object.class))
@@ -303,6 +305,9 @@ public class MicroClassReader
 				Boolean	sync	= val.synchronous().toBoolean();
 				Boolean	persist	= val.persistable().toBoolean();
 				Boolean	keep	= val.keepalive().toBoolean();
+				
+				// Use most specific autoprovide setting.
+				autoprovide	= autoprovide != Boolean3.NULL ? autoprovide : val.autoprovide();
 
 				if(susp!=null && modelinfo.getSuspend()==null)
 				{
@@ -372,7 +377,7 @@ public class MicroClassReader
 			// Is a little hack because getAllImports() of ModelInfo add package again.
 //			Set<String> imports = (Set)getOrCreateSet("imports", toset);
 			
-			// Take all, duplicates are eleminated
+			// Take all, duplicates are eliminated
 			if(!featdone && isAnnotationPresent(cma, Features.class, cl))
 			{
 				Features fs = getAnnotation(cma, Features.class, cl);
@@ -1077,9 +1082,7 @@ public class MicroClassReader
 		
 		// Check if there are implemented service interfaces for which the agent
 		// does not have a provided service declaration (implementation=agent)
-		
-		if(isAnnotationPresent(clazz, Agent.class, cl) && getAnnotation(clazz, Agent.class, cl).autoprovide() 
-			&& !serifaces.isEmpty())
+		if(autoprovide.isTrue() && !serifaces.isEmpty())
 		{
 			ProvidedServiceInfo[] psis = modelinfo.getProvidedServices();
 			for(ProvidedServiceInfo psi: psis)

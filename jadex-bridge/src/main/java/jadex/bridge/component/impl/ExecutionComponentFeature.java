@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -28,6 +29,7 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.StepAborted;
+import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
@@ -67,7 +69,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -395,37 +396,50 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		// todo: remember and cleanup timers in case of component removal.
 		
 		final Future<T> ret = new Future<T>();
-		
-		// todo: support getLocal... with proxy==false
-//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+
+		if(delay>=0)
 		{
-			public void customResultAvailable(IClockService cs)
+			// todo: support getLocal... with proxy==false
+	//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 			{
-				ITimedObject	to	= new ITimedObject()
+				public void customResultAvailable(IClockService cs)
 				{
-					public void timeEventOccurred(long currenttime)
+					ITimedObject	to	= new ITimedObject()
 					{
-//						System.out.println("step: "+step);
-						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
-					}
-					
-					public String toString()
+						public void timeEventOccurred(long currenttime)
+						{
+	//						System.out.println("step: "+step);
+							scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
+						}
+						
+						public String toString()
+						{
+							return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
+						}
+					};
+					if(realtime)
 					{
-						return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
+						cs.createRealtimeTimer(delay, to);
 					}
-				};
-				if(realtime)
-				{
-					cs.createRealtimeTimer(delay, to);
+					else
+					{
+						cs.createTimer(delay, to);					
+					}
 				}
-				else
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
 				{
-					cs.createTimer(delay, to);					
+					// Ignore (TODO: why happens during shutdown!?)
 				}
-			}
-		}));
+			}));
+		}
+		else
+		{
+			getComponent().getLogger().warning("WaitFor will never complete: "+step);
+		}
 		
 		return ret;
 	}
@@ -1225,22 +1239,38 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else
 				{
-					getComponent().getLogger().warning(!stateok? "Step omitted due to endstate:"+" "+step.getStep(): "Step invalid "+" "+step.getStep());
-					ex = new StepInvalidException(step.getStep());
-					//ex = new StepAborted();
-//					{
-//						public void printStackTrace() 
-//						{
-//							super.printStackTrace();
-//						}
-//					};
+					if(valid)
+					{
+						getComponent().getLogger().warning("Step aborted due to endstate:"+" "+step.getStep());
+						ex = new StepAbortedException(step.getStep())
+						{
+							@Override
+							public void printStackTrace(PrintStream s)
+							{
+								Thread.dumpStack();
+								super.printStackTrace(s);
+							}
+							
+							@Override
+							public void printStackTrace(PrintWriter s)
+							{
+								Thread.dumpStack();
+								super.printStackTrace(s);
+							}
+						};
+					}
+					else
+					{
+						getComponent().getLogger().info("Step invalid "+" "+step.getStep());
+						ex = new StepInvalidException(step.getStep());
+					}
 				}
 			}
 			catch(Throwable t)
 			{
 				ex = t;
 				
-				if(!(t instanceof StepAborted))
+				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
 				{
 					StringWriter	sw	= new StringWriter();
 					t.printStackTrace(new PrintWriter(sw));
@@ -1268,7 +1298,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
 					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier()))
-					&& !(ex instanceof StepInvalidException))
+					&& !(ex instanceof StepInvalidException) && !(ex instanceof StepAbortedException))
 				{
 					final Throwable fex = ex;
 					// No wait for delayed listener addition for hard failures to print errors immediately.
@@ -1324,7 +1354,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						});
 					}
 					else
-					{	
+					{
 						stepfut.addResultListener(new DelegationResultListener(step.getFuture())
 						{
 							public void customResultAvailable(Object result)

@@ -3,12 +3,10 @@ package jadex.micro.testcases.recfutures;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -21,7 +19,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -210,34 +207,43 @@ public class UserAgent
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false"
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-	                {
-	                    public void customResultAvailable(ITransportComponentIdentifier result)
-	                    { 
-							performTest(result, testno, delay, max)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							// inverse proxy from remote to local.
+							Starter.createProxy(platform, agent.getExternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 							{
-								public void customResultAvailable(final TestReport result)
+								public void customResultAvailable(IComponentIdentifier result)
 								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
+									performTest(platform.getComponentIdentifier(), testno, delay, max)
+										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+									{
+										public void customResultAvailable(final TestReport result)
+										{
+											platform.killComponent();
+					//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+					//						{
+					//							public void customResultAvailable(Map<String, Object> v)
+					//							{
+					//								ret.setResult(result);
+					//							}
+					//						});
+											ret.setResult(result);
+										}
+									}));
 								}
-							}));
-	                    }
-	                });
+							});
+						}
+					});
 				}
 			}));
 		}
@@ -315,9 +321,9 @@ public class UserAgent
 //								});
 								
 								IFuture<IIntermediateFuture<String>> futb = service.methodB();
-								futb.addResultListener(new DefaultResultListener<IIntermediateFuture<String>>()
+								futb.addResultListener(new ExceptionDelegationResultListener<IIntermediateFuture<String>, TestReport>(ret)
 								{
-									public void resultAvailable(IIntermediateFuture<String> fut2)
+									public void customResultAvailable(IIntermediateFuture<String> fut2)
 									{
 										System.out.println("received first: "+fut2);
 										

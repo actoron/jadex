@@ -1,5 +1,9 @@
 package jadex.webservice.examples.rs.hello;
 import static org.junit.Assert.assertEquals;
+
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -7,14 +11,15 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 
 import java.net.BindException;
 
-import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
@@ -27,13 +32,15 @@ import com.sun.jersey.api.core.ResourceConfig;
  * a Jadex Service.
  *
  */
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class RSHelloTest
 {
 
 	private static final String BASE_URI = "http://localhost";
 	private int basePort = 9123;
 	private Hello hello;
-	private HttpServer httpServer;
+	private Object httpServer;
 	private IExternalAccess extAcc;
 //	private DefaultRestServicePublishService pservice;
 	private IServiceIdentifier sid;
@@ -59,8 +66,7 @@ public class RSHelloTest
     @Before
 	public void setUp() throws Exception
 	{
-		SReflectSub sReflectSub = new SReflectSub();
-		sReflectSub.setIsAndroid(false);
+		new SReflectSub().setIsAndroid(true, true);
 		
 		hello = new Hello();
 		System.out.println("Starting grizzly...");
@@ -83,10 +89,15 @@ public class RSHelloTest
 			}
 		}
 
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+		config.setKernels(IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_MICRO);
+		config.setTcpTransport(false);
+		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
-				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
+//		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+//				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get();
 	}
@@ -95,7 +106,7 @@ public class RSHelloTest
 	public void tearDown() throws Exception
 	{
 //		pservice.unpublishService(sid);
-		httpServer.stop();
+		httpServer.getClass().getMethod("stop").invoke(httpServer); // references to HttpServer not working because of conflicting classloaders (robolectric/AppLoader)
 	}
 
     @Test
@@ -110,10 +121,10 @@ public class RSHelloTest
 		assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);
 	}
-	
+
 	private class SReflectSub extends SReflect {
-		public void setIsAndroid(Boolean b) {
-			isAndroid = b;
+		public void setIsAndroid(Boolean isAndroidFlag, Boolean isAndroidTestingFlag) {
+			SReflect.setAndroid(isAndroidFlag, isAndroidTestingFlag);
 		}
 	}
 }

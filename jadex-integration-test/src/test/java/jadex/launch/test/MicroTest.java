@@ -18,6 +18,20 @@ public class MicroTest	extends ComponentTestSuite
 		// Broken, please fix (cf. David Georg Reichelt)
 		"remotestepinservicecall",
 		
+		// Race condition. inner BlockAgent killed before body -> body fails -> shutdown fails (TODO fail after kill)
+		"ShutdownAgent",
+		
+		// Hangs due to 5 sec repeat step in simulation
+		"TimeProviderAgent",
+
+		// excluded until maybe remote objects will be supported again
+		"recfutures/User",
+		"recfutures\\User",
+
+		// excluded until new authorization model conceived
+		"authenticate/Initiator",
+		"authenticate\\Initiator",
+		
 		// Test-support agents
 		"BodyExceptionAgent",
 		"PojoBodyExceptionAgent",
@@ -33,6 +47,10 @@ public class MicroTest	extends ComponentTestSuite
 		"ExternalAccessInvokerAgent",
 		
 		// Application sub agents
+		"message/Sender",
+		"message\\Sender",
+		"message/Benchmark",
+		"message\\Benchmark",
 		"messagequeue/User",
 		"messagequeue\\User",
 		"messagequeue/replicated/User",

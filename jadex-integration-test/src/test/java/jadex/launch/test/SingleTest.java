@@ -31,9 +31,11 @@ public class SingleTest extends	ComponentTestSuite
 				"jadex-applications-bpmn"), tests, new String[0]);
 	}
 
-	private static File[][] findOutputDirs(String... projects) {
+	private static File[][] findOutputDirs(String... projects) 
+	{
 		File[][] projArr = new File[projects.length][];
-		for (int i=0; i < projects.length; i++) {
+		for (int i=0; i < projects.length; i++) 
+		{
 			String project = projects[i];
 			List<File> list = new ArrayList<File>();
 			list.addAll(Arrays.asList(SUtil.findOutputDirs(project)));
@@ -46,7 +48,8 @@ public class SingleTest extends	ComponentTestSuite
 	 * Implement this to adjust this SingleTest to your needs.
 	 * @return
      */
-	public static SingleTest getSingleTest() throws Exception {
+	public static SingleTest getSingleTest() throws Exception 
+	{
 		SingleTest test = null;
 //		test = new SingleTest("jadex.bdi.examples.puzzle.Benchmark");
 //		test = new SingleTest("jadex.bdiv3.testcases.semiautomatic");
@@ -68,18 +71,23 @@ public class SingleTest extends	ComponentTestSuite
 	/**
 	 * Static method called by eclipse (and gradle?) JUnit runner.
 	 */
-	public static Test suite() throws Exception {
+	public static Test suite() throws Exception 
+	{
 		SingleTest test = getSingleTest();
-		if (test == null) {
-			test = new SingleTest() {
+		if (test == null) 
+		{
+			test = new SingleTest() 
+			{
 				@Override
-				public void run(TestResult result) {
+				public void run(TestResult result) 
+				{
 					result.startTest(this);
 					result.endTest(this);
 				}
 
 				@Override
-				protected List<String> getAllFiles(File root) {
+				protected List<String> getAllFiles(File root) 
+				{
 					return Collections.emptyList();
 				}
 			};

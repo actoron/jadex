@@ -33,6 +33,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
@@ -147,7 +148,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						component.getClassLoader(), component.getModel().getAllImports()))+":virtual", info.getType().getType(component.getClassLoader(), component.getModel().getAllImports()));
 					IServiceIdentifier sid = BasicService.createServiceIdentifier(component.getComponentIdentifier(), 
 						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
-						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
+						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope(), ServiceIdentifier.isUnrestricted(component, rsi.getType()));
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getComponentIdentifier()));
 					
@@ -807,7 +808,14 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		{
 			for(Object ser: services)
 			{
-				if(((IService)ser).getServiceIdentifier().equals(sid))
+				// Special case for fake proxies, i.e. creating a service proxy for a known component (without knowing cid)
+				if(sid.getServiceName().equals("NULL"))
+				{
+					((IService)ser).getServiceIdentifier().getServiceType().equals(sid.getServiceType());
+					ret = (IService)ser;
+					break;
+				}
+				else if(((IService)ser).getServiceIdentifier().equals(sid))
 				{
 					ret = (IService)ser;
 					break;

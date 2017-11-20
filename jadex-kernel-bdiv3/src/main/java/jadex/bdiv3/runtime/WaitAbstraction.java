@@ -7,9 +7,7 @@ import java.util.Set;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
-import jadex.bdiv3x.features.BDIXMessageComponentFeature;
 import jadex.bdiv3x.runtime.RMessageEvent;
-import jadex.commons.Tuple2;
 
 /**
  *  Object that indicates on which elements a plan is waiting. 
@@ -26,7 +24,8 @@ public class WaitAbstraction
 	protected Set<String> changeeventtypes;
 	
 	/** The reply elements. */
-	protected Set<Tuple2<RMessageEvent, Set<MMessageEvent>>> replyelements;
+//	protected Set<Tuple2<RMessageEvent, Set<MMessageEvent>>> replyelements;
+	protected Set<RMessageEvent<?>> replyelements;
 	
 //	/**
 //	 *  Add a message event.
@@ -42,13 +41,13 @@ public class WaitAbstraction
 	 *  @param me The message event.
 	 *  @param mevents Allowed message templates (null for any).
 	 */
-	public void addReply(RMessageEvent event,  Set<MMessageEvent> mevents)
+	public <T> void addReply(RMessageEvent<T> event,  Set<MMessageEvent> mevents)
 	{
 		if(replyelements==null)
 		{
-			replyelements = new LinkedHashSet<Tuple2<RMessageEvent, Set<MMessageEvent>>>();
+			replyelements = new LinkedHashSet<RMessageEvent<?>>();
 		}
-		replyelements.add(new Tuple2<RMessageEvent, Set<MMessageEvent>>(event, mevents));
+		replyelements.add(event);
 	}
 	
 	/**
@@ -334,18 +333,16 @@ public class WaitAbstraction
 				ret = changeeventtypes.contains(type+"."+src);
 			}
 		}
-		if(!ret && replyelements!=null)
+		if(!ret && replyelements!=null && procelem instanceof RMessageEvent)
 		{
-			if(procelem instanceof RMessageEvent)
-			{
-				for(Tuple2<RMessageEvent, Set<MMessageEvent>> msg: replyelements)
-				{
-					ret = (msg.getSecondEntity()==null || msg.getSecondEntity().contains(((RMessageEvent)procelem).getMMessageEvent()))
-						&& BDIXMessageComponentFeature.isReply(msg.getFirstEntity(), (RMessageEvent)procelem);
-					if(ret)
-						break;
-				}
-			}
+			ret	= replyelements.contains(((RMessageEvent<?>)procelem).getOriginal());
+//				for(Tuple2<RMessageEvent, Set<MMessageEvent>> msg: replyelements)
+//				{
+//					ret = (msg.getSecondEntity()==null || msg.getSecondEntity().contains(((RMessageEvent)procelem).getMMessageEvent()))
+//						&& BDIXMessageComponentFeature.isReply(msg.getFirstEntity(), (RMessageEvent)procelem);
+//					if(ret)
+//						break;
+//				}
 		}
 		
 		return ret;

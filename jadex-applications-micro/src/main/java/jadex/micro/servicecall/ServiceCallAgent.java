@@ -1,19 +1,21 @@
 package jadex.micro.servicecall;
 
+import java.io.IOException;
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.TagFilter;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -21,9 +23,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -38,9 +39,15 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 @Agent
-@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
+//@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class ServiceCallAgent	extends TestAgent
 {
+	//-------- constants --------
+	
+	/** Wait for key pressed between local and remote tests (for profiling). */
+	public static boolean	WAIT	= false;
+	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -52,7 +59,7 @@ public class ServiceCallAgent	extends TestAgent
 	
 	/** The invocation count. */
 	@AgentArgument
-	protected int max;
+	protected int max	= 500;
 	
 	//-------- methods --------
 	
@@ -63,17 +70,17 @@ public class ServiceCallAgent	extends TestAgent
 	{
 		final Future<TestReport>	ret	= new Future<TestReport>();
 		
-		System.out.println("Service call test on: "+agent.getComponentIdentifier());
+//		System.out.println("Service call test on: "+agent.getComponentIdentifier());
 		
-		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 2000 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 20000 : 1, local ? 6 : 1, local ? 6 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				performTests(cms, DirectServiceAgent.class.getName()+".class", local ? 200 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				performTests(cms, DirectServiceAgent.class.getName()+".class", local ? 10 : 1, local ? 6 : 1, local ? 4 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performTests(cms, DecoupledServiceAgent.class.getName()+".class", local ? 100 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+						performTests(cms, DecoupledServiceAgent.class.getName()+".class", local ? 2 : 1, local ? 4 : 1, local ? 2 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
@@ -92,7 +99,7 @@ public class ServiceCallAgent	extends TestAgent
 	/**
 	 *  Perform all tests with the given agent.
 	 */
-	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int factor)
+	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int rawfactor, final int directfactor, final int decoupledfactor)
 	{
 		final Future<Void> ret	= new Future<Void>();
 		CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
@@ -100,7 +107,7 @@ public class ServiceCallAgent	extends TestAgent
 		
 		String an = agentname.toLowerCase();
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
-		System.out.println("Tag is: "+tag+" "+agentname);	
+//		System.out.println("Tag is: "+tag+" "+agentname);	
 		
 		cms.createComponent(null, agentname, ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
@@ -108,15 +115,15 @@ public class ServiceCallAgent	extends TestAgent
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				final Future<Void>	ret2 = new Future<Void>();
-				performSingleTest(tag, "raw", 5*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+				performSingleTest(tag, "raw", rawfactor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performSingleTest(tag, "direct", 2*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+						performSingleTest(tag, "direct", directfactor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 						{
 							public void customResultAvailable(Void result)
 							{
-								performSingleTest(tag, "decoupled", 1*factor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
+								performSingleTest(tag, "decoupled", decoupledfactor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
 							}
 						}));
 					}
@@ -154,15 +161,16 @@ public class ServiceCallAgent	extends TestAgent
 	{
 		final Future<Void> ret	= new Future<Void>();
 //		IFuture<IServiceCallService> fut = getServiceCallService(servicename, 0, 2, 3000);
-		IFuture<IServiceCallService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IServiceCallService>, Void>()
-		{
-			public IFuture<IServiceCallService> execute(Void args)
-			{
+//		IFuture<IServiceCallService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IServiceCallService>, Void>()
+//		{
+//			public IFuture<IServiceCallService> execute(Void args)
+//			{
 //				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
-				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename, true, 
-					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
-			}
-		}, 7, 1500);
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename, true, 
+//					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
+//			}
+//		}, 7, 1500);
+		IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{
@@ -170,29 +178,60 @@ public class ServiceCallAgent	extends TestAgent
 			{
 				IResultListener<Void>	lis	= new DelegationResultListener<Void>(ret)
 				{
-					int	count = max*factor;
-					long start = System.currentTimeMillis();
+					int	count = 0;
+					int	num	= max*factor;
+					long start;
 					
 					public void customResultAvailable(Void result)
 					{
 //						if(ag.getAgentAdapter().isExternalThread())
 //							System.out.println("wrong thread");
 						
-						count--;
 						if(count==0)
 						{
-							long	end	= System.currentTimeMillis();
-							System.out.println(servicename+" service call on "+service+" took "+((end-start)*10000/((long)max*factor))/10.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" millis).");
+							// To start profiling after setup.
+							if(WAIT && "raw".equals(tag) && "raw".equals(servicename))
+							{
+								try
+								{
+									System.out.println("Press [RETURN] to start...");
+									while(System.in.read()!='\n');
+								}
+								catch(IOException e)
+								{
+								}
+							}
+							start = System.nanoTime();
+						}
+						
+						if(count==num)
+						{
+							long	end	= System.nanoTime();
+							System.out.println(servicename+" service call on "+tag+" service took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" nanos).");
+							// To stop profiling after finished.
+							if(WAIT && "decoupled".equals(tag) && "decoupled".equals(servicename))
+							{
+								try
+								{
+									System.out.println("Press [RETURN] to continue...");
+									while(System.in.read()!='\n');
+								}
+								catch(IOException e)
+								{
+								}
+							}
 							ret.setResult(null);
 						}
 						else
 						{
+							count++;
 							service.call().addResultListener(this);
 						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						super.exceptionOccurred(exception);
 					}
 				};
@@ -201,10 +240,28 @@ public class ServiceCallAgent	extends TestAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Starter for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+//		config1.setAwaMechanisms(AWAMECHANISM.local);
+//		config1.setAwareness(true);
+		config1.setTcpTransport(true);
+		config1.addComponent(ServiceCallAgent.class);
+		Starter.createPlatform(config1).get();
 	}
 }

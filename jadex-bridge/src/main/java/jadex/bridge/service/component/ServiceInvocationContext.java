@@ -182,8 +182,11 @@ public class ServiceInvocationContext
 		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
 		
-		this.caller = IComponentIdentifier.LOCAL.get();
-
+		this.caller = ServiceCall.getOrCreateNextInvocation().getCaller();
+//		IComponentIdentifier caller2 = IComponentIdentifier.LOCAL.get();
+//		if(caller!=null && (!caller.equals(caller2)))
+//			System.out.println("Caller different: "+caller+" "+caller2);
+			
 		// Is next call defined by user?
 		this.nextcall = CallAccess.getNextInvocation();
 		this.currentcall = CallAccess.getCurrentInvocation();
@@ -426,7 +429,7 @@ public class ServiceInvocationContext
 //			System.out.println("call method init");
 		
 //		if(SReflect.isSupertype(IFuture.class, getMethod().getReturnType()) && !(result instanceof Future))
-//			System.out.println("hääääääääää");
+//			System.out.println("haeaeaeaeaeae");
 		
 		this.result.set(used.size()-1, result);
 	}
@@ -703,6 +706,22 @@ public class ServiceInvocationContext
 	public void setNextCall(ServiceCall call)
 	{
 		this.nextcall = call;
+	}
+
+	/**
+	 *  Get the service id.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return sid;
+	}
+	
+	/**
+	 *  Set the service id.
+	 */
+	public void setServiceIdentifier(IServiceIdentifier sid)
+	{
+		this.sid = sid;
 	}
 }
 

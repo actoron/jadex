@@ -57,6 +57,14 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 	/**
 	 *  Create a new listener.
 	 */
+	public TimeoutResultListener(final long timeout, IExternalAccess exta)
+	{
+		this(timeout, exta, false, null, null);
+	}
+	
+	/**
+	 *  Create a new listener.
+	 */
 	public TimeoutResultListener(final long timeout, IExternalAccess exta, final IResultListener<E> listener)
 	{
 		this(timeout, exta, false, null, listener);
@@ -67,8 +75,6 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 	 */
 	public TimeoutResultListener(final long timeout, IExternalAccess exta, final boolean realtime, Object message, final IResultListener<E> listener)
 	{
-		if(listener==null)
-			throw new IllegalArgumentException("Listener must not null.");
 		if(exta==null)
 			throw new IllegalArgumentException("External access must not null.");
 			
@@ -94,7 +100,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		{
 			if(!notified)
 			{
-				notify = true;
+				notify = listener!=null;
 				notified = true;
 				cancel();
 			}
@@ -124,7 +130,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 			if(!notified)
 			{
 				// need to further delegate to chained listeners/futures?
-				notify = true;
+				notify = listener!=null;
 				notified = true;
 				cancel();
 			}
@@ -229,16 +235,8 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														Exception	te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.setDebugFutures(true) for timeout cause."), ex);
-														
-														if(undone && listener instanceof IUndoneResultListener)
-														{
-															((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(te);
-														}
-														else
-														{
-															listener.exceptionOccurred(te);
-														}
+														TimeoutException	te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.setDebugFutures(true) for timeout cause."), ex);
+														timeoutOccurred(te);
 														return IFuture.DONE;
 													}
 												});
@@ -353,4 +351,23 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 //			System.out.println("Cannot forward command: "+listener+" "+command);
 		}
 	}
+
+	/**
+	 *  Can be overridden, e.g. when no listener is used.
+	 */
+	public void timeoutOccurred(TimeoutException te)
+	{
+		if(listener!=null)
+		{
+			if(undone && listener instanceof IUndoneResultListener)
+			{
+				((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(te);
+			}
+			else
+			{
+				listener.exceptionOccurred(te);
+			}
+		}
+	}
+
 }

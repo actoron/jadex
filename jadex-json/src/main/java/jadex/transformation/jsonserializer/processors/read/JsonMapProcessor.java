@@ -10,8 +10,10 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -26,7 +28,7 @@ public class JsonMapProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 //		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(Map.class, clazz));
@@ -36,12 +38,11 @@ public class JsonMapProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonReadContext rc = (JsonReadContext)context;
 		Class<?> clazz = SReflect.getClass(type);
@@ -52,17 +53,29 @@ public class JsonMapProcessor implements ITraverseProcessor
 		
 		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		if(idx!=null)
+		{
+			try{
 			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
+			}
+			catch(Exception e)
+			{
+				throw SUtil.convertToRuntimeException(e);
+			}
+		}
+		
 		
 		if(obj.get("__keys")==null)
 		{
 			for(String name: obj.names())
 			{
-				if(JsonTraverser.CLASSNAME_MARKER.equals(name))
+				if(JsonTraverser.CLASSNAME_MARKER.equals(name) || JsonTraverser.ID_MARKER.equals(name))
 					continue;
 				Object val = obj.get(name);
 				Class<?> valclazz = getValueClass(val, context);
-				Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+				Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
+//				Object newval = traverser.doTraverse(val, null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
+//				Class<?> valclazz = val!=null? val.getClass(): null;
+//				Object newval = traverser.doTraverse(val, valclazz, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 				if(newval != Traverser.IGNORE_RESULT)
 				{
 					if(newval!=val)
@@ -73,9 +86,11 @@ public class JsonMapProcessor implements ITraverseProcessor
 		else
 		{
 //			rc.setIgnoreNext(true);
-			Object keys = traverser.doTraverse(obj.get("__keys"), null, traversed, processors, clone, targetcl, context);
+			Object keys = traverser.doTraverse(obj.get("__keys"), null, conversionprocessors, processors, mode, targetcl, context);
+			Object vals = traverser.doTraverse(obj.get("__values"), null, conversionprocessors, processors, mode, targetcl, context);
+//			Object keys = traverser.doTraverse(obj.get("__keys"), null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 //			rc.setIgnoreNext(true);
-			Object vals = traverser.doTraverse(obj.get("__values"), null, traversed, processors, clone, targetcl, context);
+//			Object vals = traverser.doTraverse(obj.get("__values"), null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
 			
 			for(int i=0; i<Array.getLength(keys); i++)
 			{
@@ -99,7 +114,7 @@ public class JsonMapProcessor implements ITraverseProcessor
 	 */
 	public Class<?> getValueClass(Object val, Object context)
 	{
-		Class<?> valclazz = val!=null? val.getClass(): null;
+		Class<?> valclazz = val!=null && !(val instanceof JsonObject)? val.getClass(): null;
 		return valclazz;
 	}
 	

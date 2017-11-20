@@ -1,7 +1,9 @@
 package jadex.micro.testcases.timeout;
 
-import java.util.Collection;
+import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -9,12 +11,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -23,6 +24,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -35,6 +37,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class InitiatorAgent extends TestAgent
 {
 	/**
@@ -44,17 +47,18 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		System.out.println("TEST LOCAL");
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
+				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 				tc.addReport(result);
-				System.out.println("TEST REMOVE");
 				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -126,8 +130,8 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		
-		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
 		System.out.println("root: "+root+" "+root.getPlatformName());
@@ -235,5 +239,22 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Starter for testing.
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Start platform with agent.
+		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
+//		config1.setLogging(true);
+//		config1.setDefaultTimeout(-1);
+		config1.setSecurity(true);
+//		config1.setAwaMechanisms(AWAMECHANISM.local);
+//		config1.setAwareness(true);
+        config1.setTcpTransport(false);
+		config1.addComponent(InitiatorAgent.class);
+		Starter.createPlatform(config1).get();
 	}
 }

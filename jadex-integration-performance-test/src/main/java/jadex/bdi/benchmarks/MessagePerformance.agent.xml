@@ -56,7 +56,7 @@
 
 	<events>
 		<!-- This message is echoed or sent to itself, and therefore also received. -->
-		<messageevent name="inform" type="fipa" direction="send_receive">
+		<messageevent name="inform" type="jadex.bridge.fipa.FipaMessage" direction="send_receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>

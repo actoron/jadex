@@ -5,8 +5,8 @@ import jadex.android.IEventReceiver;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -39,8 +39,8 @@ public class EventDemoActivity extends JadexAndroidActivity
 	public EventDemoActivity()
 	{
 		super();
-		PlatformConfiguration config = getPlatformConfiguration();
-		config.getRootConfig().setKernels(RootComponentConfiguration.KERNEL.micro);
+		IPlatformConfiguration config = getPlatformConfiguration();
+		config.getRootConfig().setKernels(IRootComponentConfiguration.KERNEL_MICRO);
 		config.setPlatformName("eventDemoPlatform");
 		setPlatformAutostart(true);
 	}

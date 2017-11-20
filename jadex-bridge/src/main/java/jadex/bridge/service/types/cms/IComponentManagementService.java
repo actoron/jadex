@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.cms;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -153,20 +152,18 @@ public interface IComponentManagementService
 	//-------- listener methods --------
 	
 	/**
-     *  Add an component listener.
+     *  Add a component listener for all components.
      *  The listener is registered for component changes.
-     *  @param comp  The component to be listened on (or null for listening on all components).
-     *  @param listener  The listener to be added.
      */
-    public IFuture<Void> addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
+    public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll();
     
-    /**
-     *  Remove a listener.
-     *  @param comp  The component to be listened on (or null for listening on all components).
-     *  @param listener  The listener to be removed.
+	/**
+     *  Add a component listener for a specific component.
+     *  The listener is registered for component changes.
+     *  @param cid	The component to be listened.
      */
-    public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
-
+    public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid);
+    
     //-------- external access methods --------
     
 	/**
@@ -201,90 +198,16 @@ public interface IComponentManagementService
 	 */
 	public IFuture<IComponentDescription[]> getChildrenDescriptions(IComponentIdentifier cid);
 	
-	//-------- create methods for cms objects --------
-	
-	// todo: remove all following methods 
-	// (they are synchronous and not necessary, direct constructor creation)
-	
-//	/**
-//	 *  Create component identifier (name assumed being local).
-//	 *  @param name The name.
-//	 *  @return The new component identifier.
-//	 */
-//	public IComponentIdentifier createComponentIdentifier(String name);
-//	
-//	/**
-//	 *  Create component identifier.
-//	 *  @param name The name.
-//	 *  @param local True for local name.
-//	 *  @return The new component identifier.
-//	 */
-//	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
-//
-//	/**
-//	 *  Create component identifier.
-//	 *  @param name The name.
-//	 *  @param local True for local name.
-//	 *  @param addresses The addresses.
-//	 *  @return The new component identifier.
-//	 */
-//	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
-//	
-//	/**
-//	 *  Create component identifier.
-//	 *  @param name The name.
-//	 *  @param addresses The addresses.
-//	 *  @return The new component identifier.
-//	 */
-//	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses);
-//	
-//	/**
-//	 *  Create a component identifier that is allowed on the platform.
-//	 *  @param name The base name.
-//	 *  @return The component identifier.
-//	 */
-//	public IComponentIdentifier generateComponentIdentifier(String name, String platformname);
-//	
-//	/**
-//	 * Create a component description.
-//	 * @param id The component identifier.
-//	 * @param state The state.
-//	 * @param ownership The ownership.
-//	 * @param type The component type.
-//	 * @param parent The parent.
-//	 * @return The component description.
-//	 */
-//	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, 
-//		String ownership, String type, String modelname, String localtype);
-//	
-//	/**
-//	* Create a search constraints object.
-//	* @param maxresults The maximum number of results.
-//	* @param maxdepth The maximal search depth.
-//	* @return The search constraints.
-//	*/
-//	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
-	
-//	/**
-//	 *  Get the component adapter for a component identifier.
-//	 *  @param aid The component identifier.
-//	 *  @param listener The result listener.
-//	 */
-//    // Todo: Hack!!! remove
-//	@Excluded
-//	public IFuture<IComponentAdapter> getComponentAdapter(IComponentIdentifier cid);
+	//-------- status events --------
 	
 	/**
-	 * 
+	 *  Base change event. If used w/o subclass denotes change in description. 
 	 */
 	public static class CMSStatusEvent
 	{
-		/** The cid. */
-		protected IComponentIdentifier cid;
+		/** The component description. */
+		protected IComponentDescription desc;
 		
-		/** Optional properties. */
-		protected Map<String, Object> properties;
-
 		/**
 		 *  Create a new CMSStatusEvent.
 		 */
@@ -295,9 +218,9 @@ public interface IComponentManagementService
 		/**
 		 *  Create a new CMSStatusEvent.
 		 */
-		public CMSStatusEvent(IComponentIdentifier cid)
+		public CMSStatusEvent(IComponentDescription desc)
 		{
-			this.cid = cid;
+			this.desc = desc;
 		}
 
 		/**
@@ -306,52 +229,25 @@ public interface IComponentManagementService
 		 */
 		public IComponentIdentifier getComponentIdentifier()
 		{
-			return cid;
+			return desc.getName();
 		}
 
 		/**
-		 *  Set the componentIdentifier.
-		 *  @param cid The componentIdentifier to set.
+		 *  Get the component description.
+		 *  @return The description.
 		 */
-		public void setComponentIdentifier(IComponentIdentifier cid)
+		public IComponentDescription getComponentDescription()
 		{
-			this.cid = cid;
+			return desc;
 		}
 
 		/**
-		 *  Get the properties.
-		 *  return The properties.
+		 *  Set the component description.
+		 *  @param desc The component description to set.
 		 */
-		public Map<String, Object> getProperties()
+		public void setComponentDescription(IComponentDescription desc)
 		{
-			return properties;
-		}
-
-		/**
-		 *  Set the properties. 
-		 *  @param properties The properties to set.
-		 */
-		public void setProperties(Map<String, Object> properties)
-		{
-			this.properties = properties;
-		}
-		
-		/**
-		 *  Add a property.
-		 */
-		public void setProperty(String name, Object value)
-		{
-			if(properties==null)
-				properties = new HashMap<String, Object>();
-			properties.put(name, value);
-		}
-		
-		/**
-		 *  Get a property.
-		 */
-		public Object getProperty(String name)
-		{
-			return properties==null? null: properties.get(name);
+			this.desc = desc;
 		}
 
 		/**
@@ -359,18 +255,15 @@ public interface IComponentManagementService
 		 */
 		public String toString()
 		{
-			return SReflect.getInnerClassName(getClass())+ "[cid=" + cid + ", properties=" + properties + "]";
+			return SReflect.getInnerClassName(getClass())+"["+desc+"]";
 		}
 	}
 	
 	/**
-	 * 
+	 *  Status event for a newly created component.
 	 */
 	public static class CMSCreatedEvent extends CMSStatusEvent
 	{
-//		/** The cid. */
-//		protected IComponentIdentifier cid;
-
 		/**
 		 *  Create a new CMSCreatedEvent. 
 		 */
@@ -381,32 +274,14 @@ public interface IComponentManagementService
 		/**
 		 *  Create a new CMSCreatedEvent. 
 		 */
-		public CMSCreatedEvent(IComponentIdentifier cid)
+		public CMSCreatedEvent(IComponentDescription desc)
 		{
-			super(cid);
+			super(desc);
 		}
-
-//		/**
-//		 *  Get the componentIdentifier.
-//		 *  @return The componentIdentifier.
-//		 */
-//		public IComponentIdentifier getComponentIdentifier()
-//		{
-//			return cid;
-//		}
-//
-//		/**
-//		 *  Set the componentIdentifier.
-//		 *  @param cid The componentIdentifier to set.
-//		 */
-//		public void setComponentIdentifier(IComponentIdentifier cid)
-//		{
-//			this.cid = cid;
-//		}
 	}
 	
 	/**
-	 * 
+	 *  Status event for an intermediate result of a component.
 	 */
 	public static class CMSIntermediateResultEvent extends CMSStatusEvent
 	{
@@ -426,9 +301,9 @@ public interface IComponentManagementService
 		/**
 		 *  Create a new CMSIntermediateResultEvent. 
 		 */
-		public CMSIntermediateResultEvent(IComponentIdentifier cid, String name, Object value)
+		public CMSIntermediateResultEvent(IComponentDescription desc, String name, Object value)
 		{
-			super(cid);
+			super(desc);
 			this.name = name;
 			this.value = value;
 		}
@@ -471,7 +346,7 @@ public interface IComponentManagementService
 	}
 	
 	/**
-	 * 
+	 *  Final event of a finished component, including all results. 
 	 */
 	public static class CMSTerminatedEvent extends CMSStatusEvent
 	{
@@ -488,9 +363,9 @@ public interface IComponentManagementService
 		/**
 		 *  Create a new CMSCreatedEvent. 
 		 */
-		public CMSTerminatedEvent(IComponentIdentifier cid, Map<String, Object> results)
+		public CMSTerminatedEvent(IComponentDescription desc, Map<String, Object> results)
 		{
-			super(cid);
+			super(desc);
 			this.results = results;
 		}
 

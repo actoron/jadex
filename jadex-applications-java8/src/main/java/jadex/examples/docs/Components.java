@@ -1,7 +1,5 @@
 package jadex.examples.docs;
 
-import jadex.base.PlatformConfiguration;
-import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;

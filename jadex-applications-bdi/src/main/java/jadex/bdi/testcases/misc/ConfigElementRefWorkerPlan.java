@@ -142,7 +142,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		reports.add(report);
 		
 		// Initial message event from capability.
-		report	= new TestReport("initial message event", "Check if initial message event from capability is correctly named.");
+		report	= new TestReport("initial capa message event", "Check if initial message event from capability is correctly named.");
 		try
 		{
 			/*IMessageEvent	msg	=*/ waitForMessageEvent("configrefcap.testmsg", 100);

@@ -1,24 +1,21 @@
 package jadex.micro.testcases.stream;
 
 import java.io.InputStream;
-import java.util.Collection;
+import java.util.Map;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.component.IMessageFeature;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -44,6 +41,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
@@ -56,10 +54,12 @@ public class InitiatorAgent extends TestAgent
 				} 
 				else 
 				{
+					agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 					testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(TestReport result)
 						{
+							agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 							tc.addReport(result);
 							ret.setResult(null);
 						}
@@ -86,21 +86,14 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+		setupRemotePlatform(false).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
-			public void customResultAvailable(final IExternalAccess platform)
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-                {
-                    public void customResultAvailable(ITransportComponentIdentifier result)
-                    { 
-                    	performTest(result, testno)
-                    		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-                    }
-                });
+	        	performTest(exta.getComponentIdentifier(), testno)
+	        		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -126,27 +119,37 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		
-		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut)
+		{
+			@Override
+			public void customResultAvailable(Map<String, Object> result)
+			{
+				agent.getLogger().severe("Testagent receiver finished: "+agent.getComponentDescription());
+				super.customResultAvailable(result);
+			}
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				agent.getLogger().severe("Testagent receiver failed: "+agent.getComponentDescription()+", "+exception);
+				super.exceptionOccurred(exception);
+			}
+		};
 		
+		agent.getLogger().severe("Testagent setup receiver: "+agent.getComponentDescription());
 		createComponent("jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				IFuture<IMessageService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("msgservice");
-				msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, TestReport>(ret)
+				agent.getLogger().severe("Testagent setup receiver done: "+agent.getComponentDescription());
+				IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
+				mf.createOutputConnection(agent.getComponentIdentifier(), cid, null)
+					.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)
 				{
-					public void customResultAvailable(IMessageService ms)
+					public void customResultAvailable(final IOutputConnection ocon) 
 					{
-						ms.createOutputConnection(agent.getComponentIdentifier(), cid, null)
-							.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)
-						{
-							public void customResultAvailable(final IOutputConnection ocon) 
-							{
-								sendBehavior(testno, ocon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret));
-							}
-						});
+						sendBehavior(testno, ocon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret));
 					}
 				});
 			}
@@ -158,7 +161,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 * 
 	 */
-	protected IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
+	protected IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Map<String, Object>> resfut)
 	{
 		final long start = System.currentTimeMillis();
 		final long[] filesize = new long[1];
@@ -171,11 +174,12 @@ public class InitiatorAgent extends TestAgent
 			
 			final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
 			
-			resfut.addResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
+			resfut.addResultListener(new IResultListener<Map<String,Object>>()
 			{
-				public void resultAvailable(Collection<Tuple2<String, Object>> results)
+				public void resultAvailable(Map<String, Object> results)
 				{
-					Long fs = (Long)jadex.bridge.modelinfo.Argument.getResult(results, "filesize");
+//					Long fs = (Long)jadex.bridge.modelinfo.Argument.getResult(results, "filesize");
+					Long fs = (Long) results.get("filesize");
 					if(fs!=null)
 					{
 						if(fs.longValue()==filesize[0])
@@ -218,7 +222,7 @@ public class InitiatorAgent extends TestAgent
 							read += is.read(buf, read, buf.length-read);
 						}
 						con.write(buf);
-//						System.out.println("wrote: "+size);
+						System.out.println("wrote: "+size);
 						if(is.available()>0)
 						{
 							con.waitForReady().addResultListener(new IResultListener<Integer>()

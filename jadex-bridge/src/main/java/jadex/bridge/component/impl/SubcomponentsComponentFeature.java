@@ -223,7 +223,24 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 //					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null), null).addResultListener(crl);
+						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
+//							getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
+//						{
+//							@Override
+//							public void resultAvailable(Collection<Tuple2<String, Object>> result)
+//							{
+//								// OK -> ignore.
+//							}
+//							
+//							@Override
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								// Let super component fail when subcomponent fails.
+//								// TODO: alternative behavior? restart, ignore?
+//								getComponent().killComponent(exception);
+//							}
+//						})
+							null).addResultListener(crl);
 				}
 				else
 				{

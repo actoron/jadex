@@ -4,11 +4,11 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  A map processor allows for traversing maps.
@@ -29,7 +29,7 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(MultiCollection.class, clazz);
@@ -38,18 +38,16 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		MultiCollection<Object, Object> ret = (MultiCollection<Object, Object>)getReturnObject(object, clazz, clone);
+		MultiCollection<Object, Object> ret = (MultiCollection<Object, Object>)getReturnObject(object, clazz, context);
 		MultiCollection<Object, Object> map = (MultiCollection<Object, Object>)object;
-		
-		traversed.put(object, ret);
+		TraversedObjectsContext.put(context, object, ret);
 		
 		Set<Object> keyset = map.keySet();
 		Object[] keys = keyset.toArray(new Object[keyset.size()]);
@@ -57,16 +55,16 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 		{
 			Object key = keys[i];
 			Class<?> keyclazz = key != null? key.getClass() : null;
-			Object newkey = traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
+			Object newkey = traverser.doTraverse(key, keyclazz, conversionprocessors, processors, mode, targetcl, context);
 			if (newkey != Traverser.IGNORE_RESULT)
 			{
 				Collection<Object> vals = map.get(key);
 				for(Object val : vals)
 				{
 					Class<?> valclazz = val!=null? val.getClass(): null;
-					Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+					Object newval = traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, context);
 					
-					if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
+					if(newval != Traverser.IGNORE_RESULT && (SCloner.isCloneContext(context) || newval!=val))
 						ret.add(newkey, newval);
 				}
 			}
@@ -78,11 +76,11 @@ public class MultiCollectionProcessor implements ITraverseProcessor
 	/**
 	 * 
 	 */
-	public Object getReturnObject(Object object, Class<?> clazz, boolean clone)
+	public Object getReturnObject(Object object, Class<?> clazz, Object context)
 	{
 		Object ret = object;
 		
-		if(clone)
+		if(SCloner.isCloneContext(context))
 		{
 			try
 			{

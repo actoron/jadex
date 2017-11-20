@@ -61,7 +61,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class, IResourceIdentifier.class, Class.class, String.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class, IResourceIdentifier.class, Class.class, String.class, boolean.class}));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[]{IInternalAccess.class}));
 //			SERVICEMETHODS.add(IService.class.getMethod("getExternalComponentFeature", new Class[]{Class.class}));
 			

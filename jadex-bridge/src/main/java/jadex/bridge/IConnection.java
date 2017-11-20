@@ -18,13 +18,13 @@ public interface IConnection
 	 *  Get the initiator.
 	 *  @return The initiator.
 	 */
-	public ITransportComponentIdentifier getInitiator();
+	public IComponentIdentifier getInitiator();
 	
 	/**
 	 *  Get the participant.
 	 *  @return The participant.
 	 */
-	public ITransportComponentIdentifier getParticipant();
+	public IComponentIdentifier getParticipant();
 	
 	/**
 	 *  Close the connection.

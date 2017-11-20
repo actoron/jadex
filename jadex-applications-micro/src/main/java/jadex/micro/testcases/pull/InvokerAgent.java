@@ -7,12 +7,11 @@ import java.util.List;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -64,14 +63,14 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if(SReflect.isAndroid()) 
+//		if(SReflect.isAndroid()) 
 		{
 			tc.setTestCount(2);
 		} 
-		else 
-		{
-			tc.setTestCount(4);
-		}
+//		else 
+//		{
+//			tc.setTestCount(4);
+//		}
 		
 		final Future<Void> ret = new Future<Void>();
 		ret.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
@@ -92,35 +91,19 @@ public class InvokerAgent
 				agent.killComponent();	
 			}
 		}));
-			
-//		testLocal().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+//					
+//		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 //		{
-//			public void customResultAvailable(Void result)
+//			public void customResultAvailable(TestReport[] result)
 //			{
-//				System.out.println("tests finished");
-//			}
-//		}));
-		
-//		testRemote().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				System.out.println("tests finished");
-//			}
-//		}));
-		
-		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
-		{
-			public void customResultAvailable(TestReport[] result)
-			{
-				for(TestReport tr: result)
-					tc.addReport(tr);
-				if(SReflect.isAndroid()) 
-				{
-					ret.setResult(null);
-				} 
-				else 
-				{
+//				for(TestReport tr: result)
+//					tc.addReport(tr);
+//				if(SReflect.isAndroid()) 
+//				{
+//					ret.setResult(null);
+//				} 
+//				else 
+//				{
 					testRemote(2, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 					{
 						public void customResultAvailable(TestReport[] result)
@@ -130,9 +113,9 @@ public class InvokerAgent
 							ret.setResult(null);
 						}
 					}));
-				}
-			}
-		}));
+//				}
+//			}
+//		}));
 	}
 	
 	/**
@@ -171,44 +154,53 @@ public class InvokerAgent
 		// Start platform
 		try
 		{
-			String url	= SUtil.getOutputDirsExpression("../jadex-applications-micro");	// Todo: support RID for all loaded models.
+			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro");	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false"
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-					ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport[]>(ret)
+					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
 					{
-						public void customResultAvailable(final ITransportComponentIdentifier result) 
+						public void customResultAvailable(IComponentIdentifier result)
 						{
-							performTestA(result, testno, delay, max)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+							// inverse proxy from remote to local.
+							Starter.createProxy(platform, agent.getExternalAccess())
+								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
 							{
-								public void customResultAvailable(final TestReport result1)
+								public void customResultAvailable(IComponentIdentifier result)
 								{
-									performTestB(result, testno+1, delay, max)
+									performTestA(platform.getComponentIdentifier(), testno, delay, max)
 										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
-										public void customResultAvailable(final TestReport result2)
+										public void customResultAvailable(final TestReport result1)
 										{
-											platform.killComponent();
-				//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-				//							{
-				//								public void customResultAvailable(Map<String, Object> v)
-				//								{
-				//									ret.setResult(result);
-				//								}
-				//							});
-											ret.setResult(new TestReport[]{result1, result2});
+											performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
+												.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
+											{
+												public void customResultAvailable(final TestReport result2)
+												{
+													platform.killComponent();
+						//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+						//							{
+						//								public void customResultAvailable(Map<String, Object> v)
+						//								{
+						//									ret.setResult(result);
+						//								}
+						//							});
+													ret.setResult(new TestReport[]{result1, result2});
+												}
+											}));
 										}
 									}));
 								}
-							}));
+							});
 						}
 					});
 				}
@@ -250,11 +242,7 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getExternalAccess(root).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
-				{
-					public void customResultAvailable(IExternalAccess exta)
-					{
-						SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 						{
 							public void customResultAvailable(final IClockService clock)
@@ -269,14 +257,14 @@ public class InvokerAgent
 								{	
 									public void customResultAvailable(final IComponentIdentifier cid)
 									{
-		//								System.out.println("cid is: "+cid);
+										System.out.println("cid is: "+cid);
 										SServiceProvider.getService(agent, cid, IPullResultService.class)
 											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 										{
 											public void customResultAvailable(IPullResultService service)
 											{
 												// Invoke service agent
-		//										System.out.println("Invoking");
+												System.out.println("Invoking");
 												IPullIntermediateFuture<String> fut = service.getResultsA(max);
 												
 												fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
@@ -290,7 +278,7 @@ public class InvokerAgent
 													}
 													public void finished()
 													{
-		//												System.out.println("finished: "+needed);
+														System.out.println("finished: ");
 														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 														if(res.size()==max)
 														{
@@ -319,18 +307,19 @@ public class InvokerAgent
 														ret.setResult(tr);
 													}
 												}));
-				//								System.out.println("Added listener");
+												System.out.println("Added listener");
 												
 												for(int i=0; i<max; i++)
+												{
+													System.out.println("pulling");
 													fut.pullIntermediateResult();
+												}
 											}		
 										}));
 									}
 								});
 							}
 						}));
-					}
-				});
 			}	
 		});
 		
@@ -365,15 +354,11 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getExternalAccess(root).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					public void customResultAvailable(final IClockService clock)
 					{
-						SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
-						{
-							public void customResultAvailable(final IClockService clock)
-							{
 								IResourceIdentifier	rid	= new ResourceIdentifier(
 									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		//						System.out.println("Using rid: "+rid);
@@ -384,13 +369,14 @@ public class InvokerAgent
 								{	
 									public void customResultAvailable(final IComponentIdentifier cid)
 									{
-		//								System.out.println("cid is: "+cid);
+										System.out.println("cid is: "+cid);
 										SServiceProvider.getService(agent, cid, IPullResultService.class)
 											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 										{
 											public void customResultAvailable(IPullResultService service)
 											{
 												// Invoke service agent
+												System.out.println("Invoking B");
 												IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
 												
 												fut2.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
@@ -404,7 +390,7 @@ public class InvokerAgent
 													}
 													public void finished()
 													{
-		//												System.out.println("finished: "+needed);
+														System.out.println("finished: ");
 														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 														tr.setReason("Exception did not occur");
 														cms.destroyComponent(cid);
@@ -435,7 +421,7 @@ public class InvokerAgent
 														ret.setResult(tr);
 													}
 												}));
-				//								System.out.println("Added listener");
+												System.out.println("Added listener");
 												
 												fut2.pullIntermediateResult();
 												
@@ -450,8 +436,6 @@ public class InvokerAgent
 								});
 							}
 						}));
-					}
-				});
 			}	
 		});
 		

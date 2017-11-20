@@ -40,11 +40,11 @@ public class RPQPInitiatorPlan extends AbstractInitiatorPlan
 		request = createMessageEvent(getShortProtocolName()+"_request");
 		request.getParameter(SFipa.CONTENT).setValue(getParameter("action").getValue());
 
-		request.getParameterSet("receivers").addValue(getParameter("receiver").getValue());
+		request.getParameterSet(SFipa.RECEIVERS).addValue(getParameter("receiver").getValue());
 		if(getParameter("language").getValue()!=null)
-			request.getParameter("language").setValue(getParameter("language").getValue());
+			request.getParameter(SFipa.LANGUAGE).setValue(getParameter("language").getValue());
 		if(getParameter("ontology").getValue()!=null)
-			request.getParameter("ontology").setValue(getParameter("ontology").getValue());
+			request.getParameter(SFipa.ONTOLOGY).setValue(getParameter("ontology").getValue());
 
 		// Send message and wait for answer.
 		try

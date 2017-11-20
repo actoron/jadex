@@ -58,7 +58,7 @@ public class DFComponentTable extends JTable
 		
 		sorter.setTableHeader(getTableHeader());
 		setPreferredScrollableViewportSize(new Dimension(800, 70));
-		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
+		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(null));
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
 		setDefaultRenderer(IDFServiceDescription[].class, new ServiceDescriptionArrayRenderer());
 		setDefaultRenderer(Date.class, new LeaseTimeRenderer());

@@ -14,6 +14,7 @@ import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,11 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	{
 		Collection<String> ret = null;
 		
-		if(obj instanceof String || obj==null)
+		if(obj==null)
+		{
+			ret = Collections.emptyList();
+		}
+		else if(obj instanceof String)
 		{
 			ret = new ArrayList<String>();
 			ret.add((String)obj);
@@ -172,5 +177,32 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			ret.add(tag);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Check if it is a reserved tag.
+	 *  @param tag The tag.
+	 *  @return True if is reserved.
+	 */
+	public static void checkReservedTags(String[] tags)
+	{
+		for(String tag: tags)
+		{
+			checkReservedTag(tag);
+		}
+	}
+	
+	/**
+	 *  Check if it is a reserved tag.
+	 *  @param tag The tag.
+	 *  @return True if is reserved.
+	 */
+	public static void checkReservedTag(String tag)
+	{
+		if(PLATFORM_NAME_INTERNAL.equals(tag) || PLATFORM_NAME.equals(tag) || JADEX_VERSION_INTERNAL.equals(tag) 
+			|| JADEX_VERSION.equals(tag))
+		{
+			throw new IllegalArgumentException("Tag name is reserved.");
+		}
 	}
 }

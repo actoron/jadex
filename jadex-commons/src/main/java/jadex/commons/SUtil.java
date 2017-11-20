@@ -17,7 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
@@ -26,6 +25,7 @@ import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,8 +34,6 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -67,14 +65,13 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
-import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -84,10 +81,8 @@ import java.util.zip.ZipOutputStream;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.ErrorException;
-import jadex.commons.random.FastThreadedRandom;
-import jadex.commons.random.Xoroshiro128Random;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer2;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -132,6 +127,9 @@ public class SUtil
 	
 	/** UTF-8 charset. */
 	public static final Charset UTF8 = Charset.forName("UTF-8");
+	
+	/** ISO-8859-1 charset. */
+	public static final Charset ISO8859_1 = Charset.forName("ISO-8859-1");
 	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
@@ -1039,6 +1037,45 @@ public class SUtil
 				res += tmp;
 		}
 		return res;
+	}
+	
+	/**
+	 *  Convert CamelCase to snake_case.
+	 */
+	public static String	camelToSnakeCase(String camel)
+	{
+        String snake	= camel.replaceAll("([^A-Z])([A-Z]+)", "$1_$2").toLowerCase();
+        return snake;
+	}
+
+	/**
+	 *  Convert snake_case to CamelCase.
+	 */
+	public static String	snakeToCamelCase(String snake)
+	{
+		// Match any number of underscores followed by a single non-underscore (group 1).
+	    Matcher	msnake	= Pattern.compile("_+([^_])").matcher(snake);
+	    StringBuilder camel	= new StringBuilder();
+	    int	end	= 0;
+	    while(msnake.find())
+	    {
+	    	// Add skipped characters
+	    	if(msnake.start()>end)
+	    	{
+	    		camel.append(snake.substring(end, msnake.start()));
+	    	}
+	    	
+	    	// Convert character to uppercase.
+	    	camel.append(msnake.group(1).toUpperCase());
+	    	
+	    	// Remember end index of last match. 
+	    	end	= msnake.end();
+	    }
+	    
+		// Add non-matched rest of string
+	    camel.append(snake.substring(end));
+	    
+        return camel.toString();
 	}
 
 	/**
@@ -2009,7 +2046,15 @@ public class SUtil
 	
 	/**
 	 * Create a globally unique conversation id.
-	 * 
+	 * @return The conversation id.
+	 */
+	public static String createUniqueId()
+	{
+		return createUniqueId(null);
+	}
+	
+	/**
+	 * Create a globally unique conversation id.
 	 * @return The conversation id.
 	 */
 	public static String createUniqueId(String name)
@@ -2044,23 +2089,6 @@ public class SUtil
 		return ret;
 	}
 	
-	public static final Field strval;
-	static
-	{
-		Field f = null;
-		try
-		{
-			f = String.class.getDeclaredField("value");
-			f.setAccessible(true);
-		}
-		catch (Exception e)
-		{
-			
-		}
-		
-		strval = f;
-	}
-	
 	/**
 	 * Create a globally unique conversation id.
 	 * 
@@ -2078,20 +2106,20 @@ public class SUtil
 //	}
 
 	/**
-	 * Create a globally unique conversation id.
+	 * Create a random id with only alphanumeric chars.
 	 * 
-	 * @return The conversation id.
+	 * @return The id.
 	 */
-	public static String createUniqueId(String name, int length)
+	public static String createPlainRandomId(String name, int length)
 	{
-		UUID uuid = UUID.randomUUID();
-		String rand = uuid.toString();
-		return name + "_" + rand.substring(0, length);
+//		String rand = createUniqueId(name);
+//		return rand.substring(0, name.length() + length + 1);
 
-		// String rand = ""+Math.random();
-		// rand = rand.substring(2, 2+Math.min(length-2, rand.length()-2));
-		// return name+"_"+rand+(++convidcnt%100);
-	}	
+		double	rnd	= Math.random();
+		rnd	= rnd * Math.pow(36, length);
+		String rand = Integer.toString((int)rnd, 36);
+		return name+"_"+rand;
+	}
 	
 	/**
 	 * 
@@ -2548,6 +2576,8 @@ public class SUtil
 	 */
 	public static final void rethrowAsUnchecked(Throwable e)
 	{
+		if (e instanceof Error)
+			throw ((Error)e);
 		throw convertToRuntimeException(e);
 	}
 
@@ -2662,10 +2692,18 @@ public class SUtil
 	{
 		byte[] buffer = new byte[2];
 
-		buffer[0] = (byte)((val >>> 8) & 0xFF);
-		buffer[1] = (byte)(val & 0xFF);
+		shortIntoBytes(val, buffer, 0);
 
 		return buffer;
+	}
+	
+	/**
+	 *  Convert a short into byte array.
+	 */
+	public static void shortIntoBytes(int val, byte[] buffer, int offset)
+	{
+		buffer[offset] = (byte)((val >>> 8) & 0xFF);
+		buffer[offset+1] = (byte)(val & 0xFF);
 	}
 
 	/**
@@ -2678,13 +2716,8 @@ public class SUtil
 //		{
 //			throw new IllegalArgumentException("buffer length must be 4 bytes!");
 //		}
-
-		int value = (0xFF & buffer[0]) << 24;
-		value |= (0xFF & buffer[1]) << 16;
-		value |= (0xFF & buffer[2]) << 8;
-		value |= (0xFF & buffer[3]);
-
-		return value;
+		
+		return bytesToInt(buffer, 0);
 	}
 	
 	/**
@@ -2696,7 +2729,7 @@ public class SUtil
 		value |= (0xFF & buffer[offset+1]) << 16;
 		value |= (0xFF & buffer[offset+2]) << 8;
 		value |= (0xFF & buffer[offset+3]);
-
+		
 		return value;
 	}
 
@@ -2706,11 +2739,8 @@ public class SUtil
 	public static byte[] intToBytes(int val)
 	{
 		byte[] buffer = new byte[4];
-
-		buffer[0] = (byte)((val >>> 24) & 0xFF);
-		buffer[1] = (byte)((val >>> 16) & 0xFF);
-		buffer[2] = (byte)((val >>> 8) & 0xFF);
-		buffer[3] = (byte)(val & 0xFF);
+		
+		intIntoBytes(val, buffer, 0);
 
 		return buffer;
 	}
@@ -3933,6 +3963,71 @@ public class SUtil
 	}
 	
 	/**
+	 *  Primitive encoding approach: Merges multiple byte arrays
+	 *  into a single one so it can be split later.
+	 * 
+	 *  @param data The input data.
+	 *  @return A merged byte array.
+	 */
+	public static byte[] mergeData(byte[]... data)
+	{
+		int datasize = 0;
+		for (int i = 0; i < data.length; ++i)
+			datasize += data[i].length;
+		byte[] ret = new byte[datasize + (data.length << 2)];
+		int offset = 0;
+		for (int i = 0; i < data.length; ++i)
+		{
+			SUtil.intIntoBytes(data[i].length, ret, offset);
+			offset += 4;
+			System.arraycopy(data[i], 0, ret, offset, data[i].length);
+			offset += data[i].length;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Primitive encoding approach: Splits a byte array
+	 *  that was encoded with mergeData().
+	 * 
+	 *  @param data The input data.
+	 *  @return A list of byte arrays representing the original set.
+	 */
+	public static List<byte[]> splitData(byte[] data)
+	{
+		return splitData(data, -1, -1);
+	}
+	
+	/**
+	 *  Primitive encoding approach: Splits a byte array
+	 *  that was encoded with mergeData().
+	 * 
+	 *  @param data The input data.
+	 *  @param offset Offset where the data is located.
+	 *  @param length Length of the data, rest of data used if length < 0.
+	 *  @return A list of byte arrays representing the original set.
+	 */
+	public static List<byte[]> splitData(byte[] data, int offset, int length)
+	{
+		List<byte[]> ret = new ArrayList<byte[]>();
+		offset = offset < 0 ? 0 : offset;
+		length = length < 0 ? data.length - offset : length;
+		int endpos = offset + length;
+		while (offset < endpos)
+		{
+			int datalen = SUtil.bytesToInt(data, offset);
+			offset += 4;
+			if (offset + datalen > endpos)
+				throw new IllegalArgumentException("Invalid encoded data.");
+			byte[] datapart = new byte[datalen];
+			System.arraycopy(data, offset, datapart, 0, datalen);
+			offset += datalen;
+			ret.add(datapart);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Convert char to hex vavlue.
 	 */
 	public static String hex(char ch) 
@@ -4258,7 +4353,7 @@ public class SUtil
 			    baos.write(buf, 0, readbytes);
 			}
 		}
-		catch (IOException e)
+		catch(IOException e)
 		{
 			try
 			{
@@ -4274,11 +4369,13 @@ public class SUtil
 		{
 			fis.close();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 		}
 		
-		return baos.toByteArray();
+		byte[] ret = baos.toByteArray();
+		
+		return ret;
 	}
 	
 	/**
@@ -4362,6 +4459,28 @@ public class SUtil
 		catch (Exception e)
 		{
 			rethrowAsUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Attempt to close a Socket (e.g. on error recovery)
+	 *  ignoring any error.
+	 *  (compatibility for Java versions below 7 where Closeable exists
+	 *   but is not implemented by Socket because stupid)
+	 *  
+	 *  @param socket The socket.
+	 */
+	public static void close(Socket socket)
+	{
+		if (socket != null)
+		{
+			try
+			{
+				socket.close();
+			}
+			catch (IOException e)
+			{
+			}
 		}
 	}
 	
@@ -4944,6 +5063,17 @@ public class SUtil
     }
 	
 	/**
+	 *  Returns a UTF8 byte array as string.
+	 * 
+	 *  @param bytes The bytes.
+	 *  @return The string.
+	 */
+	public static String toUTF8(byte[] bytes)
+	{
+		return new String(bytes, UTF8);
+	}
+	
+	/**
 	 *  Get the exception stacktrace.
 	 *  @param e The exception.
 	 *  @return The exception stacktrace.
@@ -5199,7 +5329,7 @@ public class SUtil
 		{
 			cache.getParentFile().mkdirs();
 			FileOutputStream	fos	= new FileOutputStream(cache);
-			SBinarySerializer2.writeObjectToStream(fos, HASHES, null);
+			SBinarySerializer.writeObjectToStream(fos, HASHES, null);
 		}
 		catch(Exception e)
 		{

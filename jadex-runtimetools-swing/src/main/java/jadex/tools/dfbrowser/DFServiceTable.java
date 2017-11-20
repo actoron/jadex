@@ -27,7 +27,7 @@ public class DFServiceTable extends JTable//JScrollPane
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		TableSorter sorter = (TableSorter)getModel();
 		sorter.setTableHeader(getTableHeader());
-		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
+		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(null));
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
 		setDefaultRenderer(IProperty[].class, new PropertyArrayRenderer());
 	}

@@ -2,9 +2,7 @@ package jadex.bdi.testcases.misc;
 
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.component.IMessageFeature;
 
 /**
  * 
@@ -16,8 +14,8 @@ public class SendStreamPlan extends Plan
 	  */
 	public void body()
 	{
-		IMessageService ms = getAgent().getComponentFeature(IRequiredServicesFeature.class).searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IOutputConnection con = ms.createOutputConnection(getComponentIdentifier(), getComponentIdentifier(), null).get();
+		IMessageFeature mf = getAgent().getComponentFeature(IMessageFeature.class);
+		IOutputConnection con = mf.createOutputConnection(getComponentIdentifier(), getComponentIdentifier(), null).get();
 
 		for(int i=0; i<5; i++)
 		{

@@ -1,5 +1,6 @@
 package jadex.platform.service.threadpool;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -62,7 +63,7 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 		{
 			public void run()
 			{
-//				System.err.println("Shutdown threadpool timeout: "+this+", "+new Date());
+				System.out.println("Shutdown threadpool timeout: "+this+", "+new Date());
 				// stop waiting for threadpool if still no notifaction
 				ret.setResultIfUndone(null);
 			}

@@ -130,9 +130,7 @@ public class Cause
 //		String ret = UUID.randomUUID().toString();
 		String ret = SUtil.createUniqueId(origin);
 		if(len>0)
-		{
 			ret = ret.substring(0, len);
-		}
 		return ret;
 	}
 	

@@ -50,7 +50,7 @@ public class PropagateGameStatePlan extends Plan
 		{
 			IMessageEvent	inform	= createMessageEvent("inform_game_state");
 			inform.getParameter(SFipa.CONTENT).setValue(gs);
-			IParameterSet rec = inform.getParameterSet("receivers");
+			IParameterSet rec = inform.getParameterSet(SFipa.RECEIVERS);
 			for(int i=0; i<players.length; i++)
 				if(!rec.containsValue(players[i].getAgentID()))
 					rec.addValue(players[i].getAgentID());

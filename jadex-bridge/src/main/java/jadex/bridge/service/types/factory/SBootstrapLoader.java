@@ -13,6 +13,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.traverser.SCloner;
 import jadex.commons.transformation.traverser.Traverser;
 
 /**
@@ -56,8 +57,9 @@ public class SBootstrapLoader
 						}
 						else
 						{
-							// Wrapper for model info from different class loaders.
-							Object	traversed	= Traverser.traverseObject(model, Traverser.getDefaultProcessors(), false, getClass().getClassLoader(), null);
+							// Wrapper for model info from different class loaders. ---> Why was clone false here?
+							Object traversed = SCloner.clone(model, getClass().getClassLoader());
+//							Object	traversed	= Traverser.traverseObject(model, null, Traverser.getDefaultProcessors(), null, false, getClass().getClassLoader(), null);
 							ret.setResult((IModelInfo)traversed);
 						}
 					}

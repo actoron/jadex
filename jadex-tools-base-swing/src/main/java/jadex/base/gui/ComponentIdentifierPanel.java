@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,9 +24,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 /**
  *  A panel for displaying/editing a component identifier.
@@ -132,23 +136,33 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		SServiceProvider.getService(access, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(access, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<ITransportAddressService>()
 		{
-			public void customResultAvailable(Object result)
+			public void resultAvailable(ITransportAddressService tas)
 			{
-				IMessageService ms = (IMessageService)result;
-				String[] ss = ms.getAddressSchemes();
-				for(int i=0; i<ss.length; i++)
+				tas.getAddresses().addResultListener(new SwingResultListener<List<TransportAddress>>(new IResultListener<List<TransportAddress>>()
 				{
-					schemes.addRow(new Object[]{ss[i]});
-				}
+					public void resultAvailable(List<TransportAddress> adrs) 
+					{
+						for(int i=0; i<adrs.size(); i++)
+						{
+							schemes.addRow(new Object[]{adrs.get(i)});
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				}));
 			}
-			public void customExceptionOccurred(Exception exception)
+			
+			public void exceptionOccurred(Exception exception)
 			{
 				// ignore
 			}
-		});
+		});	
+				
 	}
 
 	/**

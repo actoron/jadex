@@ -26,6 +26,11 @@ public class TagFilter<T> implements IAsyncFilter<T>
 	/** The search tags. */
 	protected Collection<String> tags;
 	
+	public TagFilter()
+	{
+		// TODO Auto-generated constructor stub
+	}
+	
 	/**
 	 *  Create a new tag filter.
 	 */
@@ -60,4 +65,40 @@ public class TagFilter<T> implements IAsyncFilter<T>
 		});
 		return ret;
 	}
+
+	/**
+	 * @return the component
+	 */
+	public IExternalAccess getComponent()
+	{
+		return component;
+	}
+
+	/**
+	 *  Sets the component.
+	 *  @param component The component to set
+	 */
+	public void setComponent(IExternalAccess component)
+	{
+		this.component = component;
+	}
+
+	/**
+	 * @return the tags
+	 */
+	public Collection<String> getTags()
+	{
+		return tags;
+	}
+
+	/**
+	 *  Sets the tags.
+	 *  @param tags The tags to set
+	 */
+	public void setTags(Collection<String> tags)
+	{
+		this.tags = tags;
+	}
+	
+	
 }

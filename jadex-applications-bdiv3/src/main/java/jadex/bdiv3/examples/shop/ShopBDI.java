@@ -20,7 +20,7 @@ import jadex.micro.annotation.Arguments;
 @Arguments(
 {
 	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopBDI.getDefaultCatalog()"), 
-	@Argument(name="shopname", clazz=String.class, defaultvalue="jadex.commons.SUtil.createUniqueId(\"Shop\",2)")
+	@Argument(name="shopname", clazz=String.class, defaultvalue="jadex.commons.SUtil.createPlainRandomId(\"Shop\",2)")
 })
 public class ShopBDI
 {

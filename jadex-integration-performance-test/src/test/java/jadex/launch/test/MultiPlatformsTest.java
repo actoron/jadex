@@ -76,7 +76,7 @@ public class MultiPlatformsTest //extends TestCase
 //				"-awamechanisms", "\"Relay\"", 
 //				"-awamechanisms", "\"Broadcast\"", // broadcast 3 times as slow!?
 //				"-awamechanisms", "\"Multicast\"", 
-				"-awamechanisms", "\"Relay, Multicast, Message\"", 
+//				"-awamechanisms", "\"Relay, Multicast, Message\"", 
 //				"-deftimeout", "60000",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}

@@ -2,7 +2,9 @@ package jadex.bridge.component;
 
 import java.util.Map;
 
-import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInputConnection;
+import jadex.bridge.IOutputConnection;
 import jadex.commons.future.IFuture;
 
 /**
@@ -12,35 +14,75 @@ public interface IMessageFeature
 {
 	/**
 	 *  Send a message.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> me, MessageType mt);
+	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message);
 	
 	/**
 	 *  Send a message.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  @param addheaderfields Additional header fields.
+	 *  
 	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> me, final MessageType mt, final byte[] codecids);
+	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message, Map<String, Object> addheaderfields);
 	
 	/**
 	 *  Send a message and wait for a reply.
-	 *  @param me	The message content (name value pairs).
-	 *  @param mt	The message type describing the content.
+	 *  
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  
+	 *  @return The reply.
 	 */
-	// Todo: supply reply message as future return value?
-	public IFuture<Void> sendMessageAndWait(final Map<String, Object> me, final MessageType mt, final IMessageHandler handler);
+	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message);
+	
+	/**
+	 *  Send a message and wait for a reply.
+	 *  
+	 *  @param receiver	The message receiver.
+	 *  @param message	The message.
+	 *  @param timeout	The reply timeout.
+	 *  
+	 *  @return The reply.
+	 */
+	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message, Long timeout);
+	
+	/**
+	 *  Send a message reply.
+	 *  @param receivedmessageid	ID of the received message that is being replied to.
+	 *  @param message	The reply message.
+	 *  
+	 */
+	public IFuture<Void> sendReply(IMsgHeader header, Object message);
 	
 	/**
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
-	public IFuture<Void> addMessageHandler(IMessageHandler handler);
+	public void addMessageHandler(IMessageHandler handler);
 	
 	/**
 	 *  Remove a message handler.
 	 *  @param handler The handler.
 	 */
-	public IFuture<Void> removeMessageHandler(IMessageHandler handler);
+	public void removeMessageHandler(IMessageHandler handler);
+	
+	/**
+	 *  Create a virtual output connection.
+	 *  @param sender The sender.
+	 *  @param receiver The receiver.
+	 *  @param nonfunc The nonfunc props.
+	 */
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
+
+	/**
+	 *  Create a virtual input connection.
+	 *  @param sender The sender.
+	 *  @param receiver The receiver.
+	 *  @param nonfunc The nonfunc props.
+	 */
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, Map<String, Object> nonfunc);
 }

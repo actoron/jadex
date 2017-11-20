@@ -6,7 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -166,7 +167,7 @@ public class TimeProviderAgent	implements ITimeService
 	 */
 	public static void	main(String[] args)
 	{
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimalRelayAwareness();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalRelayAwareness();
 		config.addComponent(TimeProviderAgent.class.getName()+".class");
 		Starter.createPlatform(config).get();
 	}

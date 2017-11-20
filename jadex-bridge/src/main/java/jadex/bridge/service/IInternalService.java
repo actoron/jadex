@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import java.util.List;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.Reference;
@@ -31,7 +33,7 @@ public interface IInternalService extends IService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope);
+	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted);
 	
 //	/**
 //	 *  Get the implementation type.

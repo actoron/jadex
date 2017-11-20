@@ -48,11 +48,14 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		{
 			public void notifyObservers(final RegistryEvent event)
 			{
+//				System.out.println("notify obs: "+lrobs.hashCode());
+				
 				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
-//						System.out.println("localobs");
+//						System.out.println("spser !!!!!!"+lrobs.hashCode());
+						
 						IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
 						{
 							public void resultAvailable(RegistryUpdateEvent spevent) 
@@ -73,17 +76,24 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								
 								System.out.println("Exception with superpeer, resetting");
 								
+								exception.printStackTrace();
+								
 								spregser = null;
 							}
 						};
 						
+//						System.out.println("updateCientData called: "+System.currentTimeMillis());
 						spser.updateClientData(event).addResultListener(lis);
 						if(event.size()>0)
+						{
 							System.out.println("Send client delta update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+							System.out.println("Event is: "+event);
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+//						exception.printStackTrace();
 //						System.out.println("No superpeer found to send client data to");
 						// Not a problem because on first occurrence sends full data (removeds are lost)
 					}
@@ -114,13 +124,22 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
+					System.out.println("Found superpeer: "+spcid);
 					SServiceProvider.getService(component, spcid, ISuperpeerRegistrySynchronizationService.class).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
 					{
 						public void customResultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 						{
+//							System.out.println("Found sp service");
 							spregser = spser;
 							ret.setResult(spregser);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+//							System.out.println("balabala "+exception.getMessage());
+							super.exceptionOccurred(exception);
 						}
 					});
 				}

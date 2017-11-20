@@ -14,7 +14,7 @@ public interface IEventbase extends IElement
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public IFuture<Void> sendMessage(IMessageEvent me);
+	public IFuture<Void> sendMessage(IMessageEvent<?> me);
 
 	/**
 	 *  Dispatch an event.
@@ -26,7 +26,7 @@ public interface IEventbase extends IElement
 	 *  Create a new message event.
 	 *  @return The new message event.
 	 */
-	public IMessageEvent createMessageEvent(String type);
+	public <T> IMessageEvent<T> createMessageEvent(String type);
 
 	/**
 	 *  Create a reply to a message event.
@@ -34,7 +34,7 @@ public interface IEventbase extends IElement
 	 *  @param msgeventtype	The reply message event type.
 	 *  @return The reply event.
 	 */
-	public IMessageEvent createReply(IMessageEvent event, String msgeventtype);
+	public <T> IMessageEvent<T>	createReply(IMessageEvent<T> event, String type);
 	
 	/**
 	 *  Create a new intenal event.

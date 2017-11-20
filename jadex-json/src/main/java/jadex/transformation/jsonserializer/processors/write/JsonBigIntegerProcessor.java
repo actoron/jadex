@@ -9,12 +9,13 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  * 
  */
 public class JsonBigIntegerProcessor implements ITraverseProcessor
-{	
+{
 	/**
 	 *  Test if the processor is applicable.
 	 *  @param object The object.
@@ -22,12 +23,12 @@ public class JsonBigIntegerProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(BigInteger.class, clazz);
 	}
-	
+
 	/**
 	 *  Process an object.
 	 *  @param object The object.
@@ -35,18 +36,17 @@ public class JsonBigIntegerProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
-		wr.addObject(traversed, object);
+		wr.addObject(wr.getCurrentInputObject());
 	
 		BigInteger bi  = (BigInteger)object;
 		
 		wr.write("{");
 		
 		wr.write("\"value\":");
-		traverser.doTraverse(bi.toByteArray(), byte[].class, traversed, processors, clone, targetcl, context);
+		traverser.doTraverse(bi.toByteArray(), byte[].class, conversionprocessors, processors, mode, targetcl, context);
 
 		if(wr.isWriteClass())
 			wr.write(",").writeClass(object.getClass());

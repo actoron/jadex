@@ -10,6 +10,7 @@ import java.util.Set;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 public class MapCodec extends AbstractCodec
 {
@@ -64,31 +65,18 @@ public class MapCodec extends AbstractCodec
 		int size = (int) context.readVarInt();
 		for (int i = 0; i < size; ++i)
 		{
-			Object key = BinarySerializer.decodeObject(context);
-			Object value = BinarySerializer.decodeObject(context);
+			Object key = SBinarySerializer.decodeObject(context);
+			Object value = SBinarySerializer.decodeObject(context);
 			ret.put(key, value);
 		}
 		
 		return ret;
 	}
-	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		ec.writeVarInt(((Map)object).size());
 		
@@ -99,23 +87,23 @@ public class MapCodec extends AbstractCodec
 			Object ev = entry.getKey();
 			if (ev == null)
 			{
-				ec.writeClassname(BinarySerializer.NULL_MARKER);
+				ec.writeClassname(SBinarySerializer.NULL_MARKER);
 				//BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, ec);
 			}
 			else
 			{
-				traverser.doTraverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
+				traverser.doTraverse(ev, ev.getClass(), preprocessors, processors, mode, targetcl, ec);
 			}
 			
 			ev = entry.getValue();
 			if (ev == null)
 			{
-				ec.writeClassname(BinarySerializer.NULL_MARKER);
+				ec.writeClassname(SBinarySerializer.NULL_MARKER);
 				//BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, ec);
 			}
 			else
 			{
-				traverser.doTraverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
+				traverser.doTraverse(ev, ev.getClass(), preprocessors, processors, mode, targetcl, ec);
 			}
 		}
 		

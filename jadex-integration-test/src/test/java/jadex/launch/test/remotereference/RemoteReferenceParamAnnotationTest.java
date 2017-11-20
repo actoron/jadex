@@ -56,26 +56,27 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		Starter.createProxy(platform2, platform1).get(timeout);
 	}
 
-	@Test
-	public void testRemoteReferenceCall_withTypeAnnotation()
-	{
-		// schedule on platform, so platform2platform communication is used.
-		platform2.scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				Future<Void> ret = new Future<Void>();
-				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
-				// call service with @Reference Object
-				locService.executeCallback(new MyCallbackReference()).addResultListener(new DelegationResultListener<Void>(ret));
-				;
-				return ret;
-			}
-		}).get();
-
-		Assert.assertTrue(successIndicator.isDone());
-		Assert.assertTrue(successIndicator.get());
-	}
+	// excluded until maybe remote objects will be supported again
+//	@Test
+//	public void testRemoteReferenceCall_withTypeAnnotation()
+//	{
+//		// schedule on platform, so platform2platform communication is used.
+//		platform2.scheduleStep(new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				Future<Void> ret = new Future<Void>();
+//				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+//				// call service with @Reference Object
+//				locService.executeCallback(new MyCallbackReference()).addResultListener(new DelegationResultListener<Void>(ret));
+//				;
+//				return ret;
+//			}
+//		}).get();
+//
+//		Assert.assertTrue(successIndicator.isDone());
+//		Assert.assertTrue(successIndicator.get());
+//	}
 
 	// @Test
 	public void testRemoteReferenceCall_withMethodAnnotation()

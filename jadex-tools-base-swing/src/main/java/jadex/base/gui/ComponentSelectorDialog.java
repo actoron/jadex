@@ -42,7 +42,6 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IResultListener;
@@ -270,9 +269,9 @@ public class ComponentSelectorDialog
 							public void resultAvailable(IProxyAgentService ps)
 							{
 								ps.getRemoteComponentIdentifier().addResultListener(
-									new SwingResultListener<ITransportComponentIdentifier>(new IResultListener<ITransportComponentIdentifier>()
+									new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 								{
-									public void resultAvailable(ITransportComponentIdentifier result)
+									public void resultAvailable(IComponentIdentifier result)
 									{
 										proceed(result);
 									}

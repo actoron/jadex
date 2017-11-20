@@ -6,7 +6,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -19,7 +20,10 @@ public class ExecutionServiceTest
 	@Test
 	public void	testSimpleExecution()
 	{
-		IExternalAccess	platform	= Starter.createPlatform(PlatformConfiguration.getMinimal()).get();
+		IPlatformConfiguration minimal = PlatformConfigurationHandler.getMinimal();
+		minimal.setRelayTransport(false);
+		minimal.setWsTransport(false);
+		IExternalAccess	platform	= Starter.createPlatform(minimal).get();
 		IExecutionService	exe	= SServiceProvider.getService(platform, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		final List<String>	list	= new ArrayList<String>();		

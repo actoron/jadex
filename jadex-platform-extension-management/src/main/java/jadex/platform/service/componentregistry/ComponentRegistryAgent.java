@@ -22,12 +22,14 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
@@ -63,7 +65,7 @@ import jadex.micro.annotation.ProvidedServices;
     @Argument(name="componentinfos", clazz=CreationInfo.class, description="The component models to add initially.",
     	defaultvalue="new CreationInfo[]{"
 //    		+ "new CreationInfo(\"jadex/platform/service/componentregistry/HelloAgent.class\"), "
-    		+ "new CreationInfo(\"jadex/platform/service/address/TransportAddressAgent.class\"), "
+//    		+ "new CreationInfo(\"jadex/platform/service/address/TransportAddressAgent.class\"), "
 //    		+ "new CreationInfo(\"jadex/platform/service/message/MessageAgent.class\"), " // message service is raw :-(
 //    		+ "new CreationInfo(\"jadex/platform/service/marshal/MarshalAgent.class\"), " // marshal service is raw :-(
     		+ "new CreationInfo(\"jadex/platform/service/chat/ChatAgent.class\"), "
@@ -74,7 +76,7 @@ import jadex.micro.annotation.ProvidedServices;
 			+ "new CreationInfo(\"jadex/platform/service/monitoring/MonitoringAgent.class\"), "
       		+ "new CreationInfo(\"jadex/platform/service/settings/SettingsAgent.class\"), "
       		+ "new CreationInfo(\"%{$args.paargs.rspublishcomponent}\"), "
-      		+ "new CreationInfo(\"jadex/platform/service/context/ContextAgent.class\", null, jadex.commons.SUtil.createHashMap(new String[]{\"contextserviceclass\"}, new Object[]{$args.paargs.contextserviceclass})) "
+      		+ "new CreationInfo(\"jadex/platform/service/context/ContextAgent.class\", null, (java.util.Map)($args.paargs!=null ? jadex.commons.SUtil.createHashMap(new String[]{\"contextserviceclass\"}, new Object[]{$args.paargs.contextserviceclass}): null)) "
 //      		+ "new CreationInfo(\"jadex/platform/service/remote/RemoteServiceManagementAgent.class\")" // has no service :-(
     		+ "}")
 })
@@ -151,84 +153,92 @@ public class ComponentRegistryAgent implements IComponentRegistryService
                 final String fn = (String)SJavaParser.evaluateExpressionPotentially(info.getFilename(), info.getImports(), agent.getFetcher(), cl);
 //              System.out.println("reg component model: "+fn);
                 
-                SComponentFactory.loadModel(agent.getExternalAccess(), fn, info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<IModelInfo, Void>(ret)
+                if (fn != null)
                 {
-                    public void customResultAvailable(final IModelInfo model) throws Exception
-                    {
-                        ProvidedServiceInfo[] psis = model.getProvidedServices();
-                        ClassLoader cl = ((ModelInfo)model).getClassLoader();
-                        List<IServiceIdentifier> sids = new ArrayList<IServiceIdentifier>();
-                        
-                        if(psis!=null && psis.length>0)
-                        {
-        	                CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, new DelegationResultListener<Void>(ret));
-        	                for(ProvidedServiceInfo psi: psis)
-        	                {
-        	                    final Class<?> servicetype = psi.getType().getType(cl);
-        	                    final IServiceIdentifier fsid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), SUtil.createUniqueId(servicetype.getName(), 3), servicetype, null, model.getResourceIdentifier(), null);
-        	                    
-        	                    Object serviceproxy = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, new InvocationHandler()
-        	                    {
-        	                        public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
-        	                        {
-        	                            assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
-
-//        	                            if(servicetype.getName().indexOf("Settings")!=-1)
-//        	                            	System.out.println("settings called: "+method.getName());
-        	                            
-        	                            if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
-        	                            {
-        		                    		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
-        		                            getComponent(info).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
-        									{
-        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
-        		                            	{
-        		                            		IFuture<IService> fut = (IFuture)SServiceProvider.getService(exta, exta.getComponentIdentifier(), servicetype);
-        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
-        											{
-        		                        				public void customResultAvailable(IService service) throws Exception
-        		                        				{
-        		                        					 IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
-        		                                             FutureFunctionality.connectDelegationFuture(ret, res);
-        		                        				}
-        											});
-        		                            	}
-        									});
-        		                            
-        		                            return ret;
-        	                            }
-        	                            else if(method.getName().equals("getServiceIdentifier"))
-        	                            {
-        	                            	return fsid;
-        	                            }
-        	                            else if(method.getName().equals("getPropertyMap"))
-        	                            {
-        	                            	// todo:?!
-        	                            	return Collections.EMPTY_MAP;
-        	                            }
-        	                            else
-        	                            {
-        	                            	 IExternalAccess exta = getComponent(info).get();
-        	                            	 IService service = (IService)SServiceProvider.getLocalService(agent, servicetype, exta.getComponentIdentifier());
-        	                            	 return method.invoke(service, args);
-        	                            }
-        	                        }
-        	                    });
-        	                    
-        	        			agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, serviceproxy, null, null).addResultListener(lis);
-        	        			sids.add(fsid);
-        	                }
-        	                if(componenttypes==null)
-        	                	componenttypes = new HashMap<String, ComponentInfo>();
-        	                componenttypes.put(info.getFilename(), new ComponentInfo());
-                        }
-                        else
-                        {
-                        	System.out.println("Component model has no provided services: "+fn);
-                        	ret.setResult(null);
-                        }
-                    }
-                });
+	                SComponentFactory.loadModel(agent.getExternalAccess(), fn, info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<IModelInfo, Void>(ret)
+	                {
+	                    public void customResultAvailable(final IModelInfo model) throws Exception
+	                    {
+	                        ProvidedServiceInfo[] psis = model.getProvidedServices();
+	                        ClassLoader cl = ((ModelInfo)model).getClassLoader();
+	                        List<IServiceIdentifier> sids = new ArrayList<IServiceIdentifier>();
+	                        
+	                        if(psis!=null && psis.length>0)
+	                        {
+	        	                CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, new DelegationResultListener<Void>(ret));
+	        	                for(ProvidedServiceInfo psi: psis)
+	        	                {
+	        	                    final Class<?> servicetype = psi.getType().getType(cl);
+	        	                    final IServiceIdentifier fsid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), SUtil.createPlainRandomId(servicetype.getName(), 3), servicetype, null, model.getResourceIdentifier(), null, ServiceIdentifier.isUnrestricted(agent, servicetype));
+	        	                    
+	        	                    Object serviceproxy = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, new InvocationHandler()
+	        	                    {
+	        	                        public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
+	        	                        {
+	        	                            assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+	
+	//        	                            if(servicetype.getName().indexOf("Settings")!=-1)
+	//        	                            	System.out.println("settings called: "+method.getName());
+	        	                            
+	        	                            if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+	        	                            {
+	        		                    		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
+	        		                            getComponent(info).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+	        									{
+	        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
+	        		                            	{
+	        		                            		IFuture<IService> fut = (IFuture)SServiceProvider.getService(exta, exta.getComponentIdentifier(), servicetype);
+	        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
+	        											{
+	        		                        				public void customResultAvailable(IService service) throws Exception
+	        		                        				{
+	        		                        					 IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
+	        		                                             FutureFunctionality.connectDelegationFuture(ret, res);
+	        		                        				}
+	        											});
+	        		                            	}
+	        									});
+	        		                            
+	        		                            return ret;
+	        	                            }
+	        	                            else if(method.getName().equals("getServiceIdentifier"))
+	        	                            {
+	        	                            	return fsid;
+	        	                            }
+	        	                            else if(method.getName().equals("getPropertyMap"))
+	        	                            {
+	        	                            	// todo:?!
+	        	                            	return Collections.EMPTY_MAP;
+	        	                            }
+	        	                            else
+	        	                            {
+	        	                            	 IExternalAccess exta = getComponent(info).get();
+	        	                            	 IService service = (IService)SServiceProvider.getLocalService(agent, servicetype, exta.getComponentIdentifier());
+	        	                            	 return method.invoke(service, args);
+	        	                            }
+	        	                        }
+	        	                    });
+	        	                    
+	        	        			agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, serviceproxy, null, null).addResultListener(lis);
+	        	        			sids.add(fsid);
+	        	                }
+	        	                if(componenttypes==null)
+	        	                	componenttypes = new HashMap<String, ComponentInfo>();
+	        	                componenttypes.put(info.getFilename(), new ComponentInfo());
+	                        }
+	                        else
+	                        {
+	                        	System.out.println("Component model has no provided services: "+fn);
+	                        	ret.setResult(null);
+	                        }
+	                    }
+	                });
+        		}
+                else
+                {
+                	agent.getLogger().warning("ComponentRegistryAgent did not find model: " + info.toString());
+                	ret.setResult(null);
+                }
         	}
 		});
         

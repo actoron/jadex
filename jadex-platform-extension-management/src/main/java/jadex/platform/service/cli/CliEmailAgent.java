@@ -13,7 +13,6 @@ import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.email.Email;
 import jadex.bridge.service.types.email.EmailAccount;
 import jadex.bridge.service.types.email.IEmailService;
-import jadex.bridge.service.types.security.DefaultAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Base64;
 import jadex.commons.IFilter;
@@ -237,33 +236,35 @@ public class CliEmailAgent
 	//						System.out.println("dur: "+dur);
 	//						System.out.println("content: "+content);
 							
-							IFuture<ISecurityService> secfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("secser");
-							secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
-							{
-								public void customResultAvailable(final ISecurityService secser)
-								{
-									DefaultAuthorizable da = new DefaultAuthorizable();
-									da.setTimestamp(ts);
-									da.setValidityDuration(dur);
-									da.setDigestContent(content);
-									da.setAuthenticationData(authdata);
-									secser.validateRequest(da).addResultListener(new IResultListener<Void>()
-									{
-										public void resultAvailable(Void result)
-										{
-											executeCommands(cliser, lines.iterator(), eml, new StringBuffer(), new StringBuffer())
-												.addResultListener(new DelegationResultListener<Email>(ret));
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											Email rep = new Email(null, "Security exception, invalid request.", "failed to execute: "
-												+SUtil.arrayToString(lines), eml.getSender());
-											ret.setResult(rep);
-										}
-									});
-								}
-							});
+							throw new UnsupportedOperationException("todo: fix security check");
+							
+//							IFuture<ISecurityService> secfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("secser");
+//							secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
+//							{
+//								public void customResultAvailable(final ISecurityService secser)
+//								{
+//									DefaultAuthorizable da = new DefaultAuthorizable();
+//									da.setTimestamp(ts);
+//									da.setValidityDuration(dur);
+//									da.setDigestContent(content);
+//									da.setAuthenticationData(authdata);
+//									secser.validateRequest(da).addResultListener(new IResultListener<Void>()
+//									{
+//										public void resultAvailable(Void result)
+//										{
+//											executeCommands(cliser, lines.iterator(), eml, new StringBuffer(), new StringBuffer())
+//												.addResultListener(new DelegationResultListener<Email>(ret));
+//										}
+//										
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											Email rep = new Email(null, "Security exception, invalid request.", "failed to execute: "
+//												+SUtil.arrayToString(lines), eml.getSender());
+//											ret.setResult(rep);
+//										}
+//									});
+//								}
+//							});
 						}
 						else
 						{

@@ -1,8 +1,6 @@
 package jadex.android.bluetooth.message;
 
 import jadex.android.bluetooth.device.IBluetoothDevice;
-import jadex.android.bluetooth.device.factory.AndroidBluetoothAdapterFactory;
-import jadex.android.bluetooth.device.factory.AndroidBluetoothDeviceFactory;
 import jadex.android.bluetooth.exceptions.MessageToLongException;
 import jadex.android.bluetooth.util.Helper;
 
@@ -45,7 +43,7 @@ public class DataPacketSerializable implements Serializable {
 	public static final int DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
 
 	public DataPacketSerializable(BluetoothMessage msg, byte type) {
-		this(msg.getRemoteAdress(), msg.getData(), type);
+		this(msg.getRemoteAddress(), msg.getData(), type);
 	}
 
 	public DataPacketSerializable(IBluetoothDevice dev, byte[] data, byte type) {

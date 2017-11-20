@@ -36,7 +36,7 @@ public class StreamProviderAgent implements IStreamService
 	protected IInternalAccess agent;
 	
 	/**
-	 *  Pass an Input stream to the user.
+	 *  Pass an input stream to the user.
 	 *  @return The Input stream.
 	 */
 	public IFuture<IInputConnection> getInputStream()
@@ -49,7 +49,7 @@ public class StreamProviderAgent implements IStreamService
 	}
 	
 	/**
-	 *  Pass an Input stream to the user.
+	 *  Pass an output stream to the user.
 	 *  @return The Input stream.
 	 */
 	public IFuture<IOutputConnection> getOutputStream()

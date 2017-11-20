@@ -1,14 +1,6 @@
 package jadex.micro.testcases.visibility;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import jadex.base.PlatformConfiguration;
 import jadex.base.test.TestReport;
-import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -26,6 +18,11 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *  Simple test agent with one service.

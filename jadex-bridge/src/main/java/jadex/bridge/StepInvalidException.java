@@ -1,7 +1,7 @@
 package jadex.bridge;
 
 /**
- *  Exception thrown when a step is invalid on execution.
+ *  Exception thrown when a conditional step is invalid on execution.
  */
 public class StepInvalidException extends RuntimeException
 {
@@ -23,10 +23,5 @@ public class StepInvalidException extends RuntimeException
 	public IComponentStep<?> getStep()
 	{
 		return step;
-	}
-	
-	public void printStackTrace()
-	{
-		super.printStackTrace();
 	}
 }

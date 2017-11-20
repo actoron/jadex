@@ -5,10 +5,8 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
@@ -59,15 +57,18 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
+				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -109,17 +110,17 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				// Hack: announce platform immediately
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-				{
-					public void customResultAvailable(final ITransportComponentIdentifier result) 
-					{
+//				// Hack: announce platform immediately
+//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
+//				{
+//					public void customResultAvailable(final ITransportComponentIdentifier result) 
+//					{
 						IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
 						fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
 							{
-								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{result.getRoot()}));
+								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier()}));
 								cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
 									new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
 		//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
@@ -140,8 +141,8 @@ public class InitiatorAgent extends TestAgent
 								});
 							}
 						});
-					}
-				});
+//					}
+//				});
 			}
 		}));
 		
@@ -169,8 +170,8 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		
-		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 
 		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)

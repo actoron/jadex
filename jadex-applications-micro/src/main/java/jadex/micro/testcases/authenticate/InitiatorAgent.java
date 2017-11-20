@@ -1,17 +1,15 @@
 package jadex.micro.testcases.authenticate;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -41,15 +39,18 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
+				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -67,35 +68,35 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
-		{
-			public void customResultAvailable(final ISecurityService sec)
-			{
-				sec.addVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix())
-					.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
+//		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, TestReport>(ret)
+//		{
+//			public void customResultAvailable(final ISecurityService sec)
+//			{
+//				sec.addVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix())
+//					.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
 						performTest(agent.getComponentIdentifier().getRoot(), testno)
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
 							public void customResultAvailable(final TestReport result)
 							{
-								sec.removeVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix()).
-									addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
-								{
-									public void customResultAvailable(Void v) throws Exception
-									{
+//								sec.removeVirtual("testuser", agent.getComponentIdentifier().getPlatformPrefix()).
+//									addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+//								{
+//									public void customResultAvailable(Void v) throws Exception
+//									{
 										ret.setResult(result);
-									}
-								});
+//									}
+//								});
 							}
 						}));
-					}
-				});
-			}
-		});
+//					}
+//				});
+//			}
+//		});
 		
 		return ret;
 	}
@@ -114,14 +115,8 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(IExternalAccess platform)
 			{
-				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, TestReport>(ret)
-                {
-                    public void customResultAvailable(ITransportComponentIdentifier cid)
-                    { 
-						performTest(cid, testno)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-        			}
-        		});
+				performTest(platform.getComponentIdentifier(), testno)
+					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -149,8 +144,8 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		
-		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
 		createComponent("jadex/micro/testcases/authenticate/ProviderAgent.class", root, reslis)

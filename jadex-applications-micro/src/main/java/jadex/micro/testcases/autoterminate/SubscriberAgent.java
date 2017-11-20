@@ -4,8 +4,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IResultCommand;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
@@ -53,15 +51,10 @@ public class SubscriberAgent
 	@AgentBody
 	public void	body(final IInternalAccess agent)
 	{
-//		System.out.println("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
+//		agent.getLogger().severe("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IAutoTerminateService>, Void>()
-		{
-			public IFuture<IAutoTerminateService> execute(Void args)
-			{
-				return SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL);
-			}
-		}, 3, 2000).addResultListener(new IResultListener<IAutoTerminateService>()
+		SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			.addResultListener(new IResultListener<IAutoTerminateService>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -74,16 +67,16 @@ public class SubscriberAgent
 				{
 					public void intermediateResultAvailable(String result)
 					{
-//						System.out.println("subscribed "+agent.getComponentIdentifier());
+//						agent.getLogger().severe("subscribed "+agent.getComponentIdentifier());
 						
 						if("platform".equals(agent.getConfiguration()))
 						{
-//							System.out.println("destroy platform: "+agent.getComponentIdentifier().getRoot());
+//							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
 							cms.destroyComponent(agent.getComponentIdentifier().getRoot());
 						}
 						else
 						{
-//							System.out.println("destroy comp: "+agent.getComponentIdentifier());
+//							agent.getLogger().severe("destroy comp: "+agent.getComponentIdentifier());
 							agent.killComponent();
 						}
 					}

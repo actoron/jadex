@@ -28,7 +28,7 @@ public class ResultPlan extends Plan
 	 *  The plan body.
 	 */
 	public void body()
-	{
+	{System.out.println("RP CALLED0");
 		if(hasParameter("wait"))
 			wait	= ((Number)getParameter("wait").getValue()).longValue();
 		if(hasParameter("success"))
