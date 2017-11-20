@@ -143,8 +143,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		boolean callrem = getSerializationServices().isRemoteObject(sic.getProxy());
 		if(copy && !sic.isRemoteCall() && !callrem)
 		{
-			if(sic.getMethod().getName().indexOf("Stream")!=-1)
-				System.out.println("sdfsdfsdf");
+//			if(sic.getMethod().getName().indexOf("Stream")!=-1)
+//				System.out.println("sdfsdfsdf");
 			
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);

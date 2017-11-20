@@ -22,7 +22,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-public class ComponentSearcher 
+/**
+ * 
+ */
+public class ComponentSearcherAgent 
 {
 	/** The global query delay, i.e. how often is polled. */
 	protected long delay;
@@ -42,19 +45,23 @@ public class ComponentSearcher
 	/**
 	 *  Create a new service.
 	 */
-	public ComponentSearcher(IComponentIdentifier[] targets)
+	public ComponentSearcherAgent(IComponentIdentifier[] targets)
 	{
 		if(targets==null)
 			this.targets = SUtil.arrayToList(targets);
 	}
 	
 	/**
-	 *  Get the superpeer. Triggers search in background if none available.
-	 *  @return The superpeer.
+	 *  Get the target. Triggers search in background if none available.
+	 *  @return The target.
 	 */
-	public IComponentIdentifier getTargetSync()
+	public IComponentIdentifier getTargetSync(boolean force)
 	{
+		if(force)
+			target = null;
+		
 		long ct = System.currentTimeMillis();
+		
 		if(target==null && searchtime<ct)
 		{
 			// Ensure that a delay is waited between searches
@@ -76,14 +83,14 @@ public class ComponentSearcher
 		}
 		else
 		{
-			System.out.println("No target search: "+searchtime+" "+ct);
+			System.out.println("No new target search: "+searchtime+" "+ct);
 		}
 			
 		return target;
 	}
 	
 	/**
-	 *  Find a supersuperpeer from a given list of superpeers.
+	 *  Find a target from a given list of targets.
 	 */
 	protected IFuture<IComponentIdentifier> getTarget(boolean force)
 	{
@@ -112,33 +119,32 @@ public class ComponentSearcher
 	}
 	
 	/**
-	 *  Find a supersuperpeer from a given list of superpeers.
+	 *  Find a target from a given list of targets.
 	 */
-	protected IFuture<IComponentIdentifier> searchTarget(final Iterator<IComponentIdentifier> ssps)
+	protected IFuture<IComponentIdentifier> searchTarget(final Iterator<IComponentIdentifier> targets)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		if(ssps!=null && ssps.hasNext())
+		if(targets!=null && targets.hasNext())
 		{
-			final IComponentIdentifier sspcid = ssps.next();
-			ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, ssps.next(), ISuperpeerRegistrySynchronizationService.class);
-			isTargetOk(sspcid).addResultListener(new IResultListener<Boolean>()
+			final IComponentIdentifier t = targets.next();
+			isTargetOk(t).addResultListener(new IResultListener<Boolean>()
 			{
 				public void resultAvailable(Boolean ok) 
 				{
 					if(ok.booleanValue())
 					{
-						ret.setResult(sspcid);
+						ret.setResult(t);
 					}
 					else
 					{
-						searchTarget(ssps);
+						searchTarget(targets);
 					}
 				}
 				
 				public void exceptionOccurred(Exception exception) 
 				{
-					searchTarget(ssps);
+					searchTarget(targets);
 				}
 			});
 		}
@@ -192,7 +198,8 @@ public class ComponentSearcher
 	}
 	
 	/**
-	 * 
+	 *  Get the component.
+	 *  @return The component.
 	 */
 	public IInternalAccess getComponent()
 	{

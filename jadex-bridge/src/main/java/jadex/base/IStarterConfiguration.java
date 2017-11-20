@@ -73,6 +73,9 @@ public interface IStarterConfiguration
 
     /** Flag to enable or disable the platform as superpeer. **/
     public static final String SUPERPEER = "superpeer";
+    
+    /** Flag to enable or disable the platform as supersuperpeer. **/
+    public static final String SUPERSUPERPEER = "supersuperpeer";
 
     /** Flag to enable or disable the platform as superpeern client. **/
     public static final String SUPERPEERCLIENT = "superpeerclient";
