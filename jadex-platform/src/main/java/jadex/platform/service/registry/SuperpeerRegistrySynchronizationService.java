@@ -40,6 +40,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
@@ -54,7 +55,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
  *  
  *  Has two behaviors:
  *  a) allows others to subscribe and sends updates according to local service registry
- *  b) uses awareness to detect new platforms and searches the ISuperpeerRegistrySynchronizationService for them. Subscribes at those.
+ *  b) uses awareness to detect new platforms and searches the ISuperpeerRegistrySynchronizationService for them. Subscribes at those of same level.
  */
 public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegistrySynchronizationService
 {
@@ -127,6 +128,31 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	/**
 	 *  Find a supersuperpeer from a given list of superpeers.
 	 */
+	protected IFuture<ISuperpeerRegistrySynchronizationService> getSupersuperpeerService(boolean force)
+	{
+		final Future<ISuperpeerRegistrySynchronizationService> ret = new Future<ISuperpeerRegistrySynchronizationService>();
+		getSupersuperpeer(force).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, ISuperpeerRegistrySynchronizationService>(ret)
+		{
+			public void customResultAvailable(IComponentIdentifier result) throws Exception
+			{
+				try
+				{
+					ISuperpeerRegistrySynchronizationService res = SServiceProvider.getServiceProxy(component, result, ISuperpeerRegistrySynchronizationService.class);
+					ret.setResult(res);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
+	
+		return ret;
+	}
+	
+	/**
+	 *  Find a supersuperpeer from a given list of superpeers.
+	 */
 	protected IFuture<IComponentIdentifier> getSupersuperpeer()
 	{
 		return getSupersuperpeer(false);
@@ -148,7 +174,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			ret.setResult(supersuperpeer);
 		}
-		else if(potentialsupersuperpeers!=null && (lastsearch==0 || lastsearch+searchdelay>ct))
+		else if(potentialsupersuperpeers!=null && (lastsearch==0 || lastsearch+searchdelay<ct))
 		{
 			lastsearch = ct;
 			
@@ -161,6 +187,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					super.customResultAvailable(result);
 				}
 			});
+		}
+		else
+		{
+			ret.setException(new RuntimeException("No search possible"));
 		}
 		
 		return ret;
@@ -175,7 +205,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		
 		if(ssps!=null && ssps.hasNext())
 		{
-			final IComponentIdentifier sspcid = ssps.next();
+			final IComponentIdentifier sspcid = new ComponentIdentifier("registrysuperpeer@"+ssps.next().getPlatformName());
 			try
 			{
 				ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
@@ -183,25 +213,25 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				{
 					public void resultAvailable(Integer result) 
 					{
-						if(internalGetLevel()==result.intValue())
+						if(internalGetLevel()-1==result.intValue())
 						{
 							ret.setResult(sspcid);
 						}
 						else
 						{
-							findSupersuperpeer(ssps);
+							findSupersuperpeer(ssps).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 						}
 					}
 					
 					public void exceptionOccurred(Exception exception) 
 					{
-						findSupersuperpeer(ssps);
+						findSupersuperpeer(ssps).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 					}
 				});
 			}
 			catch(ServiceNotFoundException e)
 			{
-				findSupersuperpeer(ssps);
+				findSupersuperpeer(ssps).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		}
 		else
@@ -218,15 +248,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	@ServiceStart
 	public void init()
 	{
-		// search supersuperpeer
-		getSupersuperpeer(true).addResultListener(new DefaultResultListener<IComponentIdentifier>()
-		{
-			@Override
-			public void resultAvailable(IComponentIdentifier result)
-			{
-			}
-		});
-		
 		// Subscribe to changes of the local registry to inform other platforms
 		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component))//, eventslimit, timelimit)
 		{
@@ -236,6 +257,100 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				forwardRegistryEvent(event);
 			}
 		};
+		
+		// Send regularily alive to the supersuperpeer
+		if(level!=0)
+		{
+			component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			{
+				boolean force = false;
+				
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					final IComponentStep<Void> step = this;
+					
+					System.out.println("start supersuperpeer search");
+					
+					// search supersuperpeer
+					getSupersuperpeerService(force).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+					{
+						public void resultAvailable(final ISuperpeerRegistrySynchronizationService sspser)
+						{
+							System.out.println("supersuperpeer: "+sspser);
+							force = false;
+							
+							IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
+							{
+								public void resultAvailable(RegistryUpdateEvent spevent) 
+								{
+									if(spevent.isRemoved())
+									{
+										RegistryEvent event = new RegistryEvent(true);
+										event.addAddedService((IService)SServiceProvider.getLocalService(component, ISuperpeerRegistrySynchronizationService.class));
+										sspser.updateClientData(event).addResultListener(this);
+	//									System.out.println("Send update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+									}
+									// Calls notify observers at latest 
+									
+									searchOn((long)(spevent.getLeasetime()*0.9));
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									// Exception during update call on supersuperpeer
+									// Supersuperpeer could have vanished or network partition
+									
+									System.out.println("Exception with supersuperpeer, resetting");
+									
+									exception.printStackTrace();
+									
+									force = true;
+								}
+							};
+							
+							RegistryEvent event = new RegistryEvent(true);
+	//						event.addAddedService((IService)SServiceProvider.getLocalService(component, ISuperpeerRegistrySynchronizationService.class));
+							
+	//						System.out.println("updateCientData called: "+System.currentTimeMillis());
+							sspser.updateClientData(event).addResultListener(lis);
+	//						if(event.size()>0)
+	//						{
+	//							System.out.println("Send superpeer update to supersuperpeer: "+((IService)sspregser).getServiceIdentifier().getProviderId());
+	//							System.out.println("Event is: "+event);
+	//						}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							System.out.println("supersuperpeer ex: "+exception);
+							searchOn(searchdelay);
+						}
+						
+						/**
+						 *  Search on.
+						 */
+						protected void searchOn(long delay)
+						{
+							component.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step)
+								.addResultListener(new DefaultResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+								}
+							});
+						}
+					});
+					
+					return IFuture.DONE;
+				}
+			}).addResultListener(new DefaultResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+			});
+		}
 		
 		// Subscribe to awareness service to get informed when new platforms are discovered
 		// todo: does not work without awareness

@@ -20,6 +20,7 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
@@ -38,6 +39,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -2417,9 +2419,10 @@ public class SServiceProvider
 	 *  Gets a proxy for a known service at a target component.
 	 *  @return Service proxy.
 	 */
-	public static <S> S getServiceProxy(IInternalAccess component, IComponentIdentifier providerid, Class<S> servicetype)
+	public static <S> S getServiceProxy(IInternalAccess component, final IComponentIdentifier providerid, final Class<S> servicetype)
 	{				
 		S ret = null;
+		
 		boolean local = component.getComponentIdentifier().getRoot().equals(providerid.getRoot());
 		if(local)
 		{
@@ -2429,9 +2432,35 @@ public class SServiceProvider
 		{
 			try
 			{
+				final IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, "NULL", servicetype, null, null, RequiredServiceInfo.SCOPE_GLOBAL, true);
+
 				Class<?>[] interfaces = new Class[]{servicetype, IService.class};
 				ProxyInfo pi = new ProxyInfo(interfaces);
-				IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, "NULL", servicetype, null, null, RequiredServiceInfo.SCOPE_GLOBAL, true);
+				pi.addMethodReplacement(new MethodInfo("equals", new Class[]{Object.class}), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
+							&& ProxyFactory.getInvocationHandler(obj).equals(ProxyFactory.getInvocationHandler(args[0])));
+					}
+				});
+				pi.addMethodReplacement(new MethodInfo("hashCode", new Class[0]), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return Integer.valueOf(ProxyFactory.getInvocationHandler(obj).hashCode());
+					}
+				});
+				pi.addMethodReplacement(new MethodInfo("toString", new Class[0]), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return "Fake proxy for service("+sid+")";
+					}
+				});
+				Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
+				pi.addExcludedMethod(new MethodInfo(getclass));
+				
 				RemoteReference rr = new RemoteReference(providerid, sid);
 				ProxyReference pr = new ProxyReference(pi, rr);
 				Class<?> h = SReflect.classForName0("jadex.platform.service.serialization.RemoteMethodInvocationHandler", null);

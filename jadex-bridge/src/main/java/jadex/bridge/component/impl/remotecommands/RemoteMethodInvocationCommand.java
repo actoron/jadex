@@ -121,6 +121,10 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 					Object	service	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 					ret	= m.invoke(service, args);
 				}
+				catch(NullPointerException nex)
+				{
+					ret	= new Future<Object>(nex);
+				}
 				catch(Exception e)
 				{
 					ret	= new Future<Object>(e);
