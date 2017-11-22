@@ -950,6 +950,22 @@ public interface IRootComponentConfiguration
     public void setRelayAddress(String value);
     
     /**
+     *  Checks if the relay transport should support
+     *  routing through dynamically acquired peers.
+     *  
+     *  @return True, if the routing service should support dynamic routing.
+     */
+    public boolean isDynamicRouting();
+    
+    /**
+     *  Sets if the relay transport should support
+     *  routing through dynamically acquired peers.
+     * 
+     *  @param dynamicrouting If true, the routing service should support dynamic routing.
+     */
+    public void setDynamicRouting(boolean dynamicrouting);
+    
+    /**
      *  Get the flag if the ws transport is active.
      *  @return Flag if the ws transport is active.
      */
@@ -1246,7 +1262,7 @@ public interface IRootComponentConfiguration
      *  Get the superpeer client flag.
      *  @return The superpeer client flag.
      */
-    boolean getSuperpeerClient();
+    public boolean getSuperpeerClient();
 
     /**
      *  Set the superpeer client flag.
