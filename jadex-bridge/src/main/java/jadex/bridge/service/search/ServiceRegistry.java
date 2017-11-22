@@ -352,7 +352,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("No superpeer found");
+//							System.out.println("No superpeer found");
 						}
 					});
 				}

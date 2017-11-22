@@ -354,7 +354,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress"),
-				@NameValue(name="forwarding", value="$args.relayforwarding")
+				@NameValue(name="forwarding", value="$args.relayforwarding"),
+				@NameValue(name="dynamicrouting", value="$args.dynamicrouting")
 			}),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -435,7 +436,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress"),
-				@NameValue(name="forwarding", value="$args.relayforwarding")
+				@NameValue(name="forwarding", value="$args.relayforwarding"),
+				@NameValue(name="dynamicrouting", value="$args.dynamicrouting")
 			}),
 	}),
 	@Configuration(name="minimal", arguments={
@@ -492,7 +494,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
 				@NameValue(name="relays", value="$args.relayaddress"),
-				@NameValue(name="forwarding", value="$args.relayforwarding")
+				@NameValue(name="forwarding", value="$args.relayforwarding"),
+				@NameValue(name="dynamicrouting", value="$args.dynamicrouting")
 			}),
 	}),
 })
