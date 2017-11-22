@@ -94,6 +94,14 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			ret = values;
 		}
+		else if(mname.equals("enhanceWith"))
+		{
+			Map<String, Object>	other	= ((PlatformConfigurationHandler)ProxyFactory.getInvocationHandler(args[0])).values;
+	        for(Map.Entry<String, Object> entry : other.entrySet())
+	        {
+	            values.put(entry.getKey(), entry.getValue());
+	        }
+		}
 //		else if(mname.equals("getComponentFactory"))
 //		{
 //			 return (String)values.get(IStarterConfiguration.COMPONENT_FACTORY)!=null?

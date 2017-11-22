@@ -11,7 +11,6 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
-import jadex.bridge.service.types.registry.IRegistryEvent;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryUpdateEvent;

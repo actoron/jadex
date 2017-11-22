@@ -60,6 +60,7 @@ import static jadex.base.IRootComponentConfiguration.WELCOME;
 import static jadex.base.IRootComponentConfiguration.WSPORT;
 import static jadex.base.IRootComponentConfiguration.WSPUBLISH;
 import static jadex.base.IRootComponentConfiguration.WSTRANSPORT;
+import static jadex.base.IRootComponentConfiguration.SUPERSUPERPEER;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -197,7 +198,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="$args.superpeer==null? true: !$args.superpeer")
+	@Argument(name=SUPERSUPERPEER, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer")
 })
 
 @ComponentTypes({
@@ -313,16 +315,21 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+		arguments={
+			@NameValue(name="mechanisms", value="$args.awamechanisms"),
+			@NameValue(name="delay", value="$args.awadelay"),
+			@NameValue(name="fast", value="$args.awafast"),
+			@NameValue(name="includes", value="$args.awaincludes"),
+			@NameValue(name="excludes", value="$args.awaexcludes")}),
+		
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
+			arguments={
+				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
+			}
+		),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-			arguments={
-				@NameValue(name="mechanisms", value="$args.awamechanisms"),
-				@NameValue(name="delay", value="$args.awadelay"),
-				@NameValue(name="fast", value="$args.awafast"),
-				@NameValue(name="includes", value="$args.awaincludes"),
-				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={
@@ -393,13 +400,19 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+		arguments={
+			@NameValue(name="mechanisms", value="$args.awamechanisms"),
+			@NameValue(name="includes", value="$args.awaincludes"),
+			@NameValue(name="excludes", value="$args.awaexcludes")}),
+		
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
 			arguments={
-				@NameValue(name="mechanisms", value="$args.awamechanisms"),
-				@NameValue(name="includes", value="$args.awaincludes"),
-				@NameValue(name="excludes", value="$args.awaexcludes")}),
+				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
+			}
+		),
+		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
+		
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={
@@ -455,7 +468,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		}),
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer? 1 : 0"),
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 
 		// not requested as service
