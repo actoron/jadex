@@ -1,5 +1,7 @@
 package jadex.platform.service.registry;
 
+import java.util.Arrays;
+
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -43,7 +45,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public void init()
 	{
 		// Subscribe to changes of the local registry to inform my superpeer
-		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component))
+		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component), true)
 		{
 			public void notifyObservers(final RegistryEvent event)
 			{
@@ -59,6 +61,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						{
 							public void resultAvailable(RegistryUpdateEvent spevent) 
 							{
+								System.out.println("registry update event: "+Arrays.toString(spevent.getSuperpeers()));
+								
 								if(spevent.isRemoved())
 								{
 									spser.updateClientData(lrobs.getCurrentStateEvent()).addResultListener(this);

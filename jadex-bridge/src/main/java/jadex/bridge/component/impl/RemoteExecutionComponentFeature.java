@@ -328,9 +328,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
 						Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
+//						if(nonfunc==null)
+//							nonfunc = new HashMap<String, Object>();
+//						nonfunc.put("securityinfo", secinfos);
 						IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
 						// Local is used to set the caller in the new service call context
-						sc	= ServiceCall.getOrCreateNextInvocation(nonfunc);
+						sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
 						// After call creation it can be reset
 						IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
 					}
@@ -346,7 +349,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					final IResultListener<Void>	term;
 					if(retfut instanceof ITerminableFuture)
 					{
-						term	= new IResultListener<Void>()
+						term = new IResultListener<Void>()
 						{
 							public void exceptionOccurred(Exception exception)
 							{

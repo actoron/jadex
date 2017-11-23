@@ -24,7 +24,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- *  Service query definition.
+ *  Service query definition. T is the return type for search methods.
  */
 public class ServiceQuery<T>
 {

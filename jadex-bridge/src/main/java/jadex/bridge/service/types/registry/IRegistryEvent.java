@@ -9,6 +9,10 @@ import jadex.bridge.service.IService;
  */
 public interface IRegistryEvent
 {
+	public static final String CLIENTTYPE_CLIENT = "client";
+	public static final String CLIENTTYPE_SUPERPEER_LEVEL0 = "superpeer_0";
+	public static final String CLIENTTYPE_SUPERPEER_LEVEL1 = "superpeer_1";
+	
 	/**
 	 *  Get the addedservices.
 	 *  @return The addedservices
@@ -33,4 +37,18 @@ public interface IRegistryEvent
 	 *  @return The number of contained changes.
 	 */
 	public int size();
+	
+	
+	
+	/**
+	 *  Get the client type.
+	 *  @return The client type.
+	 */
+	public String getClientType();
+	
+	/**
+	 *  Get the networknames.
+	 *  @return The networknames.
+	 */
+	public String[] getNetworkNames();
 }

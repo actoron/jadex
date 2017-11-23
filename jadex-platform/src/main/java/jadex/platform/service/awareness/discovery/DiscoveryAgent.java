@@ -58,7 +58,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })*/
 @ProvidedServices(
-	@ProvidedService(type=IDiscoveryService.class)
+	@ProvidedService(type=IDiscoveryService.class, scope=Binding.SCOPE_PLATFORM)
 )
 @RequiredServices(
 {

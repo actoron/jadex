@@ -26,6 +26,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -37,7 +38,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Description("This agent represents a proxy for a remote component.")
 @Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
-@ProvidedServices(@ProvidedService(type=IProxyAgentService.class))
+@ProvidedServices(@ProvidedService(type=IProxyAgentService.class, scope=Binding.SCOPE_PLATFORM))
 @NFProperties(@NFProperty(ProxyLatencyProperty.class))
 @Service
 @Agent

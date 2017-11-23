@@ -6,6 +6,7 @@ import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -31,8 +32,8 @@ import jadex.micro.annotation.ProvidedServices;
 	@Argument(name="kerneluriregex", description="Regular expression identifying kernel URIs  (ignored on android as there is only the DEX file).",
 		clazz=String.class, defaultvalue="jadex.commons.SReflect.isAndroid() ? \".*\" : \".*[Kk]ernel.*\"")})
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.potentialkernels, $args.ignorekernels, $args.ignoreextensions)")),
-	@ProvidedService(type=IMultiKernelNotifierService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
+	@ProvidedService(type=IComponentFactory.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.kernelbase.MultiFactory($args.defaultkernels, $args.potentialkernels, $args.ignorekernels, $args.ignoreextensions)")),
+	@ProvidedService(type=IMultiKernelNotifierService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
 @ComponentTypes({
 	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")

@@ -101,7 +101,7 @@ import jadex.micro.annotation.RequiredServices;
 })*/
 //@Properties({@NameValue(name="system", value="true"), @NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettings\"}")})
 @ProvidedServices(
-	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$pojoagent"))
+	@ProvidedService(type=IAwarenessManagementService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent"))
 )
 @RequiredServices(
 {

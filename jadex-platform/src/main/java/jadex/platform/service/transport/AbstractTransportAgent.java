@@ -57,7 +57,7 @@ import jadex.micro.annotation.ProvidedServices;
  * @param <Con> A custom object type to hold connection information as required by the concrete transport.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
+@ProvidedServices(@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 public abstract class AbstractTransportAgent<Con> implements ITransportService, IInternalService, ITransportHandler<Con>
 {
 	// -------- arguments --------

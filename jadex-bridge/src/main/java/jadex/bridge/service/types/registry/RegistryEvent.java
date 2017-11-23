@@ -30,6 +30,15 @@ public class RegistryEvent implements IRegistryEvent
 	/** Flag if is delta (or full) registry content. */
 	protected boolean delta;
 	
+	
+	//-------- for superpeer supersuperpeer interaction --------
+	
+	/** The client type (client, superpeer_1, superpeer_0, ...). */
+	protected String clienttype;
+	
+	/** The network names. */
+	protected String[] networknames;
+	
 	/**
 	 *  Create a new registry event.
 	 */
@@ -43,7 +52,15 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public RegistryEvent(boolean delta)
 	{
-		this(null, null, 50, 5000, delta);
+		this(null, null, 50, 5000, delta, null);
+	}
+	
+	/**
+	 *  Create a new registry event.
+	 */
+	public RegistryEvent(boolean delta, String clienttype)
+	{
+		this(null, null, 50, 5000, delta, clienttype);
 	}
 	
 	/**
@@ -51,7 +68,7 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public RegistryEvent(boolean delta, long timelimit)
 	{
-		this(null, null, 50, timelimit, delta);
+		this(null, null, 50, timelimit, delta, null);
 	}
 	
 	/**
@@ -59,12 +76,13 @@ public class RegistryEvent implements IRegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta)
+	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta, String clienttype)
 	{
 		this.eventslimit = eventslimit;
 		this.timelimit = timelimit;
 		this.timestamp = System.currentTimeMillis();
 		this.delta = delta;
+		this.clienttype = clienttype==null? IRegistryEvent.CLIENTTYPE_CLIENT: clienttype;
 		setAddedServices(addedservices);
 		setRemovedServices(removedservices);
 	}
@@ -161,6 +179,42 @@ public class RegistryEvent implements IRegistryEvent
 	public void setDelta(boolean delta)
 	{
 		this.delta = delta;
+	}
+	
+	/**
+	 *  Get the client type.
+	 *  @return The client type.
+	 */
+	public String getClientType()
+	{
+		return clienttype;
+	}
+
+	/**
+	 *  Set the client type.
+	 *  @param clienttype The client type to set.
+	 */
+	public void setClientType(String clienttype)
+	{
+		this.clienttype = clienttype;
+	}
+	
+	/**
+	 *  Get the networknames.
+	 *  @return The networknames.
+	 */
+	public String[] getNetworkNames()
+	{
+		return networknames;
+	}
+
+	/**
+	 *  Set the network names.
+	 *  @param networknames The networknames to set.
+	 */
+	public void setNetworkNames(String[] networknames)
+	{
+		this.networknames = networknames;
 	}
 
 	/**
