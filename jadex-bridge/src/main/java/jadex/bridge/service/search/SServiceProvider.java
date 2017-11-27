@@ -1431,7 +1431,7 @@ public class SServiceProvider
 	{
 		checkComponent(component);
 		if(proxy && !component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-			throw new RuntimeException("Must be called on component thread. Use methods with external access otherwise.");
+			throw new RuntimeException("Must be called on component thread. Called component is "+component+" calling component is "+IComponentIdentifier.LOCAL.get()+". Use methods with external access otherwise.");
 	}
 	
 	/**
