@@ -1,9 +1,11 @@
-package jadex.launch.test;
+package jadex.tools.jcc.test;
 
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.BasicComponentIdentifier;
@@ -33,11 +35,9 @@ public class JCCTest //extends TestCase
 	public void	testJCC()
 	{
 //		System.err.println("starting platform");
-		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-//			"-logging", "true",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false",
-			"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-			});
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
+		config.setGui(true);
+		IFuture<IExternalAccess>	fut	= Starter.createPlatform(config);
 		
 		long timeout = Starter.getLocalDefaultTimeout(null);
 //		ISuspendable	sus	= 	new ThreadSuspendable();
