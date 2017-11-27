@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -223,14 +224,14 @@ public class NFPropertyProvider implements INFPropertyProvider
 			if(getParentId()!=null)
 			{
 				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				cms.getExternalAccess(getParentId()).addResultListener(new ComponentResultListener<IExternalAccess>(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
-					public void customResultAvailable(IExternalAccess component) 
+					public void customResultAvailable(IExternalAccess pacomponent) 
 					{
-						IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(component, name);
-						res.addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(pacomponent, name);
+						res.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), component));
 					}
-				});
+				}, component));
 			}
 			else
 			{

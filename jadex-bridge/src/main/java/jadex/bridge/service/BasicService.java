@@ -302,6 +302,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //		setParent(internalaccess.getExternalAccess());
 //		
 //		// init properties when access is available
+		
 		return initNFProperties();
 		
 //		return IFuture.DONE;
@@ -327,11 +328,12 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 					.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 			{
 				public void customResultAvailable(Void result) throws Exception
-				{
+				{					
 					nfcf.getProvidedServicePropertyProvider(sid).getNFPropertyValue(TagProperty.NAME).addResultListener(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)
 						{
+//							System.out.println("Starting serviceINIT: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 							Collection<String> coll = (Collection<String>)result;
 							if(coll!=null && coll.size()>0)
 							{
@@ -352,6 +354,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 						
 						public void exceptionOccurred(Exception exception)
 						{
+//							exception.printStackTrace();
+//							System.out.println("Starting serviceINITEX: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 							ret.setResult(null);
 						}
 					});

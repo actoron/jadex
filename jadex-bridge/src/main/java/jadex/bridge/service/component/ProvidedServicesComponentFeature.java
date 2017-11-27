@@ -445,11 +445,12 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	protected IFuture<Void> initService(final IInternalService is)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.getLogger().info("Starting service: "+is.getServiceIdentifier());
+		component.getLogger().info("Starting service: "+is.getServiceIdentifier()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 		is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
+//				System.out.println("Starting service: "+is.getServiceIdentifier()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 				is.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)

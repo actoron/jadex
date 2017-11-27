@@ -1598,9 +1598,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void setComponentThread(Thread componentthread)
 	{
-		System.out.println(getComponent().getComponentIdentifier().getLocalName()+" "+componentthread);
-		if("clock".equals(getComponent().getComponentIdentifier().getLocalName()) && componentthread==null)
-			System.out.println("clock thread to null");
+//		System.out.println(getComponent().getComponentIdentifier().getLocalName()+" "+componentthread);
+//		if("clock".equals(getComponent().getComponentIdentifier().getLocalName()) && componentthread==null)
+//			System.out.println("clock thread to null");
 		this.componentthread = componentthread;
 	}
 

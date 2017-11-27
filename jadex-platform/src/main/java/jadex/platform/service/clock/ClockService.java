@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TimerTask;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -311,7 +312,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public IFuture<Void> startService()
 	{
-//		System.out.println("start clock: "+this);
+		System.out.println("start clock: "+this+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 		
 		final Future<Void> ret = new Future<Void>();
 
