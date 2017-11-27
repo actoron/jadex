@@ -312,12 +312,12 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public IFuture<Void> startService()
 	{
-		System.out.println("start clock: "+this+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+//		System.out.println("start clock: "+this+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 		
 		final Future<Void> ret = new Future<Void>();
 
 		threadpool = SServiceProvider.getLocalService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
-		ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 
 //		System.out.println("clock: "+ServiceCall.get);
 		

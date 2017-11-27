@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.management.ServiceNotFoundException;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
@@ -119,7 +121,14 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 				{
 					Method	m	= method.getMethod(access.getClassLoader());
 					Object	service	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
-					ret	= m.invoke(service, args);
+					if(service==null)
+					{
+						ret = new Future<Object>(new ServiceNotFoundException(sid.getServiceType()+" on component: "+access));
+					}
+					else
+					{
+						ret	= m.invoke(service, args);
+					}
 				}
 				catch(NullPointerException nex)
 				{

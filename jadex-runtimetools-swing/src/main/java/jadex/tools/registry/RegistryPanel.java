@@ -110,6 +110,9 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	/** The make superpeer/peer button. */
 	protected JButton buswitchpeer;
 	
+	/** fetch superpeer button. */
+	protected JButton bufetchpeer;
+	
 	/** The tabbed pane. */
 	protected JTabbedPane tpane;
 	
@@ -175,10 +178,20 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 		});
 		
+		bufetchpeer = new JButton("Refresh");
+		bufetchpeer.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fetchSuperpeer();
+			}
+		});
+		
 		JPanel psp = new JPanel(new GridBagLayout());
 		psp.add(lsp, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		psp.add(tfsuperpeer, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		psp.add(buswitchpeer, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		psp.add(bufetchpeer, new GridBagConstraints(3, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 
 		// create panel with service table
 		JPanel pserinfos = new JPanel(new BorderLayout());
@@ -425,32 +438,78 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+//		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
+//		{
+//			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
+//			{
+//				tfsuperpeer.setText("self");
+//				buswitchpeer.setEnabled(true);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				tfsuperpeer.setText("fetching ...");
+//				
+//				executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
+//				{
+//					public Object execute(IServiceRegistry reg)
+//					{
+//						return reg.getSuperpeer();
+//					}
+//				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						IComponentIdentifier cid = (IComponentIdentifier)result;
+//						tfsuperpeer.setText(cid==null? "n/a": cid.getName());
+//						buswitchpeer.setEnabled(true);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						if(exception instanceof ComponentNotFoundException || exception instanceof ServiceNotFoundException)
+//						{
+//							tfsuperpeer.setText("None");
+//						}
+//						else
+//						{
+//							tfsuperpeer.setText("Error: "+exception.getMessage());
+//						}
+//						buswitchpeer.setEnabled(true);
+//					}
+//				}));
+//			}
+//		});
+		
+		fetchSuperpeer();
+	}
+	
+	/**
+	 *  Fetch superpeer info.
+	 */
+	protected void fetchSuperpeer()
+	{
+		SServiceProvider.getService(getActiveComponent(), IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
 		{
-			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
+			public void exceptionOccurred(Exception exception)
 			{
 				tfsuperpeer.setText("self");
-				buswitchpeer.setEnabled(true);
+				bufetchpeer.setEnabled(true);
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void resultAvailable(IPeerRegistrySynchronizationService sps)
 			{
 				tfsuperpeer.setText("fetching ...");
 				
-				executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
+				sps.getSuperpeer(false).addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 				{
-					public Object execute(IServiceRegistry reg)
-					{
-						return reg.getSuperpeer(false);
-					}
-				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
-				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IComponentIdentifier result)
 					{
 						IComponentIdentifier cid = (IComponentIdentifier)result;
-						tfsuperpeer.setText(cid.getName());
-						buswitchpeer.setEnabled(true);
+						tfsuperpeer.setText(cid==null? "n/a": cid.getName());
+						bufetchpeer.setEnabled(true);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -463,7 +522,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 						{
 							tfsuperpeer.setText("Error: "+exception.getMessage());
 						}
-						buswitchpeer.setEnabled(true);
+						bufetchpeer.setEnabled(true);
 					}
 				}));
 			}

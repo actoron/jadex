@@ -88,6 +88,12 @@ public class Starter
 
     /** Constant for remote default timeout name. */
     public static String DATA_DEFAULT_REMOTE_TIMEOUT = "default_remote_timeout";
+    
+    // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
+//    /** Constant for the superpeer. */
+//    public static String DATA_SUPERPEER = "superpeer";
+
+    
 
 	/** Global platform data. For each platform stored by  */
 	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();

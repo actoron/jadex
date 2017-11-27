@@ -128,12 +128,12 @@ public interface IServiceRegistry
 	// read
 	public boolean isIncluded(IComponentIdentifier cid, IService ser);
 	
-	/**
-	 *  Get the superpeer.
-	 *  @param force If trues forces fresh search.
-	 *  @return The superpeer.
-	 */
-	public IFuture<IComponentIdentifier> getSuperpeer(boolean force);
+//	/**
+//	 *  Get the superpeer.
+//	 *  @param force If trues forces fresh search.
+//	 *  @return The superpeer.
+//	 */
+//	public IFuture<IComponentIdentifier> getSuperpeer(boolean force);
 	
 	/**
 	 *  Get all services.
@@ -146,4 +146,18 @@ public interface IServiceRegistry
 	 *  @return All queries (copy).
 	 */
 	public Set<ServiceQueryInfo<IService>> getAllQueries();
+	
+	
+	// todo: move superpeer to platform data?! 
+	/**
+	 *  Get the superpeer.
+	 *  @return the superpeer.
+	 */
+	public IComponentIdentifier getSuperpeer();
+
+	/**
+	 *  Set the superpeer.
+	 *  @param superpeer The superpeer to set.
+	 */
+	public void setSuperpeer(IComponentIdentifier superpeer);
 }

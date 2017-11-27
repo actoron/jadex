@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -25,7 +24,6 @@ import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.ChangeEvent;
@@ -85,10 +83,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected long delay;
 	
 	/** The selected superpeer. */
-	protected volatile IComponentIdentifier superpeer;
+	protected IComponentIdentifier superpeer;
 	
-	/** The superpeer search time. */
-	protected volatile long searchtime;
+//	/** The superpeer search time. */
+//	protected volatile long searchtime;
 	
 	//-------- methods --------
 	
@@ -146,57 +144,57 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //		return getSuperpeer()!=null;
 //	}
 
-	/**
-	 *  Get the superpeer.
-	 *  @param force If true searches superpeer anew.
-	 *  @return The superpeer.
-	 */
-	public IFuture<IComponentIdentifier> getSuperpeer(boolean force)
-	{
-		if(force)
-			resetSuperpeer();
-		
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		
-		if(superpeer!=null)
-		{
-			ret.setResult(superpeer);
-		}
-		else
-		{
-			long ct = System.currentTimeMillis();
-			if(superpeer==null && searchtime<ct)
-			{
-				synchronized(this)
-				{
-					if(superpeer==null && searchtime<ct)
-					{
-						// Ensure that a delay is waited between searches
-						searchtime = ct+delay;
-						searchSuperpeer().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
-								superpeer = result;
-								addQueriesToNewSuperpeer();
-								super.customResultAvailable(result);
-							}
-						});
-					}
-					else
-					{
-						ret.setException(new ComponentNotFoundException("No superpeer found."));
-					}
-				}
-			}
-			else
-			{
-				ret.setException(new ComponentNotFoundException("No superpeer found."));
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the superpeer.
+//	 *  @param force If true searches superpeer anew.
+//	 *  @return The superpeer.
+//	 */
+//	public IFuture<IComponentIdentifier> getSuperpeer(boolean force)
+//	{
+//		if(force)
+//			resetSuperpeer();
+//		
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		if(superpeer!=null)
+//		{
+//			ret.setResult(superpeer);
+//		}
+//		else
+//		{
+//			long ct = System.currentTimeMillis();
+//			if(superpeer==null && searchtime<ct)
+//			{
+//				synchronized(this)
+//				{
+//					if(superpeer==null && searchtime<ct)
+//					{
+//						// Ensure that a delay is waited between searches
+//						searchtime = ct+delay;
+//						searchSuperpeer().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+//						{
+//							public void customResultAvailable(IComponentIdentifier result)
+//							{
+//								superpeer = result;
+//								addQueriesToNewSuperpeer();
+//								super.customResultAvailable(result);
+//							}
+//						});
+//					}
+//					else
+//					{
+//						ret.setException(new ComponentNotFoundException("No superpeer found."));
+//					}
+//				}
+//			}
+//			else
+//			{
+//				ret.setException(new ComponentNotFoundException("No superpeer found."));
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Adapt the existing queries to a new superpeer.
@@ -233,21 +231,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param spcid The platform id.
 	 *  @param sqi The query.
 	 */
-	protected <T> ISubscriptionIntermediateFuture<T> addQueryOnPlatform(IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
+	protected <T> ISubscriptionIntermediateFuture<T> addQueryOnPlatform(final IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
 		if(cms!=null)
 		{
-			cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
+			cms.getExternalAccess(spcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result) throws Exception
 				{
 					try
 					{
 						// Set superpeer in query info for later removal
-						sqi.setSuperpeer(cid);
+						sqi.setSuperpeer(spcid);
 						
 						final ServiceQuery<T> query = sqi.getQuery();
 						
@@ -325,86 +323,86 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		return ret;
 	}
 	
-	/**
-	 *  Get the superpeer. Triggers search in background if none available.
-	 *  @return The superpeer.
-	 */
-	public IComponentIdentifier getSuperpeerSync()
-	{
-		long ct = System.currentTimeMillis();
-		if(superpeer==null && searchtime<ct)
-		{
-			synchronized(this)
-			{
-				if(superpeer==null && searchtime<ct)
-				{
-					// Ensure that a delay is waited between searches
-					searchtime = ct+delay;
-					searchSuperpeer().addResultListener(new IResultListener<IComponentIdentifier>()
-					{
-						public void resultAvailable(IComponentIdentifier result)
-						{
-//							System.out.println("Found superpeer: "+result);
-							superpeer = result;
-							addQueriesToNewSuperpeer();
-							// initiating 
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-//							System.out.println("No superpeer found");
-						}
-					});
-				}
-				else
-				{
-					System.out.println("No superpeer search: "+searchtime+" "+ct);
-				}
-			}
-		}
-			
-		return superpeer;
-	}
+//	/**
+//	 *  Get the superpeer. Triggers search in background if none available.
+//	 *  @return The superpeer.
+//	 */
+//	public IComponentIdentifier getSuperpeerSync()
+//	{
+//		long ct = System.currentTimeMillis();
+//		if(superpeer==null && searchtime<ct)
+//		{
+//			synchronized(this)
+//			{
+//				if(superpeer==null && searchtime<ct)
+//				{
+//					// Ensure that a delay is waited between searches
+//					searchtime = ct+delay;
+//					searchSuperpeer().addResultListener(new IResultListener<IComponentIdentifier>()
+//					{
+//						public void resultAvailable(IComponentIdentifier result)
+//						{
+////							System.out.println("Found superpeer: "+result);
+//							superpeer = result;
+//							addQueriesToNewSuperpeer();
+//							// initiating 
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+////							System.out.println("No superpeer found");
+//						}
+//					});
+//				}
+//				else
+//				{
+//					System.out.println("No superpeer search: "+searchtime+" "+ct);
+//				}
+//			}
+//		}
+//			
+//		return superpeer;
+//	}
 	
-	/**
-	 *  Reset the superpeer.
-	 */
-	public void resetSuperpeer()
-	{
-		this.superpeer = null;
-		this.searchtime = 0;
-	}
+//	/**
+//	 *  Reset the superpeer.
+//	 */
+//	public void resetSuperpeer()
+//	{
+//		this.superpeer = null;
+//		this.searchtime = 0;
+//	}
 		
-	/**
-	 *  Search superpeer by sending requests to all known platforms if they host a IRegistrySynchronizationService service.
-	 *  @return The cids of the superpeers.
-	 */
-	protected IFuture<IComponentIdentifier> searchSuperpeer()
-	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-
-		// Only search for super peer when super peer client agent is running. Otherwise the platform is itself a super peer (hack???)
-		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
-		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
-		{
-//			System.out.println("ask all");
-			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
-				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
-			{
-				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
-				{
-//					System.out.println("found: "+result);
-					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
-				}
-			});
-		}
-		else
-		{
-			ret.setException(new ComponentNotFoundException("No superpeer found."));
-		}
-
-		return ret;
-	}
+//	/**
+//	 *  Search superpeer by sending requests to all known platforms if they host a IRegistrySynchronizationService service.
+//	 *  @return The cids of the superpeers.
+//	 */
+//	protected IFuture<IComponentIdentifier> searchSuperpeer()
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//
+//		// Only search for super peer when super peer client agent is running. Otherwise the platform is itself a super peer (hack???)
+//		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
+//		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
+//		{
+////			System.out.println("ask all");
+//			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
+//				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
+//				{
+////					System.out.println("found: "+result);
+//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setException(new ComponentNotFoundException("No superpeer found."));
+//		}
+//
+//		return ret;
+//	}
 	
 	/**
 	 *  Add a service to the registry.
@@ -710,7 +708,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			else
 			{
-				IComponentIdentifier cid = getSuperpeerSync();
+//				IComponentIdentifier cid = getSuperpeerSync();
+				IComponentIdentifier cid = getSuperpeer();
 				// Search has explicit start point ask there
 				if(query.getProvider()!=null)
 				{
@@ -766,7 +765,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			else
 			{
-				IComponentIdentifier cid = getSuperpeerSync();
+//				IComponentIdentifier cid = getSuperpeerSync();
+				IComponentIdentifier cid = getSuperpeer();
 				// if search has explicit start point ask there
 				if(query.getProvider()!=null)
 				{
@@ -814,7 +814,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			if(!isSuperpeer() && !RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
 			{
 				ISubscriptionIntermediateFuture<T> fut = null;
-				IComponentIdentifier cid = getSuperpeerSync();
+//				IComponentIdentifier cid = getSuperpeerSync();
+				IComponentIdentifier cid = getSuperpeer();
 				if(cid!=null)
 				{
 					// If superpeer is available ask it
@@ -926,7 +927,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
-			if(getSuperpeerSync()!=null)
+//			if(getSuperpeerSync()!=null)
+			if(getSuperpeer()!=null)
 			{
 				final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
 				if(cms!=null)
@@ -1761,7 +1763,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Search for services.
 	 */
-	protected <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByAskAll(ServiceQuery<T> query)
+	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByAskAll(ServiceQuery<T> query)
 	{
 		SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		IIntermediateResultListener<T> reslis = new IntermediateDelegationResultListener<T>(ret)
@@ -2073,7 +2075,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Search for services.
 	 */
-	protected <T> IFuture<T> searchServiceAsyncByAskAll(final ServiceQuery<T> query)
+	public <T> IFuture<T> searchServiceAsyncByAskAll(final ServiceQuery<T> query)
 	{
 //		if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //			System.out.println("searchServiceAsyncByAskAll: "+query);
@@ -2520,6 +2522,25 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		if(ret.getOwner()!=null && !target.equals(ret.getOwner().getRoot()))
 			ret.setOwner(target);
 		return ret;
+	}
+
+	/**
+	 *  Get the superpeer.
+	 *  @return the superpeer.
+	 */
+	public synchronized IComponentIdentifier getSuperpeer()
+	{
+		return superpeer;
+	}
+
+	/**
+	 *  Set the superpeer.
+	 *  @param superpeer The superpeer to set.
+	 */
+	public synchronized void setSuperpeer(IComponentIdentifier superpeer)
+	{
+		this.superpeer = superpeer;
+		addQueriesToNewSuperpeer();
 	}
 
 }
