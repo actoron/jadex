@@ -312,7 +312,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public IFuture<Void> startService()
 	{
-		System.out.println("start clock: "+this+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+//		System.out.println("start clock: "+this+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 		
 		final Future<Void> ret = new Future<Void>();
 
