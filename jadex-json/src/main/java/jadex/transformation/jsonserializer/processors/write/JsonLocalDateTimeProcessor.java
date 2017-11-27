@@ -1,18 +1,12 @@
 package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Type;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
-
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 public class JsonLocalDateTimeProcessor implements ITraverseProcessor
 {
@@ -23,7 +17,7 @@ public class JsonLocalDateTimeProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		boolean ret = (jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor.CHRONOLOCALDATECLASS != null && SReflect.isSupertype(jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor.CHRONOLOCALDATECLASS, clazz)) ||
@@ -40,8 +34,7 @@ public class JsonLocalDateTimeProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		

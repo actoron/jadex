@@ -2,8 +2,10 @@ package jadex.webservice.examples.rs.hello;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
@@ -33,7 +35,7 @@ public class RSHelloTest //extends TestCase
 	public void setUp() throws Exception
 	{
 		hello = new Hello();
-		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null);
+		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null, false);
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new GrizzlyRestServicePublishService();
@@ -46,11 +48,17 @@ public class RSHelloTest //extends TestCase
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		publishService.get();
 
-		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
-//				"-componentfactory", "jadex.component.ComponentComponentFactory",
-//				"-conf", "jadex/platform/Platform.component.xml",
-				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
+
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+		config.setTcpTransport(false);
+		config.setKernels(IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_MICRO);
+		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
+//		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+////				"-componentfactory", "jadex.component.ComponentComponentFactory",
+////				"-conf", "jadex/platform/Platform.component.xml",
+//				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
 
 		extAcc = fut.get();
 	}

@@ -2,8 +2,11 @@ package jadex.commons.security.random;
 
 import java.security.SecureRandom;
 
+import org.bouncycastle.crypto.engines.ChaChaEngine;
+import org.bouncycastle.util.Pack;
+
 import jadex.commons.SUtil;
-import jadex.commons.security.ChaChaBlockGenerator;
+import jadex.commons.security.IEntropySource;
 import jadex.commons.security.SSecurity;
 
 public class ChaCha20Random extends SecureRandom
@@ -11,10 +14,20 @@ public class ChaCha20Random extends SecureRandom
 	/** ID */
 	private static final long serialVersionUID = 0xBD611DFD65C5ABB2L;
 	
-	/** Seeding source, use SSecurity. */
-	protected SecureRandom seedrandom;
+	/** The start value of the block count. */
+	private static final long BLOCK_COUNT_START = Long.MIN_VALUE + 16;
 	
-	protected ChaChaBlockGenerator blockgen = new ChaChaBlockGenerator();
+	/** Entropy source for seeding, use SSecurity. */
+	protected IEntropySource entropysource;
+	
+//	/** ChaCha state */
+//	protected int[] state = new int[16];
+	
+	/** ChaCha base state */
+	protected int[] basestate = new int[10];
+	
+	/** Current block count. */
+	protected long blockcount = BLOCK_COUNT_START;
 	
 	/** The output block. */
 	protected byte[] outputblock = new byte[64];
@@ -22,34 +35,72 @@ public class ChaCha20Random extends SecureRandom
 	/** Pointer to unused output. */
 	protected int outptr = 64;
 	
+	/**
+	 *  Initializes the PRNG.
+	 */
 	public ChaCha20Random()
 	{
-		seedrandom = SSecurity.getSeedRandom();
-		reseed();
+		this(null, null);
 	}
 	
-	public ChaCha20Random(SecureRandom seedrandom)
+	/**
+	 *  Initializes the PRNG.
+	 */
+	public ChaCha20Random(IEntropySource seedrandom)
 	{
-		this.seedrandom = seedrandom;
-		reseed();
+		this(seedrandom, null);
 	}
 	
+	/**
+	 *  Initializes the PRNG.
+	 */
+	public ChaCha20Random(byte[] initialseed)
+	{
+		this(null, initialseed);
+	}
+	
+	/**
+	 *  Initializes the PRNG.
+	 */
+	public ChaCha20Random(IEntropySource entropysource, byte[] initialseed)
+	{
+		if (initialseed != null && initialseed.length != 40)
+			throw new IllegalArgumentException("Initial seed length must be 40 bytes.");
+		
+		this.entropysource = entropysource == null ? SSecurity.getEntropySource() : entropysource;
+		
+		if (initialseed == null)
+			reseed();
+		else
+			reseed(initialseed);
+	}
+	
+	/** 
+	 *  Gets the next long.
+	 */
 	public long nextLong()
 	{
 		byte[] bytes = new byte[8];
 		nextBytes(bytes);
 		
-		return SUtil.bytesToLong(bytes);
+		return Pack.littleEndianToLong(bytes, 0);
 	}
 	
+	/**
+	 *  Gets the next int.
+	 */
 	public int nextInt()
 	{
 		byte[] bytes = new byte[4];
 		nextBytes(bytes);
 		
-		return SUtil.bytesToInt(bytes);
+		return Pack.littleEndianToInt(bytes, 0);
 	}
 	
+	
+	/**
+	 *  Gets the next bytes.
+	 */
 	public void nextBytes(byte[] bytes)
 	{
 		int filled = 0;
@@ -64,37 +115,63 @@ public class ChaCha20Random extends SecureRandom
 		}
 	}
 	
+	/**
+	 *  Generates the next ChaCha block.
+	 */
 	protected void nextBlock()
 	{
-		if (blockgen.getState()[12] < 0)
+//		if (state[12] < 0)
+//			reseed();
+		
+		if (blockcount < BLOCK_COUNT_START)
 			reseed();
 		
-		blockgen.nextBlock(outputblock);
+		nextBlock(outputblock);
 		
 		outptr = 0;
 	}
 	
+	/**
+	 *  Reseeds the PRNG.
+	 */
 	public void reseed()
 	{
-		byte[] seedstate = new byte[48];
-		seedrandom.nextBytes(seedstate);
-		blockgen.initState(seedstate);
+		byte[] seedstate = new byte[40];
+		entropysource.getEntropy(seedstate);
+		reseed(seedstate);
 	}
 	
-//	public static void main(String[] args)
-//	{
-//		byte[] out = new byte[64];
-//		ChaCha20Random r = new ChaCha20Random();
-//		r.nextBytes(out);
-//		
-//		char[] hexArray = "0123456789ABCDEF".toCharArray();
-//		char[] hexChars = new char[out.length * 2];
-//	    for ( int j = 0; j < out.length; j++ ) {
-//	        int v = out[j] & 0xFF;
-//	        hexChars[j * 2] = hexArray[v >>> 4];
-//	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-//	    }
-//		
-//	    System.out.println(new String(hexChars));
-//	}
+	/**
+	 *  Reseeds the PRNG.
+	 */
+	public void reseed(byte[] providedseed)
+	{
+		Pack.littleEndianToInt(providedseed, 0, basestate);
+		blockcount = BLOCK_COUNT_START;
+	}
+	
+	/**
+	 *  Generate next block (64 bytes).
+	 *  
+	 *  @param outputblock The block.
+	 */
+	public void nextBlock(byte[] outputblock)
+	{
+		assert outputblock.length == 64;
+		
+		int[] state = new int[16];
+		state[0]   = 0x61707865;
+		state[1] = 0x3320646e;
+		state[2] = 0x79622d32;
+		state[3] = 0x6b206574;
+		System.arraycopy(basestate, 0, state, 4, 8);
+		state[12] = (int) blockcount;
+		state[13] = (int) (blockcount >>> 32);
+		state[14] = basestate[8];
+		state[15] = basestate[9];
+		++blockcount;
+		
+		ChaChaEngine.chachaCore(20, state, state);
+		Pack.intToLittleEndian(state, outputblock, 0);
+	}
 }

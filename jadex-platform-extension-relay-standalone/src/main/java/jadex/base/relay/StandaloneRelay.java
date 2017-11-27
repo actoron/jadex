@@ -46,6 +46,7 @@ public class StandaloneRelay
 		String	storepass	= "jadexrelay";
 		String	keyalias		= "jadexrelaykey";
 		String	keypass		= "jadexrelaypass";
+		String  ownUrl = null;
 		boolean	status	= true;
 		
 		for(int i=0; args!=null && i<args.length; i++)
@@ -78,6 +79,10 @@ public class StandaloneRelay
 			{
 				status	= Boolean.parseBoolean(args[i+1]);
 			}
+			else if("-ownurl".equals(args[i]) && i+1<args.length)
+			{
+				ownUrl	= args[i+1];
+			}
 			else if("-help".equals(args[i]))
 			{
 				System.out.println("Jadex Standalone Relay Server Version "+VersionInfo.getInstance().getVersion()+" ("+VersionInfo.getInstance().getTextDateString()+")");
@@ -89,6 +94,7 @@ public class StandaloneRelay
 				System.out.println("-keyalias <alias name>\t(name of the certificate)");
 				System.out.println("-keypass <password>\t(password for the key)");
 				System.out.println("-status <flag>\t\t(show status page on web access, default true)");
+				System.out.println("-ownurl <url>\t\t(url that points to this relay. May also be specified using $RELAY_OWNURL environment variable.)");
 				return;
 			}
 		}
@@ -173,6 +179,18 @@ public class StandaloneRelay
 		}
 		
 		final RelayHandler	handler	= new RelayHandler();
+		if (ownUrl == null) ownUrl = System.getenv("RELAY_OWNURL");
+		if (ownUrl != null) {
+			// hacks to allow pure http urls as parameter
+			if (!ownUrl.startsWith("relay-")) {
+				ownUrl = "relay-" + ownUrl;
+			}
+			if (!ownUrl.endsWith("/")) {
+				ownUrl = ownUrl + "/";
+			}
+			handler.setUrl(ownUrl);
+		}
+		RelayHandler.getLogger().info("Relay own URL is: " + handler.settings.getUrl() != null ? handler.settings.getUrl() : " not set explicitly.");
 		RelayHandler.getLogger().info("Jadex Relay listening on port "+port);
 		while(true)
 		{

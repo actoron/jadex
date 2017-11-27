@@ -38,18 +38,12 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.ImageTranscoder;
-import org.apache.batik.transcoder.image.PNGTranscoder;
-
 import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple3;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 
 /**
  *  Class for providing images, either stored or generated, with a cache.
@@ -459,7 +453,7 @@ public class ImageProvider
 		is.close();
 		try
 		{
-			imagecache = (Map<Object, Image>) BinarySerializer.objectFromByteArray(data, null, null, ImageProvider.class.getClassLoader(), null);
+			imagecache = (Map<Object, Image>) SBinarySerializer.readObjectFromByteArray(data, null, null, ImageProvider.class.getClassLoader(), null);
 		}
 		catch (Exception e)
 		{
@@ -492,7 +486,7 @@ public class ImageProvider
 			}
 		}
 		
-		byte[] data = BinarySerializer.objectToByteArray(imagecache, ImageProvider.class.getClassLoader());
+		byte[] data = SBinarySerializer.writeObjectToByteArray(imagecache, ImageProvider.class.getClassLoader());
 		File tmpfile = File.createTempFile("imagecache", ".cfg");
 		FileOutputStream os = new FileOutputStream(tmpfile);
 		os.write(data);

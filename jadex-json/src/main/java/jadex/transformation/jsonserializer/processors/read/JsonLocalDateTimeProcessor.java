@@ -10,6 +10,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 public class JsonLocalDateTimeProcessor implements ITraverseProcessor
 {
@@ -51,7 +52,7 @@ public class JsonLocalDateTimeProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		boolean ret = (CHRONOLOCALDATECLASS != null && SReflect.isSupertype(CHRONOLOCALDATECLASS, clazz)) ||
@@ -68,8 +69,7 @@ public class JsonLocalDateTimeProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		JsonObject obj = (JsonObject)object;

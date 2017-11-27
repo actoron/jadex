@@ -272,55 +272,44 @@ public class ThreadPool implements IThreadPool
 			this.timer.cancel();
 		}
 		
-		// Must not remove thread, removes itself
-//		while(!pool.isEmpty())
-//		{
-//			ServiceThread thread = (ServiceThread)pool.remove(0);
-//			synchronized(thread)
-//			{
-//				thread.terminated = true;
-//				thread.notify();
-//			}
-//		}
-//		
-//		while(!parked.isEmpty())
-//		{
-//			ServiceThread thread = (ServiceThread)parked.remove(0);
-//			synchronized(thread)
-//			{
-//				thread.terminated = true;
-//				thread.notify();
-//			}
-//		}
-		
 		ServiceThread[] pots = pool.toArray(new ServiceThread[pool.size()]);
 		ServiceThread[] pts = parked.toArray(new ServiceThread[parked.size()]);
 		
-		for(ServiceThread thread: pots)
+		// Notify finished of nothing to shutdown
+		if(pots.length==0 && pts.length==0)
 		{
-			if(WAITING_THREADS.containsKey(thread))
-			{
-//				System.out.println("Killing thread: "+thread);
-				WAITING_THREADS.get(thread).setExceptionIfUndone(new ErrorException(new ThreadDeath()));
-			}
-			synchronized(thread)
-			{
-				thread.terminated = true;
-				thread.notify();
-			}
+			notifyFinishListeners();
 		}
 		
-		for(ServiceThread thread: pts)
+		// Otherwise last thread will notify shutdown
+		else
 		{
-			if(WAITING_THREADS.containsKey(thread))
+			for(ServiceThread thread: pots)
 			{
-//				System.out.println("Killing thread: "+thread);
-				WAITING_THREADS.get(thread).setExceptionIfUndone(new ErrorException(new ThreadDeath()));
+				if(WAITING_THREADS.containsKey(thread))
+				{
+	//				System.out.println("Killing thread: "+thread);
+					WAITING_THREADS.get(thread).setExceptionIfUndone(new ErrorException(new ThreadDeath()));
+				}
+				synchronized(thread)
+				{
+					thread.terminated = true;
+					thread.interrupt();	// wakes up threads in I/O as well
+				}
 			}
-			synchronized(thread)
+			
+			for(ServiceThread thread: pts)
 			{
-				thread.terminated = true;
-				thread.notify();
+				if(WAITING_THREADS.containsKey(thread))
+				{
+	//				System.out.println("Killing thread: "+thread);
+					WAITING_THREADS.get(thread).setExceptionIfUndone(new ErrorException(new ThreadDeath()));
+				}
+				synchronized(thread)
+				{
+					thread.terminated = true;
+					thread.interrupt(); // wakes up threads in I/O as well
+				}
 			}
 		}
 		

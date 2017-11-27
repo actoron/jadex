@@ -30,7 +30,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -268,7 +267,8 @@ public class MessagePerformanceAgent
 										request.put(SFipa.CONTENT, new BenchmarkMessage(scontent, true));
 									}
 									
-									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+//									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(receiver, request);
 									fut.addResultListener(crl);
 									final int fi = i;
 									fut.addResultListener(new IResultListener<Void>()
@@ -367,7 +367,7 @@ public class MessagePerformanceAgent
 	 *  Called on message arrival.
 	 */
 	@AgentMessageArrived
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg)
 	{
 		if(received == 0)
 		{

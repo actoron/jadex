@@ -2,67 +2,94 @@ package jadex.bridge.service.search;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- *  Service query definition.
+ *  Service query definition. T is the return type for search methods.
  */
 public class ServiceQuery<T>
 {
-	/** The return type. */
-	protected ClassInfo returntype;
-	
 	/** The service type. */
 	protected ClassInfo servicetype;
 	
 	/** Tags of the service. */
 	protected String[] servicetags;
 	
+	/** The service provider. (rename serviceowner?) */
+	protected IComponentIdentifier provider;
+	
+	/** The service platform. (Find a service from another known platform, e.g. cms) */
+	protected IComponentIdentifier platform;
+	
+	/** The service ID of the target service. Fast lookup of a service by id. */
+	protected IServiceIdentifier serviceidentifier;
+	
+	/** The network names. */
+	protected String[] networknames;
+	
+	/** Should the service be unrestricted. */
+	protected Boolean unrestricted;
+	
+	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
+	// todo: should be removed or replaced with a more declarative variant
+	protected Object filter;
+	
+	
 	/** The search scope. */
 	protected String scope;
 	
-	/** The query owner. */
+	/** The query owner. (rename queryowner?) */
 	protected IComponentIdentifier owner;
 	
-	/** The service provider. */
-	protected IComponentIdentifier provider;
+	//-------- influence the result --------
 	
-	/** The service platform. */
-	protected IComponentIdentifier platform;
-	
-	/** Flag, if service by the owner should be excluded. */
+	/** Flag, if service by the query owner should be excluded, i.e. do not return my own service. */
 	protected boolean excludeowner;
 	
-	/** The query id. */
+	/** The multiple flag. Search for multiple services */
+	protected boolean multiple;
+	
+	/** The return type. Tell registry to return services or service events. */
+	protected ClassInfo returntype;
+	
+	/** The matching mode for multivalued terms. True is and and false is or. */
+	protected Map<String, Boolean> matchingmodes;
+	
+	//-------- identification of a query --------
+	
+	/** The query id. Id is used for hashcode and equals and the same is used by servicequeryinfo class.
+	    Allows for hashing queryies and use a queryinfo object for lookup. */
 	protected String id;
 	
-	/** 
-	 *  Filter for checking further service attributes.
-	 *  Either IAsyncFilter<T> or IFilter<T>.
-	 */
-	protected Object filter;
-	
-	/** The multiple flag. */
-	protected boolean multiple;
+//	/** Is the query prepared? Prepared means that the query is ready to be processed by the registry. */ 
+//	protected boolean prepared;
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery()
+	protected ServiceQuery()
 	{
+		// Not public to not encourage user to use it.
+		// Here it does NOT set the networknames automatically because used for serialization.
 	}
 	
 //	/**
@@ -201,7 +228,8 @@ public class ServiceQuery<T>
 		this.filter = filter;
 		this.returntype = returntype;
 		
-		this.id = SUtil.createUniqueId(""+servicetype);
+		this.id = SUtil.createUniqueId();
+		this.networknames = getNetworkNames(owner); // Set the networknames to the current set of network names.
 	}
 	
 	/**
@@ -217,6 +245,11 @@ public class ServiceQuery<T>
 		this.filter = original.filter;
 		this.owner = original.owner;
 		this.id = original.id;
+		this.networknames = original.networknames;
+		this.matchingmodes = original.matchingmodes;
+		this.platform	= original.platform;
+		this.provider	= original.provider;
+		this.unrestricted = original.unrestricted;
 	}
 
 	/**
@@ -321,12 +354,23 @@ public class ServiceQuery<T>
 	
 	/**
 	 *  Sets the service tags.
-	 *  
 	 *  @param servicetags The service tags. 
 	 */
 	public void setServiceTags(String[] servicetags)
 	{
+		TagProperty.checkReservedTags(servicetags);
 		this.servicetags = servicetags;
+	}
+	
+	/**
+	 *  Sets the service tags.
+	 *  @param servicetags The service tags.
+	 *  
+	 *  todo: move or refactor to hide complexity!?
+	 */
+	public void setServiceTags(String[] servicetags, IExternalAccess component)
+	{
+		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags!=null ? servicetags.length : 0]);
 	}
 	
 	/**
@@ -357,7 +401,7 @@ public class ServiceQuery<T>
 	}
 	
 	/**
-	 *  Get the platform.
+	 *  Set the platform.
 	 *  @param platform The platform
 	 */
 	public void setPlatform(IComponentIdentifier platform)
@@ -365,6 +409,26 @@ public class ServiceQuery<T>
 		this.platform = platform;
 	}
 	
+	/**
+	 *  Gets the service identifier.
+	 *
+	 *  @return The service identifier.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return serviceidentifier;
+	}
+
+	/**
+	 *  Sets the service identifier.
+	 *
+	 *  @param serviceidentifier The service identifier.
+	 */
+	public void setServiceIdentifier(IServiceIdentifier serviceidentifier)
+	{
+		this.serviceidentifier = serviceidentifier;
+	}
+
 	/**
 	 *  Get the owner.
 	 *  @return The owner
@@ -444,25 +508,72 @@ public class ServiceQuery<T>
 	 *  
 	 *  @return The specification for the indexer.
 	 */
-	public List<Tuple2<String, String[]>> getIndexerSearchSpec()
+	public List<Tuple3<String, String[], Boolean>> getIndexerSearchSpec()
 	{
-		List<Tuple2<String, String[]>> ret = new ArrayList<Tuple2<String,String[]>>();
+		List<Tuple3<String, String[], Boolean>> ret = new ArrayList<Tuple3<String,String[],Boolean>>();
 		
 		if(platform != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[] { platform.toString() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
 		if(provider != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[] { provider.toString() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{provider.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
 		
 		if(servicetype != null)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[] { servicetype.getGenericTypeName() }));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{servicetype.getGenericTypeName()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_INTERFACE)));
 		
 		if(servicetags != null && servicetags.length > 0)
-			ret.add(new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, servicetags));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_TAGS, servicetags, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_TAGS)));
+		
+		if(serviceidentifier != null)
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
+		
+		if(networknames != null && networknames.length>0)
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
 		
 		return ret;
 	}
 		
+	/**
+	 *  Get the matching mode for a key.
+	 *  @param key The key name.
+	 *  @return True for and, false for or.
+	 */
+	public Boolean getMatchingMode(String key)
+	{
+		return matchingmodes!=null? matchingmodes.get(key): null;
+	}
+	
+	/**
+	 *  Set a matching mode.
+	 *  @param key The key name.
+	 *  @param and True for and.
+	 */
+	public void setMatchingMode(String key, Boolean and)
+	{
+		if(matchingmodes==null)
+			matchingmodes = new HashMap<String, Boolean>();
+		matchingmodes.put(key, and);
+	}
+	
+	
+	/**
+	 *  Get the unrestricted mode.
+	 *  @return The unrestricted mode.
+	 */
+	public Boolean isUnrestricted()
+	{
+		return unrestricted;
+	}
+
+	/**
+	 *  Set the unrestricted mode.
+	 *  @param unrestricted the unrestricted to set
+	 */
+	public void setUnrestricted(Boolean unrestricted)
+	{
+		this.unrestricted = unrestricted;
+	}
+
 	/**
 	 *  Tests if the query matches a service.
 	 *  
@@ -529,6 +640,70 @@ public class ServiceQuery<T>
 		return true;
 	}
 	
+//	/**
+//	 *  Get the prepared.
+//	 *  @return the prepared
+//	 */
+//	public boolean isPrepared()
+//	{
+//		return prepared;
+//	}
+//
+//	/**
+//	 *  Set the prepared.
+//	 *  @param prepared The prepared to set
+//	 */
+//	public void setPrepared(boolean prepared)
+//	{
+//		this.prepared = prepared;
+//	}
+	
+//	/**
+//	 *  Prepare the query.
+//	 */
+//	public void prepare(IComponentIdentifier cid)
+//	{
+//		if(!prepared)
+//		{
+//			networknames = getNetworkNames(cid);
+//			prepared = true;
+//		}
+//	}
+	
+	
+	
+	/**
+	 *  Static helper method to get the current network names.
+	 *  @param cid The platform cid.
+	 *  @return The current network names.
+	 */
+	public static String[] getNetworkNames(IComponentIdentifier cid)
+	{
+		if(cid==null)
+			return SUtil.EMPTY_STRING_ARRAY;
+		
+		Set<String> nnames = (Set<String>)Starter.getPlatformValue(cid, Starter.DATA_NETWORKNAMESCACHE);
+		return nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY;
+	}
+
+	/**
+	 *  Get the networknames.
+	 *  @return the networknames
+	 */
+	public String[] getNetworkNames()
+	{
+		return networknames;
+	}
+
+	/**
+	 *  Set the networknames.
+	 *  @param networknames The networknames to set
+	 */
+	public void setNetworkNames(String[] networknames)
+	{
+		this.networknames = networknames;
+	}
+
 	/**
 	 *  Get the hashcode.
 	 */
@@ -550,13 +725,23 @@ public class ServiceQuery<T>
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the target platform if specified (using platform and provider).
+	 *  @return The target platform.
+	 */
+	public IComponentIdentifier getTargetPlatform()
+	{
+		return getPlatform()!=null? getPlatform().getRoot(): getProvider()!=null? getProvider().getRoot(): null;
+	}
 
 	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(returntype=" + returntype + ", servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", scope=" + scope + ", owner=" + owner + ", provider="
-			+ provider + ", platform=" + platform + ", excludeowner=" + excludeowner + ", filter=" + filter + ")";
+		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", provider=" + provider + ", platform=" + platform 
+			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", filter=" + filter + ", scope=" + scope + ", owner=" + owner
+			+ ", id=" + id + ")";
 	}
 }

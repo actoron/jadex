@@ -35,7 +35,7 @@ public class SumService implements ISumService {
 ```
 
 # Providing Services
-A service can be provided by any component. Just add the following Annotation to you component's code to make it provide the *SumService* declared above:
+A service can be provided by any component. Just add the following Annotation to your component's code to make it provide the *SumService* declared above:
  
 ```java
 @ProvidedServices({
@@ -60,7 +60,7 @@ Inside the ```@ProvidedService``` annotation, the following parameters can be sp
 |*properties* | Properties (```NameValue``` array) (see [Properties](#properties)) |
 
 ** @Implementation **  
-The implementation is usually given by specifiying a class that implements the service type. This class should usually have an empty constructor.
+The implementation is usually given by specifying a class that implements the service type. This class should usually have an empty constructor.
 Additionally, the following parameters can be specified:
 
 |Parameter|Description|
@@ -104,7 +104,7 @@ To use a service, it has to be declared as Required Service inside the using com
 
 ```java
 @RequiredServices({
-    @RequiredService(name="sumservice", type=ISumService.class, 
+    @RequiredService(name="sumService", type=ISumService.class, 
     binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
 @Agent
@@ -182,11 +182,11 @@ You can also access the required services of a component by using the RequiredSe
 private IRequiredServiceFeature reqFeat;
 ...
 {
-    ISumService sum = reqFeat.getRequiredService("sum").get();
+    ISumService sum = reqFeat.getRequiredService("sumService").get();
 }
 ```
 
-Note that the name specified must match the required service declaration.
+Note that the name specified must match the required service declaration (as seen [above](services#using-services)).
 By using the ```IProvidedServiceFeature```, you can also get access to services *provided* by your component.
 
 ## The IService interface

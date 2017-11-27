@@ -52,10 +52,10 @@ public class ServiceCall
 	//-------- attributes --------
 	
 	/** The calling component. */
-	protected IComponentIdentifier	caller;
+	public IComponentIdentifier	caller;
 	
 	/** The service call properties. */
-	protected Map<String, Object> properties;
+	public Map<String, Object> properties;
 	
 	// hack for debugging concurrent modification
 	public IComponentIdentifier	lastmod;
@@ -69,6 +69,10 @@ public class ServiceCall
 	 */
 	protected ServiceCall(IComponentIdentifier caller, Map<String, Object> props)
 	{
+//		if(caller==null)
+//		{
+//			System.out.println("dflishg");
+//		}
 		this.caller	= caller;
 		this.properties = props!=null? props: new HashMap<String, Object>();
 	}

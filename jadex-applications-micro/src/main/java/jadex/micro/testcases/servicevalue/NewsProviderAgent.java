@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -15,7 +16,7 @@ import jadex.micro.annotation.AgentBody;
 /**
  *  Agent that provides a news service.
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 public class NewsProviderAgent implements INewsService
 {
 	/** The agent. */

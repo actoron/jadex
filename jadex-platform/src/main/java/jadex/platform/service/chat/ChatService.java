@@ -154,7 +154,7 @@ public class ChatService implements IChatService, IChatGuiService
 				public void proceed()
 				{
 					if(nick==null)
-						nick	= SUtil.createUniqueId("user", 3);
+						nick	= SUtil.createPlainRandomId("user", 3);
 					transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
 					transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
 					

@@ -1,6 +1,6 @@
 package jadex.micro.testcases.tracing;
 
-import java.util.Collection;
+import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -11,7 +11,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -40,16 +39,18 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
 		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				System.out.println("test local fini");
+				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
+						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -120,8 +121,8 @@ public class InitiatorAgent extends TestAgent
 			}
 		});
 		
-		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
+		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
 		
@@ -132,11 +133,13 @@ public class InitiatorAgent extends TestAgent
 		
 		System.out.println("create component started with: "+CallAccess.getCurrentInvocation());
 		
+		agent.getLogger().severe("Testagent create provider: "+agent.getComponentDescription());
 		createComponent("jadex/micro/testcases/tracing/ProviderAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+				agent.getLogger().severe("Testagent create provider done: "+agent.getComponentDescription());
 				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			

@@ -52,6 +52,7 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.rules.eca.ChangeInfo;
@@ -549,7 +550,7 @@ public abstract class Plan
 	 *  @param me The message event.
 	 *  @return The result event.
 	 */
-	public IMessageEvent sendMessageAndWait(IMessageEvent me)
+	public <T> IMessageEvent<T> sendMessageAndWait(IMessageEvent<T> me)
 	{
 		return sendMessageAndWait(me, -1);
 	}
@@ -561,39 +562,44 @@ public abstract class Plan
 	 *  @param timeout The timeout.
 	 *  @return The result event.
 	 */
-	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout)
+	public <T> IMessageEvent<T> sendMessageAndWait(IMessageEvent<T> me, long timeout)
 	{
 		checkNotInAtomic();
 		
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addReply((RMessageEvent)me, null);
+		wa.addReply((RMessageEvent<T>)me, null);
 
 		rplan.setWaitAbstraction(wa);
 		
-		sendMessage(me);
+		final Future<IMessageEvent<T>>	replyfut	= new Future<IMessageEvent<T>>();
+		sendMessage(me).addResultListener(new IResultListener<Void>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				// Cannot use blocking get, because wait abstraction is cleared after resume.
+				replyfut.setExceptionIfUndone(exception);
+			}
+			@Override
+			public void resultAvailable(Void result)
+			{
+			}
+		});
 		
-		Future<IMessageEvent> ret = new Future<IMessageEvent>();
+		@SuppressWarnings("unchecked")
+		RMessageEvent<Object>	rme	= (RMessageEvent<Object>)me;
 		try
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)me);
-			return ret.get(timeout);
+			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent(rme);
+			IMessageEvent<T>	reply	= replyfut.get(timeout);
+			return reply;
 		}
 		finally
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)me);
+			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent(rme);
 		}
 	}
 
-	/**
-	 *  Send a message and wait until it is sent.
-	 *  @param me	The message event.
-	 */
-	public IFuture<Void> sendMessage(IMessageEvent me)
-	{
-		return getEventbase().sendMessage(me);
-	}
-	
 	/**
 	 *  Let the plan fail.
 	 */
@@ -810,14 +816,14 @@ public abstract class Plan
 		getGoalbase().dispatchTopLevelGoal(goal);
 	}
 
-//	/**
-//	 *  Send a message.
-//	 *  @param me	The message event.
-//	 */
-//	public IFuture<Void> sendMessage(IMessageEvent me, byte[] codecids)
-//	{	
-//		return getEventbase().sendMessage(me, codecids);
-//	}
+	/**
+	 *  Send a message.
+	 *  @param me	The message event.
+	 */
+	public IFuture<Void> sendMessage(IMessageEvent<?> me)
+	{	
+		return getEventbase().sendMessage(me);
+	}
 
 	/**
 	 *  Dispatch an internal event.
@@ -833,7 +839,7 @@ public abstract class Plan
 	 *  Create a new message event.
 	 *  @return The new message event.
 	 */
-	public IMessageEvent createMessageEvent(String type)
+	public <T> IMessageEvent<T> createMessageEvent(String type)
 	{
 		return getEventbase().createMessageEvent(type);
 	}

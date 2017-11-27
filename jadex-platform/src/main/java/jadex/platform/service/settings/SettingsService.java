@@ -354,26 +354,26 @@ public class SettingsService implements ISettingsService
 //		System.out.println("Save properties"+(shutdown?" (shutdown)":""));
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IResultListener	rl	= new DelegationResultListener(ret)
+		IResultListener<Void>	rl	= new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				writePropertiesToStore(props);
-				ret.setResult(null);
+				writePropertiesToStore(props)
+					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 
 			
 		};
 		rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
-		final CounterResultListener	crl	= new CounterResultListener(providers.size(), rl);
+		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(), rl);
 		
-		for(Iterator it=providers.keySet().iterator(); it.hasNext(); )
+		for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
 		{
-			final String	id	= (String)it.next();
-			IPropertiesProvider	provider	= (IPropertiesProvider)providers.get(id);
-			rl	= new DelegationResultListener(ret)
+			final String	id	= it.next();
+			IPropertiesProvider	provider	= providers.get(id);
+			IResultListener<Properties>	rlp	= new ExceptionDelegationResultListener<Properties, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Properties result)
 				{
 					props.removeSubproperties(id);
 					props.addSubproperties(id, (Properties)result);
@@ -381,7 +381,7 @@ public class SettingsService implements ISettingsService
 				}
 			};
 			rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
-			provider.getProperties().addResultListener(rl);
+			provider.getProperties().addResultListener(rlp);
 		}
 		
 		return ret;
@@ -405,8 +405,9 @@ public class SettingsService implements ISettingsService
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	protected void writePropertiesToStore(final Properties props) //throws FileNotFoundException, Exception, IOException 
+	protected IFuture<Void> writePropertiesToStore(final Properties props) //throws FileNotFoundException, Exception, IOException 
 	{
+		final Future<Void>	ret	= new Future<Void>();
 		// Todo: Which class loader to use? library service unavailable, because
 		// it depends on settings service?
 		getFile(filename).addResultListener(new IResultListener<File>()
@@ -435,6 +436,7 @@ public class SettingsService implements ISettingsService
 						{
 						}
 					}
+					ret.setResult(null);	// TODO: pass exception to caller?
 				}
 			}
 			
@@ -443,7 +445,8 @@ public class SettingsService implements ISettingsService
 				
 			}
 		});
-	
+		
+		return ret;
 	}
 	
 	/**

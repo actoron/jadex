@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URL;
 
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.types.address.TransportAddressBook;
 import jadex.commons.SUtil;
 
 /**
@@ -96,17 +95,17 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		this.cid = cid;
 		this.uri = uri;
 		
-		// Automatically add transport addresses. hack?
-		if(!(cid instanceof ITransportComponentIdentifier))
-		{
-			ComponentIdentifier	tcid	= new ComponentIdentifier(cid.getName());
-			TransportAddressBook	tab	= TransportAddressBook.getAddressBook(cid);
-			if(tab!=null)
-			{
-				tcid.setAddresses(tab.getPlatformAddresses(cid));
-			}
-			this.cid	= tcid;
-		}
+//		// Automatically add transport addresses. hack?
+//		if(!(cid instanceof ITransportComponentIdentifier))
+//		{
+//			ComponentIdentifier	tcid	= new ComponentIdentifier(cid.getName());
+//			TransportAddressBook	tab	= TransportAddressBook.getAddressBook(cid);
+//			if(tab!=null)
+//			{
+//				tcid.setAddresses(tab.getPlatformAddresses(cid));
+//			}
+//			this.cid	= tcid;
+//		}
 	}
 
 	//-------- methods --------

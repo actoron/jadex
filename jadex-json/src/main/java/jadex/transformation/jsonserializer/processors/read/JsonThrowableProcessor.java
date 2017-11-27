@@ -3,7 +3,6 @@ package jadex.transformation.jsonserializer.processors.read;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -13,6 +12,7 @@ import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -30,7 +30,7 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return object instanceof JsonObject && SReflect.isSupertype(Throwable.class, clazz);
@@ -39,12 +39,11 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
@@ -55,7 +54,8 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 		Throwable cause = null;
 		JsonValue cau = obj.get("cause");
 		if(cau!=null)
-			cause = (Throwable)traverser.traverse(cau, Throwable.class, processors, targetcl, context);
+			cause = (Throwable)traverser.traverse(cau, Throwable.class, conversionprocessors, processors, mode, targetcl, context);
+//			cause = (Throwable)traverser.traverse(cau, Throwable.class, preprocessors, processors, postprocessors, targetcl, context);
 		
 		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
 		
@@ -137,7 +137,8 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 			if(idx!=null)
 				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 			
-			JsonBeanProcessor.traverseProperties(object, clazz, traversed, processors, traverser, clone, targetcl, ret, context, intro);
+			JsonBeanProcessor.traverseProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
+//			JsonBeanProcessor.traverseProperties(object, clazz, traversed, processors, postprocessors, traverser, clone, targetcl, ret, context, intro);
 		}
 		
 		return ret;

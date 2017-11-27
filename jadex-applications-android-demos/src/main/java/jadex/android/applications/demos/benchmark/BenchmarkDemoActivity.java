@@ -2,9 +2,8 @@ package jadex.android.applications.demos.benchmark;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
-import jadex.android.commons.JadexPlatformOptions;
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -25,7 +24,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,9 +57,9 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 	public BenchmarkDemoActivity()
 	{
 		super();
-		PlatformConfiguration config = getPlatformConfiguration();
+		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("benchmarkDemoPlatform");
-		config.getRootConfig().setKernels(RootComponentConfiguration.KERNEL.micro);
+		config.getRootConfig().setKernels(IRootComponentConfiguration.KERNEL_MICRO);
 		setPlatformAutostart(true);
 	}
 	

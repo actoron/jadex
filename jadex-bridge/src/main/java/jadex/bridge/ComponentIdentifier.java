@@ -1,13 +1,5 @@
 package jadex.bridge;
 
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.address.ITransportAddressService;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-
 /**
  *  Component identifier with transport addresses.
  */
@@ -137,17 +129,17 @@ public class ComponentIdentifier extends BasicComponentIdentifier implements ITr
 	 *  
 	 *  Static helper method to convert the identifier to a transport identifier.
 	 */
-	public static IFuture<ITransportComponentIdentifier> getTransportIdentifier(final IExternalAccess exta)
-	{
-		final Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
-		SServiceProvider.getService(exta, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, ITransportComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(ITransportAddressService tas)
-			{
-				tas.getTransportComponentIdentifier(exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<ITransportComponentIdentifier>(ret));
-			}
-		});
-		return ret;
-	}
+//	public static IFuture<ITransportComponentIdentifier> getTransportIdentifier(final IExternalAccess exta)
+//	{
+//		final Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
+//		SServiceProvider.getService(exta, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, ITransportComponentIdentifier>(ret)
+//		{
+//			public void customResultAvailable(ITransportAddressService tas)
+//			{
+//				tas.getTransportComponentIdentifier(exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<ITransportComponentIdentifier>(ret));
+//			}
+//		});
+//		return ret;
+//	}
 }

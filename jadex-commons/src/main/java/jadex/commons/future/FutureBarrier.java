@@ -94,11 +94,21 @@ public class FutureBarrier<E>
 	 */
 	public IFuture<Collection<E>> waitForResults()
 	{
-		Future<Collection<E>> ret = new Future<Collection<E>>();
+		final Future<Collection<E>> ret = new Future<Collection<E>>();
 		
 		if(futures!=null)
 		{
-			CollectionResultListener<E> lis = new CollectionResultListener<E>(futures.size(), new DelegationResultListener<Collection<E>>(ret));
+			CounterResultListener<E> lis = new CounterResultListener<E>(futures.size(), new ExceptionDelegationResultListener<Void, Collection<E>>(ret)
+			{
+				public void customResultAvailable(Void result) throws Exception
+				{
+					Collection<E> res = new ArrayList<E>();
+					for(IFuture<E> fut: futures)
+						res.add(fut.get());
+					ret.setResult(res);
+				}
+			});
+			
 			for(IFuture<E> fut: futures)
 			{
 				fut.addResultListener(lis);
@@ -118,23 +128,31 @@ public class FutureBarrier<E>
 	 */
 	public IFuture<Collection<E>> waitForResultsIgnoreFailures(final ICommand<Exception> failurehandler)
 	{
-		Future<Collection<E>> ret = new Future<Collection<E>>();
+		final Future<Collection<E>> ret = new Future<Collection<E>>();
 		
 		if(futures!=null)
 		{
-			CollectionResultListener<E> lis = new CollectionResultListener<E>(futures.size(), true, new DelegationResultListener<Collection<E>>(ret))
+			CounterResultListener<E> lis = new CounterResultListener<E>(futures.size(), true, new ExceptionDelegationResultListener<Void, Collection<E>>(ret)
 			{
-				@Override
+				public void customResultAvailable(Void result) throws Exception
+				{
+					Collection<E> res = new ArrayList<E>();
+					for(IFuture<E> fut: futures)
+					{
+						if(fut.getException()==null)
+							res.add(fut.get());
+					}
+					ret.setResult(res);
+				}
+				
 				public void exceptionOccurred(Exception exception)
 				{
 					if(failurehandler!=null)
-					{
 						failurehandler.execute(exception);
-					}
 					super.exceptionOccurred(exception);
 				}
-			};
-
+			});
+			
 			for(IFuture<E> fut: futures)
 			{
 				fut.addResultListener(lis);
@@ -146,5 +164,17 @@ public class FutureBarrier<E>
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the nth result.
+	 *  Must be called after the barrier is due.
+	 *  @param index The index.
+	 */
+	public E getResult(int index)
+	{
+		if(!futures.get(index).isDone())
+			throw new RuntimeException("Future not finished.");
+		return futures.get(index).get();
 	}
 }

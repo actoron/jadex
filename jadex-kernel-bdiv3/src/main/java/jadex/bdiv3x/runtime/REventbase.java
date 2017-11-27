@@ -1,8 +1,7 @@
 package jadex.bdiv3x.runtime;
 
-import java.util.Map;
-
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
+import jadex.bdiv3.model.MConfigParameterElement;
 import jadex.bdiv3.model.MInternalEvent;
 import jadex.bdiv3.model.MMessageEvent;
 import jadex.bdiv3.runtime.impl.RElement;
@@ -10,7 +9,7 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
-import jadex.bridge.fipa.SFipa;
+import jadex.bridge.fipa.FipaMessage;
 import jadex.commons.future.IFuture;
 
 /**
@@ -41,9 +40,9 @@ public class REventbase extends RElement implements IEventbase
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public IFuture<Void> sendMessage(IMessageEvent me)
+	public IFuture<Void> sendMessage(IMessageEvent<?> me)
 	{
-		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage((Map<String, Object>)me.getMessage(), me.getMessageType());
+		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage(null, me.getMessage());
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class REventbase extends RElement implements IEventbase
 	public IMessageEvent createMessageEvent(String type)
 	{
 		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
-		return new RMessageEvent(mevent, getAgent(), null);
+		return new RMessageEvent(mevent, getAgent(), (MConfigParameterElement)null);
 	}
 
 	/**
@@ -72,14 +71,24 @@ public class REventbase extends RElement implements IEventbase
 	 *  @param type	The reply message event type.
 	 *  @return The reply event.
 	 */
-	public IMessageEvent createReply(IMessageEvent event, String type)
+	public <T> IMessageEvent<T>	createReply(IMessageEvent<T> event, String type)
 	{
 		if(event==null)
 			throw new IllegalArgumentException("Event must not null");
 		
-		MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
-		Map<String, Object> rep = event.getMessageType().createReply((Map<String, Object>)event.getMessage());
-		return new RMessageEvent(mevent, rep, SFipa.FIPA_MESSAGE_TYPE, getAgent());
+		if(event.getMessage() instanceof FipaMessage)
+		{
+			FipaMessage	reply	= ((FipaMessage)event.getMessage()).createReply();
+			MMessageEvent mevent = getCapability().getMCapability().getResolvedMessageEvent(scope, type);
+			// TODO: set parameter values from model???
+			@SuppressWarnings("unchecked")
+			RMessageEvent<T>	ret	= new RMessageEvent<T>(mevent, (T)reply, getAgent(), (RMessageEvent<T>)event);
+			return ret;
+		}
+		else
+		{
+			throw new UnsupportedOperationException("Currently only FipaMessage supported: "+event.getMessage());
+		}
 	}
 	
 	/**

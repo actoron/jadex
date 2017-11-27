@@ -2,8 +2,8 @@ package jadex.bridge.service.types.platform;
 
 import java.util.Map;
 
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -11,7 +11,6 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -42,13 +41,6 @@ public interface IJadexMultiPlatformBinder
  	 * @deprecated use getService() or getsService() instead.
 	 */
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID);
-	
-	/**
-	 * Retrieves the MS of the Platform with the given ID.
-	 * 
-	 * @deprecated use getService() or getsService() instead.
-	 */
-	public IFuture<IMessageService> getMS(IComponentIdentifier platformID);
 	
 	/**
 	 * Looks up a service and returns it synchronously.
@@ -100,7 +92,7 @@ public interface IJadexMultiPlatformBinder
 	 * 
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final RootComponentConfiguration.KERNEL[] kernels);
+	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels);
 
 	/**
 	 * Starts a Jadex Platform.
@@ -112,7 +104,7 @@ public interface IJadexMultiPlatformBinder
 	 *            Identifier of the new platform
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final RootComponentConfiguration.KERNEL[] kernels, final String platformId);
+	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId);
 
 	/**
 	 * Starts a Jadex Platform with default configuration
@@ -130,7 +122,7 @@ public interface IJadexMultiPlatformBinder
 	 * 
 	 * @return IFuture<IExternalAccess> The external platform access
 	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final PlatformConfiguration config);
+	public IFuture<IExternalAccess> startJadexPlatform(final IPlatformConfiguration config);
 
 	/**
 	 * Terminates all running jadex platforms.

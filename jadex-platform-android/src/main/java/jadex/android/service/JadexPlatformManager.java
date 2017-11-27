@@ -3,13 +3,15 @@ package jadex.android.service;
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidError;
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -43,7 +45,7 @@ import android.util.Log;
  */
 public class JadexPlatformManager implements IJadexPlatformManager
 {
-	private PlatformConfiguration defaultConfiguration;
+	private IPlatformConfiguration defaultConfiguration;
 	
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
@@ -63,15 +65,15 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return instance;
 	}
 
-	private static Map<RootComponentConfiguration.KERNEL, String> kernelClassNames = new HashMap<RootComponentConfiguration.KERNEL, String>();
+	private static Map<String, String> kernelClassNames = new HashMap<String, String>();
 
 	static {
-		kernelClassNames.put(RootComponentConfiguration.KERNEL.micro, "jadex.micro.MicroAgentFactory");
-		kernelClassNames.put(RootComponentConfiguration.KERNEL.v3, "jadex.bdiv3.BDIAgentFactory");
-		kernelClassNames.put(RootComponentConfiguration.KERNEL.bpmn, "jadex.bpmn.BpmnFactory");
-		kernelClassNames.put(RootComponentConfiguration.KERNEL.component, "jadex.component.ComponentComponentFactory");
-		kernelClassNames.put(RootComponentConfiguration.KERNEL.bdi, "jadex.bdiv3x.BDIXComponentFactory");
-		kernelClassNames.put(RootComponentConfiguration.KERNEL.multi, "jadex.kernelbase.MultiFactory");
+		kernelClassNames.put(IRootComponentConfiguration.KERNEL_MICRO, "jadex.micro.MicroAgentFactory");
+		kernelClassNames.put(IRootComponentConfiguration.KERNEL_BDIV3, "jadex.bdiv3.BDIAgentFactory");
+		kernelClassNames.put(IRootComponentConfiguration.KERNEL_BPMN, "jadex.bpmn.BpmnFactory");
+		kernelClassNames.put(IRootComponentConfiguration.KERNEL_COMPONENT, "jadex.component.ComponentComponentFactory");
+		kernelClassNames.put(IRootComponentConfiguration.KERNEL_BDI, "jadex.bdiv3x.BDIXComponentFactory");
+		kernelClassNames.put(IRootComponentConfiguration.KERNEL_MULTI, "jadex.kernelbase.MultiFactory");
 	}
 
 	private JadexPlatformManager()
@@ -83,10 +85,10 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		instance = this;
 	}
 
-	private PlatformConfiguration createDefaultConfiguration()
+	private IPlatformConfiguration createDefaultConfiguration()
 	{
-		PlatformConfiguration config = new PlatformConfiguration();
-		RootComponentConfiguration rootConfig = config.getRootConfig();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getPlatformConfiguration();
+		IRootComponentConfiguration rootConfig = config.getRootConfig();
 		rootConfig.setLoggingLevel(Level.INFO);
 		rootConfig.setWsPublish(false);
 		rootConfig.setRsPublish(false);
@@ -261,7 +263,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 //
 //	}
 
-	public synchronized IFuture<IExternalAccess> startJadexPlatform(final PlatformConfiguration config)
+	public synchronized IFuture<IExternalAccess> startJadexPlatform(final IPlatformConfiguration config)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		new Thread(new Runnable()
@@ -341,12 +343,12 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return ret;
 	}
 
-	private void checkKernels(RootComponentConfiguration.KERNEL[] kernels) {
+	private void checkKernels(String[] kernels) {
 		// make sure default kernels all exist in classpath
 		ArrayList<String> kernelList = new ArrayList<String>();
 		ClassLoader myCL = getClass().getClassLoader();
 
-		for (RootComponentConfiguration.KERNEL k : kernels) {
+		for (String k : kernels) {
 			String className = kernelClassNames.get(k);
 			boolean found = false;
 			if (className != null) {
@@ -362,13 +364,13 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	}
 
 	@SuppressWarnings("unchecked")
-	protected static IFuture<IExternalAccess> createPlatformWithClassloader(PlatformConfiguration config, ClassLoader cl)
+	protected static IFuture<IExternalAccess> createPlatformWithClassloader(IPlatformConfiguration config, ClassLoader cl)
 	{
 		try
 		{
 //			System.out.println(config);
 			Class<?> starter = cl.loadClass("jadex.base.Starter");
-			Method createPlatform = starter.getMethod("createPlatform", PlatformConfiguration.class); // =
+			Method createPlatform = starter.getMethod("createPlatform", IPlatformConfiguration.class); // =
 																							// Starter.createPlatform();
 			return (IFuture<IExternalAccess>) createPlatform.invoke(null, (Object) config);
 		}

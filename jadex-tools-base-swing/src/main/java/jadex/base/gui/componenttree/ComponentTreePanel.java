@@ -523,11 +523,16 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(final ISecurityService sec)
 							{
-								sec.getPlatformPassword(cid)
+								sec.getPlatformSecret(cid)
 									.addResultListener(new SwingDefaultResultListener<String>(ComponentTreePanel.this)
 								{
 									public void customResultAvailable(String pass)
 									{
+										if (pass == null || !pass.startsWith("pw:"))
+											pass = "";
+										else
+											pass = pass.substring(3);
+										
 										JLabel	lbpass	= new JLabel("Password");
 										final JPasswordField	tfpass	= new JPasswordField(10);
 										tfpass.setText(pass);
@@ -566,7 +571,8 @@ public class ComponentTreePanel extends JSplitPane
 											JOptionPane.PLAIN_MESSAGE, icons.getIcon("overlay_lock"));
 										if(ok==JOptionPane.OK_OPTION)
 										{
-											sec.setPlatformPassword(cid, new String(tfpass.getPassword()))
+//											sec.setPlatformPassword(cid, new String(tfpass.getPassword()))
+											sec.setPlatformSecret(cid, "pw:" + new String(tfpass.getPassword()))
 												.addResultListener(new SwingDefaultResultListener<Void>()
 											{
 												public void	customResultAvailable(Void result)

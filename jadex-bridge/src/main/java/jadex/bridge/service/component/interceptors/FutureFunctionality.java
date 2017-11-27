@@ -8,7 +8,6 @@ import jadex.bridge.ProxyFactory;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -153,9 +152,23 @@ public class FutureFunctionality
 	}
 	
 	/**
+	 *  Optionally augment exception behavior.
+	 */
+	public void	handleException(Exception exception)
+	{
+	}
+	
+	/**
 	 *  Optionally augment termination behavior.
 	 */
 	public void	handleTerminated(Exception reason)
+	{
+	}
+	
+	/**
+	 *  Optionally augment pull behavior.
+	 */
+	public void	handlePull()
 	{
 	}
 	
@@ -230,31 +243,31 @@ public class FutureFunctionality
 	{
 		Future<?> ret = null;
 		
-		if(SReflect.isSupertype(ITuple2Future.class, clazz))
+		if(ITuple2Future.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingTupleFuture(func);
 		}
-		else if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
+		else if(IPullSubscriptionIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingPullSubscriptionIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(IPullIntermediateFuture.class, clazz))
+		else if(IPullIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingPullIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, clazz))
+		else if(ISubscriptionIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingSubscriptionIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, clazz))
+		else if(ITerminableIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingTerminableIntermediateDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(ITerminableFuture.class, clazz))
+		else if(ITerminableFuture.class.isAssignableFrom(clazz))
 		{
 			ret = new DelegatingTerminableDelegationFuture(func);
 		}
-		else if(SReflect.isSupertype(IIntermediateFuture.class, clazz))
+		else if(IIntermediateFuture.class.isAssignableFrom(clazz))
 		{
 			ret	= new DelegatingIntermediateFuture(func);
 		}
@@ -366,6 +379,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -445,6 +459,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			@Override
 			public void execute(Void args)
 			{
+				func.handlePull();
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.pullIntermediateResult();
 			}
 		});
@@ -536,6 +551,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingPullIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -616,6 +632,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			@Override
 			public void execute(Void args)
 			{
+				func.handlePull();
 				DelegatingPullIntermediateDelegationFuture.super.pullIntermediateResult();
 			}
 		});
@@ -707,6 +724,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingSubscriptionIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -862,6 +880,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingTerminableIntermediateDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1012,6 +1031,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingTerminableDelegationFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1118,6 +1138,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingIntermediateFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1228,6 +1249,7 @@ class DelegatingFuture extends Future<Object>
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	
@@ -1310,6 +1332,7 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 	@Override
 	protected boolean	doSetException(Exception exception, boolean undone)
 	{
+		func.handleException(exception);
 		return DelegatingTupleFuture.super.doSetException(exception, func.isUndone(undone));
 	}
 	

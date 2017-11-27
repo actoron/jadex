@@ -239,6 +239,33 @@ pre code {
 	display: block;
 }
 
+.version-header {
+	font-weight: bold;
+	font-size: 16px;
+	font-family: open sans;
+	text-align: center;
+	color: #2a6699;
+	height: 100%;
+	display: inline-block;
+	float: inline-end;
+	margin-left: 15px;
+}
+
+.version-header-container > span {
+	line-height: 20px;
+}
+
+/*.version-header div {
+	padding-top: 15.55px;
+	padding-bottom: 10px;
+}*/
+
+@media screen and (max-width: 1350px) {
+	.version-header .version-header-jadex {
+		display: none;
+	}
+}
+
 @media screen and (max-width: 768px) {
 	.wy-nav-side {
 /*		left: -301px;*/
@@ -267,6 +294,10 @@ pre code {
 
     .navbar-brand>img {
     	width: unset;
+    }
+
+    .version-header {
+    	display: none;
     }
 }
 

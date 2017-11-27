@@ -23,6 +23,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -63,9 +64,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 			{
 				if(!mparam.isMulti(agent.getClassLoader()))
 				{
-					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
+					if(vals!=null && (vals.containsKey(mparam.getName()) || vals.containsKey(SUtil.snakeToCamelCase(mparam.getName()))) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
-						addParameter(createParameter(mparam, mparam.getName(), getAgent(), vals.get(mparam.getName())));
+						addParameter(createParameter(mparam, mparam.getName(), getAgent(), vals.containsKey(mparam.getName()) ? vals.get(mparam.getName()) : vals.get(SUtil.snakeToCamelCase(mparam.getName()))));
 					}
 					else
 					{
@@ -74,9 +75,9 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				}
 				else
 				{
-					if(vals!=null && vals.containsKey(mparam.getName()) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
+					if(vals!=null && (vals.containsKey(mparam.getName()) || vals.containsKey(SUtil.snakeToCamelCase(mparam.getName()))) && MParameter.EvaluationMode.STATIC.equals(mparam.getEvaluationMode()))
 					{
-						addParameterSet(createParameterSet(mparam, mparam.getName(), getAgent(), vals.get(mparam.getName())));
+						addParameterSet(createParameterSet(mparam, mparam.getName(), getAgent(), vals.containsKey(mparam.getName()) ? vals.get(mparam.getName()) : vals.get(SUtil.snakeToCamelCase(mparam.getName()))));
 					}
 					else
 					{
@@ -544,7 +545,15 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 				value	= SReflect.convertWrappedValue(value, clazz);
 			}
 			
-			internalGetValues().add(value);
+			internalAddValue(value);
+		}
+		
+		/**
+		 *  Add a value.
+		 */
+		protected void internalAddValue(Object value)
+		{
+			internalGetValues().add(value);			
 		}
 
 		/**
@@ -555,7 +564,15 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			testWriteOK((MParameter)getModelElement());
 			
-			internalGetValues().remove(value);
+			internalRemoveValue(value);
+		}
+		
+		/**
+		 *  Remove a value.
+		 */
+		protected void internalRemoveValue(Object value)
+		{
+			internalGetValues().remove(value);			
 		}
 
 		/**
@@ -579,6 +596,14 @@ public abstract class RParameterElement extends RElement implements IParameterEl
 		{
 			testWriteOK((MParameter)getModelElement());
 			
+			internalRemoveValues();
+		}
+		
+		/**
+		 *  Remove all values.
+		 */
+		protected void internalRemoveValues()
+		{
 			internalGetValues().clear();
 		}
 

@@ -8,13 +8,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +19,6 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -53,14 +49,12 @@ import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -68,16 +62,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.DateTimeRenderer;
 import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.awareness.management.AwarenessManagementAgentHelper;
 import jadex.platform.service.awareness.management.AwarenessSettingsData;
-import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
 
 /**
  *  Panel for the awareness infos.
@@ -92,7 +83,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 	//-------- attributes --------
 	
 	/** The jcc. */
-//	protected IControlCenter jcc;
+	protected IControlCenter jcc;
 	
 	/** The component. */
 //	protected IExternalAccess component;
@@ -186,104 +177,104 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 	 */
 	public IFuture<Void> init(final IControlCenter jcc, final IExternalAccess component)
 	{
-//		this.jcc = jcc;
+		this.jcc = jcc;
 //		this.component = component;
 		this.helper = new AwarenessManagementAgentHelper(component);
 		
 		JPanel	mainpanel = new JPanel(new GridBagLayout());
-		final JLabel	map	= new JLabel("No map available.", JLabel.CENTER);
+//		final JLabel	map	= new JLabel("No map available.", JLabel.CENTER);
 		this.panel	= new JTabbedPane();
 		panel.add(mainpanel, "Main");
 		
 		// Commented out as long as it is broken
 //		panel.add(map, "Map");
 		
-		map.addComponentListener(new ComponentAdapter()
-		{
-			public void componentResized(ComponentEvent e)
-			{
-				loadMap();
-			}
-			
-			public void componentShown(ComponentEvent e)
-			{
-				loadMap();
-			}	
-		
-			protected void loadMap()
-			{
-				map.setIcon(null);
-				map.setText("Loading map. Please wait...");
-				map.repaint();
-				panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-				SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingResultListener<IMessageService>(new IResultListener<IMessageService>()
-				{
-					public void resultAvailable(IMessageService ms)
-					{
-						ms.getAddresses().addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
-						{
-							public void resultAvailable(String[] addresses)
-							{
-								boolean	done	= false;
-								for(String adr: addresses)
-								{
-									if(adr.startsWith("relay-http"))
-									{
-										adr	= RelayConnectionManager.httpAddress(adr) + "map?width="+map.getWidth()+"&height="+map.getHeight();
-		//								System.out.println("adr: "+adr);
-										try
-										{
-											map.setIcon(new ImageIcon(new URL(adr)));
-											map.setText(null);
-											map.repaint();
-											done	= true;
-											break;
-										}
-										catch(Exception ex)
-										{
-		//									ex.printStackTrace();
-											map.setIcon(null);
-											map.setText("Error while loading map: "+ex.toString());
-											map.repaint();
-											done	= true;
-											break;
-										}
-									}
-								}
-								
-								if(!done)
-								{
-									map.setText("Could not load map.");
-									map.repaint();					
-								}
-		
-								panel.setCursor(Cursor.getDefaultCursor());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								map.setIcon(null);
-								map.setText("Error while loading map: "+exception.toString());
-								map.repaint();
-								
-								panel.setCursor(Cursor.getDefaultCursor());
-							}
-						}));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						map.setIcon(null);
-						map.setText("Error while loading map: "+exception.toString());
-						map.repaint();
-						
-						panel.setCursor(Cursor.getDefaultCursor());
-					}
-				}));
-			}
-		});
+//		map.addComponentListener(new ComponentAdapter()
+//		{
+//			public void componentResized(ComponentEvent e)
+//			{
+//				loadMap();
+//			}
+//			
+//			public void componentShown(ComponentEvent e)
+//			{
+//				loadMap();
+//			}	
+//		
+//			protected void loadMap()
+//			{
+//				map.setIcon(null);
+//				map.setText("Loading map. Please wait...");
+//				map.repaint();
+//				panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//
+//				SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new SwingResultListener<IMessageService>(new IResultListener<IMessageService>()
+//				{
+//					public void resultAvailable(IMessageService ms)
+//					{
+//						ms.getAddresses().addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+//						{
+//							public void resultAvailable(String[] addresses)
+//							{
+//								boolean	done	= false;
+//								for(String adr: addresses)
+//								{
+//									if(adr.startsWith("relay-http"))
+//									{
+//										adr	= RelayConnectionManager.httpAddress(adr) + "map?width="+map.getWidth()+"&height="+map.getHeight();
+//		//								System.out.println("adr: "+adr);
+//										try
+//										{
+//											map.setIcon(new ImageIcon(new URL(adr)));
+//											map.setText(null);
+//											map.repaint();
+//											done	= true;
+//											break;
+//										}
+//										catch(Exception ex)
+//										{
+//		//									ex.printStackTrace();
+//											map.setIcon(null);
+//											map.setText("Error while loading map: "+ex.toString());
+//											map.repaint();
+//											done	= true;
+//											break;
+//										}
+//									}
+//								}
+//								
+//								if(!done)
+//								{
+//									map.setText("Could not load map.");
+//									map.repaint();					
+//								}
+//		
+//								panel.setCursor(Cursor.getDefaultCursor());
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								map.setIcon(null);
+//								map.setText("Error while loading map: "+exception.toString());
+//								map.repaint();
+//								
+//								panel.setCursor(Cursor.getDefaultCursor());
+//							}
+//						}));
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						map.setIcon(null);
+//						map.setText("Error while loading map: "+exception.toString());
+//						map.repaint();
+//						
+//						panel.setCursor(Cursor.getDefaultCursor());
+//					}
+//				}));
+//			}
+//		});
 		
 		this.timerdelay = 5000;
 				
@@ -403,7 +394,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
 		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
+		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(jcc.getJCCAccess().getComponentIdentifier().getRoot()));
 		updateDiscoveryInfos(jtdis);
 		jtdis.addMouseListener(new MouseAdapter()
 		{
@@ -864,7 +855,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 
 		public int getColumnCount()
 		{
-			return 6;
+			return 5;
 		}
 
 		public String getColumnName(int column)
@@ -938,7 +929,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 		{
 			DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
 			final boolean	create	= ((Boolean)val).booleanValue();
-			final ITransportComponentIdentifier	cid	= dif.getComponentIdentifier();
+			final IComponentIdentifier	cid	= dif.getComponentIdentifier();
 			final IComponentIdentifier	proxy	=  dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? dif.getProxy().get() : null;
 			if(create && dif.getProxy()==null || !create && proxy!=null)
 			{

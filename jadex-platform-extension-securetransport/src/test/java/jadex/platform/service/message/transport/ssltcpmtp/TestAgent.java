@@ -25,7 +25,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -45,8 +44,8 @@ import jadex.micro.annotation.Results;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="msgservice", type=IMessageService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//	@RequiredService(name="msgservice", type=IMessageService.class, 
+//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="cms", type=IComponentManagementService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="clock", type=IClockService.class, 
@@ -225,8 +224,6 @@ public abstract class TestAgent
 							"-printpass", "false"
 //							"-logging", "true",
 ////							"-relaytransport", "false",
-//							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
-//							"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
 //							"-gui", "false", "-usepass", "false", "-simulation", "false"
 //							"-binarymessages", "false",
 						};
@@ -260,18 +257,24 @@ public abstract class TestAgent
 						Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 							new DelegationResultListener<IExternalAccess>(ret)
 						{
-							public void customResultAvailable(IExternalAccess result)
+							public void customResultAvailable(final IExternalAccess exta)
 							{
-								try
+								platforms.add(exta);
+								Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
 								{
-									Thread.sleep(5000);
-								}
-								catch(InterruptedException e)
-								{
-								}
-								
-								platforms.add(result);
-								super.customResultAvailable(result);
+									public void customResultAvailable(IComponentIdentifier result)
+									{
+										// inverse proxy from remote to local.
+										Starter.createProxy(exta, agent.getExternalAccess())
+											.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+										{
+											public void customResultAvailable(IComponentIdentifier result)
+											{
+												ret.setResult(exta);
+											}
+										});
+									}
+								});
 							}
 						}));
 					}
@@ -399,21 +402,21 @@ public abstract class TestAgent
 				if(manualremove)
 					platforms.remove(exta);
 				
-				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-						// inverse proxy from remote to local.
-						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
+//				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+//				{
+//					public void customResultAvailable(IComponentIdentifier result)
+//					{
+//						// inverse proxy from remote to local.
+//						Starter.createProxy(exta, agent.getExternalAccess())
+//							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+//						{
+//							public void customResultAvailable(IComponentIdentifier result)
+//							{
 								ret.setResult(exta);
-							}
-						});
-					}
-				});
+//							}
+//						});
+//					}
+//				});
 			}
 		});
 		

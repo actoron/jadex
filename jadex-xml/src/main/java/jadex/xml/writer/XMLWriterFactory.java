@@ -33,7 +33,7 @@ public abstract class XMLWriterFactory
 	{
 		if(INSTANCE == null)
 		{
-			if(SReflect.isAndroid())
+			if(SReflect.isAndroid() && !SReflect.isAndroidTesting())
 			{
 				Class< ? > clz;
 				try

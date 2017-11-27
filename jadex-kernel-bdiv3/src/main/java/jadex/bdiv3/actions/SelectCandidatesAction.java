@@ -314,4 +314,9 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		
 		return ret;
 	}
+	
+	public String toString()
+	{
+		return "SelectCandidatesAction("+element+")";
+	}
 }

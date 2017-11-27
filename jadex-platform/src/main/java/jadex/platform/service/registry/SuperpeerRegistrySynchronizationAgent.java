@@ -1,7 +1,7 @@
 package jadex.platform.service.registry;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IServiceRegistry;
@@ -14,8 +14,9 @@ import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationServ
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -26,7 +27,12 @@ import jadex.micro.annotation.ProvidedServices;
  *  Starts peer agent on terminate.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ISuperpeerRegistrySynchronizationService.class, implementation=@Implementation(SuperpeerRegistrySynchronizationService.class)))
+@ProvidedServices(@ProvidedService(type=ISuperpeerRegistrySynchronizationService.class, 
+	implementation=@Implementation(expression="new SuperpeerRegistrySynchronizationService($args.supersuperpeer? null: SuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)")))
+@Arguments({
+	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false")//,
+//	@Argument(name="supersuperpeers", clazz=String.class, defaultvalue="$args.supersuperpeer? null: \"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
+})
 //@Properties(value=@NameValue(name="system", value="true"))
 public class SuperpeerRegistrySynchronizationAgent
 {
@@ -34,12 +40,17 @@ public class SuperpeerRegistrySynchronizationAgent
 	@Agent
 	protected IInternalAccess component;
 	
+//	@AgentArgument(convert="jadex.bridge.service.types.address.TransportAddress.fromString($value)")
+//	protected TransportAddress[] supersuperpeers;
+	
 	/**
 	 *  Called on agent start.
 	 */
 	@AgentCreated
 	public void init()
 	{
+//		System.out.println("superpeers: "+Arrays.toString(supersuperpeers));
+		
 		try
 		{
 			// Kill peer agent
@@ -57,6 +68,14 @@ public class SuperpeerRegistrySynchronizationAgent
 	}
 	
 	/**
+	 *  Test if is supersuperpeer.
+	 */
+	public boolean isSupersuperpeer()
+	{
+		return ((Boolean)component.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("supersuperpeer")).booleanValue();
+	}
+	
+	/**
 	 *  Called on agent kill.
 	 */
 	@AgentKilled
@@ -67,7 +86,8 @@ public class SuperpeerRegistrySynchronizationAgent
 		// Remove all remote services handled by the registry 
 		reg.removeServicesExcept(component.getComponentIdentifier().getRoot());
 		
-		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
+		// Produces problems in platform shutdown
+//		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
 	}
 }

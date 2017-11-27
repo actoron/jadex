@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
@@ -162,7 +163,7 @@ public class JadexGatewayServlet extends HttpServlet
 			
 			if(ret==null)
 			{
-				PlatformConfiguration pc = PlatformConfiguration.getDefault();
+				IPlatformConfiguration pc = PlatformConfigurationHandler.getDefault();
 			    pc.getRootConfig().setGui(false);
 			    pc.getRootConfig().setRsPublish(true);
 			

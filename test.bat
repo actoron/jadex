@@ -1,0 +1,2 @@
+@REM perform a clean build and test
+gradlew -Pdist=publishdists cleanTest test -x javadoc -x lint -x generatereleaseJavadoc -x generatedebugJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x testDebugUnitTest -x jar

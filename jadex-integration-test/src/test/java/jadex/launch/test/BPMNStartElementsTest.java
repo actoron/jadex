@@ -36,8 +36,7 @@ public class BPMNStartElementsTest //extends TestCase
 				"-autoshutdown", "false",
 				"-opengl", "false",
 				"-cli", "false",
-//				"-niotcptransport", "false",
-//				"-tcptransport", "true",
+				"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 //				"-deftimeout", "-1",
 				"-printpass", "false",});
 		

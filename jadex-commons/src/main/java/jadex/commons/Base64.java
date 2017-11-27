@@ -62,6 +62,30 @@ public final class Base64
       }
       return code;
    }
+   
+   /**
+    * Encode and omit padding. 
+    * @param text
+    * @return encoded text
+    */
+   public final static byte[] encodeNoPadding(final byte[] text)
+   {
+	   byte[] ret = encode(text);
+	   if (text.length % 3 == 1)
+	   {
+		   byte[] tmp = ret;
+		   ret = new byte[tmp.length - 2];
+		   System.arraycopy(tmp, 0, ret, 0, ret.length);
+	   }
+	   else if (text.length % 3 == 2)
+	   {
+		   byte[] tmp = ret;
+		   ret = new byte[tmp.length - 1];
+		   System.arraycopy(tmp, 0, ret, 0, ret.length);
+	   }
+	   
+	   return ret;
+   }
 
    /** 
     * @param text
@@ -375,6 +399,34 @@ public final class Base64
          text[--bi] = (byte) (i >>> 16);
       }
       return text;
+   }
+   
+   /**
+    * Decode without padding. 
+    * @param code
+    * @return a byte array holding encoded char data
+    */
+   public final static byte[] decodeNoPadding(byte[] code)
+   {
+	   if (code[code.length - 1] != '=' && code.length % 4 != 0)
+	   {
+		   if ((code.length + 2) % 4 == 0)
+		   {
+			   byte[] tmp = code;
+			   code = new byte[code.length + 2];
+			   System.arraycopy(tmp, 0, code, 0, tmp.length);
+			   code[code.length - 2] = '=';
+			   code[code.length - 1] = '=';
+		   }
+		   else
+		   {
+			   byte[] tmp = code;
+			   code = new byte[code.length + 1];
+			   System.arraycopy(tmp, 0, code, 0, tmp.length);
+			   code[code.length - 1] = '=';
+		   }
+	   }
+	   return decode(code);
    }
 
    /** 

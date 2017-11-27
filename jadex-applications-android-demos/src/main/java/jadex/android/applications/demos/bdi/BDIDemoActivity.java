@@ -3,8 +3,8 @@ package jadex.android.applications.demos.bdi;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.base.PlatformConfiguration;
-import jadex.base.RootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
+import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -35,9 +35,9 @@ public class BDIDemoActivity extends JadexAndroidActivity
 		super();
 		INSTANCE = this;
 		setPlatformAutostart(true);
-		PlatformConfiguration config = getPlatformConfiguration();
+		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("bdiDemoPlatform");
-		config.getRootConfig().setKernels(RootComponentConfiguration.KERNEL.micro, RootComponentConfiguration.KERNEL.component, RootComponentConfiguration.KERNEL.bdi);
+		config.getRootConfig().setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_BDI);
 	}
 
 	@Override

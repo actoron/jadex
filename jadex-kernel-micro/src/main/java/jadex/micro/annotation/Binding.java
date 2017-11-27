@@ -21,23 +21,41 @@ public @interface Binding
 	/** None component scope (nothing will be searched, forces required service creation). */
 	public static final String SCOPE_NONE = RequiredServiceInfo.SCOPE_NONE;
 	
+	/** Parent scope. */
+	public static final String SCOPE_PARENT = RequiredServiceInfo.SCOPE_PARENT;
+	
+	// todo: rename (COMPONENT_LOCAL)
 	/** Local component scope. */
 	public static final String SCOPE_LOCAL = RequiredServiceInfo.SCOPE_LOCAL;
 	
-	/** Component scope. */
+	/** Component scope (component and subcomponents). */
 	public static final String SCOPE_COMPONENT = RequiredServiceInfo.SCOPE_COMPONENT;
 	
-	/** Application scope. */
+	// todo: rename (APPLICATION_PLATFORM) or remove
+	/** Application scope (local application, i.e. second level component plus all subcomponents). */
 	public static final String SCOPE_APPLICATION = RequiredServiceInfo.SCOPE_APPLICATION;
 
-	/** Platform scope. */
+	/** Platform scope (all components on the local platform). */
 	public static final String SCOPE_PLATFORM = RequiredServiceInfo.SCOPE_PLATFORM;
 
-	/** Global scope. */
+	
+	
+	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
+	public static final String SCOPE_APPLICATION_NETWORK = RequiredServiceInfo.SCOPE_APPLICATION_NETWORK;
+//	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
+	
+	/** Network scope (any platform with which a secret is shared). */
+	public static final String SCOPE_NETWORK = RequiredServiceInfo.SCOPE_NETWORK;
+//	public static final String SCOPE_CLOUD = "cloud";
+		
+	// needed?!
+	/** Global application scope. */
+	public static final String SCOPE_APPLICATION_GLOBAL = RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL;
+		
+	/** Global scope (any reachable platform including those with unrestricted services). */
 	public static final String SCOPE_GLOBAL = RequiredServiceInfo.SCOPE_GLOBAL;
 	
-	/** Parent scope. */
-	public static final String SCOPE_PARENT = RequiredServiceInfo.SCOPE_PARENT;
+	
 	
 	/** The raw proxy type (i.e. no proxy). */
 	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;

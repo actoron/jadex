@@ -1,7 +1,6 @@
 package jadex.commons.future;
 
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,11 +49,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Debug flag. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean NO_STACK_COMPACTION = false;
+	public static boolean NO_STACK_COMPACTION = true;
 	
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
@@ -246,6 +245,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     	if(suspend)
 		{
 			if (SReflect.isAndroid()
+					&& !SReflect.isAndroidTesting()
 					&& ISuspendable.SUSPENDABLE.get() == null
 					&& SUtil.androidUtils().runningOnUiThread()) {
 				new Exception("Should not suspend Android UI main thread. Try executing your calls from a different thread! (see stacktrace)").printStackTrace();

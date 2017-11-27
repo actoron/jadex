@@ -24,6 +24,8 @@ public @interface AgentServiceSearch
 	public boolean required() default true;
 	
 	/**
+	 *  todo: remove and replace by query.
+	 * 
 	 *  If is lazy the service search will happen on first call.
 	 *  This can go wrong if first call is a synchronous message.
 	 *  If lazy is false, the agent might block when search takes time.

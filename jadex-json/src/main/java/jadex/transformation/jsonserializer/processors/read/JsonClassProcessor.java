@@ -2,7 +2,6 @@ package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -10,6 +9,8 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Codec for encoding and decoding class objects.
@@ -23,7 +24,7 @@ public class JsonClassProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(Class.class, clazz);
@@ -32,15 +33,14 @@ public class JsonClassProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		Class<?> ret = null;
-		JsonValue val = (JsonValue)object;
+		JsonObject val = (JsonObject)object;
 		
 		try
 		{
@@ -53,6 +53,9 @@ public class JsonClassProcessor implements ITraverseProcessor
 				String clname = ((JsonObject)val).getString("value", null);
 				ret = SReflect.findClass(clname, null, targetcl);
 			}
+			JsonValue idx = (JsonValue)val.get(JsonTraverser.ID_MARKER);
+			if (idx != null)
+				((JsonReadContext) context).addKnownObject(ret, idx.asInt());
 		}
 		catch(Exception e)
 		{

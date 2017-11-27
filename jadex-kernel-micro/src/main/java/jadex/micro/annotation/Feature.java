@@ -23,7 +23,7 @@ public @interface Feature
 	public Class<?> clazz();
 	
 	/** 
-	 *  The presdecessors. 
+	 *  The predecessors. 
 	 */
 	public Class<?>[] predecessors() default {};
 	

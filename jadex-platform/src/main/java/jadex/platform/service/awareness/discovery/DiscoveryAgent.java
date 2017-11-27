@@ -1,5 +1,8 @@
 package jadex.platform.service.awareness.discovery;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -8,24 +11,23 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.message.ICodec;
-import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -38,7 +40,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.service.message.MapSendTask;
 
 /**
  *  Base class for different kinds of discovery agents.
@@ -57,12 +58,12 @@ import jadex.platform.service.message.MapSendTask;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
 })*/
 @ProvidedServices(
-	@ProvidedService(type=IDiscoveryService.class)
+	@ProvidedService(type=IDiscoveryService.class, scope=Binding.SCOPE_PLATFORM)
 )
 @RequiredServices(
 {
-	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="tas", type=ITransportAddressService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//	@RequiredService(name="tas", type=ITransportAddressService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="threadpool", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IAwarenessManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
@@ -115,6 +116,9 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 //	/** The classloader. */
 //	protected ClassLoader classloader;
 	
+	/** The map of all serializers. */
+	protected Map<Byte, ISerializer> allserializers;
+	
 	/** The default codecs. */
 	protected ICodec[] defaultcodecs;
 	
@@ -126,33 +130,35 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		final Future<Void> ret = new Future<Void>();
-	
-//		System.out.println("fast: "+fast);
-		
-//		System.out.println(agent.getComponentIdentifier()+" includes: "+SUtil.arrayToString(includes));
-//		System.out.println(agent.getComponentIdentifier()+" excludes: "+SUtil.arrayToString(excludes));
-		
-//		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
-		
-		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
-		{
-			public void customResultAvailable(ICodec[] result)
-			{
-				defaultcodecs = result;
-				msgser.getAllCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
-				{
-					public void customResultAvailable(Map<Byte, ICodec> result)
-					{
-						allcodecs = result;
-						ret.setResult(null);
-					}
-				}));
-			}
-		}));
-		
-		return ret;
+//		final Future<Void> ret = new Future<Void>();
+//	
+////		System.out.println("fast: "+fast);
+//		
+////		System.out.println(agent.getComponentIdentifier()+" includes: "+SUtil.arrayToString(includes));
+////		System.out.println(agent.getComponentIdentifier()+" excludes: "+SUtil.arrayToString(excludes));
+//		
+////		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
+//		
+//		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
+//		{
+//			public void customResultAvailable(ICodec[] result)
+//			{
+//				defaultcodecs = result;
+//				msgser.getAllSerializersAndCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>>, Void>(ret)
+//				{
+//					public void customResultAvailable(Tuple2<Map<Byte, ISerializer>,Map<Byte, ICodec>> result)
+//					{
+//						allserializers = result.getFirstEntity();
+//						allcodecs = result.getSecondEntity();
+//						ret.setResult(null);
+//					}
+//				}));
+//			}
+//		}));
+//		
+//		return ret;
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -458,10 +464,13 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  @param object The object.
 	 *  @return The byte array.
 	 */
-	public static byte[] encodeObject(Object object, ICodec[] codecs, ClassLoader classloader)
+	public static byte[] encodeObject(Object object, ClassLoader classloader)
 	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		SBinarySerializer.writeObjectToStream(baos, object, classloader);
+		return baos.toByteArray();
 		// TODO: Hack? The encoding context probably needs to be target-based
-		return MapSendTask.encodeMessage(object, codecs, classloader, null);
+//		return MapSendTask.encodeMessage(object, null, null, codecs, classloader);
 //		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
 //			classloader), classloader);
 	}
@@ -471,10 +480,11 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	 *  @param data The byte array.
 	 *  @return The object.
 	 */
-	public static Object decodeObject(byte[] data, Map<Byte, ICodec> codecs, ClassLoader classloader)
+	public static Object decodeObject(byte[] data, ClassLoader classloader)
 	{
+		return SBinarySerializer.readObjectFromStream(new ByteArrayInputStream(data), null, null, classloader, null, null);
 //		System.out.println("size: "+data.length);
-		return MapSendTask.decodeMessage(data, codecs, classloader, IErrorReporter.IGNORE);
+//		return MapSendTask.decodeMessage(data, null, serializers, codecs, classloader, IErrorReporter.IGNORE);
 //		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
 //			classloader), classloader);
 //		return Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 
@@ -492,6 +502,15 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 //		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
 //		return decodeObject(data, classloader);
 //	}
+	
+	/**
+	 *  Get the allcodecs.
+	 *  @return the allcodecs.
+	 */
+	public Map<Byte, ISerializer> getAllSerializers()
+	{
+		return allserializers;
+	}
 	
 	/**
 	 *  Get the allcodecs.
@@ -518,24 +537,29 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+		List<TransportAddress> addresses = tas.getAddresses().get();
+		AwarenessInfo info = new AwarenessInfo(root, addresses, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
+				getExcludes(), null, awa);
+		ret.setResult(info);
 //		System.out.println("awa: "+awa);
-		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
-		{
-			public void customResultAvailable(ITransportAddressService tas)
-			{
-				tas.getTransportComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-					new ExceptionDelegationResultListener<ITransportComponentIdentifier, AwarenessInfo>(ret)
-				{
-					public void customResultAvailable(ITransportComponentIdentifier root)
-					{
-						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
-							getExcludes(), null, awa);
-						ret.setResult(info);
-					}
-				}));
-			}
-		}));
+//		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
+//		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
+//		{
+//			public void customResultAvailable(ITransportAddressService tas)
+//			{
+//				tas.getTransportComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+//					new ExceptionDelegationResultListener<ITransportComponentIdentifier, AwarenessInfo>(ret)
+//				{
+//					public void customResultAvailable(ITransportComponentIdentifier root)
+//					{
+//						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
+//							getExcludes(), null, awa);
+//						ret.setResult(info);
+//					}
+//				}));
+//			}
+//		}));
 		return ret;
 	}
 	
@@ -546,23 +570,28 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
-		{
-			public void customResultAvailable(ITransportAddressService tas)
-			{
-				tas.getTransportComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-					new ExceptionDelegationResultListener<ITransportComponentIdentifier, AwarenessInfo>(ret)
-				{
-					public void customResultAvailable(ITransportComponentIdentifier root)
-					{
-						AwarenessInfo info = new AwarenessInfo(root, state, getDelay(), getIncludes(), 
-							getExcludes(), masterid, awa);
-						ret.setResult(info);
-					}
-				}));
-			}
-		}));
+		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+		List<TransportAddress> addresses = tas.getAddresses().get();
+		AwarenessInfo info = new AwarenessInfo(root, addresses, state, getDelay(), getIncludes(), 
+				getExcludes(), masterid, awa);
+		ret.setResult(info);
+//		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
+//		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
+//		{
+//			public void customResultAvailable(ITransportAddressService tas)
+//			{
+//				tas.getTransportComponentIdentifier(getRoot()).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+//					new ExceptionDelegationResultListener<ITransportComponentIdentifier, AwarenessInfo>(ret)
+//				{
+//					public void customResultAvailable(ITransportComponentIdentifier root)
+//					{
+//						AwarenessInfo info = new AwarenessInfo(root, state, getDelay(), getIncludes(), 
+//							getExcludes(), masterid, awa);
+//						ret.setResult(info);
+//					}
+//				}));
+//			}
+//		}));
 		return ret;
 	}
 

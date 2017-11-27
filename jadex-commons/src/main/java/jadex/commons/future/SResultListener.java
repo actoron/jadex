@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 
 /**
  * Static helper class for creating result listeners.

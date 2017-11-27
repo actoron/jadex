@@ -23,7 +23,7 @@ import java.util.zip.ZipFile;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
-import jadex.base.PlatformConfiguration;
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -43,7 +43,6 @@ import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
@@ -68,7 +67,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //		"-logging", "true",
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
-//		"-logging_level", "java.util.logging.Level.WARNING",
+		"-logging_level", "java.util.logging.Level.WARNING",
 //		"-debugfutures", "true",
 //		"-nostackcompaction", "true",
 		"-gui", "false",
@@ -79,12 +78,13 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-opengl", "false",
 		"-cli", "false",
 //		"-persist", "true", // for testing persistence
-//		"-niotcptransport", "false",
-//		"-tcptransport", "true",
 //		"-deftimeout", "-1",
 		"-printpass", "false",
+		"-superpeerclient", "false",
+		"-wstransport", "false",
+//		"-tcptransport", "false"
 		// Hack!!! include ssl transport if available
-		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
+//		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
 	};
 
 	//-------- attributes --------
@@ -155,7 +155,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	public ComponentTestSuite(File[][] roots, String[] tests, String[] excludes) throws Exception
 	{
 		this(roots, tests, excludes, true, true, true);
-//		this(path, roots, excludes, false, false, true);
+//		this(roots, tests, excludes, true, false, false);
 	}
 	
 	/**
@@ -251,7 +251,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			args = newargs;
 		}
 		
-		PlatformConfiguration conf = PlatformConfiguration.processArgs(args);
+		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
 		this.timeout	= conf.getLocalDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();

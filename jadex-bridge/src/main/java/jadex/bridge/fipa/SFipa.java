@@ -9,7 +9,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
@@ -133,7 +132,7 @@ public class SFipa
 		PERFORMATIVES.add(UNKNOWN);
 	}
 
-	// Names of the various fields of an ACL messages.
+	// Names of the various fields of an ACL message.
 	// Not FIPA compliant, "receivers" should be "receiver" and "_"'s should be "-"'s.
 	public static final String ENCODING = "encoding";
 	public static final String IN_REPLY_TO = "in_reply_to";
@@ -192,7 +191,7 @@ public class SFipa
 	public static final String NUGGETS_XML = "nuggets-xml"; //NuggetsXMLContentCodec.NUGGETS_XML; // Hack!!! avoid dependency
 	//public static final String XSTREAM_XML = "xstream-xml"; //todo
 
-	public static final MessageType FIPA_MESSAGE_TYPE = new FIPAMessageType();
+//	public static final MessageType FIPA_MESSAGE_TYPE = new FIPAMessageType();
 	
 	/**
 	 *  Clone the component identifier.

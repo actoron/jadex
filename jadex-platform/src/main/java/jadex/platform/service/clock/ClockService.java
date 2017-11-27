@@ -22,6 +22,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -313,40 +314,48 @@ public class ClockService extends BasicService implements IClockService, IProper
 //		System.out.println("start clock: "+this);
 		
 		final Future<Void> ret = new Future<Void>();
+
+		threadpool = SServiceProvider.getLocalService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+		ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+
+//		System.out.println("clock: "+ServiceCall.get);
 		
-		SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				threadpool = (IThreadPoolService)result;
+//		SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
+//		{
+//			public void customResultAvailable(IThreadPoolService result)
+//			{
+//				threadpool = result;
 				clock = createClock(cinfo, threadpool);
 				clock.start();
-				ClockService.super.startService().addResultListener(new DelegationResultListener(ret)
+				ClockService.super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
-						SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								ISettingsService	settings	= (ISettingsService)result;
-								settings.registerPropertiesProvider("clockservice", ClockService.this)
-									.addResultListener(new DelegationResultListener(ret));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// No settings service: ignore.
-								ret.setResult(null);
-//								ret.setResult(getServiceIdentifier());
-							}
-						});
+						ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						settings.registerPropertiesProvider("clockservice", ClockService.this)
+							.addResultListener(new DelegationResultListener<Void>(ret));
+						
+//						SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//							.addResultListener(new IResultListener<ISettingsService>()
+//						{
+//							public void resultAvailable(ISettingsService settings)
+//							{
+//								settings.registerPropertiesProvider("clockservice", ClockService.this)
+//									.addResultListener(new DelegationResultListener<Void>(ret));
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								// No settings service: ignore.
+//								ret.setResult(null);
+////								ret.setResult(getServiceIdentifier());
+//							}
+//						});
 					}
 				});
-			}
-		});
+//			}
+//		});
 	
 		return ret;
 	}

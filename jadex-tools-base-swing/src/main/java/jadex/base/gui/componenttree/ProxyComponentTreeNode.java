@@ -13,7 +13,6 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -69,7 +68,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	//-------- attribute --------
 
 	/** The remote component identifier.*/
-	protected ITransportComponentIdentifier cid;
+	protected IComponentIdentifier cid;
 	
 	/** The connection state. */
 //	protected String	state;
@@ -87,9 +86,9 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		this.state = State.UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
-		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<ITransportComponentIdentifier>(new IResultListener<ITransportComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 		{
-			public void resultAvailable(ITransportComponentIdentifier result)
+			public void resultAvailable(IComponentIdentifier result)
 			{
 				if(result!=null)
 				{
@@ -161,9 +160,9 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		});
 		
 		// Get remote component identifier before calling searchChildren
-		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<ITransportComponentIdentifier>(new IResultListener<ITransportComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 		{
-			public void resultAvailable(ITransportComponentIdentifier result)
+			public void resultAvailable(IComponentIdentifier result)
 			{
 				if(result!=null)
 				{
@@ -233,20 +232,20 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	 *  Get the remote component identifier.
 	 *  @return The remote identifier.
 	 */
-	public IFuture<ITransportComponentIdentifier> getRemoteComponentIdentifier()
+	public IFuture<IComponentIdentifier> getRemoteComponentIdentifier()
 	{
-		final Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
 		if(cid==null)
 		{
 			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, ITransportComponentIdentifier>(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)
 				{
-					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<ITransportComponentIdentifier>(ret)
+					pas.getRemoteComponentIdentifier().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 					{
-						public void customResultAvailable(ITransportComponentIdentifier rcid)
+						public void customResultAvailable(IComponentIdentifier rcid)
 						{
 							cid	= rcid;
 							super.customResultAvailable(rcid);

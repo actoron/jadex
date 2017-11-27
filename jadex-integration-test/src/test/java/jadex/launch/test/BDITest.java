@@ -22,6 +22,7 @@ public class BDITest	extends	ComponentTestSuite
 			"BeliefSetContains",
 			"MultiplePlanTriggers",
 			"MessagingTest",	// wrong email configuration?
+			"Codec",	// Content codecs no longer supported in messaging-ng
 			
 			// Agents not to be started in isolation
 			"Worker",

@@ -4,9 +4,9 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -27,21 +27,19 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IRemoteMessageListener;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageListener;
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.IFilter;
+import jadex.bridge.SFuture;
+import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.component.IMessageHandler;
+import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.fipa.FipaMessage;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.Properties;
-import jadex.commons.SReflect;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -119,19 +117,16 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
 					IComponentIdentifier receiver = new BasicComponentIdentifier(rec.getName());
-					Map	message	= convcenter.getMessagePanel().getMessage();
-					MessageType	mt	= (MessageType)message.get(ConversationPanel.MESSAGE_TYPE);
-					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(mt.getReceiverIdentifier());
-					List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
-					if(lrecs.contains(receiver))
+					FipaMessage	message	= convcenter.getMessagePanel().getMessage();
+					Set<IComponentIdentifier>	recs	= message.getReceivers();
+					if(recs!=null && recs.contains(receiver))
 					{
-						lrecs.remove(receiver);
+						message.removeReceiver(receiver);
 					}
 					else
 					{
-						lrecs.add(receiver);
+						message.addReceiver(receiver);
 					}
-					message.put(mt.getReceiverIdentifier(), (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
 					convcenter.getMessagePanel().setMessage(message);
 					
 					comptree.getModel().fireNodeChanged(node);
@@ -152,7 +147,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getJCCAccess(), getJCC().getCMSHandler(), getJCC().getPropertyHandler(), getJCC().getIconCache());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
-		convcenter = new ConversationPanel(getJCC().getPlatformAccess(), getJCC().getJCCAccess(), getJCC().getCMSHandler(), getJCC().getIconCache(), comptree, SFipa.FIPA_MESSAGE_TYPE);
+		convcenter = new ConversationPanel(getJCC().getPlatformAccess(), getJCC().getJCCAccess(), getJCC().getCMSHandler(), getJCC().getIconCache(), comptree);
 		comptree.addNodeHandler(new ShowRemoteControlCenterHandler(getJCC(), getView()));
 		comptree.addNodeHandler(new ISwingNodeHandler()
 		{
@@ -220,56 +215,79 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		split.setDividerLocation(150);
 		
 		
-
-		final IMessageListener listener = new IRemoteMessageListener()
-		{
-			public IFuture messageReceived(IMessageAdapter msg)
-			{
-				convcenter.addMessage(msg);
-				return IFuture.DONE;
-			}
-			public IFuture messageSent(IMessageAdapter msg)
-			{
-				return IFuture.DONE;
-			}
-		};
+//
+//		final IMessageListener listener = new IRemoteMessageListener()
+//		{
+//			public IFuture messageReceived(IMessageAdapter msg)
+//			{
+//				convcenter.addMessage(msg);
+//				return IFuture.DONE;
+//			}
+//			public IFuture messageSent(IMessageAdapter msg)
+//			{
+//				return IFuture.DONE;
+//			}
+//		};
 		
-		getJCC().getPlatformAccess().scheduleStep(new IComponentStep<Void>()
+		getJCC().getPlatformAccess().scheduleStep(new IComponentStep<Collection<Object>>()
 		{
 			@Classname("installListener")
-			public IFuture<Void> execute(final IInternalAccess ia)
+			public ISubscriptionIntermediateFuture<Object> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getService(ia, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener(ia.getLogger())
+				final SubscriptionIntermediateFuture<Object>	ret	= new SubscriptionIntermediateFuture<Object>();
+				SFuture.avoidCallTimeouts(ret, ia);
+				
+				final IMessageHandler	handler	= new IMessageHandler()
 				{
-					public void resultAvailable(Object result)
+					@Override
+					public boolean isRemove()
 					{
-						IMessageService	ms	= (IMessageService)result;
-						ms.addMessageListener(listener, new IFilter()
-						{
-							public boolean filter(Object obj)
-							{
-								IMessageAdapter	msg	= (IMessageAdapter)obj;
-								boolean	tojcc	= false;
-								Object	rec	= msg.getValue(msg.getMessageType().getReceiverIdentifier());
-								if(SReflect.isIterable(rec))
-								{
-									for(Iterator it=SReflect.getIterator(rec); !tojcc && it.hasNext(); )
-									{
-										tojcc	= ia.getComponentIdentifier().equals(it.next());
-									}
-								}
-								else
-								{
-									tojcc	= ia.getComponentIdentifier().equals(rec);
-								}
-								
-								return tojcc;
-							}
-						});
+						return false;
 					}
-				}));
-				return IFuture.DONE;
+					
+					@Override
+					public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+					{
+						return true;
+					}
+					
+					@Override
+					public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+					{
+						ret.addIntermediateResultIfUndone(msg);
+					}
+				};
+				
+				ia.getComponentFeature(IMessageFeature.class).addMessageHandler(handler);
+				
+				ret.setTerminationCommand(new TerminationCommand()
+				{
+					@Override
+					public void terminated(Exception reason)
+					{
+						ia.getComponentFeature(IMessageFeature.class).removeMessageHandler(handler);
+					}
+				});
+				return ret;
+			}
+		}).addResultListener(new IIntermediateResultListener<Object>()
+		{
+			@Override
+			public void intermediateResultAvailable(Object result)
+			{
+				convcenter.addMessage(result);
+			}
+			@Override
+			public void resultAvailable(Collection<Object> result)
+			{
+			}
+			@Override
+			public void finished()
+			{
+			}
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
 			}
 		});
 		

@@ -12,6 +12,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -26,7 +27,7 @@ public class JsonBigIntegerProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return object instanceof JsonObject && SReflect.isSupertype(BigInteger.class, clazz);
@@ -39,13 +40,13 @@ public class JsonBigIntegerProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonObject obj = (JsonObject)object;
 		
 		JsonValue val = obj.get("value");
-		byte[] vals = (byte[])traverser.traverse(val, byte[].class, processors, targetcl, context);
+		
+		byte[] vals = (byte[])traverser.traverse(val, byte[].class, conversionprocessors, processors, mode, targetcl, context);
 		BigInteger ret = new BigInteger(vals);
 		
 		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);

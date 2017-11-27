@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
@@ -227,50 +226,61 @@ public class SFuture
 	public static Future<?> getFuture(Class<?> clazz)
 	{
 		Future<?> ret = null;
+		Exception ex	= null;
 		
-		// todo: refactor to not catch exception but check type?
-		
-		try
+		if(!clazz.isInterface())
 		{
-			ret = (Future<?>)clazz.newInstance();
+			try
+			{
+				ret = (Future<?>)clazz.newInstance();
+			}
+			catch(Exception e)
+			{
+				ex	= e;
+			}
 		}
-		catch(Exception e)
+		
+		if(ret==null)
 		{
-			if(SReflect.isSupertype(ITuple2Future.class, clazz))
+			if(ITuple2Future.class.isAssignableFrom(clazz))
 			{
 				ret = new Tuple2Future();
 			}
-			else if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
+			else if(IPullSubscriptionIntermediateFuture.class.isAssignableFrom(clazz))
 			{
 				ret = new PullSubscriptionIntermediateDelegationFuture();
 			}
-			else if(SReflect.isSupertype(IPullIntermediateFuture.class, clazz))
+			else if(IPullIntermediateFuture.class.isAssignableFrom(clazz))
 			{
 				ret = new PullIntermediateDelegationFuture();
 			}
-			else if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, clazz))
+			else if(ISubscriptionIntermediateFuture.class.isAssignableFrom(clazz))
 			{
 				ret = new SubscriptionIntermediateDelegationFuture();
 			}
-			else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, clazz))
+			else if(ITerminableIntermediateFuture.class.isAssignableFrom(clazz))
 			{
 				ret = new TerminableIntermediateDelegationFuture();
 			}
-			else if(SReflect.isSupertype(ITerminableFuture.class, clazz))
+			else if(ITerminableFuture.class.isAssignableFrom(clazz))
 			{
 				ret = new TerminableDelegationFuture();
 			}
-			else if(SReflect.isSupertype(IIntermediateFuture.class, clazz))
+			else if(IIntermediateFuture.class.isAssignableFrom(clazz))
 			{
 				ret	= new IntermediateFuture();
 			}
-			else if(SReflect.isSupertype(IFuture.class, clazz))
+			else if(IFuture.class.isAssignableFrom(clazz))
 			{
 				ret	= new Future();
 			}
+			else if(ex!=null)
+			{
+				throw SUtil.throwUnchecked(ex);
+			}
 			else
 			{
-				throw SUtil.throwUnchecked(e);
+				throw new RuntimeException("No future type: "+clazz);
 			}
 		}
 		

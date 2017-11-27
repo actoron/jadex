@@ -1,6 +1,11 @@
 package jadex.webservice.examples.rs.chart;
 
 import static org.junit.Assert.assertNotNull;
+
+import java.security.Security;
+
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -11,9 +16,13 @@ import jadex.commons.future.ThreadSuspendable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
-import android.graphics.Color;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
@@ -21,17 +30,25 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
-		new SReflectSub().setIsAndroid(false);
-		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{
-				"-gui", "false",
-				"-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
-//				"-componentfactory", "jadex.component.ComponentComponentFactory",
-//				"-conf", "jadex/platform/Platform.component.xml",
-//				"-logging", "true",
-//				"-deftimeout", "-1",
-				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"
-		});
+		System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_GCM_SHA256");	// Hack: workaround for java 8 problem with ECDH key exchange
+		new SReflectSub().setIsAndroid(true, true);
+
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+		config.setAwareness(false);
+		config.addComponent(ChartProviderAgent.class);
+		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
+
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
+//		{
+//				"-gui", "false",
+//				"-awareness", "false", //"-relaytransport", "false", "-tcptransport", "false",
+////				"-componentfactory", "jadex.component.ComponentComponentFactory",
+////				"-conf", "jadex/platform/Platform.component.xml",
+////				"-logging", "true",
+////				"-deftimeout", "-1",
+////				"-component", "jadex/webservice/examples/rs/chart/ChartProvider.component.xml"
+//				"-component", "jadex/webservice/examples/rs/chart/ChartProviderAgent.class"
+//		});
 
 		extAcc = fut.get();
 	}
@@ -42,7 +59,7 @@ public class RSChartTest
 		IFuture<IChartService> fut = SServiceProvider.getService(extAcc, IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		IChartService hs = fut.get();
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
-		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get();
+		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{0xFF000000, 0xFF0000FF, 0xFF00FFFF, 0xFFFFFF00}).get();
 		
 		
 //		RestTemplate rt = new RestTemplate();
@@ -68,8 +85,8 @@ public class RSChartTest
 	}
 	
 	private class SReflectSub extends SReflect {
-		public void setIsAndroid(Boolean b) {
-			isAndroid = b;
+		public void setIsAndroid(Boolean isAndroidFlag, Boolean isAndroidTestingFlag) {
+			SReflect.setAndroid(isAndroidFlag, isAndroidTestingFlag);
 		}
 	}
 }

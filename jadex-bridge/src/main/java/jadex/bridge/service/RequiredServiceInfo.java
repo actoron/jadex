@@ -18,30 +18,47 @@ public class RequiredServiceInfo
 	
 	/** None component scope (nothing will be searched, forces required service creation). */
 	public static final String SCOPE_NONE = "none";
+
+	/** Parent scope. */
+	public static final String SCOPE_PARENT = "parent";
 	
-	/** Local component scope. */
+	// todo: rename (COMPONENT_LOCAL)
+	/** Local component scope (component only). */
 	public static final String SCOPE_LOCAL = "local";
 	
-	/** Component scope. */
+	/** Component scope (component and subcomponents). */
 	public static final String SCOPE_COMPONENT = "component";
 	
-	/** Application scope. */
+	// todo: rename (APPLICATION_PLATFORM) or remove
+	/** Application scope (local application, i.e. second level component plus all subcomponents). */
 	public static final String SCOPE_APPLICATION = "application";
 
-	/** Platform scope. */
+	/** Platform scope (all components on the local platform). */
 	public static final String SCOPE_PLATFORM = "platform";
 
-	/** Global scope. */
+	
+	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
+	public static final String SCOPE_APPLICATION_NETWORK = "application_network";
+//	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
+	
+	/** Network scope (any platform with which a secret is shared). */
+	public static final String SCOPE_NETWORK = "network";
+//	public static final String SCOPE_CLOUD = "cloud";
+		
+	// needed?!
+	/** Global application scope. */
+	public static final String SCOPE_APPLICATION_GLOBAL = "application_global";
+	
+	/** Global scope (any reachable platform including those with unrestricted services). */
 	public static final String SCOPE_GLOBAL = "global";
 	
-	/** Global Application scope. */
-	public static final String SCOPE_GLOBAL_APPLICATION = "global_application";
+	
+//	/** Global application scope. */
+//	public static final String SCOPE_GLOBAL_APPLICATION = "global_application";
 	
 //	/** Upwards scope. */
 //	public static final String SCOPE_UPWARDS = "upwards";
 	
-	/** Parent scope. */
-	public static final String SCOPE_PARENT = "parent";
 	
 	//-------- attributes --------
 
@@ -303,7 +320,8 @@ public class RequiredServiceInfo
 	 */
 	public static boolean isScopeOnLocalPlatform(String scope)
 	{
-		return !SCOPE_GLOBAL.equals(scope) && !SCOPE_GLOBAL_APPLICATION.equals(scope);
+		return SCOPE_NONE.equals(scope) || SCOPE_LOCAL.equals(scope) || SCOPE_COMPONENT.equals(scope)
+			|| SCOPE_APPLICATION.equals(scope) || SCOPE_PLATFORM.equals(scope) || SCOPE_PARENT.equals(scope);
 	}
 	
 }

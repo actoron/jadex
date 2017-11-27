@@ -49,8 +49,6 @@
 		<argument name="simulation" class="Boolean"/>
 		<!-- Use asynchronous execution mode? -->
 		<argument name="asyncexecution" class="Boolean"/>
-		<!-- Flag to enable component persistence. -->
-		<argument name="persist" class="boolean">false</argument>
 		<!-- Flag if CIDs may be reused (true for not). -->
 		<argument name="uniqueids" class="boolean">true</argument>
 		<!-- Flag for deferring thread creation/deletion in thread pool -->
@@ -255,16 +253,7 @@
 		 </providedservice>
 		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService" name="cms">
 			<implementation>
-				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
-					? jadex.platform.service.persistence.PersistenceComponentManagementService.create($args.platformaccess, $args.componentfactory, $args.persist, $args.uniqueids)
-					: new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.componentfactory, $args.uniqueids)
-			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.persistence.IPersistenceService">
-			<implementation>
-				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
-					? $component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.cms.IComponentManagementService.class)
-					: null
+				new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.bootstrapfactory, $args.uniqueids)
 			</implementation>
 		</providedservice>
 		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">

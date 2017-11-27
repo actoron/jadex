@@ -14,6 +14,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
@@ -40,6 +41,12 @@ public class ReceiverAgent
 	
 	@AgentServiceSearch
 	protected IContextService contextService;
+
+	@AgentCreated
+	public void created()
+	{
+		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+	}
 	
 	/**
 	 * 

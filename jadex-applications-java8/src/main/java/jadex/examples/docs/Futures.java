@@ -5,7 +5,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SResultListener;
+import jadex.commons.future.TerminableFuture;
 
 /**
  * Created by kalinowski on 01.09.16.
@@ -66,6 +68,23 @@ public class Futures {
 //
 //    }
 
+    public static TerminableFuture<String> doTerminableWork() {
+        TerminableFuture<String> fut = new TerminableFuture<String>();
+        ITerminationCommand term = new ITerminationCommand() {
+
+            public boolean checkTermination(Exception reason) {
+                return true; // termination is accepted at this point
+            }
+
+            public void terminated(Exception reason) {
+//                stopWork();
+            }
+        };
+        fut.setTerminationCommand(term);
+        // do some asynchronous work that calls fut.setResult() eventually
+        return fut;
+    }
+
 
     /**
      * SResultListener
@@ -84,7 +103,7 @@ public class Futures {
         fut.addResultListener(SResultListener.delegate(myFut), ex -> threeDots(ex));
 
 // count results
-        CounterResultListener<Object> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
+        CounterResultListener<?> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
 
     }
 

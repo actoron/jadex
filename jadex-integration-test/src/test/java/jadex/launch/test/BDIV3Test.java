@@ -17,6 +17,8 @@ public class BDIV3Test	extends	ComponentTestSuite
 		{
 			"treasureisland",	// in progress -> include later
 			
+			"d5",	// uses dispatchGoal().get() in body which causes agent to fail on shutdown, depending on race condition
+			"HelloWorldGoal",	// uses dispatchGoal().get() in body which causes agent to fail on shutdown, depending on race condition
 			"INegotiationAgent",	// Not an agent.
 			"QuickstartBDI",	// blocks due to opened dialog
 			"Ambulance",	// sub agent

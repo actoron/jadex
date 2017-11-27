@@ -299,7 +299,7 @@ public class GenerateService implements IGenerateService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("ex: "+exception);
+				System.out.println("ex in perform tasks: "+exception);
 				ret.setExceptionIfUndone(exception);
 			}
 			

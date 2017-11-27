@@ -101,8 +101,8 @@ public class BPMNRecoveryTestAgent
 //		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
-		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE).get();
+//		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(fut.getFirstResult(), msg).get();
 		
 		cres.get();
 		

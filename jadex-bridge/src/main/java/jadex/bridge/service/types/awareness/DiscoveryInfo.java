@@ -2,10 +2,11 @@ package jadex.bridge.service.types.awareness;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
@@ -22,7 +23,10 @@ public class DiscoveryInfo
 	//-------- attributes --------
 	
 	/** The component identifier of the remote component. */
-	protected ITransportComponentIdentifier cid;
+	protected IComponentIdentifier cid;
+	
+	/** The transport addresses of the remote component. */
+	protected List<TransportAddress> addresses;
 	
 	/** Component id of local proxy (if any). */
 	protected IFuture<IComponentIdentifier> proxy;
@@ -55,10 +59,11 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(ITransportComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
+	public DiscoveryInfo(IComponentIdentifier cid, List<TransportAddress> addresses, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
 			boolean remoteexcluded, Map<String, String> properties)
 	{
 		this.cid = cid;
+		this.addresses = addresses;
 		this.proxy = proxy;
 //		this.time = time;
 //		this.delay = delay;
@@ -72,7 +77,7 @@ public class DiscoveryInfo
 	 *  Get the component identifier.
 	 *  @return the component identifier.
 	 */
-	public ITransportComponentIdentifier getComponentIdentifier()
+	public IComponentIdentifier getComponentIdentifier()
 	{
 		return cid;
 	}
@@ -81,11 +86,33 @@ public class DiscoveryInfo
 	 *  Set the component identifier.
 	 *  @param component identifier The component identifier to set.
 	 */
-	public void setComponentIdentifier(ITransportComponentIdentifier componentIdentifier)
+	public void setComponentIdentifier(IComponentIdentifier componentIdentifier)
 	{
 		this.cid = componentIdentifier;
 	}
 	
+	
+	
+	/**
+	 *  Gets the addresses.
+	 *
+	 *  @return The addresses.
+	 */
+	public List<TransportAddress> getAddresses()
+	{
+		return addresses;
+	}
+
+	/**
+	 *  Sets the addresses.
+	 *
+	 *  @param addresses The addresses.
+	 */
+	public void setAddresses(List<TransportAddress> addresses)
+	{
+		this.addresses = addresses;
+	}
+
 	/**
 	 *  Get the proxy.
 	 *  @return the proxy.

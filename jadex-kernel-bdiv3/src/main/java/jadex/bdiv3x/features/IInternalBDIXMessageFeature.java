@@ -12,11 +12,11 @@ public interface IInternalBDIXMessageFeature
 	 *  to send back answers to the source capability.
 	 *  @param msgevent The message event.
 	 */
-	public void registerMessageEvent(RMessageEvent msgevent);
+	public void registerMessageEvent(RMessageEvent<Object> msgevent);
 	
 	/**
 	 *  Deregister a conversation or reply-with.
 	 *  @param msgevent The message event.
 	 */
-	public void deregisterMessageEvent(RMessageEvent msgevent);
+	public void deregisterMessageEvent(RMessageEvent<Object> msgevent);
 }

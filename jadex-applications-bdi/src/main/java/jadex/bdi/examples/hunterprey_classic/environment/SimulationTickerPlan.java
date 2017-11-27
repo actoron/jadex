@@ -5,7 +5,6 @@ import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.MessageFailureException;
 import jadex.bridge.fipa.SFipa;
 
 
@@ -50,7 +49,7 @@ public class SimulationTickerPlan extends Plan
 				{
 					sendMessage(mevent);
 				}
-				catch(MessageFailureException e)
+				catch(Exception e)
 				{
 					env.removeCreature(creatures[i]);
 				}

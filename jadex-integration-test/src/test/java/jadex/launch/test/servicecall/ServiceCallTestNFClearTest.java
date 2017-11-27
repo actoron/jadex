@@ -10,6 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -62,13 +64,23 @@ public class ServiceCallTestNFClearTest
 	{
 		timeout = Starter.getLocalDefaultTimeout(null);
 
-		String pid = SUtil.createUniqueId(name.getMethodName(), 3) + "-*";
+		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
-		platform1 = Starter.createPlatform(
-			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false", "-logging", "false"}).get(timeout);
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
+//		config.setLogging(true);
+//		config.setDefaultTimeout(-1);
+		config.setPlatformName(pid);
+		config.setSaveOnExit(false);
+		config.setAutoShutdown(false);
+		config.setSecurity(true);
+//		config.setAwaMechanisms(AWAMECHANISM.local);
+//		config.setAwareness(true);
+		config.setAwareness(false);
+		config.setTcpTransport(true);
 
-		platform2 = Starter.createPlatform(
-			new String[]{"-platformname", pid, "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false", "-logging", "false"}).get(timeout);
+		platform1 = Starter.createPlatform(config).get(timeout);
+
+		platform2 = Starter.createPlatform(config).get(timeout);
 
 		createProxies(platform1, platform2);
 
@@ -330,7 +342,10 @@ public class ServiceCallTestNFClearTest
 		{
 			for(int j = 0; j < platforms.length; j++)
 			{
-				Starter.createProxy(platforms[i], platforms[j]).get(timeout);
+				if(i!=j)
+				{
+					Starter.createProxy(platforms[i], platforms[j]).get(timeout);
+				}
 			}
 		}
 	}

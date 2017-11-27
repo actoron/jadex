@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 public class MultiCollectionCodec extends AbstractCodec
 {
@@ -63,7 +65,7 @@ public class MultiCollectionCodec extends AbstractCodec
 	 */
 	public Object decodeSubObjects(Object object, Class<?> clazz, IDecodingContext context)
 	{
-		Map map = (Map)BinarySerializer.decodeObject(context);
+		Map map = (Map)SBinarySerializer.decodeObject(context);
 		String classname = context.readClassname();
 		Class type = SReflect.classForName0(classname, context.getClassloader());
 		if (type == null)
@@ -87,24 +89,11 @@ public class MultiCollectionCodec extends AbstractCodec
 		
 		return object;
 	}
-	
-	/**
-	 *  Test if the processor is applicable.
-	 *  @param object The object.
-	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
-	 *    e.g. by cloning the object using the class loaded from the target class loader.
-	 *  @return True, if is applicable. 
-	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-	{
-		return isApplicable(clazz);
-	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		MultiCollection mc = (MultiCollection) object;
 		try
@@ -112,7 +101,7 @@ public class MultiCollectionCodec extends AbstractCodec
 			Field mapfield = MultiCollection.class.getDeclaredField("map");
 			mapfield.setAccessible(true);
 			Map map = (Map) mapfield.get(mc);
-			traverser.doTraverse(map, map.getClass(), traversed, processors, clone, null, ec);
+			traverser.doTraverse(map, map.getClass(), preprocessors, processors, mode, targetcl, ec);
 			
 			Field typefield = MultiCollection.class.getDeclaredField("type");
 			typefield.setAccessible(true);
@@ -121,7 +110,7 @@ public class MultiCollectionCodec extends AbstractCodec
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException(e);
+			SUtil.rethrowAsUnchecked(e);
 		}
 		
 		return object;

@@ -51,14 +51,15 @@ public class PeerRegistrySynchronizationAgent
 		}
 	}
 	
-	/**
-	 *  Called on agent kill.
-	 */
-	@AgentKilled
-	public void terminate()
-	{
-		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
-	}
+//	/**
+//	 *  Called on agent kill.
+//	 */
+//	@AgentKilled
+//	public void terminate()
+//	{
+//		// Produces problems in platform shutdown
+//		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
+//	}
 }
 

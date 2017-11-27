@@ -4,10 +4,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
  *  Codec for encoding and decoding Date objects.
@@ -54,12 +54,11 @@ public class DateCodec extends AbstractCodec
 //		Class<?> clazz = SReflect.getClass(type);
 //		return isApplicable(clazz);
 //	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		long time = ((Date)object).getTime();
 		byte[] abuf = new byte[8];

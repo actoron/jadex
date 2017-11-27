@@ -1,52 +1,84 @@
 package jadex.bridge.service.types.address;
 
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- *  Service that manages the platform transport addresses.
+ *  Service for translating platform names
+ *  to communication addresses and address book
+ *  management.
+ *
  */
 @Service(system=true)
 public interface ITransportAddressService
 {
 	/**
-	 *  Set the addresses of a platform.
-	 *  @param platform The component identifier of the platform.
+	 *  Gets the addresses of the local platform.
+	 *  
+	 *  @return Addresses of the local platform.
 	 */
-	public IFuture<Void> addPlatformAddresses(ITransportComponentIdentifier platform);
+	public IFuture<List<TransportAddress>> getAddresses();
 	
 	/**
-	 *  Remove the addresses of a platform.
-	 *  @param platform The component identifier of the platform.
+	 *  Gets the addresses of the local platform.
+	 *  
+	 *  @param transporttype The transport type.
+	 *  @return Addresses of the local platform.
 	 */
-	public IFuture<Void> removePlatformAddresses(ITransportComponentIdentifier platform);
+	public IFuture<List<TransportAddress>> getAddresses(String transporttype);
 	
 	/**
-	 *  Remove the addresses of a platform.
-	 *  @param platform The component identifier of the platform.
+	 *  Gets the addresses of another platform known to the local platform.
+	 *  
+	 *  @param platformid ID of the platform.
+	 *  @return Addresses of the platform, if known.
 	 */
-	public IFuture<String[]> getPlatformAddresses(IComponentIdentifier component);
+	public IFuture<List<TransportAddress>> getAddresses(IComponentIdentifier platformid);
 	
 	/**
-	 *  Create a transport component identifier.
-	 *  @param The component identifier.
-	 *  @return The transport component identifier.
+	 *  Gets the addresses of another platform known to the local platform.
+	 *  
+	 *  @param platformid ID of the platform.
+	 *  @param transporttype The transport type.
+	 *  @return Addresses of the platform, if known.
 	 */
-	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier(IComponentIdentifier component); 
+	public IFuture<List<TransportAddress>> getAddresses(IComponentIdentifier platformid, String transporttype);
 	
 	/**
-	 *  Create a transport component identifiers.
-	 *  @param The component identifiers.
-	 *  @return The transport component identifiers.
+	 *  Resolves the addresses of a platform for a specific transport type using multiple methods.
+	 *  
+	 *  @param platformid ID of the platform.
+	 *  @param transporttype The transport type.
+	 *  @return Addresses of the local platform.
 	 */
-	public IFuture<ITransportComponentIdentifier[]> getTransportComponentIdentifiers(IComponentIdentifier[] component); 
-
+	public IFuture<List<TransportAddress>> resolveAddresses(IComponentIdentifier platformid, String transporttype);
+	
 	/**
-	 *  Get direct access to the map of the addresses.
-	 *  @return The map.
+	 *  Adds the addresses of the local platform.
+	 *  
+	 *  @param addresses Local platform addresses.
+	 *  @return Null, when done.
 	 */
-	public @Reference(local=true, remote=false) IFuture<TransportAddressBook> getTransportAddresses();
+	public IFuture<Void> addLocalAddresses(Collection<TransportAddress> addresses);
+	
+	/**
+	 *  Subscribe to local address changes.
+	 *  
+	 *  @return Address and true if removed.
+	 */
+	public ISubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>> subscribeToLocalAddresses();
+	
+	/**
+	 *  Adds the addresses of the local platform.
+	 *  
+	 *  @param addresses Local platform addresses.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addManualAddresses(Collection<TransportAddress> addresses);
 }

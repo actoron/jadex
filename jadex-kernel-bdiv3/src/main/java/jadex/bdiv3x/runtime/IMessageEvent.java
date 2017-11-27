@@ -1,12 +1,9 @@
 package jadex.bdiv3x.runtime;
 
-import jadex.bridge.service.types.message.MessageType;
-
-
 /**
  *  The interface for all message events (concrete and referenced).
  */
-public interface IMessageEvent extends IParameterElement
+public interface IMessageEvent<T> extends IParameterElement
 {
 	//-------- methods --------
 
@@ -14,14 +11,14 @@ public interface IMessageEvent extends IParameterElement
 	 *  Get the native (platform specific) message object.
 	 *  @return The native message.
 	 */
-	public Object getMessage();
-
-	/**
-	 *  Get the message type.
-	 *  @return The message type.
-	 */
-	public MessageType getMessageType();
-	
+	public T getMessage();
+//
+//	/**
+//	 *  Get the message type.
+//	 *  @return The message type.
+//	 */
+//	public MessageType getMessageType();
+//	
 	/**
 	 *  Get the message direction.
 	 *  @return True, if message is incoming.

@@ -162,6 +162,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			{
 				return executeBodyOnFeatures(lfeatures.iterator());
 			}
+			
+			@Override
+			public String toString()
+			{
+				return "PlatformComponent.body("+getComponentIdentifier()+")";
+			}
 		});
 	}
 	

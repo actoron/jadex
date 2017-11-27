@@ -1,7 +1,5 @@
 package jadex.bridge.service.types.message;
 
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-
 /**
  *  Encode and decode an object from a string representation.
  */
@@ -14,7 +12,7 @@ public interface ICodec
 	 *  Get the codec id.
 	 *  @return The codec id.
 	 */
-	public byte getCodecId();
+	public int getCodecId();
 	
 	/**
 	 *  Encode data with the codec.
@@ -22,14 +20,19 @@ public interface ICodec
 	 *  @return The encoded object.
 	 */
 //	public byte[] encode(Object val, ClassLoader classloader);
-	public Object encode(Object val, ClassLoader classloader, IEncodingContext context);
+	public byte[] encode(byte[] val);
 	
 	/**
 	 *  Decode data with the codec.
 	 *  @param bytes The value bytes as byte array or input stream.
 	 *  @return The decoded object or byte array (for intermediate codecs).
 	 */
-//	public Object decode(byte[] bytes, ClassLoader classloader);
-	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep);
+	public byte[] decode(byte[] bytes);
 	
+	/**
+	 *  Decode data with the codec.
+	 *  @param bytes The value bytes as byte array or input stream.
+	 *  @return The decoded object or byte array (for intermediate codecs).
+	 */
+	public byte[] decode(byte[] bytes, int offset, int length);
 }

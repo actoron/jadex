@@ -2,6 +2,8 @@ package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import java.util.Collection;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -40,16 +42,21 @@ public class StartScenario
 	{
 		final Future<IExternalAccess[]> ret = new Future<IExternalAccess[]>();
 		
-		String[] defargs = new String[]{"-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001", "-printpass", "false", "-networkname", "abc"};
+//		String[] defargs = new String[]{"-logging", "true", "-platformname", "local", "-tcpport", "10000", "-tcpport", "10001", "-printpass", "false", "-networkname", "abc"};
 		
-		Starter.createPlatform(createArguments(defargs, libpaths))
+		
+//		Starter.createPlatform(createArguments(defargs, libpaths))
+		IPlatformConfiguration conf1 = PlatformConfigurationHandler.getMinimal();
+		conf1.setGui(true);
+		Starter.createPlatform(conf1)
 			.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(final IExternalAccess lplat)
 			{
-				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-niotcpport", "11001", "-printpass", "false", "-networkname", "abc"};
+				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-tcpport", "11001", "-printpass", "false", "-networkname", "abc"};
 				
-				Starter.createPlatform(createArguments(defargs, libpaths))
+//				Starter.createPlatform(createArguments(defargs, libpaths))
+				Starter.createPlatform(PlatformConfigurationHandler.getMinimal())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(final IExternalAccess rplat)

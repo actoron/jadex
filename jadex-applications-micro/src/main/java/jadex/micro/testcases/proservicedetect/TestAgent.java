@@ -7,6 +7,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.Results;
  *  Agent that implements a service and uses it automatically as
  *  provided service (without declaration).
  */
-@Agent(autoprovide=true)
+@Agent(autoprovide=Boolean3.TRUE)
 @Service
 //@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
 //@ProvidedServices(@ProvidedService(type=ITestService.class))

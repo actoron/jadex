@@ -26,7 +26,10 @@ dependencies
 										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
 										   ':jadex-platform-extension-webservice-desktop',
 										   ':jadex-platform-extension-webservice-desktop-jetty',
-										   ':jadex-platform-extension-webservice-desktop-grizzly'
+										   ':jadex-platform-extension-webservice-desktop-grizzly',
+
+										   ':jadex-platform-extension-websockettransport',
+										   ':jadex-platform-extension-relaytransport',
 										   ])
 	
 	launcharts.retainAll(gradle.ext.includeartifacts)
@@ -34,6 +37,7 @@ dependencies
 	launcharts.each { art ->
 		compile project(art)
 	}
+	compile project(':jadex-applications-micro')
 
 //	test {
 //		testLogging {

@@ -21,6 +21,6 @@ public class PrintResultPlan extends Plan
 	{
 		this.result = getParameter("result").getValue();
 		
-		getLogger().info(""+result);
+		getLogger().info("result: "+result);
 	}
 }

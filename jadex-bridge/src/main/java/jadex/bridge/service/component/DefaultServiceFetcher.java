@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -21,7 +22,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
-import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -29,9 +29,9 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.search.TagFilter;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -44,7 +44,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureFinishChecker;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -102,18 +101,19 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
-		if(info.getTags()!=null && info.getTags().size()>0)
-		{
-			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
-			if(filter==null)
-			{
-				filter = tf;
-			}
-			else
-			{
-				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
-			}
-		}
+//		if(info.getTags()!=null && info.getTags().size()>0)
+//		{
+//			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
+//			if(filter==null)
+//			{
+//				filter = tf;
+//			}
+//			else
+//			{
+//				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
+//			}
+//		}
+		final String[] tags = info.getTags() == null? null : info.getTags().toArray(new String[0]);
 		final IAsyncFilter<T> ffilter = filter;
 		
 //		System.out.println(info.getType().getTypeName().toString());
@@ -133,7 +133,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				// Test if already bound.
 				if(result==null)
 				{
-					// Search component.
+					// Search component per name.
 					if(binding.getComponentName()!=null)
 					{
 //						System.out.println("searching: "+binding.getComponentName());
@@ -142,7 +142,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
+//								IFuture<T> fut = SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
+								IFuture<T> fut = SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags);
 								fut.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
 							}
 //							public void exceptionOccurred(Exception exception)
@@ -163,7 +164,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								if(coll!=null && coll.size()>0)
 								{
 									IExternalAccess ea = coll.iterator().next();
-									SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+//									SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+									SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags)
 										.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding));
 								}
 								else
@@ -175,8 +177,12 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					}
 					else
 					{
+						if("decoupled".equals(info.getName()))
+						{
+							System.out.println("searching6: "+info.getName()+", "+type+", "+binding.getScope());
+						}
 						// Search service using search specification.
-						SServiceProvider.getService(ia, type, binding.getScope(), ffilter, false)
+						SServiceProvider.getTaggedService(ia, type, binding.getScope(), ffilter, false, tags)
 							.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding)
 						{
 //							public void customResultAvailable(Object result)
@@ -229,18 +235,22 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
-		if(info.getTags()!=null && info.getTags().size()>0)
-		{
-			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
-			if(filter==null)
-			{
-				filter = tf;
-			}
-			else
-			{
-				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
-			}
-		}
+//		if (info.getTags() != null && info.getTags().size()>0)
+//			throw new RuntimeException("Multi service injection with tags broken.");
+		
+//		if(info.getTags()!=null && info.getTags().size()>0)
+//		{
+//			TagFilter<T> tf = new TagFilter<T>(ia.getExternalAccess(), info.getTags());
+//			if(filter==null)
+//			{
+//				filter = tf;
+//			}
+//			else
+//			{
+//				filter = new ComposedRemoteFilter<T>(new IAsyncFilter[]{filter, tf});
+//			}
+//		}
+		final String[] tags = info.getTags() == null? null : info.getTags().toArray(new String[0]);
 		final IAsyncFilter<T> ffilter = filter;
 		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
@@ -268,7 +278,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
+								IFuture<Collection<T>> fut = SServiceProvider.getTaggedServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags);
+//								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter);
 //								IFuture<Collection<T>> fut = SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL);
 								fut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding));
 							}
@@ -315,7 +326,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 												final IExternalAccess ea = it.next();
 //												final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
 	
-												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+//												SServiceProvider.getService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter)
+												SServiceProvider.getTaggedService(ea, type, RequiredServiceInfo.SCOPE_LOCAL, ffilter, tags)
 													.addResultListener(new IResultListener<T>()
 												{
 													public void resultAvailable(final T result)
@@ -356,8 +368,20 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 						// Search service using search specification.
 //						if(type.toString().indexOf("Test")!=-1)
 //							System.out.println("result: "+result);
+						
+						ServiceQuery<T> query = new ServiceQuery<T>(new ClassInfo(type), binding.getScope(), null, ia.getComponentIdentifier(), ffilter, new ClassInfo(type));
+						
+//						ServiceQuery<T> query = new ServiceQuery<T>();
+//						query.setServiceType(new ClassInfo(type));
+//						query.setScope(binding.getScope());
+//						query.setOwner(ia.getComponentIdentifier());
+//						query.setAsyncFilter(ffilter);
+//						query.setReturnType(query.getServiceType());
 
-						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
+						query.setServiceTags(tags, ia.getExternalAccess());
+						
+//						IIntermediateFuture<T>	ifut	= SServiceProvider.getServices(ia, type, binding.getScope(), ffilter, false);
+						IIntermediateFuture<T>	ifut	= ServiceRegistry.getRegistry(ia.getComponentIdentifier().getRoot()).searchServicesAsync(query);
 						ifut.addResultListener(new StoreIntermediateDelegationResultListener<T>(ret, ia, info, binding)
 						{
 							public void exceptionOccurred(Exception exception)

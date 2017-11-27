@@ -17,7 +17,7 @@ import jadex.bridge.service.IService;
 /**
  *  Responsible for extracting values.
  */
-public class ServiceKeyExtractor implements IKeyExtractor
+public class ServiceKeyExtractor implements IKeyExtractor<IService>
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -30,6 +30,16 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	
 	/** Key type for the service platform. */
 	public static final String KEY_TYPE_PLATFORM = "platform";
+	
+	/** Key type for the service id. */
+	public static final String KEY_TYPE_SID = "serviceid";
+	
+	/** Key type for the networks. */
+	public static final String KEY_TYPE_NETWORKS = "networks";
+	
+	/** Key type for the unrestricted mode. */
+	public static final String KEY_TYPE_UNRESTRICTED = "unrestricted";
+
 	
 	/** The key types. */
 	public static final String[] SERVICE_KEY_TYPES;
@@ -61,7 +71,7 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	 *  @param service The service.
 	 *  @return The keys matching the type.
 	 */
-	public Set<String> getKeys(String keytype, Object serv)
+	public Set<String> getKeyValues(String keytype, IService serv)
 	{
 		return getKeysStatic(keytype, serv);
 	}
@@ -84,11 +94,18 @@ public class ServiceKeyExtractor implements IKeyExtractor
 	 *  @return The keys matching the type.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final Set<String> getKeysStatic(String keytype, Object serv)
+	public static final Set<String> getKeysStatic(String keytype, IService serv)
 	{
-		IService service = (IService) serv;
+//		if(serv instanceof IService)
+//		{
+//			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//				System.out.println("sdhgfsdh");
+//		}
 		Set<String> ret = null;
-		if (KEY_TYPE_INTERFACE.equals(keytype))
+		
+		IService service = (IService)serv;
+		
+		if(KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			ret = new HashSet<String>();
 			ret.add(service.getServiceIdentifier().getServiceType().toString());
@@ -99,21 +116,49 @@ public class ServiceKeyExtractor implements IKeyExtractor
 					ret.add(supertype.toString());
 			}
 		}
-		else if (KEY_TYPE_TAGS.equals(keytype))
+		else if(KEY_TYPE_TAGS.equals(keytype))
 		{
-			Map<String, Object> sprops = service.getPropertyMap();
-			if (sprops != null)
-				ret = (Set<String>) sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+//			Map<String, Object> sprops = service.getPropertyMap();
+//			if(sprops != null)
+//				ret = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
+			ret = service.getServiceIdentifier().getTags();
 		}
-		else if (KEY_TYPE_PROVIDER.equals(keytype))
+		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
 			ret = new SetWrapper<String>(service.getServiceIdentifier().getProviderId().toString());
 		}
-		else if (KEY_TYPE_PLATFORM.equals(keytype))
+		else if(KEY_TYPE_PLATFORM.equals(keytype))
 		{
 			ret = new SetWrapper<String>(service.getServiceIdentifier().getProviderId().getRoot().toString());
 		}
+		else if(KEY_TYPE_SID.equals(keytype))
+		{
+			ret = new SetWrapper<String>(service.getServiceIdentifier().toString());
+		}
+		else if(KEY_TYPE_NETWORKS.equals(keytype))
+		{
+			ret = new HashSet<String>(service.getServiceIdentifier().getNetworkNames());
+		}
+		else if(KEY_TYPE_UNRESTRICTED.equals(keytype))
+		{
+			ret = new SetWrapper<String>(""+service.getServiceIdentifier().isUnrestricted());
+		}
 		return ret;
+	}
+	
+	/**
+	 *  Extracts the matching mode from a multivalued term.
+	 *  true = AND, false = OR
+	 *  
+	 *  @param keytype The type of key being extracted.
+	 *  @param value The value.
+	 *  @return The key matching mode.
+	 */
+	public Boolean getKeyMatchingMode(String keytype, IService value)
+	{
+		if(KEY_TYPE_TAGS.equals(keytype))
+			return Boolean.TRUE;
+		return null;
 	}
 	
 	/**

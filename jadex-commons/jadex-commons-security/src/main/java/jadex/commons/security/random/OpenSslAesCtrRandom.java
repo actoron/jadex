@@ -58,9 +58,9 @@ public class OpenSslAesCtrRandom extends SecureRandom
 	public void reseed(byte[] carryover)
 	{
 		byte[] key = new byte[32];
-		SSecurity.getSeedRandom().nextBytes(key);
+		SSecurity.getEntropySource().getEntropy(key);
 		byte[] iv = new byte[16];
-		SSecurity.getSeedRandom().nextBytes(iv);
+		SSecurity.getEntropySource().getEntropy(iv);
 		
 		if (carryover != null)
 		{

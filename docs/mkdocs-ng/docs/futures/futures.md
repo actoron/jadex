@@ -19,7 +19,7 @@ For more information and motivation, please refer to [Asynchronous Programming](
 
 # Working with Futures
 
-The typical case of working with futures is calling a method from the Jadex framework which returns a ```IFuture<>``` type.
+The typical case of working with futures is calling a method from the Jadex framework which returns an ```IFuture<...>``` type.
 In this case, you can either call *get()* on the future, which will block until the result is available, or **add a result listener** (which will be the default case in this chapter from now on):
 
 ```java
@@ -235,18 +235,22 @@ A terminable future allows the caller to cancel the task at any point in time by
 ### Delivering Results
 
 ```java
-TerminableFuture<String> fut = new TerminableFuture<String>();
-ITerminationCommand term = new ITerminationCommand() {
+public TerminableFuture<String> doTerminableWork() {
+	TerminableFuture<String> fut = new TerminableFuture<String>();
+	ITerminationCommand term = new ITerminationCommand() {
 
-    public boolean checkTermination(Exception reason) {
-        return true; // termination is accepted at this point
-    }
+		public boolean checkTermination(Exception reason) {
+			return true; // termination is accepted at this point
+		}
 
-    public void terminated(Exception reason) {
-        stopWork();
-    }
-};
-startWork(fut); // startWork() will call fut.setResult() eventually
+		public void terminated(Exception reason) {
+			stopWork(); // stop the asynchronous work that you're doing
+		}
+	};
+	fut.setTerminationCommand(term);
+	// do some asynchronous work that calls fut.setResult() eventually
+	return fut;
+}
 ```
 
 ### Listening to Results
@@ -368,5 +372,5 @@ fut.addResultListener(res -> ... , SResultListener.delegate(myFut));
 fut.addResultListener(SResultListener.delegate(myFut), ex -> ...);
 
 // count results
-CounterResultListener<> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
+CounterResultListener<?> counter = SResultListener.countResults(2, reached -> System.out.println("reached"), ex -> ex.printStackTrace());
 ```

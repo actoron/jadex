@@ -22,6 +22,8 @@ public class ResourceIdentifier implements IResourceIdentifier
 {
 	//-------- constants --------
 	
+	public static final boolean ENABLE_HASHES = false;
+	
 	/** The ignored directories for determining resource project name. */
 	protected static final Set<String>	IGNORED	= Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 		"bin",
@@ -112,6 +114,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  @param lid The local identifier.
 	 *  @param gid The global idenfifier.
 	 */
+	@SuppressWarnings("unused")
 	public ResourceIdentifier(ILocalResourceIdentifier lid, IGlobalResourceIdentifier gid)
 	{
 //		if(lid.getUrl()!=null && lid.getUrl().toString().indexOf("jar:")!=-1)

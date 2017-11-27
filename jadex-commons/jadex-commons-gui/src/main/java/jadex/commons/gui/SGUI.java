@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -22,31 +23,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.EventObject;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriter;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -64,13 +63,16 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.LayoutStyle;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 
@@ -83,6 +85,15 @@ public class SGUI
 	
 	/** This property can be set on components to be automatically adjusted to equal sizes. */
 	public static final String	AUTO_ADJUST	= "auto-adjust";
+	
+	/**
+	 *  IDs of potentially broken UIs that override behavior like setBackground().
+	 */
+	protected static final Set<String> BROKEN_UI_IDS = new HashSet<String>();
+	static
+	{
+		BROKEN_UI_IDS.add("GTK");
+	}
 	
 	//-------- methods --------
 
@@ -437,6 +448,19 @@ public class SGUI
 		
 		JOptionPane.showMessageDialog(parent, message, errortitle, JOptionPane.ERROR_MESSAGE);
 	}
+	
+	/**
+	 *  Adjust components to equal sizes according to their
+	 *  miminum, maximum, and preferred sizes.
+	 *  
+	 *  All components must be JComponents, this performs automatic array conversion.
+	 */
+	public static void	adjustComponentSizes(Component[] components)
+	{
+		JComponent[] jcomponents = new JComponent[components.length];
+		System.arraycopy(components, 0, jcomponents, 0, components.length);
+		adjustComponentSizes(jcomponents);
+	}
 
 
 	/**
@@ -471,6 +495,74 @@ public class SGUI
 		
 		for(int i=0; i<components.length; i++)
 		{
+			components[i].setMinimumSize(minimum);
+			components[i].setMaximumSize(maximum);
+			components[i].setPreferredSize(preferred);
+		}
+	}
+	
+	/**
+	 *  Adjust components to equal sizes according to their
+	 *  miminum, maximum, and preferred sizes horizontally.
+	 */
+	public static void	adjustComponentHorizontalSizes(JComponent[] components)
+	{
+		int minimumwidth	= 0;
+		int maximumwidth	= 0;
+		int preferredwidth	= 0;
+
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension	minimum	= components[i].getMinimumSize();
+			Dimension	maximum	= components[i].getMaximumSize();
+			Dimension	preferred	= components[i].getPreferredSize();
+			minimumwidth = Math.max(minimumwidth, minimum.width);
+			maximumwidth = Math.max(maximumwidth, maximum.width);
+			preferredwidth = Math.max(preferredwidth, preferred.width);
+		}
+		
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension minimum	= components[i].getMinimumSize();
+			Dimension maximum	= components[i].getMaximumSize();
+			Dimension preferred	= components[i].getPreferredSize();
+			minimum		= new Dimension(minimumwidth, minimum.height);
+			maximum		= new Dimension(maximumwidth, maximum.height);
+			preferred	= new Dimension(preferredwidth, preferred.height);
+			components[i].setMinimumSize(minimum);
+			components[i].setMaximumSize(maximum);
+			components[i].setPreferredSize(preferred);
+		}
+	}
+	
+	/**
+	 *  Adjust components to equal sizes according to their
+	 *  miminum, maximum, and preferred sizes vertically.
+	 */
+	public static void	adjustComponentVerticalSizes(JComponent[] components)
+	{
+		int minimumheight	= 0;
+		int maximumheight	= 0;
+		int preferredheight	= 0;
+
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension	minimum	= components[i].getMinimumSize();
+			Dimension	maximum	= components[i].getMaximumSize();
+			Dimension	preferred	= components[i].getPreferredSize();
+			minimumheight = Math.max(minimumheight, minimum.height);
+			maximumheight = Math.max(maximumheight, maximum.height);
+			preferredheight = Math.max(preferredheight, preferred.height);
+		}
+		
+		for(int i=0; i<components.length; i++)
+		{
+			Dimension minimum	= components[i].getMinimumSize();
+			Dimension maximum	= components[i].getMaximumSize();
+			Dimension preferred	= components[i].getPreferredSize();
+			minimum		= new Dimension(minimum.width, minimumheight);
+			maximum		= new Dimension(maximum.width, maximumheight);
+			preferred	= new Dimension(preferred.width, preferredheight);
 			components[i].setMinimumSize(minimum);
 			components[i].setMaximumSize(maximum);
 			components[i].setPreferredSize(preferred);
@@ -516,6 +608,169 @@ public class SGUI
 			JComponent[]	jcomps	= (JComponent[])adjustables.toArray(new JComponent[adjustables.size()]);
 			adjustComponentSizes(jcomps);
 		}
+	}
+	
+	/**
+	 *  Sets the minimum size along with the preferred size.
+	 *  Negative values will remain the same.
+	 *  
+	 *  @param c Component.
+	 *  @param w Width.
+	 *  @param h Height.
+	 */
+	public static void setMinimumSize(JComponent c, int w, int h)
+	{
+		Dimension ms = c.getMinimumSize();
+		Dimension ps = c.getPreferredSize();
+		
+		c.setMinimumSize(new Dimension(w < 0 ? ms.width : w, h < 0 ? ms.height : h));
+		c.setPreferredSize(new Dimension(w < 0 ? ps.width : w, h < 0 ? ps.height : h));
+	}
+	
+	/**
+	 *  Creates a simple vertical arrangement using group layout with gaps.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createVerticalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
+	{
+		GroupLayout l = new GroupLayout(container);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		container.setLayout(l);
+		
+		SequentialGroup rhgroup = l.createSequentialGroup();
+		ParallelGroup hgroup = l.createParallelGroup();
+		rhgroup.addGroup(hgroup);
+		
+		SequentialGroup vgroup = l.createSequentialGroup();
+		
+		for (int i = 0; i < components.length; ++i)
+		{
+			container.add(components[i]);
+			
+			if (fixedsize)
+			{
+				hgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				vgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+			}
+			else
+			{
+				hgroup.addComponent(components[i]);
+				vgroup.addComponent(components[i]);
+			}
+		}
+		
+		if (fixedsize)
+			SGUI.adjustComponentHorizontalSizes(components);
+		
+		l.setHorizontalGroup(rhgroup);
+		l.setVerticalGroup(vgroup);
+	}
+	
+	/**
+	 *  Creates a simple vertical arrangement using group layout with gaps.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
+	{
+		GroupLayout l = new GroupLayout(container);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		container.setLayout(l);
+		
+		SequentialGroup hgroup = l.createSequentialGroup();
+		
+		SequentialGroup rvgroup = l.createSequentialGroup();
+		ParallelGroup vgroup = l.createParallelGroup();
+		rvgroup.addGroup(vgroup);
+		
+		for (int i = 0; i < components.length; ++i)
+		{
+			container.add(components[i]);
+			
+			if (fixedsize)
+			{
+				hgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				vgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+			}
+			else
+			{
+				hgroup.addComponent(components[i]);
+				vgroup.addComponent(components[i]);
+			}
+		}
+		
+		if (fixedsize)
+			SGUI.adjustComponentHorizontalSizes(components);
+		
+		l.setHorizontalGroup(hgroup);
+		l.setVerticalGroup(rvgroup);
+	}
+	
+	/**
+	 *  Creates a simple edgeless, vertical arrangement using group layout.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createEdgelessHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize)
+	{
+		createEdgelessHorizontalGroupLayout(container, components, fixedsize, false);
+	}
+	
+	/**
+	 *  Creates a simple edgeless, vertical arrangement using group layout.
+	 *  Automatically adds the components.
+	 *  
+	 *  @param container The container.
+	 *  @param components The components.
+	 */
+	public static void createEdgelessHorizontalGroupLayout(Container container, JComponent[] components, boolean fixedsize, boolean rightalign)
+	{
+		GroupLayout l = new GroupLayout(container);
+		l.setAutoCreateContainerGaps(false);
+		l.setAutoCreateGaps(true);
+		container.setLayout(l);
+		
+		SequentialGroup hgroup = l.createSequentialGroup();
+		if (rightalign)
+			hgroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE);
+		
+		SequentialGroup rvgroup = l.createSequentialGroup();
+		ParallelGroup vgroup = l.createParallelGroup();
+		rvgroup.addGroup(vgroup);
+		
+		for (int i = 0; i < components.length; ++i)
+		{
+			container.add(components[i]);
+			
+			if (fixedsize)
+			{
+				hgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				vgroup.addComponent(components[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+			}
+			else
+			{
+				hgroup.addComponent(components[i]);
+				vgroup.addComponent(components[i]);
+			}
+		}
+		
+		if (!rightalign)
+			hgroup.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE);
+		
+		if (fixedsize)
+			SGUI.adjustComponentHorizontalSizes(components);
+		
+		l.setHorizontalGroup(hgroup);
+		l.setVerticalGroup(rvgroup);
 	}
 	
 	/**
@@ -705,12 +960,85 @@ public class SGUI
 	 *  @param h The height.
 	 *  @param type The type (Image.SCALE_XYZ).
 	 */
-	public static BufferedImage scaleImage(Image src, int w, int h, int type)
+	public static final BufferedImage scaleImage(Image src, int w, int h, int type)
 	{
 		Image img = src.getScaledInstance(w, h, type);
 		BufferedImage ret = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		Graphics g = ret.createGraphics();
 		g.drawImage(img, 0, 0, new Color(0,0,0), null);
+		g.dispose();
+		return ret;
+	}
+	
+	/**
+	 *  Converts a buffered image to a new image type.
+	 *  E.g. BufferedImage.TYPE_4BYTE_ABGR_PRE.
+	 *  
+	 *  @param original Original image.
+	 *  @param type New type.
+	 *  @return Converted image.
+	 */
+	public static final BufferedImage convertBufferedImageType(BufferedImage original, int type)
+	{
+		BufferedImage ret = new BufferedImage(original.getWidth(), original.getHeight(), type);
+		Graphics g = ret.createGraphics();
+		g.drawImage(original, 0, 0, null);
+		g.dispose();
+		return ret;
+	}
+	
+	/**
+	 *  Gets the index of the selected button in a button group.
+	 *  
+	 *  @param bg The button group.
+	 *  @return The selected index.
+	 */
+	public static int getSelectedButton(ButtonGroup bg)
+	{
+		int ret = -1;
+		Enumeration<AbstractButton> enumer = bg.getElements();
+		int i = 0;
+		while (enumer.hasMoreElements())
+		{
+			if (enumer.nextElement().isSelected())
+			{
+				ret = i;
+				break;
+			}
+			++i;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Sets the enabled state of all buttons in a button group.
+	 *  
+	 *  @param bg The button group.
+	 *  @param enabled True, if enabled
+	 */
+	public static void setAllEnabled(ButtonGroup bg, boolean enabled)
+	{
+		Enumeration<AbstractButton> enumer = bg.getElements();
+		while (enumer.hasMoreElements())
+		{
+			enumer.nextElement().setEnabled(enabled);
+		}
+	}
+	
+	/**
+	 *  Scales a buffered image.
+	 *  
+	 *  @param original Original image.
+	 *  @param w New width.
+	 *  @param h New height.
+	 *  @return Scaled image.
+	 */
+	public static final BufferedImage scaleBufferedImage(BufferedImage original, int w, int h)
+	{
+		Image scaled = original.getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING);
+		BufferedImage ret = new BufferedImage(w, h, original.getType());
+		Graphics2D g = ret.createGraphics();
+		g.drawImage(scaled, 0, 0, null);
 		g.dispose();
 		return ret;
 	}
@@ -723,6 +1051,105 @@ public class SGUI
 	public static void invokeLater(Runnable runnable) 
 	{
 		SwingUtilities.invokeLater(runnable);
+	}
+	
+	/**
+	 *  Shortcut method.
+	 *  Text extraction from the Java "Document" class used by JTextArea is braindead,
+	 *  it throws checked exception, lots of parameters: Bloat, bloat, bloat.
+	 *  
+	 *  @param doc The text area.
+	 *  @return The extracted String.
+	 */
+	public static final String getText(JTextArea area)
+	{
+		Document doc = area.getDocument();
+		String ret = null;
+        
+		try
+        {
+            ret = doc.getText(0, doc.getLength());
+            if (ret.length() == 0)
+    		{
+    			ret = null;
+    		}
+        }
+        catch (BadLocationException e)
+        {
+        }
+        
+        return ret;
+	}
+	
+	/**
+	 * 	Shortcut method.
+	 *  Setting text the Java "Document" class used by JTextArea is braindead,
+	 *  it throws non-RuntimeException, multiple invocations, many parameters:
+	 *  Bloat, bloat, bloat.
+	 *  
+	 *  @param doc The document.
+	 *  @return The extracted String.
+	 */
+	public static final void setText(JTextArea area, String text)
+	{
+		Document doc = area.getDocument();
+		try
+		{
+			doc.remove(0, doc.getLength());
+			doc.insertString(0, text, null);
+		}
+		catch (BadLocationException e)
+		{
+		}
+	}
+	
+	/**
+	 *  Adds a copy & paste menu to a text component.
+	 *  
+	 *  @param textcomponent The text component.
+	 */
+	public static void addCopyPasteMenu(final JTextComponent textcomponent)
+	{
+		textcomponent.addMouseListener(new TextCopyPasteMouseListener(textcomponent));
+	}
+	
+	/**
+	 *  Removes copy & paste menu from a text component.
+	 *  
+	 *  @param textcomponent The text component.
+	 */
+	public static void removeCopyPasteMenu(final JTextComponent textcomponent)
+	{
+		for (MouseListener lis : textcomponent.getMouseListeners())
+		{
+			if (lis instanceof TextCopyPasteMouseListener)
+			{
+				textcomponent.removeMouseListener(lis);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 *  Converts a color to RGBA array.
+	 */
+	public static double[] colorToRgba(Color color)
+	{
+		double[] ret = new double[4];
+		ret[0] = color.getRed() / 255.0;
+		ret[1] = color.getGreen() / 255.0;
+		ret[2] = color.getBlue() / 255.0;
+		ret[3] = color.getAlpha() / 255.0;
+		return ret;
+	}
+	
+	/**
+	 *  Converts a RGBA array to color.
+	 */
+	public static Color rgbaToColor(double[] rgba)
+	{
+		assert rgba != null && rgba.length == 4;
+		return new Color((float) rgba[0], (float) rgba[1], (float) rgba[2], (float) rgba[3]);
 	}
 	
 //	/** Lookup table for divider locations (split->Integer).*/
@@ -787,4 +1214,34 @@ public class SGUI
 //			}
 //		}
 //	}
+	
+	/**
+	 *  Listener for copy-paste menu.
+	 *
+	 */
+	public static class TextCopyPasteMouseListener extends MouseAdapter
+	{
+		/** The text component. */
+		protected JTextComponent textcomponent;
+		
+		/**
+		 *  Creates the listener.
+		 */
+		public TextCopyPasteMouseListener(JTextComponent textcomponent)
+		{
+			this.textcomponent = textcomponent;
+		}
+		
+		/**
+		 *  Called when mouse pressed.
+		 */
+		public void mousePressed(MouseEvent e)
+		{
+			if (e.isPopupTrigger())
+			{
+				JCopyPasteContextMenu popup = new JCopyPasteContextMenu(textcomponent);
+				popup.show(textcomponent, e.getX(), e.getY());
+			}
+		}
+	}
 }

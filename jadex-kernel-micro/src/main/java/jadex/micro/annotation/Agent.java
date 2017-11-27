@@ -61,5 +61,5 @@ public @interface Agent
 	/**
 	 *  Auto-provide provided services that are directly implemented by the agent.
 	 */
-	public boolean autoprovide() default false;
+	public Boolean3 autoprovide() default Boolean3.NULL;
 }

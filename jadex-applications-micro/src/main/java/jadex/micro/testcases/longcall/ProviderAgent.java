@@ -116,7 +116,7 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc.getTimeout();
 
-		System.out.println("Timeout is: " + to);
+//		System.out.println("Timeout is: " + to);
 	
 		final long wait = to>0? to*2: 0;
 		final long startwait = System.currentTimeMillis();

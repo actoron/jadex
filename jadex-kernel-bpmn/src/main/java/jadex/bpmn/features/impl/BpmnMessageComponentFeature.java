@@ -5,15 +5,14 @@ import java.util.Iterator;
 import jadex.bpmn.features.IBpmnComponentFeature;
 import jadex.bpmn.features.IInternalBpmnComponentFeature;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IFilter;
 
 /**
@@ -36,129 +35,43 @@ public class BpmnMessageComponentFeature extends MessageComponentFeature
 		super(component, cinfo);
 	}
 	
-	//-------- IInternalMessageFeature interface --------
+	
+	//-------- micro agent specific message handling --------
 	
 	/**
-	 *  Helper method to override message handling.
-	 *  May be called from external threads.
+	 *  Called for all messages without matching message handlers.
+	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected IComponentStep<Void> createHandleMessageStep(IMessageAdapter message)
+	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
 	{
-		return new HandleBpmnMessageStep(message);
-	}
-	
-	/**
-	 *  Step to handle a message.
-	 */
-	public class HandleBpmnMessageStep	extends HandleMessageStep
-	{
-		public HandleBpmnMessageStep(IMessageAdapter message)
-		{
-			super(message);
-		}
+//		System.out.println("rec msg: "+message);
+		
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
 
-		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
-		 */
-		protected boolean invokeHandlers(IMessageAdapter message)
+		// Iterate through process threads and dispatch message to first
+		// waiting and fitting one (filter check).
+		boolean processed = false;
+		for(Iterator<ProcessThread> it=bcf.getTopLevelThread().getAllThreads().iterator(); it.hasNext() && !processed; )
 		{
-			boolean	ret	= super.invokeHandlers(message);
-			
-//			System.out.println("rec msg: "+message);
-			
-			if(!ret)
+			ProcessThread pt = it.next();
+			if(pt.isWaiting())
 			{
-				IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
-
-				// Iterate through process threads and dispatch message to first
-				// waiting and fitting one (filter check).
-				boolean processed = false;
-				for(Iterator<ProcessThread> it=bcf.getTopLevelThread().getAllThreads().iterator(); it.hasNext() && !processed; )
+				// TODO: allow filtering also header and/or secinf???
+				IFilter<Object> filter = pt.getWaitFilter();
+				if(filter!=null && filter.filter(body))
 				{
-					ProcessThread pt = it.next();
-					if(pt.isWaiting())
-					{
-						IFilter<Object> filter = pt.getWaitFilter();
-						if(filter!=null && filter.filter(message))
-						{
-//							System.out.println("Dispatched to thread: "+getComponent().getComponentIdentifier().getLocalName()+" "+System.identityHashCode(message)+", "+pt);
-							bcf.notify(pt.getActivity(), pt, message);
-//							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
-							processed = true;
-						}
-					}
-				}
-				
-				if(!processed)
-				{
-					bcf.getMessages().add(message);
-//					messages.add(message);
-//					System.out.println("Dispatched to waitqueue: "+getComponent().getComponentIdentifier().getLocalName()+" "+message);
+//					System.out.println("Dispatched to thread: "+getComponent().getComponentIdentifier().getLocalName()+" "+System.identityHashCode(body)+", "+pt);
+					bcf.notify(pt.getActivity(), pt, body);
+					processed = true;
 				}
 			}
-			
-			return ret;
 		}
-	}
-
-	/**
-	 *  Helper method to override stream handling.
-	 *  May be called from external threads.
-	 */
-	protected IComponentStep<Void> createHandleStreamStep(IConnection con)
-	{
-		return new HandleBpmnStreamStep(con);
+		
+		if(!processed)
+		{
+			bcf.getMessages().add(body);
+//			System.out.println("Dispatched to waitqueue: "+getComponent().getComponentIdentifier().getLocalName()+" "+body);
+		}
 	}
 	
-	/**
-	 *  Step to handle a message.
-	 */
-	public class HandleBpmnStreamStep	extends HandleStreamStep
-	{
-		public HandleBpmnStreamStep(IConnection con)
-		{
-			super(con);
-		}
-
-		/**
-		 *  Extracted to allow overriding behaviour.
-		 *  @return true, when at least one matching handler was found.
-		 */
-		protected boolean invokeHandlers(IConnection con)
-		{
-			boolean	ret	= super.invokeHandlers(con);
-			
-			if(!ret)
-			{
-				IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
-
-				// Iterate through process threads and dispatch message to first
-				// waiting and fitting one (filter check).
-				boolean processed = false;
-				for(Iterator<ProcessThread> it=bcf.getTopLevelThread().getAllThreads().iterator(); it.hasNext() && !processed; )
-				{
-					ProcessThread pt = (ProcessThread)it.next();
-					if(pt.isWaiting())
-					{
-						IFilter<Object> filter = pt.getWaitFilter();
-						if(filter!=null && filter.filter(con))
-						{
-							bcf.notify(pt.getActivity(), pt, con);
-//							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
-							processed = true;
-						}
-					}
-				}
-				
-				if(!processed)
-				{
-					bcf.getStreams().add(con);
-//					System.out.println("Dispatched to waitqueue: "+message);
-				}
-			}
-			
-			return ret;
-		}
-	}
 }

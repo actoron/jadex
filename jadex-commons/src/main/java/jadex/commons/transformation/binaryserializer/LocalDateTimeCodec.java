@@ -1,12 +1,12 @@
 package jadex.commons.transformation.binaryserializer;
 
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 public class LocalDateTimeCodec extends AbstractCodec
 {
@@ -43,7 +43,7 @@ public class LocalDateTimeCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		ec.writeString(object.toString());
 		return object;

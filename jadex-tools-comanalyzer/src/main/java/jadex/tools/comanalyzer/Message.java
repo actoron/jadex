@@ -7,11 +7,14 @@ import java.util.Map;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 
 /**
@@ -101,10 +104,6 @@ public class Message extends ParameterElement
 	/** The unique id (sequence nr) saved for quick access */
 	protected int uniqueId;
 
-	/** The original message. */
-	protected IMessageAdapter message;
-//	protected Map msgmap;
-
 	/**
 	 * For loading from file.
 	 * Create a message with given parameters and sequence number.
@@ -120,21 +119,26 @@ public class Message extends ParameterElement
 	 * @param arguments The parameters of the message.
 	 * @param sequence The sequence number of the message.
 	 */
-	public Message(IMessageAdapter msg, int sequence, IComponentIdentifier receiver)
+	public Message(Object event, int sequence, String xid, IComponentIdentifier sender, IComponentIdentifier receiver, Object body)
 	{
 		assert receiver != null;
 
 		this.uniqueId = sequence;
 
-//		MessageType mt = msg.getMessageType();
-		//		String[] pnames = mt.getParameterNames();
-		//		for(int i = 0; i < pnames.length; i++)
-		//			this.parameters.put(pnames[i], msg.getValue(pnames[i]));
-		//		String[] psnames = mt.getParameterSetNames();
-		//		for(int i = 0; i < psnames.length; i++)
-		//			this.parameters.put(psnames[i], msg.getValue(psnames[i]));
-		this.message = msg;
-		//		this.msgmap = msg.getParameterMap();
+		if(body!=null)
+		{
+			IBeanIntrospector	bi	= BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+			Map<String, BeanProperty>	props	= bi.getBeanProperties(body.getClass(), true, false);
+			for(Map.Entry<String, BeanProperty> entry: props.entrySet())
+			{
+				Object	val	= entry.getValue().getPropertyValue(body);
+				if(val!=null)
+				{
+					// Use snake_case for FIPA backwards compatibility (hack?) 
+					parameters.put(SUtil.camelToSnakeCase(entry.getKey()), val);
+				}
+			}
+		}
 
 		this.parameters.put(SEQ_NO, Integer.valueOf(sequence));
 		//		this.parameters.put(EVENT_DIRECTION, direction);
@@ -142,9 +146,14 @@ public class Message extends ParameterElement
 
 		// parameters for element panel
 		//		this.parameters.put(NAME, parameters.get(ID));
-		this.parameters.put(NAME, message.getParameterMap().get(SFipa.X_MESSAGE_ID));
+		this.parameters.put(NAME, xid);
+		this.parameters.put(XID, xid);
 		this.parameters.put(CLASS, Message.class.getSimpleName());
 		this.parameters.put(RECEIVER, receiver);
+		this.parameters.put(SENDER, sender);
+		
+//		public static final String DATE = SFipa.X_TIMESTAMP;
+//		public static final String DURATION = "duration";
 	}
 
 	/**
@@ -331,13 +340,13 @@ public class Message extends ParameterElement
 	public Object getParameter(String name)
 	{
 		Object ret = super.getParameter(name);
-		if(ret == null)
-		{
-//			if(msgmap!=null)
-//				ret = (String)msgmap.get(XID);
-			if(message!=null)
-				ret = message.getValue(name);
-		}
+//		if(ret == null)
+//		{
+////			if(msgmap!=null)
+////				ret = (String)msgmap.get(XID);
+//			if(message!=null)
+//				ret = message.getValue(name);
+//		}
 		return ret;
 	}
 
@@ -348,9 +357,9 @@ public class Message extends ParameterElement
 	public Map getParameters()
 	{
 		Map ret = new HashMap();
-		ret.putAll(parameters);
-		if(message!=null)
-			ret.putAll(message.getParameterMap());
+//		ret.putAll(parameters);
+//		if(message!=null)
+//			ret.putAll(message.getParameterMap());
 		return ret;
 	}
 	
@@ -362,8 +371,8 @@ public class Message extends ParameterElement
 	public boolean hasParameter(String name)
 	{
 		boolean ret=parameters.containsKey(name);
-		if (ret==false) 
-			ret=message.getParameterMap().containsKey(name);
+//		if (ret==false) 
+//			ret=message.getParameterMap().containsKey(name);
 		return ret;
 	}
 	

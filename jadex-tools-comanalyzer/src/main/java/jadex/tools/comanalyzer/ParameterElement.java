@@ -25,7 +25,7 @@ public abstract class ParameterElement implements Serializable, Comparable
 	protected boolean visible;
 
 	/** The parameters. */
-	protected Map parameters;
+	protected Map<String, Object> parameters;
 
 	// ------ constructors ------
 

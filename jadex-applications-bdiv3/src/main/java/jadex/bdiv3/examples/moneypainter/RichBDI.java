@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.moneypainter.RichBDI.GetOneEuro;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -118,9 +119,13 @@ public class RichBDI
 	}
 	
 	@Plan(trigger=@Trigger(goalfinisheds=BecomeRich.class))
-	public void printRich(BecomeRich goal)
+//	public void printRich(BecomeRich goal) // Injection works but cannot access RGoal from pojo at this point
+	public void printRich(IGoal goal)
 	{
-		if(agent.getComponentFeature(IBDIAgentFeature.class).getGoal(goal).isSucceeded())
+//		System.out.println("Become rich finished: "+goal);
+		
+//		if(agent.getComponentFeature(IBDIAgentFeature.class).getGoal(goal).isSucceeded())
+		if(goal.isSucceeded())
 		{
 			System.out.println("Now I am rich as I have made "+money+" euros.");
 		}

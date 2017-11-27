@@ -31,6 +31,11 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	
 	/** Key type for the service scope. */
 	public static final String KEY_TYPE_SCOPE = "scope";
+
+	/** Key type for the id. */
+	public static final String KEY_TYPE_NETWORKS = "networks";
+
+	
 	
 	/** Key type for the owner. */
 	public static final String KEY_TYPE_OWNER_PLATORM = "owner";
@@ -40,13 +45,14 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	
 	/** Key type for the id. */
 	public static final String KEY_TYPE_ID = "id";
+	
 
 	
 	/** The key types. */
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_NETWORKS};
 	
 	static
 	{
@@ -74,7 +80,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	 *  @param value The value.
 	 *  @return The key values.
 	 */
-	public Set<String> getKeys(String keytype, ServiceQueryInfo<IService> sqi)
+	public Set<String> getKeyValues(String keytype, ServiceQueryInfo<IService> sqi)
 	{
 		Set<String> ret = null;
 		ServiceQuery<IService> query = sqi.getQuery();
@@ -141,6 +147,22 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 			ret = new SetWrapper<String>(sqi.getQuery().getId());
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Extracts the matching mode from a multivalued term.
+	 *  true = AND, false = OR
+	 *  
+	 *  @param keytype The type of key being extracted.
+	 *  @param value The value.
+	 *  @return The key matching mode.
+	 */
+	public Boolean getKeyMatchingMode(String keytype, ServiceQueryInfo<IService> query)
+	{
+		Boolean ret = query.getQuery().getMatchingMode(keytype);
+		if(ret == null && KEY_TYPE_TAGS.equals(keytype))
+			ret = Boolean.TRUE;
 		return ret;
 	}
 	

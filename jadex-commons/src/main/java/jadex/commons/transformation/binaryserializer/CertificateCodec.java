@@ -4,11 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
+import jadex.commons.transformation.traverser.Traverser.MODE;
 
 
 /**
@@ -41,7 +41,7 @@ public class CertificateCodec extends AbstractCodec
 //			String type = "X.509";
 			// This is correct because this byte array is a technical object specific to the image and
 			// is not part of the object graph proper.
-			byte[] data = (byte[])BinarySerializer.decodeObject(context);
+			byte[] data = (byte[])SBinarySerializer.decodeObject(context);
 			CertificateFactory cf = CertificateFactory.getInstance(type);
 			return cf.generateCertificate(new ByteArrayInputStream(data));
 		}
@@ -67,18 +67,17 @@ public class CertificateCodec extends AbstractCodec
 //		Class<?> clazz = SReflect.getClass(type);
 //		return isApplicable(clazz);
 //	}
-	
+
 	/**
 	 *  Encode the object.
 	 */
-	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, IEncodingContext ec)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
 		try
 		{
 			ec.writeString(((Certificate)object).getType());
 			byte[] encimg = ((Certificate)object).getEncoded();
-			traverser.doTraverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
+			traverser.doTraverse(encimg, encimg.getClass(), preprocessors, processors, mode, targetcl, ec);
 			return object;
 		}
 		catch(RuntimeException e)

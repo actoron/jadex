@@ -1,7 +1,7 @@
 package jadex.commons.concurrent;
 
 /**
- *  Jadex timout exception.
+ *  Jadex timeout exception.
  *  Jadex does not use the JDK timeout exception, because it is checked.
  *
  */

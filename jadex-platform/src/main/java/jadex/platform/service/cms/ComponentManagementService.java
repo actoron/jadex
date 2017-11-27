@@ -1,21 +1,20 @@
 package jadex.platform.service.cms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import jadex.base.PlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -31,16 +30,17 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.IInternalArgumentsResultsFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
+import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -49,22 +49,20 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -86,12 +84,13 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.Tuple2Future;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.Binding;
 
 /**
  *  Abstract default implementation of component management service.
@@ -127,7 +126,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected Map<IComponentIdentifier, IFuture<Map<String, Object>>> cfs;
 	
 	/** The listeners. */
-	protected MultiCollection<IComponentIdentifier, ICMSComponentListener> listeners;
+	protected MultiCollection<IComponentIdentifier, SubscriptionIntermediateFuture<CMSStatusEvent>> listeners;
 	
 //	/** The execution service (cached to avoid using futures). */
 //	protected IExecutionService	exeservice;
@@ -177,7 +176,9 @@ public class ComponentManagementService implements IComponentManagementService
 		this.componentfactory = componentfactory;
 		this.uniqueids = uniqueids;
 		
-		this.components = SCollection.createHashMap();
+//		this.components = SCollection.createHashMap();
+		components = Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>());
+		Starter.putPlatformValue(access.getInternalAccess().getComponentIdentifier(), Starter.DATA_COMPONENTMAP, components);
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
@@ -334,7 +335,7 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			public void intermediateResultAvailable(Tuple2<String, Object> result)
 			{
-				ret.addIntermediateResultIfUndone(new CMSIntermediateResultEvent(mycid[0], result.getFirstEntity(), result.getSecondEntity()));
+				ret.addIntermediateResultIfUndone(new CMSIntermediateResultEvent(getDescription(mycid[0]), result.getFirstEntity(), result.getSecondEntity()));
 				results.put(result.getFirstEntity(), result.getSecondEntity());
 			}
 			
@@ -352,7 +353,7 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			public void finished()
 			{
-				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(mycid[0], results));
+				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(getDescription(mycid[0]), results));
 				ret.setFinishedIfUndone();
 			}
 			
@@ -365,7 +366,7 @@ public class ComponentManagementService implements IComponentManagementService
 			public void resultAvailable(IComponentIdentifier cid)
 			{
 				mycid[0] = cid;
-				ret.addIntermediateResultIfUndone(new CMSCreatedEvent(cid));
+				ret.addIntermediateResultIfUndone(new CMSCreatedEvent(getDescription(cid)));
 				if(terminate[0])
 				{
 					destroyComponent(cid);
@@ -436,7 +437,75 @@ public class ComponentManagementService implements IComponentManagementService
 					// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
 					// will deliver the platform (as this second call is performed by the cms itself)
 					
-					rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
+					// Map remote subscription events to local result listener (avoids the need for listener as plain remote object)
+					rcms.createComponent(cinfo, name, modelname).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+					{
+						Collection<Tuple2<String, Object>>	results;
+						
+						@Override
+						public void intermediateResultAvailable(CMSStatusEvent result)
+						{
+							if(result instanceof CMSCreatedEvent)
+							{
+								inited.setResult(result.getComponentIdentifier());
+							}
+							else if(result instanceof CMSIntermediateResultEvent && resultlistener!=null)
+							{
+								CMSIntermediateResultEvent	ire	= (CMSIntermediateResultEvent)result;
+								Tuple2<String, Object>	res	= new Tuple2<String, Object>(ire.getName(), ire.getValue());
+								
+								if(resultlistener instanceof IIntermediateResultListener)
+								{
+									IIntermediateResultListener<Tuple2<String, Object>>	reslis	= (IIntermediateResultListener<Tuple2<String, Object>>)resultlistener;
+									reslis.intermediateResultAvailable(res);
+								}
+								else
+								{
+									if(results==null)
+									{
+										results	= new HashSet<Tuple2<String,Object>>();
+									}
+									
+									results.add(res);
+								}
+							}
+						}
+						
+						@Override
+						public void resultAvailable(Collection<CMSStatusEvent> result)
+						{
+							assert false: "Should not happen"; 
+						}
+						
+						@Override
+						public void finished()
+						{
+							if(resultlistener!=null)
+							{
+								if(resultlistener instanceof IIntermediateResultListener)
+								{
+									((IIntermediateResultListener<Tuple2<String, Object>>)resultlistener).finished();
+								}
+								else
+								{
+									if(results==null)
+									{
+										results	= Collections.emptySet();
+									}
+									resultlistener.resultAvailable(results);
+								}								
+							}
+						}
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							if(!inited.setExceptionIfUndone(exception) && resultlistener!=null)
+							{
+								resultlistener.exceptionOccurred(exception);
+							}
+						}
+					});
 				}
 			}));
 		}
@@ -778,7 +847,7 @@ public class ComponentManagementService implements IComponentManagementService
 																					
 																					// todo: can be called after listener has (concurrently) deregistered
 																					// notify listeners without holding locks
-																					notifyListenersAdded(cid, ad);
+																					notifyListenersAdded(ad);
 																							
 			//																		System.out.println("created: "+cid.getLocalName());//+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
 							//														System.out.println("added: "+descs.size()+", "+aid);
@@ -828,7 +897,7 @@ public class ComponentManagementService implements IComponentManagementService
 																					// --> complete init, so parent can terminate.
 																					if(exception instanceof ComponentTerminatedException)
 																					{
-																						notifyListenersAdded(cid, ad);
+																						notifyListenersAdded(ad);
 																						inited.setResult(cid);
 																					}
 																					else
@@ -843,7 +912,9 @@ public class ComponentManagementService implements IComponentManagementService
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
 																			
-																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																			IServiceRegistry	reg	= access!=null ? ServiceRegistry.getRegistry(access.getInternalAccess()) : null;
+																			if(reg!=null)	// TODO: why null? -> platform shutdown, superpeer fail?
+																				reg.removeExcludedComponent(cid);
 																			
 //																			System.err.println("Starting component failed: "+cid+", "+exception);
 //																			exception.printStackTrace();
@@ -1629,7 +1700,7 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 					}					
 					desc.setState(IComponentDescription.STATE_SUSPENDED);
-					notifyListenersChanged(cid, desc);
+					notifyListenersChanged(desc);
 					
 					ret	= IFuture.DONE;
 				}
@@ -1755,7 +1826,7 @@ public class ComponentManagementService implements IComponentManagementService
 							}
 							
 							if(changed)
-								notifyListenersChanged(cid, desc);
+								notifyListenersChanged(desc);
 						
 							ret.setResult(null);
 						}
@@ -1870,7 +1941,7 @@ public class ComponentManagementService implements IComponentManagementService
 			CMSComponentDescription ad = (CMSComponentDescription)getDescription(cid);
 			ad.setBreakpoints(breakpoints);
 			
-			notifyListenersChanged(cid, ad);
+			notifyListenersChanged(ad);
 			
 			ret.setResult(null);
 		}
@@ -1881,26 +1952,43 @@ public class ComponentManagementService implements IComponentManagementService
 	//-------- listener methods --------
 	
 	/**
-     *  Add an component listener.
+     *  Add a component listener for all components.
      *  The listener is registered for component changes.
-     *  @param comp  The component to be listened on (or null for listening on all components).
-     *  @param listener  The listener to be added.
      */
-    public IFuture<Void> addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
+    public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll()
     {
-		listeners.add(comp, listener);
-		return IFuture.DONE;
+    	return listenToComponent(null);
     }
     
-    /**
-     *  Remove a listener.
-     *  @param comp  The component to be listened on (or null for listening on all components).
-     *  @param listener  The listener to be removed.
+	/**
+     *  Add a component listener for a specific component.
+     *  The listener is registered for component changes.
+     *  @param cid	The component to be listened.
      */
-    public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
+    public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid)
     {
-		listeners.removeObject(comp, listener);
-		return IFuture.DONE;
+    	final SubscriptionIntermediateFuture<CMSStatusEvent>	ret	= new SubscriptionIntermediateFuture<IComponentManagementService.CMSStatusEvent>();
+    	SFuture.avoidCallTimeouts(ret, agent);
+    	
+    	if(listeners==null)
+    	{
+    		listeners	= new MultiCollection<IComponentIdentifier, SubscriptionIntermediateFuture<CMSStatusEvent>>();
+    	}
+    	listeners.add(cid, ret);
+    	
+    	ret.setTerminationCommand(new TerminationCommand()
+    	{
+    		@Override
+    		public void terminated(Exception reason)
+    		{
+    			if(listeners!=null)
+    			{
+    				listeners.removeObject(cid, ret);
+    			}
+    		}
+    	});
+    	
+    	return ret;    	
     }
     
     //-------- helper classes --------
@@ -2029,12 +2117,12 @@ public class ComponentManagementService implements IComponentManagementService
 			
 			exitDestroy(cid, desc, ex, results);
 
-			notifyListenersRemoved(cid, desc, results);
+			notifyListenersRemoved(desc, results);
 			
 			if(ex!=null)
 			{
 				// Unhandled component exception
-				if(af!=null && ((IInternalArgumentsResultsFeature)af).hasListener())
+				if(af!=null && ((IInternalArgumentsResultsFeature)af).exceptionNotified())
 				{
 					// Delegated exception to some listener, only print info.
 					comp.getInternalAccess().getLogger().info("Fatal error, component '"+cid+"' will be removed due to "+ex);
@@ -2067,7 +2155,7 @@ public class ComponentManagementService implements IComponentManagementService
 			if(cid.getRoot().equals(cid))
 			{
 //				System.out.println("removed: "+cid);
-				PlatformConfiguration.removePlatformMemory(cid);
+				Starter.removePlatformMemory(cid);
 			}
 //		}
 //		catch(Throwable t)
@@ -2104,14 +2192,18 @@ public class ComponentManagementService implements IComponentManagementService
 //		{
 //			public void resultAvailable(IExternalAccess result)
 //			{
-//				if(result==null)
+//				if(cid.toString().indexOf("Killer")!=-1)
 //				{
-//					System.err.println("ea is null in cms!!! "+cid);
+//					System.out.println("getExternalAccess: "+cid+", "+result+", "+agent);
 //				}
 //			}
 //			
 //			public void exceptionOccurred(Exception exception)
 //			{
+//				if(cid.toString().indexOf("Killer")!=-1)
+//				{
+//					System.out.println("getExternalAccess: "+cid+", "+exception+", "+agent);
+//				}
 //			}
 //		});
 		
@@ -2123,23 +2215,13 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(isRemoteComponent(cid))
 		{
-//			System.out.println("getExternalAccess: remote");
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 			{
-				public void customResultAvailable(IRemoteServiceManagementService rms)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					rms.getExternalAccessProxy(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 				}
 			});
-	
-	//		getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
-	//		{
-	//			public void customResultAvailable(IComponentManagementService rcms)
-	//			{
-	//				rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-	//			}
-	//		});
 		}
 		else
 		{
@@ -2203,22 +2285,16 @@ public class ComponentManagementService implements IComponentManagementService
 			
 		}
 		
-		ret.addResultListener(new IResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(IExternalAccess result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				if(cid.getName().toLowerCase().indexOf("directservice")!=-1
-					|| cid.getName().toLowerCase().indexOf("rawservice")!=-1
-					|| cid.getName().toLowerCase().indexOf("decoupledservice")!=-1)
-				{
-					System.out.println("getExternalAccess: "+agent.getComponentIdentifier()+", "+cid);
-//					getExternalAccess(cid);
-				}
-			}
-		});
+//		ret.addResultListener(new IResultListener<IExternalAccess>()
+//		{
+//			public void resultAvailable(IExternalAccess result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.err.println("getExternalAccess() failed: "+agent+", "+exception);//SUtil.getExceptionStacktrace(exception));
+//			}
+//		});
 		
 		return ret;
 	}
@@ -2227,7 +2303,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  Find the class loader for a new (local) component.
 	 *  Use parent component class loader for local parents
 	 *  and current platform class loader for remote or no parents.
-	 *  @param cid	The component id.
+	 *  @param platform	The component id.
 	 *  @return	The class loader.
 	 */
 	protected IFuture<IResourceIdentifier>	getResourceIdentifier(final CreationInfo ci)
@@ -2320,7 +2396,7 @@ public class ComponentManagementService implements IComponentManagementService
 	
 	/**
 	 *  Get the parent component of a component.
-	 *  @param cid The component identifier.
+	 *  @param platform The component identifier.
 	 *  @return The parent component identifier.
 	 */
 	public IComponentIdentifier getParentIdentifier(CreationInfo ci)
@@ -2883,7 +2959,7 @@ public class ComponentManagementService implements IComponentManagementService
 		desc	= (CMSComponentDescription)getDescription(comp);
 		desc.setState(state);			
 		
-		notifyListenersChanged(comp, desc);
+		notifyListenersChanged(desc);
 	}
 
 	//-------- IService interface --------
@@ -3115,93 +3191,31 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Notify the cms listeners of a change.
 	 */
-	protected void notifyListenersChanged(final IComponentIdentifier cid, final IComponentDescription origdesc)
+	protected void notifyListenersChanged(IComponentDescription desc)
 	{
-//		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
-//		{
-//			public void resultAvailable(IComponentDescription newdesc)
-//			{
-				ICMSComponentListener[]	alisteners;
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-				// todo: can be called after listener has (concurrently) deregistered
-				
-//				System.out.println("comp changed: "+desc+" "+listeners);
-//				logger.info("Component changed: "+desc+" "+listeners);
-				
-				for(int i=0; i<alisteners.length; i++)
-				{
-					final ICMSComponentListener lis = alisteners[i];
-//					lis.componentChanged(newdesc).addResultListener(createResultListener(new IResultListener<Void>()
-					lis.componentChanged(origdesc).addResultListener(createResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-//							System.out.println("prob: "+exception);
-							removeComponentListener(cid, lis);
-						}
-					}));
-				}
-//			}
-//		}));
+		Set<SubscriptionIntermediateFuture<CMSStatusEvent>>	slisteners	= new LinkedHashSet<SubscriptionIntermediateFuture<CMSStatusEvent>>(listeners.getCollection(null));
+		slisteners.addAll(listeners.getCollection(desc.getName()));
+		
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slisteners)
+		{
+			sub.addIntermediateResult(new CMSStatusEvent(desc));
+		}
 	}
 	
 	/**
 	 *  Notify the cms listeners of a removal.
 	 */
-	protected void notifyListenersRemoved(final IComponentIdentifier cid, final IComponentDescription origdesc, final Map results)
+	protected void notifyListenersRemoved(IComponentDescription desc, Map<String, Object> results)
 	{
-//		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new IResultListener<IComponentDescription>()
-//		{
-//			public void resultAvailable(IComponentDescription newdesc)
-//			{
-				ICMSComponentListener[]	alisteners;
-				
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-				// todo: can be called after listener has (concurrently) deregistered
-				
-		//		System.out.println("comp changed: "+desc+" "+listeners);
-		//		logger.info("Component changed: "+desc+" "+listeners);
-				
-				
-				for(int i=0; i<alisteners.length; i++)
-				{
-					final ICMSComponentListener lis = alisteners[i];
-					try
-					{
-//						lis.componentRemoved(newdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
-						lis.componentRemoved(origdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-			//					System.out.println("prob: "+exception);
-								removeComponentListener(cid, lis);
-							}
-						}));
-					}
-					catch(Exception e)
-					{
-						removeComponentListener(cid, lis);
-					}
-				}
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				resultAvailable(origdesc);
-//			}
-//		}));
+		Set<SubscriptionIntermediateFuture<CMSStatusEvent>>	slisteners	= new LinkedHashSet<SubscriptionIntermediateFuture<CMSStatusEvent>>(listeners.getCollection(null));
+		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	coll	= listeners.remove(desc.getName());	// remove(!) subscriptions for termination event
+		if(coll!=null)
+			slisteners.addAll(coll);
+		
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slisteners)
+		{
+			sub.addIntermediateResult(new CMSTerminatedEvent(desc, results));
+		}
 	}
 	
 	/**
@@ -3215,40 +3229,15 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Notify the cms listeners of an addition.
 	 */
-	protected void notifyListenersAdded(final IComponentIdentifier cid, final IComponentDescription origdesc)
+	protected void notifyListenersAdded(IComponentDescription desc)
 	{
-//		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
-//		{
-//			public void resultAvailable(IComponentDescription newdesc)
-//			{
-				ICMSComponentListener[]	alisteners;
-				Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-				// todo: can be called after listener has (concurrently) deregistered
-				
-		//		System.out.println("comp changed: "+desc+" "+listeners);
-		//		logger.info("Component changed: "+desc+" "+listeners);
-				
-				for(int i=0; i<alisteners.length; i++)
-				{
-					final ICMSComponentListener lis = alisteners[i];
-//					lis.componentAdded(newdesc).addResultListener(createResultListener(new IResultListener<Void>()
-					lis.componentAdded(origdesc).addResultListener(createResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-		//					System.out.println("prob: "+exception);
-							removeComponentListener(cid, lis);
-						}
-					}));
-				}
-//			}
-//		}));
+		Set<SubscriptionIntermediateFuture<CMSStatusEvent>>	slisteners	= new LinkedHashSet<SubscriptionIntermediateFuture<CMSStatusEvent>>(listeners.getCollection(null));
+		slisteners.addAll(listeners.getCollection(desc.getName()));
+		
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slisteners)
+		{
+			sub.addIntermediateResult(new CMSCreatedEvent(desc));
+		}
 	}
 	
 //	/**
@@ -3287,15 +3276,32 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<IComponentManagementService>	getRemoteCMS(final IComponentIdentifier cid)
 	{
 		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
-		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
+		
+		ServiceQuery<IComponentManagementService> query = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_PLATFORM, null, cid, null);
+		 ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
+			.executeRemoteSearch(cid, query).addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, IComponentManagementService>(ret)
 		{
-			public void customResultAvailable(IRemoteServiceManagementService rms)
+			@Override
+			public void customResultAvailable(Collection<IComponentManagementService> result) throws Exception
 			{
-				IFuture<IComponentManagementService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), cid, new ClassInfo(IComponentManagementService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
-				fut.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
+				assert result!=null && !result.isEmpty();
+				ret.setResult(result.iterator().next());
 			}
-		}));
+		});
+
+//		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
+//		sq.setPlatform(cid.getRoot());
+//		return ServiceRegistry.getRegistry(agent).searchServiceAsync(sq);
+		
+//		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
+//		{
+//			public void customResultAvailable(IRemoteServiceManagementService rms)
+//			{
+//				IFuture<IComponentManagementService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), cid, new ClassInfo(IComponentManagementService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+//				fut.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
+//			}
+//		}));
 		
 //		ret.addResultListener(new IResultListener<IComponentManagementService>() 
 //		{
@@ -3312,21 +3318,21 @@ public class ComponentManagementService implements IComponentManagementService
 		return ret;
 	}
 	
-	/**
-	 *  Get the addresses.
-	 */
-	protected IFuture<String[]> getAddresses()
-	{
-		IMessageService ms = getMessageService0();
-		if(ms!=null)
-		{
-			return ms.getAddresses();
-		}
-		else
-		{
-			return new Future<String[]>((String[])null);
-		}
-	}
+//	/**
+//	 *  Get the addresses.
+//	 */
+//	protected IFuture<String[]> getAddresses()
+//	{
+//		IMessageService ms = getMessageService0();
+//		if(ms!=null)
+//		{
+//			return ms.getAddresses();
+//		}
+//		else
+//		{
+//			return new Future<String[]>((String[])null);
+//		}
+//	}
 	
 	/**
 	 *  Get the clock service without exception if not found.
@@ -3346,23 +3352,23 @@ public class ComponentManagementService implements IComponentManagementService
 		return ret;
 	}
 	
-	/**
-	 *  Get the message service without exception if not found.
-	 */
-	protected IMessageService getMessageService0()
-	{
-		IMessageService ret = null;
-		
-		try
-		{
-			ret = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		}
-		catch(ServiceNotFoundException e)
-		{
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the message service without exception if not found.
+//	 */
+//	protected IMessageService getMessageService0()
+//	{
+//		IMessageService ret = null;
+//		
+//		try
+//		{
+//			ret = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		}
+//		catch(ServiceNotFoundException e)
+//		{
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the init info for a component identifier.
