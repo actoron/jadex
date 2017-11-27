@@ -205,6 +205,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
 		jtservices.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtservices.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
+		jtservices.setDefaultRenderer(Set.class, new DefaultTableCellRenderer());
 		
 		// create panel with query table
 		JPanel pqueryinfos = new JPanel(new BorderLayout());
