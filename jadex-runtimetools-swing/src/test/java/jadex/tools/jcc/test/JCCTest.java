@@ -1,5 +1,12 @@
 package jadex.tools.jcc.test;
 
+import java.io.File;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.List;
+import java.util.jar.JarEntry;
+
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;
@@ -7,6 +14,7 @@ import org.junit.Test;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.base.gui.ClassChooserPanel;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -17,14 +25,18 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.SNonAndroid;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.tools.jcc.ControlCenter;
 import jadex.tools.jcc.JCCAgent;
 import jadex.tools.jcc.PlatformControlCenter;
+import jadex.tools.jcc.PlatformControlCenterPanel;
 
 /**
  *  Test if all JCC plugins can be activated.
@@ -126,6 +138,79 @@ public class JCCTest //extends TestCase
 			ret	= IFuture.DONE;
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Add all plugins from classpath to jcc.
+	 */
+	protected void	addAllPlugins(final IInternalAccess jcca, final PlatformControlCenter pcc)
+	{
+//     	controlcenter.libservice.getClassLoader(null)
+//				.addResultListener(new SwingDefaultResultListener<ClassLoader>(PlatformControlCenterPanel.this)
+//			{
+//				public void customResultAvailable(final ClassLoader cl)
+//				{
+//                	controlcenter.libservice.getAllURLs()//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+//						.addResultListener(new SwingDefaultResultListener<List<URL>>(PlatformControlCenterPanel.this)
+//					{
+//						public void customResultAvailable(List<URL> urls)
+//						{
+//							IFilter ffil = new IFilter()
+//							{
+//								public boolean filter(Object obj)
+//								{
+//									String	fn	= "";
+//									if(obj instanceof File)
+//									{
+//										File	f	= (File)obj;
+//										fn	= f.getName();
+//									}
+//									else if(obj instanceof JarEntry)
+//									{
+//										JarEntry	je	= (JarEntry)obj;
+//										fn	= je.getName();
+//									}
+//									return fn.indexOf("Plugin")!=-1 && 
+//										fn.indexOf("$")==-1 && fn.indexOf("Panel")==-1;
+//								}
+//							};
+//							IFilter cfil = new IFilter()
+//							{
+//								public boolean filter(Object obj)
+//								{
+////									System.out.println("found: "+obj);
+//											
+//									Class<?> cl = (Class<?>)obj;
+//									boolean ret = SReflect.isSupertype(IControlCenterPlugin.class, cl) && !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+//									
+//									if(ret)
+//									{
+//										// Check if already used
+//										IControlCenterPlugin[] pls = controlcenter.getPlugins();
+//										for(IControlCenterPlugin pl: pls)
+//										{
+//											if(pl.getClass().equals(obj))
+//											{
+//												ret = false;
+//												break;
+//											}
+//										}
+//									}
+//									return ret;
+//								}
+//							};
+//       	                	ClassChooserPanel pp = new ClassChooserPanel(ffil, cfil, urls.toArray(new URL[urls.size()]), cl);
+//       	            		int res	= JOptionPane.showOptionDialog(PlatformControlCenterPanel.this, pp, "", JOptionPane.YES_NO_CANCEL_OPTION,
+//	            			JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
+//    	            		if(0==res)
+//    	            		{
+//    	            			Class<?> plcl = (Class<?>)pp.getSelectedElement();
+//    	            			if(plcl!=null)
+//    	            			{
+//        	        				controlcenter.addPlugin(plcl);
+//    	            			}
+//    	            		}
+
 	}
 	
 	/**
