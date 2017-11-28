@@ -91,7 +91,7 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		createPlatform(sec ? new String[]{"-ssltcptransport", "true"} : null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

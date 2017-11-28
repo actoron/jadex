@@ -65,7 +65,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-simulation", "true",
 		"-asyncexecution", "true",
 //		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-		"-logging", "true",
+//		"-logging", "true",
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 		"-logging_level", "java.util.logging.Level.WARNING",
 //		"-debugfutures", "true",
@@ -82,6 +82,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-printpass", "false",
 		"-superpeerclient", "false",
 		"-wstransport", "false",
+		"-relaytransport", "false",
 //		"-tcptransport", "false"
 		// Hack!!! include ssl transport if available
 //		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  

@@ -852,7 +852,7 @@ public class Starter
 											public void customResultAvailable(final IComponentManagementService localcms)
 											{
 												Map<String, Object>	args = new HashMap<String, Object>();
-												args.put("component", remote.getComponentIdentifier());
+												args.put("component", remote.getComponentIdentifier().getRoot());
 												CreationInfo ci = new CreationInfo(args);
 												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 											}

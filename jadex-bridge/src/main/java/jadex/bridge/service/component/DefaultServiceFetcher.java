@@ -177,10 +177,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					}
 					else
 					{
-						if("decoupled".equals(info.getName()))
-						{
-							System.out.println("searching6: "+info.getName()+", "+type+", "+binding.getScope());
-						}
+//						if("decoupled".equals(info.getName()))
+//						{
+//							System.out.println("searching6: "+info.getName()+", "+type+", "+binding.getScope());
+//						}
 						// Search service using search specification.
 						SServiceProvider.getTaggedService(ia, type, binding.getScope(), ffilter, false, tags)
 							.addResultListener(new StoreDelegationResultListener<T>(ret, ia, info, binding)

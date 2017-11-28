@@ -34,6 +34,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.testcases.RemoteTestBaseAgent;
 
 /**
  *  The invoker agent tests if intermediate results are directly delivered 
@@ -43,7 +44,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Description("The invoker agent tests if intermediate results are directly " +
 	"delivered back to the invoker in local and remote case.")
-public class InvokerAgent
+public class InvokerAgent	extends RemoteTestBaseAgent
 {
 	//-------- attributes --------
 	
@@ -160,28 +161,21 @@ public class InvokerAgent
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
-				{					
-					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+				{
+					createProxies(platform)
+						.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 					{
-						public void customResultAvailable(IComponentIdentifier result)
+						public void customResultAvailable(Void result)
 						{
-							// inverse proxy from remote to local.
-							Starter.createProxy(platform, agent.getExternalAccess())
-								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+							performTest(platform.getComponentIdentifier(), testno, delay, max)
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+						{
+							public void customResultAvailable(final TestReport result)
 							{
-								public void customResultAvailable(IComponentIdentifier result)
-								{
-									performTest(platform.getComponentIdentifier(), testno, delay, max)
-									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
-								{
-									public void customResultAvailable(final TestReport result)
-									{
-										platform.killComponent();
-										ret.setResult(result);
-									}
-								}));
-								}
-							});
+								platform.killComponent();
+								ret.setResult(result);
+							}
+						}));
 						}
 					});
 				}

@@ -26,6 +26,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
@@ -52,7 +53,7 @@ import jadex.micro.annotation.Results;
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
 //)
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public abstract class TestAgent
+public abstract class TestAgent	extends RemoteTestBaseAgent
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -66,46 +67,18 @@ public abstract class TestAgent
 	@AgentKilled
 	public IFuture<Void>	cleanup()
 	{
-		final Future<Void>	ret	= new Future<Void>();
-//		agent.getLogger().severe("Testagent kill: "+agent.getComponentDescription());
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			@Override
-			public void resultAvailable(Void result)
-			{
-//				agent.getLogger().severe("Testagent killed: "+agent.getComponentDescription());
-			}
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-//				agent.getLogger().severe("Testagent kill exception: "+agent.getComponentDescription()+", "+exception);
-			}
-		});
-		final IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
+		FutureBarrier<Void>	outer	= new FutureBarrier<Void>();
+		outer.addFuture(super.cleanup());
 		
+		FutureBarrier<Map<String, Object>>	inner	= new FutureBarrier<Map<String,Object>>();
 		for(final IExternalAccess platform: platforms)
 		{
-//			agent.getLogger().severe("kill platform: "+platform.getComponentIdentifier());
-			platform.killComponent().addResultListener(new IResultListener<Map<String,Object>>()
-			{
-				@Override
-				public void resultAvailable(Map<String, Object> result)
-				{
-//					agent.getLogger().severe("Test platform killed: "+platform.getComponentIdentifier());
-					crl.resultAvailable(result);
-				}
-
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-//					agent.getLogger().severe("Test platform kill exception: "+platform.getComponentIdentifier()+", "+exception);
-					crl.exceptionOccurred(exception);
-				}
-			});
+			inner.addFuture(platform.killComponent());
 		}
 		platforms	= null;
+		outer.addFuture(inner.waitFor());
 
-		return ret;
+		return outer.waitFor();
 	}
 	
 	/**
@@ -279,17 +252,9 @@ public abstract class TestAgent
 							public void customResultAvailable(IExternalAccess result)
 							{
 //								final DelegationResultListener<IExternalAccess> self = this;
-								final IExternalAccess myresult = result;
 								agent.getLogger().severe("Testagent create platform done: "+agent.getComponentDescription());
 								platforms.add(result);
-								Starter.createProxy(agent.getExternalAccess(), result).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
-								{
-									public void customResultAvailable(IComponentIdentifier result) throws Exception
-									{
-										superCustomResultAvailable(myresult);
-									}
-								});
-//								super.customResultAvailable(result);
+								super.customResultAvailable(result);
 							}
 
 							public void superCustomResultAvailable(IExternalAccess result)
@@ -557,20 +522,12 @@ public abstract class TestAgent
 				if(manualremove)
 					platforms.remove(exta);
 				
-				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+				createProxies(exta).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					@Override
+					public void customResultAvailable(Void result) throws Exception
 					{
-						// inverse proxy from remote to local.
-						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
-//								agent.getLogger().severe("Testagent setup remote platform done: "+agent.getComponentDescription());
-								ret.setResult(exta);
-							}
-						}));
+						ret.setResult(exta);
 					}
 				});
 			}
@@ -608,5 +565,5 @@ public abstract class TestAgent
 	protected IFuture<TestReport>	test(IComponentManagementService cms, boolean local)
 	{
 		throw new UnsupportedOperationException("Implement test() or performTests()");
-	}
+	}	
 }
