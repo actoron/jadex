@@ -521,8 +521,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		rootconf.setAwareness(true);
 //		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM.broadcast, IRootComponentConfiguration.AWAMECHANISM.multicast, IRootComponentConfiguration.AWAMECHANISM.message,
 //			IRootComponentConfiguration.AWAMECHANISM.relay, IRootComponentConfiguration.AWAMECHANISM.local);
-		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_BROADCAST, IRootComponentConfiguration.AWAMECHANISM_MULTICAST, IRootComponentConfiguration.AWAMECHANISM_MESSAGE,
-				IRootComponentConfiguration.AWAMECHANISM_RELAY, IRootComponentConfiguration.AWAMECHANISM_LOCAL);
+		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_BROADCAST, IRootComponentConfiguration.AWAMECHANISM_MULTICAST, IRootComponentConfiguration.AWAMECHANISM_LOCAL);
 		rootconf.setAwaDelay(20000);
 		rootconf.setAwaIncludes("");
 		rootconf.setAwaExcludes("");
@@ -646,13 +645,14 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		IRootComponentConfiguration rootconf = config.getRootConfig();
 
 		rootconf.setAwareness(true);
-		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_RELAY);
+//		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_RELAY);
 		rootconf.setAwaFast(true); // Make sure awareness finds other
 										// platforms quickly
 		// rootConfig.setRelayTransport(true);
 
 		rootconf.setSecurity(true); // enable security when remote comm.
 
-		return config;
+		throw new RuntimeException("Sorry, no relay available.");
+//		return config;
 	}
 }

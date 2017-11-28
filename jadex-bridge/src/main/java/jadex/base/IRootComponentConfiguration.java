@@ -31,11 +31,11 @@ public interface IRootComponentConfiguration
 	/** Message discovery allows detecting other platforms upon message reception.
 	 *  This helps especially if network connection is asymetric, e.g. one platform
 	 *  can find the other (and send messages) but not vice versa.*/
-	public static final String AWAMECHANISM_MESSAGE = "message";
+//	public static final String AWAMECHANISM_MESSAGE = "message";
 	/** The Relay discovery is the most robust discovery variant. It uses an external
 	 *  web server as relay where each platform registers. It is possible to set-up a
 	 *  self-hosted relay server, but per default, https://activecomponents.org/relay is used. */
-	public static final String AWAMECHANISM_RELAY = "relay";
+//	public static final String AWAMECHANISM_RELAY = "relay";
 	/** The local discovery uses a file-based mechanism to detect platforms running on the same host. */
 	public static final String AWAMECHANISM_LOCAL = "local";
 	/** The Registry mechanism implements a master-slave mechanism, where one
