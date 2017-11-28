@@ -237,7 +237,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				}
 				return IFuture.DONE;
 			}
-		});
+		}, true);
 		return ret;
 	}
 	
@@ -1799,7 +1799,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		@SuppressWarnings("unchecked")
 		final SubscriptionIntermediateFuture<MessageEvent>	ret	= (SubscriptionIntermediateFuture<MessageEvent>)
-			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent());
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent(), true);
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override

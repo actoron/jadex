@@ -334,7 +334,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							});
 						}
 					}
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(relayping >>> 1, this);
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(relayping >>> 1, this, true);
 					return IFuture.DONE;
 				}
 			});
@@ -621,7 +621,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						List<IRoutingService> filteredaddrs = new ArrayList<IRoutingService>();
 						try
 						{
-							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY);
+							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
 							for (IRoutingService rs : addrs)
 							{
 								IComponentIdentifier rsprov = ((IService) rs).getServiceIdentifier().getProviderId();
