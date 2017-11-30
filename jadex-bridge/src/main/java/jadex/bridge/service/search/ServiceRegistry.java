@@ -13,10 +13,13 @@ import java.util.Set;
 import jadex.base.PlatformConfiguration;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IRegistryListener;
 import jadex.bridge.service.types.registry.RegistryListenerEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -341,7 +344,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
+
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			public void terminated(Exception reason)
@@ -367,7 +370,6 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		{
 			// Creates a new collection so that filter check must NOT be locked
 			Collection<T> ssers = searchfunc.checkScope(sers, query.getOwner(), query.getScope(), false);
-			
 //			searchfunc.searchLoopServices(query.getFilter(), sers, query.getOwner(), query.getScope())
 			searchfunc.checkAsyncFilters(query.getFilter(), ssers.iterator())
 				.addIntermediateResultListener(new UnlimitedIntermediateDelegationResultListener<T>(ret));
@@ -541,42 +543,60 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 							ret.setFinished();
 						}
 					});
-					
-					for(IService ser: sers)
+
+					final boolean reschedule = (caller != null && !caller.equals(IComponentIdentifier.LOCAL.get()));
+					final IComponentManagementService cms = reschedule ? getService(IComponentManagementService.class) : null;
+//					System.out.println("Service registry searching remote, origin is: " + IComponentIdentifier.LOCAL.get() + ", owner is: " + caller + ", rescheduling: " + reschedule + " searching for: " + type);
+
+					for (IService ser : sers)
 					{
-						IProxyAgentService ps = (IProxyAgentService)ser;
-						
+						IProxyAgentService ps = (IProxyAgentService) ser;
+
 						ps.getRemoteComponentIdentifier().addResultListener(new IResultListener<ITransportComponentIdentifier>()
 						{
 							public void resultAvailable(ITransportComponentIdentifier rcid)
 							{
-								// User RMS getServiceProxies() to fetch services
-								
+								// Use RMS getServiceProxies() to fetch services
+
 								IFuture<Collection<T>> rsers = rms.getServiceProxies(caller, rcid, type, RequiredServiceInfo.SCOPE_PLATFORM, filter);
 								rsers.addResultListener(new IResultListener<Collection<T>>()
 								{
 									public void resultAvailable(Collection<T> result)
 									{
-										for(T t: result)
+										for (final T t : result)
 										{
-											if(!founds.contains(t))
+											if (!founds.contains(t))
 											{
-												ret.addIntermediateResult(t);
+												founds.add(t);
+												if (reschedule) // reschedule because we're on the wrong thread
+												{
+													IExternalAccess access = cms.getExternalAccess(caller).get();
+													access.scheduleStep(new IComponentStep<Void>()
+													{
+														@Override
+														public IFuture<Void> execute(IInternalAccess ia)
+														{
+															ret.addIntermediateResult(t);
+															return Future.DONE;
+														}
+													}).get();
+												}
+												else
+												{
+													ret.addIntermediateResult(t);
+												}
 											}
-											founds.add(t);
 										}
 										clis.resultAvailable(null);
 									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
+
+									public void exceptionOccurred(Exception exception) {
 										clis.resultAvailable(null);
 									}
 								});
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
+
+							public void exceptionOccurred(Exception exception) {
 								clis.resultAvailable(null);
 							}
 						});
