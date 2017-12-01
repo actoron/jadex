@@ -1,6 +1,8 @@
 package jadex.base.test.impl;
 
 
+import java.io.File;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
@@ -8,18 +10,22 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.ITuple2Future;
@@ -37,6 +43,12 @@ public class ComponentTest extends TestCase
 	
 	/** The component management system. */
 	protected IComponentManagementService	cms;
+	
+	/** The platform configuration */
+	protected IPlatformConfiguration	conf;
+	
+	/** The dirs for rids (e.g. classes and resources dirs). */
+	protected File[][]	dirs;
 	
 	/** The component model. */
 	protected String	filename;
@@ -68,6 +80,8 @@ public class ComponentTest extends TestCase
 	
 	/**
 	 *  Create a component test.
+	 *  Run on existing test suite platform.
+	 *  @param cms	The CMS of the test suite platform.
 	 */
 	public ComponentTest(IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
 	{
@@ -85,8 +99,33 @@ public class ComponentTest extends TestCase
 		{
 			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId());
 		}
-		this.suite	= suite;
-		
+		this.suite	= suite;		
+	}
+	
+	/**
+	 *  Create a component test.
+	 *  Run on separate platform.
+	 *  @param conf	The config for the new platform.
+	 */
+	public ComponentTest(IPlatformConfiguration conf, File[][] dirs, IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
+	{
+		this.conf	= conf;
+		this.dirs	= dirs;
+		//	this.cms	= cms; // Don't store suite cms -> use for own cms later.
+		this.filename	= comp.getFilename();
+		this.rid	= comp.getResourceIdentifier();
+		this.fullname	= comp.getFullName();
+		this.type	= comp.getType();
+		Object	to	= comp.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClass().getClassLoader());
+		if(to!=null)
+		{
+			this.timeout	= ((Number)to).longValue();
+		}
+		else
+		{
+			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getServiceIdentifier().getProviderId());
+		}
+		this.suite	= suite;		
 	}
 	
 	//-------- methods --------
@@ -129,7 +168,8 @@ public class ComponentTest extends TestCase
 
 					triggered[0] = true;
 					boolean	b = finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
-					if(b && cid[0]!=null)
+					IComponentManagementService	cms	= ComponentTest.this.cms;
+					if(b && cid[0]!=null && cms!=null)
 					{
 						cms.destroyComponent(cid[0]);
 					}
@@ -140,10 +180,48 @@ public class ComponentTest extends TestCase
 		// Actually not needed, because create component has no timoeut (hack???)
 		 ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 		
+		if(conf!=null)
+		{
+			IExternalAccess	exta	= Starter.createPlatform(conf).get(timeout, true);
+			cms	= SServiceProvider.getService(exta, IComponentManagementService.class).get(timeout, true);
+			ILibraryService	libsrv	= SServiceProvider.getService(exta, ILibraryService.class).get(timeout, true);
+			
+			for (int projectIndex=0; projectIndex < dirs.length; projectIndex++) {
+				File[] project = dirs[projectIndex];
+				IResourceIdentifier	parentRid	= null;
+				for(int rootIndex=0; rootIndex<project.length; rootIndex++)
+				{
+					try
+					{
+						if(parentRid==null && rid.getLocalIdentifier().getUri().equals(project[rootIndex].getCanonicalFile().toURI()))
+						{
+							System.out.println(fullname+": choose "+project[rootIndex]+" as "+rid);
+							parentRid	= rid;
+							libsrv.addURL(null, project[rootIndex].toURI().toURL()).get(timeout, true);
+						}
+						else if(parentRid!=null)
+						{
+							System.out.println(fullname+": add "+project[rootIndex]+" to "+rid);
+							libsrv.addURL(parentRid, project[rootIndex].toURI().toURL()).get(timeout, true);
+						}
+						else
+						{
+							System.out.println(fullname+": no match "+project[rootIndex]+" for "+rid);
+						}
+					}
+					catch(Exception e)
+					{
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		}
+		 
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{
+			@SuppressWarnings("unchecked")
 			public void intermediateResultAvailable(TupleResult result)
 			{
 				if(result.getNum()==0)
@@ -166,7 +244,7 @@ public class ComponentTest extends TestCase
 		Map<String, Object>	res	= null;
 		try
 		{
-			res	= finished.get();
+			res	= finished.get();	// Timeout set by timer above -> no get timeout needed.
 		}
 		catch(TimeoutException te)
 		{
@@ -181,11 +259,18 @@ public class ComponentTest extends TestCase
 		{
 			t.cancel();
 		}
-		checkTestResults(res);
+		
+		// cleanup platform?
+		if(conf!=null)
+		{
+			cms.destroyComponent(cms.getRootIdentifier().get(timeout, true)).get(timeout, true);
+		}
 		
 		// Remove references to Jadex resources to aid GC cleanup.
 		cms	= null;
 		suite	= null;
+		
+		checkTestResults(res);	// Do last -> throws exception on failure.
 	}
 
 	/**

@@ -55,6 +55,10 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 {
 	//-------- constants --------
 	
+	/** Run all tests on the same platform. */
+	// Set to true for old behavior 
+	public static final boolean	SAME_PLATFORM	= false;
+	
 	/**
 	 *  The default test platform arguments.
 	 */
@@ -348,7 +352,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 								if (istest) {
 									System.out.print(".");
 									if (runtests) {
-										ComponentTest test = new ComponentTest(cms, model, this);
+										ComponentTest test = SAME_PLATFORM
+											? new ComponentTest(cms, model, this)
+											: new ComponentTest(conf, roots, cms, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if (ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE) {
