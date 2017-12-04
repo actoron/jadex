@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import jadex.commons.ICommand;
+import jadex.commons.Tuple2;
 
 /**
  *  Collection that remove elements after a lease time on trigger.
@@ -30,8 +31,8 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 		// could also use simple t1-t2 if Long.MAX_VALUE would be used for no leasetime. */
 		public int compare(E e1, E e2)
 		{
-			long t1 = times.get(e1).longValue();
-			long t2 = times.get(e2).longValue();
+			long t1 = times.get(e1).getFirstEntity().longValue();
+			long t2 = times.get(e2).getFirstEntity().longValue();
 			int ret = 0;
 			if(t1<=0 && t2<=0)
 				ret = 0;
@@ -64,13 +65,13 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	};
 	
 	/** The timestamps. */
-	protected Map<E, Long> times = new HashMap<E, Long>();
+	protected Map<E, Tuple2<Long, Long>> times = new HashMap<E, Tuple2<Long, Long>>();
 	
 	/** The leasetime. */
 	protected long leasetime;
 	
 	/** The cleaner. */
-	protected ICommand<E> removecmd;
+	protected ICommand<Tuple2<E, Long>> removecmd;
 
 	//-------- constructors --------
 	
@@ -94,7 +95,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public PassiveLeaseTimeSet(ICommand<E> removecmd)
+	public PassiveLeaseTimeSet(ICommand<Tuple2<E, Long>> removecmd)
 	{
 		// per default no general leasetime
 		this(UNSET, removecmd);
@@ -103,7 +104,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public PassiveLeaseTimeSet(long leasetime, ICommand<E> removecmd)
+	public PassiveLeaseTimeSet(long leasetime, ICommand<Tuple2<E, Long>> removecmd)
 	{
 		this.leasetime = leasetime;
 		this.removecmd = removecmd;
@@ -114,7 +115,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	/**
 	 *  Set the remove cmd.
 	 */
-	public void setRemoveCommand(ICommand<E> cmd)
+	public void setRemoveCommand(ICommand<Tuple2<E, Long>> cmd)
 	{
 		this.removecmd = cmd;
 	}
@@ -158,7 +159,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
     
     public boolean add(E e, long leasetime)
     {
-    	times.put(e, getExpirationTime(leasetime));
+    	times.put(e, new Tuple2<Long, Long>(getExpirationTime(leasetime), leasetime));
     	boolean ret = entries.add(e);
     
     	//if(ret)
@@ -293,7 +294,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	 */
 	public void touch(E e, long leasetime)
 	{
-	   	times.put(e, getExpirationTime(leasetime));
+	   	times.put(e, new Tuple2<Long, Long>(getExpirationTime(leasetime), leasetime));
 		// Does only reorder when element is added again :-(
 		// http://stackoverflow.com/questions/6952660/java-priority-queue-reordering-when-editing-elements
 		entries.remove(e);
@@ -343,7 +344,8 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 			
 			if(first!=null)
 			{
-				long etime = times.get(first).longValue();
+				long etime = times.get(first).getFirstEntity().longValue();
+				Long lease = times.get(first).getSecondEntity();
 				if(etime>0)
 				{
 					long curtime = getClockTime();
@@ -352,7 +354,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 					{
 						remove(first);
 						if(removecmd!=null)
-							removecmd.execute(first);
+							removecmd.execute(new Tuple2<E, Long>(first, lease));
 					}
 				}
 			}

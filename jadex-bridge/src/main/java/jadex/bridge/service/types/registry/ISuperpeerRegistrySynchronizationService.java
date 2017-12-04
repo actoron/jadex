@@ -2,6 +2,7 @@ package jadex.bridge.service.types.registry;
 
 import java.util.Collection;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
@@ -17,6 +18,14 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 @Security("%{$args.supersuperpeer? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
 public interface ISuperpeerRegistrySynchronizationService 
 {
+	/** Predefined supersuperpeers. */
+	public static final IComponentIdentifier[] DEFAULT_SUPERSUPERPEERS = new IComponentIdentifier[]
+	{
+		new ComponentIdentifier("ssp1"),
+		new ComponentIdentifier("ssp2"),
+		new ComponentIdentifier("ssp3"),
+	};
+	
 	/**
 	 *  Subscribe to change events of the registry. 
 	 *  This is used by super-peers to exchange and replicate the global registry content.

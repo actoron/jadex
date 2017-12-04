@@ -230,7 +230,7 @@ public abstract class PeerSearchFunctionality
 			@Override
 			public void customResultAvailable(final IComponentIdentifier peer)
 			{
-				System.out.println("Next potential peer is: "+peer);
+//				System.out.println("Next potential peer is: "+peer);
 				
 				isOk(peer).addResultListener(new IResultListener<Boolean>()
 				{

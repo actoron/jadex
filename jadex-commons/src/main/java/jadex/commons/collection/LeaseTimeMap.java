@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.ICommand;
+import jadex.commons.Tuple2;
 
 /**
  *  Lease time map with supervised write/update access.
@@ -41,7 +42,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(long leasetime, final ICommand<K> removecmd, boolean touchonread, boolean touchonwrite)
+	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<K, Long>> removecmd, boolean touchonread, boolean touchonwrite)
 	{
 		this(leasetime, removecmd, touchonread, touchonwrite, null, true);
 	}
@@ -49,15 +50,15 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(long leasetime, final ICommand<K> removecmd, boolean touchonread, boolean touchonwrite, IDelayRunner timer, boolean sync)
+	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<K, Long>> removecmd, boolean touchonread, boolean touchonwrite, IDelayRunner timer, boolean sync)
 	{
 		this.touchonread = touchonread;
 		this.touchonwrite = touchonwrite;
 		this.map = new HashMap<K, V>();
 		
-		ICommand<K> rcmd = new ICommand<K>()
+		ICommand<Tuple2<K, Long>> rcmd = new ICommand<Tuple2<K, Long>>()
 		{
-			public void execute(K args)
+			public void execute(Tuple2<K, Long> args)
 			{
 //				System.out.println("removed: "+args);
 				LeaseTimeMap.this.map.remove(args);

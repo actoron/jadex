@@ -4,14 +4,13 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.management.ServiceNotFoundException;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;

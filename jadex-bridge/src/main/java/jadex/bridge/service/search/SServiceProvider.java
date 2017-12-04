@@ -2462,6 +2462,13 @@ public class SServiceProvider
 						return "Fake proxy for service("+sid+")";
 					}
 				});
+				pi.addMethodReplacement(new MethodInfo("getServiceIdentifier", new Class[0]), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return sid;
+					}
+				});
 				Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
 				pi.addExcludedMethod(new MethodInfo(getclass));
 				

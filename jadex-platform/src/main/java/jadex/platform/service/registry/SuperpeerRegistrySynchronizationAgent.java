@@ -28,7 +28,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=ISuperpeerRegistrySynchronizationService.class, 
-	implementation=@Implementation(expression="new SuperpeerRegistrySynchronizationService($args.supersuperpeer? null: SuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)")))
+	implementation=@Implementation(expression="new SuperpeerRegistrySynchronizationService(SuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS, $args.supersuperpeer? 0: 1)")))
 @Arguments({
 	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false")//,
 //	@Argument(name="supersuperpeers", clazz=String.class, defaultvalue="$args.supersuperpeer? null: \"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),

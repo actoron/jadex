@@ -28,7 +28,6 @@ import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.bridge.service.types.registry.RegistryUpdateEvent;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -159,10 +158,9 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			public IFuture<Boolean> isOk(IComponentIdentifier peer)
 			{
 				final Future<Boolean> ret = new Future<Boolean>();
-				final IComponentIdentifier sspcid = new ComponentIdentifier("registrysuperpeer@"+peer.getPlatformName());
 				try
 				{
-					ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
+					ISuperpeerRegistrySynchronizationService sps = getSuperpeerRegistrySynchronizationService(component, peer);
 					sps.getLevel().addResultListener(new IResultListener<Integer>()
 					{
 						public void resultAvailable(Integer result) 
@@ -424,40 +422,52 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		return ret;
 	}
 	
+//	/**
+//	 *  Search superpeer by sending requests to all known platforms if they host a IRegistrySynchronizationService service.
+//	 *  @return The cids of the superpeers.
+//	 */
+//	protected IFuture<IComponentIdentifier> searchSuperpeer()
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//
+////		// Only search for super peer when super peer client agent is running. Otherwise the platform is itself a super peer (hack???)
+////		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
+////		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
+////		{
+////			System.out.println("ask all");
+//			
+//		if(superpeers.size()>0)
+//		{
+//			
+//		}
+//		
+//			((ServiceRegistry)getRegistry()).searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null))
+//				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
+//				{
+////					System.out.println("found: "+result);
+//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//				}
+//			});
+////		}
+////		else
+////		{
+////			ret.setException(new ComponentNotFoundException("No superpeer found."));
+////		}
+//
+//		return ret;
+//	}
+	
 	/**
-	 *  Search superpeer by sending requests to all known platforms if they host a IRegistrySynchronizationService service.
-	 *  @return The cids of the superpeers.
+	 * 
+	 * @param cid
+	 * @return
 	 */
-	protected IFuture<IComponentIdentifier> searchSuperpeer()
+	public static ISuperpeerRegistrySynchronizationService getSuperpeerRegistrySynchronizationService(IInternalAccess component, IComponentIdentifier cid)
 	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-
-//		// Only search for super peer when super peer client agent is running. Otherwise the platform is itself a super peer (hack???)
-//		// TODO: move super peer management to separate agent (common base agent also needed for relay and transport address super peer management).
-//		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
-//		{
-//			System.out.println("ask all");
-			
-		if(superpeers.size()>0)
-		{
-			
-		}
-		
-			((ServiceRegistry)getRegistry()).searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null))
-				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
-			{
-				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
-				{
-//					System.out.println("found: "+result);
-					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
-				}
-			});
-//		}
-//		else
-//		{
-//			ret.setException(new ComponentNotFoundException("No superpeer found."));
-//		}
-
-		return ret;
+		IComponentIdentifier sspcid = new ComponentIdentifier("registrysuperpeer@"+cid.getPlatformName());
+		ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
+		return sps;
 	}
 }
