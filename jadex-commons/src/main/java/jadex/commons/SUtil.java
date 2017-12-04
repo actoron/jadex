@@ -5641,10 +5641,11 @@ public class SUtil
 		
 		// gradle
 		candidates.add(new ArrayList<File>(Arrays.asList(
-			new File(new File(new File(projectDir, "build"), "classes"),  "main"),
-			new File(new File(new File(projectDir, "build"), "classes"),  "test"),
+			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "main"),
+			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "test"),
 			new File(new File(new File(projectDir, "build"), "resources"),  "main"),
 			new File(new File(new File(projectDir, "build"), "resources"),  "test"))));
+
 		
 		// maven
 		candidates.add(new ArrayList<File>(Arrays.asList(
@@ -5680,7 +5681,7 @@ public class SUtil
 				}
 			}
 		}
-		
+
 		return found!=null ? found.toArray(new File[found.size()]) : new File[0];
 	}
 
