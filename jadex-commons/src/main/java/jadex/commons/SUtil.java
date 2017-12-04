@@ -1721,7 +1721,7 @@ public class SUtil
 				}
 			}
 			
-			if(includebootpath)
+			if(includebootpath && System.getProperty("sun.boot.class.path")!=null)
 			{
 				stok = new StringTokenizer(System.getProperty("sun.boot.class.path"), System.getProperty("path.separator"));
 				while(stok.hasMoreTokens())
@@ -1809,40 +1809,40 @@ public class SUtil
 			}
 		}
 		
-		else
-		{
-			try
-			{
-				// Hack for java 9
-				Field	ucpf	= SReflect.getField(classloader.getClass(), "ucp");
-				ucpf.setAccessible(true);
-				Object	ucp	=	ucpf.get(classloader);
-				Field	pathf	= SReflect.getField(ucp.getClass(), "path");
-				pathf.setAccessible(true);
-				@SuppressWarnings("unchecked")
-				List<File>	path	= (List<File>)pathf.get(ucp);
-				for(File f: path)
-				{
-					String	name	= f.getName();
-					if(name.endsWith(".jar"))
-					{
-						String jarname	= getJarName(name);
-						jarnames.add(jarname);
-					}
-				}
-				
-				for(File f: path)
-				{
-					set.add(f.toURI().toURL());
-					collectManifestURLs(f.toURI().toURL(), set, jarnames);
-				}
-
-			}
-			catch(Throwable t)
-			{
-				t.printStackTrace();
-			}
-		}
+//		else
+//		{
+//			try
+//			{
+//				// Hack for java 9 -> Doesn't work -> not accessible :(
+//				Field	ucpf	= SReflect.getField(classloader.getClass(), "ucp");
+//				ucpf.setAccessible(true);
+//				Object	ucp	=	ucpf.get(classloader);
+//				Field	pathf	= SReflect.getField(ucp.getClass(), "path");
+//				pathf.setAccessible(true);
+//				@SuppressWarnings("unchecked")
+//				List<File>	path	= (List<File>)pathf.get(ucp);
+//				for(File f: path)
+//				{
+//					String	name	= f.getName();
+//					if(name.endsWith(".jar"))
+//					{
+//						String jarname	= getJarName(name);
+//						jarnames.add(jarname);
+//					}
+//				}
+//				
+//				for(File f: path)
+//				{
+//					set.add(f.toURI().toURL());
+//					collectManifestURLs(f.toURI().toURL(), set, jarnames);
+//				}
+//
+//			}
+//			catch(Throwable t)
+//			{
+//				t.printStackTrace();
+//			}
+//		}
 	}
 	
 	/**

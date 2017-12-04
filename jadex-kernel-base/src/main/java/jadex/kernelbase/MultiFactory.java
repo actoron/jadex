@@ -288,7 +288,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		// Add base classpath
 		ClassLoader basecl = MultiFactory.class.getClassLoader();
-		for(URL url: SUtil.collectClasspathURLs(basecl))
+		for(URL url: SUtil.getClasspathURLs(basecl, true))
 		{
 			// Hack to avoid at least some Java junk.
 			if (!url.toString().contains("jre/lib/ext"))
