@@ -68,11 +68,11 @@ def withJUnit(cl){
 }
 
 def copyDownloads(src, dest) {
-    sh "scp -i ~/.ssh/pushuser.key -P 20000 -r ${src} webpush@download.actoron.com:${dest}"
+    sh "scp -i ~/.ssh/pushuser.key -P 18000 -r ${src} webpush@upload.actoron.com:${dest}"
 }
 
 def sshDownloads(cmd) {
-    sh """ssh -i ~/.ssh/pushuser.key -p 20000 webpush@download.actoron.com "${cmd}" """
+    sh """ssh -i ~/.ssh/pushuser.key -p 18000 webpush@upload.actoron.com "${cmd}" """
 }
 
 
