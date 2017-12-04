@@ -283,6 +283,12 @@ subprojects
 
     sourceCompatibility = 1.6
     
+    if(isTestParallel(project)) {
+		tasks.withType(Test) {
+ 			maxParallelForks = Runtime.runtime.availableProcessors()
+ 		} 
+	}
+    
     uploadArchives {
     	if (project.hasProperty('repouser')) {
 	        repositories {

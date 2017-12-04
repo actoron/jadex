@@ -55,6 +55,10 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 {
 	//-------- constants --------
 	
+	/** Run all tests on the same platform. */
+	// Set to true for old behavior 
+	public static final boolean	SAME_PLATFORM	= false;
+	
 	/**
 	 *  The default test platform arguments.
 	 */
@@ -65,7 +69,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-simulation", "true",
 		"-asyncexecution", "true",
 //		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-		"-logging", "true",
+//		"-logging", "true",
 //		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
 		"-logging_level", "java.util.logging.Level.WARNING",
 //		"-debugfutures", "true",
@@ -82,6 +86,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		"-printpass", "false",
 		"-superpeerclient", "false",
 		"-wstransport", "false",
+		"-relaytransport", "false",
 //		"-tcptransport", "false"
 		// Hack!!! include ssl transport if available
 //		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
@@ -347,7 +352,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 								if (istest) {
 									System.out.print(".");
 									if (runtests) {
-										ComponentTest test = new ComponentTest(cms, model, this);
+										ComponentTest test = SAME_PLATFORM
+											? new ComponentTest(cms, model, this)
+											: new ComponentTest(conf, roots, cms, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if (ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE) {

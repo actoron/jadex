@@ -22,7 +22,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -38,6 +37,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.testcases.RemoteTestBaseAgent;
 
 /**
  *  The invoker agent tests if intermediate results are directly delivered 
@@ -47,7 +47,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Description("The invoker agent tests if pull results are directly " +
 	"delivered back to the invoker in local and remote case.")
-public class InvokerAgent
+public class InvokerAgent	extends RemoteTestBaseAgent
 {
 	//-------- attributes --------
 	
@@ -166,41 +166,34 @@ public class InvokerAgent
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
+					createProxies(platform)
+						.addResultListener(new ExceptionDelegationResultListener<Void, TestReport[]>(ret)
 					{
-						public void customResultAvailable(IComponentIdentifier result)
+						public void customResultAvailable(Void result)
 						{
-							// inverse proxy from remote to local.
-							Starter.createProxy(platform, agent.getExternalAccess())
-								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
+							performTestA(platform.getComponentIdentifier(), testno, delay, max)
+								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
-								public void customResultAvailable(IComponentIdentifier result)
+								public void customResultAvailable(final TestReport result1)
 								{
-									performTestA(platform.getComponentIdentifier(), testno, delay, max)
+									performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
 										.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
-										public void customResultAvailable(final TestReport result1)
+										public void customResultAvailable(final TestReport result2)
 										{
-											performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
-												.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
-											{
-												public void customResultAvailable(final TestReport result2)
-												{
-													platform.killComponent();
-						//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-						//							{
-						//								public void customResultAvailable(Map<String, Object> v)
-						//								{
-						//									ret.setResult(result);
-						//								}
-						//							});
-													ret.setResult(new TestReport[]{result1, result2});
-												}
-											}));
+											platform.killComponent();
+				//								.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+				//							{
+				//								public void customResultAvailable(Map<String, Object> v)
+				//								{
+				//									ret.setResult(result);
+				//								}
+				//							});
+											ret.setResult(new TestReport[]{result1, result2});
 										}
 									}));
 								}
-							});
+							}));
 						}
 					});
 				}

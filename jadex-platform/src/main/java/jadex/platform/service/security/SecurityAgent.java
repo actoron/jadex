@@ -923,7 +923,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									cleanuptask = null;
 									return IFuture.DONE;
 								}
-							});
+							}, true);
 						}
 					});
 				}
@@ -1003,7 +1003,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							
 							return IFuture.DONE;
 						}
-					});
+					}, true);
 				}
 				return IFuture.DONE;
 			}

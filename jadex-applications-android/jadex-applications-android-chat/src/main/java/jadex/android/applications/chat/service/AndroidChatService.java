@@ -111,8 +111,8 @@ public class AndroidChatService extends JadexPlatformService
 		rootConfig.setAwaMechanisms(
 				IRootComponentConfiguration.AWAMECHANISM_BROADCAST,
 				IRootComponentConfiguration.AWAMECHANISM_MULTICAST,
-				IRootComponentConfiguration.AWAMECHANISM_MESSAGE,
-				IRootComponentConfiguration.AWAMECHANISM_RELAY,
+//				IRootComponentConfiguration.AWAMECHANISM_MESSAGE,
+//				IRootComponentConfiguration.AWAMECHANISM_RELAY,
 				IRootComponentConfiguration.AWAMECHANISM_LOCAL
 //				RootComponentConfiguration.AWAMECHANISM.bluetooth)
 		);

@@ -33,6 +33,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.micro.testcases.RemoteTestBaseAgent;
 
 /**
  *  The invoker agent tests if futures can be terminated
@@ -42,7 +43,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Description("The invoker agent tests if futures can be terminated " +
 	"in local and remote cases.")
-public class InvokerAgent
+public class InvokerAgent	extends RemoteTestBaseAgent
 {
 	//-------- attributes --------
 	
@@ -150,32 +151,25 @@ public class InvokerAgent
 			{
 				public void customResultAvailable(final IExternalAccess platform)
 				{
-					Starter.createProxy(agent.getExternalAccess(), platform).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
+					createProxies(platform)
+						.addResultListener(new ExceptionDelegationResultListener<Void, Collection<TestReport>>(ret)
 					{
-						public void customResultAvailable(IComponentIdentifier result)
+						public void customResultAvailable(Void result)
 						{
-							// inverse proxy from remote to local.
-							Starter.createProxy(platform, agent.getExternalAccess())
-								.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
+							performTest(platform.getComponentIdentifier(), testno, delay)
+								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
 							{
-								public void customResultAvailable(IComponentIdentifier result)
+								public void customResultAvailable(final Collection<TestReport> result)
 								{
-									performTest(platform.getComponentIdentifier(), testno, delay)
-										.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
-									{
-										public void customResultAvailable(final Collection<TestReport> result)
-										{
-											platform.killComponent();
-					//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-					//						{
-					//							public void customResultAvailable(Map<String, Object> v)
-					//							{
-					//								ret.setResult(result);
-					//							}
-					//						});
-											ret.setResult(result);
-										}
-									});
+									platform.killComponent();
+			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+			//						{
+			//							public void customResultAvailable(Map<String, Object> v)
+			//							{
+			//								ret.setResult(result);
+			//							}
+			//						});
+									ret.setResult(result);
 								}
 							});
 						}

@@ -1244,22 +1244,22 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					if(valid)
 					{
 						getComponent().getLogger().warning("Step aborted due to endstate:"+" "+step.getStep());
-						ex = new StepAbortedException(step.getStep())
-						{
-							@Override
-							public void printStackTrace(PrintStream s)
-							{
-								Thread.dumpStack();
-								super.printStackTrace(s);
-							}
-							
-							@Override
-							public void printStackTrace(PrintWriter s)
-							{
-								Thread.dumpStack();
-								super.printStackTrace(s);
-							}
-						};
+						ex = new StepAbortedException(step.getStep());
+//						{
+//							@Override
+//							public void printStackTrace(PrintStream s)
+//							{
+//								Thread.dumpStack();
+//								super.printStackTrace(s);
+//							}
+//							
+//							@Override
+//							public void printStackTrace(PrintWriter s)
+//							{
+//								Thread.dumpStack();
+//								super.printStackTrace(s);
+//							}
+//						};
 					}
 					else
 					{

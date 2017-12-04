@@ -37,8 +37,23 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ia.getComponentIdentifier()); // Hack!!! find out in which cases service call can null
 		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+		avoidCallTimeouts(ret, ia, realtime);
+	}
+	
+	/**
+	 *  Automatically update the timer of a long running service call future.
+	 *  Ensures that the caller does not timeout even if no result
+	 *  value is set in that time span.
+	 *  The call periodically sends alive calls to the caller. 
+	 *  @param ret The future that is returned by the service call.
+	 *  @param ia The component handling the service call (on that component the periodic updates are scheduled).
+	 *  @param realtime	true, for real time timeouts (simulation clock based timeouts otherwise).
+	 */
+	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia, boolean realtime)
+	{
+		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ia.getComponentIdentifier()); // Hack!!! find out in which cases service call can null
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
@@ -166,6 +181,19 @@ public class SFuture
 	public static <T> Future<?> getNoTimeoutFuture(Class<T> type, IInternalAccess ia)
 	{
 		return getFuture(type, false, ia);
+	}
+	
+	/**
+	 *  Convenience method for creating a future with timeout avoidance.
+	 *  @param type The future type (e.g. IntermediateFuture.class).
+	 *  @param ia The internal access.
+	 *  @param realtime	true, for real time timeouts (simulation clock based timeouts otherwise).
+	 */
+	public static <T> Future<?> getNoTimeoutFuture(Class<T> type, IInternalAccess ia, boolean realtime)
+	{
+		Future<?> ret = getFuture(type);
+		avoidCallTimeouts(ret, ia, realtime);
+		return ret;
 	}
 	
 	/**
