@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Test initial result values of components. -->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="ComponentResultTest" package="jadex.micro.testcases">
+	
+	<imports>
+		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<arguments>
+		<result name="testresults" class="Testcase"/>
+	</arguments>
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>	
+	
+	<configurations>
+		<configuration name="default">
+			<steps>
+				<initialstep class="ComponentResultTestStep"/>
+			</steps>
+		</configuration>
+	</configurations>
+	
+</componenttype>

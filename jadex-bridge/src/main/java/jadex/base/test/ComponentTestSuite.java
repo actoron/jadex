@@ -125,9 +125,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 * @param projectDir	The project directory.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path).
 	 */
-	public ComponentTestSuite(String projectDir, String[] excludes) throws Exception
+	public ComponentTestSuite(String projectDir, String[] excludes, boolean includeTestClasses) throws Exception
 	{
-		this(new File[][]{SUtil.findOutputDirs(projectDir)}, null, excludes);
+		this(new File[][]{SUtil.findOutputDirs(projectDir, includeTestClasses)}, null, excludes);
 	}
 
 	/**
@@ -136,9 +136,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 * @param tests	The tests (full qualified names) to include. Includes all, if null.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 */
-	public ComponentTestSuite(String projectDir, String[] tests, String[] excludes) throws Exception
+	public ComponentTestSuite(String projectDir, String[] tests, String[] excludes, boolean includeTestClasses) throws Exception
 	{
-		this(new File[][]{SUtil.findOutputDirs(projectDir)}, tests, excludes);
+		this(new File[][]{SUtil.findOutputDirs(projectDir, includeTestClasses)}, tests, excludes);
 	}
 	
 	/**

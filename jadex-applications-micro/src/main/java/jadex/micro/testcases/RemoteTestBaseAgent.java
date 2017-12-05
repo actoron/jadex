@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -17,7 +18,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
 
@@ -26,7 +26,7 @@ import jadex.micro.annotation.AgentKilled;
  *  Provides proxy creation and cleanup.
  */
 @Agent
-public class RemoteTestBaseAgent
+public class RemoteTestBaseAgent  extends JunitAgentTest
 {
 	//-------- attributes --------
 	

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Calculator Application</H3>
+	
+	Uses a composite calculator and connects it to
+	adder and subtractor peer components in this composite.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Calculate2" package="jadex.micro.testcases.semiautomatic.compositeservice">
+	
+	<arguments>
+		<argument name="arg" class="String">"default"</argument>
+	</arguments>
+	
+	<componenttypes>
+		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CompositeCalculatorAgent.class" master="true"/>
+		<componenttype name="CorruptAdder" filename="jadex/micro/testcases/semiautomatic/compositeservice/CorruptAdderAgent.class"/>
+		<componenttype name="Adder" filename="jadex/micro/testcases/semiautomatic/compositeservice/Adder.component.xml"/>
+		<componenttype name="Subtractor" filename="jadex/micro/testcases/semiautomatic/compositeservice/Subtractor.component.xml"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Component creation">
+			<components>
+				<component name="calculator" type="Calculator">
+					<requiredservices>
+						<!-- <requiredservice name="addservice">
+							<binding componenttype="Adder" create="true" scope="parent"
+						</requiredservice>	-->		
+						<binding name="addservice" create="true" scope="parent">
+							<creationinfo type="Adder"/>
+						</binding>			
+						<binding name="subservice" create="true" scope="parent">
+							<creationinfo type="Subtractor"/>
+						</binding>			
+					</requiredservices>
+				</component>
+			</components>
+		</configuration>
+		<configuration name="All components available">
+			<arguments>
+				<argument name="arg">"new value"</argument>
+			</arguments>
+			<components>
+				<component name="calculator" type="Calculator">
+					<requiredservices>
+						<binding name="addservice" componentname="adder" scope="parent"/>			
+						<binding name="subservice" componentname="subtractor" scope="parent"/>			
+					</requiredservices>
+				</component>
+				<component name="adder" type="Adder">
+					<arguments>
+						<argument name="arg">"new value"</argument>
+					</arguments>
+				</component>
+				<component name="subtractor" type="Subtractor"/>
+			</components>
+		</configuration>
+		<configuration name="Component creation and recovery">
+			<components>
+				<component name="calculator" type="Calculator">
+					<requiredservices>
+						<binding name="addservice" componentname="adder"  create="true" scope="parent" recover="true">
+							<creationinfo type="Adder"/>
+						</binding>			
+						<!-- <binding name="addservice" componenttype="CorruptAdder" create="true" scope="parent"/>	 -->		
+						<binding name="subservice" create="true" scope="parent">
+							<creationinfo type="Subtractor"/>
+						</binding>			
+					</requiredservices>
+				</component>
+				<component name="adder" type="CorruptAdder"/>
+			</components>
+		</configuration>
+	</configurations>
+	
+</componenttype>

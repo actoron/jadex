@@ -27,7 +27,7 @@ public class ManagementExtensionTest extends ComponentTestSuite
 				"TestIntermediateEvent",	// part of test and sometimes produces exception when started alone.
 
 				"CliEmail", "BPMNRecoveryTest", "globalservicepool/Initiator", "globalservicepool\\Initiator", "JavaWrapperTest", "IntermediateTest" // all are failing in stable branch (11.09.2017)
-			});
+			}, true);
 	}
 	
 //	/**
