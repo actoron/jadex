@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Adder component.</H3>
+	
+	Very simple component that provides an add service.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Adder" package="jadex.micro.testcases.semiautomatic.compositeservice">
+	
+	<arguments>
+		<argument name="arg" class="String">"default"</argument>
+	</arguments>
+	
+	<services>
+		<providedservice class="IAddService">
+			<implementation>new AddService($component)</implementation>
+		</providedservice>
+	</services>
+</componenttype>

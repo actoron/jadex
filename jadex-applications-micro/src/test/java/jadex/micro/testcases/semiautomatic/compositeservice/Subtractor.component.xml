@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Subtractor component.</H3>
+	
+	Very simple component that provides a subtract service.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Subtractor" package="jadex.micro.testcases.semiautomatic.compositeservice">
+	
+	<services>
+		<providedservice class="ISubService">
+			<implementation>new SubService($component)</implementation>
+		</providedservice>
+	</services>
+</componenttype>

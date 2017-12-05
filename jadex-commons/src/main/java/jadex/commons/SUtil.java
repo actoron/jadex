@@ -5599,10 +5599,10 @@ public class SUtil
 	 *  and uses the directory with the newest file.
 	 *  @return an expression string of the fpr 'new String[]{...}'.
 	 */
-	public static String	getOutputDirsExpression(String projectroot)
+	public static String	getOutputDirsExpression(String projectroot, boolean includeTestClasses)
 	{
 		StringBuffer	ret	= new StringBuffer("new String[]{");
-		for(File f: findOutputDirs(projectroot))
+		for(File f: findOutputDirs(projectroot, includeTestClasses))
 		{
 			try
 			{
@@ -5629,7 +5629,7 @@ public class SUtil
 	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.
 	 */
-	public static File[]	findOutputDirs(String projectroot)
+	public static File[]	findOutputDirs(String projectroot, boolean includeTestClasses)
 	{
 		File projectDir = findDirForProject(projectroot);
 		
@@ -5642,17 +5642,22 @@ public class SUtil
 		// gradle
 		candidates.add(new ArrayList<File>(Arrays.asList(
 			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "main"),
-			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "test"),
-			new File(new File(new File(projectDir, "build"), "resources"),  "main"),
-			new File(new File(new File(projectDir, "build"), "resources"),  "test"))));
+			new File(new File(new File(projectDir, "build"), "resources"),  "main"))));
+		if (includeTestClasses) {
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "test"),
+				new File(new File(new File(projectDir, "build"), "resources"),  "test"))));
+		}
 
-		
 		// maven
 		candidates.add(new ArrayList<File>(Arrays.asList(
 			new File(new File(projectDir, "target"), "classes"),
-			new File(new File(projectDir, "target"), "test-classes"),
-			new File(new File(projectDir, "target"), "resources"),
-			new File(new File(projectDir, "target"), "test-resources"))));
+			new File(new File(projectDir, "target"), "resources"))));
+		if (includeTestClasses) {
+			candidates.add(new ArrayList<File>(Arrays.asList(
+					new File(new File(projectDir, "target"), "test-classes"),
+					new File(new File(projectDir, "target"), "test-resources"))));
+		}
 		
 		// Choose newest list of files based on first entry
 		List<File>	found	= null;

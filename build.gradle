@@ -101,7 +101,6 @@ subprojects
     def mainSrcDir  = 'src/main/java'
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
-    def allSource   = ''
 
 	apply plugin: 'signing'
 	apply plugin: 'maven'
@@ -172,8 +171,8 @@ subprojects
             sourceSets {
                 main {
                     manifest.srcFile 'src/main/AndroidManifest.xml'
-                    resources.srcDirs = ['src/main/java']
-                    aidl.srcDirs = ['src/main/java']
+                    resources.srcDirs = [mainSrcDir]
+                    aidl.srcDirs = [mainSrcDir]
                     res.srcDirs = ['src/main/res']
                 }
             }
@@ -202,9 +201,8 @@ subprojects
         }
 
         // include all resources that are placed inside src dirs
-        android.sourceSets.main.resources.srcDirs mainSrcDir
-        android.sourceSets.test.resources.srcDirs testSrcDir
-        allSource   = android.sourceSets.main.java.srcDirs
+//        android.sourceSets.main.resources.srcDirs mainSrcDir
+//        android.sourceSets.test.resources.srcDirs testSrcDir
         dependencies
         {
             testCompile junit
@@ -229,7 +227,6 @@ subprojects
 		}
 
         compileJava.options.encoding = 'UTF-8'
-        allSource   = sourceSets.main.allSource
         // include all resources that are placed inside src dirs
         sourceSets.main.resources.srcDirs    mainSrcDir
         //sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
