@@ -410,40 +410,44 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	outputs.upToDateWhen {false}
 }
 
-task exampleZips << {
-	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
-	def preprocessdir = preprocessdirfile.getCanonicalPath()
+task exampleZips {
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
-    String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
-	gradle.ext.maindistartifacts.each { artname ->
-		Project sp = project.ext.subprojectmap.get(artname)
-		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
-		if (exdir.exists() && exdir.isDirectory()) {
-			exdir.listFiles().each { ex ->
-				preprocessdirfile.mkdirs()
-				def ant = new groovy.util.AntBuilder()
-				ant.sequential {
-					ant.copy todir: preprocessdir + '/' + ex.getName(),
-					{
-						resources
+	outputs.dir outputdir
+	doLast {
+		def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
+		def preprocessdir = preprocessdirfile.getCanonicalPath()
+		//String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
+		String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
+		gradle.ext.maindistartifacts.each { artname ->
+			Project sp = project.ext.subprojectmap.get(artname)
+			File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
+			if (exdir.exists() && exdir.isDirectory()) {
+				exdir.listFiles().each { ex ->
+					preprocessdirfile.mkdirs()
+					def ant = new groovy.util.AntBuilder()
+					ant.sequential {
+						ant.copy todir: preprocessdir + '/' + ex.getName(),
 						{
-							fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
-						}
+							resources
+							{
+								fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
+							}
 
-						filterset begintoken: '${', endtoken: '}',
-						{
-							filter token: 'jadex_build_version', value: jadex_build_version
+							filterset begintoken: '${', endtoken: '}',
+							{
+								filter token: 'jadex_build_version', value: jadex_build_version
+							}
 						}
-					}
-					ant.copy todir: preprocessdir + '/' + ex.getName(),
-					{
-						resources
+						ant.copy todir: preprocessdir + '/' + ex.getName(),
 						{
-							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
+							resources
+							{
+								fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
+							}
 						}
+						ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
+						ant.delete dir: preprocessdir
 					}
-					ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
-					ant.delete dir: preprocessdir
 				}
 			}
 		}
