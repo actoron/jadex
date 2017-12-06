@@ -47,46 +47,6 @@ public abstract class PeerSearchFunctionality
 		return getPeer(false);
 	}
 	
-//	/**
-//	 *  Find a peer from a given list of peers.
-//	 */
-//	protected IFuture<IComponentIdentifier> getPeer(boolean force)
-//	{
-//		Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-//		
-//		if(force)
-//			peer = null;
-//		
-//		long ct = System.currentTimeMillis();
-//		
-//		if(peer!=null)
-//		{
-//			ret.setResult(peer);
-//		}
-//		else if(getPotentialPeers()!=null && (lastsearch==0 || lastsearch+searchdelay<ct))
-//		{
-//			lastsearch = ct;
-//			
-//			findPeer(getPotentialPeers().iterator()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-//			{
-//				public void customResultAvailable(IComponentIdentifier result) 
-//				{
-////					System.out.println("found peer: "+result);
-//					peer = result;
-//					super.customResultAvailable(result);
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setException(new RuntimeException("No search possible"));
-//		}
-//		
-//		return ret;
-//	}
-	
-	
-	
 	/**
 	 *  Find a peer from a given list of peers.
 	 */

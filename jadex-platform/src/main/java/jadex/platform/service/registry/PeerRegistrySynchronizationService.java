@@ -187,12 +187,6 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				super.resetPeer();
 				currentsearch = null;
 			}
-			
-//			@Override
-//			public Collection<IComponentIdentifier> getPotentialPeers()
-//			{
-//				return superpeers;
-//			}
 		};
 		
 		// Subscribe to changes of the local registry to inform my superpeer
@@ -206,6 +200,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
+						final IResultListener<ISuperpeerRegistrySynchronizationService> searchlis = this; 
 //						System.out.println("spser !!!!!!"+lrobs.hashCode());
 						
 						IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
@@ -222,18 +217,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 									for(ISuperpeerRegistrySynchronizationService ser: spevent.getSuperpeers())
 										superpeers.add(((IService)ser).getServiceIdentifier().getProviderId());
 									
-									psfunc.getPeer(true).addResultListener(new IResultListener<IComponentIdentifier>()
-									{
-										public void resultAvailable(IComponentIdentifier result)
-										{
-											System.out.println("Now using superpeer: "+result);
-										}
-
-										public void exceptionOccurred(Exception exception)
-										{
-											System.out.println("Exception in superpeer search: "+exception);
-										}
-									});
+									// Does a new search to refresh superpeer
+									getSuperpeerService(true).addResultListener(searchlis);
 								}
 								
 								if(spevent.isRemoved())
