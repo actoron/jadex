@@ -13,6 +13,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -49,6 +51,83 @@ public class SASM
 	}
 	
 	/**
+	 *  Push an immediate (constant) integer value onto the stack
+	 *  with the best set of instructions.
+	 *  
+	 *  @param nl The instruction list. 
+	 *  @param immediate The immediate value.
+	 */
+	public static void pushImmediate(InsnList nl, int immediate)
+	{
+		if (immediate >= -1 && immediate <= 5)
+		{
+			switch (immediate)
+			{
+				case -1:
+					nl.add(new InsnNode(Opcodes.ICONST_M1));
+					break;
+				case 0:
+					nl.add(new InsnNode(Opcodes.ICONST_0));
+					break;
+				case 1:
+					nl.add(new InsnNode(Opcodes.ICONST_1));
+					break;
+				case 2:
+					nl.add(new InsnNode(Opcodes.ICONST_2));
+					break;
+				case 3:
+					nl.add(new InsnNode(Opcodes.ICONST_3));
+					break;
+				case 4:
+					nl.add(new InsnNode(Opcodes.ICONST_4));
+					break;
+				case 5:
+					nl.add(new InsnNode(Opcodes.ICONST_5));
+			}
+		}
+		else if (immediate <= Byte.MAX_VALUE && immediate >= Byte.MIN_VALUE)
+		{
+			nl.add(new IntInsnNode(Opcodes.BIPUSH, (int) immediate));
+		}
+		else if (immediate <= Short.MAX_VALUE && immediate >= Short.MIN_VALUE)
+		{
+			nl.add(new IntInsnNode(Opcodes.SIPUSH, (int) immediate));
+		}
+		else
+		{
+			nl.add(new LdcInsnNode(immediate));
+		}
+	}
+	
+	/**
+	 *  Push an immediate (constant) long value onto the stack
+	 *  with the best set of instructions.
+	 *  
+	 *  @param nl The instruction list. 
+	 *  @param immediate The immediate value.
+	 */
+	public static void pushImmediate(InsnList nl, long immediate)
+	{
+		if (immediate == 0L)
+		{
+			nl.add(new InsnNode(Opcodes.LCONST_0));
+		}
+		else if (immediate == 1L)
+		{
+			nl.add(new InsnNode(Opcodes.LCONST_1));
+		}
+		else if (immediate >= Integer.MIN_VALUE && immediate <= Integer.MAX_VALUE)
+		{
+			pushImmediate(nl, (int) immediate);
+			nl.add(new InsnNode(Opcodes.I2L));
+		}
+		else
+		{
+			nl.add(new LdcInsnNode(immediate));
+		}
+	}
+	
+	/**
 	 *  Make a value to an object.
 	 *  @param nl The instruction list.
 	 *  @param type The value type.
@@ -70,44 +149,44 @@ public class SASM
 		if(arg.getClassName().equals("byte"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false));
 		}
 		else if(arg.getClassName().equals("short"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false));
 		}
 		else if(arg.getClassName().equals("int"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false));
 		}
 		else if(arg.getClassName().equals("char"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false));
 		}
 		else if(arg.getClassName().equals("boolean"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false));
 		}
 		else if(arg.getClassName().equals("long"))
 		{
 			nl.add(new VarInsnNode(Opcodes.LLOAD, pos++));
 			pos++;
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false));
 		}
 		else if(arg.getClassName().equals("float"))
 		{
 			nl.add(new VarInsnNode(Opcodes.FLOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false));
 		}
 		else if(arg.getClassName().equals("double"))
 		{
 			nl.add(new VarInsnNode(Opcodes.DLOAD, pos++));
 			pos++;
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false));
 		}
 		else // Object
 		{
@@ -127,42 +206,42 @@ public class SASM
 		if(type.getClassName().equals("byte"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Boolean.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false));
 		}
 		else if(type.getClassName().equals("short"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Short.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false));
 		}
 		else if(type.getClassName().equals("int"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Integer.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false));
 		}
 		else if(type.getClassName().equals("char"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Character.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false));
 		}
 		else if(type.getClassName().equals("boolean"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Boolean.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false));
 		}
 		else if(type.getClassName().equals("long"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Long.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false));
 		}
 		else if(type.getClassName().equals("float"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Float.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
 		}
 		else if(type.getClassName().equals("double"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Double.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
 		}
 //		else // Object
 //		{
