@@ -910,7 +910,6 @@ public class SReflect
 			int	cnt	= 0;
 			for(int i=0; i<ms.length; i++)
 			{
-				System.out.println(ms[i].getName());
 				if(ms[i].getName().equals(name))
 				{
 					cnt++;

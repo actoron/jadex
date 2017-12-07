@@ -204,7 +204,7 @@ public class FastInvocation
 			}
 			
 			// Prepare method parameters
-			readyParameters(mv, method.getParameterTypes());
+			prepareParameters(mv, method.getParameterTypes());
 			
 			// Invoke static if static method.
 			if (isstatic)
@@ -561,7 +561,7 @@ public class FastInvocation
 	 *  @param mv The MethodVisitor being used.
 	 *  @param parameters The parameters of the method.
 	 */
-	protected static final void readyParameters(MethodVisitor mv, Class<?>[] parameters)
+	protected static final void prepareParameters(MethodVisitor mv, Class<?>[] parameters)
 	{
 		for (int i = 0; i < parameters.length; ++i)
 		{
