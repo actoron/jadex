@@ -43,6 +43,10 @@ def isWebApplicationProject(project) {
     project.hasProperty("webArchiveProject") && project.property("webArchiveProject") == 'true'
 }
 
+def isTestParallel(project) {
+    project.hasProperty("testParallel") && project.property("testParallel") == 'true'
+}
+
 def onVariant(Project project, String variantName, Closure c) {
     onAllVariants(project) {variant ->
         if (variant.buildType.name.equals(variantName)) {
@@ -521,6 +525,7 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
+    isTestParallel = this.&isTestParallel
     androidSdkExists = this.&androidSdkExists
     onVariant = this.&onVariant
     onVariantOutput = this.&onVariantOutput

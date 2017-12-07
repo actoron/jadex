@@ -218,6 +218,7 @@ public abstract class LocalRegistryObserver
 			for(Iterator<IService> it=added.iterator(); it.hasNext(); )
 			{
 				IService ser = it.next();
+				// Remove locally (platform) scoped events
 				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getServiceIdentifier().getScope()))
 					it.remove();
 			}

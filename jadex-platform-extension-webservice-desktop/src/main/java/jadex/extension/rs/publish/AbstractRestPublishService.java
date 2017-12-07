@@ -189,14 +189,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         {
         	public java.util.Collection<AsyncContext> createCollection(final String callid) 
         	{
-        		return LeaseTimeSet.createLeaseTimeCollection(to, new ICommand<AsyncContext>()
+        		return LeaseTimeSet.createLeaseTimeCollection(to, new ICommand<Tuple2<AsyncContext, Long>>()
     			{
-        			public void execute(AsyncContext ctx)
+        			public void execute(Tuple2<AsyncContext, Long> tup)
         			{
         				// Client timeout (nearly) occurred for the request
         				System.out.println("sending timeout to client");
         				writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, 
-        					(HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+        					(HttpServletRequest)tup.getFirstEntity().getRequest(), (HttpServletResponse)tup.getFirstEntity().getResponse(), false);
 //        				ctx.complete();
         			}
     			});
