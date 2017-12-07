@@ -20,35 +20,24 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import jadex.commons.SUtil;
+import jadex.commons.collection.WeakKeyValueMap;
 
 /**
  *  Static ASM helper methods.
  */
 public class SASM
 {
-	protected static Method methoddc1;
-    protected static Method methoddc2;
-
-	static
-	{
-		try
-		{
-			AccessController.doPrivileged(new PrivilegedExceptionAction<Object>()
-			{
-				public Object run() throws Exception
-				{
-					Class<?> cl = Class.forName("java.lang.ClassLoader");
-					methoddc1 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class});
-					methoddc2 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
-					return null;
-				}
-			});
-		}
-		catch(PrivilegedActionException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+    /** 
+	 *  Enables the shared bytecode classloader mode.
+	 *  If false, a new classloader is generated for each
+	 *  generated class for easier unloading, but
+	 *  potentially wastes more memory.
+	 */
+	public static boolean SHARED_LOADERS_MODE = false;
+	
+	/** Shared ClassLoader cache. */
+	protected static final WeakKeyValueMap<ClassLoader, ByteCodeClassLoader> SHARED_CLASSLOADERS =
+		new WeakKeyValueMap<ClassLoader, ByteCodeClassLoader>();
 	
 	/**
 	 *  Push an immediate (constant) integer value onto the stack
@@ -311,58 +300,24 @@ public class SASM
 	{
 		Class<?> ret = null;
 		
+		ByteCodeClassLoader bcl = getByteCodeClassLoader(loader, true);
 		try
 		{
-			Method method;
-			Object[] args;
-			if(domain == null)
-			{
-				method = methoddc1;
-				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length)};
-			}
+			if (domain == null)
+				ret = bcl.doDefineClass(name, data, 0, data.length);
 			else
-			{
-				method = methoddc2;
-				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length), domain};
-			}
-
-			method.setAccessible(true);
+				ret = bcl.doDefineClass(name, data, 0, data.length, domain);
+		}
+		catch(LinkageError e)
+		{
+			// when same class was already loaded via other filename wrong cache miss:-(
 			try
 			{
-				ret = (Class<?>)method.invoke(loader, args);
+				ret = Class.forName(name, true, bcl);
 			}
-			catch(InvocationTargetException e)
+			catch (Exception e1)
 			{
-				if(e.getTargetException() instanceof LinkageError)
-				{
-//					e.printStackTrace();					
-					// when same class was already loaded via other filename wrong cache miss:-(
-//					ret = SReflect.findClass(name, null, loader);
-					ret = Class.forName(name, true, loader);
-				}
-				else
-				{
-					throw e.getTargetException();
-				}
-			}
-			finally
-			{
-				method.setAccessible(false);
-			}
-		}
-		catch(Throwable e)
-		{
-			if(e instanceof Error)
-			{
-				throw (Error)e;
-			}
-			else if(e instanceof RuntimeException)
-			{
-				throw (RuntimeException)e;
-			}
-			else
-			{
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 		
@@ -391,5 +346,52 @@ public class SASM
 		}
 		
 		return cns;
+	}
+	
+	/**
+	 *  Generates a ByteCodeClassLoader for loading a generated class.
+	 * 
+	 *  @param parent Parent ClassLoader.
+	 *  @param sharedloader Set true, to use shared loaders.
+	 *  @return The ByteCodeClassLoader.
+	 */
+	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent)
+	{
+		return getByteCodeClassLoader(parent, SHARED_LOADERS_MODE);
+	}
+	
+	/**
+	 *  Generates a ByteCodeClassLoader for loading a generated class.
+	 * 
+	 *  @param parent Parent ClassLoader.
+	 *  @param sharedloader Set true, to use shared loaders.
+	 *  @return The ByteCodeClassLoader.
+	 */
+	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent, boolean sharedloaders)
+	{
+		while (parent instanceof ByteCodeClassLoader)
+			parent = parent.getParent();
+		
+		ByteCodeClassLoader bcl = null;
+		
+		if (sharedloaders)
+		{
+			synchronized(SHARED_CLASSLOADERS)
+			{
+				bcl = SHARED_CLASSLOADERS.get(parent);
+				
+				if (bcl == null)
+				{
+					bcl = new ByteCodeClassLoader(parent);
+					SHARED_CLASSLOADERS.put(parent, bcl);
+				}
+			}
+		}
+		else
+		{
+			bcl = new ByteCodeClassLoader(parent);
+		}
+		
+		return bcl;
 	}
 }
