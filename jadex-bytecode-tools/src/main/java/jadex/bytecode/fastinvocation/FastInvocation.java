@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.ProtectionDomain;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -11,10 +12,13 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import jadex.bytecode.ByteCodeClassLoader;
 import jadex.bytecode.SASM;
@@ -184,9 +188,9 @@ public class FastInvocation
 			boolean notpublic = (method.getModifiers() & Modifier.PUBLIC) == 0;
 			boolean isstatic = (method.getModifiers() & Modifier.STATIC) != 0;
 			
-			String classname = FastInvocation.class.getPackage().getName() + ".invokers.MethodInvoker_" + method.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
-			
-			ClassWriter cw = createClass(classname, notpublic, IMethodInvoker.class);
+			String classname = "MethodInvoker_" + method.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
+			int accesslevel = determineAccessLevel(Opcodes.ACC_PUBLIC, method.getModifiers());
+			ClassWriter cw = createClass(clazz, classname, accesslevel, IMethodInvoker.class);
 			if (cw == null)
 				return null;
 			
@@ -331,7 +335,7 @@ public class FastInvocation
 		
 		Method[] ifacemethods = SReflect.getAllMethods(iface);
 		
-		boolean privileged = false;
+		int accesslevel = Opcodes.ACC_PUBLIC;
 		Method[] targets = new Method[ifacemethods.length];
 		for (int i = 0; i < ifacemethods.length; ++i)
 		{
@@ -347,12 +351,12 @@ public class FastInvocation
 				throw new IllegalArgumentException("No match found for interface method " + ifacemethods[i]);
 			
 			targets[i] = cms[match[0]];
-			privileged |= (targets[i].getModifiers() & Modifier.PUBLIC) == 0;
+			accesslevel = determineAccessLevel(accesslevel, targets[i].getModifiers());
 		}
 		
 		String classname = FastInvocation.class.getPackage().getName() + ".accessors.ClassAccessor_" + clazz.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
-		String internalname = classname.replace('.', '/');
-		ClassWriter cw = createClass(classname, privileged, iface);
+		ClassWriter cw = createClass(clazz, classname, accesslevel, iface);
+		String internalname = cw.toString();
 		
 		cw.visitField(Opcodes.ACC_PUBLIC, "delegate", Type.getDescriptor(clazz), null, null);
 		
@@ -429,6 +433,20 @@ public class FastInvocation
 		}
 	}
 	
+	public static final IExtractor newExtractor(Class<IExtractor> extractorclass)
+	{
+		try
+		{
+			System.out.println(extractorclass);
+			Constructor<IExtractor> c = extractorclass.getConstructor((Class[]) null);
+			return c.newInstance((Object[]) null);
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
 	/**
 	 *  Creates extractor class.
 	 *  
@@ -436,26 +454,24 @@ public class FastInvocation
 	 *  @param clazz The class used to map methods.
 	 *  @return The generated invoker.
 	 */
-	public static final <T> Class<IExtractor<T>> createExtractorClass(ByteCodeClassLoader cl, Class<T> clazz, String[] propnames, Method[] accessormethods)
+	public static final Class<IExtractor> createExtractorClass(ByteCodeClassLoader cl, Class<?> clazz, String[] propnames, Method[] accessormethods)
 	{
 		if (propnames.length != accessormethods.length)
 			throw new IllegalArgumentException("Number of properties and methods must match.");
 		
-		Class<IExtractor<T>> ret = null;
-		
-		boolean privileged = false;
+		int accesslevel = Opcodes.ACC_PUBLIC;
 		for (int i = 0; i < accessormethods.length; ++i)
-			privileged |= (accessormethods[i].getModifiers() & Modifier.PUBLIC) == 0;
+			accesslevel = determineAccessLevel(accesslevel, accessormethods[i].getModifiers());
 		
-		String classname = FastInvocation.class.getPackage().getName() + ".accessors.ClassAccessor_" + clazz.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
-		String internalname = classname.replace('.', '/');
-		ClassWriter cw = createClass(classname, privileged, IExtractor.class);
+		String classnamesuffix = "ClassAccessor_" + clazz.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
+		ClassWriter cw = createClass(clazz, classnamesuffix, accesslevel, IExtractor.class);
+		String internalname = cw.toString();
 		
 		cw.visitField(Opcodes.ACC_PROTECTED | Opcodes.ACC_FINAL | Opcodes.ACC_STATIC, "PROPERTYNAMES", Type.getDescriptor(String[].class), null, null);
 		MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<clinit>", Type.getMethodDescriptor(Type.getType(void.class), new Type[0]), null, null);
 		InsnList nl = new InsnList();
 		SASM.pushImmediate(nl, propnames.length);
-		nl.add(new TypeInsnNode(Opcodes.ANEWARRAY, Type.getDescriptor(String.class)));
+		nl.add(new TypeInsnNode(Opcodes.ANEWARRAY, Type.getInternalName(String.class)));
 		for (int i = 0; i < propnames.length; ++i)
 		{
 			nl.add(new InsnNode(Opcodes.DUP));
@@ -463,8 +479,10 @@ public class FastInvocation
 			nl.add(new LdcInsnNode(propnames[i]));
 			nl.add(new InsnNode(Opcodes.AASTORE));
 		}
-		nl.add(new InsnNode(Opcodes.PUTSTATIC));
+		nl.add(new FieldInsnNode(Opcodes.PUTSTATIC, internalname, "PROPERTYNAMES", Type.getDescriptor(String[].class)));
+		nl.add(new InsnNode(Opcodes.RETURN));
 		nl.accept(mv);
+		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 		
 		try
@@ -476,46 +494,65 @@ public class FastInvocation
 	        mv.visitTypeInsn(Opcodes.NEW, Type.getInternalName(Tuple2.class));
 			mv.visitInsn(Opcodes.DUP);
 			
-			mv.visitFieldInsn(Opcodes.GETFIELD, internalname, "PROPERTYNAMES", Type.getDescriptor(String[].class));
+			mv.visitFieldInsn(Opcodes.GETSTATIC, internalname, "PROPERTYNAMES", Type.getDescriptor(String[].class));
 			
-			mv.visitTypeInsn(Opcodes.ANEWARRAY, Type.getDescriptor(Object.class));
 			nl = new InsnList();
+			SASM.pushImmediate(nl, propnames.length);
+			nl.add(new TypeInsnNode(Opcodes.ANEWARRAY, Type.getInternalName(Object.class)));
 			for (int i = 0; i < propnames.length; ++i)
 			{
 				nl.add(new InsnNode(Opcodes.DUP));
 				SASM.pushImmediate(nl, i);
-				mv.visitVarInsn(Opcodes.ALOAD, 1);
-				mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(accessormethods[i].getDeclaringClass()), accessormethods[i].getName(), Type.getMethodDescriptor(accessormethods[i]), false);
+				nl.add(new VarInsnNode(Opcodes.ALOAD, 1));
+				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(clazz)));
+				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Type.getInternalName(accessormethods[i].getDeclaringClass()), accessormethods[i].getName(), Type.getMethodDescriptor(accessormethods[i]), false));
 				nl.add(new InsnNode(Opcodes.AASTORE));
 			}
+			nl.accept(mv);
 			
 			mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(Tuple2.class), "<init>", Type.getConstructorDescriptor(Tuple2.class.getConstructor(Object.class, Object.class)), false);
 			mv.visitInsn(Opcodes.ARETURN);
+			mv.visitMaxs(0, 0);
+			mv.visitEnd();
 		}
 		catch (Exception e)
 		{
 			SUtil.throwUnchecked(e);
 		}
 		
-		return ret;
+		try
+		{
+			cw.visitEnd();
+			byte[] classcode = cw.toByteArray();
+			@SuppressWarnings("unchecked")
+			Class<IExtractor> genclass = (Class<IExtractor>) cl.defineClass(classcode);
+			
+			return genclass;
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 	
 	/**
 	 *  Creates the initial setup for a new class in ASM.
 	 *  
-	 *  @param classname Fully-qualified name of the class.
+	 *  @param classname Simple name of the class.
 	 *  @param privileged If the class should be "privileged" to allow
 	 *  				  access to non-publics.
 	 *  @return Preinitialized class writer.
 	 */
-	protected static final ClassWriter createClass(String classname, boolean privileged, Class<?>... interfaces)
+	protected static final ClassWriter createClass(Class<?> targetclass, String classname, int accesslevel, Class<?>... interfaces)
 	{
+		if (FALLBACK_MODE)
+			return null;
+		
 		Class<?> superclass = Object.class;
-		if (privileged)
+		String genpackage = "jadex.bytecode.fastinvocation.generated";
+//		accesslevel = Opcodes.ACC_PUBLIC;
+		if (accesslevel == Opcodes.ACC_PRIVATE)
 		{
-			if (FALLBACK_MODE)
-				return null;
-			
 			try
 			{
 				Class<?> reffacclass = Class.forName("sun.reflect.ReflectionFactory");
@@ -526,15 +563,30 @@ public class FastInvocation
 				return null;
 			}
 		}
+		else if (accesslevel != Opcodes.ACC_PUBLIC)
+		{
+//			System.err.println("Created limited scope");
+			// At least protected, inject into the package...
+			genpackage = targetclass.getPackage().getName();
+			//additional suffix to avoid clash
+			classname += "_" + Math.abs(SUtil.SECURE_RANDOM.nextLong());
+		}
 		
 		String[] internalifaces = interfaces != null ? new String[interfaces.length] : new String[0];
 		for (int i = 0; i < internalifaces.length; ++i)
 			internalifaces[i] = Type.getType(interfaces[i]).getInternalName();
 		
 		// Create class implementing the handler.
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+		final String internalname = (genpackage + "." + classname).replace('.', '/');
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
+		{
+			public String toString()
+			{
+				return internalname;
+			}
+		};
 		
-		cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, classname.replace('.', '/'), null, Type.getType(superclass).getInternalName(), internalifaces);
+		cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(superclass).getInternalName(), internalifaces);
 		
 		// Create empty constructor for our invoker handler.
 		MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.getType(void.class), new Type[0]), null, null);
@@ -545,7 +597,8 @@ public class FastInvocation
 			mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(Object.class), "<init>", Type.getConstructorDescriptor(Object.class.getConstructor((Class[])null)), false);
 		}
 		catch (Exception e)
-		{SUtil.throwUnchecked(e);
+		{
+			SUtil.throwUnchecked(e);
 		}
 		mv.visitInsn(Opcodes.RETURN);
 		mv.visitMaxs(0, 0);
@@ -639,6 +692,27 @@ public class FastInvocation
 				mv.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(parameters[i]));
 			}
 		}
+	}
+	
+	/**
+	 *  Determines the necessary access level based on the current access level.
+	 *   
+	 *  @param currentlevel The current level.
+	 *  @param modifiers Modifiers of the target
+	 *  @return Needed access level.
+	 */
+	protected static final int determineAccessLevel(int currentlevel, int modifiers)
+	{
+		if ((modifiers & Modifier.PUBLIC) == 0)
+		{
+			if ((modifiers & Modifier.PRIVATE) != 0)
+				currentlevel = Opcodes.ACC_PRIVATE;
+			else if ((modifiers & Modifier.PROTECTED) != 0 && currentlevel == Opcodes.ACC_PUBLIC)
+				currentlevel = Opcodes.ACC_PROTECTED;
+			else if (currentlevel == Opcodes.ACC_PUBLIC)
+				currentlevel = 0;
+		}
+		return currentlevel;
 	}
 	
 	/**

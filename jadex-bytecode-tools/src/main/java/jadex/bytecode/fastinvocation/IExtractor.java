@@ -2,7 +2,7 @@ package jadex.bytecode.fastinvocation;
 
 import jadex.commons.Tuple2;
 
-public interface IExtractor<T>
+public interface IExtractor
 {
-	public Tuple2<String[], Object[]> extractValues(T target);
+	public Tuple2<String[], Object[]> extract(Object target);
 }

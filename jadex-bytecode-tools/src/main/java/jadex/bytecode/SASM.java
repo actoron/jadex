@@ -1,10 +1,8 @@
 package jadex.bytecode;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 
 import org.objectweb.asm.ClassReader;
@@ -19,6 +17,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import jadex.bytecode.fastinvocation.FastInvocation;
+import jadex.bytecode.fastinvocation.IMethodInvoker;
 import jadex.commons.SUtil;
 import jadex.commons.collection.WeakKeyValueMap;
 
@@ -27,13 +27,16 @@ import jadex.commons.collection.WeakKeyValueMap;
  */
 public class SASM
 {
+	/** Access to sun.misc.Unsafe or equivalent. */
+	public static final Unsafe UNSAFE = new Unsafe();
+	
     /** 
 	 *  Enables the shared bytecode classloader mode.
 	 *  If false, a new classloader is generated for each
 	 *  generated class for easier unloading, but
 	 *  potentially wastes more memory.
 	 */
-	public static boolean SHARED_LOADERS_MODE = false;
+	public static boolean SHARED_LOADERS_MODE = true;
 	
 	/** Shared ClassLoader cache. */
 	protected static final WeakKeyValueMap<ClassLoader, ByteCodeClassLoader> SHARED_CLASSLOADERS =
@@ -369,8 +372,8 @@ public class SASM
 	 */
 	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent, boolean sharedloaders)
 	{
-		while (parent instanceof ByteCodeClassLoader)
-			parent = parent.getParent();
+//		while (parent instanceof ByteCodeClassLoader)
+//			parent = parent.getParent();
 		
 		ByteCodeClassLoader bcl = null;
 		
@@ -382,16 +385,119 @@ public class SASM
 				
 				if (bcl == null)
 				{
-					bcl = new ByteCodeClassLoader(parent);
+					bcl = new ByteCodeClassLoader(parent, true);
 					SHARED_CLASSLOADERS.put(parent, bcl);
 				}
 			}
 		}
 		else
 		{
-			bcl = new ByteCodeClassLoader(parent);
+			bcl = new ByteCodeClassLoader(parent, true);
 		}
 		
 		return bcl;
+	}
+	
+	/**
+     *  Access to sun.misc.Unsafe or equivalent.
+     */
+	protected static class Unsafe
+	{
+		
+		/** Instance, if available. */
+		Object instance = null;
+		
+		/** NativeHelper, if available. */
+		NativeHelper nativehelper = null;
+		
+		/** The defineClass method. */
+		IMethodInvoker defineclass;
+		
+		/**
+		 *  Creates the Unsafe.
+		 */
+		public Unsafe()
+		{
+			try
+			{
+				nativehelper = new NativeHelper();
+			}
+			catch (Throwable t)
+			{
+			}
+			
+			if (nativehelper == null)
+			{
+				Class<?> unsafeclass = null;
+				try
+				{
+					unsafeclass = Class.forName("sun.misc.Unsafe");
+					
+					Field instancefield = null;
+					try
+					{
+						// Field name in regular Java, normally...
+						instancefield = unsafeclass.getDeclaredField("theUnsafe");
+					}
+					catch (Exception e)
+					{
+					}
+					
+					if (instancefield == null)
+					{
+						try
+						{
+							// Field name in Android, normally...
+							instancefield = unsafeclass.getDeclaredField("THE_ONE");
+						}
+						catch (Exception e)
+						{
+						}
+					}
+					
+					
+					if (instancefield != null)
+					{
+						// attempt to acquire the singleton instance.
+						try
+						{
+							instancefield.setAccessible(true);
+							instance = instancefield.get(null);
+						}
+						catch (Exception e)
+						{
+						}
+					}
+					
+					if (instance == null)
+					{
+						// Okay, last chance, just instantiate a new instance...
+						Constructor<?> c = unsafeclass.getConstructor();
+						c.setAccessible(true);
+						instance = c.newInstance();
+					}
+					
+					ByteCodeClassLoader cl = new ByteCodeClassLoader(Unsafe.class.getClassLoader());
+					Method method = unsafeclass.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
+					Class<?> genclass = FastInvocation.createInvokerClass(cl, method);
+					defineclass = FastInvocation.newInvoker(genclass);
+				}
+				catch (Exception e)
+				{
+					SUtil.throwUnchecked(e);
+				}
+			}
+		}
+		
+		/**
+	     *  Access to sun.misc.Unsafe or equivalent.
+	     */
+		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
+	    {
+			if (nativehelper != null)
+				return nativehelper.defineClass(name, b, loader);
+			else
+				return (Class<?>) defineclass.invoke(instance, name, b, off, len, loader, pd == null ? loader.getClass().getProtectionDomain() : pd);
+	    }
 	}
 }

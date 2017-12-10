@@ -8,13 +8,28 @@ import java.security.ProtectionDomain;
  */
 public class ByteCodeClassLoader extends ClassLoader
 {
+	/** Flag if class should be defined in the parent. */
+	protected boolean definedirect;
+	
 	/**
 	 *  Creates the loader.
 	 *  @param parent Parent loader.
 	 */
 	public ByteCodeClassLoader(ClassLoader parent)
 	{
+		super(parent); 
+		definedirect = false;
+	}
+	
+	/**
+	 *  Creates the loader.
+	 *  @param parent Parent loader.
+	 *  @param definedirect Flag if class should be defined in the parent.
+	 */
+	public ByteCodeClassLoader(ClassLoader parent, boolean definedirect)
+	{
 		super(parent);
+		this.definedirect = definedirect;
 	}
 	
 	/**
@@ -34,7 +49,10 @@ public class ByteCodeClassLoader extends ClassLoader
 	 */
 	public Class<?> doDefineClass(String name, byte[] b, int off, int len)
 	{
-		return defineClass(name, b, off, len);
+		if (definedirect)
+			return SASM.UNSAFE.defineClass(name, b, off, len, getParent(), null);
+		else
+			return defineClass(name, b, off, len);
 	}
 	
 	/**
@@ -42,6 +60,11 @@ public class ByteCodeClassLoader extends ClassLoader
 	 */
 	public Class<?> doDefineClass(String name, byte[] b, int off, int len, ProtectionDomain protectiondomain)
 	{
-		return defineClass(name, b, off, len, protectiondomain);
+		if (definedirect)
+			return SASM.UNSAFE.defineClass(name, b, off, len, getParent(), protectiondomain);
+		else
+			return defineClass(name, b, off, len, protectiondomain);
 	}
+	
+	
 }
