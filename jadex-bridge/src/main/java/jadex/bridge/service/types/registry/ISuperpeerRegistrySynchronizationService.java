@@ -31,7 +31,7 @@ public interface ISuperpeerRegistrySynchronizationService
 	 *  This is used by super-peers to exchange and replicate the global registry content.
 	 *  @return The registry events.
 	 */
-	public ISubscriptionIntermediateFuture<IRegistryEvent> subscribeToEvents();
+	public ISubscriptionIntermediateFuture<ARegistryEvent> subscribeToEvents();
 	
 	/**
 	 *  Update the data of a new or already known client platform on the super-peer.
@@ -41,7 +41,7 @@ public interface ISuperpeerRegistrySynchronizationService
 	 *  @param event The event.
 	 *  @return The update event.
 	 */
-	public IFuture<RegistryUpdateEvent> updateClientData(IRegistryEvent event); 
+	public IFuture<ARegistryResponseEvent> updateClientData(ARegistryEvent event); 
 	
 	/**
 	 *  Get the current partner superpeers.
