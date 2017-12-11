@@ -13,38 +13,106 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import jadex.commons.SUtil;
+import jadex.commons.collection.WeakKeyValueMap;
 
 /**
  *  Static ASM helper methods.
  */
 public class SASM
 {
-	protected static Method methoddc1;
-    protected static Method methoddc2;
-
-	static
+    /** 
+	 *  Enables the shared bytecode classloader mode.
+	 *  If false, a new classloader is generated for each
+	 *  generated class for easier unloading, but
+	 *  potentially wastes more memory.
+	 */
+	public static boolean SHARED_LOADERS_MODE = false;
+	
+	/** Shared ClassLoader cache. */
+	protected static final WeakKeyValueMap<ClassLoader, ByteCodeClassLoader> SHARED_CLASSLOADERS =
+		new WeakKeyValueMap<ClassLoader, ByteCodeClassLoader>();
+	
+	/**
+	 *  Push an immediate (constant) integer value onto the stack
+	 *  with the best set of instructions.
+	 *  
+	 *  @param nl The instruction list. 
+	 *  @param immediate The immediate value.
+	 */
+	public static void pushImmediate(InsnList nl, int immediate)
 	{
-		try
+		if (immediate >= -1 && immediate <= 5)
 		{
-			AccessController.doPrivileged(new PrivilegedExceptionAction<Object>()
+			switch (immediate)
 			{
-				public Object run() throws Exception
-				{
-					Class<?> cl = Class.forName("java.lang.ClassLoader");
-					methoddc1 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class});
-					methoddc2 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
-					return null;
-				}
-			});
+				case -1:
+					nl.add(new InsnNode(Opcodes.ICONST_M1));
+					break;
+				case 0:
+					nl.add(new InsnNode(Opcodes.ICONST_0));
+					break;
+				case 1:
+					nl.add(new InsnNode(Opcodes.ICONST_1));
+					break;
+				case 2:
+					nl.add(new InsnNode(Opcodes.ICONST_2));
+					break;
+				case 3:
+					nl.add(new InsnNode(Opcodes.ICONST_3));
+					break;
+				case 4:
+					nl.add(new InsnNode(Opcodes.ICONST_4));
+					break;
+				case 5:
+					nl.add(new InsnNode(Opcodes.ICONST_5));
+			}
 		}
-		catch(PrivilegedActionException e)
+		else if (immediate <= Byte.MAX_VALUE && immediate >= Byte.MIN_VALUE)
 		{
-			throw new RuntimeException(e);
+			nl.add(new IntInsnNode(Opcodes.BIPUSH, (int) immediate));
+		}
+		else if (immediate <= Short.MAX_VALUE && immediate >= Short.MIN_VALUE)
+		{
+			nl.add(new IntInsnNode(Opcodes.SIPUSH, (int) immediate));
+		}
+		else
+		{
+			nl.add(new LdcInsnNode(immediate));
+		}
+	}
+	
+	/**
+	 *  Push an immediate (constant) long value onto the stack
+	 *  with the best set of instructions.
+	 *  
+	 *  @param nl The instruction list. 
+	 *  @param immediate The immediate value.
+	 */
+	public static void pushImmediate(InsnList nl, long immediate)
+	{
+		if (immediate == 0L)
+		{
+			nl.add(new InsnNode(Opcodes.LCONST_0));
+		}
+		else if (immediate == 1L)
+		{
+			nl.add(new InsnNode(Opcodes.LCONST_1));
+		}
+		else if (immediate >= Integer.MIN_VALUE && immediate <= Integer.MAX_VALUE)
+		{
+			pushImmediate(nl, (int) immediate);
+			nl.add(new InsnNode(Opcodes.I2L));
+		}
+		else
+		{
+			nl.add(new LdcInsnNode(immediate));
 		}
 	}
 	
@@ -70,44 +138,44 @@ public class SASM
 		if(arg.getClassName().equals("byte"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false));
 		}
 		else if(arg.getClassName().equals("short"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false));
 		}
 		else if(arg.getClassName().equals("int"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false));
 		}
 		else if(arg.getClassName().equals("char"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false));
 		}
 		else if(arg.getClassName().equals("boolean"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false));
 		}
 		else if(arg.getClassName().equals("long"))
 		{
 			nl.add(new VarInsnNode(Opcodes.LLOAD, pos++));
 			pos++;
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false));
 		}
 		else if(arg.getClassName().equals("float"))
 		{
 			nl.add(new VarInsnNode(Opcodes.FLOAD, pos++));
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false));
 		}
 		else if(arg.getClassName().equals("double"))
 		{
 			nl.add(new VarInsnNode(Opcodes.DLOAD, pos++));
 			pos++;
-			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false));
 		}
 		else // Object
 		{
@@ -127,42 +195,42 @@ public class SASM
 		if(type.getClassName().equals("byte"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Boolean.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false));
 		}
 		else if(type.getClassName().equals("short"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Short.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false));
 		}
 		else if(type.getClassName().equals("int"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Integer.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false));
 		}
 		else if(type.getClassName().equals("char"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Character.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false));
 		}
 		else if(type.getClassName().equals("boolean"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Boolean.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false));
 		}
 		else if(type.getClassName().equals("long"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Long.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false));
 		}
 		else if(type.getClassName().equals("float"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Float.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
 		}
 		else if(type.getClassName().equals("double"))
 		{
 			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(Double.class)));
-			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
 		}
 //		else // Object
 //		{
@@ -232,58 +300,24 @@ public class SASM
 	{
 		Class<?> ret = null;
 		
+		ByteCodeClassLoader bcl = getByteCodeClassLoader(loader, true);
 		try
 		{
-			Method method;
-			Object[] args;
-			if(domain == null)
-			{
-				method = methoddc1;
-				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length)};
-			}
+			if (domain == null)
+				ret = bcl.doDefineClass(name, data, 0, data.length);
 			else
-			{
-				method = methoddc2;
-				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length), domain};
-			}
-
-			method.setAccessible(true);
+				ret = bcl.doDefineClass(name, data, 0, data.length, domain);
+		}
+		catch(LinkageError e)
+		{
+			// when same class was already loaded via other filename wrong cache miss:-(
 			try
 			{
-				ret = (Class<?>)method.invoke(loader, args);
+				ret = Class.forName(name, true, bcl);
 			}
-			catch(InvocationTargetException e)
+			catch (Exception e1)
 			{
-				if(e.getTargetException() instanceof LinkageError)
-				{
-//					e.printStackTrace();					
-					// when same class was already loaded via other filename wrong cache miss:-(
-//					ret = SReflect.findClass(name, null, loader);
-					ret = Class.forName(name, true, loader);
-				}
-				else
-				{
-					throw e.getTargetException();
-				}
-			}
-			finally
-			{
-				method.setAccessible(false);
-			}
-		}
-		catch(Throwable e)
-		{
-			if(e instanceof Error)
-			{
-				throw (Error)e;
-			}
-			else if(e instanceof RuntimeException)
-			{
-				throw (RuntimeException)e;
-			}
-			else
-			{
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 		
@@ -312,5 +346,52 @@ public class SASM
 		}
 		
 		return cns;
+	}
+	
+	/**
+	 *  Generates a ByteCodeClassLoader for loading a generated class.
+	 * 
+	 *  @param parent Parent ClassLoader.
+	 *  @param sharedloader Set true, to use shared loaders.
+	 *  @return The ByteCodeClassLoader.
+	 */
+	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent)
+	{
+		return getByteCodeClassLoader(parent, SHARED_LOADERS_MODE);
+	}
+	
+	/**
+	 *  Generates a ByteCodeClassLoader for loading a generated class.
+	 * 
+	 *  @param parent Parent ClassLoader.
+	 *  @param sharedloader Set true, to use shared loaders.
+	 *  @return The ByteCodeClassLoader.
+	 */
+	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent, boolean sharedloaders)
+	{
+		while (parent instanceof ByteCodeClassLoader)
+			parent = parent.getParent();
+		
+		ByteCodeClassLoader bcl = null;
+		
+		if (sharedloaders)
+		{
+			synchronized(SHARED_CLASSLOADERS)
+			{
+				bcl = SHARED_CLASSLOADERS.get(parent);
+				
+				if (bcl == null)
+				{
+					bcl = new ByteCodeClassLoader(parent);
+					SHARED_CLASSLOADERS.put(parent, bcl);
+				}
+			}
+		}
+		else
+		{
+			bcl = new ByteCodeClassLoader(parent);
+		}
+		
+		return bcl;
 	}
 }

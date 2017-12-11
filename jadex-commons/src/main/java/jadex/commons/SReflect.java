@@ -58,6 +58,9 @@ public class SReflect
 
 	/** Method lookup cache (class->(name->method[])). */
 	protected static final Map methodcache	= Collections.synchronizedMap(new WeakHashMap());
+	
+	/** Method lookup cache (class->(name->method[])), includes non-public methods. */
+	protected static final Map allmethodcache	= Collections.synchronizedMap(new WeakHashMap());
 
 	/** Field lookup cache (class->(name->field[])). */
 	protected static final Map fieldcache = Collections.synchronizedMap(new WeakHashMap());
@@ -843,7 +846,7 @@ public class SReflect
 	 *  @param name	The name of the method to search for.
 	 *  @return	The method(s).
 	 */
-	public static Method[]	getMethods(Class clazz, String name)
+	public static Method[] getMethods(Class clazz, String name)
 	{
 		Map	map	= (Map)methodcache.get(clazz);
 		if(map==null)
@@ -859,6 +862,55 @@ public class SReflect
 			int	cnt	= 0;
 			for(int i=0; i<ms.length; i++)
 			{
+				if(ms[i].getName().equals(name))
+				{
+					cnt++;
+				}
+				else
+				{
+					ms[i]	= null;
+				}
+				
+			}
+			ret	= new Method[cnt];
+			cnt	= 0;
+			for(int i=0; i<ms.length; i++)
+			{
+				if(ms[i]!=null)
+					ret[cnt++]	= ms[i];
+			}
+			map.put(name, ret);
+		}
+//		if(name.indexOf("receive")!=-1)
+//			System.out.println(Arrays.toString(ret));
+		return ret;
+	}
+	
+	/**
+	 *  Get all method(s) of the class by name,
+	 *  including public, protected and private methods.
+	 *  
+	 *  @param clazz	The class to search.
+	 *  @param name	The name of the method to search for.
+	 *  @return	The method(s).
+	 */
+	public static Method[] getAllMethods(Class<?> clazz, String name)
+	{
+		Map	map	= (Map)allmethodcache.get(clazz);
+		if(map==null)
+		{
+			map	= SCollection.createHashMap();
+			allmethodcache.put(clazz, map);
+		}
+
+		Method[] ret = (Method[])map.get(name);
+		if(ret==null)
+		{
+			Method[]	ms	= getAllMethods(clazz);
+			int	cnt	= 0;
+			for(int i=0; i<ms.length; i++)
+			{
+				System.out.println(ms[i].getName());
 				if(ms[i].getName().equals(name))
 				{
 					cnt++;
