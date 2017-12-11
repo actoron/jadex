@@ -114,7 +114,7 @@ public abstract class EventCollector
 	 *  Set the timelimit.
 	 *  @param timelimit The timelimit to set
 	 */
-	public void setTimelimit(long timelimit)
+	public void setTimeLimit(long timelimit)
 	{
 		if(timelimit!=this.timelimit)
 		{

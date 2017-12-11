@@ -245,7 +245,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 										System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
 									}
 									// Calls notify observers at latest 
-									lrobs.setTimelimit((long)(re.getLeasetime()*0.9));
+									lrobs.setTimeLimit((long)(re.getLeasetime()*0.9));
 								}
 							}
 							
