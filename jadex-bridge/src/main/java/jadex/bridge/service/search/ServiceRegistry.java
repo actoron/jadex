@@ -2176,7 +2176,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 							// Disable filter, we do that locally.
 							remotequery.setFilter(null);
 
-							IComponentIdentifier	origin	= IComponentIdentifier.LOCAL.get();
+							IComponentIdentifier origin	= IComponentIdentifier.LOCAL.get();
 							if(origin==null)	// TODO: shouldn't happen?
 								origin	= cid;
 							IComponentManagementService	cms	= getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));

@@ -42,7 +42,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<K, Long>> removecmd, boolean touchonread, boolean touchonwrite)
+	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<Entry<K, V>, Long>> removecmd, boolean touchonread, boolean touchonwrite)
 	{
 		this(leasetime, removecmd, touchonread, touchonwrite, null, true);
 	}
@@ -50,7 +50,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<K, Long>> removecmd, boolean touchonread, boolean touchonwrite, IDelayRunner timer, boolean sync)
+	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<Entry<K,V>, Long>> removecmd, boolean touchonread, boolean touchonwrite, IDelayRunner timer, boolean sync)
 	{
 		this.touchonread = touchonread;
 		this.touchonwrite = touchonwrite;
@@ -61,9 +61,9 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 			public void execute(Tuple2<K, Long> args)
 			{
 //				System.out.println("removed: "+args);
-				LeaseTimeMap.this.map.remove(args);
+				V val = LeaseTimeMap.this.map.remove(args.getFirstEntity());
 				if(removecmd!=null)
-					removecmd.execute(args);
+					removecmd.execute(new Tuple2<Entry<K,V>, Long>(new MapEntry<K,V>(args.getFirstEntity(), val), args.getSecondEntity()));
 			}
 		};
 		
