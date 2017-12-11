@@ -330,9 +330,17 @@ public class JsonTraverser extends Traverser
 	 */
 	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors)
 	{
+		return objectToString(val, classloader, writeclass, true, excludes, null, processors);	
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, boolean writeid, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors)
+	{
 		String ret = null;
 		Traverser traverser = getWriteTraverser();
-		JsonWriteContext wr = new JsonWriteContext(writeclass, excludes);
+		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
 		
 		try
 		{

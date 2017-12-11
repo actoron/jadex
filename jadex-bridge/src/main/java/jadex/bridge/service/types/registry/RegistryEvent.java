@@ -8,7 +8,7 @@ import jadex.bridge.service.IService;
 /**
  *  Registry event for notifications from the registry.
  */
-public class RegistryEvent implements IRegistryEvent
+public class RegistryEvent extends ARegistryEvent
 {
 	/** The added services. */
 	protected Set<IService> addedservices;
@@ -18,15 +18,6 @@ public class RegistryEvent implements IRegistryEvent
 	protected Set<IService> removedservices;
 //	protected Set<IServiceIdentifier> removedservices;
 
-	/** The number of events that must have occured before a remote message is sent. */
-	protected int eventslimit;
-	
-	/** The timestamp of the first event (change). */
-	protected long timestamp; 
-	
-	/** The time limit. */
-	protected long timelimit;
-	
 	/** Flag if is delta (or full) registry content. */
 	protected boolean delta;
 	
@@ -78,11 +69,10 @@ public class RegistryEvent implements IRegistryEvent
 	 */
 	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta, String clienttype)
 	{
-		this.eventslimit = eventslimit;
-		this.timelimit = timelimit;
+		super(eventslimit, timelimit);
 		this.timestamp = System.currentTimeMillis();
 		this.delta = delta;
-		this.clienttype = clienttype==null? IRegistryEvent.CLIENTTYPE_CLIENT: clienttype;
+		this.clienttype = clienttype==null? CLIENTTYPE_CLIENT: clienttype;
 		setAddedServices(addedservices);
 		setRemovedServices(removedservices);
 	}
@@ -229,32 +219,6 @@ public class RegistryEvent implements IRegistryEvent
 			size += removedservices.size();
 		return size;
 	}
-	
-	/**
-	 *  Check if this event is due and should be sent.
-	 *  @param True, if the event is due and should be sent.
-	 */
-	public boolean isDue()
-	{
-		int size = size();
-		// Send event if more than eventlimit events have been collected
-		// OR
-		// timeout has been reached (AND and at least one event has been collected)
-		// The last aspect is not used because lease times are used
-		// so an empty event at least renews the lease
-		return size>=eventslimit || (System.currentTimeMillis()-timestamp>=timelimit);// && size>0);
-	}
-
-	/**
-	 *  Get the time until this event is due.
-	 *  @return The time until the event is due.
-	 */
-	public long getTimeUntilDue()
-	{
-		long wait = timelimit-(System.currentTimeMillis()-timestamp);
-		return wait>0? wait: 0;
-	}
-	
 	
 	/**
 	 *  Get the string representation.

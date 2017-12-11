@@ -4,7 +4,7 @@ package jadex.bridge.service.types.registry;
  *  Event from super-peers to an update request.
  *  Indicates whether the client was removed or was  
  */
-public class RegistryUpdateEvent
+public class RegistryResponseEvent extends ARegistryResponseEvent
 {
 	/** Removed flag. */
 	protected boolean removed;
@@ -18,14 +18,14 @@ public class RegistryUpdateEvent
 	/**
 	 *  Create a new RegistryUpdateEvent.
 	 */
-	public RegistryUpdateEvent()
+	public RegistryResponseEvent()
 	{
 	}
 	
 	/**
 	 *  Create a new RegistryUpdateEvent.
 	 */
-	public RegistryUpdateEvent(boolean removed, long leasetime)
+	public RegistryResponseEvent(boolean removed, long leasetime)
 	{
 		this.removed = removed;
 		this.leasetime = leasetime;
