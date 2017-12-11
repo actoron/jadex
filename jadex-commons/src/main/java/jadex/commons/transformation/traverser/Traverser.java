@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.binaryserializer.OptionalCodec;
 
 /**
  *  The traverser allows to traverse an object graph deeply.
@@ -59,6 +60,7 @@ public class Traverser
 		processors.add(new UUIDProcessor());
 		processors.add(new BigIntegerProcessor());
 		processors.add(new CloneProcessor());
+		processors.add(new OptionalProcessor());
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
 	}

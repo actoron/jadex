@@ -89,6 +89,7 @@ public class BinarySerializer
 		ENCODER_HANDLERS.add(new ThrowableCodec());
 		ENCODER_HANDLERS.add(new LocalDateTimeCodec());
 		ENCODER_HANDLERS.add(new BigIntegerCodec());
+		ENCODER_HANDLERS.add(new OptionalCodec());
 		ENCODER_HANDLERS.add(new BeanCodec());
 	}
 	

@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
@@ -174,6 +175,8 @@ public abstract class Test extends TestCase
 				testBeanWithPublicFields();
 				testBeanWithIncludedFields();
 				testSelfReferenceBean();
+
+				testOptionals();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -184,7 +187,7 @@ public abstract class Test extends TestCase
 			e.printStackTrace();
 		}
 	}
-	
+
 	//-------- test methods --------
 	
 	/**
@@ -1214,7 +1217,34 @@ public abstract class Test extends TestCase
 			}
 		});
 	}
-	
+
+	public void testOptionals() throws Exception {
+		String className = "java.util.Optional";
+		Class<?> optionalClass = SReflect.classForName0(className, null);
+
+		if (optionalClass != null) {
+			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+			Method emptyMethod = SReflect.getMethod(optionalClass, "empty", new Class[]{});
+	//		getMethod = SReflect.getMethod(optionalClass, "get", new Class[]{});
+	//		isPresentMethod = SReflect.getMethod(optionalClass, "isPresent", new Class[]{});
+
+
+			long value = 10000;
+	//		Optional<Long> longOptional = Optional.of(value);
+			Object longOptional = ofMethod.invoke(optionalClass, value);
+			doWriteAndRead(longOptional);
+
+			Date value2 = new Date(10000);
+//			Optional<Date> dateOptional = Optional.of(value2);
+			Object dateOptional = ofMethod.invoke(optionalClass, value2);
+			doWriteAndRead(dateOptional);
+
+//			Optional<Date> nullOptional = Optional.empty();
+			Object nullOptional = emptyMethod.invoke(optionalClass, null);
+			doWriteAndRead(nullOptional);
+		}
+	}
+
 	/**
 	 *  Get some bean.
 	 */
