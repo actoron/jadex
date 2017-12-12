@@ -61,7 +61,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return (clazz != null) && OPTIONAL_CLASSNAME.equals(clazz.getName());
@@ -74,12 +74,11 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, Object context)
 	{
 		init();
 		JsonWriteContext wr = (JsonWriteContext)context;
-		wr.addObject(traversed, object);
+		wr.addObject(object);
 
 		wr.write("{");
 
@@ -95,7 +94,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 			if (!first)
 				wr.write(",");
 			wr.write("\"isPresent\":");
-			traverser.doTraverse(isPresent, Boolean.class, traversed, processors, clone, targetcl, context);
+			traverser.doTraverse(isPresent, Boolean.class, conversionprocessors, processors, mode, targetcl, context);
 
 			Object subobject = null;
 			if (isPresent) {
@@ -103,7 +102,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 					wr.write(",");
 				wr.write("\"subobject\":");
 				subobject = getMethod.invoke(object, null);
-				traverser.doTraverse(subobject, subobject.getClass(), traversed, processors, clone, targetcl, context);
+				traverser.doTraverse(subobject, subobject.getClass(), conversionprocessors, processors, mode, targetcl, context);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

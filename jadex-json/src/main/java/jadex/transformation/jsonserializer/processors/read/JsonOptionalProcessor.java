@@ -69,7 +69,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, boolean clone, ClassLoader targetcl)
+	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return (clazz != null) && OPTIONAL_CLASSNAME.equals(clazz.getName());
@@ -82,8 +82,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, Object context)
 	{
 		init();
 		Object ret = null;
@@ -94,7 +93,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 				JsonValue subJson = obj.get("subobject");
 				Object subObject;
 				if (subJson != null) {
-					subObject = traverser.traverse(subJson, Object.class, processors, targetcl, context);
+					subObject = traverser.traverse(subJson, Object.class, conversionprocessors, processors, mode, targetcl, context);
 					ret =	ofMethod.invoke(optionalClass, subObject);
 				} else {
 					ret = emptyMethod.invoke(optionalClass);
