@@ -2,6 +2,7 @@ package jadex.micro.testcases.serviceinheritance;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -36,7 +37,7 @@ import jadex.micro.annotation.Results;
 @ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.serviceinheritance.ProviderAgent.class"))
 @Configurations(@Configuration(name="def", components=@Component(type="provider")))
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class UserAgent
+public class UserAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

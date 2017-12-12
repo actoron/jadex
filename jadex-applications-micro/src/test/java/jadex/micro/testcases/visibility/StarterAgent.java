@@ -1,6 +1,13 @@
 package jadex.micro.testcases.visibility;
 
+import org.junit.Ignore;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -19,17 +26,13 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  *  Simple test agent with one service.
  */
-@Results(@Result(name="testcases", clazz=List.class))
+@Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-public class StarterAgent 
+@Ignore
+public class StarterAgent  extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent; 
@@ -61,9 +64,9 @@ public class StarterAgent
 				
 				plat.killComponent();
 				
-				List<TestReport> tests = new ArrayList<TestReport>();
-				tests.add(new TestReport("#1", "Test provided scope platform is respected.", sers.length==2, sers.length!=2? "Found "+sers.length+" services": null));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);		
+				TestReport tr1 = new TestReport("#1", "Test provided scope platform is respected.", sers.length == 2, sers.length != 2 ? "Found " + sers.length + " services" : null);
+
+				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
 				agent.killComponent();
 			}
 		});

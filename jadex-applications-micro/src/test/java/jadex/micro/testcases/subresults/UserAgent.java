@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -30,7 +31,7 @@ import jadex.micro.annotation.Results;
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @ComponentTypes(@ComponentType(name="producer", clazz=ResultProducerAgent.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class UserAgent
+public class UserAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

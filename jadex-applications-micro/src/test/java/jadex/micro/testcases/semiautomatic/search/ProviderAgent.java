@@ -1,4 +1,4 @@
-package jadex.micro.testcases.search;
+package jadex.micro.testcases.semiautomatic.search;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;

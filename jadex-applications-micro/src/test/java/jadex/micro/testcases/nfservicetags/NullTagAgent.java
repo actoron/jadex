@@ -1,5 +1,7 @@
 package jadex.micro.testcases.nfservicetags;
 
+import org.junit.Ignore;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +29,7 @@ import jadex.micro.annotation.Results;
 @Arguments(@Argument(name = TagProperty.NAME, clazz = String.class, defaultvalue="null"))
 @NFProperties(@NFProperty(value = TagProperty.class))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
+@Ignore
 public class NullTagAgent extends JunitAgentTest
 {
 	@Agent

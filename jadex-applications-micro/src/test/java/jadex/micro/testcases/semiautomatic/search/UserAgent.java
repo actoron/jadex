@@ -1,4 +1,4 @@
-package jadex.micro.testcases.search;
+package jadex.micro.testcases.semiautomatic.search;
 
 import java.util.Collection;
 import java.util.Map;
@@ -23,7 +23,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent
 @RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, 
 	binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
-public class UserAgent 
+public class UserAgent
 {
     @Agent
     protected IInternalAccess agent;
