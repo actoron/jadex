@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -32,7 +33,7 @@ import jadex.micro.annotation.Results;
 	@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class UserAgent 
+public class UserAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

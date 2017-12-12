@@ -2,6 +2,7 @@ package jadex.micro.testcases.timeoutcascade;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -36,7 +37,7 @@ import jadex.micro.annotation.Results;
 @Properties({
 		@NameValue(name = Testcase.PROPERTY_TEST_TIMEOUT, value = "40000")
 })
-public class UserAgent
+public class UserAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

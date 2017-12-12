@@ -1,5 +1,7 @@
 package jadex.micro.testcases;
 
+import org.junit.Ignore;
+
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,7 @@ import jadex.micro.annotation.AgentKilled;
  *  Provides proxy creation and cleanup.
  */
 @Agent
+@Ignore
 public class RemoteTestBaseAgent  extends JunitAgentTest
 {
 	//-------- attributes --------

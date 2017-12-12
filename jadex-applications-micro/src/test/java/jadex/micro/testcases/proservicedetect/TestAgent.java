@@ -2,6 +2,7 @@ package jadex.micro.testcases.proservicedetect;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.Results;
 //@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
 //@ProvidedServices(@ProvidedService(type=ITestService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class TestAgent implements ITestService
+public class TestAgent extends JunitAgentTest implements ITestService
 {
 	/** 
 	 * The agent body.

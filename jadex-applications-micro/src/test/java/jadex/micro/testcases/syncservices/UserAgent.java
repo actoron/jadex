@@ -6,6 +6,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceInvalidException;
@@ -30,7 +31,7 @@ import jadex.micro.annotation.Results;
 @ComponentTypes(@ComponentType(name="provider", clazz=ProviderAgent.class))
 @Configurations(@Configuration(name="def", components=@Component(type="provider")))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-public class UserAgent
+public class UserAgent extends JunitAgentTest
 {
 	/** The agent. */
 	@Agent

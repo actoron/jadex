@@ -2,6 +2,7 @@ package jadex.micro.testcases.tuplefuture;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -30,7 +31,7 @@ import jadex.micro.annotation.*;
 // Hangs with jadex_deftimeout -1 when incompatible platforms are online, because global search does not return and creation binding never happens :(
 @Properties(
 	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 1.5)"))
-public class UserAgent
+public class UserAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;
