@@ -167,10 +167,11 @@ pre code {
 }
 
 /* sub-subitems in subnav */
-.wy-menu-vertical ul.subnav > li.toctree-l1.current > ul > li > a.toctree-l4 {
+.wy-menu-vertical ul.subnav ul > li > .toctree-l3 {
 	padding: 0.4045em 5.2em;
 	font-size: 80%;
 }
+
 /** subnav styles end **/
 
 /* default link color */
