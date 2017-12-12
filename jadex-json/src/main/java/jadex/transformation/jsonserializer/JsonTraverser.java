@@ -71,10 +71,13 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLocalDateTimeProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBigIntegerProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonOptionalProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
-//		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonReferenceProcessor());
+		// JsonArrayProcessor needs to be first, because others don't check array marker:
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
+		//readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonReferenceProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
@@ -88,7 +91,6 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMultiCollectionProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonEnumProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCertificateProcessor());
-		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonStackTraceElementProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
@@ -105,6 +107,7 @@ public class JsonTraverser extends Traverser
 		int pos = readprocs.size();
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBigIntegerProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonOptionalProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
 		
@@ -152,7 +155,7 @@ public class JsonTraverser extends Traverser
 					JsonWriteContext wr = (JsonWriteContext)context;
 					wr.setCurrentInputObject(inputobject);
 					Object ret = null;
-					
+
 					Integer ref = wr.getObjectId(inputobject);
 					if (ref != null)
 					{
@@ -163,7 +166,7 @@ public class JsonTraverser extends Traverser
 					}
 					return ret;
 				}
-				
+
 				public void finalizeProcessing(Object inputobject, Object outputobject, ITraverseProcessor convproc, ITraverseProcessor proc, Object context)
 				{
 					if (outputobject == null)
@@ -194,14 +197,14 @@ public class JsonTraverser extends Traverser
 					{
 						JsonObject obj = (JsonObject)inputobject;
 						int num = obj.getInt(JsonTraverser.REFERENCE_MARKER, 0);
-						
+
 						ret = jrc.getKnownObject(num);
 					}
-					
+
 					jrc.pushIdStack();
 					return ret;
 				}
-				
+
 				public void finalizeProcessing(Object inputobject, Object outputobject, ITraverseProcessor convproc, ITraverseProcessor proc, Object context)
 				{
 					JsonReadContext jrc = (JsonReadContext) context;
@@ -263,7 +266,7 @@ public class JsonTraverser extends Traverser
 	{
 		return objectToByteArray(val, classloader, enc, writeclass, writeid, excludes, conversionprocessors, conversionprocessors, null);
 	}
-	
+
 	/**
 	 *  Convert to a byte array.
 	 */
@@ -272,7 +275,7 @@ public class JsonTraverser extends Traverser
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
 		wr.setUserContext(usercontext);
-		
+
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -324,15 +327,15 @@ public class JsonTraverser extends Traverser
 	{
 		return objectToString(val, classloader, writeclass, excludes, null, processors);
 	}
-	
+
 	/**
 	 *  Convert to a string.
 	 */
 	public static String objectToString(Object val, ClassLoader classloader, boolean writeclass, Map<Class<?>, Set<String>> excludes, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors)
 	{
-		return objectToString(val, classloader, writeclass, true, excludes, null, processors);	
+		return objectToString(val, classloader, writeclass, true, excludes, null, processors);
 	}
-	
+
 	/**
 	 *  Convert to a string.
 	 */
@@ -341,7 +344,7 @@ public class JsonTraverser extends Traverser
 		String ret = null;
 		Traverser traverser = getWriteTraverser();
 		JsonWriteContext wr = new JsonWriteContext(writeclass, writeid, excludes);
-		
+
 		try
 		{
 			traverser.traverse(val, null, preprocessors, processors!=null? processors: writeprocs, Traverser.MODE.PREPROCESS, classloader, wr);
@@ -403,7 +406,7 @@ public class JsonTraverser extends Traverser
 	{
 		return objectFromByteArray(val, classloader, rep, enc, clazz, null, null);
 	}
-	
+
 	/**
 	 *  Convert a byte array (of an xml) to an object.
 	 *  @param val The byte array.
@@ -414,7 +417,7 @@ public class JsonTraverser extends Traverser
 	{
 		return objectFromByteArray(val, classloader, rep, enc, clazz, procs, postprocs, null);
 	}
-	
+
 	/**
 	 *  Convert a byte array (of an xml) to an object.
 	 *  @param val The byte array.
@@ -465,7 +468,7 @@ public class JsonTraverser extends Traverser
 	{
 		return objectFromString(val, classloader, rep, clazz, processors, null);
 	}
-	
+
 	/**
 	 *  Convert a byte array (of an xml) to an object.
 	 *  @param val The byte array.
@@ -477,7 +480,7 @@ public class JsonTraverser extends Traverser
 	{
 		return objectFromString(val, classloader, rep, clazz, processors, postprocessors, null);
 	}
-	
+
 	/**
 	 *  Convert a byte array (of an xml) to an object.
 	 *  @param val The byte array.

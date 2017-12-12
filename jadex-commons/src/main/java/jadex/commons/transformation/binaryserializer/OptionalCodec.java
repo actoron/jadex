@@ -96,7 +96,6 @@ public class OptionalCodec extends AbstractCodec
 	{
 		init();
 		try {
-			Class<?> optionalClass = SReflect.classForName(OPTIONAL_CLASSNAME, null);
 			Boolean isPresent = (Boolean) isPresentMethod.invoke(object, null);
 			ec.writeBoolean(isPresent);
 
