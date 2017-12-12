@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Component that contains a subcomponent producing an exception during init. -->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="BrokenInit" package="jadex.micro.testcases">
+	
+	<componenttypes>
+		<componenttype name="BrokenInitAgent" filename="BrokenInitAgent.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="default">
+			<components>
+				<component type="BrokenInitAgent"/>
+			</components>
+		</configuration>
+	</configurations>
+	
+</componenttype>

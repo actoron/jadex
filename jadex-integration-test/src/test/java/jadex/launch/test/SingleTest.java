@@ -38,7 +38,7 @@ public class SingleTest extends	ComponentTestSuite
 		{
 			String project = projects[i];
 			List<File> list = new ArrayList<File>();
-			list.addAll(Arrays.asList(SUtil.findOutputDirs(project)));
+			list.addAll(Arrays.asList(SUtil.findOutputDirs(project, true)));
 			projArr[i] = list.toArray(new File[list.size()]);
 		}
 		return projArr;

@@ -10,6 +10,9 @@ sourceSets
             exclude 'jadex/micro/examples/dungeonkeeper/**'
         }
     }
+	test {
+		java.srcDir 'src/test/java'
+	}
 }
 
 
@@ -24,6 +27,9 @@ dependencies
 	runtime project(':jadex-kernel-component') // Todo: move component tests in own project. -<scope>runtime</scope>
 	compile project(':jadex-kernel-application')
 	compile project(':jadex-kernel-extension-envsupport')
+	testCompile project(':jadex-platform')
+	testCompile project(':jadex-platform-extension-websockettransport')
+	testCompile project(':jadex-platform-extension-relaytransport')
 	
 	compile 'com.github.sarxos:webcam-capture:0.3.9'
 	compile 'org.jcodec:jcodec:0.1.5'

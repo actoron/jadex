@@ -40,7 +40,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BDIV3Test()	throws Exception {
-		super("jadex-applications-bdiv3", EXCLUDES);
+		super("jadex-applications-bdiv3", EXCLUDES, true);
 	}
 
 //	/**
