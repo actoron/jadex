@@ -18,7 +18,7 @@ String[] addrs = tas.getPlatformAddresses(cid).get();
 ```
 
 ### Parameters do not get passed in service calls, instead, they are null
-If you pass an instance of a custom class in a service call, it may happen that the target service implementation receives ```null``` instead of the correct value. When that happens, check if your class follows the JavaBean specification as described in [Remote Communication - Custom Classes](../remote/remote/#serialization).
+If you pass an instance of a custom class in a service call, it may happen that the target service implementation receives ```null``` instead of the correct value. When that happens, check if your class follows the JavaBean specification or uses annotations as described in [Remote Communication - Serialization](../remote/remote/#serialization).
 
 ### How can the environment of a Jadex MAS be programmed?
 If distribution is needed we used the approach of a separate environment. The environment holds the global state permits tasks, actions and processes being executed. See the environment user guide for details.

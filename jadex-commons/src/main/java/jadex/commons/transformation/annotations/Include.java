@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Specify that a public field should be included in serialization.
+ *  Specify that a public or private field should be included in serialization.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
