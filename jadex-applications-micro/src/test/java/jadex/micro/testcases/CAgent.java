@@ -8,6 +8,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -39,7 +40,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
 @Agent
-public class CAgent implements ICService
+public class CAgent extends JunitAgentTest implements ICService
 {
 	@Agent
 	protected IInternalAccess agent;

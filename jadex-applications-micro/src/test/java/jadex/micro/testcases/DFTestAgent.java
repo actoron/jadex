@@ -7,6 +7,7 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -42,7 +43,7 @@ import jadex.micro.annotation.Results;
 @Description("Test DF usage from micro agent.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-public class DFTestAgent
+public class DFTestAgent extends JunitAgentTest
 {
 	//-------- attributes --------
 	

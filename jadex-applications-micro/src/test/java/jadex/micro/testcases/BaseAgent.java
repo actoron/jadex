@@ -1,6 +1,7 @@
 package jadex.micro.testcases;
 
 
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
@@ -33,6 +34,6 @@ import jadex.micro.annotation.Results;
 @Arguments(@Argument(name="arg1", defaultvalue="\"bval\"", clazz=String.class))
 @Results(@Result(name="res1", defaultvalue="\"bres\"", clazz=String.class))
 @Configurations({@Configuration(name="config1"), @Configuration(name="config2")})
-public abstract class BaseAgent
+public abstract class BaseAgent extends JunitAgentTest
 {
 }

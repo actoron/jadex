@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -38,7 +39,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 @Agent
-public class BrokenTestAgent
+public class BrokenTestAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent; 

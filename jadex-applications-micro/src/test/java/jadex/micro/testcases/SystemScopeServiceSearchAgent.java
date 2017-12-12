@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.Results;
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
-public class SystemScopeServiceSearchAgent
+public class SystemScopeServiceSearchAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

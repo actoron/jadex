@@ -8,6 +8,7 @@ import java.util.logging.LogRecord;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -48,7 +49,7 @@ import jadex.micro.testcases.LoggerAgent.TestLogHandler;
 //	@NameValue(name="logging.handlers", value="new LoggerAgent$TestLogHandler()")
 })
 @Agent
-public class LoggerAgent
+public class LoggerAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

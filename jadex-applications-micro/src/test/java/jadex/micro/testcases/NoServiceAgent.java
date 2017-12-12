@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.Results;
 @Description("Test searching for services that don't exist.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-public class NoServiceAgent
+public class NoServiceAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

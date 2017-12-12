@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
@@ -23,6 +24,6 @@ import jadex.micro.annotation.Results;
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Configurations({@Configuration(name="first"), @Configuration(name="second")})
-public class ServiceParameterAgent
+public class ServiceParameterAgent extends JunitAgentTest
 {
 }
