@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -37,7 +38,7 @@ import jadex.micro.testcases.semiautomatic.compositeservice.ISubService;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(IAddService.class) // todo: multi interfaces?
 @Agent
-public class MultiServiceAgent	implements IAddService, ISubService
+public class MultiServiceAgent extends JunitAgentTest implements IAddService, ISubService
 {
 	@Agent
 	protected IInternalAccess agent;

@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.Service;
@@ -32,7 +33,7 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
 @Service(IAService.class)
 @Agent
-public class ProvidedServiceConfigurationsAgent implements IAService
+public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implements IAService
 {
 	@Agent
 	protected IInternalAccess agent;

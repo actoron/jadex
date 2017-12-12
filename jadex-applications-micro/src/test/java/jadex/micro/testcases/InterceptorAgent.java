@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -41,7 +42,7 @@ import jadex.micro.annotation.Results;
 	binding=@Binding(scope="local", interceptors=@Value("$pojoagent.reqinter"))))
 @Service(IAService.class)
 @Agent
-public class InterceptorAgent implements IAService
+public class InterceptorAgent extends JunitAgentTest implements IAService
 {	
 	@Agent
 	protected IInternalAccess agent;

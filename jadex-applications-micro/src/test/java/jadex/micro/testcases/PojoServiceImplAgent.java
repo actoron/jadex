@@ -3,6 +3,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.Results;
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
 @ProvidedServices(@ProvidedService(type=IAService.class))//, implementation=@Implementation(PojoServiceImplAgent.class)))
-public class PojoServiceImplAgent implements IAService
+public class PojoServiceImplAgent extends JunitAgentTest implements IAService
 {
 	@Agent 
 	protected IInternalAccess agent;

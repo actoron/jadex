@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -28,7 +29,7 @@ import jadex.micro.annotation.Results;
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
 @Agent(keepalive=Boolean3.FALSE)
-public class RequiredServiceConfigurationsAgent
+public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;

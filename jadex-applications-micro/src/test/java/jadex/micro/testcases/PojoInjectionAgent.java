@@ -2,6 +2,7 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.Service;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.Results;
 @Service
 @Description("Test if a pojo agent can be injected into a service as servicecomponent.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
-public class PojoInjectionAgent implements IAService
+public class PojoInjectionAgent extends JunitAgentTest implements IAService
 {
 	/** The agent. */
 	@Agent

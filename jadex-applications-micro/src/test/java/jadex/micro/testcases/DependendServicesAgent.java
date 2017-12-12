@@ -8,6 +8,7 @@ import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -58,7 +59,7 @@ import jadex.micro.annotation.Results;
     @Component(type="b")
 }))
 @Agent
-public class DependendServicesAgent
+public class DependendServicesAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;
