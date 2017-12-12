@@ -11,7 +11,7 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 variables:
-  - GRADLE_ARGS: "--info --stacktrace"
+  GRADLE_ARGS: "--info --stacktrace"
 
 cache:
   key: "$CI_COMMIT_REF_NAME"
