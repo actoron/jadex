@@ -137,27 +137,55 @@ If you don't want to add bean-conform getters/setters to your classes, you may a
 @IncludeFields
 public class Customer {
 
-	public int id;
-	public String name;
+	public int id; // included
+	public String name; // included
 
 	public Customer() {
 	}
 ```
 
+You may also use an explicit [@Include](${URLJavaDoc}/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+
+```java
+public class Customer {
+
+    @Include
+    public int id;
+    @Include
+    public String name;
+
+    private String hidden;  // field hidden is exluded
+}
+```
+
 ### Private fields
 
-Since Jadex 3.0.79, it is also possible to include private fields in serialization, using ```@IncludeFields(includePrivate=true)``` or by placing an explicit [@Include](${URLJavaDoc}/jadex/commons/transformation/annotations/Include.html) annotation on every field to include.
-Specific fields can also be excluded, as shown below:
+Since Jadex 3.0.80, it is also possible to include private fields in serialization, using ```@IncludeFields(includePrivate=true)```. Specific fields can also be excluded, as shown below:
 
 ```java
 @IncludeFields(includePrivate=true)
 public class Customer {
 
-    @Include // will include field even if @IncludeFields is missing
-	private int id;
-	private String name;
-	@Exclude
-	private String hidden;
+    private int id; // included
+    private String name; // included
+
+    @Exclude
+    private String hidden;
+}
+```
+
+As with public fields, you may also use an explicit [@Include](${URLJavaDoc}/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+
+```java
+public class Customer {
+
+    @Include
+    private int id;
+    @Include
+    private String name;
+
+    private String hidden;  // field hidden is exluded
+}
 ```
 
 # Advanced Topics 
