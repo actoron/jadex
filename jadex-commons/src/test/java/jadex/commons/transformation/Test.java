@@ -1,15 +1,8 @@
 package jadex.commons.transformation;
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.ILRUEntryCleaner;
-import jadex.commons.collection.LRU;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.transformation.annotations.Classname;
+import junit.framework.TestCase;
+
+import org.spongycastle.x509.X509V1CertificateGenerator;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,7 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -52,9 +44,16 @@ import java.util.logging.LogRecord;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.spongycastle.x509.X509V1CertificateGenerator;
-
-import junit.framework.TestCase;
+import jadex.bridge.ClassInfo;
+import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.ILRUEntryCleaner;
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  Testcases for writer and reader.
@@ -1262,6 +1261,7 @@ public abstract class Test extends TestCase
 
 		if (optionalClass != null) {
 			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+			final Method getMethod = SReflect.getMethod(optionalClass, "get", new Class[]{});
 
 			Date value2 = new Date(10000);
 			Object dateOptional = ofMethod.invoke(optionalClass, value2);
@@ -1270,16 +1270,32 @@ public abstract class Test extends TestCase
 			Object intArrayOptional = ofMethod.invoke(optionalClass, (Object) new Integer[]{1,2,3});
 			doWriteAndRead(intArrayOptional, new Comparator() {
 				@Override
-				public int compare(Object o, Object t1) {
-					return Arrays.equals(((Optional<Integer[]>)o).get(),((Optional<Integer[]>)t1).get()) ? 0 : -1;
+				public int compare(Object o, Object o2) {
+					Object array1 = null;
+					Object array2 = null;
+					try {
+					 	array1 = getMethod.invoke(o);
+						array2 = getMethod.invoke(o2);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+					return Arrays.equals(((Integer[])array1),(Integer[])array2) ? 0 : -1;
 				}
 			});
 
 			Object dateArrayOptional = ofMethod.invoke(optionalClass, (Object)new Date[]{new Date(1000), new Date(2000)});
 			doWriteAndRead(dateArrayOptional, new Comparator() {
 				@Override
-				public int compare(Object o, Object t1) {
-					return Arrays.equals(((Optional<Date[]>)o).get(),((Optional<Date[]>)t1).get()) ? 0 : -1;
+				public int compare(Object o, Object o2) {
+					Object date1 = null;
+					Object date2 = null;
+					try {
+						date1 = getMethod.invoke(o);
+						date2 = getMethod.invoke(o2);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+					return Arrays.equals(((Date[])date1),(Date[])date2) ? 0 : -1;
 				}
 			});
 
