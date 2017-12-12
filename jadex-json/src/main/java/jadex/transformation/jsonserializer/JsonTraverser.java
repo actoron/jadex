@@ -68,9 +68,12 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLocalDateTimeProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBigIntegerProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonOptionalProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
+		// JsonArrayProcessor needs to be first, because others don't check array marker:
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonReferenceProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
@@ -89,7 +92,6 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor());
-		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURIProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURLProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassProcessor());
@@ -102,6 +104,7 @@ public class JsonTraverser extends Traverser
 		int pos = readprocs.size();
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBigIntegerProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonOptionalProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonPrimitiveProcessor());
 		

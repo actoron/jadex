@@ -44,6 +44,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -176,7 +177,11 @@ public abstract class Test extends TestCase
 				testBeanWithIncludedFields();
 				testSelfReferenceBean();
 
-				testOptionals();
+				testOptionalsPrimitive();
+				testOptionalsComplex();
+				testOptionalsCollection();
+
+				testDateArray();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -1218,31 +1223,102 @@ public abstract class Test extends TestCase
 		});
 	}
 
-	public void testOptionals() throws Exception {
+	/**
+	 * Test reading/writing java optionals with primitive types.
+	 * @throws Exception
+	 */
+	public void testOptionalsPrimitive() throws Exception {
 		String className = "java.util.Optional";
 		Class<?> optionalClass = SReflect.classForName0(className, null);
 
 		if (optionalClass != null) {
 			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
 			Method emptyMethod = SReflect.getMethod(optionalClass, "empty", new Class[]{});
-	//		getMethod = SReflect.getMethod(optionalClass, "get", new Class[]{});
-	//		isPresentMethod = SReflect.getMethod(optionalClass, "isPresent", new Class[]{});
 
-
-			long value = 10000;
-	//		Optional<Long> longOptional = Optional.of(value);
-			Object longOptional = ofMethod.invoke(optionalClass, value);
+			Object longOptional = ofMethod.invoke(optionalClass, (long) 10000);
 			doWriteAndRead(longOptional);
 
-			Date value2 = new Date(10000);
-//			Optional<Date> dateOptional = Optional.of(value2);
-			Object dateOptional = ofMethod.invoke(optionalClass, value2);
-			doWriteAndRead(dateOptional);
+			Object intOptional = ofMethod.invoke(optionalClass, 1000);
+			doWriteAndRead(intOptional);
 
-//			Optional<Date> nullOptional = Optional.empty();
+			Object stringOptional = ofMethod.invoke(optionalClass, "Test");
+			doWriteAndRead(stringOptional);
+
+			Object booleanOptional = ofMethod.invoke(optionalClass, true);
+			doWriteAndRead(booleanOptional);
+
 			Object nullOptional = emptyMethod.invoke(optionalClass, null);
 			doWriteAndRead(nullOptional);
 		}
+	}
+
+	/**
+	 * Test reading/writing java optionals with complex types.
+	 * @throws Exception
+	 */
+	public void testOptionalsComplex() throws Exception {
+		String className = "java.util.Optional";
+		Class<?> optionalClass = SReflect.classForName0(className, null);
+
+		if (optionalClass != null) {
+			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+
+			Date value2 = new Date(10000);
+			Object dateOptional = ofMethod.invoke(optionalClass, value2);
+			doWriteAndRead(dateOptional);
+
+			Object intArrayOptional = ofMethod.invoke(optionalClass, (Object) new Integer[]{1,2,3});
+			doWriteAndRead(intArrayOptional, new Comparator() {
+				@Override
+				public int compare(Object o, Object t1) {
+					return Arrays.equals(((Optional<Integer[]>)o).get(),((Optional<Integer[]>)t1).get()) ? 0 : -1;
+				}
+			});
+
+			Object dateArrayOptional = ofMethod.invoke(optionalClass, (Object)new Date[]{new Date(1000), new Date(2000)});
+			doWriteAndRead(dateArrayOptional, new Comparator() {
+				@Override
+				public int compare(Object o, Object t1) {
+					return Arrays.equals(((Optional<Date[]>)o).get(),((Optional<Date[]>)t1).get()) ? 0 : -1;
+				}
+			});
+
+		}
+	}
+
+	/**
+	 * Test reading/writing java optionals with collections.
+	 * @throws Exception
+	 */
+	public void testOptionalsCollection() throws Exception {
+		String className = "java.util.Optional";
+		Class<?> optionalClass = SReflect.classForName0(className, null);
+
+		if (optionalClass != null) {
+			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+
+			ArrayList<Date> list = new ArrayList<Date>();
+			list.add(new Date(10000));
+			list.add(new Date(20000));
+			list.add(new Date(30000));
+			Object dateOptional = ofMethod.invoke(optionalClass, list);
+			doWriteAndRead(dateOptional);
+		}
+	}
+
+	/**
+	 * Test reading/writing data arrays.
+	 * @throws Exception
+	 */
+	public void testDateArray() throws Exception {
+		Date[] dates = {new Date(1000), new Date(2000)};
+		doWriteAndRead(dates, new Comparator() {
+			@Override
+			public int compare(Object o, Object o2) {
+				return Arrays.equals(((Date[]) o), ((Date[]) o2)) ? 0 : -1;
+			}
+		});
+
 	}
 
 	/**

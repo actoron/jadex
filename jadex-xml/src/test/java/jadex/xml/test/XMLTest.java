@@ -36,4 +36,14 @@ public class XMLTest extends jadex.commons.transformation.Test
 		XMLTest t = new XMLTest();
 		t.performTests();
 	}
+
+	/** dont test XML with optionals, because XML is obsolete / different in jadex 4.0 **/
+	public void testOptionalsPrimitive() throws Exception {
+	}
+	/** dont test XML with optionals, because XML is obsolete / different in jadex 4.0 **/
+	public void testOptionalsComplex() throws Exception {
+	}
+	/** dont test XML with optionals, because XML is obsolete / different in jadex 4.0 **/
+	public void testOptionalsCollection() throws Exception {
+	}
 }
