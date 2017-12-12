@@ -1,0 +1,45 @@
+image: java:7-jdk
+
+stages:
+  - preBuild
+  - build
+  - test
+
+before_script:
+#  - echo `pwd` # debug
+#  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export GRADLE_OPTS="--info --stacktrace"
+
+cache:
+  key: "$CI_COMMIT_REF_NAME"
+  untracked: true
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+preBuild:
+  stage: preBuild
+  script:
+    - ./gradlew -Pdist=addongradleplugin clean build test install -x javadoc
+
+build:
+  stage: build
+  script:
+    - ./gradlew -Pdist=publishdists clean build -x test -x javadoc
+
+test:
+  stage: test
+  script:
+    - ./gradlew -Pdist=publishdists test -x javadoc
+
+#deploy:
+#  stage: deploy
+#  script:
+#    - ./gradlew publish
+#  only:
+#    - master
+#    - development
+
+after_script:
+- echo "End CI"
