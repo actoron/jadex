@@ -64,7 +64,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 		try
 		{
 			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL, null);
-			queryfut.addIntermediateResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IExampleService>()
+			queryfut.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
 			{
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
@@ -84,6 +84,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 				public void intermediateResultAvailable(IExampleService result)
 				{
 					System.out.println("received: "+result+" "+cms.getRootIdentifier().get()+" "+((IService)result).getServiceIdentifier().getProviderId().getRoot());
+					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getComponentFeature0(IExecutionFeature.class).isComponentThread());
 					if(cms.getRootIdentifier().get().equals(((IService)result).getServiceIdentifier().getProviderId().getRoot()))
 					{
 						num++;
@@ -105,7 +106,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 						tr.setFailed("Wrong number of results: "+cnt);
 					}
 				}
-			}));
+			});
 
 			// The creation info is important to be able to resolve the class/model
 			CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())

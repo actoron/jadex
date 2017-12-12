@@ -11,8 +11,12 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
@@ -542,7 +546,40 @@ public class RegistrySearchFunctionality
 				public void customResultAvailable(Boolean result) throws Exception
 				{
 					if(result.booleanValue())
-						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(service);
+					{
+						if (sqi.query.getOwner() != null && !sqi.query.getOwner().equals(IComponentIdentifier.LOCAL.get()))
+						{
+							// schedule to owner component
+							Iterator<IService> cmsIt = provider.getServices(new ClassInfo(IComponentManagementService.class));
+							if (cmsIt.hasNext())
+							{
+								IComponentManagementService cms = (IComponentManagementService) cmsIt.next();
+								cms.getExternalAccess(sqi.query.getOwner()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+								{
+									@Override
+									public void customResultAvailable(IExternalAccess access) throws Exception
+									{
+										access.scheduleStep(new IComponentStep<Void>()
+										{
+											@Override
+											public IFuture<Void> execute(IInternalAccess ia)
+											{
+												((IntermediateFuture)sqi.getFuture()).addIntermediateResult(service);
+												return Future.DONE;
+											}
+										});
+									}
+								});
+							}
+							else
+							{
+								((IntermediateFuture)sqi.getFuture()).addIntermediateResult(service);
+							}
+						} else {
+							((IntermediateFuture)sqi.getFuture()).addIntermediateResult(service);
+						}
+
+					}
 					checkQueriesLoop(it, service).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});

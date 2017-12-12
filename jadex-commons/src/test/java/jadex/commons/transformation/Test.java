@@ -1047,7 +1047,28 @@ public abstract class Test extends TestCase
 		
 		doWriteAndRead(d);
 	}
-	
+
+	/**
+	 *  Test if writer writes private bean fields (when includePrivate = true).
+	 */
+	public void testBeanWithIncludedPrivateFields() throws Exception
+	{
+		F f = new F("test\n", 23);
+		f.excludeMe = 100;
+
+		doWriteAndRead(f);
+	}
+
+	/**
+	 *  Test if writer writes private bean fields (when @Include is used).
+	 */
+	public void testBeanWithIncludedSinglePrivateFields() throws Exception
+	{
+		G g = new G("test\n", 23);
+
+		doWriteAndRead(g);
+	}
+
 	/**
 	 *  Test if special characters can be transferred.
 	 */
