@@ -1,7 +1,6 @@
 package jadex.commons.collection;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  *  Replacement for Map.Entry which cannot be instantiated :-(
