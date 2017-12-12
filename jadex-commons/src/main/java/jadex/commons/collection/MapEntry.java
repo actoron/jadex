@@ -54,7 +54,7 @@ public class MapEntry<K,V> implements Map.Entry<K, V>
      */
     public final int hashCode() 
     {
-        return Objects.hashCode(k) ^ Objects.hashCode(v);
+        return (k!=null ? k.hashCode() : 0) ^ (v!=null ? v.hashCode() : 0);
     }
 
     /**
@@ -67,11 +67,21 @@ public class MapEntry<K,V> implements Map.Entry<K, V>
         if(o instanceof Map.Entry) 
         {
             Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-            if(Objects.equals(k, e.getKey()) &&
-                Objects.equals(v, e.getValue()))
+            if(equals(k, e.getKey()) &&
+                equals(v, e.getValue()))
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Equals with null check.
+     * @param var0
+     * @param var1
+     * @return
+     */
+    private static boolean equals(Object var0, Object var1) {
+        return var0 == var1 || var0 != null && var0.equals(var1);
     }
 }
 
