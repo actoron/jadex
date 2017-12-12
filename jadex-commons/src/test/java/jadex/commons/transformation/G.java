@@ -5,7 +5,7 @@ import jadex.commons.transformation.annotations.Include;
 public class G
 {
 	@Include
-	private String string;
+	private final String string;
 	@Include
 	private int integer;
 
@@ -13,6 +13,7 @@ public class G
 
 	public G()
 	{
+		string = null;
 	}
 
 	public G(String string, int integer)
