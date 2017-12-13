@@ -1,5 +1,7 @@
 package jadex.commons.transformation;
 
+import junit.framework.TestCase;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -10,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
@@ -51,7 +54,6 @@ import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.annotations.Classname;
-import junit.framework.TestCase;
 
 /**
  *  Testcases for writer and reader.
@@ -173,6 +175,12 @@ public abstract class Test extends TestCase
 				testBeanWithPublicFields();
 				testBeanWithIncludedFields();
 				testSelfReferenceBean();
+
+				testOptionalsPrimitive();
+				testOptionalsComplex();
+				testOptionalsCollection();
+
+				testDateArray();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -183,7 +191,7 @@ public abstract class Test extends TestCase
 			e.printStackTrace();
 		}
 	}
-	
+
 	//-------- test methods --------
 	
 	/**
@@ -1039,7 +1047,28 @@ public abstract class Test extends TestCase
 		
 		doWriteAndRead(d);
 	}
-	
+
+	/**
+	 *  Test if writer writes private bean fields (when includePrivate = true).
+	 */
+	public void testBeanWithIncludedPrivateFields() throws Exception
+	{
+		F f = new F("test\n", 23);
+		f.excludeMe = 100;
+
+		doWriteAndRead(f);
+	}
+
+	/**
+	 *  Test if writer writes private bean fields (when @Include is used).
+	 */
+	public void testBeanWithIncludedSinglePrivateFields() throws Exception
+	{
+		G g = new G("test\n", 23);
+
+		doWriteAndRead(g);
+	}
+
 	/**
 	 *  Test if special characters can be transferred.
 	 */
@@ -1213,7 +1242,122 @@ public abstract class Test extends TestCase
 			}
 		});
 	}
-	
+
+	/**
+	 * Test reading/writing java optionals with primitive types.
+	 * @throws Exception
+	 */
+	public void testOptionalsPrimitive() throws Exception {
+		String className = "java.util.Optional";
+		Class<?> optionalClass = SReflect.classForName0(className, null);
+
+		if (optionalClass != null) {
+			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+			Method emptyMethod = SReflect.getMethod(optionalClass, "empty", new Class[]{});
+
+			Object longOptional = ofMethod.invoke(optionalClass, (long) 10000);
+			doWriteAndRead(longOptional);
+
+			Object intOptional = ofMethod.invoke(optionalClass, 1000);
+			doWriteAndRead(intOptional);
+
+			Object stringOptional = ofMethod.invoke(optionalClass, "Test");
+			doWriteAndRead(stringOptional);
+
+			Object booleanOptional = ofMethod.invoke(optionalClass, true);
+			doWriteAndRead(booleanOptional);
+
+			Object nullOptional = emptyMethod.invoke(optionalClass, null);
+			doWriteAndRead(nullOptional);
+		}
+	}
+
+	/**
+	 * Test reading/writing java optionals with complex types.
+	 * @throws Exception
+	 */
+	public void testOptionalsComplex() throws Exception {
+		String className = "java.util.Optional";
+		Class<?> optionalClass = SReflect.classForName0(className, null);
+
+		if (optionalClass != null) {
+			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+			final Method getMethod = SReflect.getMethod(optionalClass, "get", new Class[]{});
+
+			Date value2 = new Date(10000);
+			Object dateOptional = ofMethod.invoke(optionalClass, value2);
+			doWriteAndRead(dateOptional);
+
+			Object intArrayOptional = ofMethod.invoke(optionalClass, (Object) new Integer[]{1,2,3});
+			doWriteAndRead(intArrayOptional, new Comparator() {
+				@Override
+				public int compare(Object o, Object o2) {
+					Object array1 = null;
+					Object array2 = null;
+					try {
+					 	array1 = getMethod.invoke(o);
+						array2 = getMethod.invoke(o2);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+					return Arrays.equals(((Integer[])array1),(Integer[])array2) ? 0 : -1;
+				}
+			});
+
+			Object dateArrayOptional = ofMethod.invoke(optionalClass, (Object)new Date[]{new Date(1000), new Date(2000)});
+			doWriteAndRead(dateArrayOptional, new Comparator() {
+				@Override
+				public int compare(Object o, Object o2) {
+					Object date1 = null;
+					Object date2 = null;
+					try {
+						date1 = getMethod.invoke(o);
+						date2 = getMethod.invoke(o2);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+					return Arrays.equals(((Date[])date1),(Date[])date2) ? 0 : -1;
+				}
+			});
+
+		}
+	}
+
+	/**
+	 * Test reading/writing java optionals with collections.
+	 * @throws Exception
+	 */
+	public void testOptionalsCollection() throws Exception {
+		String className = "java.util.Optional";
+		Class<?> optionalClass = SReflect.classForName0(className, null);
+
+		if (optionalClass != null) {
+			Method ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
+
+			ArrayList<Date> list = new ArrayList<Date>();
+			list.add(new Date(10000));
+			list.add(new Date(20000));
+			list.add(new Date(30000));
+			Object dateOptional = ofMethod.invoke(optionalClass, list);
+			doWriteAndRead(dateOptional);
+		}
+	}
+
+	/**
+	 * Test reading/writing data arrays.
+	 * @throws Exception
+	 */
+	public void testDateArray() throws Exception {
+		Date[] dates = {new Date(1000), new Date(2000)};
+		doWriteAndRead(dates, new Comparator() {
+			@Override
+			public int compare(Object o, Object o2) {
+				return Arrays.equals(((Date[]) o), ((Date[]) o2)) ? 0 : -1;
+			}
+		});
+
+	}
+
 	/**
 	 *  Get some bean.
 	 */

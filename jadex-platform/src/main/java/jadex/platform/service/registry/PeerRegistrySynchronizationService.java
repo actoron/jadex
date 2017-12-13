@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -24,10 +22,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.registry.ARegistryEvent;
+import jadex.bridge.service.types.registry.ARegistryResponseEvent;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
-import jadex.bridge.service.types.registry.RegistryEvent;
-import jadex.bridge.service.types.registry.RegistryUpdateEvent;
+import jadex.bridge.service.types.registry.MultiRegistryResponseEvent;
+import jadex.bridge.service.types.registry.RegistryResponseEvent;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -192,7 +192,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		// Subscribe to changes of the local registry to inform my superpeer
 		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component), true)
 		{
-			public void notifyObservers(final RegistryEvent event)
+			public void notifyObservers(final ARegistryEvent event)
 			{
 //				System.out.println("notify obs: "+lrobs.hashCode());
 				
@@ -203,31 +203,50 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						final IResultListener<ISuperpeerRegistrySynchronizationService> searchlis = this; 
 //						System.out.println("spser !!!!!!"+lrobs.hashCode());
 						
-						IResultListener<RegistryUpdateEvent> lis = new IResultListener<RegistryUpdateEvent>()
+						IResultListener<ARegistryResponseEvent> lis = new IResultListener<ARegistryResponseEvent>()
 						{
-							public void resultAvailable(RegistryUpdateEvent spevent) 
+							public void resultAvailable(ARegistryResponseEvent spevent) 
 							{
-								System.out.println("registry update event: "+Arrays.toString(spevent.getSuperpeers()));
-								
-								// Superpeer level 0 send info about available level 1 superpeers
-								if(spevent.getSuperpeers()!=null && spevent.getSuperpeers().length>0)
+								// Should clients receive multi responses?!
+								if(spevent instanceof MultiRegistryResponseEvent)
 								{
-									System.out.println("Refreshing superpeer");
-									superpeers.clear();
-									for(ISuperpeerRegistrySynchronizationService ser: spevent.getSuperpeers())
-										superpeers.add(((IService)ser).getServiceIdentifier().getProviderId());
+									MultiRegistryResponseEvent mre = (MultiRegistryResponseEvent)spevent;
+									if(mre.getEvents()!=null)
+									{
+										for(ARegistryResponseEvent e: mre.getEvents())
+										{
+											RegistryResponseEvent re = (RegistryResponseEvent)e;
+											resultAvailable(re);
+										}
+									}
+								}
+								else if(spevent instanceof RegistryResponseEvent)
+								{
+									// todo: multi events need to be treated special (not inform superpeer n times)
 									
-									// Does a new search to refresh superpeer
-									getSuperpeerService(true).addResultListener(searchlis);
+									RegistryResponseEvent re = (RegistryResponseEvent)spevent;
+									System.out.println("registry update event: "+Arrays.toString(re.getSuperpeers()));
+									
+									// Superpeer level 0 send info about available level 1 superpeers
+									if(re.getSuperpeers()!=null && re.getSuperpeers().length>0)
+									{
+										System.out.println("Refreshing superpeer");
+										superpeers.clear();
+										for(ISuperpeerRegistrySynchronizationService ser: re.getSuperpeers())
+											superpeers.add(((IService)ser).getServiceIdentifier().getProviderId());
+										
+										// Does a new search to refresh superpeer
+										getSuperpeerService(true).addResultListener(searchlis);
+									}
+									
+									if(re.isRemoved())
+									{
+										spser.updateClientData(lrobs.getCurrentStateEvent()).addResultListener(this);
+										System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+									}
+									// Calls notify observers at latest 
+									lrobs.setTimeLimit((long)(re.getLeasetime()*0.9));
 								}
-								
-								if(spevent.isRemoved())
-								{
-									spser.updateClientData(lrobs.getCurrentStateEvent()).addResultListener(this);
-									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
-								}
-								// Calls notify observers at latest 
-								lrobs.setTimelimit((long)(spevent.getLeasetime()*0.9));
 							}
 							
 							public void exceptionOccurred(Exception exception)

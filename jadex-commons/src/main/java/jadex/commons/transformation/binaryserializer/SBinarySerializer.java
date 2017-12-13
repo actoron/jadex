@@ -32,8 +32,8 @@ public class SBinarySerializer
 	
 	/** Marker for references */
 	protected static final String REFERENCE_MARKER = "1";
-	
-	/** 
+
+	/**
 	 *  Handlers for encoding.
 	 */
 	public static final List<ITraverseProcessor> ENCODER_HANDLERS;
@@ -71,9 +71,10 @@ public class SBinarySerializer
 		ENCODER_HANDLERS.add(new ThrowableCodec());
 		ENCODER_HANDLERS.add(new LocalDateTimeCodec());
 		ENCODER_HANDLERS.add(new BigIntegerCodec());
+		ENCODER_HANDLERS.add(new OptionalCodec());
 		ENCODER_HANDLERS.add(new BeanCodec());
 	}
-	
+
 	/** 
 	 *  Handlers for decoding.
 	 */

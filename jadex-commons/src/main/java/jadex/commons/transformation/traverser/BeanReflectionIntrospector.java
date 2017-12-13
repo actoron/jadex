@@ -84,6 +84,14 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 					{
 					}
 				}
+
+				boolean includePrivateFields = false;
+				if (includefields) {
+					IncludeFields annotation = clazz.getAnnotation(IncludeFields.class);
+					if (annotation != null && annotation.includePrivate()) {
+						includePrivateFields = true;
+					}
+				}
 				
 				// todo: allow including single method pairs
 				ret = new HashMap<String, BeanProperty>();
@@ -137,11 +145,22 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 						ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
 					}
 				}
+
+				// Get all private fields (and include if requested)
+				fields = clazz.getDeclaredFields();
+				for(int i = 0; i < fields.length; i++)
+				{
+					String property_java_name = fields[i].getName();
+					if(((includefields && includePrivateFields)|| fields[i].isAnnotationPresent(Include.class))
+							&& fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
+					{
+						ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
+					}
+				}
 				
 				// Get final values (val$xyz fields) for anonymous classes.
 				if(clazz.isAnonymousClass())
 				{
-					fields = clazz.getDeclaredFields();
 					for(int i = 0; i < fields.length; i++)
 					{
 						String property_java_name = fields[i].getName();

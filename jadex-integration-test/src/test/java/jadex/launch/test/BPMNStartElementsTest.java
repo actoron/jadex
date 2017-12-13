@@ -24,7 +24,7 @@ public class BPMNStartElementsTest //extends TestCase
 //				"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 				"-simulation", "true",
 				"-asyncexecution", "true",
-				"-libpath", SUtil.getOutputDirsExpression(projectroot),
+				"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
 //				"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 				"-logging_level", "java.util.logging.Level.WARNING",
 //				"-debugfutures", "true",

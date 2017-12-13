@@ -37,7 +37,7 @@ public class BDICreationTest //extends TestCase
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 //			"-logging", "true",
-			"-libpath", SUtil.getOutputDirsExpression(projectroot),
+			"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
 //			"-componentfactory", "jadex.component.ComponentComponentFactory",

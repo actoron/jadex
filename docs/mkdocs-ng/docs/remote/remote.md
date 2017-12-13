@@ -85,10 +85,10 @@ Java objects like those in the parameters exist in the local computers memory. I
 
 Jadex Active Components includes a number of serialization approaches, the default being a compact binary format. However, not all objects can be sensible serialized, for example, it makes no sense to serialize a *java.lang.Thread* object, since it represents an execution thread only valid on the local machine. Therefore, in order for serialization to work, the classes you use in service calls must one of the following:
 
-* A number of classes, mostly standard Java library classes, are directly supported by Jadex Active Components. This includes primitive value (int, long, ...), Strings, Java collection classes (Lists, Sets, Maps, ...) as well as certain useful standard classes like Exceptions, Date, Image and URI/URL.
+* A number of classes, mostly standard Java library classes, are directly supported by Jadex Active Components. This includes primitive value (int, long, ...), Strings, Java collection classes (Lists, Sets, Maps, ...) as well as certain useful standard classes like Exceptions, Optionals, Date, Image and URI/URL.
 * Classes that loosely follow the *JavaBean* conventions (see below).
 
-## Custom Classes
+## Bean-conform Classes
 The latter option allows you to easily implement your own classes that can be transmitted. The classes do not have to follow the full JavaBean specification, only two things are required:
 
 * The class must offer a "default constructor", which means it includes a constructor that has no arguments.
@@ -128,6 +128,65 @@ As long as your classes conform to this pattern or are one of the directly suppo
 Notice that the class does not implement the java.io.Serializable interface. It is not necessary because Jadex Active Components does not use the Java built-in serialization by default.  
 While the build-in Java serialization works and is quick, it has some serious drawbacks that makes it inflexible such as requiring implementing the java.io.Serialization marker interface in all classes nested in an object as well as lack of support for partially-matching class versions.
 </x-hint>
+
+## Annotation-based
+
+If you don't want to add bean-conform getters/setters to your classes, you may also use the [@IncludeFields](${URLJavaDoc}/jadex/commons/transformation/annotations/IncludeFields.html) annotation:
+
+```java
+@IncludeFields
+public class Customer {
+
+	public int id; // included
+	public String name; // included
+
+	public Customer() {
+	}
+```
+
+You may also use an explicit [@Include](${URLJavaDoc}/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+
+```java
+public class Customer {
+
+    @Include
+    public int id;
+    @Include
+    public String name;
+
+    private String hidden;  // field hidden is exluded
+}
+```
+
+### Private fields
+
+Since Jadex 3.0.80, it is also possible to include private fields in serialization, using ```@IncludeFields(includePrivate=true)```. Specific fields can also be excluded, as shown below:
+
+```java
+@IncludeFields(includePrivate=true)
+public class Customer {
+
+    private int id; // included
+    private String name; // included
+
+    @Exclude
+    private String hidden;
+}
+```
+
+As with public fields, you may also use an explicit [@Include](${URLJavaDoc}/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+
+```java
+public class Customer {
+
+    @Include
+    private int id;
+    @Include
+    private String name;
+
+    private String hidden;  // field hidden is exluded
+}
+```
 
 # Advanced Topics 
 
