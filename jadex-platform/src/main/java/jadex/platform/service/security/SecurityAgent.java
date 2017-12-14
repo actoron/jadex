@@ -948,7 +948,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			}
 		}
 		
-		for (String pf : expiringcryptosuites.keySet())
+		String[] keys = expiringcryptosuites.keySet().toArray(new String[expiringcryptosuites.size()]);
+		for (String pf : keys)
 		{
 			Collection<Tuple2<ICryptoSuite, Long>> coll = expiringcryptosuites.get(pf);
 			for (Tuple2<ICryptoSuite, Long> tup : coll)
