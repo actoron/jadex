@@ -38,8 +38,6 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	/** Access to daemon thread pool for WS API */
 	protected JadexExecutorServiceAdapter execservice;
 	
-	protected Map<WebSocketFrame, Future<Void>> scheduledframes;
-	
 	/**
 	 *  Creates the connection.
 	 *  
@@ -49,8 +47,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	public WebSocketConnectionClient(String address, IComponentIdentifier target, ITransportHandler<IWebSocketConnection> handler)
 	{
 		super(handler);
-		this.address = address;
-		this.scheduledframes = Collections.synchronizedMap(new HashMap<WebSocketFrame, Future<Void>>()); 
+		this.address = address; 
 		execservice = new JadexExecutorServiceAdapter(pojoagent.getThreadPoolService());
 //		{
 //			public void execute(final Runnable command)
@@ -192,16 +189,10 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 			public void onFrameSent(WebSocket websocket, WebSocketFrame frame) throws Exception
 			{
 //				System.out.println("Frame handled1: " + (frame == null) + " " + System.identityHashCode(frame));
-				Future<Void> fut = scheduledframes.remove(frame);
-				if (fut != null)
-					fut.setResult(null);
 			}
 			
 			public void onFrameUnsent(WebSocket websocket, WebSocketFrame frame) throws Exception
 			{
-				Future<Void> fut = scheduledframes.remove(frame);
-				if (fut != null)
-					fut.setResult(null);
 				cleanup(new RuntimeException("Connection terminated."));
 			}
 			
@@ -308,14 +299,6 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 				}
 				catch (Exception e1)
 				{
-				}
-				synchronized (scheduledframes)
-				{
-					while (!scheduledframes.isEmpty())
-					{
-						Future<Void> fut = scheduledframes.remove(scheduledframes.keySet().iterator().next());
-						fut.setException(e != null? e : new RuntimeException("Connection terminated."));
-					}
 				}
 			}
 		});
@@ -497,50 +480,19 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 //		System.out.println("SendClient: " + hashCode() + " " + (header == null ? "null" : String.valueOf(header.length)) + " " + (body == null ? "null" : String.valueOf(body.length)));
 		final Future<Void> ret = new Future<Void>();
 		
-		IResultListener<Void> lis = new IResultListener<Void>()
-		{
-			/** If the result is broken (exception). */
-			protected Exception exception;
-			
-			/** Flag if first. */
-			protected boolean first = true;
-			
-			public void resultAvailable(Void result)
-			{
-				if (first)
-				{
-					first = false;
-				}
-				else
-				{
-					if (exception != null)
-						ret.setException(exception);
-					else
-						ret.setResult(null);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				this.exception = exception;
-				resultAvailable(null);
-			}
-		};
-		
-		synchronized(this)
-		{
-			sendAsFrames(header).addResultListener(lis);;
-			sendAsFrames(body).addResultListener(lis);
-		}
-		
 		try
 		{
-			
+			synchronized(this)
+			{
+				sendAsFrames(header);
+				sendAsFrames(body);
+			}
+			ret.setResult(null);
 		}
 		catch (Exception e)
 		{
+			forceClose();
 			ret.setException(e);
-//			e.printStackTrace();
 		}
 		return ret;
 	}
@@ -581,16 +533,14 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	 *  @param data The data.
 	 *  @param fut The future.
 	 */
-	protected IFuture<Void> sendAsFrames(byte[] data)
+	protected void sendAsFrames(byte[] data)
 	{
-		Future<Void> ret = new Future<Void>();
 		if (data == null)
 		{
 			WebSocketFrame wsf = new WebSocketFrame();
 			wsf.setOpcode(WebSocketOpcode.TEXT);
 			wsf.setFin(true);
 			wsf.setPayload(NULL_MSG_COMMAND);
-			scheduledframes.put(wsf, ret);
 			websocket.sendFrame(wsf);
 		}
 		else
@@ -618,11 +568,8 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 				offset += psize;
 				wsf.setPayload(payload);
 	//			System.out.println("Send Frame OP: " + wsf.getOpcode() + " " + wsf.getFin() + " " + offset + " " + payload.length);
-				scheduledframes.put(wsf, ret);
 				websocket.sendFrame(wsf);
 			}
 		}
-		
-		return ret;
 	}
 }
