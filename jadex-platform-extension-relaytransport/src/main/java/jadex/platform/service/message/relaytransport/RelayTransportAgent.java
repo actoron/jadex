@@ -486,7 +486,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				if (route != null)
 				{
 					fnewheader.addProperty(IMsgHeader.RECEIVER, route.getFirstEntity());
-					IInternalMessageFeature intmsgfeat = agent.getComponentFeature(IInternalMessageFeature.class);
+					IInternalMessageFeature intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
 					intmsgfeat.sendToTransports(fnewheader, fnewbody).addResultListener(new DelegationResultListener<Void>(ret));
 					notsent = false;
 				}
@@ -513,6 +513,17 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //		System.out.println("Discover route on " + agent.getComponentIdentifier());
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
+		ret.addResultListener(new IResultListener<Collection<Integer>>()
+		{
+			public void resultAvailable(Collection<Integer> result)
+			{
+				System.out.println("Found route to: " + dest);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		
 		if (hops.contains(agent.getComponentIdentifier()) || hops.size() + 1 > maxhops)
 		{
