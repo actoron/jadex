@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
@@ -19,16 +21,19 @@ import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceKeyExtractor;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Basic service provide a simple default isValid() implementation
@@ -328,13 +333,36 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 					.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 			{
 				public void customResultAvailable(Void result) throws Exception
-				{					
+				{
 					nfcf.getProvidedServicePropertyProvider(sid).getNFPropertyValue(TagProperty.NAME).addResultListener(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)
 						{
 //							System.out.println("Starting serviceINIT: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
-							Collection<String> coll = (Collection<String>)result;
+							Collection<String> coll = result == null ? new ArrayList<String>() : new LinkedHashSet<String>((Collection<String>)result);
+							
+							IValueFetcher vf = (IValueFetcher) internalaccess.getComponentFeature(IArgumentsResultsFeature.class);
+							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
+							for (int si = 0; si < sertypes.length; ++si)
+							{
+								if(sertypes[si] != null && sertypes[si].isAnnotationPresent(Tags.class))
+								{
+									Tags anntags = (Tags)sertypes[si].getAnnotation(Tags.class);
+									String[] tags = anntags != null ? anntags.value() : null;
+									if (tags != null && tags.length > 0)
+									{
+										for (int i = 0; i < tags.length; ++i)
+										{
+											Object tagval = SJavaParser.evaluateExpression(tags[i], null, vf, internalaccess.getClassLoader());
+											if (tagval instanceof String)
+												coll.add((String) tagval);
+											else
+												internalaccess.getLogger().warning("Invalid tag value, ignored: " + tagval + " " + tags[i]);
+										}
+									}
+								}
+							}
+							
 							if(coll!=null && coll.size()>0)
 							{
 								if(properties==null)
@@ -356,7 +384,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 						{
 //							exception.printStackTrace();
 //							System.out.println("Starting serviceINITEX: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
-							ret.setResult(null);
+//							ret.setResult(null);
+							resultAvailable(null);
 						}
 					});
 				}
