@@ -1,4 +1,4 @@
-image: julakali/openjdk-xvfb:latest
+image: julakali/openjdk8-xvfb:latest
 
 stages:
   - preBuild
