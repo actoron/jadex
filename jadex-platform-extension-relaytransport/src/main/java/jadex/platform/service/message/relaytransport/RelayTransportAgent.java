@@ -30,6 +30,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -74,8 +75,9 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 		@ProvidedService(type=ITransportService.class, scope=Binding.SCOPE_PLATFORM),
 		@ProvidedService(type=IRoutingService.class, name="routing")
 })
-@Features(additional=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
+@Features(additional=true, replace=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
 @Service
+@Tags("\"forwarding=\"+$args.forwarding")
 public class RelayTransportAgent implements ITransportService, IRoutingService
 {
 	/** Maxmimum number of relays to use. */
@@ -122,6 +124,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentArgument
 	protected boolean forwarding;
 	
+	/** Flag if the transport should dynamically acquire more routing services. */
+	@AgentArgument
+	protected boolean dynamicrouting;
+	
 	/** Maintain a connection to at least this number of relays. */
 	protected int keepalivecount = 1;
 	
@@ -132,7 +138,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected long nextclean = System.currentTimeMillis();
 	
 	/** Maximum allowed routing hops. */
-	protected int maxhops = 16;
+	protected int maxhops = 3;
 	
 	/** List of relays. */
 	protected List<IComponentIdentifier> relays = new ArrayList<IComponentIdentifier>();
@@ -610,7 +616,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if (!forwarding)
+						if (!forwarding || !dynamicrouting)
 						{
 							ret.setException(new RuntimeException("No route found: "+exception));
 							return;
@@ -621,7 +627,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						List<IRoutingService> filteredaddrs = new ArrayList<IRoutingService>();
 						try
 						{
-							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
+//							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
+							Collection<IRoutingService> addrs = SServiceProvider.getTaggedServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL, "forwarding=true").get(MAX_ROUTING_SERVICE_DELAY, true);
 							for (IRoutingService rs : addrs)
 							{
 								IComponentIdentifier rsprov = ((IService) rs).getServiceIdentifier().getProviderId();
