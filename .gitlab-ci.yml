@@ -36,7 +36,7 @@ test:
     - ./gradlew -Pdist=publishdists test -x javadoc
   artifacts:
     paths:
-    - */build/reports/tests/test
+    - "*/build/reports/tests/test"
     expire_in: 4 week
 
 #deploy:
