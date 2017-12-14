@@ -14,7 +14,7 @@ stage('preparation') {
                     jadexVersion: ${jadexVersion}"""
 
         checkout scm: [$class: 'GitSCM',
-            userRemoteConfigs: [[url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex']],
+            userRemoteConfigs: [[url: 'ssh://git@git.actoron.com:20000/jadex/jadex.git']],
             branches: [[name: "refs/tags/${jadexVersion}"]]], changelog: false, poll: false
 
         branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
@@ -27,7 +27,7 @@ stage('preparation') {
         println "On tag: ${git_tag}"
 
         util = fileLoader.fromGit('src/main/buildutils/JenkinsfileUtil.groovy',
-                'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', 'jenkinsfile', null, '')
+                'ssh://git@git.actoron.com:20000/jadex/jadex.git', 'jenkinsfile', null, '')
 
         def versionsFromTag = util.getVersionsFromTag(git_tag);
         def patch = versionsFromTag.patch

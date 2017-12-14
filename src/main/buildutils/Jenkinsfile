@@ -59,20 +59,20 @@ stage('preparation') {
                 resetPatchVersion: ${resetPatchVersion}"""
 
             util = fileLoader.fromGit('src/main/buildutils/JenkinsfileUtil.groovy',
-                    'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', 'jenkinsfile', null, '')
+                    'ssh://git@git.actoron.com:20000/jadex/jadex.git', 'jenkinsfile', null, '')
 
             if (tagToBuild && !tagToBuild.isEmpty()) {
                 isTagRebuild = true
                 echo "building from tag: " + tagToBuild
                 echo "disabling tagging"
                 tagBuild = false;
-//               git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: "refs/tags/${tagToBuild}"
+//               git url: 'ssh://git@git.actoron.com:20000/jadex/jadex.git', branch: "refs/tags/${tagToBuild}"
 		checkout([$class: 'GitSCM', branches: [[name: "refs/tags/${tagToBuild}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], 
 			userRemoteConfigs: 
-			[[url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex']]])
+			[[url: 'ssh://git@git.actoron.com:20000/jadex/jadex.git']]])
             } else {
                 // build from branch
-                git url: 'ssh://jenkins@repo.actoron.com:20000/repositories/jadex', branch: branchToBuild
+                git url: 'ssh://git@git.actoron.com:20000/jadex/jadex.git', branch: branchToBuild
 
                 branchName = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                 println "On branch: ${branchName}"
