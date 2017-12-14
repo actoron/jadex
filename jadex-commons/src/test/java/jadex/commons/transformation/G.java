@@ -11,7 +11,7 @@ public class G
 
 	public Integer excludeMe;
 
-	public G()
+	private G()
 	{
 		string = null;
 	}
