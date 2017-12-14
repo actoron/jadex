@@ -1,4 +1,4 @@
-image: openjdk:8-jdk
+image: julakali/openjdk-xvfb:latest
 
 stages:
   - preBuild
@@ -9,6 +9,8 @@ before_script:
 #  - echo `pwd` # debug
 #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - Xvfb -ac :99 -screen 0 1280x1024x16 &
+  - export DISPLAY=:99
 
 variables:
   GRADLE_ARGS: "--info --stacktrace"
