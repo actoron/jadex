@@ -147,8 +147,11 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				}
 				if(fini)
 				{
-					for(Future<IComponentIdentifier> fut: futs)
-						fut.setException(new RuntimeException("No more potential peers"));
+					if (futs != null)
+					{
+						for(Future<IComponentIdentifier> fut: futs)
+							fut.setException(new RuntimeException("No more potential peers"));
+					}
 					opencalls.remove(call);
 					currentsearch = null;
 				}
