@@ -82,6 +82,8 @@ import java.util.zip.ZipOutputStream;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.ErrorException;
+import jadex.commons.random.FastThreadedRandom;
+import jadex.commons.random.Xoroshiro128Random;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -215,6 +217,10 @@ public class SUtil
 		}
 	};
 	
+	/** Access to non-secure fast random source. */
+	public static final Random FAST_RANDOM = new FastThreadedRandom();
+	
+	/** Access to secure random source. */
 	public static final SecureRandom SECURE_RANDOM;
 	static
 	{
@@ -2104,22 +2110,38 @@ public class SUtil
 		
 		byte[] precached = new byte[32];
 		SECURE_RANDOM.nextBytes(precached);
-
+		
 		long rndlong = SUtil.bytesToLong(precached, 0);
 		for (int i = 0; i < 11; ++i)
-			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+			chars[i + o] = ID_CHARS[(int) (rndlong >>> ((i << 2) + (i << 1)) & 0x3F)];
 		o += 11;
 		rndlong = SUtil.bytesToLong(precached, 8);
 		for (int i = 0; i < 11; ++i)
-			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+			chars[i + o] = ID_CHARS[(int) (rndlong >>> ((i << 2) + (i << 1)) & 0x3F)];
 		o += 11;
 		rndlong = SUtil.bytesToLong(precached, 16);
 		for (int i = 0; i < 11; ++i)
-			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+			chars[i + o] = ID_CHARS[(int) (rndlong >>> ((i << 2) + (i << 1)) & 0x3F)];
 		o += 11;
 		rndlong = SUtil.bytesToLong(precached, 24);
 		for (int i = 0; i < 11; ++i)
-			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+			chars[i + o] = ID_CHARS[(int) (rndlong >>> ((i << 2) + (i << 1)) & 0x3F)];
+
+//		long rndlong = SUtil.bytesToLong(precached, 0);
+//		for (int i = 0; i < 11; ++i)
+//			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+//		o += 11;
+//		rndlong = SUtil.bytesToLong(precached, 8);
+//		for (int i = 0; i < 11; ++i)
+//			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+//		o += 11;
+//		rndlong = SUtil.bytesToLong(precached, 16);
+//		for (int i = 0; i < 11; ++i)
+//			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
+//		o += 11;
+//		rndlong = SUtil.bytesToLong(precached, 24);
+//		for (int i = 0; i < 11; ++i)
+//			chars[i + o] = (char) ((rndlong >>> ((i << 2) + (i << 1)) & 0x3F) + 0x30);
 		
 		String ret = new String(chars);
 		return ret;
@@ -2140,7 +2162,7 @@ public class SUtil
 //			return name + "_" + Math.random() + "_" + (convidcnt.incrementAndGet());
 ////		}
 //	}
-
+	
 	/**
 	 * Create a random id with only alphanumeric chars.
 	 * 
@@ -2151,10 +2173,22 @@ public class SUtil
 //		String rand = createUniqueId(name);
 //		return rand.substring(0, name.length() + length + 1);
 
-		double	rnd	= Math.random();
-		rnd	= rnd * Math.pow(36, length);
-		String rand = Integer.toString((int)rnd, 36);
-		return name+"_"+rand;
+//		double	rnd	= Math.random();
+//		double rnd = FAST_RANDOM.nextDouble();
+//		rnd	= rnd * Math.pow(36, length);
+//		String rand = Integer.toString((int)rnd, 36);
+//		return name+"_";//+rand;
+		
+		char[] retchars = new char[length + 1];
+		int offset = 0;
+		retchars[offset] = '_';
+		byte[] random = new byte[length];
+		FAST_RANDOM.nextBytes(random);
+		for (int i = 0; i < random.length; ++i)
+		{
+			retchars[++offset] = ID_CHARS[random[i] & 0xFF % 36];
+		}
+		return name+new String(retchars);
 	}
 	
 	/**
@@ -5736,4 +5770,15 @@ public class SUtil
 		long result = state0 + state1;  
 		return (int) result; 
 	}
+	
+	/**
+     * Lookup table used for unique strings.
+     */
+    protected static final char[] ID_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    										  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+    										  'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+    										  'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D',
+    										  'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+    										  'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+    										  'Y', 'Z', '?', '!' };
 }
