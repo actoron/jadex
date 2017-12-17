@@ -33,7 +33,7 @@ import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
 import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
 import static jadex.base.IRootComponentConfiguration.PRINTPASS;
 import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.IRootComponentConfiguration.RELAYADDRESS;
+import static jadex.base.IRootComponentConfiguration.RELAYADDRESSES;
 import static jadex.base.IRootComponentConfiguration.RELAYFORWARDING;
 import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
 import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
@@ -164,7 +164,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=WSPORT, clazz=int.class, defaultvalue="-1"),
 	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 //	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="\"relay,ws,127.0.0.1:8080\""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
-	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue=""),
+	@Argument(name=RELAYADDRESSES, clazz=String.class, defaultvalue=""),
 	@Argument(name=RELAYFORWARDING, clazz=boolean.class, defaultvalue="false"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
@@ -353,9 +353,9 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			}),
 		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
-				@NameValue(name="relays", value="$args.relayaddress"),
+				@NameValue(name="addresses", value="$args.relayaddresses"),
 				@NameValue(name="forwarding", value="$args.relayforwarding"),
-				@NameValue(name="dynamicrouting", value="$args.dynamicrouting")
+				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
 			}),
 	}),
 	@Configuration(name="fixed", arguments={
@@ -435,9 +435,9 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			}),
 		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
-				@NameValue(name="relays", value="$args.relayaddress"),
+				@NameValue(name="addresses", value="$args.relayaddresses"),
 				@NameValue(name="forwarding", value="$args.relayforwarding"),
-				@NameValue(name="dynamicrouting", value="$args.dynamicrouting")
+				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
 			}),
 	}),
 	@Configuration(name="minimal", arguments={
@@ -493,9 +493,9 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			}),
 		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
-				@NameValue(name="relays", value="$args.relayaddress"),
+				@NameValue(name="addresses", value="$args.relayaddresses"),
 				@NameValue(name="forwarding", value="$args.relayforwarding"),
-				@NameValue(name="dynamicrouting", value="$args.dynamicrouting")
+				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
 			}),
 	}),
 })

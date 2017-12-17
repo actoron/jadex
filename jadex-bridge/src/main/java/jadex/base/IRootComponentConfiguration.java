@@ -291,7 +291,7 @@ public interface IRootComponentConfiguration
      * Address(es) for relay transport (one or more addresses separated by
      * commas).
      **/
-    public static final String	RELAYADDRESS		= "relayaddress";							// class:
+    public static final String	RELAYADDRESSES		= "relayaddresses";							// class:
     // String
     // default:
     // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
@@ -943,16 +943,16 @@ public interface IRootComponentConfiguration
     public void setRelayTransport(boolean value);
 
     /**
-     *  Get the relay address.
-     *  @return The relay address.
+     *  Get the relay addresses.
+     *  @return The relay addresses.
      */
-    public String getRelayAddress();
+    public String getRelayAddresses();
 
     /**
-     *  Set the relay address.
-     *  @param value The relay address.
+     *  Set the relay addresses.
+     *  @param value The relay addresses.
      */
-    public void setRelayAddress(String value);
+    public void setRelayAddresses(String value);
 
     /**
      *  Checks if the relay transport should support
@@ -960,7 +960,7 @@ public interface IRootComponentConfiguration
      *  
      *  @return True, if the routing service should support dynamic routing.
      */
-    public boolean isDynamicRouting();
+    public boolean isRelayDynamicRouting();
     
     /**
      *  Sets if the relay transport should support
@@ -968,7 +968,7 @@ public interface IRootComponentConfiguration
      * 
      *  @param dynamicrouting If true, the routing service should support dynamic routing.
      */
-    public void setDynamicRouting(boolean dynamicrouting);
+    public void setRelayDynamicRouting(boolean dynamicrouting);
     
     /**
      *  Get the flag if the ws transport is active.

@@ -3,6 +3,7 @@ package jadex.base;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -457,7 +458,7 @@ public class Starter
 						e.printStackTrace();
 					}
 
-					putPlatformValue(cid, DATA_TRANSPORTCACHE, new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000));
+					putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 					
 					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());

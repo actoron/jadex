@@ -1,13 +1,11 @@
 package jadex.bridge.component.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -36,7 +34,6 @@ import jadex.bridge.component.streams.InputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.component.streams.StreamPacket;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
@@ -437,7 +434,27 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 	}
 	
+	/**
+	 *  Gets the transport services cache.
+	 *  
+	 *  @param platformid The platform ID.
+	 *  @return The transport cache.
+	 */
+	@SuppressWarnings("unchecked")
+	protected Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> getTransportCache(IComponentIdentifier platformid)
+	{
+		return (Map<IComponentIdentifier, Tuple2<ITransportService, Integer>>) Starter.getPlatformValue(platformid.getRoot(), Starter.DATA_TRANSPORTCACHE);
+	}
 	
+	/**
+	 *  Gets all transports on the platform.
+	 *  
+	 *  @return All transports.
+	 */
+	protected Collection<ITransportService> getAllTransports()
+	{
+		return SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+	}
 	
 	/**
 	 *  Handle message with user message handlers.
@@ -696,7 +713,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		else
 		{
 //			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			final Collection<ITransportService> coll = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+			final Collection<ITransportService> coll = getAllTransports();
 			if (coll != null && coll.size() > 0)
 			{
 				final IComponentIdentifier receiverplatform = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
@@ -768,18 +785,6 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public static final ISerializationServices getSerializationServices(IComponentIdentifier platformid)
 	{
 		return (ISerializationServices) Starter.getPlatformValue(platformid.getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
-	}
-	
-	/**
-	 *  Gets the transport cache services.
-	 *  
-	 *  @param platformid The platform ID.
-	 *  @return The transport cache.
-	 */
-	@SuppressWarnings("unchecked")
-	public static final Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> getTransportCache(IComponentIdentifier platformid)
-	{
-		return (Map<IComponentIdentifier, Tuple2<ITransportService, Integer>>) Starter.getPlatformValue(platformid.getRoot(), Starter.DATA_TRANSPORTCACHE);
 	}
 	
 	/**
