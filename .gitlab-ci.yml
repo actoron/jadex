@@ -11,13 +11,14 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - Xvfb -ac :99 -screen 0 1280x1024x16 &
   - export DISPLAY=:99
+  - ls -la /tmp
 
 variables:
   GRADLE_ARGS: "--info --stacktrace"
 
 cache:
   key: "$CI_COMMIT_REF_NAME"
-  untracked: true
+  untracked: false
   paths:
     - .gradle/wrapper
     - .gradle/caches
@@ -35,12 +36,15 @@ build:
 test:
   stage: test
   script:
+    - ls -la /tmp/
+    - whoami
     - ./gradlew -Pdist=publishdists test -x javadoc
   artifacts:
     paths:
     - "*/build/reports/tests/test"
     expire_in: 4 week
-
+    when: always
+    
 #deploy:
 #  stage: deploy
 #  script:
