@@ -26,17 +26,24 @@ cache:
 preBuild:
   stage: preBuild
   script:
+    - ls -la /tmp/
+    - whoami
+    - mkdir -p /tmp/
     - ./gradlew -Pdist=addongradleplugin clean build test install -x javadoc $GRADLE_ARGS
 
 build:
   stage: build
   script:
+    - ls -la /tmp/
+    - whoami
+    - mkdir -p /tmp/
     - ./gradlew -Pdist=publishdists clean build -x test -x javadoc $GRADLE_ARGS
 
 test:
   stage: test
   script:
     - ls -la /tmp/
+    - mkdir -p /tmp/
     - whoami
     - ./gradlew -Pdist=publishdists test -x javadoc
   artifacts:
