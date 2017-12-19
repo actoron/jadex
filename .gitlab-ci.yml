@@ -11,7 +11,6 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - Xvfb -ac :99 -screen 0 1280x1024x16 &
   - export DISPLAY=:99
-  - ls -la /tmp
 
 variables:
   GRADLE_ARGS: "--info --stacktrace"
@@ -29,6 +28,8 @@ preBuild:
     - ls -la /tmp/
     - whoami
     - mkdir -p /tmp/
+    - df -h /tmp/
+    - dd if=/dev/urandom of=/tmp/randomPreBuild bs=1M count=10
     - ./gradlew -Pdist=addongradleplugin clean build test install -x javadoc $GRADLE_ARGS
 
 build:
@@ -37,14 +38,18 @@ build:
     - ls -la /tmp/
     - whoami
     - mkdir -p /tmp/
+    - df -h /tmp/
+    - dd if=/dev/urandom of=/tmp/randomBuild bs=1M count=10
     - ./gradlew -Pdist=publishdists clean build -x test -x javadoc $GRADLE_ARGS
 
 test:
   stage: test
   script:
     - ls -la /tmp/
-    - mkdir -p /tmp/
     - whoami
+    - mkdir -p /tmp/
+    - df -h /tmp/
+    - dd if=/dev/urandom of=/tmp/randomTest bs=1M count=10
     - ./gradlew -Pdist=publishdists test -x javadoc
   artifacts:
     paths:
