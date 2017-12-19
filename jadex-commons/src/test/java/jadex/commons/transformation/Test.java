@@ -176,6 +176,7 @@ public abstract class Test extends TestCase
 				testBeanWithIncludedFields();
 				testBeanWithIncludedPrivateFields();
 				testBeanWithIncludedSinglePrivateFields();
+				testBeanWithIncludedInheritedPrivateFields();
 				testSelfReferenceBean();
 
 				testOptionalsPrimitive();
@@ -1067,6 +1068,16 @@ public abstract class Test extends TestCase
 	public void testBeanWithIncludedSinglePrivateFields() throws Exception
 	{
 		G g = new G("test\n", 23);
+
+		doWriteAndRead(g);
+	}
+
+	/**
+	 *  Test if writer writes included private bean fields (when @Include is used).
+	 */
+	public void testBeanWithIncludedInheritedPrivateFields() throws Exception
+	{
+		H g = new H("test\n");
 
 		doWriteAndRead(g);
 	}

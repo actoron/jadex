@@ -907,6 +907,33 @@ public class SReflect
 
 		return ret.toArray(new Method[ret.size()]);
 	}
+
+	/**
+	 *  Get all fields of a class including public, protected
+	 *  and private fields of the class and its superclasses.
+	 *  @return Array of all fields starting from the current
+	 *  	class upwards towards Object.class.
+	 */
+	public static Field[]	getAllFields(Class clazz)
+	{
+		List<Field>	ret	= new ArrayList<Field>();
+		Class	cls	= clazz;
+
+		while(cls!=null)
+		{
+			try
+			{
+				ret.addAll(Arrays.asList(cls.getDeclaredFields()));
+			}
+			catch(Exception e)
+			{
+				//e.printStackTrace();
+			}
+			cls	= cls.getSuperclass();
+		}
+
+		return ret.toArray(new Field[ret.size()]);
+	}
 	
 	/**
 	 *  Find a class.
