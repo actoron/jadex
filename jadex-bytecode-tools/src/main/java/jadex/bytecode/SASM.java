@@ -1,5 +1,6 @@
 package jadex.bytecode;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,6 +30,22 @@ public class SASM
 {
 	/** Access to sun.misc.Unsafe or equivalent. */
 	public static final Unsafe UNSAFE = new Unsafe();
+	
+	/** Flag if native support is available. */
+	public static final boolean HAS_NATIVE;
+	static
+	{
+		boolean hasnative = false;
+		try
+		{
+			new NativeHelper();
+			hasnative = true;
+		}
+		catch (Throwable t)
+		{
+		}
+		HAS_NATIVE = hasnative;
+	}
 	
     /** 
 	 *  Enables the shared bytecode classloader mode.
@@ -401,32 +418,21 @@ public class SASM
 	/**
      *  Access to sun.misc.Unsafe or equivalent.
      */
-	protected static class Unsafe
+	public static class Unsafe
 	{
 		
 		/** Instance, if available. */
-		Object instance = null;
-		
-		/** NativeHelper, if available. */
-		NativeHelper nativehelper = null;
+		private Object instance = null;
 		
 		/** The defineClass method. */
-		IMethodInvoker defineclass;
+		private IMethodInvoker defineclass;
 		
 		/**
 		 *  Creates the Unsafe.
 		 */
 		public Unsafe()
 		{
-			try
-			{
-				nativehelper = new NativeHelper();
-			}
-			catch (Throwable t)
-			{
-			}
-			
-			if (nativehelper == null)
+			if (!HAS_NATIVE)
 			{
 				Class<?> unsafeclass = null;
 				try
@@ -490,12 +496,26 @@ public class SASM
 		}
 		
 		/**
+		 *  Sets reflective object accessible without checks if native support is available.
+		 *  
+		 *  @param accobj The accessible object.
+		 *  @param flag The flag value.
+		 */
+		public void setAccessible(AccessibleObject accobj, boolean flag)
+		{
+			if (HAS_NATIVE)
+				NativeHelper.setAccessible(accobj, flag);
+			else
+				accobj.setAccessible(flag);
+		}
+		
+		/**
 	     *  Access to sun.misc.Unsafe or equivalent.
 	     */
 		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
 	    {
-			if (nativehelper != null)
-				return nativehelper.defineClass(name, b, loader);
+			if (HAS_NATIVE)
+				return NativeHelper.defineClass(name, b, loader);
 			else
 				return (Class<?>) defineclass.invoke(instance, name, b, off, len, loader, pd == null ? loader.getClass().getProtectionDomain() : pd);
 	    }

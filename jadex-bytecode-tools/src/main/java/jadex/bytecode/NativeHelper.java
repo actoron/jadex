@@ -3,7 +3,8 @@ package jadex.bytecode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.security.ProtectionDomain;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 
 import jadex.commons.SUtil;
 
@@ -16,6 +17,7 @@ import jadex.commons.SUtil;
  */
 public class NativeHelper
 {
+	// Initialize native code.
 	static
 	{
 		try
@@ -39,6 +41,7 @@ public class NativeHelper
 				libsuffix = ".dll";
 				libname = libmainname + archstr;
 			}
+			System.out.println("Loading " + libname+libsuffix);
 			
 			String libres = "nativelibs/" + libname + libsuffix;
 			InputStream is = NativeHelper.class.getClassLoader().getResourceAsStream(libres);
@@ -49,19 +52,56 @@ public class NativeHelper
 			os.close();
 			System.load(libfile.getAbsolutePath());
 		}
+		catch (Throwable t)
+		{
+//			t.printStackTrace();
+			SUtil.throwUnchecked(t);
+		}
+	}
+	
+	/** Name of the AccessibleObject override flag. */
+	protected static final String OVERRIDE;
+	static
+	{
+		// Sometimes called "flag"?
+		String flagname = "flag";
+		try
+		{
+			Field f = AccessibleObject.class.getDeclaredField("override");
+			flagname = "override";
+		}
 		catch (Exception e)
 		{
-			SUtil.throwUnchecked(e);
 		}
+		OVERRIDE = flagname;
 	}
 	
 	/**
      * Define a class in any ClassLoader.
      */
-	public Class<?> defineClass(String name, byte[] b, ClassLoader loader)
+	protected static final Class<?> defineClass(String name, byte[] b, ClassLoader loader)
 	{
 		return defineClass(name, b, b.length, loader);
 	}
+	
+	/**
+	 *  Sets reflective object accessible without checks.
+	 *  
+	 *  @param accobj The accessible object.
+	 *  @param flag The flag value.
+	 */
+	protected static final void setAccessible(AccessibleObject accobj, boolean flag)
+	{
+		setAccessible(OVERRIDE, accobj, flag);
+	}
+	
+	/**
+	 *  Sets reflective object accessible without checks.
+	 *  
+	 *  @param accobj The accessible object.
+	 *  @param flag The flag value.
+	 */
+	private static final native void setAccessible(String flagname, AccessibleObject accobj, boolean flag);
 	
 	/**
      * Define a class in any ClassLoader.

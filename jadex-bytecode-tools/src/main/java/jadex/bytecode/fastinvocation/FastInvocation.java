@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.ProtectionDomain;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -32,8 +31,56 @@ import jadex.commons.collection.WeakKeyValueMap;
  */
 public class FastInvocation
 {
-	/** Set this to true to switch to fallback mode for non-public invocation */
-	public static boolean FALLBACK_MODE = false;
+	/** Set this to true to switch to fallback mode for invocation */
+	protected static boolean NO_ASM = false;
+	
+	/** Flag if default / protected access via ASM is available. */
+	protected static final boolean DEFAULT_ACCESS;
+	
+	/** Flag if private access via ASM is available. */
+	protected static final boolean PRIVATE_ACCESS;
+	static
+	{
+		// No ASM bytecode on Android
+		if (SReflect.isAndroid())
+			NO_ASM = true;
+		
+		ByteCodeClassLoader dummycl = new ByteCodeClassLoader(AccessTestClass.class.getClassLoader(), true);
+		boolean acc = false;
+		try
+		{
+			Method m = AccessTestClass.class.getMethod("defaultTest", (Class<?>[]) null);
+			Class<?> invclass = createInvokerClass(dummycl, m);
+			if (invclass != null)
+			{
+				IMethodInvoker inv = newInvoker(invclass);
+				inv.invoke(null, (Object[]) null);
+				acc = true;
+			}
+		}
+		catch (Throwable t)
+		{
+		}
+		DEFAULT_ACCESS = acc;
+		
+		dummycl = new ByteCodeClassLoader(AccessTestClass.class.getClassLoader(), false);
+		acc = false;
+		try
+		{
+			Method m = AccessTestClass.class.getMethod("privateTest", (Class<?>[]) null);
+			Class<?> invclass = createInvokerClass(dummycl, m);
+			if (invclass != null)
+			{
+				IMethodInvoker inv = newInvoker(invclass);
+				inv.invoke(null, (Object[]) null);
+				acc = true;
+			}
+		}
+		catch (Throwable t)
+		{
+		}
+		PRIVATE_ACCESS = acc;
+	}
 	
 	/** Cached invoker classes, the invoker class does not prevent GC (tested). */
 	protected static volatile WeakHashMap<Method, Class<IMethodInvoker>> INVOKER_CLASSES =
@@ -141,6 +188,9 @@ public class FastInvocation
 		
 		if (ic == null)
 		{
+			if (INVOKER_CLASSES.containsKey(method))
+				return null;
+			
 			synchronized(NAME_SUFFIX_COUNTER)
 			{
 				ic = INVOKER_CLASSES.get(method);
@@ -152,12 +202,9 @@ public class FastInvocation
 					
 					ic = createInvokerClass(bcl, method);
 					
-					if (ic != null)
-					{
-						WeakHashMap<Method, Class<IMethodInvoker>> newgenclasses = new WeakHashMap<Method, Class<IMethodInvoker>>(INVOKER_CLASSES);
-						newgenclasses.put(method, ic);
-						INVOKER_CLASSES = newgenclasses;
-					}
+					WeakHashMap<Method, Class<IMethodInvoker>> newgenclasses = new WeakHashMap<Method, Class<IMethodInvoker>>(INVOKER_CLASSES);
+					newgenclasses.put(method, ic);
+					INVOKER_CLASSES = newgenclasses;
 				}
 			}
 			
@@ -185,7 +232,7 @@ public class FastInvocation
 			if (!clazz.equals(cl.loadClass(clazz.getCanonicalName())))
 				throw new IllegalArgumentException("Code generation classloader " + cl + " does not have access to class " + clazz + " defined in method " + method.getName());
 			
-			boolean notpublic = (method.getModifiers() & Modifier.PUBLIC) == 0;
+//			boolean notpublic = (method.getModifiers() & Modifier.PUBLIC) == 0;
 			boolean isstatic = (method.getModifiers() & Modifier.STATIC) != 0;
 			
 			String classname = "MethodInvoker_" + method.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
@@ -237,6 +284,8 @@ public class FastInvocation
 			cw.visitEnd();
 			byte[] classcode = cw.toByteArray();
 			ret = (Class<IMethodInvoker>) cl.defineClass(classcode);
+//			ret = (Class<IMethodInvoker>) SASM.UNSAFE.defineClass(null, classcode, 0, classcode.length, ClassLoader.getSystemClassLoader(), null);
+//			ret = (Class<IMethodInvoker>) SASM.NATIVE_HELPER.defineClass(null, classcode, ClassLoader.getSystemClassLoader());
 		}
 		catch (Exception e)
 		{
@@ -545,7 +594,7 @@ public class FastInvocation
 	 */
 	protected static final ClassWriter createClass(Class<?> targetclass, String classname, int accesslevel, Class<?>... interfaces)
 	{
-		if (FALLBACK_MODE)
+		if (NO_ASM)
 			return null;
 		
 		Class<?> superclass = Object.class;
@@ -553,6 +602,9 @@ public class FastInvocation
 //		accesslevel = Opcodes.ACC_PUBLIC;
 		if (accesslevel == Opcodes.ACC_PRIVATE)
 		{
+			if (!PRIVATE_ACCESS)
+				return null;
+			
 			try
 			{
 				Class<?> reffacclass = Class.forName("sun.reflect.ReflectionFactory");
@@ -565,11 +617,14 @@ public class FastInvocation
 		}
 		else if (accesslevel != Opcodes.ACC_PUBLIC)
 		{
+			if (!DEFAULT_ACCESS)
+				return null;
+			
 //			System.err.println("Created limited scope");
 			// At least protected, inject into the package...
 			genpackage = targetclass.getPackage().getName();
 			//additional suffix to avoid clash
-			classname += "_" + Math.abs(SUtil.SECURE_RANDOM.nextLong());
+			classname += "_" + Math.abs(SUtil.FAST_RANDOM.nextLong());
 		}
 		
 		String[] internalifaces = interfaces != null ? new String[interfaces.length] : new String[0];
@@ -732,7 +787,7 @@ public class FastInvocation
 		public FallBackInvoker(Method method)
 		{
 //			System.err.println("WARNING FALLBACK MODE ENABLED");
-			method.setAccessible(true);
+			SASM.UNSAFE.setAccessible(method, true);
 			this.method = method;
 		}
 		
@@ -755,6 +810,23 @@ public class FastInvocation
 			{
 				throw SUtil.throwUnchecked(e);
 			}
+		}
+	}
+	
+	/**
+	 *  Class used to test access level via ASM.
+	 *
+	 */
+	protected static final class AccessTestClass
+	{
+		static final Object defaultTest()
+		{
+			return privateTest();
+		}
+		
+		private static final Object privateTest()
+		{
+			return null;
 		}
 	}
 }

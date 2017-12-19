@@ -1,8 +1,18 @@
 #include "jadex_bytecode_NativeHelper.h"
 
-#include <iostream>
-
-jmethodID defclass = NULL;
+/*
+ * Class:     jadex_bytecode_NativeHelper
+ * Method:    setAccessible
+ * Signature: (Ljava/lang/String;Ljava/lang/reflect/AccessibleObject;)V
+ */
+JNIEXPORT void JNICALL Java_jadex_bytecode_NativeHelper_setAccessible(JNIEnv *env, jclass nhclazz, jstring flagname, jobject accobj, jboolean flag)
+{
+	jclass accclazz = env->GetObjectClass(accobj);
+	const char* cflagname = env->GetStringUTFChars(flagname, NULL);
+	jfieldID fid = env->GetFieldID(accclazz, cflagname, "Z");
+	env->ReleaseStringUTFChars(flagname, cflagname);
+	env->SetBooleanField(accobj, fid, flag);
+}
 
 /*
  * Class:     jadex_bytecode_NativeHelper
@@ -23,3 +33,4 @@ JNIEXPORT jclass JNICALL Java_jadex_bytecode_NativeHelper_defineClass(JNIEnv *en
 	env->ReleaseByteArrayElements(bytecode, cbytecode, length);
 	return ret;
 }
+

@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     jadex_bytecode_NativeHelper
+ * Method:    setAccessible
+ * Signature: (Ljava/lang/String;Ljava/lang/reflect/AccessibleObject;Z)V
+ */
+JNIEXPORT void JNICALL Java_jadex_bytecode_NativeHelper_setAccessible
+  (JNIEnv *, jclass, jstring, jobject, jboolean);
+
+/*
+ * Class:     jadex_bytecode_NativeHelper
  * Method:    defineClass
  * Signature: (Ljava/lang/String;[BILjava/lang/ClassLoader;)Ljava/lang/Class;
  */
