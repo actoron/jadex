@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jadex.commons.SReflect;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.LRU;
 import jadex.commons.transformation.annotations.Exclude;
@@ -147,7 +148,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				}
 
 				// Get all private fields (and include if requested)
-				fields = clazz.getDeclaredFields();
+				fields = SReflect.getAllFields(clazz);
 				for(int i = 0; i < fields.length; i++)
 				{
 					String property_java_name = fields[i].getName();
