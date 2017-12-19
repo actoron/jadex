@@ -69,8 +69,10 @@ public class ImageProcessor implements ITraverseProcessor
 //		if (System.getProperty("os.name").startsWith("Mac "))
 //		{
 		System.out.println("ImageIO: CacheDir " + ImageIO.getCacheDirectory());
-		System.out.println("ImageIO: CacheDir canRead " + ImageIO.getCacheDirectory().canRead());
-		System.out.println("ImageIO: CacheDir canRead " + ImageIO.getCacheDirectory().canWrite());
+		if (ImageIO.getCacheDirectory() != null) {
+			System.out.println("ImageIO: CacheDir canRead " + ImageIO.getCacheDirectory().canRead());
+			System.out.println("ImageIO: CacheDir canRead " + ImageIO.getCacheDirectory().canWrite());
+		}
 		ImageIO.setUseCache(false);
 //		}
 	}
