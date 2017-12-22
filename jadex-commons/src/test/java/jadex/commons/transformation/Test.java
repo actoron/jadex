@@ -85,14 +85,14 @@ public abstract class Test extends TestCase
 //		{
 //			e.printStackTrace();
 //		}
-		
+
 		try
 		{
-			
+
 //			int cnt = 1000;
 			long start = System.currentTimeMillis();
 			for(int i=0; i<cnt; i++)
-			{	
+			{
 //			while(true)
 //			{
 				testMultiCollection();
@@ -100,10 +100,10 @@ public abstract class Test extends TestCase
 				testByte();
 
 				testCalendar();
-				
+
 				testException();
 
-				testCertificate(); 
+				testCertificate();
 
 				testTimestamp();
 
@@ -113,7 +113,7 @@ public abstract class Test extends TestCase
 				testDouble();
 				testBigInteger();
 //				testBigData();
-					
+
 				testByteArray();
 				testBByteArray();
 				testIntArray();
@@ -130,7 +130,7 @@ public abstract class Test extends TestCase
 				testBShortArray();
 				testBooleanArray();
 				testBBooleanArray();
-				
+
 				testVectorModel();
 				testEmptySet();
 				testEmptyList();
@@ -144,7 +144,7 @@ public abstract class Test extends TestCase
 				testMultiArray2();
 				testMultiArrayAttribute();
 				testByteArrayAttribute();
-	
+
 				testClass();
 				testClassInfo();
 				testDate();
@@ -158,22 +158,25 @@ public abstract class Test extends TestCase
 				testTuple();
 				testTuple2();
 				testTimestamp();
-			
+
 				testBean();
 				testExcluded();
-				
+
 				testAnonymousInnerClass();
 				testAnonymousInnerClassWithSimpleTypes();
-			
+
 				testColor();
 				testImage();
 				testRectangle();
 				testMap();
 				testLRU();
-				
+
 				testSpecialCharacter();
 				testBeanWithPublicFields();
 				testBeanWithIncludedFields();
+				testBeanWithIncludedPrivateFields();
+				testBeanWithIncludedSinglePrivateFields();
+				testBeanWithIncludedInheritedPrivateFields();
 				testSelfReferenceBean();
 
 				testOptionalsPrimitive();
@@ -183,7 +186,7 @@ public abstract class Test extends TestCase
 				testDateArray();
 			}
 			long dur = System.currentTimeMillis()-start;
-			
+
 			System.out.println("Needed: "+dur+" for cnt="+cnt);
 		}
 		catch(Exception e)
@@ -1044,7 +1047,7 @@ public abstract class Test extends TestCase
 	public void testBeanWithIncludedFields() throws Exception
 	{
 		D d = new D("test\n", 23);
-		
+
 		doWriteAndRead(d);
 	}
 
@@ -1065,6 +1068,16 @@ public abstract class Test extends TestCase
 	public void testBeanWithIncludedSinglePrivateFields() throws Exception
 	{
 		G g = new G("test\n", 23);
+
+		doWriteAndRead(g);
+	}
+
+	/**
+	 *  Test if writer writes included private bean fields (when @Include is used).
+	 */
+	public void testBeanWithIncludedInheritedPrivateFields() throws Exception
+	{
+		H g = new H("test\n");
 
 		doWriteAndRead(g);
 	}
