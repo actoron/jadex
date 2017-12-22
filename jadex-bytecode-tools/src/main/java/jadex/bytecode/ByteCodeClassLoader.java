@@ -2,34 +2,60 @@ package jadex.bytecode;
 
 import java.security.ProtectionDomain;
 
+import jadex.bytecode.vmhacks.VmHacks;
+
 /**
  *  ClassLoader for generated classes.
  *
  */
-public class ByteCodeClassLoader extends ClassLoader
+public class ByteCodeClassLoader extends ClassLoader implements IByteCodeClassLoader
 {
-	/** Flag if class should be defined in the parent. */
-	protected boolean definedirect;
+	/** Additional delegates besides the parent. */
+	protected ClassLoader[] delegates;
 	
 	/**
 	 *  Creates the loader.
-	 *  @param parent Parent loader.
+	 *  @param parent Parent loaders.
 	 */
-	public ByteCodeClassLoader(ClassLoader parent)
+	public ByteCodeClassLoader(ClassLoader... parents)
 	{
-		super(parent); 
-		definedirect = false;
+		super(parents == null || parents.length == 0 ? null : parents[0]);
+		addDelegates(parents);
 	}
 	
 	/**
-	 *  Creates the loader.
-	 *  @param parent Parent loader.
-	 *  @param definedirect Flag if class should be defined in the parent.
+	 *  Delegation.
 	 */
-	public ByteCodeClassLoader(ClassLoader parent, boolean definedirect)
+	protected Class<?> findClass(String name) throws ClassNotFoundException
 	{
-		super(parent);
-		this.definedirect = definedirect;
+		Class<?> ret = null;
+		if (delegates != null)
+		{
+			for (int i = 0; ret == null && i < delegates.length; ++i)
+			{
+				try
+				{
+					System.out.println("Trying: " + delegates[i] + " " + name);
+					ret = delegates[i].loadClass(name);
+				}
+				catch (ClassNotFoundException e)
+				{
+				}
+			}
+		}
+		if (ret == null)
+			throw new ClassNotFoundException(name);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Access to the classloader type.
+	 *  @return ClassLoader.
+	 */
+	public ClassLoader asClassLoader()
+	{
+		return this;
 	}
 	
 	/**
@@ -38,7 +64,7 @@ public class ByteCodeClassLoader extends ClassLoader
 	 *  @param classcode Code of the class. 
 	 *  @return The generated class.
 	 */
-	public Class<?> defineClass(byte[] classcode)
+	public Class<?> doDefineClass(byte[] classcode)
 	{
 		Class<?> ret = doDefineClass(null, classcode, 0, classcode.length);
 		return ret;
@@ -49,10 +75,7 @@ public class ByteCodeClassLoader extends ClassLoader
 	 */
 	public Class<?> doDefineClass(String name, byte[] b, int off, int len)
 	{
-		if (definedirect)
-			return SASM.UNSAFE.defineClass(name, b, off, len, getParent(), null);
-		else
-			return defineClass(name, b, off, len);
+		return defineClass(name, b, off, len);
 	}
 	
 	/**
@@ -60,11 +83,23 @@ public class ByteCodeClassLoader extends ClassLoader
 	 */
 	public Class<?> doDefineClass(String name, byte[] b, int off, int len, ProtectionDomain protectiondomain)
 	{
-		if (definedirect)
-			return SASM.UNSAFE.defineClass(name, b, off, len, getParent(), protectiondomain);
-		else
-			return defineClass(name, b, off, len, protectiondomain);
+		return defineClass(name, b, off, len, protectiondomain);
 	}
 	
+	/**
+	 *  Exposes the defineClass() method for explicit indirect definition.
+	 */
+	public Class<?> doDefineClassInParent(String name, byte[] b, int off, int len, ProtectionDomain protectiondomain)
+	{
+		return VmHacks.getUnsafe().defineClass(name, b, off, len, getParent(), protectiondomain);
+	}
 	
+	protected void addDelegates(ClassLoader[] parents)
+	{
+		if (parents != null && parents.length > 1)
+		{
+			delegates = new ClassLoader[parents.length - 1];
+			System.arraycopy(parents, 1, delegates, 0, delegates.length);
+		}
+	}
 }

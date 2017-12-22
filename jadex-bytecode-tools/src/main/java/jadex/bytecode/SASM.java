@@ -18,8 +18,10 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import jadex.bytecode.fastinvocation.FastInvocation;
+import jadex.bytecode.fastinvocation.SInvocation;
 import jadex.bytecode.fastinvocation.IMethodInvoker;
+import jadex.bytecode.vmhacks.NativeHelper;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SUtil;
 import jadex.commons.collection.WeakKeyValueMap;
 
@@ -28,25 +30,6 @@ import jadex.commons.collection.WeakKeyValueMap;
  */
 public class SASM
 {
-	/** Access to sun.misc.Unsafe or equivalent. */
-	public static final Unsafe UNSAFE = new Unsafe();
-	
-	/** Flag if native support is available. */
-	public static final boolean HAS_NATIVE;
-	static
-	{
-		boolean hasnative = false;
-		try
-		{
-			new NativeHelper();
-			hasnative = true;
-		}
-		catch (Throwable t)
-		{
-		}
-		HAS_NATIVE = hasnative;
-	}
-	
     /** 
 	 *  Enables the shared bytecode classloader mode.
 	 *  If false, a new classloader is generated for each
@@ -56,8 +39,8 @@ public class SASM
 	public static boolean SHARED_LOADERS_MODE = true;
 	
 	/** Shared ClassLoader cache. */
-	protected static final WeakKeyValueMap<ClassLoader, ByteCodeClassLoader> SHARED_CLASSLOADERS =
-		new WeakKeyValueMap<ClassLoader, ByteCodeClassLoader>();
+	protected static final WeakKeyValueMap<ClassLoader, IByteCodeClassLoader> SHARED_CLASSLOADERS =
+		new WeakKeyValueMap<ClassLoader, IByteCodeClassLoader>();
 	
 	/**
 	 *  Push an immediate (constant) integer value onto the stack
@@ -320,20 +303,17 @@ public class SASM
 	{
 		Class<?> ret = null;
 		
-		ByteCodeClassLoader bcl = getByteCodeClassLoader(loader, true);
+		IByteCodeClassLoader bcl = getByteCodeClassLoader(loader, true);
 		try
 		{
-			if (domain == null)
-				ret = bcl.doDefineClass(name, data, 0, data.length);
-			else
-				ret = bcl.doDefineClass(name, data, 0, data.length, domain);
+			ret = bcl.doDefineClassInParent(name, data, 0, data.length, domain);
 		}
 		catch(LinkageError e)
 		{
 			// when same class was already loaded via other filename wrong cache miss:-(
 			try
 			{
-				ret = Class.forName(name, true, bcl);
+				ret = bcl.loadClass(name);
 			}
 			catch (Exception e1)
 			{
@@ -375,7 +355,7 @@ public class SASM
 	 *  @param sharedloader Set true, to use shared loaders.
 	 *  @return The ByteCodeClassLoader.
 	 */
-	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent)
+	public static IByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent)
 	{
 		return getByteCodeClassLoader(parent, SHARED_LOADERS_MODE);
 	}
@@ -387,12 +367,12 @@ public class SASM
 	 *  @param sharedloader Set true, to use shared loaders.
 	 *  @return The ByteCodeClassLoader.
 	 */
-	public static ByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent, boolean sharedloaders)
+	public static IByteCodeClassLoader getByteCodeClassLoader(ClassLoader parent, boolean sharedloaders)
 	{
 //		while (parent instanceof ByteCodeClassLoader)
 //			parent = parent.getParent();
 		
-		ByteCodeClassLoader bcl = null;
+		IByteCodeClassLoader bcl = null;
 		
 		if (sharedloaders)
 		{
@@ -402,122 +382,29 @@ public class SASM
 				
 				if (bcl == null)
 				{
-					bcl = new ByteCodeClassLoader(parent, true);
+					bcl = createByteCodeClassLoader(parent, SASM.class.getClassLoader());
 					SHARED_CLASSLOADERS.put(parent, bcl);
 				}
 			}
 		}
 		else
 		{
-			bcl = new ByteCodeClassLoader(parent, true);
+			bcl = createByteCodeClassLoader(parent, SASM.class.getClassLoader());
 		}
 		
 		return bcl;
 	}
 	
 	/**
-     *  Access to sun.misc.Unsafe or equivalent.
-     */
-	public static class Unsafe
+	 *  Creates a byte code ClassLoader.
+	 *  @param parents ClassLoader parents, first parameters is the getParent() ClassLoader.
+	 *  @return The loader.
+	 */
+	public static final IByteCodeClassLoader createByteCodeClassLoader(ClassLoader... parents)
 	{
+		if (VmHacks.HAS_EXTENDED_BYTECODE_CLASSLOADER)
+			return VmHacks.getExtendedByteCodeClassLoader(parents);
 		
-		/** Instance, if available. */
-		private Object instance = null;
-		
-		/** The defineClass method. */
-		private IMethodInvoker defineclass;
-		
-		/**
-		 *  Creates the Unsafe.
-		 */
-		public Unsafe()
-		{
-			if (!HAS_NATIVE)
-			{
-				Class<?> unsafeclass = null;
-				try
-				{
-					unsafeclass = Class.forName("sun.misc.Unsafe");
-					
-					Field instancefield = null;
-					try
-					{
-						// Field name in regular Java, normally...
-						instancefield = unsafeclass.getDeclaredField("theUnsafe");
-					}
-					catch (Exception e)
-					{
-					}
-					
-					if (instancefield == null)
-					{
-						try
-						{
-							// Field name in Android, normally...
-							instancefield = unsafeclass.getDeclaredField("THE_ONE");
-						}
-						catch (Exception e)
-						{
-						}
-					}
-					
-					
-					if (instancefield != null)
-					{
-						// attempt to acquire the singleton instance.
-						try
-						{
-							instancefield.setAccessible(true);
-							instance = instancefield.get(null);
-						}
-						catch (Exception e)
-						{
-						}
-					}
-					
-					if (instance == null)
-					{
-						// Okay, last chance, just instantiate a new instance...
-						Constructor<?> c = unsafeclass.getConstructor();
-						c.setAccessible(true);
-						instance = c.newInstance();
-					}
-					
-					ByteCodeClassLoader cl = new ByteCodeClassLoader(Unsafe.class.getClassLoader());
-					Method method = unsafeclass.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
-					Class<?> genclass = FastInvocation.createInvokerClass(cl, method);
-					defineclass = FastInvocation.newInvoker(genclass);
-				}
-				catch (Exception e)
-				{
-					SUtil.throwUnchecked(e);
-				}
-			}
-		}
-		
-		/**
-		 *  Sets reflective object accessible without checks if native support is available.
-		 *  
-		 *  @param accobj The accessible object.
-		 *  @param flag The flag value.
-		 */
-		public void setAccessible(AccessibleObject accobj, boolean flag)
-		{
-			if (HAS_NATIVE)
-				NativeHelper.setAccessible(accobj, flag);
-			else
-				accobj.setAccessible(flag);
-		}
-		
-		/**
-	     *  Access to sun.misc.Unsafe or equivalent.
-	     */
-		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
-	    {
-			if (HAS_NATIVE)
-				return NativeHelper.defineClass(name, b, loader);
-			else
-				return (Class<?>) defineclass.invoke(instance, name, b, off, len, loader, pd == null ? loader.getClass().getProtectionDomain() : pd);
-	    }
+		return new ByteCodeClassLoader(parents);
 	}
 }

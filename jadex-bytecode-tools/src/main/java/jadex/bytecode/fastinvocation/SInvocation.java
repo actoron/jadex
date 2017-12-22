@@ -2,8 +2,13 @@ package jadex.bytecode.fastinvocation;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,8 +24,9 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import jadex.bytecode.ByteCodeClassLoader;
+import jadex.bytecode.IByteCodeClassLoader;
 import jadex.bytecode.SASM;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -29,58 +35,10 @@ import jadex.commons.collection.WeakKeyValueMap;
 /**
  *  Factory for providing fast reflective access to methods.
  */
-public class FastInvocation
+public class SInvocation
 {
-	/** Set this to true to switch to fallback mode for invocation */
-	protected static boolean NO_ASM = false;
-	
-	/** Flag if default / protected access via ASM is available. */
-	protected static final boolean DEFAULT_ACCESS;
-	
-	/** Flag if private access via ASM is available. */
-	protected static final boolean PRIVATE_ACCESS;
-	static
-	{
-		// No ASM bytecode on Android
-		if (SReflect.isAndroid())
-			NO_ASM = true;
-		
-		ByteCodeClassLoader dummycl = new ByteCodeClassLoader(AccessTestClass.class.getClassLoader(), true);
-		boolean acc = false;
-		try
-		{
-			Method m = AccessTestClass.class.getMethod("defaultTest", (Class<?>[]) null);
-			Class<?> invclass = createInvokerClass(dummycl, m);
-			if (invclass != null)
-			{
-				IMethodInvoker inv = newInvoker(invclass);
-				inv.invoke(null, (Object[]) null);
-				acc = true;
-			}
-		}
-		catch (Throwable t)
-		{
-		}
-		DEFAULT_ACCESS = acc;
-		
-		dummycl = new ByteCodeClassLoader(AccessTestClass.class.getClassLoader(), false);
-		acc = false;
-		try
-		{
-			Method m = AccessTestClass.class.getMethod("privateTest", (Class<?>[]) null);
-			Class<?> invclass = createInvokerClass(dummycl, m);
-			if (invclass != null)
-			{
-				IMethodInvoker inv = newInvoker(invclass);
-				inv.invoke(null, (Object[]) null);
-				acc = true;
-			}
-		}
-		catch (Throwable t)
-		{
-		}
-		PRIVATE_ACCESS = acc;
-	}
+	/** Class name suffix counter. */ 
+	public static AtomicLong NAME_SUFFIX_COUNTER = new AtomicLong();
 	
 	/** Cached invoker classes, the invoker class does not prevent GC (tested). */
 	protected static volatile WeakHashMap<Method, Class<IMethodInvoker>> INVOKER_CLASSES =
@@ -93,9 +51,6 @@ public class FastInvocation
 	/** Cached extractor classes. */
 	protected static volatile WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>> EXTRACTOR_CLASSES =
 			new WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>>();
-	
-	/** Class name suffix counter. */ 
-	public static AtomicLong NAME_SUFFIX_COUNTER = new AtomicLong();
 	
 	/**
 	 *  Directly invokes a method based on the method name and arguments.
@@ -138,7 +93,7 @@ public class FastInvocation
 			if (methods[i].getParameterTypes().length == argcount)
 				return newInvoker(methods[i]).invoke(obj, args);
 		}
-		throw new IllegalArgumentException("No unambiguous method + " + methodname + " found, try " + FastInvocation.class.getName() + "getInvoker() methods.");
+		throw new IllegalArgumentException("No unambiguous method + " + methodname + " found, try " + SInvocation.class.getName() + "getInvoker() methods.");
 	}
 	
 	/**
@@ -157,12 +112,28 @@ public class FastInvocation
 	}
 	
 	/**
+	 *  Creates a new invoker for a method.
+	 * 
+	 *  @param method The method.
+	 *  @param cl ClassLoader to use.
+	 *  @return Instantiated invoker.
+	 */
+	public static final IMethodInvoker newInvoker(Method method, IByteCodeClassLoader cl)
+	{
+		Class<?> ic = createInvokerClass(cl, method);
+		if (ic == null)
+			return new FallBackInvoker(method);
+		
+		return newInvoker(ic);
+	}
+	
+	/**
 	 *  Instantiate a new method invoker from the invoker class.
 	 *  
 	 *  @param invokerclass The invoker class.
 	 *  @return Instantiated invoker.
 	 */
-	public static final IMethodInvoker newInvoker(Class<?> invokerclass)
+	protected static final IMethodInvoker newInvoker(Class<?> invokerclass)
 	{
 		try
 		{
@@ -198,7 +169,7 @@ public class FastInvocation
 				{
 					ClassLoader cl = method.getDeclaringClass().getClassLoader();
 					
-					ByteCodeClassLoader bcl = SASM.getByteCodeClassLoader(cl);
+					IByteCodeClassLoader bcl = SASM.getByteCodeClassLoader(cl);
 					
 					ic = createInvokerClass(bcl, method);
 					
@@ -221,7 +192,7 @@ public class FastInvocation
 	 *  @return The generated invoker.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final Class<IMethodInvoker> createInvokerClass(ByteCodeClassLoader cl, Method method)
+	protected static final Class<IMethodInvoker> createInvokerClass(IByteCodeClassLoader cl, Method method)
 	{
 		Class<IMethodInvoker> ret = null;
 		try
@@ -229,7 +200,7 @@ public class FastInvocation
 			Class<?> clazz = method.getDeclaringClass();
 			
 			// Check ClassLoader validity
-			if (!clazz.equals(cl.loadClass(clazz.getCanonicalName())))
+			if (!clazz.equals(cl.loadClass(clazz.getName())))
 				throw new IllegalArgumentException("Code generation classloader " + cl + " does not have access to class " + clazz + " defined in method " + method.getName());
 			
 //			boolean notpublic = (method.getModifiers() & Modifier.PUBLIC) == 0;
@@ -237,10 +208,9 @@ public class FastInvocation
 			
 			String classname = "MethodInvoker_" + method.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
 			int accesslevel = determineAccessLevel(Opcodes.ACC_PUBLIC, method.getModifiers());
-			ClassWriter cw = createClass(clazz, classname, accesslevel, IMethodInvoker.class);
+			ExtendedClassWriter cw = createClass(clazz, classname, accesslevel, IMethodInvoker.class);
 			if (cw == null)
 				return null;
-			
 			// Implement the invoke method.
 			Method invmethod = IMethodInvoker.class.getMethod("invoke", new Class<?>[] { Object.class, Object[].class });
 			MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, invmethod.getName(), Type.getMethodDescriptor(invmethod), null, null);
@@ -283,7 +253,10 @@ public class FastInvocation
 			
 			cw.visitEnd();
 			byte[] classcode = cw.toByteArray();
-			ret = (Class<IMethodInvoker>) cl.defineClass(classcode);
+			if (cw.requiresParentLoader())
+				ret = (Class<IMethodInvoker>) cl.doDefineClassInParent(null, classcode, 0, classcode.length, clazz.getProtectionDomain());
+			else	
+				ret = (Class<IMethodInvoker>) cl.doDefineClass(classcode);
 //			ret = (Class<IMethodInvoker>) SASM.UNSAFE.defineClass(null, classcode, 0, classcode.length, ClassLoader.getSystemClassLoader(), null);
 //			ret = (Class<IMethodInvoker>) SASM.NATIVE_HELPER.defineClass(null, classcode, ClassLoader.getSystemClassLoader());
 		}
@@ -301,19 +274,28 @@ public class FastInvocation
 	 *  @param delegate The delegation object / accessor target.
 	 *  @return Instantiated accessor.
 	 */
-	public static final Object newAccessor(Class<?> accessorclass, Object delegate)
+	public static final <T> T newAccessor(Class<T> iface, Class<?> targetclass, Object delegate)
 	{
-		Object ret = null;
-		try
+		Class<?> accessorclass = getAccessorClass(iface, targetclass);
+		T ret = null;
+		if (accessorclass != null)
 		{
-			Constructor<?> c = accessorclass.getConstructor((Class[]) null);
-			ret = c.newInstance((Object[]) null);
-			Field f = accessorclass.getDeclaredField("delegate");
-			f.set(ret, delegate);
+			try
+			{
+				@SuppressWarnings("unchecked")
+				Constructor<T> c = (Constructor<T>) accessorclass.getConstructor((Class[]) null);
+				ret = c.newInstance((Object[]) null);
+				Field f = accessorclass.getDeclaredField("delegate");
+				f.set(ret, delegate);
+			}
+			catch (Exception e)
+			{
+				SUtil.throwUnchecked(e);
+			}
 		}
-		catch (Exception e)
+		else
 		{
-			SUtil.throwUnchecked(e);
+			ret = createFallbackAccessor(iface, targetclass, delegate);
 		}
 		return ret;
 	}
@@ -322,22 +304,22 @@ public class FastInvocation
 	 *  Gets class for an interface-based accessor.
 	 *  
 	 *  @param iface The accessor interface.
-	 *  @param clazz The target class.
+	 *  @param targetclazz The target class.
 	 *  @return The accessor class.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final <T> Class<T> getAccessorClass(Class<T> iface, Class<?> clazz)
+	public static final <T> Class<T> getAccessorClass(Class<T> iface, Class<?> targetclazz)
 	{
 		Class<?> ac = null;
-		WeakKeyValueMap<Class<?>, Class<?>> map = ACCESSOR_CLASSES.get(clazz);
+		WeakKeyValueMap<Class<?>, Class<?>> map = ACCESSOR_CLASSES.get(targetclazz);
 		if (map != null)
 			ac = map.get(iface);
 		
-		if (ac == null)
+		if (ac == null && (map == null || !map.containsKey(iface)))
 		{
 			synchronized(NAME_SUFFIX_COUNTER)
 			{
-				map = ACCESSOR_CLASSES.get(clazz);
+				map = ACCESSOR_CLASSES.get(targetclazz);
 				if (map != null)
 					ac = map.get(iface);
 				
@@ -346,20 +328,17 @@ public class FastInvocation
 					if (map == null)
 						map = new WeakKeyValueMap<Class<?>, Class<?>>();
 					
-					ClassLoader cl = clazz.getClassLoader();
+					ClassLoader cl = targetclazz.getClassLoader();
 					
-					ByteCodeClassLoader bcl = SASM.getByteCodeClassLoader(cl);
+					IByteCodeClassLoader bcl = SASM.getByteCodeClassLoader(cl);
 					
-					ac = createAccessorClass(bcl, iface, clazz);
+					ac = createAccessorClass(bcl, iface, targetclazz);
 					
-					if (ac != null)
-					{
-						map.put(iface, ac);
-						WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>> newgenclasses =
-								new WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>>(ACCESSOR_CLASSES);
-						newgenclasses.put(clazz, map);
-						ACCESSOR_CLASSES = newgenclasses;
-					}
+					map.put(iface, ac);
+					WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>> newgenclasses =
+							new WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>>(ACCESSOR_CLASSES);
+					newgenclasses.put(targetclazz, map);
+					ACCESSOR_CLASSES = newgenclasses;
 				}
 			}
 		}
@@ -377,7 +356,8 @@ public class FastInvocation
 	 *  @param clazz The target class of the accessor.
 	 *  @return The generated class.
 	 */
-	public static final <T> Class<T> createAccessorClass(ByteCodeClassLoader cl, Class<T> iface, Class<?> clazz)
+	@SuppressWarnings("unchecked")
+	public static final <T> Class<T> createAccessorClass(IByteCodeClassLoader cl, Class<T> iface, Class<?> clazz)
 	{
 		if (iface == null || !iface.isInterface())
 			throw new IllegalArgumentException("Class is not an interface: " + iface);
@@ -403,10 +383,12 @@ public class FastInvocation
 			accesslevel = determineAccessLevel(accesslevel, targets[i].getModifiers());
 		}
 		
-		String classname = FastInvocation.class.getPackage().getName() + ".accessors.ClassAccessor_" + clazz.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
-		ClassWriter cw = createClass(clazz, classname, accesslevel, iface);
-		String internalname = cw.toString();
+		String classname = SInvocation.class.getPackage().getName() + ".accessors.ClassAccessor_" + clazz.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
+		ExtendedClassWriter cw = createClass(clazz, classname, accesslevel, iface);
+		if (cw == null)
+			return null;
 		
+		String internalname = cw.getInternalName();
 		cw.visitField(Opcodes.ACC_PUBLIC, "delegate", Type.getDescriptor(clazz), null, null);
 		
 		for (int i = 0; i < ifacemethods.length; ++i)
@@ -471,8 +453,15 @@ public class FastInvocation
 		{
 			cw.visitEnd();
 			byte[] classcode = cw.toByteArray();
-			@SuppressWarnings("unchecked")
-			Class<T> genclass = (Class<T>) cl.defineClass(classcode);
+			Class<T> genclass = null;
+			if (cw.requiresParentLoader())
+			{
+				genclass = (Class<T>) cl.doDefineClassInParent(null, classcode, 0, classcode.length, clazz.getProtectionDomain());
+			}
+			else
+			{
+				genclass = (Class<T>) cl.doDefineClass(classcode);
+			}
 			
 			return genclass;
 		}
@@ -503,18 +492,19 @@ public class FastInvocation
 	 *  @param clazz The class used to map methods.
 	 *  @return The generated invoker.
 	 */
-	public static final Class<IExtractor> createExtractorClass(ByteCodeClassLoader cl, Class<?> clazz, String[] propnames, Method[] accessormethods)
+	@SuppressWarnings("unchecked")
+	public static final Class<IExtractor> createExtractorClass(IByteCodeClassLoader cl, Class<?> clazz, String[] propnames, Member[] accessormember)
 	{
-		if (propnames.length != accessormethods.length)
+		if (propnames.length != accessormember.length)
 			throw new IllegalArgumentException("Number of properties and methods must match.");
 		
 		int accesslevel = Opcodes.ACC_PUBLIC;
-		for (int i = 0; i < accessormethods.length; ++i)
-			accesslevel = determineAccessLevel(accesslevel, accessormethods[i].getModifiers());
+		for (int i = 0; i < accessormember.length; ++i)
+			accesslevel = determineAccessLevel(accesslevel, accessormember[i].getModifiers());
 		
 		String classnamesuffix = "ClassAccessor_" + clazz.getName() + "_" + NAME_SUFFIX_COUNTER.incrementAndGet();
-		ClassWriter cw = createClass(clazz, classnamesuffix, accesslevel, IExtractor.class);
-		String internalname = cw.toString();
+		ExtendedClassWriter cw = createClass(clazz, classnamesuffix, accesslevel, IExtractor.class);
+		String internalname = cw.getInternalName();
 		
 		cw.visitField(Opcodes.ACC_PROTECTED | Opcodes.ACC_FINAL | Opcodes.ACC_STATIC, "PROPERTYNAMES", Type.getDescriptor(String[].class), null, null);
 		MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<clinit>", Type.getMethodDescriptor(Type.getType(void.class), new Type[0]), null, null);
@@ -552,9 +542,22 @@ public class FastInvocation
 			{
 				nl.add(new InsnNode(Opcodes.DUP));
 				SASM.pushImmediate(nl, i);
-				nl.add(new VarInsnNode(Opcodes.ALOAD, 1));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(clazz)));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Type.getInternalName(accessormethods[i].getDeclaringClass()), accessormethods[i].getName(), Type.getMethodDescriptor(accessormethods[i]), false));
+				if (accessormember[i] instanceof Method)
+				{
+					Method accessormethod = (Method) accessormember[i];
+					nl.add(new VarInsnNode(Opcodes.ALOAD, 1));
+					nl.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(clazz)));
+					nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Type.getInternalName(accessormethod.getDeclaringClass()), accessormethod.getName(), Type.getMethodDescriptor(accessormethod), false));
+				}
+				else if (accessormember[i] instanceof Field)
+				{
+					Field accessorfield = (Field) accessormember[i];
+					nl.add(new FieldInsnNode(Opcodes.GETFIELD, Type.getInternalName(accessorfield.getDeclaringClass()), accessorfield.getName(), Type.getDescriptor(accessorfield.getType())));
+				}
+				else
+				{
+					throw new IllegalArgumentException("Illegal accessor member: " + accessormember[i]);
+				}
 				nl.add(new InsnNode(Opcodes.AASTORE));
 			}
 			nl.accept(mv);
@@ -573,8 +576,15 @@ public class FastInvocation
 		{
 			cw.visitEnd();
 			byte[] classcode = cw.toByteArray();
-			@SuppressWarnings("unchecked")
-			Class<IExtractor> genclass = (Class<IExtractor>) cl.defineClass(classcode);
+			Class<IExtractor> genclass = null;
+			if (cw.requiresParentLoader())
+			{
+				genclass = (Class<IExtractor>) cl.doDefineClassInParent(null, classcode, 0, classcode.length, clazz.getProtectionDomain());
+			}
+			else
+			{
+				genclass = (Class<IExtractor>) cl.doDefineClass(classcode);
+			}
 			
 			return genclass;
 		}
@@ -592,17 +602,18 @@ public class FastInvocation
 	 *  				  access to non-publics.
 	 *  @return Preinitialized class writer.
 	 */
-	protected static final ClassWriter createClass(Class<?> targetclass, String classname, int accesslevel, Class<?>... interfaces)
+	protected static final ExtendedClassWriter createClass(Class<?> targetclass, String classname, int accesslevel, Class<?>... interfaces)
 	{
-		if (NO_ASM)
+		if (VmHacks.NO_ASM)
 			return null;
 		
 		Class<?> superclass = Object.class;
-		String genpackage = "jadex.bytecode.fastinvocation.generated";
+		String genpackage = SInvocation.class.getPackage().getName() + ".generated";
 //		accesslevel = Opcodes.ACC_PUBLIC;
+		boolean needsparentcl = false;
 		if (accesslevel == Opcodes.ACC_PRIVATE)
 		{
-			if (!PRIVATE_ACCESS)
+			if (!VmHacks.PRIVATE_ACCESS)
 				return null;
 			
 			try
@@ -617,7 +628,7 @@ public class FastInvocation
 		}
 		else if (accesslevel != Opcodes.ACC_PUBLIC)
 		{
-			if (!DEFAULT_ACCESS)
+			if (!VmHacks.DEFAULT_ACCESS)
 				return null;
 			
 //			System.err.println("Created limited scope");
@@ -625,6 +636,7 @@ public class FastInvocation
 			genpackage = targetclass.getPackage().getName();
 			//additional suffix to avoid clash
 			classname += "_" + Math.abs(SUtil.FAST_RANDOM.nextLong());
+			needsparentcl = true;
 		}
 		
 		String[] internalifaces = interfaces != null ? new String[interfaces.length] : new String[0];
@@ -633,13 +645,7 @@ public class FastInvocation
 		
 		// Create class implementing the handler.
 		final String internalname = (genpackage + "." + classname).replace('.', '/');
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
-		{
-			public String toString()
-			{
-				return internalname;
-			}
-		};
+		ExtendedClassWriter cw = new ExtendedClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES, internalname, needsparentcl);
 		
 		cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(superclass).getInternalName(), internalifaces);
 		
@@ -771,6 +777,103 @@ public class FastInvocation
 	}
 	
 	/**
+	 *  Implements an accessor based on a dynamic proxy.
+	 *  
+	 *  @param cl ClassLoader to use.
+	 *  @param iface The interface to implement.
+	 *  @param clazz The target class.
+	 *  @param obj The target class or null if all static.
+	 *  @return Accessor.
+	 */
+	protected static final <T> T createFallbackAccessor(final Class<T> iface, final Class<?> clazz, final Object obj)
+	{
+		InvocationHandler handler = new InvocationHandler()
+		{
+			protected Map<Method, IMethodInvoker> invocationmap;
+			{
+				invocationmap = new HashMap<Method, IMethodInvoker>();
+				try
+				{
+					Method[] methods = iface.getMethods();
+					for (Method method : methods)
+					{
+						Class<?> cclazz = clazz;
+						Method cmethod = null;
+						while (cmethod == null && cclazz != null)
+						{
+							cmethod = cclazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
+							cclazz = cclazz.getSuperclass();
+						}
+						SReflect.getMethod(clazz, method.getName(), method.getParameterTypes());
+						invocationmap.put(method, newInvoker(cmethod));
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				IMethodInvoker invoker = invocationmap.get(method);
+				return invoker.invoke(obj, args);
+			}
+		};
+		
+		ClassLoader cl = clazz.getClassLoader();
+		@SuppressWarnings("unchecked")
+		T ret = (T) Proxy.newProxyInstance(cl, new Class<?>[] { iface }, handler);
+		return ret;
+	}
+	
+	/**
+	 *  Class writer with some meta information.
+	 *
+	 */
+	protected static class ExtendedClassWriter extends ClassWriter
+	{
+		/** Class internal name. */
+		protected String internalname;
+		
+		/** Flag whether the resulting class requires the class loader parent. */
+		protected boolean requiresparentloader;
+		
+		/**
+		 *  Creates the writer.
+		 *  
+		 *  @param flags ClassWriter flags.
+		 *  @param internalname Class internal name.
+		 *  @param requiresparentloader Flag whether the resulting class requires the class loader parent.
+		 */
+		public ExtendedClassWriter(int flags, String internalname, boolean requiresparentloader)
+		{
+			super(flags);
+			this.internalname = internalname;
+			this.requiresparentloader = requiresparentloader;
+		}
+		
+		/**
+		 *  Gets the internal name.
+		 * @return The internal name.
+		 */
+		public String getInternalName()
+		{
+			return internalname;
+		}
+		
+		/**
+		 *  Returns flag whether the resulting class requires the class loader parent
+		 *  
+		 *  @return Flag whether the resulting class requires the class loader parent
+		 */
+		public boolean requiresParentLoader()
+		{
+			return requiresparentloader;
+		}
+	}
+	
+	/**
 	 *  Fallback invoker using reflection in case a byte-engineered variant is not available.
 	 *
 	 */
@@ -787,7 +890,7 @@ public class FastInvocation
 		public FallBackInvoker(Method method)
 		{
 //			System.err.println("WARNING FALLBACK MODE ENABLED");
-			SASM.UNSAFE.setAccessible(method, true);
+			VmHacks.getUnsafe().setAccessible(method, true);
 			this.method = method;
 		}
 		
@@ -810,23 +913,6 @@ public class FastInvocation
 			{
 				throw SUtil.throwUnchecked(e);
 			}
-		}
-	}
-	
-	/**
-	 *  Class used to test access level via ASM.
-	 *
-	 */
-	protected static final class AccessTestClass
-	{
-		static final Object defaultTest()
-		{
-			return privateTest();
-		}
-		
-		private static final Object privateTest()
-		{
-			return null;
 		}
 	}
 }

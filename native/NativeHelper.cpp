@@ -1,11 +1,11 @@
-#include "jadex_bytecode_NativeHelper.h"
+#include "jadex_bytecode_vmhacks_NativeHelper.h"
 
 /*
  * Class:     jadex_bytecode_NativeHelper
  * Method:    setAccessible
  * Signature: (Ljava/lang/String;Ljava/lang/reflect/AccessibleObject;)V
  */
-JNIEXPORT void JNICALL Java_jadex_bytecode_NativeHelper_setAccessible(JNIEnv *env, jclass nhclazz, jstring flagname, jobject accobj, jboolean flag)
+JNIEXPORT void JNICALL Java_jadex_bytecode_vmhacks_NativeHelper_setAccessible(JNIEnv *env, jclass nhclazz, jstring flagname, jobject accobj, jboolean flag)
 {
 	jclass accclazz = env->GetObjectClass(accobj);
 	const char* cflagname = env->GetStringUTFChars(flagname, NULL);
@@ -19,11 +19,11 @@ JNIEXPORT void JNICALL Java_jadex_bytecode_NativeHelper_setAccessible(JNIEnv *en
  * Method:    defineClass
  * Signature: (Ljava/lang/String;[BILjava/lang/ClassLoader;)Ljava/lang/Class;
  */
-JNIEXPORT jclass JNICALL Java_jadex_bytecode_NativeHelper_defineClass(JNIEnv *env, jclass nhclass,
-								      jstring name,
-								      jbyteArray bytecode,
-								      jint length,
-								      jobject classloader)
+JNIEXPORT jclass JNICALL Java_jadex_bytecode_vmhacks_NativeHelper_defineClass(JNIEnv *env, jclass nhclass,
+									      jstring name,
+									      jbyteArray bytecode,
+									      jint length,
+									      jobject classloader)
 {
 	jclass cls = env->GetObjectClass(classloader);
 	const char* cname = name == NULL? NULL : env->GetStringUTFChars(name, JNI_FALSE);
