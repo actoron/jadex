@@ -2,18 +2,8 @@ package jadex.bdiv3;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -43,7 +33,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import jadex.bdiv3.exceptions.JadexBDIGenerationException;
@@ -52,7 +41,7 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
 import jadex.bytecode.SASM;
-import jadex.commons.ByteClassLoader;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.MicroClassReader.DummyClassLoader;
@@ -63,29 +52,29 @@ import jadex.micro.MicroClassReader.DummyClassLoader;
  */
 public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 {
-    protected static Method methoddc1;
-    protected static Method methoddc2;
+//    protected static Method methoddc1;
+//    protected static Method methoddc2;
 
-	static
-	{
-		try
-		{
-			AccessController.doPrivileged(new PrivilegedExceptionAction<Object>()
-			{
-				public Object run() throws Exception
-				{
-					Class<?> cl = Class.forName("java.lang.ClassLoader");
-					methoddc1 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class});
-					methoddc2 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
-					return null;
-				}
-			});
-		}
-		catch(PrivilegedActionException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+//	static
+//	{
+//		try
+//		{
+//			AccessController.doPrivileged(new PrivilegedExceptionAction<Object>()
+//			{
+//				public Object run() throws Exception
+//				{
+//					Class<?> cl = Class.forName("java.lang.ClassLoader");
+//					methoddc1 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class});
+//					methoddc2 = cl.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
+//					return null;
+//				}
+//			});
+//		}
+//		catch(PrivilegedActionException e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 	/**
 	 *  Generate class.
@@ -412,6 +401,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 //				System.out.println("toClass: "+clname+" "+found);
 				Class<?> loadedclass = toClass(clname, data, found, null);
+				if (loadedclass != null && !isEnhanced(loadedclass))
+					loadedclass = toClass(clname, data, found, null, true);
 				if(loadedclass != null) 
 				{
 					// if it's null, we were not allowed to generate this class
@@ -905,46 +896,62 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	 */
 	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
 	{
+		return toClass(name, data, loader, domain, false);
+	}
+	
+	/**
+	 *  Transform byte Array into Class and define it in classloader.
+	 *  @return the loaded class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
+	 */
+	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain, boolean redefine)
+	{
 		Class<?> ret = null;
 		
 		try
 		{
-			Method method;
-			Object[] args;
-			if(domain == null)
-			{
-				method = methoddc1;
-				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length)};
-			}
-			else
-			{
-				method = methoddc2;
-				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length), domain};
-			}
-
-			method.setAccessible(true);
+//			Method method;
+//			Object[] args;
+//			if(domain == null)
+//			{
+//				method = methoddc1;
+//				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length)};
+//			}
+//			else
+//			{
+//				method = methoddc2;
+//				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length), domain};
+//			}
+			
+//			method.setAccessible(true);
 			try
 			{
-				ret = (Class<?>)method.invoke(loader, args);
-			}
-			catch(InvocationTargetException e)
-			{
-				if(e.getTargetException() instanceof LinkageError)
+				if (redefine && VmHacks.getUnsafe().hasIndirectRedefinition())
 				{
-//					e.printStackTrace();					
-					// when same class was already loaded via other filename wrong cache miss:-(
-//					ret = SReflect.findClass(name, null, loader);
 					ret = Class.forName(name, true, loader);
+					ret = VmHacks.getUnsafe().redefineClassIndirect(ret, data);
 				}
 				else
 				{
-					throw e.getTargetException();
+					ret = VmHacks.getUnsafe().defineClass(name, data, 0, data.length, loader, domain);
+//					ret = (Class<?>)method.invoke(loader, args);
 				}
 			}
-			finally
+			catch(LinkageError e) //InvocationTargetException e)
 			{
-				method.setAccessible(false);
+//				if(e.getTargetException() instanceof LinkageError)
+				{
+					// when same class was already loaded via other filename wrong cache miss:-(
+					ret = Class.forName(name, true, loader);
+				}
+//				else
+//				{
+//					throw e.getTargetException();
+//				}
 			}
+//			finally
+//			{
+//				method.setAccessible(false);
+//			}
 		}
 		catch(Throwable e)
 		{

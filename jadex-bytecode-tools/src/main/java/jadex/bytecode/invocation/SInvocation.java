@@ -1,4 +1,4 @@
-package jadex.bytecode.fastinvocation;
+package jadex.bytecode.invocation;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -253,6 +253,7 @@ public class SInvocation
 			
 			cw.visitEnd();
 			byte[] classcode = cw.toByteArray();
+//			System.out.println("INV CL: " + cl);
 			if (cw.requiresParentLoader())
 				ret = (Class<IMethodInvoker>) cl.doDefineClassInParent(null, classcode, 0, classcode.length, clazz.getProtectionDomain());
 			else	
@@ -611,7 +612,7 @@ public class SInvocation
 		String genpackage = SInvocation.class.getPackage().getName() + ".generated";
 //		accesslevel = Opcodes.ACC_PUBLIC;
 		boolean needsparentcl = false;
-		if (accesslevel == Opcodes.ACC_PRIVATE)
+		if (accesslevel == Opcodes.ACC_PRIVATE || (accesslevel != Opcodes.ACC_PUBLIC && VmHacks.PRIVATE_ACCESS))
 		{
 			if (!VmHacks.PRIVATE_ACCESS)
 				return null;
@@ -631,7 +632,6 @@ public class SInvocation
 			if (!VmHacks.DEFAULT_ACCESS)
 				return null;
 			
-//			System.err.println("Created limited scope");
 			// At least protected, inject into the package...
 			genpackage = targetclass.getPackage().getName();
 			//additional suffix to avoid clash
@@ -659,7 +659,7 @@ public class SInvocation
 		}
 		catch (Exception e)
 		{
-			SUtil.throwUnchecked(e);
+			return null;
 		}
 		mv.visitInsn(Opcodes.RETURN);
 		mv.visitMaxs(0, 0);
