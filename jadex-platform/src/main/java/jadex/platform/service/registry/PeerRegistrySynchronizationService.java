@@ -244,7 +244,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 									
 									if(re.isRemoved())
 									{
-										spser.updateClientData(lrobs.getCurrentStateEvent()).addResultListener(this);
+										spser.updateClientData(lrobs.getCurrentStateEvent(null)).addResultListener(this);
 										System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
 									}
 									// Calls notify observers at latest 

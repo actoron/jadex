@@ -35,7 +35,7 @@ public class ByteCodeClassLoader extends ClassLoader implements IByteCodeClassLo
 			{
 				try
 				{
-					System.out.println("Trying: " + delegates[i] + " " + name);
+//					System.out.println("Trying: " + delegates[i] + " " + name);
 					ret = delegates[i].loadClass(name);
 				}
 				catch (ClassNotFoundException e)
@@ -91,7 +91,7 @@ public class ByteCodeClassLoader extends ClassLoader implements IByteCodeClassLo
 	 */
 	public Class<?> doDefineClassInParent(String name, byte[] b, int off, int len, ProtectionDomain protectiondomain)
 	{
-		return VmHacks.getUnsafe().defineClass(name, b, off, len, getParent(), protectiondomain);
+		return VmHacks.getUnsafe().defineClass(name, b, off, len, asClassLoader().getParent(), protectiondomain);
 	}
 	
 	protected void addDelegates(ClassLoader[] parents)

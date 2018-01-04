@@ -40,11 +40,12 @@ public class NativeHelper
 				libsuffix = ".dll";
 				libname = libmainname + archstr;
 			}
-			System.out.println("Loading " + libname+libsuffix);
+//			System.out.println("Loading " + libname+libsuffix);
 			
 			String libres = "nativelibs/" + libname + libsuffix;
 			InputStream is = NativeHelper.class.getClassLoader().getResourceAsStream(libres);
 			File libfile = File.createTempFile(libname, libsuffix);
+			libfile.deleteOnExit();
 			FileOutputStream os = new FileOutputStream(libfile);
 			SUtil.copyStream(is, os);
 			is.close();

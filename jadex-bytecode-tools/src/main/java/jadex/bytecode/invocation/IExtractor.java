@@ -1,4 +1,4 @@
-package jadex.bytecode.fastinvocation;
+package jadex.bytecode.invocation;
 
 import jadex.commons.Tuple2;
 

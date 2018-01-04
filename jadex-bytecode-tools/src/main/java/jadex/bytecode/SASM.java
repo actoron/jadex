@@ -1,9 +1,5 @@
 package jadex.bytecode;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 
 import org.objectweb.asm.ClassReader;
@@ -18,9 +14,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import jadex.bytecode.fastinvocation.SInvocation;
-import jadex.bytecode.fastinvocation.IMethodInvoker;
-import jadex.bytecode.vmhacks.NativeHelper;
 import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SUtil;
 import jadex.commons.collection.WeakKeyValueMap;
@@ -290,10 +283,6 @@ public class SASM
 			nl.add(new InsnNode(Opcodes.ARETURN));
 		}
 	}
-	
-	
-	
-	
 	
 	/**
 	 *  Transform byte Array into Class and define it in classloader.

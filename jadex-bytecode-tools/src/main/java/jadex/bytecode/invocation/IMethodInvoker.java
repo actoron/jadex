@@ -1,4 +1,4 @@
-package jadex.bytecode.fastinvocation;
+package jadex.bytecode.invocation;
 
 /**
  *  Interface used to byte-engineer an accessor handler.
