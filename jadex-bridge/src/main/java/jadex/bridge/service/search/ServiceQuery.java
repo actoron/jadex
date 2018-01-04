@@ -190,6 +190,7 @@ public class ServiceQuery<T>
 	
 	/**
 	 *  Create a new service query.
+	 *  owner = startpoint
 	 */
 	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
 	{

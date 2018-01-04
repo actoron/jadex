@@ -43,6 +43,13 @@ public interface ISuperpeerRegistrySynchronizationService
 	 */
 	public IFuture<ARegistryResponseEvent> updateClientData(ARegistryEvent event); 
 	
+//	/**
+//	 *  Update the data for a partner superpeer on the same level.
+//	 *  @param event The event.
+//	 *  @return The update event.
+//	 */
+//	public IFuture<ARegistryResponseEvent> updatePartnerData(ARegistryEvent event);
+	
 	/**
 	 *  Get the current partner superpeers.
 	 *  @return The partner superpeers of the same level.
