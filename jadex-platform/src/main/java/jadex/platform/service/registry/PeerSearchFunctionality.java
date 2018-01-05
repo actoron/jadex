@@ -198,7 +198,7 @@ public abstract class PeerSearchFunctionality
 					{
 						if(result.booleanValue())
 						{
-							System.out.println("Valid next peer is: "+peer);
+//							System.out.println("Valid next peer is: "+peer);
 							ret.setResult(peer);
 						}
 						else

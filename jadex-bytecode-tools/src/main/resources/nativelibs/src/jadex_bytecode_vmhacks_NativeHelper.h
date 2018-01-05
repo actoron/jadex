@@ -17,6 +17,14 @@ JNIEXPORT void JNICALL Java_jadex_bytecode_vmhacks_NativeHelper_setAccessible
 
 /*
  * Class:     jadex_bytecode_vmhacks_NativeHelper
+ * Method:    getVm
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_jadex_bytecode_vmhacks_NativeHelper_getVm
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     jadex_bytecode_vmhacks_NativeHelper
  * Method:    defineClass
  * Signature: (Ljava/lang/String;[BILjava/lang/ClassLoader;)Ljava/lang/Class;
  */

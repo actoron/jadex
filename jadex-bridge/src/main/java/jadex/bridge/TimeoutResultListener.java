@@ -235,7 +235,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														TimeoutException	te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.setDebugFutures(true) for timeout cause."), ex);
+														TimeoutException te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.setDebugFutures(true) for timeout cause."), ex);
 														timeoutOccurred(te);
 														return IFuture.DONE;
 													}

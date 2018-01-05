@@ -60,20 +60,27 @@ public class NativeHelper
 	}
 	
 	/**
-     * Define a class in any ClassLoader.
-     */
-	protected static final Class<?> defineClass(String name, byte[] b, ClassLoader loader)
-	{
-		return defineClass(name, b, b.length, loader);
-	}
-	
-	/**
 	 *  Sets reflective object accessible without checks.
 	 *  
 	 *  @param accobj The accessible object.
 	 *  @param flag The flag value.
 	 */
 	public static final native void setAccessible(String flagname, AccessibleObject accobj, boolean flag);
+	
+	/**
+	 *  Gets a point to the VM.
+	 *  
+	 *  @return Pointer to VM.
+	 */
+	protected static final native long getVm();
+	
+	/**
+     * Define a class in any ClassLoader.
+     */
+	protected static final Class<?> defineClass(String name, byte[] b, ClassLoader loader)
+	{
+		return defineClass(name, b, b.length, loader);
+	}
 	
 	/**
      * Define a class in any ClassLoader.

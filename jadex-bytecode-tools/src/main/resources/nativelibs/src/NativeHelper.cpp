@@ -34,3 +34,14 @@ JNIEXPORT jclass JNICALL Java_jadex_bytecode_vmhacks_NativeHelper_defineClass(JN
 	return ret;
 }
 
+/*
+ * Class:     jadex_bytecode_vmhacks_NativeHelper
+ * Method:    getVm
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_jadex_bytecode_vmhacks_NativeHelper_getVm(JNIEnv *env, jclass nhclass)
+{
+	JavaVM* vm = NULL;
+	env->GetJavaVM(&vm);
+	return (jlong) vm;
+}

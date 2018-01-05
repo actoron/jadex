@@ -78,6 +78,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			@Override
 			public IFuture<IComponentIdentifier> getNextPotentialPeer(boolean reset)
 			{
+//				System.out.println("getNextPeer: "+reset);
+				
 				Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 				
 				if(reset)
@@ -86,18 +88,24 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					pos = 0;
 				}
 				
+				// First check the list of superpeers
 				if(it!=null && it.hasNext())
 				{
 					ret.setResult(it.next());
 				}
 				else if(currentsearch==null)
 				{
+//					System.out.println("created search");
 					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null));
 					final ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> fcurrentsearch = currentsearch;
+					
+					addCall(currentsearch, ret);
+					
 					currentsearch.addResultListener(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
 					{
 						public void intermediateResultAvailable(ISuperpeerRegistrySynchronizationService result) 
 						{
+							// stores all results and only emits them in subsequent getNext() calls
 							res.add(result);
 							forwardResults(fcurrentsearch!=currentsearch, fcurrentsearch);
 						}
@@ -118,7 +126,11 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 							forwardResults(true, fcurrentsearch);
 						}
 					});
-					
+//					forwardResults(false, currentsearch);
+				}
+				else 
+				{
+//					System.out.println("appended at search");
 					addCall(currentsearch, ret);
 					forwardResults(false, currentsearch);
 				}
@@ -137,6 +149,9 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				cs.add(fut);
 			}
 			
+			/**
+			 *  Deliver results to waiting calls.
+			 */
 			protected void forwardResults(boolean fini, ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> call)
 			{
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
@@ -145,15 +160,21 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					Future<IComponentIdentifier> fut = futs.remove(0);
 					fut.setResult(((IService)res.get(pos++)).getServiceIdentifier().getProviderId());
 				}
+				
+//				System.out.println("forwardRes: "+fini);
+				
 				if(fini)
 				{
-					if (futs != null)
+//					System.out.println("search fini");
+					if(futs != null)
 					{
 						for(Future<IComponentIdentifier> fut: futs)
 							fut.setException(new RuntimeException("No more potential peers"));
 					}
 					opencalls.remove(call);
 					currentsearch = null;
+					res.clear();
+					pos = 0;
 				}
 			}
 			
@@ -228,12 +249,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 									// todo: multi events need to be treated special (not inform superpeer n times)
 									
 									RegistryResponseEvent re = (RegistryResponseEvent)spevent;
-									System.out.println("registry update event: "+Arrays.toString(re.getSuperpeers()));
+//									System.out.println("registry response event: "+Arrays.toString(re.getSuperpeers()));
 									
 									// Superpeer level 0 send info about available level 1 superpeers
 									if(re.getSuperpeers()!=null && re.getSuperpeers().length>0)
 									{
-										System.out.println("Refreshing superpeer");
+										System.out.println("Information about new superpeers, refreshing superpeer");
 										superpeers.clear();
 										for(ISuperpeerRegistrySynchronizationService ser: re.getSuperpeers())
 											superpeers.add(((IService)ser).getServiceIdentifier().getProviderId());
@@ -259,7 +280,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								
 								System.out.println("Exception with superpeer, resetting");
 								
-								exception.printStackTrace();
+//								exception.printStackTrace();
 								
 								spregser = null;
 							}
@@ -307,7 +328,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
-					System.out.println("Found superpeer: "+spcid);
+//					System.out.println("Found superpeer: "+spcid);
 					SServiceProvider.getService(component, spcid, ISuperpeerRegistrySynchronizationService.class).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
 					{
