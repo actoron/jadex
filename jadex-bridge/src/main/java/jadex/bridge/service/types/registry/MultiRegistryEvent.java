@@ -1,10 +1,14 @@
 package jadex.bridge.service.types.registry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import jadex.bridge.IComponentIdentifier;
 
 /**
- * 
+ *  A combination of multiple registry events.
  */
 public class MultiRegistryEvent extends ARegistryEvent
 {
@@ -53,5 +57,26 @@ public class MultiRegistryEvent extends ARegistryEvent
 	{
 		// Just use number of contained events?! or better their contained number?!
 		return events==null? 0: events.size();
+	}
+	
+	/**
+	 *  Get the clients.
+	 */
+	public Set<IComponentIdentifier> getAggregatedClients()
+	{
+		Set<IComponentIdentifier> ret = new HashSet<IComponentIdentifier>();
+		if(events!=null)
+		{
+			for(ARegistryEvent event: events)
+			{
+				Set<IComponentIdentifier> tmp = event.getClients();
+				if(tmp!=null && tmp.size()>0)
+				{
+					for(IComponentIdentifier cid: tmp)
+						ret.add(cid);
+				}
+			}
+		}
+		return ret;
 	}
 }

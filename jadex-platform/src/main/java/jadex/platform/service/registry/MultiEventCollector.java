@@ -32,7 +32,7 @@ public abstract class MultiEventCollector extends EventCollector
 	 */
 	public void addEvent(ARegistryEvent event)
 	{
-		((MultiRegistryEvent)event).addEvent(event);
+		((MultiRegistryEvent)registryevent).addEvent(event);
 	}
 	
 	/**

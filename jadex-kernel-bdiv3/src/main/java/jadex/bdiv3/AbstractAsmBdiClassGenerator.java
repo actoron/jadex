@@ -719,11 +719,14 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	public static boolean isEnhanced(Class<?> clazz)
 	{
 		boolean isEnhanced = false;
-		try {
+		try 
+		{
 //			Field field = clazz.getField(AGENT_FIELD_NAME);
 			Field field = clazz.getField(GLOBALNAME_FIELD_NAME);
 			isEnhanced = true;
-		} catch (NoSuchFieldException ex) {
+		} 
+		catch (NoSuchFieldException ex) 
+		{
 		}
 		return isEnhanced;
 	}

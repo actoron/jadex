@@ -1,6 +1,7 @@
 package jadex.platform.service.registry;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -107,26 +108,32 @@ public abstract class LocalRegistryObserver extends EventCollector
 	}
 
 	/**
-	 *  Get the current state of the registry (full content).
+	 *  Get the current state of the registry (owner=cid).
 	 *  @return An event with the full state.
 	 */
-	public RegistryEvent getCurrentStateEvent()
+	public RegistryEvent getCurrentStateEvent(IComponentIdentifier owner)
 	{
 		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
-		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, cid, null);
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
 		Set<IService> added = reg.searchServicesSync(query);
-		// Remove only platform scoped services
+		
+		// Remove only non-globally-scoped services
+//		Set<IComponentIdentifier> clients = new HashSet<IComponentIdentifier>();
 		if(added!=null)
 		{
 			for(Iterator<IService> it=added.iterator(); it.hasNext(); )
 			{
 				IService ser = it.next();
+//				clients.add(ser.getServiceIdentifier().getProviderId().getRoot());
 				// Remove locally (platform) scoped events
 				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getServiceIdentifier().getScope()))
 					it.remove();
 			}
 		}
 		RegistryEvent event = new RegistryEvent(added, null, eventslimit, timelimit, false, null);
+//		clients.add(getComponentIdentifier());
+//		event.setClients(clients);
+		event.addClient(getComponentIdentifier());
 		return event;
 	}
 }

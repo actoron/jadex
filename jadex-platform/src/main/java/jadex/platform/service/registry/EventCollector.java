@@ -6,7 +6,7 @@ import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.collection.IDelayRunner;
 
 /**
- * 
+ *  Event collector to send bunched events.
  */
 public abstract class EventCollector
 {
@@ -70,7 +70,7 @@ public abstract class EventCollector
 					{
 						notifyObservers(registryevent);
 						createEvent();
-						registryevent = new RegistryEvent(true, timelimit);
+						registryevent = createEvent();
 					}
 					// do not wait below 10ms
 					canceltimer = timer.waitForDelay(Math.max(10, registryevent.getTimeUntilDue()), this);
@@ -132,4 +132,15 @@ public abstract class EventCollector
 	{
 		return new RegistryEvent(true, timelimit);
 	}
+
+	/**
+	 *  Get the component id.
+	 *  @return The cid.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return cid;
+	}
+	
+	
 }

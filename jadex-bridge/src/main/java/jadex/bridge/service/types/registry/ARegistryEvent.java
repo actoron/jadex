@@ -1,10 +1,16 @@
 package jadex.bridge.service.types.registry;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import jadex.bridge.IComponentIdentifier;
+
 /**
- * 
+ *  The abstract registry event.
  */
 public abstract class ARegistryEvent
 {	
+	/** Constants for identifying the different kinds of registry clients. */
 	public static final String CLIENTTYPE_CLIENT = "client";
 	public static final String CLIENTTYPE_SUPERPEER_LEVEL0 = "superpeer_0";
 	public static final String CLIENTTYPE_SUPERPEER_LEVEL1 = "superpeer_1";
@@ -17,6 +23,9 @@ public abstract class ARegistryEvent
 	
 	/** The time limit. */
 	protected long timelimit;
+	
+	/** The clients. */
+	protected Set<IComponentIdentifier> clients;
 	
 	/**
 	 *  Create a new event.
@@ -97,4 +106,33 @@ public abstract class ARegistryEvent
 		return timelimit;
 	}
 	
+	/**
+	 *  Get the clients.
+	 *  @return The clients
+	 */
+	public Set<IComponentIdentifier> getClients()
+	{
+		return clients;
+	}
+
+	/**
+	 *  Set the clients.
+	 *  @param clients the clients to set
+	 */
+	public void setClients(Set<IComponentIdentifier> clients)
+	{
+		this.clients = clients;
+	}
+	
+	/**
+	 *  Add a client.
+	 *  @param client The client.
+	 */
+	public void addClient(IComponentIdentifier client)
+	{
+		if(clients==null)
+			clients = new HashSet<IComponentIdentifier>();
+		clients.add(client);
+	}
+
 }
