@@ -197,20 +197,35 @@ public class DFTestAgent extends JunitAgentTest
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(agent.getComponentIdentifier(), hlefMessage);
-		
-		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(agent.getComponentIdentifier(), hlefMessage)
+			.addResultListener(new IResultListener<Void>()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			@Override
+			public void resultAvailable(Void result)
 			{
-				// Set test failure and kill agent.
-				tr.setFailed("No message received.");
-				return IFuture.DONE;
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				tr.setFailed(exception);
 			}
 		});
+		
+//		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				// Set test failure and kill agent.
+//				tr.setFailed("No message received.");
+//				return IFuture.DONE;
+//			}
+//		});
+		
+		// todo: set body future?!
+		return new Future<Void>();
 	}
 	
-	// todo: set body future?!
 	@AgentMessageArrived
 	public void messageArrived(Map<String, Object> msg)
 	{
