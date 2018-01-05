@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * 
  */
-public class MultiRegistryResponseEvent extends ARegistryResponseEvent
+public class MultiRegistryResponseEvent extends RegistryResponseEvent
 {
 	/** The events. */
 	protected List<ARegistryResponseEvent> events;
@@ -16,6 +16,14 @@ public class MultiRegistryResponseEvent extends ARegistryResponseEvent
 	 */
 	public MultiRegistryResponseEvent()
 	{
+	}
+	
+	/**
+	 *  Create a new RegistryUpdateEvent.
+	 */
+	public MultiRegistryResponseEvent(boolean unknown, long leasetime)
+	{
+		super(unknown, leasetime);
 	}
 	
 	/**
