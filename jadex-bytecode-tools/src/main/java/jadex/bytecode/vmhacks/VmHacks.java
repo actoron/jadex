@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.instrument.ClassDefinition;
+import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -14,10 +15,9 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -28,7 +28,6 @@ import java.util.jar.Manifest;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -36,6 +35,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.MethodRemapper;
 import org.objectweb.asm.commons.SimpleRemapper;
+import org.objectweb.asm.tree.InsnList;
 
 import jadex.bytecode.ByteCodeClassLoader;
 import jadex.bytecode.IByteCodeClassLoader;
@@ -53,9 +53,6 @@ public class VmHacks
 {
 	/** Set this to true to switch to fallback mode for invocation */
 	public static boolean NO_ASM = false;
-	
-	/** Flag if instrumentation is available. */
-	public static boolean HAS_INSTRUMENTATION = true;
 	
 	/** Flag if native support is available. */
 	public static final boolean HAS_NATIVE;
@@ -94,10 +91,7 @@ public class VmHacks
 		UNSAFE = new Unsafe();
 		UNSAFE.init();
 		
-		createInstrumentation();
-		
-		if (HAS_INSTRUMENTATION)
-			UNSAFE.initInstrumentation();
+		UNSAFE.startInstrumentationAgent();
 		
 		EXTENDED_BYTECODE_CLASSLOADER = createExtendedClassLoaderClass();
 		HAS_EXTENDED_BYTECODE_CLASSLOADER = hasExtendedClassLoader();
@@ -143,56 +137,6 @@ public class VmHacks
 	}
 	
 	/**
-	 *  Creates instrumentation, if available.
-	 */
-	private static final void createInstrumentation()
-	{
-		try
-		{
-			String javahome = System.getProperty("java.home");
-			File toolsjar = new File(javahome + File.separator + "lib" + File.separator + "tools.jar");
-			if (!toolsjar.exists())
-			{
-				toolsjar = new File(javahome + File.separator + ".." + File.separator + "lib" + File.separator + "tools.jar");
-			}
-			
-			if (!toolsjar.exists())
-				return;
-			
-			@SuppressWarnings("resource")
-			ClassLoader toolsloader = new URLClassLoader(new URL[] { toolsjar.toURI().toURL() });
-			
-			Manifest man = new Manifest();
-	        Attributes attrs = man.getMainAttributes();
-	        attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0");
-	        attrs.put(new Attributes.Name("Premain-Class"), VmHacksAgent.class.getName());
-	        attrs.put(new Attributes.Name("Agent-Class"), VmHacksAgent.class.getName());
-	        attrs.put(new Attributes.Name("Can-Redefine-Classes"), "true");
-	        attrs.put(new Attributes.Name("Can-Retransform-Classes"), "true");
-	        
-	        InputStream is = VmHacksAgent.class.getResourceAsStream(VmHacksAgent.class.getSimpleName() + ".class");
-	        File jar = createTempJar(VmHacksAgent.class.getName(), is, man);
-	        SUtil.close(is);
-	        
-	        if (jar != null)
-	        {
-		        String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-		        
-		        Class<?> vmclass = toolsloader.loadClass("com.sun.tools.attach.VirtualMachine");
-		        Method attach = vmclass.getDeclaredMethod("attach", String.class);
-		        Object vm = attach.invoke(null, pid);
-		        Method loadagent = vmclass.getDeclaredMethod("loadAgent", String.class);
-		        loadagent.invoke(vm, jar.getAbsolutePath());
-	        }
-	        
-	        VmHacksAgent.WAIT.tryAcquire(300, TimeUnit.MILLISECONDS);
-		}
-		catch (Exception e)
-		{
-		}
-	}
-	
-	/**
 	 *  Creates an extended class loader class with additional privileges if available.
 	 *  
 	 *  @return The ClassLoader class.
@@ -201,9 +145,7 @@ public class VmHacks
 	{
 		Class<?> ret = null;
 		
-		
-		
-		if (!NO_ASM && HAS_INSTRUMENTATION)
+		if (!NO_ASM && getUnsafe().hasInstrumentation())
 		{
 			try
 			{
@@ -443,11 +385,20 @@ public class VmHacks
 		/** setAccessible() override field offset. */
 		private Long setaccessibleoverrideoffset;
 		
-		private Map<ClassLoader, Map<String, Class<?>>> clinjections = Collections.synchronizedMap(new WeakHashMap<ClassLoader, Map<String, Class<?>>>());
+		/** The instrumentation access if available. */
+		private Instrumentation instrumentation;
 		
+		/** Classloader class injection map. */
+		private Map<Object[], Class<?>>  injectionclassstore;
+		
+		/** Name of the class store. */
 		private String classstoreclassname;
 		
-		private Map<ClassLoader, Unsafe> enhancedloaders = new WeakHashMap<ClassLoader, VmHacks.Unsafe>();
+		/** Classloader classes that have been enhanced with injections. */
+		private Map<Class<?>, Unsafe> enhancedloaders = new WeakHashMap<Class<?>, Unsafe>();
+		
+		/** Synchronization lock for the instrumentation agent. */
+		private Semaphore instagentlock = new Semaphore(0);
 		
 		/**
 		 *  Creates the Unsafe.
@@ -555,7 +506,7 @@ public class VmHacks
 		 */
 		public boolean hasInstrumentation()
 		{
-			return HAS_INSTRUMENTATION;
+			return instrumentation != null;
 		}
 		
 		/**
@@ -565,7 +516,7 @@ public class VmHacks
 		 */
 		public boolean hasIndirectRedefinition()
 		{
-			return !NO_ASM && HAS_INSTRUMENTATION;
+			return !NO_ASM && instrumentation != null;
 		}
 		
 		/**
@@ -579,23 +530,16 @@ public class VmHacks
 		public Class<?> redefineClassIndirect(final Class<?> clazz, final byte[] bytecode)
 		{
 			ClassLoader cl = clazz.getClassLoader();
-			enhanceClassLoader(cl);
-			IByteCodeClassLoader bcl = SASM.createByteCodeClassLoader(cl);
 			Class<?> ret = clazz;
-			synchronized(clinjections)
+			try
 			{
-				Map<String, Class<?>> clmap = clinjections.get(cl);
-				if (clmap == null)
-				{
-					clmap = new HashMap<String, Class<?>>();
-					clinjections.put(cl, clmap);
-				}
-				ret = clmap.get(clazz.getName());
-				if (ret == null)
-				{
-					ret = bcl.doDefineClass(bytecode);
-					clmap.put(clazz.getName(), ret);
-				}
+				enhanceClassLoader(cl);
+				IByteCodeClassLoader bcl = SASM.createByteCodeClassLoader(cl);
+				ret = bcl.doDefineClass(bytecode);
+				injectionclassstore.put(new Object[] { cl, clazz.getName() }, ret);
+			}
+			catch (Exception e)
+			{
 			}
 			return ret;
 		}
@@ -611,7 +555,7 @@ public class VmHacks
 			ClassDefinition def = new ClassDefinition(clazz, bytecode);
 			try
 			{
-				VmHacksAgent.getInstrumentation().redefineClasses(def);
+				instrumentation.redefineClasses(def);
 			}
 			catch (Exception e)
 			{
@@ -642,12 +586,118 @@ public class VmHacks
 			{
 				File file = createTempJar(classname, classcontent, null);
 				JarFile jarfile = new JarFile(file);
-				VmHacksAgent.getInstrumentation().appendToBootstrapClassLoaderSearch(jarfile);
+				instrumentation.appendToBootstrapClassLoaderSearch(jarfile);
 			}
 			catch (Exception e)
 			{
 				SUtil.throwUnchecked(e);
 			}
+		}
+		
+		/**
+		 *  Creates instrumentation, if available.
+		 */
+		@SuppressWarnings("unchecked")
+		protected void startInstrumentationAgent()
+		{
+			if (NO_ASM)
+				return;
+			
+			File jar = null;
+			try
+			{
+				Manifest man = new Manifest();
+		        Attributes attrs = man.getMainAttributes();
+		        attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		        attrs.put(new Attributes.Name("Premain-Class"), VmHacksAgent.class.getName());
+		        attrs.put(new Attributes.Name("Agent-Class"), VmHacksAgent.class.getName());
+		        attrs.put(new Attributes.Name("Can-Redefine-Classes"), "true");
+		        attrs.put(new Attributes.Name("Can-Retransform-Classes"), "true");
+		        
+		        InputStream is = VmHacksAgent.class.getResourceAsStream(VmHacksAgent.class.getSimpleName() + ".class");
+		        jar = createTempJar(VmHacksAgent.class.getName(), is, man);
+		        SUtil.close(is);
+		        
+		        boolean hasagent = false;
+		        if (HAS_NATIVE)
+		        {
+			        try
+					{
+						Class.forName("sun.instrument.InstrumentationImpl");
+						InstrumentStarter.startAgent(jar.getAbsolutePath());
+						hasagent = true;
+					}
+					catch (Exception e1)
+					{
+					}
+		        }
+		        
+		        if (!hasagent)
+		        {
+		        	try
+		        	{
+				        String javahome = System.getProperty("java.home");
+						File toolsjar = new File(javahome + File.separator + "lib" + File.separator + "tools.jar");
+						if (!toolsjar.exists())
+						{
+							toolsjar = new File(javahome + File.separator + ".." + File.separator + "lib" + File.separator + "tools.jar");
+						}
+						
+						ClassLoader toolsloader = VmHacks.class.getClassLoader();
+						if (toolsjar.exists())
+						{
+							toolsloader = new URLClassLoader(new URL[] { toolsjar.toURI().toURL() });
+						}
+				        Class<?> vmclass = toolsloader.loadClass("com.sun.tools.attach.VirtualMachine");
+				        
+				        String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+				        
+				        Method attach = vmclass.getDeclaredMethod("attach", String.class);
+				        Object vm = attach.invoke(null, pid);
+				        Method loadagent = vmclass.getDeclaredMethod("loadAgent", String.class);
+				        loadagent.invoke(vm, jar.getAbsolutePath());	        
+		        	}
+		        	catch (Exception e1)
+		        	{
+		        	}
+		        }
+		        
+		        if (hasagent)
+		        	instagentlock.tryAcquire(300, TimeUnit.MILLISECONDS);
+		        
+		        if (hasInstrumentation())
+		        {
+			        // Inject the class storage.
+			        classstoreclassname = VmHacks.class.getPackage().getName() + "." + "ClassStore";
+			        try
+					{
+				        is = null;
+				        is = VmHacks.class.getClassLoader().getResourceAsStream(classstoreclassname.replace('.', '/') + ".class");
+						appendToBootstrapClassLoaderSearch(classstoreclassname, is);
+					
+						Class<?> storeclass = Class.forName(classstoreclassname);
+						Field clinj = storeclass.getField("STORE");
+						injectionclassstore = (Map<Object[], Class<?>>) clinj.get(null);
+					}
+					catch (Exception e)
+					{
+					}
+		        }
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		
+		/**
+		 *  Sets the instrumentation, called by VmHacksAgent.
+		 *  
+		 *  @param inst The instrumentation. 
+		 */
+		protected void setInstrumentation(Instrumentation inst)
+		{
+			instrumentation = inst;
+			instagentlock.release();
 		}
 		
 		/**
@@ -704,30 +754,6 @@ public class VmHacks
 		}
 		
 		/**
-		 *  Initialization step after constructor to allow bootstrapping.
-		 */
-		protected void initInstrumentation()
-		{
-			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-			classstoreclassname = VmHacks.class.getPackage().getName() + "." + "ClassStore";
-			String internalname = classstoreclassname.replace('.', '/');
-			cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(Object.class).getInternalName(), null);
-			FieldVisitor fv = cw.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "STORE", Type.getDescriptor(Map.class), null, null);
-			fv.visitEnd();
-			byte[] storeclasscode = cw.toByteArray();
-			appendToBootstrapClassLoaderSearch(classstoreclassname, storeclasscode);
-			try
-			{
-				Class<?> storeclass = Class.forName(classstoreclassname);
-				Field clinj = storeclass.getField("STORE");
-				clinj.set(null, clinjections);
-			}
-			catch (Exception e)
-			{
-			}
-		}
-		
-		/**
 		 *  Enhance a classloader to allow injections.
 		 *  @param cl The classloader.
 		 */
@@ -735,22 +761,40 @@ public class VmHacks
 		{
 			synchronized(enhancedloaders)
 			{
-				if (enhancedloaders.containsKey(cl))
+				if (enhancedloaders.containsKey(cl.getClass()))
 					return;
 				
 				Class<?> clclazz = cl.getClass();
+				Method m = null;
+				while (m == null)
+				{
+					try
+					{
+						m = clclazz.getDeclaredMethod("loadClass", String.class, boolean.class);
+					}
+					catch (Exception e)
+					{
+						clclazz = clclazz.getSuperclass();
+						if (Object.class.equals(clclazz))
+							SUtil.throwUnchecked(e);
+					}
+				}
+				
+				if (enhancedloaders.containsKey(clclazz))
+				{
+					enhancedloaders.put(clclazz, Unsafe.this);
+					return;
+				}
+				
 				InputStream is = cl.getResourceAsStream(clclazz.getName().replace('.', '/') + ".class");
 				ClassReader cr = null;
-				Method m = null;
+				
 				try
 				{
 					cr = new ClassReader(is);
-					m = clclazz.getDeclaredMethod("loadClass", String.class, boolean.class);
 				}
 				catch (Exception e)
 				{
-					System.out.println(is);
-					e.printStackTrace();
 				}
 				
 				final Method loadclass = m; 
@@ -770,6 +814,11 @@ public class VmHacks
 								public void visitCode()
 								{
 								};
+								
+								public void visitMaxs(int maxStack, int maxLocals)
+								{
+									mv.visitMaxs(0, 0);
+								};
 							};
 							
 							try
@@ -778,21 +827,36 @@ public class VmHacks
 								Field clinj = storeclass.getField("STORE");
 								ret.visitFieldInsn(Opcodes.GETSTATIC, Type.getInternalName(clinj.getDeclaringClass()), clinj.getName(), Type.getDescriptor(clinj.getType()));
 								
-								ret.visitVarInsn(Opcodes.ALOAD, 0);
+								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(Map.class));
 								
-								Label cont = new Label();
+								ret.visitInsn(Opcodes.ICONST_2);
+								
+								ret.visitTypeInsn(Opcodes.ANEWARRAY, Type.getInternalName(Object.class));
+								ret.visitInsn(Opcodes.DUP);
+								ret.visitInsn(Opcodes.ICONST_0);
+								ret.visitVarInsn(Opcodes.ALOAD, 0);
+								ret.visitInsn(Opcodes.AASTORE);
+								ret.visitInsn(Opcodes.DUP);
+								ret.visitInsn(Opcodes.ICONST_1);
+								ret.visitVarInsn(Opcodes.ALOAD, 1);
+								ret.visitInsn(Opcodes.AASTORE);
 								
 								Method get = Map.class.getMethod("get", Object.class);
 								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
 								
-								ret.visitInsn(Opcodes.DUP);
-								ret.visitJumpInsn(Opcodes.IFNULL, cont);
-								
-								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(Map.class));
-								
-								ret.visitVarInsn(Opcodes.ALOAD, 1);
-								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
-								
+//								ret.visitVarInsn(Opcodes.ALOAD, 0);
+//								
+//								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
+//								
+//								ret.visitInsn(Opcodes.DUP);
+//								ret.visitJumpInsn(Opcodes.IFNULL, cont);
+//								
+//								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(Map.class));
+//								
+//								ret.visitVarInsn(Opcodes.ALOAD, 1);
+//								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
+//								
+								Label cont = new Label();
 								ret.visitInsn(Opcodes.DUP);
 								ret.visitJumpInsn(Opcodes.IFNULL, cont);
 								
@@ -807,11 +871,18 @@ public class VmHacks
 					}
 				};
 				
-				cr.accept(cv, 0);
+				try
+				{
+					cr.accept(cv, 0);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 				byte[] newcl = cw.toByteArray();
 				
 				redefineClass(clclazz, newcl);
-				enhancedloaders.put(cl, Unsafe.this);
+				enhancedloaders.put(clclazz, Unsafe.this);
 			}
 		}
 		

@@ -27,6 +27,7 @@ public class STest {
         config.setAwareness(false);
         config.setWsTransport(false);
         config.setRelayTransport(false);
+        config.setSimulation(true);
         return config;
     }
 

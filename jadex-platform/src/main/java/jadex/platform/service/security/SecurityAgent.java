@@ -276,15 +276,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (printsecret && platformsecret != null)
 		{
 			secretstr = platformsecret.toString();
+			String pfname = agent.getComponentIdentifier().getPlatformName();
 			
 			if (platformsecret instanceof PasswordSecret)
-				System.out.println("Platform access password: "+secretstr);
+				System.out.println("Platform " + pfname + " access password: "+secretstr);
 			else if (platformsecret instanceof KeySecret)
-				System.out.println("Platform access key: "+secretstr);
+				System.out.println("Platform " + pfname + " access key: "+secretstr);
 			else if (platformsecret instanceof AbstractX509PemSecret)
-				System.out.println("Platform access certificates: "+secretstr);
+				System.out.println("Platform " + pfname + " access certificates: "+secretstr);
 			else
-				System.out.println("Platform access secret: "+secretstr);
+				System.out.println("Platform " + pfname + " access secret: "+secretstr);
 		}
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
@@ -1287,7 +1288,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					if (convid != null && convid.equals(fm.getConversationId()))
 					{
 						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite());
-						System.out.println("Suite: " + (suite != null?suite.getClass().toString():"null"));
+						agent.getLogger().info("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)
 						{
