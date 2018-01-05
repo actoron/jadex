@@ -1288,7 +1288,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					if (convid != null && convid.equals(fm.getConversationId()))
 					{
 						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite());
-						System.out.println("Suite: " + (suite != null?suite.getClass().toString():"null"));
+						agent.getLogger().info("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)
 						{
