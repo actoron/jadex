@@ -6,8 +6,8 @@ package jadex.bridge.service.types.registry;
  */
 public class RegistryResponseEvent extends ARegistryResponseEvent
 {
-	/** Removed flag. */
-	protected boolean removed;
+	/** Unknown flag. */
+	protected boolean unknown;
 	
 	/** The super-peer lease time. After the lease time the client will be removed. */
 	protected long leasetime;
@@ -27,7 +27,7 @@ public class RegistryResponseEvent extends ARegistryResponseEvent
 	 */
 	public RegistryResponseEvent(boolean removed, long leasetime)
 	{
-		this.removed = removed;
+		this.unknown = removed;
 		this.leasetime = leasetime;
 	}
 
@@ -37,7 +37,7 @@ public class RegistryResponseEvent extends ARegistryResponseEvent
 	 */
 	public boolean isRemoved()
 	{
-		return removed;
+		return unknown;
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class RegistryResponseEvent extends ARegistryResponseEvent
 	 */
 	public void setRemoved(boolean removed)
 	{
-		this.removed = removed;
+		this.unknown = removed;
 	}
 
 	/**

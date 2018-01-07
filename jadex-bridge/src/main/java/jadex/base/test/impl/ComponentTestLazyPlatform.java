@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -113,7 +114,7 @@ public class ComponentTestLazyPlatform extends TestCase
 					this.timeout	= ((Number)to).longValue();
 					Logger.getLogger("ComponentTest").log(Level.INFO, "using timeout: " + timeout);
 				} else {
-					this.timeout = 30000;
+					this.timeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 				}
 			} else {
 				failed = true;

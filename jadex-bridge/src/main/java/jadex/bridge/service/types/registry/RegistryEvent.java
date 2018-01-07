@@ -21,15 +21,6 @@ public class RegistryEvent extends ARegistryEvent
 	/** Flag if is delta (or full) registry content. */
 	protected boolean delta;
 	
-	
-	//-------- for superpeer supersuperpeer interaction --------
-	
-	/** The client type (client, superpeer_1, superpeer_0, ...). */
-	protected String clienttype;
-	
-	/** The network names. */
-	protected String[] networknames;
-	
 	/**
 	 *  Create a new registry event.
 	 */
@@ -171,42 +162,6 @@ public class RegistryEvent extends ARegistryEvent
 		this.delta = delta;
 	}
 	
-	/**
-	 *  Get the client type.
-	 *  @return The client type.
-	 */
-	public String getClientType()
-	{
-		return clienttype;
-	}
-
-	/**
-	 *  Set the client type.
-	 *  @param clienttype The client type to set.
-	 */
-	public void setClientType(String clienttype)
-	{
-		this.clienttype = clienttype;
-	}
-	
-	/**
-	 *  Get the networknames.
-	 *  @return The networknames.
-	 */
-	public String[] getNetworkNames()
-	{
-		return networknames;
-	}
-
-	/**
-	 *  Set the network names.
-	 *  @param networknames The networknames to set.
-	 */
-	public void setNetworkNames(String[] networknames)
-	{
-		this.networknames = networknames;
-	}
-
 	/**
 	 * Returns the number of elements added to this event.
 	 */

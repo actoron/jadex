@@ -27,6 +27,17 @@ public abstract class ARegistryEvent
 	/** The clients. */
 	protected Set<IComponentIdentifier> clients;
 	
+	/** The sender. */
+	protected IComponentIdentifier sender;
+	
+	//-------- for superpeer supersuperpeer interaction --------
+	
+	/** The client type (client, superpeer_1, superpeer_0, ...). */
+	protected String clienttype;
+	
+	/** The network names. */
+	protected String[] networknames;
+	
 	/**
 	 *  Create a new event.
 	 *  @param eventslimit
@@ -135,4 +146,57 @@ public abstract class ARegistryEvent
 		clients.add(client);
 	}
 
+	/**
+	 *  Get the sender.
+	 *  @return The sender.
+	 */
+	public IComponentIdentifier getSender()
+	{
+		return sender;
+	}
+
+	/**
+	 *  Set the sender.
+	 *  @param sender The sender to set.
+	 */
+	public void setSender(IComponentIdentifier sender)
+	{
+		this.sender = sender;
+	}
+	
+	/**
+	 *  Get the client type.
+	 *  @return The client type.
+	 */
+	public String getClientType()
+	{
+		return clienttype;
+	}
+
+	/**
+	 *  Set the client type.
+	 *  @param clienttype The client type to set.
+	 */
+	public void setClientType(String clienttype)
+	{
+		this.clienttype = clienttype;
+	}
+	
+	/**
+	 *  Get the networknames.
+	 *  @return The networknames.
+	 */
+	public String[] getNetworkNames()
+	{
+		return networknames;
+	}
+
+	/**
+	 *  Set the network names.
+	 *  @param networknames The networknames to set.
+	 */
+	public void setNetworkNames(String[] networknames)
+	{
+		this.networknames = networknames;
+	}
 }
