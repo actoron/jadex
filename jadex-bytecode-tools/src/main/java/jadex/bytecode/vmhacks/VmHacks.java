@@ -32,12 +32,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.ClassRemapper;
-import org.objectweb.asm.commons.MethodRemapper;
-import org.objectweb.asm.commons.SimpleRemapper;
-import org.objectweb.asm.tree.InsnList;
 
-import jadex.bytecode.ByteCodeClassLoader;
 import jadex.bytecode.IByteCodeClassLoader;
 import jadex.bytecode.SASM;
 import jadex.bytecode.invocation.IMethodInvoker;
@@ -51,308 +46,22 @@ import jadex.commons.SUtil;
  */
 public class VmHacks
 {
-	/** Set this to true to switch to fallback mode for invocation */
-	public static boolean NO_ASM = false;
-	
-	/** Flag if native support is available. */
-	public static final boolean HAS_NATIVE;
-	
-	/** Flag if the Extended ByteCodeClassLoader is available. */
-	public static final boolean HAS_EXTENDED_BYTECODE_CLASSLOADER;
-	
-	/** 
-	 *  Flag if default / protected access via ASM is available.
-	 *  Cannot be final due to bootstrapping. 
-	 */
-	public static boolean DEFAULT_ACCESS = true;
-	
-	/** 
-	 *  Flag if private access via ASM is available.
-	 *  Cannot be final due to bootstrapping.
-	 */
-	public static boolean PRIVATE_ACCESS = true;
-	
 	/** Access to unsafe operations. */
 	private static final Unsafe UNSAFE;
 	
-	/** Class of the Extended ByteCodeClassLoader if available. */
-	private static final Class<?> EXTENDED_BYTECODE_CLASSLOADER;
-	
 	static
 	{
-		// Test if native support is available...
-		
-		HAS_NATIVE = hasNative();
-		
-		// No ASM bytecode on Android...
-		if (SReflect.isAndroid())
-			NO_ASM = true;
-		
 		UNSAFE = new Unsafe();
 		UNSAFE.init();
-		
-		UNSAFE.startInstrumentationAgent();
-		
-		EXTENDED_BYTECODE_CLASSLOADER = createExtendedClassLoaderClass();
-		HAS_EXTENDED_BYTECODE_CLASSLOADER = hasExtendedClassLoader();
-		
-		AccessTestClass testobj = new AccessTestClass();
-		DEFAULT_ACCESS = hasMethodAccess("defaultTest", testobj);
-		PRIVATE_ACCESS = hasMethodAccess("privateTest", testobj);
 	}
 	
 	/**
 	 *  Provides access to unsafe operations.
 	 *  @return The Unsafe object.
 	 */
-	public static final Unsafe getUnsafe()
+	public static final Unsafe get()
 	{
 		return UNSAFE;
-	}
-	
-	/**
-	 *  Creates an extended class loader with additional privileges if available.
-	 *  
-	 *  @param parents ClassLoader parents.
-	 *  @return The ClassLoader.
-	 */
-	public static final IByteCodeClassLoader getExtendedByteCodeClassLoader(ClassLoader... parents)
-	{
-		IByteCodeClassLoader ret = null;
-		if (EXTENDED_BYTECODE_CLASSLOADER != null)
-		{
-			try
-			{
-				@SuppressWarnings("unchecked")
-				Constructor<IByteCodeClassLoader> c = (Constructor<IByteCodeClassLoader>) EXTENDED_BYTECODE_CLASSLOADER.getConstructor(ClassLoader[].class);
-				ret = c.newInstance(new Object[] { parents });
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		ret = null;
-		return ret;
-	}
-	
-	/**
-	 *  Creates an extended class loader class with additional privileges if available.
-	 *  
-	 *  @return The ClassLoader class.
-	 */
-	private static final Class<?> createExtendedClassLoaderClass()
-	{
-		Class<?> ret = null;
-		
-		if (!NO_ASM && getUnsafe().hasInstrumentation())
-		{
-			try
-			{
-				// Future improvement, disable for now....
-				if (!HAS_EXTENDED_BYTECODE_CLASSLOADER)
-					return null;
-				
-				// Get out prybar into the base classloader...
-				ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-				Class<?> superclass = ByteCodeClassLoader.class.getClassLoader().loadClass("sun.reflect.DelegatingClassLoader");
-				System.out.println(superclass.getDeclaredConstructors().length);
-				String superclassname = superclass.getPackage().getName() + ".PublicDelegatingClassLoader";
-				String internalname = superclassname.replace('.', '/');
-				cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(superclass).getInternalName(), new String[] { });
-				MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.getType(void.class), Type.getType(ClassLoader.class)), null, null);
-				mv.visitCode();
-				mv.visitVarInsn(Opcodes.ALOAD, 0);
-				mv.visitVarInsn(Opcodes.ALOAD, 1);
-				mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(superclass), "<init>", Type.getConstructorDescriptor(superclass.getDeclaredConstructor(ClassLoader.class)), false);
-				mv.visitInsn(Opcodes.RETURN);
-				mv.visitMaxs(0, 0);
-				mv.visitEnd();
-				cw.visitEnd();
-				byte[] code = cw.toByteArray();
-				getUnsafe().appendToBootstrapClassLoaderSearch(superclassname, new ByteArrayInputStream(code));
-				superclass = ClassLoader.getSystemClassLoader().loadClass(superclassname);
-				final Constructor<?> supercon = superclass.getDeclaredConstructor(ClassLoader.class);
-				
-				// Now make something nice based on our prybar
-				internalname = (VmHacks.class.getPackage().getName() + "." + ByteCodeClassLoader.class.getSimpleName() + "Extended").replace('.', '/');
-				InputStream is = ByteCodeClassLoader.class.getClassLoader().getResourceAsStream(ByteCodeClassLoader.class.getCanonicalName().replace('.', '/') + ".class");
-				ClassReader cr = new ClassReader(is);
-				final SimpleRemapper remapper = new SimpleRemapper(Type.getInternalName(ByteCodeClassLoader.class), internalname);
-				cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-				ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, new ClassRemapper(cw, remapper))
-				{
-					private boolean noheader = true;
-					
-					public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
-					{
-						if (noheader)
-						{
-							cv.visit(version, access, name, signature, superName, interfaces);
-							noheader = false;
-						}
-					}
-					
-					public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
-					{
-						MethodVisitor ret = cv.visitMethod(access, name, desc, signature, exceptions);
-						if ("<init>".equals(name))
-						{
-//							MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.getType(void.class), Type.getType(ClassLoader.class)), null, null);
-//							mv.visitCode();
-//							mv.visitVarInsn(Opcodes.ALOAD, 0);
-//							mv.visitVarInsn(Opcodes.ALOAD, 1);
-//							Class<?> superclass = supercon.getDeclaringClass();
-//							mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(superclass), "<init>", Type.getConstructorDescriptor(supercon), false);
-//							mv.visitInsn(Opcodes.RETURN);
-//							mv.visitMaxs(0, 0);
-//							mv.visitEnd();
-							ret = new MethodVisitor(Opcodes.ASM5, ret)
-							{
-								public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
-								{
-									if (opcode == Opcodes.INVOKESPECIAL)
-									{
-										mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(supercon.getDeclaringClass()), "<init>", Type.getConstructorDescriptor(supercon), false);
-									}
-									else
-									{
-										mv.visitMethodInsn(opcode, owner, name, desc, itf);
-									}
-								};
-							};
-						}
-						ret = new MethodRemapper(ret, remapper);
-						return ret;
-					}
-				};
-				
-				cv.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(superclass).getInternalName(), new String[] { Type.getType(IByteCodeClassLoader.class).getInternalName() });
-				cr.accept(cv, 0);
-				cv.visitEnd();
-				ClassLoader basecl = IByteCodeClassLoader.class.getClassLoader();
-				basecl = basecl == null ? ClassLoader.getSystemClassLoader() : basecl;
-				ByteCodeClassLoader bcl = new ByteCodeClassLoader(basecl);
-				code = cw.toByteArray();
-				ret = bcl.doDefineClassInParent(null, code, 0, code.length, superclass.getProtectionDomain());
-				System.out.println("superrr:  " + ret.getSuperclass());
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Tests if the extended classloader is available and functional.
-	 *  @return True, if available.
-	 */
-	private static final boolean hasExtendedClassLoader()
-	{
-		boolean ret = false;
-		if (EXTENDED_BYTECODE_CLASSLOADER != null)
-		{
-			IByteCodeClassLoader testcl = getExtendedByteCodeClassLoader(VmHacks.class.getClassLoader());
-			ret = testcl != null;
-//			System.out.println("Has extended bytecode classloader!");
-		}
-		else
-		{
-			ret = false;
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Creates a temporary .jar.
-	 */
-	private static File createTempJar(String classname, InputStream classcontent, Manifest man)
-	{
-		man = man == null ? new Manifest() : man;
-		JarOutputStream os = null;
-        
-        File jar = null;
-        try
-        {
-        	jar = File.createTempFile("jadextmp", ".jar");
-            jar.deleteOnExit();
-            os = new JarOutputStream(new FileOutputStream(jar), man);
-            String clname = classname.replace('.', '/') + ".class";
-            JarEntry e = new JarEntry(clname);
-            os.putNextEntry(e);
-            SUtil.copyStream(classcontent, os);
-            os.closeEntry();
-        }
-        catch (Exception e)
-        {
-        }
-        finally
-        {
-            if (os != null)
-            	SUtil.close(os);
-        }
-        return jar;
-	}
-	
-	/**
-	 *  Tests if access to a method using the invocation API is possible.
-	 *  
-	 *  @param testmethod Name of the test method.
-	 *  @param testobject Test object with method.
-	 *  @return True, if accessible.
-	 */
-	private static final boolean hasMethodAccess(String testmethod, Object testobject)
-	{
-		IByteCodeClassLoader dummycl = SASM.createByteCodeClassLoader(null, AccessTestClass.class.getClassLoader());
-		Method cicm = null;
-		try
-		{
-			cicm = SInvocation.class.getDeclaredMethod("createInvokerClass", new Class<?>[] { IByteCodeClassLoader.class, Method.class });
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-		cicm.setAccessible(true);
-		boolean acc = false;
-		try
-		{
-			Method m = testobject.getClass().getDeclaredMethod(testmethod, (Class<?>[]) null);
-			Class<?> invclass = (Class<?>) cicm.invoke(null, dummycl, m);
-			if (invclass != null)
-			{
-				Constructor<?> c = invclass.getConstructor((Class[]) null);
-				IMethodInvoker inv = (IMethodInvoker) c.newInstance((Object[]) null);
-				inv.invoke(testobject, (Object[]) null);
-				acc = true;
-			}
-		}
-		catch (Throwable t)
-		{
-			return false;
-		}
-		return acc;
-	}
-	
-	/**
-	 *  Tests if native access is available.
-	 *  
-	 *  @return True, if native access is available.
-	 */
-	private static final boolean hasNative()
-	{
-		boolean ret = false;
-		try
-		{
-			new NativeHelper();
-			ret = true;
-		}
-		catch (Throwable t)
-		{
-		}
-		return ret;
 	}
 	
 	/**
@@ -360,6 +69,12 @@ public class VmHacks
      */
 	public static final class Unsafe
 	{
+		/** Set this to true to switch to fallback mode for invocation */
+		private boolean asm = false;
+		
+		/** Flag if native support is available. */
+		public boolean hasnative = false;
+		
 		/** sun.misc.Unsafe if available. */
 		private Class<?> unsafeclass;
 		
@@ -403,35 +118,63 @@ public class VmHacks
 		/**
 		 *  Creates the Unsafe.
 		 */
-		protected Unsafe()
+		Unsafe()
 		{
+			asm = !SReflect.isAndroid();
+			
+			try
+			{
+				new NativeHelper();
+				hasnative = true;
+			}
+			catch (Throwable t)
+			{
+			}
 		}
 		
-//		public void markAsVerified(Class<?> clazz)
-//		{
-//			
-//			sun.misc.Unsafe u = null;
-//			Object obj = null;
-//			try
-//			{
-//				Class<?> unsafeclass = Class.forName("sun.misc.Unsafe");
-//				Field instancefield = unsafeclass.getDeclaredField("theUnsafe");
-//				instancefield.setAccessible(true);
-//				u = (sun.misc.Unsafe) instancefield.get(null);
-//				obj = u.allocateInstance(clazz);
-//			}
-//			catch (Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-//			long klass = (u.getInt(obj, 8L) & 0xFFFFFFFFL) << 3;
-//			int miscflags = (int) (u.getByte(klass+354) & 0xFF);
-//			System.out.println("initstate " + clazz.getName() + ": " + miscflags);
-////			miscflags |= 1 << 2;
-////			u.putChar(klass+252, (char) 16384);
-////			u.putChar(klass+252, (char)miscflags);
-//			System.out.println("initstate2: " + miscflags);
-//		}
+		// --------- Method for checking available capabilities. -----------------
+		
+		/**
+		 *  Tests if ASM is available.
+		 *  
+		 *  @return True, if ASM is available.
+		 */
+		public boolean hasAsm()
+		{
+			return asm;
+		}
+		
+		/**
+		 *  Tests if native access is available.
+		 *  
+		 *  @return True, if native access is available.
+		 */
+		public boolean hasNative()
+		{
+			return hasnative;
+		}
+		
+		/**
+		 *  Checks if instrumentation is available.
+		 *  
+		 *  @return True, if instrumentation is available.
+		 */
+		public boolean hasInstrumentation()
+		{
+			return instrumentation != null;
+		}
+		
+		/**
+		 *  Checks if redefineClassIndirect() is available.
+		 *  
+		 *  @return True, if indirect redefinition is available. 
+		 */
+		public boolean hasIndirectRedefinition()
+		{
+			return asm && instrumentation != null;
+		}
+		
+		// --------- Methods providing functionality. -----------------
 		
 		/**
 		 *  Sets reflective object accessible without checks if native support is available.
@@ -441,7 +184,7 @@ public class VmHacks
 		 */
 		public void setAccessible(AccessibleObject accobj, boolean flag)
 		{
-			if (HAS_NATIVE && setaccessibleoverride != null)
+			if (hasnative && setaccessibleoverride != null)
 			{
 				NativeHelper.setAccessible(setaccessibleoverride.getName(), accobj, flag);
 				
@@ -475,7 +218,7 @@ public class VmHacks
 	     */
 		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
 	    {
-			if (HAS_NATIVE)
+			if (hasnative)
 			{
 				return NativeHelper.defineClass(name, b, loader);
 			}
@@ -498,26 +241,6 @@ public class VmHacks
 				return ret;
 			}
 	    }
-		
-		/**
-		 *  Checks if instrumentation is available.
-		 *  
-		 *  @return True, if instrumentation is available.
-		 */
-		public boolean hasInstrumentation()
-		{
-			return instrumentation != null;
-		}
-		
-		/**
-		 *  Checks if redefineClassIndirect() is available.
-		 *  
-		 *  @return True, if indirect redefinition is available. 
-		 */
-		public boolean hasIndirectRedefinition()
-		{
-			return !NO_ASM && instrumentation != null;
-		}
 		
 		/**
 		 *  Redefine class byte code. Check HAS_INSTRUMENTATION before use.
@@ -594,13 +317,129 @@ public class VmHacks
 			}
 		}
 		
+//		public void markAsVerified(Class<?> clazz)
+//		{
+//			
+//			sun.misc.Unsafe u = null;
+//			Object obj = null;
+//			try
+//			{
+//				Class<?> unsafeclass = Class.forName("sun.misc.Unsafe");
+//				Field instancefield = unsafeclass.getDeclaredField("theUnsafe");
+//				instancefield.setAccessible(true);
+//				u = (sun.misc.Unsafe) instancefield.get(null);
+//				obj = u.allocateInstance(clazz);
+//			}
+//			catch (Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//			long klass = (u.getInt(obj, 8L) & 0xFFFFFFFFL) << 3;
+//			int miscflags = (int) (u.getByte(klass+354) & 0xFF);
+//			System.out.println("initstate " + clazz.getName() + ": " + miscflags);
+////			miscflags |= 1 << 2;
+////			u.putChar(klass+252, (char) 16384);
+////			u.putChar(klass+252, (char)miscflags);
+//			System.out.println("initstate2: " + miscflags);
+//		}
+		
+		/**
+		 *  Creates an extended class loader with additional privileges if available.
+		 *  
+		 *  @param parents ClassLoader parents.
+		 *  @return The ClassLoader.
+		 */
+//		public IByteCodeClassLoader getExtendedByteCodeClassLoader(ClassLoader... parents)
+//		{
+//			IByteCodeClassLoader ret = null;
+//			if (EXTENDED_BYTECODE_CLASSLOADER != null)
+//			{
+//				try
+//				{
+//					@SuppressWarnings("unchecked")
+//					Constructor<IByteCodeClassLoader> c = (Constructor<IByteCodeClassLoader>) EXTENDED_BYTECODE_CLASSLOADER.getConstructor(ClassLoader[].class);
+//					ret = c.newInstance(new Object[] { parents });
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//			ret = null;
+//			return ret;
+//		}
+		
+		/**
+		 *  Sets the instrumentation, called by VmHacksAgent.
+		 *  
+		 *  @param inst The instrumentation. 
+		 */
+		protected void setInstrumentation(Instrumentation inst)
+		{
+			instrumentation = inst;
+			instagentlock.release();
+		}
+		
+		/**
+		 *  Initialization step after constructor to allow bootstrapping.
+		 */
+		protected void init()
+		{
+			try
+			{
+				unsafeclass = Class.forName("sun.misc.Unsafe");
+			}
+			catch (Exception e)
+			{
+			}
+			
+			if (unsafeclass != null)
+				unsafeinstance = getSunUnsafe(unsafeclass);
+			
+			if (unsafeinstance != null)
+			{
+				defineclass = getSunUnsafeMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
+				putboolean = getSunUnsafeMethod("putBoolean", Object.class, long.class, boolean.class);
+				objectFieldOffset = getSunUnsafeMethod("objectFieldOffset", Field.class);
+			}
+			
+			try
+			{
+				// setAccessible override flag
+				try
+				{
+					setaccessibleoverride = AccessibleObject.class.getDeclaredField("override");
+				}
+				catch (Exception e)
+				{
+					try
+					{
+						// Sometimes called flag?
+						setaccessibleoverride = AccessibleObject.class.getDeclaredField("flag");
+					}
+					catch (Exception e1)
+					{
+					}
+				}
+				
+				if (setaccessibleoverride != null && objectFieldOffset != null)
+					setaccessibleoverrideoffset = (Long) objectFieldOffset.invoke(unsafeinstance, setaccessibleoverride);
+			}
+			catch (Exception e)
+			{
+				SUtil.throwUnchecked(e);
+			}
+			
+			startInstrumentationAgent();
+		}
+		
 		/**
 		 *  Creates instrumentation, if available.
 		 */
 		@SuppressWarnings("unchecked")
-		protected void startInstrumentationAgent()
+		private void startInstrumentationAgent()
 		{
-			if (NO_ASM)
+			if (!asm)
 				return;
 			
 			File jar = null;
@@ -619,7 +458,7 @@ public class VmHacks
 		        SUtil.close(is);
 		        
 		        boolean hasagent = false;
-		        if (HAS_NATIVE)
+		        if (hasnative)
 		        {
 			        try
 					{
@@ -687,70 +526,6 @@ public class VmHacks
 			catch (Exception e)
 			{
 			}
-		}
-		
-		/**
-		 *  Sets the instrumentation, called by VmHacksAgent.
-		 *  
-		 *  @param inst The instrumentation. 
-		 */
-		protected void setInstrumentation(Instrumentation inst)
-		{
-			instrumentation = inst;
-			instagentlock.release();
-		}
-		
-		/**
-		 *  Initialization step after constructor to allow bootstrapping.
-		 */
-		protected void init()
-		{
-			try
-			{
-				unsafeclass = Class.forName("sun.misc.Unsafe");
-			}
-			catch (Exception e)
-			{
-			}
-			
-			if (unsafeclass != null)
-				unsafeinstance = getUnsafe(unsafeclass);
-			
-			if (unsafeinstance != null)
-			{
-				defineclass = getUnsafeMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
-				putboolean = getUnsafeMethod("putBoolean", Object.class, long.class, boolean.class);
-				objectFieldOffset = getUnsafeMethod("objectFieldOffset", Field.class);
-			}
-			
-			try
-			{
-				// setAccessible override flag
-				try
-				{
-					setaccessibleoverride = AccessibleObject.class.getDeclaredField("override");
-				}
-				catch (Exception e)
-				{
-					try
-					{
-						// Sometimes called flag?
-						setaccessibleoverride = AccessibleObject.class.getDeclaredField("flag");
-					}
-					catch (Exception e1)
-					{
-					}
-				}
-				
-				if (setaccessibleoverride != null && objectFieldOffset != null)
-					setaccessibleoverrideoffset = (Long) objectFieldOffset.invoke(unsafeinstance, setaccessibleoverride);
-			}
-			catch (Exception e)
-			{
-				SUtil.throwUnchecked(e);
-			}
-			
-			
 		}
 		
 		/**
@@ -892,7 +667,7 @@ public class VmHacks
 		 *  @param unsafeclazz sun.misc.Unsafe if available.
 		 *  @return Instance of the class.
 		 */
-		private Object getUnsafe(Class<?> unsafeclazz)
+		private Object getSunUnsafe(Class<?> unsafeclazz)
 		{
 			Object ret = null;
 			try
@@ -948,7 +723,7 @@ public class VmHacks
 			return ret;
 		}
 		
-		private IMethodInvoker getUnsafeMethod(String name, Class<?>... params)
+		private IMethodInvoker getSunUnsafeMethod(String name, Class<?>... params)
 		{
 			IMethodInvoker ret = null;
 			try
@@ -963,28 +738,167 @@ public class VmHacks
 			}
 			return ret;
 		}
-	}
-	
-	/**
-	 *  Class used to test access level via ASM.
-	 *
-	 */
-	public static class AccessTestClass
-	{
-		/**
-		 *  Used to test default access privileges.
-		 */
-		protected Object defaultTest()
-		{
-			return privateTest();
-		}
 		
 		/**
-		 *  Used to test private access privileges.
+		 *  Creates an extended class loader class with additional privileges if available.
+		 *  
+		 *  @return The ClassLoader class.
 		 */
-		private Object privateTest()
+//		private static final Class<?> createExtendedClassLoaderClass()
+//		{
+//			Class<?> ret = null;
+//			
+//			if (get().hasAsm() && get().hasInstrumentation())
+//			{
+//				try
+//				{
+//					// Future improvement, disable for now....
+//					if (!HAS_EXTENDED_BYTECODE_CLASSLOADER)
+//						return null;
+//					
+//					// Get out prybar into the base classloader...
+//					ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+//					Class<?> superclass = ByteCodeClassLoader.class.getClassLoader().loadClass("sun.reflect.DelegatingClassLoader");
+//					System.out.println(superclass.getDeclaredConstructors().length);
+//					String superclassname = superclass.getPackage().getName() + ".PublicDelegatingClassLoader";
+//					String internalname = superclassname.replace('.', '/');
+//					cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(superclass).getInternalName(), new String[] { });
+//					MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.getType(void.class), Type.getType(ClassLoader.class)), null, null);
+//					mv.visitCode();
+//					mv.visitVarInsn(Opcodes.ALOAD, 0);
+//					mv.visitVarInsn(Opcodes.ALOAD, 1);
+//					mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(superclass), "<init>", Type.getConstructorDescriptor(superclass.getDeclaredConstructor(ClassLoader.class)), false);
+//					mv.visitInsn(Opcodes.RETURN);
+//					mv.visitMaxs(0, 0);
+//					mv.visitEnd();
+//					cw.visitEnd();
+//					byte[] code = cw.toByteArray();
+//					get().appendToBootstrapClassLoaderSearch(superclassname, new ByteArrayInputStream(code));
+//					superclass = ClassLoader.getSystemClassLoader().loadClass(superclassname);
+//					final Constructor<?> supercon = superclass.getDeclaredConstructor(ClassLoader.class);
+//					
+//					// Now make something nice based on our prybar
+//					internalname = (VmHacks.class.getPackage().getName() + "." + ByteCodeClassLoader.class.getSimpleName() + "Extended").replace('.', '/');
+//					InputStream is = ByteCodeClassLoader.class.getClassLoader().getResourceAsStream(ByteCodeClassLoader.class.getCanonicalName().replace('.', '/') + ".class");
+//					ClassReader cr = new ClassReader(is);
+//					final SimpleRemapper remapper = new SimpleRemapper(Type.getInternalName(ByteCodeClassLoader.class), internalname);
+//					cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+//					ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, new ClassRemapper(cw, remapper))
+//					{
+//						private boolean noheader = true;
+//						
+//						public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
+//						{
+//							if (noheader)
+//							{
+//								cv.visit(version, access, name, signature, superName, interfaces);
+//								noheader = false;
+//							}
+//						}
+//						
+//						public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+//						{
+//							MethodVisitor ret = cv.visitMethod(access, name, desc, signature, exceptions);
+//							if ("<init>".equals(name))
+//							{
+////								MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.getType(void.class), Type.getType(ClassLoader.class)), null, null);
+////								mv.visitCode();
+////								mv.visitVarInsn(Opcodes.ALOAD, 0);
+////								mv.visitVarInsn(Opcodes.ALOAD, 1);
+////								Class<?> superclass = supercon.getDeclaringClass();
+////								mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(superclass), "<init>", Type.getConstructorDescriptor(supercon), false);
+////								mv.visitInsn(Opcodes.RETURN);
+////								mv.visitMaxs(0, 0);
+////								mv.visitEnd();
+//								ret = new MethodVisitor(Opcodes.ASM5, ret)
+//								{
+//									public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
+//									{
+//										if (opcode == Opcodes.INVOKESPECIAL)
+//										{
+//											mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(supercon.getDeclaringClass()), "<init>", Type.getConstructorDescriptor(supercon), false);
+//										}
+//										else
+//										{
+//											mv.visitMethodInsn(opcode, owner, name, desc, itf);
+//										}
+//									};
+//								};
+//							}
+//							ret = new MethodRemapper(ret, remapper);
+//							return ret;
+//						}
+//					};
+//					
+//					cv.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalname, null, Type.getType(superclass).getInternalName(), new String[] { Type.getType(IByteCodeClassLoader.class).getInternalName() });
+//					cr.accept(cv, 0);
+//					cv.visitEnd();
+//					ClassLoader basecl = IByteCodeClassLoader.class.getClassLoader();
+//					basecl = basecl == null ? ClassLoader.getSystemClassLoader() : basecl;
+//					ByteCodeClassLoader bcl = new ByteCodeClassLoader(basecl);
+//					code = cw.toByteArray();
+//					ret = bcl.doDefineClassInParent(null, code, 0, code.length, superclass.getProtectionDomain());
+//					System.out.println("superrr:  " + ret.getSuperclass());
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//			return ret;
+//		}
+		
+		/**
+		 *  Tests if the extended classloader is available and functional.
+		 *  @return True, if available.
+		 */
+//		private static final boolean hasExtendedClassLoader()
+//		{
+//			boolean ret = false;
+//			if (EXTENDED_BYTECODE_CLASSLOADER != null)
+//			{
+//				IByteCodeClassLoader testcl = VmHacks.get().getExtendedByteCodeClassLoader(VmHacks.class.getClassLoader());
+//				ret = testcl != null;
+////				System.out.println("Has extended bytecode classloader!");
+//			}
+//			else
+//			{
+//				ret = false;
+//			}
+//			return ret;
+//		}
+		
+		/**
+		 *  Creates a temporary .jar.
+		 */
+		private static File createTempJar(String classname, InputStream classcontent, Manifest man)
 		{
-			return null;
+			man = man == null ? new Manifest() : man;
+			JarOutputStream os = null;
+	        
+	        File jar = null;
+	        try
+	        {
+	        	jar = File.createTempFile("jadextmp", ".jar");
+	            jar.deleteOnExit();
+	            os = new JarOutputStream(new FileOutputStream(jar), man);
+	            String clname = classname.replace('.', '/') + ".class";
+	            JarEntry e = new JarEntry(clname);
+	            os.putNextEntry(e);
+	            SUtil.copyStream(classcontent, os);
+	            os.closeEntry();
+	        }
+	        catch (Exception e)
+	        {
+	        }
+	        finally
+	        {
+	            if (os != null)
+	            	SUtil.close(os);
+	        }
+	        return jar;
 		}
 	}
+	
+	
 }

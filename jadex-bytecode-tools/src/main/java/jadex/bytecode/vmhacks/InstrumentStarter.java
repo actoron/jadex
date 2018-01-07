@@ -23,10 +23,10 @@ public class InstrumentStarter
 	 *  Method for starting the agent.
 	 *  @param jarfile The jarfile of the agent.
 	 */
-	protected static final void startAgent(String jarfile)
+	protected static final int startAgent(String jarfile)
 	{
 		long vmp = NativeHelper.getVm();
-		Agent_OnAttach(new Pointer(vmp), jarfile, Pointer.NULL);
+		return Agent_OnAttach(new Pointer(vmp), jarfile, Pointer.NULL);
 	}
 	
 	/**

@@ -40,6 +40,18 @@ public class SInvocation
 	/** Class name suffix counter. */ 
 	public static AtomicLong NAME_SUFFIX_COUNTER = new AtomicLong();
 	
+	/** 
+	 *  Flag if default / protected access via ASM is available.
+	 *  Cannot be final due to bootstrapping. 
+	 */
+	public static boolean DEFAULT_ACCESS = false;
+	
+	/** 
+	 *  Flag if private access via ASM is available.
+	 *  Cannot be final due to bootstrapping.
+	 */
+	public static boolean PRIVATE_ACCESS = false;
+	
 	/** Cached invoker classes, the invoker class does not prevent GC (tested). */
 	protected static volatile WeakHashMap<Method, Class<IMethodInvoker>> INVOKER_CLASSES =
 		new WeakHashMap<Method, Class<IMethodInvoker>>();
@@ -51,6 +63,12 @@ public class SInvocation
 	/** Cached extractor classes. */
 	protected static volatile WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>> EXTRACTOR_CLASSES =
 			new WeakHashMap<Class<?>, WeakKeyValueMap<Class<?>, Class<?>>>();
+	
+	// Ensure VmHacks is initialized.
+	static
+	{
+		VmHacks.get();
+	}
 	
 	/**
 	 *  Directly invokes a method based on the method name and arguments.
@@ -605,16 +623,16 @@ public class SInvocation
 	 */
 	protected static final ExtendedClassWriter createClass(Class<?> targetclass, String classname, int accesslevel, Class<?>... interfaces)
 	{
-		if (VmHacks.NO_ASM)
+		if (!VmHacks.get().hasAsm())
 			return null;
 		
 		Class<?> superclass = Object.class;
 		String genpackage = SInvocation.class.getPackage().getName() + ".generated";
 //		accesslevel = Opcodes.ACC_PUBLIC;
 		boolean needsparentcl = false;
-		if (accesslevel == Opcodes.ACC_PRIVATE || (accesslevel != Opcodes.ACC_PUBLIC && VmHacks.PRIVATE_ACCESS))
+		if (accesslevel == Opcodes.ACC_PRIVATE || (accesslevel != Opcodes.ACC_PUBLIC && PRIVATE_ACCESS))
 		{
-			if (!VmHacks.PRIVATE_ACCESS)
+			if (PRIVATE_ACCESS)
 				return null;
 			
 			try
@@ -629,7 +647,7 @@ public class SInvocation
 		}
 		else if (accesslevel != Opcodes.ACC_PUBLIC)
 		{
-			if (!VmHacks.DEFAULT_ACCESS)
+			if (DEFAULT_ACCESS)
 				return null;
 			
 			// At least protected, inject into the package...
@@ -828,6 +846,56 @@ public class SInvocation
 	}
 	
 	/**
+	 *  Tries to enable enhanced direct access.
+	 */
+	protected static final void enableEnhancedAccess()
+	{
+		AccessTestClass testobj = new AccessTestClass();
+		DEFAULT_ACCESS = hasMethodAccess("defaultTest", testobj);
+		PRIVATE_ACCESS = hasMethodAccess("privateTest", testobj);
+	}
+	
+	/**
+	 *  Tests if access to a method using the invocation API is possible.
+	 *  
+	 *  @param testmethod Name of the test method.
+	 *  @param testobject Test object with method.
+	 *  @return True, if accessible.
+	 */
+	private static final boolean hasMethodAccess(String testmethod, Object testobject)
+	{
+		IByteCodeClassLoader dummycl = SASM.createByteCodeClassLoader(null, AccessTestClass.class.getClassLoader());
+		Method cicm = null;
+		try
+		{
+			cicm = SInvocation.class.getDeclaredMethod("createInvokerClass", new Class<?>[] { IByteCodeClassLoader.class, Method.class });
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
+		cicm.setAccessible(true);
+		boolean acc = false;
+		try
+		{
+			Method m = testobject.getClass().getDeclaredMethod(testmethod, (Class<?>[]) null);
+			Class<?> invclass = (Class<?>) cicm.invoke(null, dummycl, m);
+			if (invclass != null)
+			{
+				Constructor<?> c = invclass.getConstructor((Class[]) null);
+				IMethodInvoker inv = (IMethodInvoker) c.newInstance((Object[]) null);
+				inv.invoke(testobject, (Object[]) null);
+				acc = true;
+			}
+		}
+		catch (Throwable t)
+		{
+			return false;
+		}
+		return acc;
+	}
+	
+	/**
 	 *  Class writer with some meta information.
 	 *
 	 */
@@ -890,7 +958,7 @@ public class SInvocation
 		public FallBackInvoker(Method method)
 		{
 //			System.err.println("WARNING FALLBACK MODE ENABLED");
-			VmHacks.getUnsafe().setAccessible(method, true);
+			VmHacks.get().setAccessible(method, true);
 			this.method = method;
 		}
 		
@@ -913,6 +981,29 @@ public class SInvocation
 			{
 				throw SUtil.throwUnchecked(e);
 			}
+		}
+	}
+	
+	/**
+	 *  Class used to test access level via ASM.
+	 *
+	 */
+	public static class AccessTestClass
+	{
+		/**
+		 *  Used to test default access privileges.
+		 */
+		protected Object defaultTest()
+		{
+			return privateTest();
+		}
+		
+		/**
+		 *  Used to test private access privileges.
+		 */
+		private Object privateTest()
+		{
+			return null;
 		}
 	}
 }
