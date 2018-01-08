@@ -47,15 +47,10 @@ import jadex.commons.SUtil;
 public class VmHacks
 {
 	/** Access to unsafe operations. */
-	private static final Unsafe UNSAFE;
+	private static volatile Unsafe UNSAFE;
 	
+	/** Globally disable all VM Hacks. */
 	public static boolean DISABLE = true;
-	
-	static
-	{
-		UNSAFE = new Unsafe();
-		UNSAFE.init();
-	}
 	
 	/**
 	 *  Provides access to unsafe operations.
@@ -63,6 +58,21 @@ public class VmHacks
 	 */
 	public static final Unsafe get()
 	{
+		if (UNSAFE == null)
+		{
+			synchronized(VmHacks.class)
+			{
+				if (UNSAFE == null)
+				{
+					UNSAFE = new Unsafe();
+					
+					if (!DISABLE)
+					{
+						UNSAFE.init();
+					}
+				}
+			}
+		}
 		return UNSAFE;
 	}
 	
@@ -443,7 +453,7 @@ public class VmHacks
 		@SuppressWarnings("unchecked")
 		private void startInstrumentationAgent()
 		{
-			if (!asm || DISABLE)
+			if (!asm)
 				return;
 			
 			File jar = null;

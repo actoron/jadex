@@ -1,7 +1,6 @@
 package jadex.bytecode.vmhacks;
 
 import java.lang.instrument.Instrumentation;
-import java.util.concurrent.Semaphore;
 
 /**
  *  Agent for acquiring instrumentation access.

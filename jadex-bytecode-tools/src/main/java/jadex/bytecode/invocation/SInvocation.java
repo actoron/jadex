@@ -632,7 +632,7 @@ public class SInvocation
 		boolean needsparentcl = false;
 		if (accesslevel == Opcodes.ACC_PRIVATE || (accesslevel != Opcodes.ACC_PUBLIC && PRIVATE_ACCESS))
 		{
-			if (PRIVATE_ACCESS)
+			if (!PRIVATE_ACCESS)
 				return null;
 			
 			try
@@ -647,7 +647,7 @@ public class SInvocation
 		}
 		else if (accesslevel != Opcodes.ACC_PUBLIC)
 		{
-			if (DEFAULT_ACCESS)
+			if (!DEFAULT_ACCESS)
 				return null;
 			
 			// At least protected, inject into the package...
@@ -851,7 +851,9 @@ public class SInvocation
 	protected static final void enableEnhancedAccess()
 	{
 		AccessTestClass testobj = new AccessTestClass();
+		DEFAULT_ACCESS = true;
 		DEFAULT_ACCESS = hasMethodAccess("defaultTest", testobj);
+		PRIVATE_ACCESS = true;
 		PRIVATE_ACCESS = hasMethodAccess("privateTest", testobj);
 	}
 	
