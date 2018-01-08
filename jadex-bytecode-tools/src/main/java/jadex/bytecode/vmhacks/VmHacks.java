@@ -134,16 +134,6 @@ public class VmHacks
 		 */
 		Unsafe()
 		{
-			asm = !SReflect.isAndroid();
-			
-			try
-			{
-				new NativeHelper();
-				hasnative = true;
-			}
-			catch (Throwable t)
-			{
-			}
 		}
 		
 		// --------- Method for checking available capabilities. -----------------
@@ -245,9 +235,9 @@ public class VmHacks
 				Class<?> ret = null;
 				try
 				{
-					Method dc = ClassLoader.class.getMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
+					Method dc = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
 					setAccessible(dc, true);
-					ret = (Class<?>) dc.invoke(loader, name, b, off, len, loader, pd == null ? loader.getClass().getProtectionDomain() : pd);
+					ret = (Class<?>) dc.invoke(loader, name, b, off, len, pd == null ? loader.getClass().getProtectionDomain() : pd);
 				}
 				catch (Exception e)
 				{
@@ -399,6 +389,17 @@ public class VmHacks
 		 */
 		protected void init()
 		{
+			asm = !SReflect.isAndroid();
+			
+			try
+			{
+				new NativeHelper();
+				hasnative = true;
+			}
+			catch (Throwable t)
+			{
+			}
+			
 			try
 			{
 				unsafeclass = Class.forName("sun.misc.Unsafe");
