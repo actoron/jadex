@@ -59,8 +59,11 @@ public abstract class ResponsabilityHandler
 			}
 			
 			// Find new ones by taking send ones minus existing ones
-			tmp = new HashSet<IComponentIdentifier>(clients);
-			tmp.removeAll(ci.getIndirectClients());
+			tmp = new HashSet<IComponentIdentifier>();
+			if(clients!=null)
+				tmp.addAll(clients);
+			if(ci.getIndirectClients()!=null)
+				tmp.removeAll(ci.getIndirectClients());
 			ret.addAll(tmp);
 			
 			ci.setIndirectClients(clients);

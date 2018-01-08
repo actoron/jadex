@@ -280,7 +280,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								
 								System.out.println("Exception with superpeer, resetting");
 								
-//								exception.printStackTrace();
+								exception.printStackTrace();
 								
 								spregser = null;
 							}
