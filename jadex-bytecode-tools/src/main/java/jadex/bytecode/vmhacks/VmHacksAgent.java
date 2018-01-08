@@ -14,6 +14,6 @@ public class VmHacksAgent
      */
     public static void agentmain(String agentargs, Instrumentation inst)
     {
-    	VmHacks.getUnsafe().setInstrumentation(inst);
+    	VmHacks.get().setInstrumentation(inst);
     }
 }

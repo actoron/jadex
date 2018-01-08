@@ -91,7 +91,7 @@ public class ByteCodeClassLoader extends ClassLoader implements IByteCodeClassLo
 	 */
 	public Class<?> doDefineClassInParent(String name, byte[] b, int off, int len, ProtectionDomain protectiondomain)
 	{
-		return VmHacks.getUnsafe().defineClass(name, b, off, len, asClassLoader().getParent(), protectiondomain);
+		return VmHacks.get().defineClass(name, b, off, len, asClassLoader().getParent(), protectiondomain);
 	}
 	
 	protected void addDelegates(ClassLoader[] parents)

@@ -925,14 +925,14 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //			method.setAccessible(true);
 			try
 			{
-				if (redefine && VmHacks.getUnsafe().hasIndirectRedefinition())
+				if (redefine && VmHacks.get().hasIndirectRedefinition())
 				{
 					ret = Class.forName(name, true, loader);
-					ret = VmHacks.getUnsafe().redefineClassIndirect(ret, data);
+					ret = VmHacks.get().redefineClassIndirect(ret, data);
 				}
 				else
 				{
-					ret = VmHacks.getUnsafe().defineClass(name, data, 0, data.length, loader, domain);
+					ret = VmHacks.get().defineClass(name, data, 0, data.length, loader, domain);
 //					ret = (Class<?>)method.invoke(loader, args);
 				}
 			}

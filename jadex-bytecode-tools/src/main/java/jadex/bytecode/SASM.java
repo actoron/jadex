@@ -14,7 +14,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SUtil;
 import jadex.commons.collection.WeakKeyValueMap;
 
@@ -391,8 +390,8 @@ public class SASM
 	 */
 	public static final IByteCodeClassLoader createByteCodeClassLoader(ClassLoader... parents)
 	{
-		if (VmHacks.HAS_EXTENDED_BYTECODE_CLASSLOADER)
-			return VmHacks.getExtendedByteCodeClassLoader(parents);
+//		if (VmHacks.HAS_EXTENDED_BYTECODE_CLASSLOADER)
+//			return VmHacks.get().getExtendedByteCodeClassLoader(parents);
 		
 		return new ByteCodeClassLoader(parents);
 	}
