@@ -78,6 +78,19 @@ public class ThrowableCodec extends AbstractCodec
 		{
 			try
 			{
+				// Special case for ErrorException, that supports only Error as cause.
+				Constructor<?> con = clazz.getConstructor(new Class<?>[]{Error.class});
+				ret = con.newInstance(new Object[]{cause});
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		if(ret==null)
+		{
+			try
+			{
 				Constructor<?> con = clazz.getConstructor(new Class<?>[]{String.class});
 				ret = con.newInstance(new Object[]{msg});
 				if (ret != null && cause != null)

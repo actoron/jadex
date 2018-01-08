@@ -1,7 +1,5 @@
 package jadex.commons.transformation;
 
-import junit.framework.TestCase;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -53,7 +51,9 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.ErrorException;
 import jadex.commons.transformation.annotations.Classname;
+import junit.framework.TestCase;
 
 /**
  *  Testcases for writer and reader.
@@ -1196,6 +1196,26 @@ public abstract class Test extends TestCase
 		RuntimeException e = new RuntimeException("Some runtime reason.");
 		SecurityException ex = new SecurityException("Some security concern.", e);
 		doWriteAndRead(ex, new Comparator<Exception>()
+		{
+			public int compare(Exception e1, Exception e2)
+			{
+				int ret = -1;
+				if(e1.getClass().equals(e2.getClass()))
+				{
+					ret = Arrays.equals(e1.getStackTrace(), e2.getStackTrace())? 0: -1;
+				}
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Test reading / writing error exception.
+	 */
+	public void	testErrorException() throws Exception
+	{
+		ErrorException e = new ErrorException(new Error("test"));
+		doWriteAndRead(e, new Comparator<Exception>()
 		{
 			public int compare(Exception e1, Exception e2)
 			{
