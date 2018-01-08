@@ -73,7 +73,11 @@ public abstract class EventCollector
 						registryevent = createEvent();
 					}
 					// do not wait below 10ms
-					canceltimer = timer.waitForDelay(Math.max(10, registryevent.getTimeUntilDue()), this);
+					long w = getTimeLimit();
+					if(registryevent.getTimeUntilDue()>0)
+						w = Math.max(10, registryevent.getTimeUntilDue());
+//					System.out.println("notify in: "+w);
+					canceltimer = timer.waitForDelay(w, this);
 				}
 			}
 		});
@@ -130,7 +134,9 @@ public abstract class EventCollector
 	 */
 	public ARegistryEvent createEvent()
 	{
-		return new RegistryEvent(true, timelimit);
+		RegistryEvent ret =  new RegistryEvent(true, timelimit);
+		ret.setSender(cid);
+		return ret;
 	}
 
 	/**

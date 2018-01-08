@@ -40,6 +40,15 @@ public class MultiRegistryEvent extends ARegistryEvent
 	}
 	
 	/**
+	 *  Set the events.
+	 *  @param events The events to set.
+	 */
+	public void setEvents(List<ARegistryEvent> events)
+	{
+		this.events = events;
+	}
+
+	/**
 	 *  Add an event.
 	 *  @param event The event.
 	 */
@@ -79,4 +88,13 @@ public class MultiRegistryEvent extends ARegistryEvent
 		}
 		return ret;
 	}
+
+	/**
+	 *  Get the string rep.
+	 */
+	public String toString()
+	{
+		return "MultiRegistryEvent [sender="+sender+", events=" + events + "]";
+	}
+	
 }

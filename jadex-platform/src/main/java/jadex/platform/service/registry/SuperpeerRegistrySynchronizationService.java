@@ -84,10 +84,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	protected MultiEventCollector mevcol;
 	
 	/** Handles resposabilities of clients. */
-	protected ResponsabilityHandler crh;
+	protected ManagedClientsHandler crh;
 	
 	/** Handles resposabilities of partners. */
-	protected ResponsabilityHandler prh;
+	protected ManagedClientsHandler prh;
 	
 	/** The registry level.*/
 	protected int level;
@@ -140,7 +140,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	public void init()
 	{
 		// Handler that updates the responsibilities of clients
-		crh = new ResponsabilityHandler(getRegistry())
+		crh = new ManagedClientsHandler(getRegistry())
 		{
 			@Override
 			public void putClient(PeerInfo client)
@@ -171,7 +171,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		};
 		
 		// Handler that updates the responsibilities of partners
-		prh = new ResponsabilityHandler(getRegistry())
+		prh = new ManagedClientsHandler(getRegistry())
 		{
 			@Override
 			public void putClient(PeerInfo client)
@@ -256,7 +256,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		};
 		
 		// Subscribe to changes of the local registry to inform other platforms
-		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component), true)//, eventslimit, timelimit)
+		lrobs = new LocalRegistryObserver(component.getComponentIdentifier().getRoot(), new AgentDelayRunner(component), true)//, eventslimit, timelimit)
 		{
 			public void notifyObservers(ARegistryEvent event)
 			{
@@ -274,6 +274,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				@Override
 				public void notifyObservers(ARegistryEvent event)
 				{
+//					System.out.println("collector notify ssp");
 					forwardRegistryEventToParent(event, false);
 				}
 				
@@ -430,6 +431,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			public void resultAvailable(final ISuperpeerRegistrySynchronizationService ssp)
 			{
+//				System.out.println("Send update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
 				ssp.updateClientData(event).addResultListener(new IResultListener<ARegistryResponseEvent>()
 				{
 					public void resultAvailable(ARegistryResponseEvent revent)
@@ -461,21 +463,24 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 									newPlatformFound(ser, 0);
 								}
 							}
-							
-							// Send full status if receiver said I was removed
-							if(re.isRemoved())
-							{
-								RegistryEvent event = new RegistryEvent(true, ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
-								event.addAddedService((IService)SServiceProvider.getLocalService(component, ISuperpeerRegistrySynchronizationService.class));
-								ssp.updateClientData(event).addResultListener(this);
-	//							System.out.println("Send update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
-							}
+						}
+						
+						// Send full status if receiver said I was unknown
+						if(revent.isUnknown())
+						{
+//							RegistryEvent event = new RegistryEvent(true, ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
+							ARegistryEvent event = getCurrentStateEvent();
+							event.setClientType(ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
+//							event.addAddedService((IService)SServiceProvider.getLocalService(component, ISuperpeerRegistrySynchronizationService.class));
+							ssp.updateClientData(event).addResultListener(this);
+//							System.out.println("Send full update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
 						}
 						
 						// todo: tell client (not only superpeer!) to send full update
-						if(revent.getReceiver()!=null && getComponent().getComponentIdentifier().getRoot().equals(revent.getReceiver()))
+						if(revent.getReceiver()!=null && !getComponent().getComponentIdentifier().getRoot().equals(revent.getReceiver()))
 						{
-							PeerInfo pi = clients.get(revent.getReceiver());
+							System.out.println("indirect answer: "+revent.getReceiver()+" "+getComponent().getComponentIdentifier().getRoot());
+							PeerInfo pi = getClient(revent.getReceiver());
 							if(pi!=null)
 							{
 								pi.addAnswer(revent);
@@ -609,7 +614,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //								subscribedto.update(info);
 								
 								// todo: request updates
-								Set<IComponentIdentifier> unknown = prh.updateResponsibilities(cid, event);
+								Set<IComponentIdentifier> unknown = prh.updateManagedClients(cid, event);
 								
 								handleRegistryEvent(event, null);
 							}
@@ -826,19 +831,35 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		
 		// Forward current state initially
 		// The current state consists of those parts that are managed as clients
-		MultiRegistryEvent mre = new MultiRegistryEvent();
-		for(IComponentIdentifier c: internalGetClients())
-		{
-			ARegistryEvent ev = lrobs.getCurrentStateEvent(c);
-			mre.addEvent(ev);
-		}
-		mre.setClients(internalGetClients());
+		ARegistryEvent mre = getCurrentStateEvent();
 		
 		System.out.println("Sending full state: "+component.getComponentIdentifier()+": "+mre);
 		
 		ret.addIntermediateResult(mre);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the current state of the registry (including managed clients).
+	 */
+	protected ARegistryEvent getCurrentStateEvent()
+	{
+		// Forward current state initially
+		// The current state consists of those parts that are managed as clients
+		MultiRegistryEvent mre = new MultiRegistryEvent();
+		for(IComponentIdentifier c: internalGetClients())
+		{
+			RegistryEvent ev = lrobs.getCurrentStateEvent(c);
+			mre.addEvent(ev);
+		}
+		RegistryEvent ev = lrobs.getCurrentStateEvent(getComponent().getComponentIdentifier());
+		mre.addEvent(ev);
+		mre.setClients(internalGetClients());
+		mre.addClient(getComponent().getComponentIdentifier().getRoot());
+		mre.setSender(getComponent().getComponentIdentifier().getRoot());
+		
+		return mre;
 	}
 	
 	/**
@@ -851,11 +872,14 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		Future<ARegistryResponseEvent> ret = new Future<ARegistryResponseEvent>();
 		
-//		System.out.println("received event from client: "+event);
+//		if(event instanceof MultiRegistryEvent && ((MultiRegistryEvent)(event)).getEvents()!=null)
+		System.out.println("received event from client: "+getComponent().getComponentIdentifier()+" "+event);
 		
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 
-		Set<IComponentIdentifier> unknown = crh.updateResponsibilities(cid, event);
+		Set<IComponentIdentifier> unknown = crh.updateManagedClients(cid, event);
+		
+//		System.out.println("unknown: "+unknown);
 		
 		// indirectly deduces indirect clients from events
 		handleRegistryEvent(event, null);
@@ -870,6 +894,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		addEventForParent(event);
 		
 		ARegistryResponseEvent res = prepareRegistryEventResponse(event, unknown);
+		System.out.println("response event is: "+res+" "+res.isUnknown());
 		
 		ret.setResult(res);
 		
@@ -883,6 +908,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected ARegistryResponseEvent prepareRegistryEventResponse(ARegistryEvent event, Set<IComponentIdentifier> unknown)
 	{
+		if(unknown.size()>0)
+			System.out.println("sdf");
+		
 		ARegistryResponseEvent ret = null;
 		
 		PeerInfo pi = getClient(event.getSender());
@@ -907,6 +935,12 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			{
 				mp.addEvent(a);
 			}
+			
+			ret = mp;
+		}
+		else
+		{
+			ret = res;
 		}
 		
 		return ret;
@@ -930,16 +964,18 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		else if(event instanceof MultiRegistryEvent)
 		{
 			MultiRegistryEvent mre = (MultiRegistryEvent)event;
+			MultiRegistryResponseEvent mp = (MultiRegistryResponseEvent)createResponseEvent(/*mre.isDelta() &&*/ unknown.contains(mre.getSender()), mre.getNetworkNames(), true, event.getSender());
 			if(mre.getEvents()!=null)
 			{
-				MultiRegistryResponseEvent mp = (MultiRegistryResponseEvent)createResponseEvent(/*mre.isDelta() &&*/ unknown.contains(mre.getSender()), mre.getNetworkNames(), true, event.getSender());
 				for(ARegistryEvent e: mre.getEvents())
 				{
-					RegistryEvent re = (RegistryEvent)event;
-					ret = createResponseEvent(re.isDelta() && unknown.contains(re.getSender()), re.getNetworkNames(), true, event.getSender());
+//					ARegistryEvent re = (ARegistryEvent)event;
+					ret = createRegistryEventResponse(e, unknown);
+//					ret = createResponseEvent(re.isDelta() && unknown.contains(re.getSender()), re.getNetworkNames(), true, event.getSender());
 					mp.addEvent(ret);
 				}
 			}
+			ret = mp;
 		}
 		
 		return ret;
@@ -952,6 +988,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected void removeAllClientRegistrations(PeerInfo ci)
 	{
+		System.out.println("Remove client: "+ci.getPlatformId());
+		
 		getRegistry().removeServices(ci.getPlatformId());
 		getRegistry().removeQueriesFromPlatform(ci.getPlatformId());
 		
