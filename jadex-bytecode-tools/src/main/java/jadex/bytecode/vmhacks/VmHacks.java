@@ -50,7 +50,9 @@ public class VmHacks
 	private static volatile Unsafe UNSAFE;
 	
 	/** Globally disable all VM Hacks. */
-	public static boolean DISABLE = true;
+	public static boolean DISABLE = false;
+	
+	public static boolean DEBUG = true;
 	
 	/**
 	 *  Provides access to unsafe operations.
@@ -70,6 +72,9 @@ public class VmHacks
 					{
 						UNSAFE.init();
 					}
+					
+					if (DEBUG)
+						System.out.println(UNSAFE.toString());
 				}
 			}
 		}
@@ -319,6 +324,19 @@ public class VmHacks
 			{
 				SUtil.throwUnchecked(e);
 			}
+		}
+		
+		/**
+		 *  Debug message.
+		 */
+		public String toString()
+		{
+			String ret = getClass().getName(); 
+			ret += " asm=" + asm;
+			ret += " native=" + hasnative;
+			ret += " javaunsafe=" + unsafeinstance;
+			ret += " instrumentation=" + instrumentation;
+			return ret;
 		}
 		
 //		public void markAsVerified(Class<?> clazz)
