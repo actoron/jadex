@@ -435,7 +435,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					public void resultAvailable(ARegistryResponseEvent revent)
 					{
 						// todo!!!: handle multi events propery (inform clients about full state requests)
-						
 						if(revent instanceof MultiRegistryResponseEvent)
 						{
 							MultiRegistryResponseEvent mre = (MultiRegistryResponseEvent)revent;
@@ -474,6 +473,18 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 						}
 						
 						// todo: tell client (not only superpeer!) to send full update
+						if(revent.getReceiver()!=null && getComponent().getComponentIdentifier().getRoot().equals(revent.getReceiver()))
+						{
+							PeerInfo pi = clients.get(revent.getReceiver());
+							if(pi!=null)
+							{
+								pi.addAnswer(revent);
+							}
+							else
+							{
+								System.out.println("Unknown client: "+revent.getReceiver());
+							}
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -500,6 +511,16 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //					forwardRegistryEventToParent(event, true);
 			}
 		});
+	}
+	
+	/**
+	 *  Get a client per id.
+	 *  @param cid The id.
+	 *  @return The peer info of the client.
+	 */
+	protected PeerInfo getClient(IComponentIdentifier cid)
+	{
+		return clients==null? null: clients.get(cid);
 	}
 	
 	/**
@@ -588,7 +609,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //								subscribedto.update(info);
 								
 								// todo: request updates
-								Set<IComponentIdentifier> unknown = prh.updateResponsabilities(cid, event);
+								Set<IComponentIdentifier> unknown = prh.updateResponsibilities(cid, event);
 								
 								handleRegistryEvent(event, null);
 							}
@@ -834,7 +855,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 
-		Set<IComponentIdentifier> unknown = crh.updateResponsabilities(cid, event);
+		Set<IComponentIdentifier> unknown = crh.updateResponsibilities(cid, event);
 		
 		// indirectly deduces indirect clients from events
 		handleRegistryEvent(event, null);
@@ -845,7 +866,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// Forward client updates to all other partner superpeers
 		forwardRegistryEventToPartners(event);
 		
-		// Collect client
+		// Collect events for parent
 		addEventForParent(event);
 		
 		ARegistryResponseEvent res = prepareRegistryEventResponse(event, unknown);
@@ -864,22 +885,58 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		ARegistryResponseEvent ret = null;
 		
+		PeerInfo pi = getClient(event.getSender());
+		List<ARegistryResponseEvent> answers = pi==null? null: pi.removeAnswers();
+		
+		ARegistryResponseEvent res = createRegistryEventResponse(event, unknown);
+		
+		if(answers!=null)
+		{
+			MultiRegistryResponseEvent mp;
+			
+			if(!(res instanceof MultiRegistryResponseEvent))
+			{
+				mp = (MultiRegistryResponseEvent)createResponseEvent(/*mre.isDelta() &&*/ unknown.contains(event.getSender()), event.getNetworkNames(), true, event.getSender());
+				mp.addEvent(res);
+			}	
+			else
+			{
+				mp = (MultiRegistryResponseEvent)res;
+			}
+			for(ARegistryResponseEvent a: answers)
+			{
+				mp.addEvent(a);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 * @param event
+	 * @return
+	 */
+	protected ARegistryResponseEvent createRegistryEventResponse(ARegistryEvent event, Set<IComponentIdentifier> unknown)
+	{
+		ARegistryResponseEvent ret = null;
+		
 		// Prepare response
 		if(event instanceof RegistryEvent)
 		{
 			RegistryEvent re = (RegistryEvent)event;
-			ret = createResponseEvent(re.isDelta() && unknown.contains(re.getSender()), re.getNetworkNames(), false);
+			ret = createResponseEvent(re.isDelta() && unknown.contains(re.getSender()), re.getNetworkNames(), false, event.getSender());
 		}
 		else if(event instanceof MultiRegistryEvent)
 		{
 			MultiRegistryEvent mre = (MultiRegistryEvent)event;
 			if(mre.getEvents()!=null)
 			{
-				MultiRegistryResponseEvent mp = (MultiRegistryResponseEvent)createResponseEvent(/*mre.isDelta() &&*/ unknown.contains(mre.getSender()), mre.getNetworkNames(), true);
+				MultiRegistryResponseEvent mp = (MultiRegistryResponseEvent)createResponseEvent(/*mre.isDelta() &&*/ unknown.contains(mre.getSender()), mre.getNetworkNames(), true, event.getSender());
 				for(ARegistryEvent e: mre.getEvents())
 				{
 					RegistryEvent re = (RegistryEvent)event;
-					ret = createResponseEvent(re.isDelta() && unknown.contains(re.getSender()), re.getNetworkNames(), true);
+					ret = createResponseEvent(re.isDelta() && unknown.contains(re.getSender()), re.getNetworkNames(), true, event.getSender());
 					mp.addEvent(ret);
 				}
 			}
@@ -887,7 +944,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		
 		return ret;
 	}
-	
 	
 	/**
 	 *  Remove all data that was registered by a client.
@@ -978,11 +1034,12 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	/**
 	 *  Create a response event for a client.
 	 */
-	protected ARegistryResponseEvent createResponseEvent(boolean unknown, String[] networknames, boolean multi)
+	protected ARegistryResponseEvent createResponseEvent(boolean unknown, String[] networknames, boolean multi, IComponentIdentifier sender)
 	{
 		// Special handling for superpeer clients of level 1
 		// Sends back other network-compatible superpeers of level 1
 		RegistryResponseEvent res = multi? new MultiRegistryResponseEvent(unknown, lrobs.getTimeLimit()): new RegistryResponseEvent(unknown, lrobs.getTimeLimit());
+		res.setReceiver(sender);
 //		if(IRegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1.equals(event.getClientType()))
 //		if(IRegistryEvent.CLIENTTYPE_CLIENT.equals(event.getClientType()))
 		
@@ -1209,6 +1266,15 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	protected IServiceRegistry getRegistry()
 	{
 		return ServiceRegistry.getRegistry(component.getComponentIdentifier());
+	}
+
+	/**
+	 *  Get the component.
+	 *  @return The component.
+	 */
+	public IInternalAccess getComponent()
+	{
+		return component;
 	}
 	
 //	/**

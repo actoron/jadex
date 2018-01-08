@@ -49,6 +49,8 @@ public class VmHacks
 	/** Access to unsafe operations. */
 	private static final Unsafe UNSAFE;
 	
+	public static boolean DISABLE = true;
+	
 	static
 	{
 		UNSAFE = new Unsafe();
@@ -69,6 +71,8 @@ public class VmHacks
      */
 	public static final class Unsafe
 	{
+		
+		
 		/** Set this to true to switch to fallback mode for invocation */
 		private boolean asm = false;
 		
@@ -439,7 +443,7 @@ public class VmHacks
 		@SuppressWarnings("unchecked")
 		private void startInstrumentationAgent()
 		{
-			if (!asm)
+			if (!asm || DISABLE)
 				return;
 			
 			File jar = null;

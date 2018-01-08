@@ -67,4 +67,10 @@ public interface ISuperpeerRegistrySynchronizationService
 	 *  @retrun The level.
 	 */
 	public IFuture<Integer> getLevel();
+	
+//	/**
+//	 *  Get the responsibilities.
+//	 *  @return The clients this superpeer handles.
+//	 */
+//	public IFuture<Collection<IComponentIdentifier>>
 }

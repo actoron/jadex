@@ -29,7 +29,7 @@ public abstract class ResponsabilityHandler
 	 *  @param event The event.
 	 *  @return The new managed platform from which a full state update should be requested.
 	 */
-	public Set<IComponentIdentifier> updateResponsabilities(IComponentIdentifier cid, ARegistryEvent event)
+	public Set<IComponentIdentifier> updateResponsibilities(IComponentIdentifier cid, ARegistryEvent event)
 	{
 		Set<IComponentIdentifier> ret = new HashSet<IComponentIdentifier>();
 		

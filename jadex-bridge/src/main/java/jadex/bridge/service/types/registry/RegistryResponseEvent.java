@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.registry;
 
+import jadex.bridge.IComponentIdentifier;
+
 /**
  *  Event from super-peers to an update request.
  *  Indicates whether the client was removed or was  
@@ -14,7 +16,7 @@ public class RegistryResponseEvent extends ARegistryResponseEvent
 	
 	/** The suitable superpeer services. */
 	protected ISuperpeerRegistrySynchronizationService[] superpeers;
-	
+
 	/**
 	 *  Create a new RegistryUpdateEvent.
 	 */

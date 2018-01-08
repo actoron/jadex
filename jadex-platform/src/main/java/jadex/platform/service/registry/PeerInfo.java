@@ -1,9 +1,12 @@
 package jadex.platform.service.registry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.registry.ARegistryEvent;
+import jadex.bridge.service.types.registry.ARegistryResponseEvent;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
@@ -23,6 +26,9 @@ public class PeerInfo
 	/** The subscription. */
 	protected ISubscriptionIntermediateFuture<ARegistryEvent> subscription;
 
+	/** The list of (indirect answer) events. Need to be send on next client contact */
+	protected List<ARegistryResponseEvent> answers;
+	
 	/**
 	 * Create a new RegistrySynchronizationService.
 	 */
@@ -110,5 +116,44 @@ public class PeerInfo
 	public void setSubscription(ISubscriptionIntermediateFuture<ARegistryEvent> subscription)
 	{
 		this.subscription = subscription;
+	}
+
+	/**
+	 *  Get the answers.
+	 *  @return The answers.
+	 */
+	public List<ARegistryResponseEvent> getAnswers()
+	{
+		return answers;
+	}
+	
+	/**
+	 *  Remove the answers.
+	 *  @return The answers.
+	 */
+	public List<ARegistryResponseEvent> removeAnswers()
+	{
+		List<ARegistryResponseEvent> ret = answers;
+		answers = null;
+		return ret;
+	}
+
+	/**
+	 *  Set the answers.
+	 *  @param answers The answers to set
+	 */
+	public void setAnswers(List<ARegistryResponseEvent> answers)
+	{
+		this.answers = answers;
+	}
+	
+	/**
+	 *  Add an answer.
+	 */
+	public void addAnswer(ARegistryResponseEvent event)
+	{
+		if(answers == null)
+			answers = new ArrayList<ARegistryResponseEvent>();
+		answers.add(event);
 	}
 }

@@ -19,6 +19,8 @@ public class NativeHelper
 	// Initialize native code.
 	static
 	{
+		if (VmHacks.DISABLE)
+			throw new RuntimeException();
 		try
 		{
 			String archstr = "64";
