@@ -386,8 +386,8 @@ stage ('publish and deploy') {
                     }
 
                     // exampleprojects:
-                    util.sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
-                    util.copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/exampleprojects/"
+                    //util.sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
+                    util.copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/"
                 }
             }
         }
