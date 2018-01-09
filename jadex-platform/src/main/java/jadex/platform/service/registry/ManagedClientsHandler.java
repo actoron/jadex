@@ -6,12 +6,11 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.types.registry.ARegistryEvent;
-import jadex.bridge.service.types.registry.MultiRegistryEvent;
 
 /**
  * 
  */
-public abstract class ResponsabilityHandler
+public abstract class ManagedClientsHandler
 {
 	/** The service registry. */
 	protected IServiceRegistry registry;
@@ -19,7 +18,7 @@ public abstract class ResponsabilityHandler
 	/**
 	 *  Create a new handler.
 	 */
-	public ResponsabilityHandler(IServiceRegistry registry)
+	public ManagedClientsHandler(IServiceRegistry registry)
 	{
 		this.registry = registry;
 	}
@@ -29,11 +28,14 @@ public abstract class ResponsabilityHandler
 	 *  @param event The event.
 	 *  @return The new managed platform from which a full state update should be requested.
 	 */
-	public Set<IComponentIdentifier> updateResponsibilities(IComponentIdentifier cid, ARegistryEvent event)
+	public Set<IComponentIdentifier> updateManagedClients(IComponentIdentifier cid, ARegistryEvent event)
 	{
 		Set<IComponentIdentifier> ret = new HashSet<IComponentIdentifier>();
 		
 		Set<IComponentIdentifier> clients = event.getClients();
+		if(clients==null)
+			clients = new HashSet<IComponentIdentifier>();
+		clients.add(event.getSender());
 //		cls.remove(cid);
 		
 		PeerInfo ci = getClientInfo(cid);
@@ -50,8 +52,8 @@ public abstract class ResponsabilityHandler
 			Set<IComponentIdentifier> tmp = new HashSet<IComponentIdentifier>();
 			if(ci.getIndirectClients()!=null)
 				tmp.addAll(ci.getIndirectClients());
-			if(clients!=null)
-				tmp.removeAll(clients);
+			tmp.removeAll(clients);
+			tmp.remove(event.getSender());
 			for(IComponentIdentifier c: tmp)
 			{
 				getRegistry().removeServices(c);
@@ -60,8 +62,7 @@ public abstract class ResponsabilityHandler
 			
 			// Find new ones by taking send ones minus existing ones
 			tmp = new HashSet<IComponentIdentifier>();
-			if(clients!=null)
-				tmp.addAll(clients);
+			tmp.addAll(clients);
 			if(ci.getIndirectClients()!=null)
 				tmp.removeAll(ci.getIndirectClients());
 			ret.addAll(tmp);

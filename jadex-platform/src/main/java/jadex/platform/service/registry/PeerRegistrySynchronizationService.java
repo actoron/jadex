@@ -214,7 +214,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		};
 		
 		// Subscribe to changes of the local registry to inform my superpeer
-		lrobs = new LocalRegistryObserver(component.getComponentIdentifier(), new AgentDelayRunner(component), true)
+		lrobs = new LocalRegistryObserver(component.getComponentIdentifier().getRoot(), new AgentDelayRunner(component), true)
 		{
 			public void notifyObservers(final ARegistryEvent event)
 			{
@@ -231,6 +231,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						{
 							public void resultAvailable(ARegistryResponseEvent spevent) 
 							{
+								System.out.println("peer received: "+spevent.isUnknown()+" "+spevent.getReceiver()+" "+event);
+								
 								// Should clients receive multi responses?!
 								if(spevent instanceof MultiRegistryResponseEvent)
 								{
@@ -262,14 +264,14 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 										// Does a new search to refresh superpeer
 										getSuperpeerService(true).addResultListener(searchlis);
 									}
-									
-									if(re.isRemoved())
-									{
-										spser.updateClientData(lrobs.getCurrentStateEvent(null)).addResultListener(this);
-										System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
-									}
 									// Calls notify observers at latest 
 									lrobs.setTimeLimit((long)(re.getLeasetime()*0.9));
+								}
+								
+								if(spevent.isUnknown())
+								{
+									spser.updateClientData(lrobs.getCurrentStateEvent(null)).addResultListener(this);
+									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
 								}
 							}
 							

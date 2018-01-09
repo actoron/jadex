@@ -30,7 +30,7 @@ public abstract class MultiEventCollector extends EventCollector
 	 *  Add a registry event.
 	 *  @param event The event.
 	 */
-	public void addEvent(ARegistryEvent event)
+	public void addEvent(ARegistryEvent event) 
 	{
 		((MultiRegistryEvent)registryevent).addEvent(event);
 	}
@@ -41,6 +41,9 @@ public abstract class MultiEventCollector extends EventCollector
 	 */
 	public ARegistryEvent createEvent()
 	{
-		return new MultiRegistryEvent(eventslimit, timelimit);
+		ARegistryEvent ret = new MultiRegistryEvent(eventslimit, timelimit);
+		ret.setSender(getComponentIdentifier().getRoot());
+//		System.out.println("created mre: "+ret);
+		return ret;
 	}
 }

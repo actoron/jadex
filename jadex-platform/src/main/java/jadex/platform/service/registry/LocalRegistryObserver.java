@@ -133,7 +133,8 @@ public abstract class LocalRegistryObserver extends EventCollector
 		RegistryEvent event = new RegistryEvent(added, null, eventslimit, timelimit, false, null);
 //		clients.add(getComponentIdentifier());
 //		event.setClients(clients);
-		event.addClient(getComponentIdentifier());
+		event.addClient(getComponentIdentifier().getRoot());
+		event.setSender(getComponentIdentifier().getRoot());
 		return event;
 	}
 }

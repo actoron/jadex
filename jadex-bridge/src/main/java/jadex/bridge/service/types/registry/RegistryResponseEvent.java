@@ -1,16 +1,11 @@
 package jadex.bridge.service.types.registry;
 
-import jadex.bridge.IComponentIdentifier;
-
 /**
  *  Event from super-peers to an update request.
  *  Indicates whether the client was removed or was  
  */
 public class RegistryResponseEvent extends ARegistryResponseEvent
 {
-	/** Unknown flag. */
-	protected boolean unknown;
-	
 	/** The super-peer lease time. After the lease time the client will be removed. */
 	protected long leasetime;
 	
@@ -31,24 +26,6 @@ public class RegistryResponseEvent extends ARegistryResponseEvent
 	{
 		this.unknown = removed;
 		this.leasetime = leasetime;
-	}
-
-	/**
-	 *  Ask if the client was removed from the server.
-	 *  Should send a full update as next event.
-	 */
-	public boolean isRemoved()
-	{
-		return unknown;
-	}
-
-	/**
-	 *  Set the removed.
-	 *  @param removed The removed to set
-	 */
-	public void setRemoved(boolean removed)
-	{
-		this.unknown = removed;
 	}
 
 	/**
