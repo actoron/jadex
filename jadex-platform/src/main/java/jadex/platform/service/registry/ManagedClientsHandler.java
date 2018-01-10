@@ -54,6 +54,8 @@ public abstract class ManagedClientsHandler
 				tmp.addAll(ci.getIndirectClients());
 			tmp.removeAll(clients);
 			tmp.remove(event.getSender());
+			if(tmp.size()>0)
+				System.out.println("Remove services due to dependency management: "+tmp);
 			for(IComponentIdentifier c: tmp)
 			{
 				getRegistry().removeServices(c);

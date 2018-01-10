@@ -71,7 +71,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	protected Set<PeerInfo> subscribedto;
 	
 	/** The currently blacklisted platforms (are not checked when newPlatformArrived() is called). */
-//	protected Set<IComponentIdentifier> blackplatforms;
 	protected LeaseTimeSet<IComponentIdentifier> blackplatforms;
 	
 	/** The client platforms that are managed by this super-peer. */
@@ -741,7 +740,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			{
 				for(IService ser: removed)
 				{
-	//				System.out.println("removed ser: "+ser);
+					System.out.println("removed ser due to event: "+ser);
 					reg.removeService(ser);
 					
 					if(plat==null)
@@ -789,10 +788,14 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// Finish subscriptions of other platforms 
 		if(partners!=null)
 		{
-			SubscriptionIntermediateFuture<ARegistryEvent>[] evs = partners.values().toArray(new SubscriptionIntermediateFuture[partners.size()]);
-			for(SubscriptionIntermediateFuture<ARegistryEvent> fut: evs)
+			PeerInfo[] pis = partners.values().toArray(new PeerInfo[partners.size()]);
+			for(PeerInfo pi: pis)
 			{
-				fut.setFinished();
+				if(pi.getSubscription() instanceof SubscriptionIntermediateFuture)
+				{
+					SubscriptionIntermediateFuture<ARegistryEvent> fut = (SubscriptionIntermediateFuture<ARegistryEvent>)pi.getSubscription();
+					fut.setFinished();
+				}
 			}
 		}
 	}
@@ -908,9 +911,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected ARegistryResponseEvent prepareRegistryEventResponse(ARegistryEvent event, Set<IComponentIdentifier> unknown)
 	{
-		if(unknown.size()>0)
-			System.out.println("sdf");
-		
 		ARegistryResponseEvent ret = null;
 		
 		PeerInfo pi = getClient(event.getSender());
@@ -988,7 +988,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected void removeAllClientRegistrations(PeerInfo ci)
 	{
-		System.out.println("Remove client: "+ci.getPlatformId());
+		System.out.println("Remove client with all services: "+ci.getPlatformId());
 		
 		getRegistry().removeServices(ci.getPlatformId());
 		getRegistry().removeQueriesFromPlatform(ci.getPlatformId());
