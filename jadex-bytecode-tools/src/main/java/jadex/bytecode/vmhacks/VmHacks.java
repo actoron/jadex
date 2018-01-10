@@ -57,7 +57,7 @@ public class VmHacks
 	/** Globally disable all VM Hacks. */
 	public static boolean DISABLE = false;
 	
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	/**
 	 *  Provides access to unsafe operations.
