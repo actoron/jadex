@@ -8,9 +8,9 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.types.registry.ARegistryEvent;
 
 /**
- * 
+ *  Handle the dependencies.
  */
-public abstract class ManagedClientsHandler
+public abstract class DependenciesHandler
 {
 	/** The service registry. */
 	protected IServiceRegistry registry;
@@ -18,7 +18,7 @@ public abstract class ManagedClientsHandler
 	/**
 	 *  Create a new handler.
 	 */
-	public ManagedClientsHandler(IServiceRegistry registry)
+	public DependenciesHandler(IServiceRegistry registry)
 	{
 		this.registry = registry;
 	}
@@ -28,7 +28,7 @@ public abstract class ManagedClientsHandler
 	 *  @param event The event.
 	 *  @return The new managed platform from which a full state update should be requested.
 	 */
-	public Set<IComponentIdentifier> updateManagedClients(IComponentIdentifier cid, ARegistryEvent event)
+	public Set<IComponentIdentifier> updateDependencies(IComponentIdentifier cid, ARegistryEvent event)
 	{
 		Set<IComponentIdentifier> ret = new HashSet<IComponentIdentifier>();
 		
@@ -38,11 +38,11 @@ public abstract class ManagedClientsHandler
 		clients.add(event.getSender());
 //		cls.remove(cid);
 		
-		PeerInfo ci = getClientInfo(cid);
+		PeerInfo ci = getPeerInfo(cid);
 		
 		if(ci==null)
 		{
-			ci = createClientInfo(cid);
+			ci = createPeerInfo(cid);
 			ci.setIndirectClients(clients);
 			ret.add(cid);
 		}
@@ -54,6 +54,8 @@ public abstract class ManagedClientsHandler
 				tmp.addAll(ci.getIndirectClients());
 			tmp.removeAll(clients);
 			tmp.remove(event.getSender());
+			if(tmp.size()>0)
+				System.out.println("Remove services due to dependency management: "+tmp);
 			for(IComponentIdentifier c: tmp)
 			{
 				getRegistry().removeServices(c);
@@ -73,7 +75,7 @@ public abstract class ManagedClientsHandler
 //		System.out.println("new lease time for: "+cid+" "+System.currentTimeMillis()+"  "+lrobs.getTimeLimit());
 		
 		// Putting in the value refreshes the lease time of the entry
-		putClient(ci);//cid, ci);
+		putPeerInfo(ci);//cid, ci);
 		
 		return ret;
 	}
@@ -82,7 +84,7 @@ public abstract class ManagedClientsHandler
 	 *  Create a client info.
 	 *  @param cid The cid.
 	 */
-	public PeerInfo createClientInfo(IComponentIdentifier cid)
+	public PeerInfo createPeerInfo(IComponentIdentifier cid)
 	{
 		return new PeerInfo(cid);
 	}
@@ -101,11 +103,11 @@ public abstract class ManagedClientsHandler
 	 *  @param cid The cid.
 	 *  @return The client info.
 	 */
-	public abstract PeerInfo getClientInfo(IComponentIdentifier cid);
+	public abstract PeerInfo getPeerInfo(IComponentIdentifier cid);
 	
 	/**
 	 *  Put a client.
 	 *  @param client The client.
 	 */
-	public abstract void putClient(PeerInfo client);
+	public abstract void putPeerInfo(PeerInfo client);
 }

@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
@@ -15,8 +16,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
@@ -24,6 +27,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -32,6 +36,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.InsnList;
 
 import jadex.bytecode.IByteCodeClassLoader;
 import jadex.bytecode.SASM;
@@ -52,7 +57,7 @@ public class VmHacks
 	/** Globally disable all VM Hacks. */
 	public static boolean DISABLE = false;
 	
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	/**
 	 *  Provides access to unsafe operations.
@@ -133,6 +138,13 @@ public class VmHacks
 		
 		/** Synchronization lock for the instrumentation agent. */
 		private Semaphore instagentlock = new Semaphore(0);
+		
+		public void print(Object o)
+		{
+			System.out.println(o);
+			System.out.flush();
+			System.exit(0);
+		}
 		
 		/**
 		 *  Creates the Unsafe.
@@ -409,6 +421,8 @@ public class VmHacks
 		{
 			asm = !SReflect.isAndroid();
 			
+			LoggerFilterStore.inject();
+			
 			try
 			{
 				new NativeHelper();
@@ -535,7 +549,7 @@ public class VmHacks
 		        }
 		        
 		        if (hasagent)
-		        	instagentlock.tryAcquire(300, TimeUnit.MILLISECONDS);
+		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(300, TimeUnit.MILLISECONDS);
 		        
 		        if (hasInstrumentation())
 		        {
@@ -547,9 +561,9 @@ public class VmHacks
 				        is = VmHacks.class.getClassLoader().getResourceAsStream(classstoreclassname.replace('.', '/') + ".class");
 						appendToBootstrapClassLoaderSearch(classstoreclassname, is);
 					
-						Class<?> storeclass = Class.forName(classstoreclassname);
-						Field clinj = storeclass.getField("STORE");
-						injectionclassstore = (Map<Object[], Class<?>>) clinj.get(null);
+//						Class<?> storeclass = Class.forName(classstoreclassname);
+//						Field clinj = storeclass.getField("STORE");
+						injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
 					}
 					catch (Exception e)
 					{
@@ -631,9 +645,31 @@ public class VmHacks
 							
 							try
 							{
-								Class<?> storeclass = Class.forName(classstoreclassname);
-								Field clinj = storeclass.getField("STORE");
-								ret.visitFieldInsn(Opcodes.GETSTATIC, Type.getInternalName(clinj.getDeclaringClass()), clinj.getName(), Type.getDescriptor(clinj.getType()));
+//								Class<?> storeclass = Class.forName(classstoreclassname);
+								
+//								Method x = PrintStream.class.getMethod("exit", System.class);
+//								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(PrintStream.class), x.getName(), Type.getMethodDescriptor(x), false);
+								
+								InsnList nl = new InsnList();
+								SASM.pushImmediate(nl, LoggerFilterStore.ID);
+								nl.accept(ret);
+								
+								Method valueof = String.class.getMethod("valueOf", int.class);
+								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(String.class), valueof.getName(), Type.getMethodDescriptor(valueof), false);
+								
+								Method getlogger = Logger.class.getMethod("getLogger", String.class);
+								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(Logger.class), getlogger.getName(), Type.getMethodDescriptor(getlogger), false);
+								
+								Method getfilter = Logger.class.getMethod("getFilter");
+								ret.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(Logger.class), getfilter.getName(), Type.getMethodDescriptor(getfilter), false);
+								
+								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(ArrayList.class));
+								
+								ret.visitInsn(Opcodes.ICONST_1);
+								Method arrget = ArrayList.class.getMethod("get", int.class);
+								ret.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(ArrayList.class), arrget.getName(), Type.getMethodDescriptor(arrget), false);
+								
+//								ret.visitFieldInsn(Opcodes.GETSTATIC, Type.getInternalName(clinj.getDeclaringClass()), clinj.getName(), Type.getDescriptor(clinj.getType()));
 								
 								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(Map.class));
 								

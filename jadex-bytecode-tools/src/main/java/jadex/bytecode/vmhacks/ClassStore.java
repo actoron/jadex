@@ -13,9 +13,6 @@ import java.util.WeakHashMap;
  */
 public class ClassStore implements Map<Object[], Class<?>>
 {
-	/** The store instance. */
-	public static final Map<Object[], Class<?>> STORE = new ClassStore();
-	
 	/** The internal map. */
 	private Map<ClassLoader, Map<String, WeakReference<Class<?>>>> injections = new WeakHashMap<ClassLoader, Map<String, WeakReference<Class<?>>>>();
 	

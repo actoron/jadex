@@ -354,7 +354,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 //			System.out.println("Received message: "+header);
 			
-			getSecurityService().decryptAndAuth((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
+			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
 				{

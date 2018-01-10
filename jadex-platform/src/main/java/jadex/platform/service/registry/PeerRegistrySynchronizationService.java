@@ -154,14 +154,14 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			 */
 			protected void forwardResults(boolean fini, ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> call)
 			{
+//				System.out.println("forwardRes: "+fini);
+				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)
 				{
 					Future<IComponentIdentifier> fut = futs.remove(0);
 					fut.setResult(((IService)res.get(pos++)).getServiceIdentifier().getProviderId());
 				}
-				
-//				System.out.println("forwardRes: "+fini);
 				
 				if(fini)
 				{
@@ -231,7 +231,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						{
 							public void resultAvailable(ARegistryResponseEvent spevent) 
 							{
-								System.out.println("peer received: "+spevent.isUnknown()+" "+spevent.getReceiver()+" "+event);
+//								System.out.println("peer received: "+spevent.isUnknown()+" "+spevent.getReceiver()+" "+event);
 								
 								// Should clients receive multi responses?!
 								if(spevent instanceof MultiRegistryResponseEvent)
@@ -282,7 +282,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								
 								System.out.println("Exception with superpeer, resetting");
 								
-								exception.printStackTrace();
+//								exception.printStackTrace();
 								
 								spregser = null;
 							}
