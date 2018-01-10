@@ -262,7 +262,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 								// When no more executables, inform idle commands.
 								if(idf!=null)
 								{
-		//							System.out.println("Idle");
+//									System.out.println("Idle");
 									idf.setResult(null);
 		//							Iterator it	= idlecommands.iterator();
 		//							while(it.hasNext())

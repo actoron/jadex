@@ -59,8 +59,8 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
     }
 
     /**
-     * Returns the platform config
-     * @return
+     * Returns the platform config.
+     * Can be overridden to apply special settings. 
      */
     public IPlatformConfiguration getConfig() {
         return config;
@@ -68,7 +68,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
 
     @Override
     public void runBare() {
-        IExternalAccess platform = STest.createPlatform(config);
+        IExternalAccess platform = STest.createPlatform(getConfig());
         cms = STest.getCMS(platform);
         setPlatform(platform, cms);
         super.runBare();

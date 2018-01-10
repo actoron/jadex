@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -244,6 +245,15 @@ public class DFTestAgent extends JunitAgentTest
 		agent.killComponent();
 	}
 
+	/**
+	 *  Add df service to config.
+	 */
+	@Override
+	public IPlatformConfiguration getConfig()
+	{
+		super.getConfig().setDf(true);
+		return super.getConfig();
+	}
 	
 //	/**
 //	 *  Add the 'testresults' marking this agent as a testcase. 
