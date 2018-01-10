@@ -1763,7 +1763,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Search for services.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByAskAll(ServiceQuery<T> query)
+	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByAskAll(final ServiceQuery<T> query)
 	{
 		SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		IIntermediateResultListener<T> reslis = new IntermediateDelegationResultListener<T>(ret)
@@ -1772,6 +1772,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			
 			public void finished()
 			{
+//				System.out.println("searchServicesAsyncByAskAll: "+query.hashCode());
 				if(firstfinished)
 					super.finished();
 				else
@@ -2228,20 +2229,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								@SuppressWarnings("unchecked")
 								public void resultAvailable(Collection<T> result)
 								{
-									if (result != null)
+									if(result != null)
 									{
-										if (query.getFilter() instanceof IAsyncFilter)
+										if(query.getFilter() instanceof IAsyncFilter)
 										{
 											FutureBarrier<Boolean> filterbar = new FutureBarrier<Boolean>();
-											for (Iterator<T> it = result.iterator(); it.hasNext(); )
+											for(Iterator<T> it = result.iterator(); it.hasNext(); )
 											{
 												final T ser = it.next();
-												IFuture<Boolean> filterfut = ((IAsyncFilter<T>) query.getFilter()).filter(ser);
+												IFuture<Boolean> filterfut = ((IAsyncFilter<T>)query.getFilter()).filter(ser);
 												filterfut.addResultListener(new IResultListener<Boolean>()
 												{
 													public void resultAvailable(Boolean result)
 													{
-														if (Boolean.TRUE.equals(result))
+														if(Boolean.TRUE.equals(result))
 															ret.addIntermediateResultIfUndone(ser);
 													}
 
@@ -2255,15 +2256,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 										}
 										else
 										{
-											for (Iterator<T> it = result.iterator(); it.hasNext(); )
+											for(Iterator<T> it = result.iterator(); it.hasNext(); )
 											{
 												T ser = it.next();
-												if (query.getFilter() == null || ((IFilter<T>) query.getFilter()).filter(ser))
+												if(query.getFilter() == null || ((IFilter<T>)query.getFilter()).filter(ser))
 												{
 													ret.addIntermediateResultIfUndone(ser);
 												}
 											}
+											remotefin.setResult(null);
 										}
+									}
+									else
+									{
+										remotefin.setResult(null);
 									}
 								}
 
@@ -2299,6 +2305,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 
 				public void exceptionOccurred(Exception exception)
 				{
+					// wait ignore failures
+//					ret.setExceptionIfUndone(exception);
 				}
 			});
 		}
