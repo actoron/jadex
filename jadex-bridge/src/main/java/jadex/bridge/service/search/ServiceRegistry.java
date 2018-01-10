@@ -1975,7 +1975,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								{
 									public void resultAvailable(Boolean result)
 									{
-										if (Boolean.TRUE.equals(result))
+										if(Boolean.TRUE.equals(result))
 											ret.setResult(obj);
 										else
 											exceptionOccurred(null);
@@ -1983,7 +1983,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										if (it.hasNext())
+										if(it.hasNext())
 											cmd.execute(it);
 										else
 											ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
