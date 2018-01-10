@@ -80,7 +80,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	protected LocalRegistryObserver lrobs;
 	
 	/** Event collector for parent. */
-	protected MultiEventCollector mevcol;
+	protected MultiEventCollector parentcol;
+	
+	/** Event collector for parent. */
+	protected MultiEventCollector partnercol;
 	
 	/** Handles resposabilities of clients. */
 	protected ManagedClientsHandler crh;
@@ -265,10 +268,29 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			}
 		};
 		
+		partnercol = new MultiEventCollector(component.getComponentIdentifier(), new AgentDelayRunner(component))
+		{
+			@Override
+			public void notifyObservers(ARegistryEvent event)
+			{
+//				System.out.println("collector notify partners");
+				forwardRegistryEventToPartners(event);
+			}
+			
+			@Override
+			public ARegistryEvent createEvent()
+			{
+				MultiRegistryEvent ret = (MultiRegistryEvent)super.createEvent();
+				ret.setClients(internalGetClients()); // hmm set before send, could change
+				return ret;
+			}
+		};
+		
+		
 		// Event collector for the supersuperpeer (contacting the ssp and send bunch updates from clients and myself)
 		if(level==1)
 		{
-			mevcol = new MultiEventCollector(component.getComponentIdentifier(), new AgentDelayRunner(component))
+			parentcol = new MultiEventCollector(component.getComponentIdentifier(), new AgentDelayRunner(component))
 			{
 				@Override
 				public void notifyObservers(ARegistryEvent event)
@@ -281,7 +303,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				public ARegistryEvent createEvent()
 				{
 					MultiRegistryEvent ret = (MultiRegistryEvent)super.createEvent();
-					ret.setClients(internalGetClients());
+					ret.setClients(internalGetClients()); // hmm set before send, could change
 					return ret;
 				}
 			};
@@ -555,7 +577,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			
 		if(isBlacklistedPlatform(cid) || containsSubscribedTo(cid))
 		{
-//			System.out.println("Ignoring: already subscribed to: "+cid+" (I am: "+component.getComponentIdentifier()+")");
+			System.out.println("Ignoring: already subscribed to: "+cid+" (I am: "+component.getComponentIdentifier()+")");
 		}
 		else
 		{
@@ -891,7 +913,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //			System.out.println("Client update request from: "+cid+" size:"+event.size()+" delta: "+event.isDelta());
 		
 		// Forward client updates to all other partner superpeers
-		forwardRegistryEventToPartners(event);
+//		forwardRegistryEventToPartners(event);
+		partnercol.addEvent(event);
 		
 		// Collect events for parent
 		addEventForParent(event);
@@ -1064,7 +1087,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				final RegistryEvent nev = new RegistryEvent(event.isDelta(), ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
 				nev.setAddedServices(added);
 				nev.setRemovedServices(rem);
-				mevcol.addEvent(nev);
+				parentcol.addEvent(nev);
 			}
 		}
 	}
