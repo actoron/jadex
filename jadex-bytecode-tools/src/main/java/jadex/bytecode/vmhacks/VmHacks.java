@@ -97,7 +97,7 @@ public class VmHacks
 		private boolean asm = false;
 		
 		/** The native support if available. */
-		public INativeHelper nativehelper = null;
+		private INativeHelper nativehelper = null;
 		
 		/** sun.misc.Unsafe if available. */
 		private Class<?> unsafeclass;
@@ -138,13 +138,6 @@ public class VmHacks
 		
 		/** Synchronization lock for the instrumentation agent. */
 		private Semaphore instagentlock = new Semaphore(0);
-		
-		public void print(Object o)
-		{
-			System.out.println(o);
-			System.out.flush();
-			System.exit(0);
-		}
 		
 		/**
 		 *  Creates the Unsafe.

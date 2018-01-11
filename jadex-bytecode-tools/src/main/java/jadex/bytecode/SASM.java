@@ -283,6 +283,23 @@ public class SASM
 		}
 	}
 	
+//	public static byte[] convertJvmToDex(String name, byte[] code)
+//	{
+//		name = name == null? "dummy.class" : name.replace('.', '/') + ".class";
+//		DexOptions dexoptions = new DexOptions();
+//		DexFile dexfile = new DexFile(dexoptions);
+//		CfTranslator.translate(name, code, new CfOptions(), dexoptions).addContents(dexfile);
+//		byte[] dxcode = code;
+//		try
+//		{
+//			dxcode = dexfile.toDex(null, false);
+//		}
+//		catch (Exception e)
+//		{
+//		}
+//		return dxcode;
+//	}
+	
 	/**
 	 *  Transform byte Array into Class and define it in classloader.
 	 *  @return the loaded class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
