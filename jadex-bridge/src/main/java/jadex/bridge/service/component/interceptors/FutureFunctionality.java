@@ -285,6 +285,11 @@ public class FutureFunctionality
 	 */
 	public static void connectDelegationFuture(Future target, IFuture source)
 	{
+		if(target==null)
+			throw new IllegalArgumentException("Target must not null");
+		if(source==null)
+			throw new IllegalArgumentException("Source must not null");
+		
 		if(target instanceof IPullSubscriptionIntermediateFuture)
 		{
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
