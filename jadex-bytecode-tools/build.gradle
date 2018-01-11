@@ -4,5 +4,6 @@ dependencies
 {
 	compile project(':jadex-commons')
 	compileNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
+	compileNoAndroidRuntime 'net.java.dev.jna:jna:4.5.1'
 }
 

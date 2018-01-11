@@ -16,6 +16,16 @@ public class ClassStore implements Map<Object[], Class<?>>
 	/** The internal map. */
 	private Map<ClassLoader, Map<String, WeakReference<Class<?>>>> injections = new WeakHashMap<ClassLoader, Map<String, WeakReference<Class<?>>>>();
 	
+	/** Name of the calling class that is allowed to write to the store. */
+	private String allowedcaller = "jadex.bytecode.vmhacks.VmHacks$Unsafe";
+	
+	/**
+	 *  Creates the store.
+	 */
+	public ClassStore()
+	{
+	}
+	
 	/** Override */
 	public Class<?> get(Object key)
 	{
@@ -43,6 +53,14 @@ public class ClassStore implements Map<Object[], Class<?>>
 	/** Override */
 	public Class<?> put(Object[] key, Class<?> value)
 	{
+		StackTraceElement[] st = new RuntimeException().getStackTrace();
+		String callername = st[0].getClassName();
+		for (int i = 1; i < st.length && ClassStore.class.getName().equals(callername); ++i)
+			callername = st[i].getClassName();
+		
+		if (!allowedcaller.equals(callername))
+			throw new SecurityException("Caller not allowed: " + callername);
+		
 		ClassLoader cl = (ClassLoader) key[0];
 		String name = (String) key[1];
 		

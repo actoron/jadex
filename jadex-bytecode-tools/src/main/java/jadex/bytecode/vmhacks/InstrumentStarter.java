@@ -15,7 +15,6 @@ public class InstrumentStarter
 	/** Register native methods. */
 	static
 	{
-//		System.loadLibrary("instrument");
 		Native.register(JNA_LIBRARY_NAME);
 	}
 	
@@ -25,7 +24,7 @@ public class InstrumentStarter
 	 */
 	protected static final int startAgent(String jarfile)
 	{
-		long vmp = NativeHelper.getVm();
+		long vmp = new NativeHelper().getVm();
 		return Agent_OnAttach(new Pointer(vmp), jarfile, Pointer.NULL);
 	}
 	

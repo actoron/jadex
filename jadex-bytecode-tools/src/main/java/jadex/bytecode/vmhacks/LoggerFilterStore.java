@@ -23,15 +23,26 @@ public final class LoggerFilterStore extends ArrayList<Object> implements Filter
 	 */
 	public static final long serialVersionUID = ID;
 	
+	/** Hold the logger to prevent GC, weak-referenced globally. */
 	protected static Logger instance = null;
+	
+	private ArrayList<Object> realstore;
 	
 	/**
 	 *  Creates the store.
 	 */
 	public LoggerFilterStore()
 	{
-		add(new LinkedBlockingQueue<Object>());
-		add(new ClassStore());
+		super(0);
+		realstore = new ArrayList<Object>();
+		realstore.add(new LinkedBlockingQueue<Object>());
+		realstore.add(new ClassStore());
+	}
+	
+	/** Override */
+	public Object get(int index)
+	{
+		return realstore.get(index);
 	}
 
 	/**

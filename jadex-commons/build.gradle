@@ -4,8 +4,6 @@ dependencies
 {
 //	testCompile 'com.madgag.spongycastle:prov:1.54.0.0'
 	testCompile 'org.bouncycastle:bcprov-jdk15on:1.57'
-	compileNoAndroidRuntime 'net.java.dev.jna:jna:4.4.0'
-	compileNoAndroidRuntime 'net.java.dev.jna:jna-platform:4.4.0'
 }
 
 // testjar is needed for jadex-android-xmlpull tests

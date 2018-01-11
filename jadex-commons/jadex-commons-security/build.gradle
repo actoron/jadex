@@ -5,5 +5,7 @@ dependencies
 	compile project(':jadex-commons')
 	compile 'org.bouncycastle:bcprov-jdk15on:1.57'
 	compile 'org.bouncycastle:bcpkix-jdk15on:1.57'
+	compileNoAndroidRuntime 'net.java.dev.jna:jna:4.5.1'
+	compileNoAndroidRuntime 'net.java.dev.jna:jna-platform:4.5.1'
 //	compile 'org.bouncycastle:bcprov-debug-jdk15on:1.57'
 }
