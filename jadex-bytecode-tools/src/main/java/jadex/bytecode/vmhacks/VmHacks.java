@@ -192,17 +192,22 @@ public class VmHacks
 		
 		/**
 		 *  Attempts to change the user of the process to the given name.
-		 *  If set to null, the user name "nobody" is tried.
+		 *  If set to null, a list of default user accounts is tried.
 		 *  
-		 *  @param username The target user name, set to null for "nobody".
+		 *  @param username The target user name, set to null for a list of default user account.
 		 *  @return True, if successful, false if the attempt probably failed.
 		 */
 		public boolean tryChangeUser(String username)
 		{
+			boolean ret = false;
 			if (hasNative())
-				nativehelper.tryChangeUser(username);
+			{
+				String[] defaccounts = new String[] { "jadex", "nobody", "www", "daemon" };
+				for (int i = 0; i < defaccounts.length && !ret; ++i)
+					ret = nativehelper.tryChangeUser(username);
+			}
 			
-			return false;
+			return ret;
 		}
 		
 		/**

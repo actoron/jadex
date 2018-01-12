@@ -135,9 +135,8 @@ public final class NativeHelper implements INativeHelper
 	
 	/**
 	 *  Attempts to change the user of the process to the given name.
-	 *  If set to null, the user name "nobody" is tried.
 	 *  
-	 *  @param username The target user name, set to null for "nobody".
+	 *  @param username The target user name.
 	 *  @return True, if successful, false if the attempt probably failed.
 	 */
 	public boolean tryChangeUser(String username)
