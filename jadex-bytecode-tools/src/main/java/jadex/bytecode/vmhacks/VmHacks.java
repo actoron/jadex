@@ -191,6 +191,21 @@ public class VmHacks
 		// --------- Methods providing functionality. -----------------
 		
 		/**
+		 *  Attempts to change the user of the process to the given name.
+		 *  If set to null, the user name "nobody" is tried.
+		 *  
+		 *  @param username The target user name, set to null for "nobody".
+		 *  @return True, if successful, false if the attempt probably failed.
+		 */
+		public boolean tryChangeUser(String username)
+		{
+			if (hasNative())
+				nativehelper.tryChangeUser(username);
+			
+			return false;
+		}
+		
+		/**
 		 *  Sets reflective object accessible without checks if native support is available.
 		 *  
 		 *  @param accobj The accessible object.
