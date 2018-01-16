@@ -194,6 +194,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 			Object name = args.get(PROPERTY_NETWORK);
 			Object secret = args.get(PROPERTY_NETWORKSECRET);
+			if (secret == null)
+				secret = args.get(PROPERTY_NETWORKPASS);
 			if (name instanceof String && secret instanceof String)
 			{
 				networkprops.put((String) name, (String) secret);
