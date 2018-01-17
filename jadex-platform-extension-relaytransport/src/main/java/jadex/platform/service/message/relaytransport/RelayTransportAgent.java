@@ -137,6 +137,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentArgument
 	protected long keepaliveinterval = 30000;
 	
+	/** Set to true for more verbose output. */
+	@AgentArgument
+	protected boolean debug = false;
+	
 	/** Timestamp of the next clean for direct routes. */
 	protected long nextclean = System.currentTimeMillis();
 	
@@ -555,7 +559,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	 */
 	public IIntermediateFuture<Integer> discoverRoute(final IComponentIdentifier dest, final LinkedHashSet<IComponentIdentifier> hops)
 	{
-		System.out.println("Discover route on " + agent.getComponentIdentifier() + " for " + dest);
+		if (debug)
+			System.out.println("Discover route on " + agent.getComponentIdentifier() + " for " + dest);
+		
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		

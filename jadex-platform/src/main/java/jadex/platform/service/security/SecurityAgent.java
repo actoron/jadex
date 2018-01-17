@@ -290,9 +290,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				System.out.println("Platform " + pfname + " access secret: "+secretstr);
 		}
 		
-		for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+		if (printsecret)
 		{
-			System.out.println("Has network " + entry.getKey() + " with secret " + entry.getValue());
+			for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+				System.out.println("Available network '" + entry.getKey() + "' with secret " + entry.getValue());
 		}
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();

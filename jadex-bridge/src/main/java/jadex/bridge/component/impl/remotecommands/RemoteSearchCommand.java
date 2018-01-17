@@ -64,7 +64,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	@Override
 	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
-		System.out.println("Remote search command triggered: " + query.toString());
+//		System.out.println("Remote search command triggered: " + query.toString());
 //		if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
 //			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
 		
