@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.IExternalAccess;
@@ -272,7 +273,19 @@ public class SNFPropertyProvider
 							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 							{
 								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfos();
+								if (nfp != null)
+								{
+									INFMixedPropertyProvider prov = nfp.getProvidedServicePropertyProvider(sid);
+									if (prov != null)
+									{
+										IFuture<Map<String, INFPropertyMetaInfo>> metainf = prov.getNFPropertyMetaInfos();
+										if (metainf != null)
+										{
+											return metainf;
+										}
+									}
+								}
+								return new Future<Map<String,INFPropertyMetaInfo>>(new HashMap<String,INFPropertyMetaInfo>());
 							}
 						}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
 					}
