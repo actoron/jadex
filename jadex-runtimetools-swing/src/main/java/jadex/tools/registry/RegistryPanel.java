@@ -401,6 +401,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		Set<IService> alls = getRegistry().getAllServices();
 		executeRegistryCommand(new IResultCommand<Object, IServiceRegistry>()
 		{
+			@Classname("executeRegistryCommandListener")
 			public Object execute(IServiceRegistry reg)
 			{
 				return reg.getAllQueries();
