@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
@@ -65,6 +66,9 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public void init()
 	{
 		this.superpeers = new ArrayList<IComponentIdentifier>();
+		for (IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+			this.superpeers.add(new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()));
+		
 		this.psfunc = new PeerSearchFunctionality()
 		{
 			protected Iterator<IComponentIdentifier> it;
@@ -271,7 +275,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								if(spevent.isUnknown())
 								{
 									spser.updateClientData(lrobs.getCurrentStateEvent(null)).addResultListener(this);
-									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+//									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
 								}
 							}
 							
@@ -330,6 +334,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
+//					spcid = new ComponentIdentifier("registrysuperpeer@"+spcid.getPlatformName());
 //					System.out.println("Found superpeer: "+spcid);
 					SServiceProvider.getService(component, spcid, ISuperpeerRegistrySynchronizationService.class).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
