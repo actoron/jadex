@@ -631,7 +631,9 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		rootconf.setContext(true);
 		rootconf.setAddress(true);
 
-		rootconf.setValue(IStarterConfiguration.SUPERPEERCLIENT, false);
+		rootconf.setSuperpeer(false);
+		rootconf.setSuperpeerClient(false);
+		rootconf.setSupersuperpeer(false);
 
 		return config;
 	}

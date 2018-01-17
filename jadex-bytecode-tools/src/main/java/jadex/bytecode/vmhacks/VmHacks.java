@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
@@ -57,6 +56,7 @@ public class VmHacks
 	/** Globally disable all VM Hacks. */
 	public static boolean DISABLE = false;
 	
+	/** Set to true to see debug infos during startup. */
 	public static boolean DEBUG = false;
 	
 	/**
@@ -96,8 +96,8 @@ public class VmHacks
 		/** Set this to true to switch to fallback mode for invocation */
 		private boolean asm = false;
 		
-		/** Flag if native support is available. */
-		public boolean hasnative = false;
+		/** The native support if available. */
+		private INativeHelper nativehelper = null;
 		
 		/** sun.misc.Unsafe if available. */
 		private Class<?> unsafeclass;
@@ -139,13 +139,6 @@ public class VmHacks
 		/** Synchronization lock for the instrumentation agent. */
 		private Semaphore instagentlock = new Semaphore(0);
 		
-		public void print(Object o)
-		{
-			System.out.println(o);
-			System.out.flush();
-			System.exit(0);
-		}
-		
 		/**
 		 *  Creates the Unsafe.
 		 */
@@ -172,7 +165,7 @@ public class VmHacks
 		 */
 		public boolean hasNative()
 		{
-			return hasnative;
+			return nativehelper != null;
 		}
 		
 		/**
@@ -198,6 +191,26 @@ public class VmHacks
 		// --------- Methods providing functionality. -----------------
 		
 		/**
+		 *  Attempts to change the user of the process to the given name.
+		 *  If set to null, a list of default user accounts is tried.
+		 *  
+		 *  @param username The target user name, set to null for a list of default user account.
+		 *  @return True, if successful, false if the attempt probably failed.
+		 */
+		public boolean tryChangeUser(String username)
+		{
+			boolean ret = false;
+			if (hasNative())
+			{
+				String[] defaccounts = new String[] { "jadex", "nobody", "www", "daemon" };
+				for (int i = 0; i < defaccounts.length && !ret; ++i)
+					ret = nativehelper.tryChangeUser(username);
+			}
+			
+			return ret;
+		}
+		
+		/**
 		 *  Sets reflective object accessible without checks if native support is available.
 		 *  
 		 *  @param accobj The accessible object.
@@ -205,9 +218,9 @@ public class VmHacks
 		 */
 		public void setAccessible(AccessibleObject accobj, boolean flag)
 		{
-			if (hasnative && setaccessibleoverride != null)
+			if (hasNative() && nativehelper.canSetAccessible())
 			{
-				NativeHelper.setAccessible(setaccessibleoverride.getName(), accobj, flag);
+				nativehelper.setAccessible(setaccessibleoverride.getName(), accobj, flag);
 				
 			}
 			else if (putboolean != null && setaccessibleoverrideoffset != null)
@@ -239,9 +252,9 @@ public class VmHacks
 	     */
 		public Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain pd)
 	    {
-			if (hasnative)
+			if (hasNative())
 			{
-				return NativeHelper.defineClass(name, b, loader);
+				return nativehelper.defineClass(name, b, loader);
 			}
 			else if (defineclass != null)
 			{
@@ -345,7 +358,7 @@ public class VmHacks
 		{
 			String ret = getClass().getName(); 
 			ret += " asm=" + asm;
-			ret += " native=" + hasnative;
+			ret += " native=" + hasNative();
 			ret += " javaunsafe=" + unsafeinstance;
 			ret += " instrumentation=" + instrumentation;
 			return ret;
@@ -425,8 +438,7 @@ public class VmHacks
 			
 			try
 			{
-				new NativeHelper();
-				hasnative = true;
+				nativehelper = new NativeHelper();
 			}
 			catch (Throwable t)
 			{
@@ -442,13 +454,6 @@ public class VmHacks
 			
 			if (unsafeclass != null)
 				unsafeinstance = getSunUnsafe(unsafeclass);
-			
-			if (unsafeinstance != null)
-			{
-				defineclass = getSunUnsafeMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
-				putboolean = getSunUnsafeMethod("putBoolean", Object.class, long.class, boolean.class);
-				objectFieldOffset = getSunUnsafeMethod("objectFieldOffset", Field.class);
-			}
 			
 			try
 			{
@@ -468,14 +473,21 @@ public class VmHacks
 					{
 					}
 				}
-				
-				if (setaccessibleoverride != null && objectFieldOffset != null)
-					setaccessibleoverrideoffset = (Long) objectFieldOffset.invoke(unsafeinstance, setaccessibleoverride);
 			}
 			catch (Exception e)
 			{
 				SUtil.throwUnchecked(e);
 			}
+			
+			if (unsafeinstance != null)
+			{
+				defineclass = getSunUnsafeMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
+				putboolean = getSunUnsafeMethod("putBoolean", Object.class, long.class, boolean.class);
+				objectFieldOffset = getSunUnsafeMethod("objectFieldOffset", Field.class);
+			}
+			
+			if (setaccessibleoverride != null && objectFieldOffset != null)
+				setaccessibleoverrideoffset = (Long) objectFieldOffset.invoke(unsafeinstance, setaccessibleoverride);
 			
 			startInstrumentationAgent();
 		}
@@ -505,7 +517,7 @@ public class VmHacks
 		        SUtil.close(is);
 		        
 		        boolean hasagent = false;
-		        if (hasnative)
+		        if (hasNative())
 		        {
 			        try
 					{

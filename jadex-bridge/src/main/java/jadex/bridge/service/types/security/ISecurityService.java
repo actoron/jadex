@@ -45,7 +45,10 @@ public interface ISecurityService
 	public static final String PROPERTY_REMOTEPLATFORMSECRET = "remoteplatformsecret";
 	
 	/** Network(s) to include. */
-	public static final String PROPERTY_NETWORK = "network";
+	public static final String PROPERTY_NETWORK = "networkname";
+	
+	/** Network password, alternative to secret. */
+	public static final String PROPERTY_NETWORKPASS = "networkpass";
 
 	/** The network secret(s). */
 	public static final String PROPERTY_NETWORKSECRET = "networksecret";

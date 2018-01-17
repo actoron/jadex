@@ -194,6 +194,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 			Object name = args.get(PROPERTY_NETWORK);
 			Object secret = args.get(PROPERTY_NETWORKSECRET);
+			if (secret == null)
+				secret = args.get(PROPERTY_NETWORKPASS);
 			if (name instanceof String && secret instanceof String)
 			{
 				networkprops.put((String) name, (String) secret);
@@ -286,6 +288,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				System.out.println("Platform " + pfname + " access certificates: "+secretstr);
 			else
 				System.out.println("Platform " + pfname + " access secret: "+secretstr);
+		}
+		
+		if (printsecret)
+		{
+			for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+				System.out.println("Available network '" + entry.getKey() + "' with secret " + entry.getValue());
 		}
 		
 		initializingcryptosuites = new HashMap<String, HandshakeState>();
@@ -952,7 +960,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String[] keys = expiringcryptosuites.keySet().toArray(new String[expiringcryptosuites.size()]);
 		for (String pf : keys)
 		{
-			Collection<Tuple2<ICryptoSuite, Long>> coll = expiringcryptosuites.get(pf);
+			Collection<Tuple2<ICryptoSuite, Long>> coll = new ArrayList<Tuple2<ICryptoSuite, Long>>(expiringcryptosuites.get(pf));
 			for (Tuple2<ICryptoSuite, Long> tup : coll)
 			{
 				if (time > tup.getSecondEntity())

@@ -137,6 +137,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentArgument
 	protected long keepaliveinterval = 30000;
 	
+	/** Set to true for more verbose output. */
+	@AgentArgument
+	protected boolean debug = false;
+	
 	/** Timestamp of the next clean for direct routes. */
 	protected long nextclean = System.currentTimeMillis();
 	
@@ -555,7 +559,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	 */
 	public IIntermediateFuture<Integer> discoverRoute(final IComponentIdentifier dest, final LinkedHashSet<IComponentIdentifier> hops)
 	{
-//		System.out.println("Discover route on " + agent.getComponentIdentifier());
+		if (debug)
+			System.out.println("Discover route on " + agent.getComponentIdentifier() + " for " + dest);
+		
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
@@ -565,7 +571,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			return ret;
 		}
 		
-		if (hasDirectConnection(destination))
+		if (hasDirectConnection(destination) || agent.getComponentIdentifier().getRoot().equals(destination))
 		{
 			ret.addIntermediateResult(0);
 			ret.setFinished();
@@ -606,6 +612,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							routingservices.put(relayid, rs);
 					}
 				}
+				
+//				System.out.println("Asking routing service for " + dest + ": " + Arrays.toString(routingservices.values().toArray()));
 				
 				final Future<Void> directroute = new Future<Void>();
 				if (routingservices.size() == 0)

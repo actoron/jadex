@@ -3,6 +3,8 @@ description 'Jadex bytecode tools contains helper stuff for asm bytecode generat
 dependencies
 {
 	compile project(':jadex-commons')
+	// compile 'com.google.android.tools:dx:1.7'
 	compileNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
+	compileNoAndroidRuntime 'net.java.dev.jna:jna:4.5.1'
 }
 

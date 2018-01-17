@@ -59,7 +59,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 				if(tmptime>currenttime)
 					currenttime = tmptime;
 					
-//				System.out.println("time event notificaton: "+t.getTimedObject());
+//				System.out.println("time event notificaton: "+currenttime+", "+t.getTimedObject());
 				dorem = t;
 //				removeTimer(t);
 //				t.getTimedObject().timeEventOccurred();
@@ -105,7 +105,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 //				
 //				if(tmptime!=last)
 //				{
-//					System.out.println("next timepoint was "+last+", is now "+tmptime);
+//					System.out.println("next timepoint was "+last+", is now "+tmptime+", "+timer.getTimedObject());
 //					last	= tmptime;
 //				}
 //			}

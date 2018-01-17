@@ -68,6 +68,7 @@ public class SInvocation
 	static
 	{
 		VmHacks.get();
+		enableEnhancedAccess();
 	}
 	
 	/**
