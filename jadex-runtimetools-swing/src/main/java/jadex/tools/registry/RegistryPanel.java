@@ -66,6 +66,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ClassInfoRenderer;
 import jadex.commons.gui.jtable.DateTimeRenderer;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
 import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 
@@ -621,6 +622,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	{
 		return getActiveComponent().scheduleStep(new IComponentStep<Object>()
 		{
+			@Classname("executeRegistryCommand")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				IFuture<Object> ret = null;
