@@ -175,7 +175,7 @@ public final class NativeHelper implements INativeHelper
 			
 			ret = succeeded;
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 		}
 		return ret;
