@@ -39,6 +39,7 @@ import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
@@ -312,6 +313,9 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration config)
 	{
+		if (!config.getStarterConfig().isKeepPrivileges())
+			VmHacks.get().tryChangeUser(null);
+		
 		IRootComponentConfiguration rootconf = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:

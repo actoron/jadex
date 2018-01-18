@@ -331,12 +331,14 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 							}) : null;
 							for (final IComponentIdentifier id : relays)
 							{
-								System.out.println("Sending to " + id);
+								if (debug)
+									System.out.println("Sending to " + id);
 								msgfeat.sendMessageAndWait(getRtComponent(id), new Ping()).addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
 									{
-										System.out.println("Got answer " + id);
+										if (debug)
+											System.out.println("Got answer " + id);
 										if (keepaliveconnections.size() < keepalivecount)
 											keepaliveconnections.add(id);
 										
@@ -352,7 +354,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										System.out.println("Got exception:  " + exception);
+										if (debug)
+											System.out.println("Got exception:  " + exception);
 										if (crl != null)
 											crl.resultAvailable(null);
 									}
@@ -607,7 +610,17 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					if (!hops.contains(relayid))
 					{
 						IRoutingService rs = getRoutingService(relayid);
-						boolean valid = rs == null ? false : ((IService) rs).isValid().get();
+						boolean valid = false;
+						if (rs != null)
+						{
+							try
+							{
+								valid = ((IService) rs).isValid().get();
+							}
+							catch (Exception e)
+							{
+							}
+						}
 						if (rs != null && valid)
 							routingservices.put(relayid, rs);
 					}

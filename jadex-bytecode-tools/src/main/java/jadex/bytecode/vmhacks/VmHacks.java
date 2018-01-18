@@ -202,9 +202,16 @@ public class VmHacks
 			boolean ret = false;
 			if (hasNative())
 			{
-				String[] defaccounts = new String[] { "jadex", "nobody", "www", "daemon" };
-				for (int i = 0; i < defaccounts.length && !ret; ++i)
+				if (username == null)
+				{
+					String[] defaccounts = new String[] { "jadex", "nobody", "www", "daemon" };
+					for (int i = 0; i < defaccounts.length && !ret; ++i)
+						ret = nativehelper.tryChangeUser(defaccounts[i]);
+				}
+				else
+				{
 					ret = nativehelper.tryChangeUser(username);
+				}
 			}
 			
 			return ret;

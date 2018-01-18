@@ -1,6 +1,7 @@
 package jadex.bytecode.vmhacks;
 
 import java.lang.reflect.AccessibleObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -192,7 +193,7 @@ public final class NativeHelper implements INativeHelper
 		{
 			ret = geteUid() == 0;
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 		}
 		return ret;
@@ -257,6 +258,11 @@ public final class NativeHelper implements INativeHelper
 		return Function.getFunction(functionp);
 	}
 	
+	/**
+	 *  Retrieves the current Java VM.
+	 *  
+	 *  @return Pointer to the current Java VM struct.
+	 */
 	private Pointer getJavaVm()
 	{
 		PointerByReference vmref = new PointerByReference();
@@ -266,12 +272,23 @@ public final class NativeHelper implements INativeHelper
 		return vmref.getPointer().getPointer(0);
 	}
 	
+	/**
+	 *  Gets the effective user ID for the Java VM.
+	 *  
+	 *  @return Effective user ID of the running Java VM.
+	 */
 	private int geteUid()
 	{
 		Function geteuid = NativeLibrary.getProcess().getFunction("geteuid");
 		return geteuid.invokeInt(new Object[0]);
 	}
 	
+	/**
+	 *  Gets the UID and main GID for a user name.
+	 *  
+	 *  @param username The user name.
+	 *  @return The UID and GID.
+	 */
 	private int[] getUidGid(String username)
 	{
 		Pointer structbuf = malloc(8192);
@@ -299,11 +316,22 @@ public final class NativeHelper implements INativeHelper
 		return ret;
 	}
 	
+	/**
+	 *  Allocates memory using malloc and returns pointer.
+	 *  
+	 *  @param size Memory size to allocate.
+	 *  @return Pointer to memory.
+	 */
 	private Pointer malloc(long size)
 	{
 		return new Pointer(Native.malloc(size));
 	}
 	
+	/**
+	 *  Frees memory.
+	 *  
+	 *  @param ptr Pointer to memory.
+	 */
 	private void free(Pointer ptr)
 	{
 		Native.free(Pointer.nativeValue(ptr));

@@ -237,6 +237,22 @@ public interface IStarterConfiguration
 //    public void setPersist(boolean value);
 
 //    public boolean getPersist();
+    
+    /**
+     *  Sets if the platform should keep admin/root privileges
+     *  or attempt to drop to a user.
+     *  
+     *  @param value True, if the platform should retain root privileges.
+     */
+    public void setKeepPrivileges(boolean value);
+
+    /**
+     *  Gets if the platform should keep admin/root privileges
+     *  or attempt to drop to a user.
+     *  
+     *  @return True, if the platform should retain root privileges.
+     */
+    public boolean isKeepPrivileges();
 
     /**
      *  Set the debug futures flag.
