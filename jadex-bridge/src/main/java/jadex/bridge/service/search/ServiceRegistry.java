@@ -1578,6 +1578,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			ret = true;
 		}
+		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
@@ -1621,6 +1636,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
 			ret = true;
 		}
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
