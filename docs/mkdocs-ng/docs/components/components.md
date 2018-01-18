@@ -35,6 +35,8 @@ public IFuture<Void> body()
 }
 ```
 
+While implementing your component, keep in mind that components in Jadex are always **Single-Threaded**! Concurrency only takes place between different components, which will spare you a lot of headaches. Please don't start your own threads, as this will lead to errors later on.
+
 <x-hint title="Futures">
 Instead of the return type ```IFuture<Void>```, you can also use ```void```.
 Using a *futurized* return type allows you to perform work asynchronously, which is handled in chapter [Futures](../futures/futures).

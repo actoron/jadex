@@ -65,10 +65,10 @@ public class ImageProcessor implements ITraverseProcessor
 	/** Hack disabling image caching on Mac OS which seems broken in Java. */
 	static
 	{
-		if (System.getProperty("os.name").startsWith("Mac "))
-		{
-			ImageIO.setUseCache(false);
-		}
+//		if (System.getProperty("os.name").startsWith("Mac "))
+//		{
+		ImageIO.setUseCache(false);
+//		}
 	}
 	
 	/**
