@@ -214,7 +214,7 @@ public class HelplinePanel extends JPanel
 	/**
 	 *  Refresh the service combo box.
 	 */
-	protected void refreshServicesCombo(final JComboBox selcb, boolean remote)
+	protected void refreshServicesCombo(final JComboBox selcb, final boolean remote)
 	{
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 //			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
@@ -223,7 +223,8 @@ public class HelplinePanel extends JPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
+				ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(
+					remote ? "remotehelplineservices" : "localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
 					public void customResultAvailable(Object result) 
 					{
