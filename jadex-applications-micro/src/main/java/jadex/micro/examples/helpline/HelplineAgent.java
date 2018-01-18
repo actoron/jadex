@@ -33,10 +33,10 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent offers a helpline for getting information about missing persons.")
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
+	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_NETWORK)),
 	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class)))
+@ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class), scope=RequiredServiceInfo.SCOPE_NETWORK))
 @GuiClass(HelplineViewerPanel.class)
 @Agent
 public class HelplineAgent

@@ -1,5 +1,6 @@
 package jadex.micro.examples.helpline;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 
 /**
@@ -7,6 +8,7 @@ import jadex.commons.future.IIntermediateFuture;
  *  Allows to get local information about a person and
  *  add information about a person.
  */
+@Security(Security.UNRESTRICTED)
 public interface IHelpline
 {
 	/**
