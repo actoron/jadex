@@ -65,8 +65,9 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public void init()
 	{
 		this.superpeers = new ArrayList<IComponentIdentifier>();
-		for (IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-			this.superpeers.add(new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()));
+		// TODO: fix 1:40 timeout at startup before searching SPs
+//		for (IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+//			this.superpeers.add(new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()));
 		
 		this.psfunc = new PeerSearchFunctionality()
 		{
@@ -295,7 +296,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						spser.updateClientData(event).addResultListener(lis);
 						if(event.size()>0)
 						{
-							System.out.println("Send client delta update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
 							System.out.println("Event is: "+event);
 						}
 					}
