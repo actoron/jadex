@@ -107,8 +107,9 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 		{
 			if(type!=null)
 			{
-				// todo: clone?! is only internal method
-				ret = services.get(type);
+				Set<IService> ser = services.get(type);
+				if (ser != null)
+					ret = new HashSet<IService>(ser);
 			}
 			else
 			{
@@ -143,7 +144,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	
 	/**
 	 *  Add an excluded component. 
-	 *  @param The component identifier.
+	 *  @param cid component identifier.
 	 */
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
@@ -154,7 +155,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	
 	/**
 	 *  Remove an excluded component. 
-	 *  @param The component identifier.
+	 *  @param cid component identifier.
 	 */
 	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid)
 	{
@@ -195,7 +196,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	
 	/**
 	 *  Add a service to the registry.
-	 *  @param sid The service id.
+	 *  @param service The service.
 	 */
 	public IFuture<Void> addService(ClassInfo key, IService service)
 	{
@@ -238,7 +239,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	
 	/**
 	 *  Remove a service from the registry.
-	 *  @param sid The service id.
+	 *  @param service The service.
 	 */
 	public void removeService(ClassInfo key, IService service)
 	{
@@ -532,11 +533,11 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 			if(rms!=null)
 			{
 				// Get all proxy agents (represent other platforms)
-				
 				Set<IService> sers = services.get(new ClassInfo(IProxyAgentService.class));
 				if(sers!=null && sers.size()>0)
 				{
-					final CounterResultListener<Void> clis = new CounterResultListener<Void>(sers.size(), new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+					IService[] sersArr = sers.toArray(new IService[0]); // no size given to avoid race conditions with null objects in array
+					final CounterResultListener<Void> clis = new CounterResultListener<Void>(sersArr.length, new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
@@ -548,7 +549,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 					final IComponentManagementService cms = reschedule ? getService(IComponentManagementService.class) : null;
 //					System.out.println("Service registry searching remote, origin is: " + IComponentIdentifier.LOCAL.get() + ", owner is: " + caller + ", rescheduling: " + reschedule + " searching for: " + type);
 
-					for (IService ser : sers)
+					for (IService ser : sersArr)
 					{
 						IProxyAgentService ps = (IProxyAgentService) ser;
 
@@ -636,7 +637,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	/**
 	 *  Search for services on remote platforms.
 	 *  @param type The type.
-	 *  @param scope The scope.
+	 *  @param filter The filter.
 	 */
 	protected <T> IFuture<T> searchRemoteService(final IComponentIdentifier caller, final ClassInfo type, final IAsyncFilter<T> filter)
 	{
@@ -653,6 +654,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 				Iterator<IService> sers = getServices(new ClassInfo(IProxyAgentService.class));
 				if(sers!=null && sers.hasNext())
 				{
+
 					Set<IService> smap = getServiceMap().get(new ClassInfo(IProxyAgentService.class));
 					int size = smap==null? 0: smap.size();
 					
