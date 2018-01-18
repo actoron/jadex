@@ -65,8 +65,6 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public void init()
 	{
 		this.superpeers = new ArrayList<IComponentIdentifier>();
-		for (IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-			this.superpeers.add(new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()));
 		
 		this.psfunc = new PeerSearchFunctionality()
 		{
@@ -96,6 +94,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				{
 					ret.setResult(it.next());
 				}
+				// has results from search?
+				else if(pos<res.size())
+				{
+					ret.setResult(((IService)res.get(pos++)).getServiceIdentifier().getProviderId());
+				}
+				// no search running? -> create
 				else if(currentsearch==null)
 				{
 //					System.out.println("created search");
@@ -131,6 +135,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					});
 //					forwardResults(false, currentsearch);
 				}
+				// search is running? -> append 
 				else 
 				{
 //					System.out.println("appended at search");
@@ -168,6 +173,10 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				
 				if(fini)
 				{
+					// add superpeers as last chance
+					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+					
 //					System.out.println("search fini");
 					if(futs != null)
 					{
