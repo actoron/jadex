@@ -166,7 +166,7 @@ public final class NativeHelper implements INativeHelper
 			fun = NativeLibrary.getProcess().getFunction("setreuid");
 			for (int i = 0; i < maxtries; ++i)
 			{
-				res = fun.invokeInt(new Object[] { uidgid[1], uidgid[1] });
+				res = fun.invokeInt(new Object[] { uidgid[0], uidgid[0] });
 				if (res == 0)
 					break;
 			}
