@@ -91,7 +91,7 @@ Jadex Active Components includes a number of serialization approaches, the defau
 ## Bean-conform Classes
 The latter option allows you to easily implement your own classes that can be transmitted. The classes do not have to follow the full JavaBean specification, only two things are required:
 
-* The class must offer a "default constructor", which means it includes a constructor that has no arguments.
+* The class must offer a "default constructor", which means it includes a (public or private) constructor that has no arguments.
 * JavaBean-conforming accessor methods for each field you want transmitted.
 
 For example, the following example would conform to this:
@@ -158,6 +158,7 @@ public class Customer {
 }
 ```
 
+This annotation-based method also requires a default constructor.
 ### Private fields
 
 Since Jadex 3.0.80, it is also possible to include private fields in serialization, using ```@IncludeFields(includePrivate=true)```. Specific fields can also be excluded, as shown below:
