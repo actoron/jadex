@@ -209,9 +209,9 @@ if (deployDists) {
                     deleteDir()
                     unstash 'compiled'
                     util.withX {
-                        util.withJUnit {
-                            sh './gradlew -Pdist=publishdists distZips' + defaultGradleArgs
-                        }
+//                        util.withJUnit {
+                            sh './gradlew -Pdist=publishdists distZips -x test' + defaultGradleArgs
+//                        }
                     }
                     stash name: 'dists', includes: 'build/distributions/**, build/*.properties'
                 }
