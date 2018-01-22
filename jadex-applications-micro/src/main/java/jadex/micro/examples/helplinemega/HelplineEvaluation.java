@@ -1,5 +1,6 @@
 package jadex.micro.examples.helplinemega;
 
+import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -21,9 +22,10 @@ public class HelplineEvaluation
 	{
 		// Parse args into config and extract settings.
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
-		config.setValue("spcnt", 2);
-		config.setValue("platformcnt", 3);
-		config.setValue("personinc", 5);
+//		config.setSimulation(true);	// Todo: fix sim delay in registry!?
+		config.setValue("spcnt", 3);
+		config.setValue("platformcnt", 10);
+		config.setValue("personinc", 100);
 		config.enhanceWith(Starter.processArgs(args));
 		int	spcnt	= (Integer) config.getArgs().get("spcnt");
 		int	platformcnt	= (Integer) config.getArgs().get("platformcnt");
@@ -40,7 +42,7 @@ public class HelplineEvaluation
 		}
 		long	end	= System.nanoTime();
 		config.setSuperpeer(false);
-		System.out.println("Started "+platformcnt+" superpeers in "+((end-start)/100000000/10.0)+" seconds.");
+		System.out.println("Started "+spcnt+" superpeers in "+((end-start)/100000000/10.0)+" seconds.");
 		
 		// Start #platformcnt helpline platforms.
 		System.out.println("Starting "+platformcnt+" helpline platforms.");
@@ -54,9 +56,15 @@ public class HelplineEvaluation
 		end	= System.nanoTime();
 		System.out.println("Started "+platformcnt+" helpline platforms in "+((end-start)/100000000/10.0)+" seconds.");
 		
+		String	filename	= "eval"+System.currentTimeMillis()+".csv";
+		FileWriter	out	= new FileWriter(filename, true);
+		out.write("# of Services;Creation Time;Search Time;Found Services;Settings: spcnt="+spcnt+" platformcnt="+platformcnt+" personinc="+personinc+"\n");
+		out.close();
+		
 		// Loop to start (additional) #personinc helpline components per platform until program is interrupted.
 		for(int offset=0; ; offset+=personinc)
 		{
+			System.gc();
 			start	= System.nanoTime();
 			for(int i=0; i<platforms.length; i++)
 			{
@@ -64,21 +72,31 @@ public class HelplineEvaluation
 				for(int j=0; j<personinc; j++)
 				{
 					cms.createComponent(HelplineAgent.class.getName()+".class",
-						new CreationInfo(Collections.singletonMap("person", (Object)("person"+(offset+j))))).getFirstResult();
+						new CreationInfo(Collections.singletonMap("person", (Object)("person0")))).getFirstResult();
+//						new CreationInfo(Collections.singletonMap("person", (Object)("person"+(offset+j))))).getFirstResult();
 				}
 			}
 			end	= System.nanoTime();
-			System.out.println("Started "+personinc*platformcnt+" helpline apps in "+((end-start)/100000000/10.0)+" seconds. Total: "+(offset+personinc)*platformcnt+", per platform: "+(offset+personinc));
+			String	creation	= (""+((end-start)/1000000)).replace('.', ',');
+			System.out.println("Started "+personinc*platformcnt+" helpline apps in "+creation+" milliseconds. Total: "+(offset+personinc)*platformcnt+", per platform: "+(offset+personinc));
 			
-			Thread.sleep(5000);	// Wait for registration?
+//			Thread.sleep(5000);	// Wait for registration?
 			
-			// Search for first person to chekc if searches get slower.
+			// Search for first person to check if searches get slower.
+			System.gc();
 			start	= System.nanoTime();
 			Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(platforms[0], IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
 			end	= System.nanoTime();
-			System.out.println("Found "+found.size()+" of "+platformcnt+" helpline apps in "+((end-start)/100000000/10.0)+" seconds.");
+			String	search	= (""+((end-start)/1000000)).replace('.', ',');
+//			System.out.println("Found "+found.size()+" of "+platformcnt+" helpline apps in "+search+" milliseconds.");
+			System.out.println("Found "+found.size()+" of "+(offset+personinc)*platformcnt+" helpline apps in "+search+" milliseconds.");
 			
-			break;
+			out	= new FileWriter(filename, true);
+			out.write((offset+personinc)*platformcnt+";"+creation+";"+search+";"+found.size()+"\n");
+			out.close();
+
+			
+//			break;
 		}
 	}
 }
