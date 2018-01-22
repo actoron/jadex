@@ -481,6 +481,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void removeServices(IComponentIdentifier platform)
 	{
+		if(platform==null)
+		{
+			System.err.println("removeServices platform is null, cid="+cid);
+			throw new NullPointerException("removeServices platform is null, cid="+cid);
+		}
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try

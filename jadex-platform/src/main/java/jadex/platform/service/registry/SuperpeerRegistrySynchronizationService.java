@@ -832,7 +832,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 		
 		// If already subscribed reuse existing future
-		if(hasPartner(cid))
+		if(hasPartner(cid) && getPartnerSubscription(cid)!=null)
 			return getPartnerSubscription(cid);
 		
 		System.out.println("New subscription from: "+cid);
@@ -1083,6 +1083,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			if(rem!=null && rem.size()>0 || added!=null && added.size()>0)
 			{
 				final RegistryEvent nev = new RegistryEvent(event.isDelta(), ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
+				nev.setSender(ev.getSender());
 				nev.setAddedServices(added);
 				nev.setRemovedServices(rem);
 				parentcol.addEvent(nev);
