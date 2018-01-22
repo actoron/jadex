@@ -71,6 +71,11 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 	/** The discovery directory. */
 	protected static final File DISCOVERY_DIR = new File(System.getProperty("java.io.tmpdir") + File.separator + ".jadex" + File.separator + "discovery");
 	
+	static
+	{
+		System.out.println("Jadex local discovery dir: "+DISCOVERY_DIR);
+	}
+	
 	/** Access to agent. */
 	@Agent
 	protected IInternalAccess agent;
