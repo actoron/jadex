@@ -163,7 +163,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>> routes;
 	
 	/** Future used to ensure connectivity at startup. */
-	protected Future<Void> startupfut = null;
+	protected volatile Future<Void> startupfut = null;
 	
 	/**
 	 *  Creates the agent.
@@ -319,7 +319,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								{
 									if (startupfut != null)
 									{
-										startupfut.setResult(null);
+										startupfut.setResultIfUndone(null);
 										startupfut = null;
 									}
 								};
