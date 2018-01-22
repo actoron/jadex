@@ -1083,6 +1083,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			if(rem!=null && rem.size()>0 || added!=null && added.size()>0)
 			{
 				final RegistryEvent nev = new RegistryEvent(event.isDelta(), ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
+				nev.setSender(ev.getSender());
 				nev.setAddedServices(added);
 				nev.setRemovedServices(rem);
 				parentcol.addEvent(nev);
