@@ -1860,7 +1860,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			// Find component to schedule on (calling component or platform)
 			IComponentIdentifier origin	= IComponentIdentifier.LOCAL.get();
 			if(origin==null)	// TODO: shouldn't happen?
-				origin	= cid;
+				origin	= this.cid;
 
 			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
 			if(cms!=null)

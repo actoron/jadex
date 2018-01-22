@@ -145,7 +145,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected long nextclean = System.currentTimeMillis();
 	
 	/** Maximum allowed routing hops. */
-	protected int maxhops = 3;
+	protected int maxhops = 4;
 	
 	/** List of relays. */
 	protected List<IComponentIdentifier> relays = new ArrayList<IComponentIdentifier>();
@@ -180,6 +180,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		debug = forwarding;
 		this.cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
 		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
 		System.out.println("Started relay transport");
@@ -487,6 +488,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		else
 		{
 			fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
+			if (debug)
+			{
+				IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
+				System.out.println("Processing forward package for " + fwdest + " from " + fwsender);
+			}
 		}
 		
 		if (agent.getComponentIdentifier().getRoot().equals(fwdest))
@@ -504,7 +510,24 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (hasDirectConnection(fwdest))
 		{
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(fwdest));
-			return intmsgfeat.sendToTransports(header, body);
+			IFuture<Void> ret = intmsgfeat.sendToTransports(header, body);
+			final IComponentIdentifier ffwdest = fwdest;
+			ret.addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					synchronized(directconns)
+					{
+						directconns.checkStale();
+						directconns.remove(ffwdest);
+					}
+				}
+			});
+			return ret;
 		}
 		
 		header.addProperty(IMsgHeader.SENDER, agent.getComponentIdentifier());
@@ -540,6 +563,20 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				{
 					fheader.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
 					intmsgfeat.sendToTransports(fheader, fbody).addResultListener(new DelegationResultListener<Void>(ret));
+					ret.addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							synchronized(routes)
+							{
+								routes.remove(ffwdest);
+							}
+						}
+					});
 					notsent = false;
 				}
 			}
@@ -568,7 +605,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
-		if (hops.contains(agent.getComponentIdentifier()) || hops.size() + 1 > maxhops)
+		if (hops.contains(agent.getComponentIdentifier().getRoot()) || hops.size() + 1 > maxhops)
 		{
 			ret.setException(new IllegalStateException("Loop detected or TTL exceeded: " + agent.getComponentIdentifier() + " " + Arrays.toString(hops.toArray())));
 			return ret;
@@ -590,7 +627,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		final LinkedHashSet<IComponentIdentifier> newhops = new LinkedHashSet<IComponentIdentifier>(hops);
-		newhops.add(agent.getComponentIdentifier());
+		newhops.add(agent.getComponentIdentifier().getRoot());
 		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -607,7 +644,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				
 				for (IComponentIdentifier relayid : rls)
 				{
-					if (!hops.contains(relayid))
+					if (!newhops.contains(relayid))
 					{
 						IRoutingService rs = getRoutingService(relayid);
 						boolean valid = false;
