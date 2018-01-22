@@ -532,7 +532,7 @@ public class VmHacks
 						InstrumentStarter.startAgent(jar.getAbsolutePath());
 						hasagent = true;
 					}
-					catch (Exception e1)
+					catch (Throwable e1)
 					{
 					}
 		        }
