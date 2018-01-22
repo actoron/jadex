@@ -17,12 +17,12 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
  */
 public class HelplineEvaluation
 {
-	public static void main(String[] args)
+	public static void main(String[] args)	throws Exception
 	{
 		// Parse args into config and extract settings.
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
-		config.setValue("spcnt", 3);
-		config.setValue("platformcnt", 10);
+		config.setValue("spcnt", 2);
+		config.setValue("platformcnt", 3);
 		config.setValue("personinc", 10);
 		config.enhanceWith(Starter.processArgs(args));
 		int	spcnt	= (Integer) config.getArgs().get("spcnt");
@@ -69,6 +69,8 @@ public class HelplineEvaluation
 			}
 			end	= System.nanoTime();
 			System.out.println("Started "+personinc*platformcnt+" helpline apps in "+((end-start)/100000000/10.0)+" seconds. Total: "+(offset+personinc)*platformcnt+", per platform: "+(offset+personinc));
+			
+			Thread.sleep(5000);	// Wait for registration?
 			
 			// Search for first person of current increment.
 			start	= System.nanoTime();
