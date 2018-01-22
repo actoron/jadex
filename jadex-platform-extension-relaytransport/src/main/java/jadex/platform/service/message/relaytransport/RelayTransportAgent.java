@@ -145,7 +145,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected long nextclean = System.currentTimeMillis();
 	
 	/** Maximum allowed routing hops. */
-	protected int maxhops = 3;
+	protected int maxhops = 4;
 	
 	/** List of relays. */
 	protected List<IComponentIdentifier> relays = new ArrayList<IComponentIdentifier>();
@@ -163,7 +163,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>> routes;
 	
 	/** Future used to ensure connectivity at startup. */
-	protected Future<Void> startupfut = null;
+	protected volatile Future<Void> startupfut = null;
 	
 	/**
 	 *  Creates the agent.
@@ -180,6 +180,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		debug = forwarding;
 		this.cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
 		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
 		System.out.println("Started relay transport");
@@ -319,7 +320,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								{
 									if (startupfut != null)
 									{
-										startupfut.setResult(null);
+										startupfut.setResultIfUndone(null);
 										startupfut = null;
 									}
 								};
@@ -568,7 +569,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
-		if (hops.contains(agent.getComponentIdentifier()) || hops.size() + 1 > maxhops)
+		if (hops.contains(agent.getComponentIdentifier().getRoot()) || hops.size() + 1 > maxhops)
 		{
 			ret.setException(new IllegalStateException("Loop detected or TTL exceeded: " + agent.getComponentIdentifier() + " " + Arrays.toString(hops.toArray())));
 			return ret;
@@ -590,7 +591,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		final LinkedHashSet<IComponentIdentifier> newhops = new LinkedHashSet<IComponentIdentifier>(hops);
-		newhops.add(agent.getComponentIdentifier());
+		newhops.add(agent.getComponentIdentifier().getRoot());
 		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -607,7 +608,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				
 				for (IComponentIdentifier relayid : rls)
 				{
-					if (!hops.contains(relayid))
+					if (!newhops.contains(relayid))
 					{
 						IRoutingService rs = getRoutingService(relayid);
 						boolean valid = false;

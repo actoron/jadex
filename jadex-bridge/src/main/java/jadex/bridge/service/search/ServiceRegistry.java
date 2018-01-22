@@ -687,6 +687,25 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.readLock().unlock();
 		}
 	}
+	
+	/**
+	 *  Get all services of a platform.
+	 *  @return The services of the platform.
+	 */
+	public Set<IService> getAllServicesOfPlatform(IComponentIdentifier platform)
+	{
+		rwlock.readLock().lock();
+		try
+		{
+			return SUtil.safeSet(indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString()));
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
+	}
+	
+	
 
 	/**
 	 *  Search for services.
@@ -702,7 +721,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
-			boolean locallyavailable = query.getTargetPlatform()==null || SUtil.safeCollection(indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, query.getTargetPlatform().toString())).size()>0;
+			boolean locallyavailable = query.getTargetPlatform()==null || getAllServicesOfPlatform(query.getTargetPlatform()).size()>0;
 
 			// When this node is superpeer or the search scope is platform or below
 			if(locallyavailable && (isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope())))
@@ -761,8 +780,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
-			boolean locallyavailable = query.getTargetPlatform()==null || SUtil.safeCollection(indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, query.getTargetPlatform().toString())).size()>0;
-
+			boolean locallyavailable = query.getTargetPlatform()==null || getAllServicesOfPlatform(query.getTargetPlatform()).size()>0;
+			
 			// When this node is superpeer or the search scope is platform or below
 			if(locallyavailable && (isSuperpeer() || RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope())))
 			{

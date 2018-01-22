@@ -164,6 +164,13 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 //				System.out.println("forwardRes: "+fini);
 				
+				if(fini)
+				{
+					// add superpeers as last chance
+					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+				}
+				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)
 				{
@@ -173,11 +180,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				
 				if(fini)
 				{
-					// add superpeers as last chance
-					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
-					
-//					System.out.println("search fini");
+//					System.out.println("search fini: " + res.size());
 					if(futs != null)
 					{
 						for(Future<IComponentIdentifier> fut: futs)
@@ -302,11 +305,11 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						
 //						System.out.println("updateCientData called: "+System.currentTimeMillis());
 						spser.updateClientData(event).addResultListener(lis);
-						if(event.size()>0)
-						{
-							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
-							System.out.println("Event is: "+event);
-						}
+//						if(event.size()>0)
+//						{
+//							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
+//							System.out.println("Event is: "+event);
+//						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
