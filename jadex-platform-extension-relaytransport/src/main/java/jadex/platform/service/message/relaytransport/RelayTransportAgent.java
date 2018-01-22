@@ -568,7 +568,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
-		if (hops.contains(agent.getComponentIdentifier()) || hops.size() + 1 > maxhops)
+		if (hops.contains(agent.getComponentIdentifier().getRoot()) || hops.size() + 1 > maxhops)
 		{
 			ret.setException(new IllegalStateException("Loop detected or TTL exceeded: " + agent.getComponentIdentifier() + " " + Arrays.toString(hops.toArray())));
 			return ret;
@@ -590,7 +590,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		final LinkedHashSet<IComponentIdentifier> newhops = new LinkedHashSet<IComponentIdentifier>(hops);
-		newhops.add(agent.getComponentIdentifier());
+		newhops.add(agent.getComponentIdentifier().getRoot());
 		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -607,7 +607,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				
 				for (IComponentIdentifier relayid : rls)
 				{
-					if (!hops.contains(relayid))
+					if (!newhops.contains(relayid))
 					{
 						IRoutingService rs = getRoutingService(relayid);
 						boolean valid = false;
