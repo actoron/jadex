@@ -145,7 +145,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected long nextclean = System.currentTimeMillis();
 	
 	/** Maximum allowed routing hops. */
-	protected int maxhops = 3;
+	protected int maxhops = 4;
 	
 	/** List of relays. */
 	protected List<IComponentIdentifier> relays = new ArrayList<IComponentIdentifier>();

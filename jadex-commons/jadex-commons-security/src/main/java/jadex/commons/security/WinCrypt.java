@@ -10,6 +10,8 @@ import com.sun.jna.platform.win32.WinDef.BOOL;
 import com.sun.jna.platform.win32.WinDef.ULONG;
 import com.sun.jna.platform.win32.WinDef.ULONGByReference;
 
+import jadex.commons.SUtil;
+
 /**
  *  Access to windows cryptography API.
  *
@@ -57,6 +59,7 @@ public class WinCrypt
 		}
 		catch (Exception e)
 		{
+			SUtil.throwUnchecked(e);
 		}
 		return ret;
 	}
