@@ -302,11 +302,11 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						
 //						System.out.println("updateCientData called: "+System.currentTimeMillis());
 						spser.updateClientData(event).addResultListener(lis);
-						if(event.size()>0)
-						{
-							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
-							System.out.println("Event is: "+event);
-						}
+//						if(event.size()>0)
+//						{
+//							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
+//							System.out.println("Event is: "+event);
+//						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
