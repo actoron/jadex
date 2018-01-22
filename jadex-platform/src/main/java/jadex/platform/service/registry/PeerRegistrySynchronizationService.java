@@ -164,6 +164,13 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 //				System.out.println("forwardRes: "+fini);
 				
+				if(fini)
+				{
+					// add superpeers as last chance
+					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+				}
+				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)
 				{
@@ -173,11 +180,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				
 				if(fini)
 				{
-					// add superpeers as last chance
-					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
-					
-//					System.out.println("search fini");
+					System.out.println("search fini: " + res.size());
 					if(futs != null)
 					{
 						for(Future<IComponentIdentifier> fut: futs)
@@ -200,12 +203,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					sps.getLevel().addResultListener(new IResultListener<Integer>()
 					{
 						public void resultAvailable(Integer result) 
-						{
+						{System.out.println("peer ok");
 							ret.setResult(Boolean.TRUE);
 						}
 						
 						public void exceptionOccurred(Exception exception) 
-						{
+						{exception.printStackTrace();
 							ret.setResult(Boolean.FALSE);
 						}
 					});
