@@ -94,7 +94,7 @@ public class MultiRegistryEvent extends ARegistryEvent
 	 */
 	public String toString()
 	{
-		return "MultiRegistryEvent [sender="+sender+", events=" + events + "]";
+		return "MultiRegistryEvent [sender="+sender+", size=" + (events!=null? events.size(): 0) + "]";
 	}
 	
 }

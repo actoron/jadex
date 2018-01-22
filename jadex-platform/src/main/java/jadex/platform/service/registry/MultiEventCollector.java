@@ -15,7 +15,7 @@ public abstract class MultiEventCollector extends EventCollector
 	 */
 	public MultiEventCollector(IComponentIdentifier cid, final IDelayRunner timer)
 	{
-		this(cid, timer, 50, 10000);
+		this(cid, timer, 1000, 10000);
 	}
 	
 	/**

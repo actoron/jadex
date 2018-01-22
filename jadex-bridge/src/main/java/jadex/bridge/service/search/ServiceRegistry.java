@@ -1452,7 +1452,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				public void customResultAvailable(Boolean result) throws Exception
 				{
 					if(result.booleanValue())
+					{
+//						System.out.println("query: "+service);
 						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(wrapServiceForQuery(sqi.getQuery(), service, type));
+					}
 					checkQueriesLoop(it, service, type).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});

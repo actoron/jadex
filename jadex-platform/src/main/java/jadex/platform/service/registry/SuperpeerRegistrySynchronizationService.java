@@ -153,7 +153,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					{
 						public void execute(Tuple2<Map.Entry<IComponentIdentifier, PeerInfo>, Long> tup) 
 						{
-							System.out.println("Removed peer: "+tup.getFirstEntity().getKey());
+							System.out.println("Removed peer: "+tup.getFirstEntity().getKey()+" lease: "+2.2*lrobs.getTimeLimit());
 							
 							// Remove services and queries of client and indirect clients
 							removeAllClientRegistrations(tup.getFirstEntity().getValue());
@@ -258,7 +258,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		};
 		
 		// Subscribe to changes of the local registry to inform other platforms
-		lrobs = new LocalRegistryObserver(component.getComponentIdentifier().getRoot(), new AgentDelayRunner(component), true)//, eventslimit, timelimit)
+		lrobs = new LocalRegistryObserver(component, new AgentDelayRunner(component), true)//, eventslimit, timelimit)
 		{
 			public void notifyObservers(ARegistryEvent event)
 			{
@@ -899,8 +899,17 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		Future<ARegistryResponseEvent> ret = new Future<ARegistryResponseEvent>();
 		
-//		if(event instanceof MultiRegistryEvent && ((MultiRegistryEvent)(event)).getEvents()!=null)
-//		System.out.println("received event from client: "+getComponent().getComponentIdentifier()+" "+event);
+		if(event instanceof MultiRegistryEvent && ((MultiRegistryEvent)(event)).getEvents()!=null)
+		{
+			System.out.println("received multi event from client: "+getComponent().getComponentIdentifier()+" "+((MultiRegistryEvent)(event)).getEvents().size());
+		}
+		else if(event instanceof RegistryEvent)
+		{
+//			RegistryEvent re = (RegistryEvent)event;
+//			int added = re.getAddedServices()!=null? re.getAddedServices().size(): 0;
+//			int removed = re.getRemovedServices()!=null? re.getRemovedServices().size(): 0;
+			System.out.println("received event from client: "+System.currentTimeMillis()+" "+getComponent().getComponentIdentifier()+" event: "+event);
+		}
 		
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 

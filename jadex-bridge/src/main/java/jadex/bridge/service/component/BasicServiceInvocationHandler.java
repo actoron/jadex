@@ -805,11 +805,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
 //			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
-			Class<?> ty = info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
+			Class<?> ty = info.getType()!=null? info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports()): null;
 			if(ty==null)
-				throw new IllegalArgumentException("Type must not null: "+ty);
-			ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 
-		
+			{
+//				throw new IllegalArgumentException("Type must not null: "+ty);
+				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class}, handler); 
+			}
+			else
+			{
+				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 	
+			}
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
 			// now it can only schedule back on the hosting component of the required proxy

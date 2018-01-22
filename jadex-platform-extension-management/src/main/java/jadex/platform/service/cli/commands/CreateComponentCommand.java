@@ -25,7 +25,7 @@ import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
 
 /**
- *
+ *  Command for creating components.
  */
 public class CreateComponentCommand extends ACliCommand
 {
@@ -84,6 +84,7 @@ public class CreateComponentCommand extends ACliCommand
 						final String config = (String)args.get("-config");
 						final IComponentIdentifier parent = (IComponentIdentifier)args.get("-parent");
 						final String ridtext = (String)args.get("-rid");
+						final Integer count = (Integer)args.get("-cnt");
 						
 						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
 				
@@ -124,7 +125,8 @@ public class CreateComponentCommand extends ACliCommand
 										if(found!=null)
 											info.setResourceIdentifier(found);
 										
-										cms.createComponent(name, model, info, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+										for(int i=0; i<(count==null? 1: count.intValue()); i++)
+											cms.createComponent(name, model, info, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 									}
 								});
 							}
@@ -151,8 +153,9 @@ public class CreateComponentCommand extends ACliCommand
 		ArgumentInfo config = new ArgumentInfo("-config", String.class, null, "The model configuration.", null);
 		ArgumentInfo parent = new ArgumentInfo("-parent", IComponentIdentifier.class, null, "The parent.", DestroyComponentCommand.CID_CONVERTER);
 		ArgumentInfo rid = new ArgumentInfo("-rid", String.class, null, "The resource identifier.", null);
+		ArgumentInfo cnt = new ArgumentInfo("-cnt", Integer.class, null, "The number of components to start.", null);
 		
-		return new ArgumentInfo[]{name, model, config, parent, rid};
+		return new ArgumentInfo[]{name, model, config, parent, rid, cnt};
 	}
 	
 	/**
