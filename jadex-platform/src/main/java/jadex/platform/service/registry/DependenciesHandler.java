@@ -35,7 +35,16 @@ public abstract class DependenciesHandler
 		Set<IComponentIdentifier> clients = event.getClients();
 		if(clients==null)
 			clients = new HashSet<IComponentIdentifier>();
+		
+		if(clients.toString().indexOf("null")!=-1)
+		{
+			System.err.println("Client is null: "+cid+", "+event);
+		}
 		clients.add(event.getSender());
+		if(event.getSender()==null)
+		{
+			System.err.println("Sender is null: "+cid+", "+event);
+		}
 //		cls.remove(cid);
 		
 		PeerInfo ci = getPeerInfo(cid);
