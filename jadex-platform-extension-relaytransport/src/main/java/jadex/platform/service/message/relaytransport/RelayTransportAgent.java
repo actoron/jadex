@@ -180,6 +180,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		debug = forwarding;
 		this.cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
 		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
 		System.out.println("Started relay transport");
