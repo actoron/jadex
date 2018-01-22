@@ -23,7 +23,7 @@ public class HelplineEvaluation
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 		config.setValue("spcnt", 2);
 		config.setValue("platformcnt", 3);
-		config.setValue("personinc", 10);
+		config.setValue("personinc", 5);
 		config.enhanceWith(Starter.processArgs(args));
 		int	spcnt	= (Integer) config.getArgs().get("spcnt");
 		int	platformcnt	= (Integer) config.getArgs().get("platformcnt");
@@ -72,11 +72,13 @@ public class HelplineEvaluation
 			
 			Thread.sleep(5000);	// Wait for registration?
 			
-			// Search for first person of current increment.
+			// Search for first person to chekc if searches get slower.
 			start	= System.nanoTime();
-			Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(platforms[0], IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person"+offset).get();
+			Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(platforms[0], IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
 			end	= System.nanoTime();
 			System.out.println("Found "+found.size()+" of "+platformcnt+" helpline apps in "+((end-start)/100000000/10.0)+" seconds.");
+			
+			break;
 		}
 	}
 }
