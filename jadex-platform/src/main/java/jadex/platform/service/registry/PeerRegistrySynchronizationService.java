@@ -180,7 +180,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				
 				if(fini)
 				{
-					System.out.println("search fini: " + res.size());
+//					System.out.println("search fini: " + res.size());
 					if(futs != null)
 					{
 						for(Future<IComponentIdentifier> fut: futs)
@@ -203,12 +203,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					sps.getLevel().addResultListener(new IResultListener<Integer>()
 					{
 						public void resultAvailable(Integer result) 
-						{System.out.println("peer ok");
+						{
 							ret.setResult(Boolean.TRUE);
 						}
 						
 						public void exceptionOccurred(Exception exception) 
-						{exception.printStackTrace();
+						{
 							ret.setResult(Boolean.FALSE);
 						}
 					});
