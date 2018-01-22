@@ -505,7 +505,24 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (hasDirectConnection(fwdest))
 		{
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(fwdest));
-			return intmsgfeat.sendToTransports(header, body);
+			IFuture<Void> ret = intmsgfeat.sendToTransports(header, body);
+			final IComponentIdentifier ffwdest = fwdest;
+			ret.addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					synchronized(directconns)
+					{
+						directconns.checkStale();
+						directconns.remove(ffwdest);
+					}
+				}
+			});
+			return ret;
 		}
 		
 		header.addProperty(IMsgHeader.SENDER, agent.getComponentIdentifier());
@@ -541,6 +558,20 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				{
 					fheader.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
 					intmsgfeat.sendToTransports(fheader, fbody).addResultListener(new DelegationResultListener<Void>(ret));
+					ret.addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							synchronized(routes)
+							{
+								routes.remove(ffwdest);
+							}
+						}
+					});
 					notsent = false;
 				}
 			}
