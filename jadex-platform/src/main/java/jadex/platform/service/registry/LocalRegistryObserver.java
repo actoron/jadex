@@ -72,7 +72,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 				
 				try
 				{
-				System.out.println("Local registry changed: "+event);
+//				System.out.println("Local registry changed: "+event);
 				
 				String pubscope = event.getService().getServiceIdentifier().getScope();
 				if(!globalscope || !RequiredServiceInfo.isScopeOnLocalPlatform(pubscope))
@@ -94,6 +94,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 //					registryevent = createEvent();
 //					notifyObservers(r);
 					
+					((RegistryEvent)registryevent).fini = true;
 					notifyObservers(registryevent);
 					registryevent = createEvent();
 				}

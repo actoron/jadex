@@ -64,6 +64,8 @@ public class CMSUpdateHandler
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> addCMSListener(final IComponentIdentifier cid)
 	{
+		//Thread.dumpStack();
+		
 		assert SwingUtilities.isEventDispatchThread();
 		ISubscriptionIntermediateFuture<CMSStatusEvent>	ret;
 		

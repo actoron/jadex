@@ -94,7 +94,8 @@ public abstract class PeerSearchFunctionality
 		else
 		{
 			// Should not happen
-			ret.setException(new RuntimeException("No search possible"));
+			System.out.println("blub");
+			ret.setException(new RuntimeException("Waiting for next search"));
 		}
 		
 		return ret;

@@ -278,9 +278,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		// Transport service is platform-level shared / no required proxy: manual decoupling
 		getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportService, Void>(ret)
 		{
-			public void customResultAvailable(ITransportService result) throws Exception
+			public void customResultAvailable(ITransportService transser) throws Exception
 			{
-				result.sendMessage(header, encryptedbody).addResultListener(new IResultListener<Void>()
+				transser.sendMessage(header, encryptedbody).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
