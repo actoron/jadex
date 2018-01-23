@@ -720,10 +720,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								{
 									Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
 									if (route == null || route.getSecondEntity() > result)
-									{
-										if (!newhops.contains(route.getFirstEntity()))
-											routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
-									}
+										routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
 								}
 								ret.addIntermediateResult(result);
 							}
