@@ -12,6 +12,8 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -108,7 +110,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					
 					addCall(currentsearch, ret);
 					
-					currentsearch.addResultListener(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
+					currentsearch.addResultListener(new IntermediateComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
 					{
 						public void intermediateResultAvailable(ISuperpeerRegistrySynchronizationService result) 
 						{
@@ -132,7 +134,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 							res.addAll(result);
 							forwardResults(true, fcurrentsearch);
 						}
-					});
+					}, component));
 //					forwardResults(false, currentsearch);
 				}
 				// search is running? -> append 
@@ -229,16 +231,22 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		};
 		
 		// Subscribe to changes of the local registry to inform my superpeer
-		lrobs = new LocalRegistryObserver(component.getComponentIdentifier().getRoot(), new AgentDelayRunner(component), true)
+		lrobs = new LocalRegistryObserver(component, new AgentDelayRunner(component), true)
 		{
 			public void notifyObservers(final ARegistryEvent event)
 			{
-//				System.out.println("notify obs: "+lrobs.hashCode());
+				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+					throw new RuntimeException("wrooong2");
+				
+				System.out.println("notify obs: "+event);
 				
 				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
+						if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+							throw new RuntimeException("wrooong22");
+						
 						final IResultListener<ISuperpeerRegistrySynchronizationService> searchlis = this; 
 //						System.out.println("spser !!!!!!"+lrobs.hashCode());
 						
@@ -246,6 +254,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						{
 							public void resultAvailable(ARegistryResponseEvent spevent) 
 							{
+								if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+									throw new RuntimeException("wrooong5");
 //								System.out.println("peer received: "+spevent.isUnknown()+" "+spevent.getReceiver()+" "+event);
 								
 								// Should clients receive multi responses?!
@@ -345,6 +355,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
+					if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+						throw new RuntimeException("wrooong4");
 //					spcid = new ComponentIdentifier("registrysuperpeer@"+spcid.getPlatformName());
 //					System.out.println("Found superpeer: "+spcid);
 					SServiceProvider.getService(component, spcid, ISuperpeerRegistrySynchronizationService.class).addResultListener(

@@ -31,7 +31,7 @@ public abstract class EventCollector
 	 */
 	public EventCollector(IComponentIdentifier cid, final IDelayRunner timer)
 	{
-		this(cid, timer, 50, 10000);
+		this(cid, timer, 1000, 10000);
 	}
 	
 	/**
@@ -68,9 +68,12 @@ public abstract class EventCollector
 				{
 					if(registryevent.isDue())
 					{
-						notifyObservers(registryevent);
-						createEvent();
+						ARegistryEvent r = registryevent;
 						registryevent = createEvent();
+						notifyObservers(r);
+						
+//						notifyObservers(registryevent);
+//						registryevent = createEvent();
 					}
 					// do not wait below 10ms
 					long w = getTimeLimit();

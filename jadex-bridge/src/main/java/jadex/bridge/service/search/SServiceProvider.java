@@ -55,6 +55,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -487,7 +488,7 @@ public class SServiceProvider
 			public void customResultAvailable(Void result)
 			{
 				IResultListener<T> lis = new ProxyResultListener<T>(ret, component, query.getServiceType().getType(component.getClassLoader()));
-				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));;
+				ServiceRegistry.getRegistry(component).searchServiceAsync(query).addResultListener(new ComponentResultListener<T>(lis, component));
 			}
 		});
 		return ret;
@@ -879,6 +880,28 @@ public class SServiceProvider
 //	{
 //		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
 //	}
+	
+	/**
+	 *  Get services per query.
+//	 *  (Returns required service proxy).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess component, final ServiceQuery<T> query, final boolean proxy)
+	{
+		final TerminableIntermediateDelegationFuture<T> ret = new TerminableIntermediateDelegationFuture<T>();
+		
+		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				Class<?> type = query.getServiceType()!=null? query.getServiceType().getType(component.getClassLoader()): null;
+				IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret);
+				ServiceRegistry.getRegistry(component).searchServicesAsync(query).addIntermediateResultListener(new IntermediateComponentResultListener<T>(lis, component));
+			}
+		});
+		return ret;
+	}
 	
 	/**
 	 *  Get all declared services of the given provider.
@@ -2402,10 +2425,43 @@ public class SServiceProvider
 	{
 		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, cid, filter);
 		
+		return addQuery(cid, query);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IComponentIdentifier cid, ServiceQuery<T> query)
+	{
 		return ServiceRegistry.getRegistry(cid).addQuery(query);
-//		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, filter, cid);
+	}
+	
+	/**
+	 *  Add a service query to the registry.
+	 *  @param type The service type.
+	 *  @param scope The scope.
+	 *  @param filter The filter.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> addQuery(final IInternalAccess component, final ServiceQuery<T> query, final boolean proxy)
+	{
+		final SubscriptionIntermediateDelegationFuture<T> ret = new SubscriptionIntermediateDelegationFuture<T>();
 		
-//		return SynchronizedServiceRegistry.getRegistry(cid).addQuery(query);
+//		ensureThreadAccess(component, proxy).addResultListener(new ExceptionDelegationResultListener<Void, Collection<T>>(ret)
+//		{
+//			public void customResultAvailable(Void result)
+//			{
+				Class<?> type = query.getServiceType()==null? null: query.getServiceType().getType(component.getClassLoader());
+//				IIntermediateResultListener<T> lis = proxy? new IntermediateProxyResultListener<T>(ret, component, type): new IntermediateDelegationResultListener<T>(ret);
+				IIntermediateResultListener<T> lis = new IntermediateDelegationResultListener<T>(ret);
+				//query.setReturnType(new ClassInfo(type));
+				ServiceRegistry.getRegistry(component.getComponentIdentifier()).addQuery(query).addIntermediateResultListener(new IntermediateComponentResultListener<T>(lis, component));
+//			}
+//		});
+		
+		return ret;
 	}
 	
 	/**

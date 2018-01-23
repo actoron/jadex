@@ -34,7 +34,7 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public RegistryEvent(boolean delta)
 	{
-		this(null, null, 50, 5000, delta, null);
+		this(null, null, 1000, 10000, delta, null);
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public RegistryEvent(boolean delta, String clienttype)
 	{
-		this(null, null, 50, 5000, delta, clienttype);
+		this(null, null, 1000, 10000, delta, clienttype);
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public RegistryEvent(boolean delta, long timelimit)
 	{
-		this(null, null, 50, timelimit, delta, null);
+		this(null, null, 1000, timelimit, delta, null);
 	}
 	
 	/**
@@ -180,7 +180,10 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public String toString()
 	{
-		return "RegistryEvent(addedservices=" + addedservices + ", removedservices=" + removedservices + ", delta=" + delta + ")";
+		int added = addedservices!=null? addedservices.size(): 0;
+		int rem = removedservices!=null? removedservices.size(): 0;
+//		return "RegistryEvent(addedservices=" + (addedservices!=null? addedservices.size(): 0)  + ", removedservices=" + (removedservices!=null? removedservices.size(): 0) + ", delta=" + delta + ")";
+		return "RegistryEvent(id="+id+", addedservices="+ added +" "+ addedservices  + ", removedservices=" + rem +" "+ removedservices + ", delta=" + delta + ")";
 	}
 	
 //	/**

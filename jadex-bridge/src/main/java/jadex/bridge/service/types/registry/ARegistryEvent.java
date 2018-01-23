@@ -2,6 +2,7 @@ package jadex.bridge.service.types.registry;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.bridge.IComponentIdentifier;
 
@@ -37,7 +38,12 @@ public abstract class ARegistryEvent
 	
 	/** The network names. */
 	protected String[] networknames;
+
+	/** Identity code. */
+	protected String id = ""+ai.incrementAndGet();
 	
+	protected static AtomicInteger ai = new AtomicInteger();	
+		
 	/**
 	 *  Create a new event.
 	 *  @param eventslimit
@@ -198,5 +204,21 @@ public abstract class ARegistryEvent
 	public void setNetworkNames(String[] networknames)
 	{
 		this.networknames = networknames;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 }
