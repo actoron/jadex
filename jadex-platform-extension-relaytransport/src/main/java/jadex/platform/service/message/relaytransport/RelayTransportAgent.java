@@ -180,7 +180,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		debug = forwarding;
 		this.cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
 		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
 		System.out.println("Started relay transport");
@@ -627,9 +626,20 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(destination);
 		if (route != null)
 		{
-			ret.addIntermediateResult(route.getSecondEntity());
-			ret.setFinished();
-			return ret;
+			if (hops.contains(route.getFirstEntity()))
+			{
+				synchronized(routes)
+				{
+					routes.remove(destination);
+					route = null;
+				}
+			}
+			else
+			{
+				ret.addIntermediateResult(route.getSecondEntity());
+				ret.setFinished();
+				return ret;
+			}
 		}
 		
 		final LinkedHashSet<IComponentIdentifier> newhops = new LinkedHashSet<IComponentIdentifier>(hops);
