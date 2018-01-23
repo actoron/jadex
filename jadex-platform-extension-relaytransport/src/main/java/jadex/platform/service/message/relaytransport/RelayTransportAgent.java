@@ -627,9 +627,20 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(destination);
 		if (route != null)
 		{
-			ret.addIntermediateResult(route.getSecondEntity());
-			ret.setFinished();
-			return ret;
+			if (hops.contains(route.getFirstEntity()))
+			{
+				synchronized(routes)
+				{
+					routes.remove(destination);
+					route = null;
+				}
+			}
+			else
+			{
+				ret.addIntermediateResult(route.getSecondEntity());
+				ret.setFinished();
+				return ret;
+			}
 		}
 		
 		final LinkedHashSet<IComponentIdentifier> newhops = new LinkedHashSet<IComponentIdentifier>(hops);
@@ -709,7 +720,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								{
 									Tuple2<IComponentIdentifier, Integer> route = routes.get(destination);
 									if (route == null || route.getSecondEntity() > result)
-										routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
+									{
+										if (!newhops.contains(route.getFirstEntity()))
+											routes.put(destination, new Tuple2<IComponentIdentifier, Integer>(routetarget, result));
+									}
 								}
 								ret.addIntermediateResult(result);
 							}
