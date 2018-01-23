@@ -24,8 +24,8 @@ public class HelplineEvaluation
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 //		config.setSimulation(true);	// Todo: fix sim delay in registry!?
 		config.setValue("spcnt", 3);
-		config.setValue("platformcnt", 10);
-		config.setValue("personinc", 100);
+		config.setValue("platformcnt", 40);
+		config.setValue("personinc", 25);
 		config.enhanceWith(Starter.processArgs(args));
 		int	spcnt	= (Integer) config.getArgs().get("spcnt");
 		int	platformcnt	= (Integer) config.getArgs().get("platformcnt");
