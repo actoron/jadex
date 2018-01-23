@@ -2,6 +2,7 @@ package jadex.micro.examples.helplinemega;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -29,6 +30,16 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 public class HelplineAgent	implements IHelpline
 {
+	// for debugging
+	static AtomicInteger	ai	= new AtomicInteger(1);
+	public HelplineAgent()
+	{
+		int num	= ai.incrementAndGet();
+		if(num%100==0)
+			System.out.println("###### helplines: "+num);
+	}
+	
+	
 	//-------- attributes --------
 	
 	/** The name of the person of interest. */

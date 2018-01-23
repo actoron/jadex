@@ -52,7 +52,8 @@ public class HelplineMasterAgent
 	 */
 	public static void	main(String[] args)
 	{
-		IPlatformConfiguration	config	= PlatformConfigurationHandler.getDefaultNoGui();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getDefault();//NoGui();
+		config.enhanceWith(Starter.processArgs(args));
 		config.addComponent(HelplineMasterAgent.class);
 		Starter.createPlatform(config).get();
 	}

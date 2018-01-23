@@ -27,10 +27,14 @@ public class HelplineEvaluation
 	private static int	spcnt	= 3;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= -2;
+	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 500;
+	private static int	personcnt	= 1000;
+	
+	/** Fixed name true means that all ever created services match the query.
+	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
+	private static boolean	fixedname	= true;
 	
 	//-------- counters for creates elements --------
 	
@@ -110,10 +114,12 @@ public class HelplineEvaluation
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
+		config.setValue("fixedname", fixedname);
 		config.enhanceWith(Starter.processArgs(args));
 		spcnt	= (Integer) config.getArgs().get("spcnt");
 		platformcnt	= (Integer) config.getArgs().get("platformcnt");
 		personcnt	= (Integer) config.getArgs().get("personcnt");
+		fixedname	= (Boolean) config.getArgs().get("fixedname");
 		return config;
 	}
 
@@ -178,12 +184,12 @@ public class HelplineEvaluation
 			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
 			for(int j=0; j<cnt; j++)
 			{
+				Object	person	= fixedname ? "person0" : "person"+numpersons;
 				cms.createComponent(HelplineAgent.class.getName()+".class",
-					new CreationInfo(Collections.singletonMap("person", (Object)("person0")))).getFirstResult();
-//						new CreationInfo(Collections.singletonMap("person", (Object)("person"+(offset+j))))).getFirstResult();
-				numpersons++;
+					new CreationInfo(Collections.singletonMap("person", person))).getFirstResult();
 			}
 		}
+		numpersons	+= cnt*platforms.length;
 		long end	= System.nanoTime();
 		String	creation	= (""+((end-start)/1000000));//.replace('.', ',');
 		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
