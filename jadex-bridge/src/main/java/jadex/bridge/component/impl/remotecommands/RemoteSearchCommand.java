@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
@@ -16,7 +15,6 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  Search for remote services.
@@ -68,14 +66,14 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 //		if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
 //			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
 		
-		// No recursive global search -> change global scope to platform, and owner to local platform.
-		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
-		{
-			System.out.println("Performing remote global search (should only happen on superpeers)");
-//			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
-//				query.setOwner(access.getComponentIdentifier().getRoot());
-//			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-		}
+//		// No recursive global search -> change global scope to platform, and owner to local platform.
+//		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
+//		{
+//			System.out.println("Performing remote global search (should only happen on superpeers): "+query);
+////			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
+////				query.setOwner(access.getComponentIdentifier().getRoot());
+////			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+//		}
 		
 		final IFuture<Collection<T>>	ret;
 		if(query.getFilter() instanceof IAsyncFilter)
