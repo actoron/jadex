@@ -473,12 +473,18 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (header.getProperty(FORWARD_DEST) == null)
 		{
 			fwdest = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
+			
 			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
 			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			byte[] bheader = serserv.encode(header, agent, header);
 			bheader = secservice.encryptAndSign(header, bheader).get();
 			
 			body = SUtil.mergeData(bheader, body);
+			
+			if (debug)
+			{
+				System.out.println("Preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
+			}
 			
 			header = new MsgHeader();
 			
