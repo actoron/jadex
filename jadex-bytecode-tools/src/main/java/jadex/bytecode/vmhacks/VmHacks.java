@@ -57,7 +57,7 @@ public class VmHacks
 	public static boolean DISABLE = false;
 	
 	/** Set to true to see debug infos during startup. */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/**
 	 *  Provides access to unsafe operations.
@@ -131,14 +131,8 @@ public class VmHacks
 		/** Classloader class injection map. */
 		private Map<Object[], Class<?>>  injectionclassstore;
 		
-		/** Name of the class store. */
-		private String classstoreclassname;
-		
 		/** Classloader classes that have been enhanced with injections. */
 		private Map<Class<?>, Unsafe> enhancedloaders = new WeakHashMap<Class<?>, Unsafe>();
-		
-		/** Synchronization lock for the instrumentation agent. */
-		private Semaphore instagentlock = new Semaphore(0);
 		
 		/**
 		 *  Creates the Unsafe.
@@ -425,17 +419,6 @@ public class VmHacks
 //		}
 		
 		/**
-		 *  Sets the instrumentation, called by VmHacksAgent.
-		 *  
-		 *  @param inst The instrumentation. 
-		 */
-		protected void setInstrumentation(Instrumentation inst)
-		{
-			instrumentation = inst;
-			instagentlock.release();
-		}
-		
-		/**
 		 *  Initialization step after constructor to allow bootstrapping.
 		 */
 		protected void init()
@@ -532,8 +515,8 @@ public class VmHacks
 						Class.forName("sun.instrument.InstrumentationImpl");
 //						InstrumentStarter.startAgent(jar.getAbsolutePath());
 						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
-//						if (hasagent)
-//							System.out.println("Instrumentation agent loaded via API call.");
+						if (DEBUG && hasagent)
+							System.out.println("Instrumentation agent loaded via internal API call.");
 					}
 					catch (Exception e1)
 					{
@@ -563,7 +546,10 @@ public class VmHacks
 				        Method attach = vmclass.getDeclaredMethod("attach", String.class);
 				        Object vm = attach.invoke(null, pid);
 				        Method loadagent = vmclass.getDeclaredMethod("loadAgent", String.class);
-				        loadagent.invoke(vm, jar.getAbsolutePath());	        
+				        loadagent.invoke(vm, jar.getAbsolutePath());
+				        hasagent = true;
+				        if (DEBUG)
+							System.out.println("Instrumentation agent loaded via tools.jar.");
 		        	}
 		        	catch (Exception e1)
 		        	{
@@ -571,10 +557,12 @@ public class VmHacks
 		        }
 		        
 		        if (hasagent)
-		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(300, TimeUnit.MILLISECONDS);
+		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(500, TimeUnit.MILLISECONDS);
 		        
 		        if (hasInstrumentation())
 		        	injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
+		        else if (DEBUG)
+		        	System.out.println("Instrumentation is unavailable.");
 		        
 		        jar.delete();
 			}
