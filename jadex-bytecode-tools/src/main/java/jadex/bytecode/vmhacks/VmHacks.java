@@ -574,23 +574,9 @@ public class VmHacks
 		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(300, TimeUnit.MILLISECONDS);
 		        
 		        if (hasInstrumentation())
-		        {
-			        // Inject the class storage.
-			        classstoreclassname = VmHacks.class.getPackage().getName() + "." + "ClassStore";
-			        try
-					{
-				        is = null;
-				        is = VmHacks.class.getClassLoader().getResourceAsStream(classstoreclassname.replace('.', '/') + ".class");
-						appendToBootstrapClassLoaderSearch(classstoreclassname, is);
-					
-//						Class<?> storeclass = Class.forName(classstoreclassname);
-//						Field clinj = storeclass.getField("STORE");
-						injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
-					}
-					catch (Exception e)
-					{
-					}
-		        }
+		        	injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
+		        
+		        jar.delete();
 			}
 			catch (Exception e)
 			{
