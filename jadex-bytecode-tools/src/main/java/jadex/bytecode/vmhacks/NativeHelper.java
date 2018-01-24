@@ -116,16 +116,6 @@ public final class NativeHelper implements INativeHelper
 	}
 	
 	/**
-	 *  Gets a pointer to the VM.
-	 *  
-	 *  @return Pointer to VM.
-	 */
-	public long getVm()
-	{
-		return Pointer.nativeValue(javavm);
-	}
-	
-	/**
      * Define a class in any ClassLoader.
      */
 	public Class<?> defineClass(String name, byte[] b, ClassLoader loader)
@@ -192,6 +182,26 @@ public final class NativeHelper implements INativeHelper
 		try
 		{
 			ret = geteUid() == 0;
+		}
+		catch (Throwable e)
+		{
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Method for starting an instrumentation agent.
+	 *  
+	 *  @param jarfile The path to the jar file of the agent.
+	 *  @return True, on successful start.
+	 */
+	public boolean startInstrumentationAgent(String jarfile)
+	{
+		boolean ret = false;
+		try
+		{
+			Function fun = NativeLibrary.getInstance("instrument").getFunction("Agent_OnAttach");
+			ret = fun.invokeInt(new Object[] { javavm, jarfile, Pointer.NULL }) == 0;
 		}
 		catch (Throwable e)
 		{
@@ -346,7 +356,7 @@ public final class NativeHelper implements INativeHelper
 	public static void main(String[] args) throws Exception
 	{
 		final NativeHelper n = new NativeHelper();
-		System.out.println(n.getVm());
+//		System.out.println(n.getVm());
 		System.out.println(n.geteUid());
 		System.out.println(n.getUidGid("nobody")[0] + " " + n.getUidGid("nobody")[1]);
 		n.tryChangeUser(null);

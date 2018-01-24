@@ -36,14 +36,15 @@ public interface INativeHelper
 	public boolean canSetAccessible();
 	
 	/**
-	 *  Gets a pointer to the VM.
-	 *  
-	 *  @return Pointer to VM.
-	 */
-	public long getVm();
-	
-	/**
      * Define a class in any ClassLoader.
      */
 	public Class<?> defineClass(String name, byte[] b, ClassLoader loader);
+	
+	/**
+	 *  Method for starting an instrumentation agent.
+	 *  
+	 *  @param jarfile The path to the jar file of the agent.
+	 *  @return True, on successful start.
+	 */
+	public boolean startInstrumentationAgent(String jarfile);
 }

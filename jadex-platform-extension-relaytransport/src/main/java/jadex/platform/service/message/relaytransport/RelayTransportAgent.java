@@ -3,6 +3,7 @@ package jadex.platform.service.message.relaytransport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,7 +32,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -240,6 +240,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				tas.addManualAddresses(relayaddrs).get();
 			}
 		}
+		
+		// Shuffle relays to even out load.
+		Collections.shuffle(relays);
 		
 		IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
 //		forwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));

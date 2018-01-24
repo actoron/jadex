@@ -91,7 +91,8 @@ public class VmHacks
      */
 	public static final class Unsafe
 	{
-		
+		/** Directory for temporary jar files. */
+		protected static final File TEMP_JAR_DIR = new File(System.getProperty("java.io.tmpdir") + File.separator + ".jadex" + File.separator + "tmpjars");
 		
 		/** Set this to true to switch to fallback mode for invocation */
 		private boolean asm = false;
@@ -529,10 +530,12 @@ public class VmHacks
 			        try
 					{
 						Class.forName("sun.instrument.InstrumentationImpl");
-						InstrumentStarter.startAgent(jar.getAbsolutePath());
-						hasagent = true;
+//						InstrumentStarter.startAgent(jar.getAbsolutePath());
+						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
+//						if (hasagent)
+//							System.out.println("Instrumentation agent loaded via API call.");
 					}
-					catch (Throwable e1)
+					catch (Exception e1)
 					{
 					}
 		        }
@@ -961,6 +964,9 @@ public class VmHacks
 		 */
 		private static File createTempJar(String classname, InputStream classcontent, Manifest man)
 		{
+			if(!TEMP_JAR_DIR.exists())
+				TEMP_JAR_DIR.mkdirs();
+			
 			man = man == null ? new Manifest() : man;
 			JarOutputStream os = null;
 	        
@@ -968,6 +974,7 @@ public class VmHacks
 	        try
 	        {
 	        	jar = File.createTempFile("jadextmp", ".jar");
+	        	jar = new File(TEMP_JAR_DIR, SUtil.createPlainRandomId("tmpjar", 32)+".jar");
 	            jar.deleteOnExit();
 	            os = new JarOutputStream(new FileOutputStream(jar), man);
 	            String clname = classname.replace('.', '/') + ".class";

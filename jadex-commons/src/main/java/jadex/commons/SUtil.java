@@ -2186,7 +2186,7 @@ public class SUtil
 		FAST_RANDOM.nextBytes(random);
 		for (int i = 0; i < random.length; ++i)
 		{
-			retchars[++offset] = ID_CHARS[random[i] & 0xFF % 36];
+			retchars[++offset] = ID_CHARS[(random[i] & 0xFF) % 36];
 		}
 		return name+new String(retchars);
 	}
