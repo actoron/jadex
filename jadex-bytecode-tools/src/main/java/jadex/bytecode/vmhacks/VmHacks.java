@@ -57,7 +57,7 @@ public class VmHacks
 	public static boolean DISABLE = false;
 	
 	/** Set to true to see debug infos during startup. */
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/**
 	 *  Provides access to unsafe operations.
@@ -91,7 +91,8 @@ public class VmHacks
      */
 	public static final class Unsafe
 	{
-		
+		/** Directory for temporary jar files. */
+		protected static final File TEMP_JAR_DIR = new File(System.getProperty("java.io.tmpdir") + File.separator + ".jadex" + File.separator + "tmpjars");
 		
 		/** Set this to true to switch to fallback mode for invocation */
 		private boolean asm = false;
@@ -130,14 +131,8 @@ public class VmHacks
 		/** Classloader class injection map. */
 		private Map<Object[], Class<?>>  injectionclassstore;
 		
-		/** Name of the class store. */
-		private String classstoreclassname;
-		
 		/** Classloader classes that have been enhanced with injections. */
 		private Map<Class<?>, Unsafe> enhancedloaders = new WeakHashMap<Class<?>, Unsafe>();
-		
-		/** Synchronization lock for the instrumentation agent. */
-		private Semaphore instagentlock = new Semaphore(0);
 		
 		/**
 		 *  Creates the Unsafe.
@@ -424,17 +419,6 @@ public class VmHacks
 //		}
 		
 		/**
-		 *  Sets the instrumentation, called by VmHacksAgent.
-		 *  
-		 *  @param inst The instrumentation. 
-		 */
-		protected void setInstrumentation(Instrumentation inst)
-		{
-			instrumentation = inst;
-			instagentlock.release();
-		}
-		
-		/**
 		 *  Initialization step after constructor to allow bootstrapping.
 		 */
 		protected void init()
@@ -529,10 +513,12 @@ public class VmHacks
 			        try
 					{
 						Class.forName("sun.instrument.InstrumentationImpl");
-						InstrumentStarter.startAgent(jar.getAbsolutePath());
-						hasagent = true;
+//						InstrumentStarter.startAgent(jar.getAbsolutePath());
+						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
+						if (DEBUG && hasagent)
+							System.out.println("Instrumentation agent loaded via internal API call.");
 					}
-					catch (Throwable e1)
+					catch (Exception e1)
 					{
 					}
 		        }
@@ -560,7 +546,10 @@ public class VmHacks
 				        Method attach = vmclass.getDeclaredMethod("attach", String.class);
 				        Object vm = attach.invoke(null, pid);
 				        Method loadagent = vmclass.getDeclaredMethod("loadAgent", String.class);
-				        loadagent.invoke(vm, jar.getAbsolutePath());	        
+				        loadagent.invoke(vm, jar.getAbsolutePath());
+				        hasagent = true;
+				        if (DEBUG)
+							System.out.println("Instrumentation agent loaded via tools.jar.");
 		        	}
 		        	catch (Exception e1)
 		        	{
@@ -568,26 +557,14 @@ public class VmHacks
 		        }
 		        
 		        if (hasagent)
-		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(300, TimeUnit.MILLISECONDS);
+		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(500, TimeUnit.MILLISECONDS);
 		        
 		        if (hasInstrumentation())
-		        {
-			        // Inject the class storage.
-			        classstoreclassname = VmHacks.class.getPackage().getName() + "." + "ClassStore";
-			        try
-					{
-				        is = null;
-				        is = VmHacks.class.getClassLoader().getResourceAsStream(classstoreclassname.replace('.', '/') + ".class");
-						appendToBootstrapClassLoaderSearch(classstoreclassname, is);
-					
-//						Class<?> storeclass = Class.forName(classstoreclassname);
-//						Field clinj = storeclass.getField("STORE");
-						injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
-					}
-					catch (Exception e)
-					{
-					}
-		        }
+		        	injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
+		        else if (DEBUG)
+		        	System.out.println("Instrumentation is unavailable.");
+		        
+		        jar.delete();
 			}
 			catch (Exception e)
 			{
@@ -961,6 +938,9 @@ public class VmHacks
 		 */
 		private static File createTempJar(String classname, InputStream classcontent, Manifest man)
 		{
+			if(!TEMP_JAR_DIR.exists())
+				TEMP_JAR_DIR.mkdirs();
+			
 			man = man == null ? new Manifest() : man;
 			JarOutputStream os = null;
 	        
@@ -968,6 +948,7 @@ public class VmHacks
 	        try
 	        {
 	        	jar = File.createTempFile("jadextmp", ".jar");
+	        	jar = new File(TEMP_JAR_DIR, SUtil.createPlainRandomId("tmpjar", 32)+".jar");
 	            jar.deleteOnExit();
 	            os = new JarOutputStream(new FileOutputStream(jar), man);
 	            String clname = classname.replace('.', '/') + ".class";

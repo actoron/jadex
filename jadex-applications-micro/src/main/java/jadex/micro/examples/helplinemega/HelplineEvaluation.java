@@ -27,10 +27,10 @@ public class HelplineEvaluation
 	private static int	spcnt	= 3;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= -1;
+	private static int	platformcnt	= 10;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 1000;
+	private static int	personcnt	= 100;
 	
 	/** Fixed name true means that all ever created services match the query.
 	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
@@ -48,7 +48,7 @@ public class HelplineEvaluation
 	private static int	numpersons	= 0;
 
 	/** Output file name. */
-	private static final String filename = "eval"+System.currentTimeMillis()+".csv";
+	private static String filename;
 
 	
 	//-------- methods --------
@@ -56,6 +56,13 @@ public class HelplineEvaluation
 	public static void main(String[] args)	throws Exception
 	{
 		IPlatformConfiguration config = parseArgs(args);
+		
+		if(spcnt!=0)
+		{
+			// When using SSPs -> disable awareness.
+			config.setAwareness(false);
+			createRelayAndSSPs(config);
+		}
 
 		if(spcnt>0)
 		{
@@ -110,7 +117,10 @@ public class HelplineEvaluation
 	protected static IPlatformConfiguration parseArgs(String[] args)
 	{
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
+		config.setChat(false);	// Keep platform at minimum. Todo: minimal server config
 		config.setSimulation(false);	// Todo: fix sim delay in registry!?
+		config.setNetworkName("helpline");
+		config.setNetworkPass("p09 p6rfzb pﬂ7pv0 78rtvo0b 67rf");
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
@@ -124,15 +134,43 @@ public class HelplineEvaluation
 	}
 
 	/**
+	 *  Create a local relay and SSP platforms
+	 *  @param config	The platform config.
+	 */
+	protected static void createRelayAndSSPs(IPlatformConfiguration config)
+	{
+		IPlatformConfiguration relayconf	= PlatformConfigurationHandler.getDefaultNoGui();
+		relayconf.enhanceWith(config);
+		relayconf.setPlatformName("relay");
+		relayconf.setTcpPort(2091);
+		relayconf.setRelayForwarding(true);
+		Starter.createPlatform(relayconf).get();
+		
+		config.setRelayAddresses("tcp://relay@localhost:2091");
+		
+		IPlatformConfiguration sspconf	= PlatformConfigurationHandler.getDefaultNoGui();
+		sspconf.enhanceWith(config);
+		sspconf.setSupersuperpeer(true);
+		
+		sspconf.setPlatformName("ssp1");
+		Starter.createPlatform(sspconf).get();
+		
+		sspconf.setPlatformName("ssp2");
+		Starter.createPlatform(sspconf).get();
+		
+		sspconf.setPlatformName("ssp3");
+		Starter.createPlatform(sspconf).get();
+	}
+	
+	/**
 	 *  Create a number of SP platforms.
 	 *  @param config	The platform config.
 	 *  @param cnt	The number of platforms
 	 */
 	protected static void createSPs(IPlatformConfiguration config, int cnt)
 	{
-		config.setSuperpeer(true);	// hack???
+		config.setSuperpeer(true);
 		createPlatforms(config, cnt, "SP");
-		config.setSuperpeer(false);
 		numsps	+= cnt;
 	}
 	
@@ -144,6 +182,7 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt)
 	{
+		config.setSuperpeer(false);
 		IExternalAccess[]	ret	= createPlatforms(config, cnt, "helpline");
 		numplatforms	+= cnt;
 		return ret;
@@ -157,6 +196,7 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
 	{
+		config.setPlatformName(type+"_*");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
 		long	start	= System.nanoTime();
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
@@ -203,6 +243,7 @@ public class HelplineEvaluation
 	 */
 	protected static void	createOutputFile() throws IOException
 	{
+		filename	= "eval_"+spcnt+"_"+platformcnt+"_"+personcnt+"_"+fixedname+"_"+System.currentTimeMillis()+".csv";
 		FileWriter	out	= new FileWriter(filename, true);
 		out.write("# of SPs;# of Platforms;# of Services;Service Creation Time;Service Search Time;Found Services;Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
 		out.close();

@@ -944,6 +944,29 @@ public class SInvocation
 		}
 	}
 	
+	protected static class SortingInjectorWrapper implements IInjector
+	{
+		/**
+		 *  Injects properties into a bean.
+		 *  
+		 *  @param object The target bean object.
+		 *  @param properties The bean properties, names followed by values,
+		 *  				  size must be even.
+		 */
+		public void inject(Object object, Object... properties)
+		{
+			if (properties.length < 50)
+			{
+				for (int i = 0; i < properties.length; i = i + 2)
+				{
+					
+				}
+			}
+		}
+		
+		
+	}
+	
 	/**
 	 *  Fallback invoker using reflection in case a byte-engineered variant is not available.
 	 *
