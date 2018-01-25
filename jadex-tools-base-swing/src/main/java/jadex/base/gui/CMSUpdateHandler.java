@@ -6,7 +6,9 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
@@ -64,6 +66,8 @@ public class CMSUpdateHandler
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> addCMSListener(final IComponentIdentifier cid)
 	{
+		//Thread.dumpStack();
+		
 		assert SwingUtilities.isEventDispatchThread();
 		ISubscriptionIntermediateFuture<CMSStatusEvent>	ret;
 		
@@ -122,9 +126,18 @@ public class CMSUpdateHandler
 				addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 			{
 				@Override
-				public void customResultAvailable(IComponentManagementService cms)
+				public void customResultAvailable(final IComponentManagementService cms)
 				{
-					cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
+					// cannot invoke method on remote proxy as send message is called then on wrong thread (not component)
+					//cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
+					access.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
+							return IFuture.DONE;
+						}
+					});
 				}
 
 				@Override

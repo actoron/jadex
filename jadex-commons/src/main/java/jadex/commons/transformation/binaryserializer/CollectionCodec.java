@@ -125,6 +125,7 @@ public class CollectionCodec extends AbstractCodec
 		}
 		catch(Exception e)
 		{
+			System.out.println("thread trav: "+Thread.currentThread());
 			e.printStackTrace();
 		}
 		

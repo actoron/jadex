@@ -166,12 +166,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 //				System.out.println("forwardRes: "+fini);
 				
-				if(fini)
-				{
-					// add superpeers as last chance
-					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
-				}
+//				if(fini)
+//				{
+//					// add superpeers as last chance
+//					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+//						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+//				}
 				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)
@@ -238,7 +238,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 					throw new RuntimeException("wrooong2");
 				
-				System.out.println("notify obs: "+event);
+				if(event.size()>0)
+					System.out.println("notify obs: "+event);
 				
 				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
@@ -329,6 +330,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						// Not a problem because on first occurrence sends full data (removeds are lost)
 					}
 				}, component));
+				
 			}
 		};
 	}

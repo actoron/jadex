@@ -124,6 +124,12 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public boolean addAddedService(IService service)
 	{
+		if(fini)
+		{
+			System.out.println("thread: "+Thread.currentThread());
+			Thread.dumpStack();
+		}
+		
 		if(service==null)
 			throw new IllegalArgumentException("Service must not be null");
 		if(addedservices==null)
@@ -185,6 +191,8 @@ public class RegistryEvent extends ARegistryEvent
 //		return "RegistryEvent(addedservices=" + (addedservices!=null? addedservices.size(): 0)  + ", removedservices=" + (removedservices!=null? removedservices.size(): 0) + ", delta=" + delta + ")";
 		return "RegistryEvent(id="+id+", addedservices="+ added +" "+ addedservices  + ", removedservices=" + rem +" "+ removedservices + ", delta=" + delta + ")";
 	}
+	
+	public boolean fini = false;
 	
 //	/**
 //	 *  Get the addedservices.
