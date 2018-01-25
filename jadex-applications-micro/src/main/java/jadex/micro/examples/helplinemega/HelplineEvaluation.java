@@ -173,6 +173,7 @@ public class HelplineEvaluation
 		IPlatformConfiguration sspconf	= PlatformConfigurationHandler.getDefaultNoGui();
 		sspconf.enhanceWith(config);
 		sspconf.setSupersuperpeer(true);
+		sspconf.setSuperpeerClient(false);
 		
 		sspconf.setPlatformName("ssp1");
 		Starter.createPlatform(sspconf).get();
@@ -192,7 +193,14 @@ public class HelplineEvaluation
 	protected static void createSPs(IPlatformConfiguration config, int cnt)
 	{
 		config.setSuperpeer(true);
-		createPlatforms(config, cnt, "SP");
+//		createPlatforms(config, cnt, "SP");
+		config.setPlatformName("SP_****");
+		System.out.println("Starting "+cnt+" SP platforms.");
+		for(int i=0; i<cnt; i++)
+		{
+			Starter.createPlatform(config).get();	// Hack!!! Bug when started in parallel
+		}
+
 		numsps	+= cnt;
 	}
 	
@@ -223,7 +231,7 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
 	{
-		config.setPlatformName(type+"_*");
+		config.setPlatformName(type+"_****");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
 		FutureBarrier<IExternalAccess>	fubar	= new FutureBarrier<IExternalAccess>();
