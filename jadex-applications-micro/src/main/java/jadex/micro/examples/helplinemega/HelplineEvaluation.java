@@ -1,6 +1,7 @@
 package jadex.micro.examples.helplinemega;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -14,89 +15,210 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
- *  Main class to launch a given number of superpeers.
+ *  Main class allowing to run different evaluation scenarios for helpline scalability.
  */
 public class HelplineEvaluation
 {
+	//-------- scenario configuration --------
+
+	// may also be specified as command line parameter (e.g. '-spcnt 0').
+	
+	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
+	private static int	spcnt	= 3;
+	
+	/** The number of platforms (positive: create only once, negative: create in each round). */
+	private static int	platformcnt	= -1;
+	
+	/** The number of persons (components) to create on each (new) platform in each round. */
+	private static int	personcnt	= 1000;
+	
+	/** Fixed name true means that all ever created services match the query.
+	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
+	private static boolean	fixedname	= true;
+	
+	//-------- counters for creates elements --------
+	
+	/** Number of created SPs. */
+	private static int	numsps	= 0;
+
+	/** Number of created platforms. */
+	private static int	numplatforms	= 0;
+	
+	/** Number of created persons. */
+	private static int	numpersons	= 0;
+
+	/** Output file name. */
+	private static final String filename = "eval"+System.currentTimeMillis()+".csv";
+
+	
+	//-------- methods --------
+	
 	public static void main(String[] args)	throws Exception
 	{
-		// Parse args into config and extract settings.
-		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
-//		config.setSimulation(true);	// Todo: fix sim delay in registry!?
-		config.setValue("spcnt", 3);
-		config.setValue("platformcnt", 10);
-		config.setValue("personinc", 100);
-		config.enhanceWith(Starter.processArgs(args));
-		int	spcnt	= (Integer) config.getArgs().get("spcnt");
-		int	platformcnt	= (Integer) config.getArgs().get("platformcnt");
-		int	personinc	= (Integer) config.getArgs().get("personinc");
+		IPlatformConfiguration config = parseArgs(args);
 
-		// Start #spcnt superpeers.
-		System.out.println("Starting "+spcnt+" superpeer platforms.");
-		config.setSuperpeer(true);
-		long	start	= System.nanoTime();
-		for(int i=0; i<spcnt; i++)
+		if(spcnt>0)
 		{
-			Starter.createPlatform(config).get();
-			System.out.println("Started Superpeer #"+i);
+			createSPs(config, spcnt);
 		}
-		long	end	= System.nanoTime();
-		config.setSuperpeer(false);
-		System.out.println("Started "+spcnt+" superpeers in "+((end-start)/100000000/10.0)+" seconds.");
 		
-		// Start #platformcnt helpline platforms.
-		System.out.println("Starting "+platformcnt+" helpline platforms.");
-		start	= System.nanoTime();
-		IExternalAccess[]	platforms	= new IExternalAccess[platformcnt];
-		for(int i=0; i<platformcnt; i++)
+		IExternalAccess[]	platforms	= null;
+		if(platformcnt>0)
 		{
-			platforms[i]	= Starter.createPlatform(config).get();
-			System.out.println("Started Platform #"+i);
+			platforms	= createHelplinePlatforms(config, platformcnt);			
 		}
-		end	= System.nanoTime();
-		System.out.println("Started "+platformcnt+" helpline platforms in "+((end-start)/100000000/10.0)+" seconds.");
 		
-		String	filename	= "eval"+System.currentTimeMillis()+".csv";
-		FileWriter	out	= new FileWriter(filename, true);
-		out.write("# of Services;Creation Time;Search Time;Found Services;Settings: spcnt="+spcnt+" platformcnt="+platformcnt+" personinc="+personinc+"\n");
-		out.close();
+		createOutputFile();
 		
-		// Loop to start (additional) #personinc helpline components per platform until program is interrupted.
-		for(int offset=0; ; offset+=personinc)
+		// Loop to start additional components/platforms/SPs until program is interrupted.
+		
+		while(true)
 		{
-			System.gc();
-			start	= System.nanoTime();
-			for(int i=0; i<platforms.length; i++)
+			if(spcnt<0)
 			{
-				IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
-				for(int j=0; j<personinc; j++)
-				{
-					cms.createComponent(HelplineAgent.class.getName()+".class",
-						new CreationInfo(Collections.singletonMap("person", (Object)("person0")))).getFirstResult();
-//						new CreationInfo(Collections.singletonMap("person", (Object)("person"+(offset+j))))).getFirstResult();
-				}
+				createSPs(config, -spcnt);
 			}
-			end	= System.nanoTime();
-			String	creation	= (""+((end-start)/1000000)).replace('.', ',');
-			System.out.println("Started "+personinc*platformcnt+" helpline apps in "+creation+" milliseconds. Total: "+(offset+personinc)*platformcnt+", per platform: "+(offset+personinc));
+			
+			if(platformcnt<0)
+			{
+				platforms	= createHelplinePlatforms(config, -platformcnt);			
+			}
+			
+			System.gc();
+			String creation = createPersons(platforms, personcnt);
 			
 //			Thread.sleep(5000);	// Wait for registration?
-			
+
 			// Search for first person to check if searches get slower.
 			System.gc();
-			start	= System.nanoTime();
+			long	start	= System.nanoTime();
 			Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(platforms[0], IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
-			end	= System.nanoTime();
+			long	end	= System.nanoTime();
 			String	search	= (""+((end-start)/1000000)).replace('.', ',');
-//			System.out.println("Found "+found.size()+" of "+platformcnt+" helpline apps in "+search+" milliseconds.");
-			System.out.println("Found "+found.size()+" of "+(offset+personinc)*platformcnt+" helpline apps in "+search+" milliseconds.");
+			int	numfound	= found.size();
+			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
 			
-			out	= new FileWriter(filename, true);
-			out.write((offset+personinc)*platformcnt+";"+creation+";"+search+";"+found.size()+"\n");
-			out.close();
-
-			
-//			break;
+			writeEntry(creation, search, numfound);
 		}
+	}
+
+	/**
+	 *  Parse args into config and extract settings into static fields.
+	 *  @param args	The program arguments.
+	 *  @return	The parsed platform configuration.
+	 */
+	protected static IPlatformConfiguration parseArgs(String[] args)
+	{
+		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
+		config.setSimulation(false);	// Todo: fix sim delay in registry!?
+		config.setValue("spcnt", spcnt);
+		config.setValue("platformcnt", platformcnt);
+		config.setValue("personcnt", personcnt);
+		config.setValue("fixedname", fixedname);
+		config.enhanceWith(Starter.processArgs(args));
+		spcnt	= (Integer) config.getArgs().get("spcnt");
+		platformcnt	= (Integer) config.getArgs().get("platformcnt");
+		personcnt	= (Integer) config.getArgs().get("personcnt");
+		fixedname	= (Boolean) config.getArgs().get("fixedname");
+		return config;
+	}
+
+	/**
+	 *  Create a number of SP platforms.
+	 *  @param config	The platform config.
+	 *  @param cnt	The number of platforms
+	 */
+	protected static void createSPs(IPlatformConfiguration config, int cnt)
+	{
+		config.setSuperpeer(true);	// hack???
+		createPlatforms(config, cnt, "SP");
+		config.setSuperpeer(false);
+		numsps	+= cnt;
+	}
+	
+	/**
+	 *  Create a number of platforms (e.g. SPs or helpline nodes).
+	 *  @param config	The platform config.
+	 *  @param cnt	The number of platforms
+	 *  @return The created platforms.
+	 */
+	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt)
+	{
+		IExternalAccess[]	ret	= createPlatforms(config, cnt, "helpline");
+		numplatforms	+= cnt;
+		return ret;
+	}
+
+	/**
+	 *  Create a number of platforms (e.g. SPs or helpline nodes).
+	 *  @param config	The platform config.
+	 *  @param cnt	The number of platforms
+	 *  @return The created platforms.
+	 */
+	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
+	{
+		System.out.println("Starting "+cnt+" "+type+" platforms.");
+		long	start	= System.nanoTime();
+		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
+		for(int i=0; i<cnt; i++)
+		{
+			platforms[i]	= Starter.createPlatform(config).get();
+			System.out.println("Started "+type+" platform #"+i);
+		}
+		long	end	= System.nanoTime();
+		System.out.println("Started "+cnt+" "+type+" platforms in "+((end-start)/100000000/10.0)+" seconds.");
+		return platforms;
+	}
+	
+	/**
+	 *  Create a number of person-specific helpline components on the given platforms.
+	 *  @param platforms	The platforms to create new nodes on.
+	 *  @param cnt	The number of components to create on each platform.
+	 *  @return	The time needed for creation as preformatted string.
+	 */
+	protected static String createPersons(IExternalAccess[] platforms, int cnt)
+	{
+		long start	= System.nanoTime();
+		for(int i=0; i<platforms.length; i++)
+		{
+			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
+			for(int j=0; j<cnt; j++)
+			{
+				Object	person	= fixedname ? "person0" : "person"+numpersons;
+				cms.createComponent(HelplineAgent.class.getName()+".class",
+					new CreationInfo(Collections.singletonMap("person", person))).getFirstResult();
+			}
+		}
+		numpersons	+= cnt*platforms.length;
+		long end	= System.nanoTime();
+		String	creation	= (""+((end-start)/1000000));//.replace('.', ',');
+		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
+		return creation;
+	}
+
+	/**
+	 *  Create the output file and return the file name.
+	 *  @return	The file name.
+	 *  @throws IOException
+	 */
+	protected static void	createOutputFile() throws IOException
+	{
+		FileWriter	out	= new FileWriter(filename, true);
+		out.write("# of SPs;# of Platforms;# of Services;Service Creation Time;Service Search Time;Found Services;Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
+		out.close();
+	}
+	
+	/**
+	 *  Write an entry to the output file.
+	 *  @param creation	Service creation time.
+	 *  @param search	Service search time.
+	 *  @param numfound	Number of services found by search.
+	 *  @throws IOException
+	 */
+	protected static void writeEntry(String creation, String search, int numfound) throws IOException
+	{
+		FileWriter	out	= new FileWriter(filename, true);
+		out.write(numsps+";"+numplatforms+";"+numpersons+";"+creation+";"+search+";"+numfound+"\n");
+		out.close();
 	}
 }

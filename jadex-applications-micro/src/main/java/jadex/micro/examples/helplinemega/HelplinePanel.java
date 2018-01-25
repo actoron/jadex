@@ -239,7 +239,7 @@ public class HelplinePanel extends JPanel
 				bshowinfo.setEnabled(false);
 				bsearchinfo.setEnabled(false);
 				
-				getLocalService(tfname.getText()).addResultListener(new SwingDefaultResultListener<IHelpline>()
+				getLocalService(tfpname.getText()).addResultListener(new SwingDefaultResultListener<IHelpline>()
 				{
 					@Override
 					public void customResultAvailable(IHelpline helpline)
@@ -381,9 +381,12 @@ public class HelplinePanel extends JPanel
 
 class InfoTableModel extends AbstractTableModel
 {
-	protected List list;
+	// make eclipse happy
+	private static final long serialVersionUID = -6559445738093437784L;
 	
-	public InfoTableModel(List list)
+	protected List<InformationEntry> list;
+	
+	public InfoTableModel(List<InformationEntry> list)
 	{
 		this.list = list;
 	}
@@ -419,7 +422,7 @@ class InfoTableModel extends AbstractTableModel
 	public Object getValueAt(int row, int column)
 	{
 		Object value = null;
-		InformationEntry ie = (InformationEntry)list.get(row);
+		InformationEntry ie = list.get(row);
 		if(column == 0)
 		{
 			value = new Date(ie.getDate());

@@ -2,6 +2,9 @@ package jadex.micro.examples.helplinemega;
 
 import javax.swing.SwingUtilities;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
+import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.GuiClass;
@@ -40,5 +43,18 @@ public class HelplineMasterAgent
 			}
 		});
 		return IFuture.DONE;
+	}
+
+	//-------- main for launching --------
+	
+	/**
+	 *  Start the helpline master agent with gui.
+	 */
+	public static void	main(String[] args)
+	{
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getDefault();//NoGui();
+		config.enhanceWith(Starter.processArgs(args));
+		config.addComponent(HelplineMasterAgent.class);
+		Starter.createPlatform(config).get();
 	}
 }

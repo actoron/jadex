@@ -1,6 +1,5 @@
 package jadex.bridge.component.impl;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;

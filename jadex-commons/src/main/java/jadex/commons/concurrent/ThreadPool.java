@@ -651,7 +651,7 @@ public class ThreadPool implements IThreadPool
 		 */
 		public String toString()
 		{
-			return super.toString()+":"+hashCode();
+			return super.toString()+":"+hashCode()+", task="+task;
 		}
 	}
 	

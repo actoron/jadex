@@ -354,7 +354,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 //			System.out.println("Received message: "+header);
 			
-			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
+			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(
+				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
 				{
@@ -384,7 +385,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				{
 					exception.printStackTrace();
 				}
-			});
+			}));
 		}
 		else
 		{
@@ -590,13 +591,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			{
 				ISerializationServices serialserv = getSerializationServices(platformid);
 				byte[] body = serialserv.encode(header, component, message);
-				getSecurityService().encryptAndSign(header, body).addResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
+				getSecurityService().encryptAndSign(header, body).addResultListener(
+					component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 				{
 					public void customResultAvailable(final byte[] body) throws Exception
 					{
 						sendToTransports(header, body).addResultListener(new DelegationResultListener<Void>(ret));
 					}
-				});
+				}));
 			}
 			catch(Exception e)
 			{
