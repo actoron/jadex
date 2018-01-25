@@ -249,8 +249,8 @@ public class HelplineEvaluation
 			for(int j=0; j<cnt; j++)
 			{
 				Object	person	= fixedname ? "person"+j : "person"+(numpersons+j);
-				cms.createComponent(null, HelplineAgent.class.getName()+".class",
-					new CreationInfo(Collections.singletonMap("person", person)), null);
+				fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
+					new CreationInfo(Collections.singletonMap("person", person)), null));
 			}
 		}
 		fubar.waitFor().get();
