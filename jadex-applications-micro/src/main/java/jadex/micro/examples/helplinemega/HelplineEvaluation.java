@@ -105,12 +105,12 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			Thread.sleep(spcnt==0 ? numplatforms*20 : 50);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*50 : 50);	// Wait for registration/connection?
 
 			System.gc();
 			long creation = createPersons(platforms, personcnt);
 
-			Thread.sleep(spcnt==0 ? numplatforms*20 : 50);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*50 : 50);	// Wait for registration/connection?
 
 			// Search for first person to check if searches get slower.
 			System.gc();
