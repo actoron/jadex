@@ -8,11 +8,13 @@ import java.util.Collections;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.FutureBarrier;
 
 /**
  *  Main class allowing to run different evaluation scenarios for helpline scalability.
@@ -83,6 +85,7 @@ public class HelplineEvaluation
 		// Loop to start additional components/platforms/SPs until program is interrupted.
 		
 		while(true)
+//		while(numplatforms<10)
 		{
 			if(spcnt<0)
 			{
@@ -217,13 +220,14 @@ public class HelplineEvaluation
 	{
 		config.setPlatformName(type+"_*");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
-		long	start	= System.nanoTime();
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
+		FutureBarrier<IExternalAccess>	fubar	= new FutureBarrier<IExternalAccess>();
+		long	start	= System.nanoTime();
 		for(int i=0; i<cnt; i++)
 		{
-			platforms[i]	= Starter.createPlatform(config).get();
-			System.out.println("Started "+type+" platform #"+i);
+			fubar.addFuture(Starter.createPlatform(config));
 		}
+		platforms	= fubar.waitForResults().get().toArray(new IExternalAccess[cnt]);
 		long	end	= System.nanoTime();
 		System.out.println("Started "+cnt+" "+type+" platforms in "+((end-start)/100000000/10.0)+" seconds.");
 		return platforms;
@@ -237,6 +241,7 @@ public class HelplineEvaluation
 	 */
 	protected static String createPersons(IExternalAccess[] platforms, int cnt)
 	{
+		FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
 		long start	= System.nanoTime();
 		for(int i=0; i<platforms.length; i++)
 		{
@@ -244,12 +249,14 @@ public class HelplineEvaluation
 			for(int j=0; j<cnt; j++)
 			{
 				Object	person	= fixedname ? "person"+j : "person"+(numpersons+j);
-				cms.createComponent(HelplineAgent.class.getName()+".class",
-					new CreationInfo(Collections.singletonMap("person", person))).getFirstResult();
+				cms.createComponent(null, HelplineAgent.class.getName()+".class",
+					new CreationInfo(Collections.singletonMap("person", person)), null);
 			}
 		}
-		numpersons	+= cnt*platforms.length;
+		fubar.waitFor().get();
 		long end	= System.nanoTime();
+
+		numpersons	+= cnt*platforms.length;
 		String	creation	= (""+((end-start)/1000000.0)).replace('.', ',');
 		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
 		return creation;
