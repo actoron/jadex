@@ -29,7 +29,7 @@ public class HelplineEvaluation
 	private static int	spcnt	= 0;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= -1;
+	private static int	platformcnt	= -10;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
 	private static int	personcnt	= 1;
@@ -161,26 +161,34 @@ public class HelplineEvaluation
 	 */
 	protected static void createRelayAndSSPs(IPlatformConfiguration config)
 	{
-		IPlatformConfiguration relayconf	= PlatformConfigurationHandler.getDefaultNoGui();
+		IPlatformConfiguration relayconf	= createConfig();
 		relayconf.enhanceWith(config);
 		relayconf.setPlatformName("relay");
 		relayconf.setTcpPort(2091);
 		relayconf.setRelayForwarding(true);
 		Starter.createPlatform(relayconf).get();
 		
+		// Set relay address for all platforms created from now on.
 		config.setRelayAddresses("tcp://relay@localhost:2091");
 		
-		IPlatformConfiguration sspconf	= PlatformConfigurationHandler.getDefaultNoGui();
+		IPlatformConfiguration sspconf	= createConfig();
 		sspconf.enhanceWith(config);
 		sspconf.setSupersuperpeer(true);
-		sspconf.setSuperpeerClient(false);
-		
+		sspconf.setSuperpeerClient(false);		
 		sspconf.setPlatformName("ssp1");
 		Starter.createPlatform(sspconf).get();
 		
+		sspconf	= createConfig();
+		sspconf.enhanceWith(config);
+		sspconf.setSupersuperpeer(true);
+		sspconf.setSuperpeerClient(false);
 		sspconf.setPlatformName("ssp2");
 		Starter.createPlatform(sspconf).get();
 		
+		sspconf	= createConfig();
+		sspconf.enhanceWith(config);
+		sspconf.setSupersuperpeer(true);
+		sspconf.setSuperpeerClient(false);
 		sspconf.setPlatformName("ssp3");
 		Starter.createPlatform(sspconf).get();
 	}
@@ -192,13 +200,16 @@ public class HelplineEvaluation
 	 */
 	protected static void createSPs(IPlatformConfiguration config, int cnt)
 	{
-		config.setSuperpeer(true);
-//		createPlatforms(config, cnt, "SP");
-		config.setPlatformName("SP_****");
 		System.out.println("Starting "+cnt+" SP platforms.");
 		for(int i=0; i<cnt; i++)
 		{
-			Starter.createPlatform(config).get();	// Hack!!! Bug when started in parallel
+			IPlatformConfiguration spconf	= createConfig();
+			spconf.enhanceWith(config);
+			spconf.setSupersuperpeer(true);
+			spconf.setSuperpeerClient(false);
+			spconf.setSuperpeer(true);
+			spconf.setPlatformName("SP_****");
+			Starter.createPlatform(spconf).get();	// Hack!!! Bug when started in parallel
 		}
 
 		numsps	+= cnt;
@@ -212,6 +223,8 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt)
 	{
+		
+		
 		config.setSuperpeer(false);
 		IExternalAccess[]	ret	= createPlatforms(config, cnt, "helpline");
 		numplatforms	+= cnt;
@@ -231,14 +244,16 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
 	{
-		config.setPlatformName(type+"_****");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
 		FutureBarrier<IExternalAccess>	fubar	= new FutureBarrier<IExternalAccess>();
 		long	start	= System.nanoTime();
 		for(int i=0; i<cnt; i++)
 		{
-			fubar.addFuture(Starter.createPlatform(config));
+			IPlatformConfiguration helpconf	= createConfig();
+			helpconf.enhanceWith(config);
+			helpconf.setPlatformName(type+"_****");
+			fubar.addFuture(Starter.createPlatform(helpconf));
 		}
 		platforms	= fubar.waitForResults().get().toArray(new IExternalAccess[cnt]);
 		long	end	= System.nanoTime();
@@ -303,5 +318,13 @@ public class HelplineEvaluation
 		FileWriter	out	= new FileWriter(filename, true);
 		out.write(numsps+";"+numplatforms+";"+numpersons+";"+creation+";"+search+";"+numfound+"\n");
 		out.close();
+	}
+	
+	/**
+	 *  Create a new default config.
+	 */
+	protected static IPlatformConfiguration	createConfig()
+	{
+		return PlatformConfigurationHandler.getDefaultNoGui();
 	}
 }
