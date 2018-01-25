@@ -70,7 +70,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
 				int cnt = c.incrementAndGet();
-				System.out.println("start: "+cnt);
+//				System.out.println("start: "+cnt);
 				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 				{
 					System.out.println("Thread: "+Thread.currentThread());
@@ -110,7 +110,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 				{
 					e.printStackTrace();
 				}
-				System.out.println("end: "+cnt);
+//				System.out.println("end: "+cnt);
 			}
 
 			public void exceptionOccurred(Exception exception)
