@@ -2,10 +2,16 @@ package jadex.micro.examples.helplinemega;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -28,7 +34,7 @@ public class HelplineEvaluation
 	// may also be specified as command line parameter (e.g. '-spcnt 0').
 	
 	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
-	private static int	spcnt	= 0;
+	private static int	spcnt	= 3;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
 	private static int	platformcnt	= -1;
@@ -36,9 +42,9 @@ public class HelplineEvaluation
 	/** The number of persons (components) to create on each (new) platform in each round. */
 	private static int	personcnt	= 1;
 	
-	/** Fixed name true means that all ever created services match the query.
-	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
-	private static boolean	fixedname	= true;
+	/** Fixed name true means that all services match the query.
+	 *  Fixed name false means that only the first person on each platform in each round matches. */
+	private static boolean	fixedname	= false;
 	
 	//-------- variables for created elements --------
 	
@@ -105,12 +111,18 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			Thread.sleep(spcnt==0 ? numplatforms*50 : 50);	// Wait for registration/connection?
+			while(getProcessCpuLoad()>0.5)
+			{
+				Thread.sleep(50);	// Wait for registration/connection?
+			}
 
 			System.gc();
 			long creation = createPersons(platforms, personcnt);
 
-			Thread.sleep(spcnt==0 ? numplatforms*50 : 50);	// Wait for registration/connection?
+			while(getProcessCpuLoad()>0.5)
+			{
+				Thread.sleep(50);	// Wait for registration/connection?
+			}
 
 			// Search for first person to check if searches get slower.
 			System.gc();
@@ -148,7 +160,7 @@ public class HelplineEvaluation
 		config.setNetworkName("helpline");
 		config.setNetworkPass("key:wlXEahZlSgTfqiv0LwNbsdUZ8qlgtKSSQaKK74XkJxU");
 		config.setAwaMechanisms("IntraVM");
-		config.setWsTransport(false);
+//		config.setWsTransport(false);
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
@@ -210,17 +222,11 @@ public class HelplineEvaluation
 	 */
 	protected static void createSPs(IPlatformConfiguration config, int cnt)
 	{
-		System.out.println("Starting "+cnt+" SP platforms.");
-		for(int i=0; i<cnt; i++)
-		{
-			IPlatformConfiguration spconf	= createConfig();
-			spconf.enhanceWith(config);
-			spconf.setSupersuperpeer(true);
-			spconf.setSuperpeerClient(false);
-			spconf.setSuperpeer(true);
-			spconf.setPlatformName("SP_****");
-			Starter.createPlatform(spconf).get();	// Hack!!! Bug when started in parallel
-		}
+		IPlatformConfiguration spconf	= createConfig();
+		spconf.enhanceWith(config);
+		spconf.setSuperpeerClient(false);
+		spconf.setSuperpeer(true);
+		createPlatforms(spconf, cnt, "SP");
 
 		numsps	+= cnt;
 	}
@@ -233,10 +239,10 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt)
 	{
-		
-		
-		config.setSuperpeer(false);
-		IExternalAccess[]	ret	= createPlatforms(config, cnt, "helpline");
+		IPlatformConfiguration helpconf	= createConfig();
+		helpconf.enhanceWith(config);
+		helpconf.setSuperpeer(false);
+		IExternalAccess[]	ret	= createPlatforms(helpconf, cnt, "helpline");
 		numplatforms	+= cnt;
 		
 		if(firstplatform==null)
@@ -260,10 +266,10 @@ public class HelplineEvaluation
 		long	start	= System.nanoTime();
 		for(int i=0; i<cnt; i++)
 		{
-			IPlatformConfiguration helpconf	= createConfig();
-			helpconf.enhanceWith(config);
-			helpconf.setPlatformName(type+"_****");
-			fubar.addFuture(Starter.createPlatform(helpconf));
+			IPlatformConfiguration pconf	= createConfig();
+			pconf.enhanceWith(config);
+			pconf.setPlatformName(type+"_****");
+			fubar.addFuture(Starter.createPlatform(pconf));
 		}
 		platforms	= fubar.waitForResults().get().toArray(new IExternalAccess[cnt]);
 		long	end	= System.nanoTime();
@@ -286,7 +292,7 @@ public class HelplineEvaluation
 			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
 			for(int j=0; j<cnt; j++)
 			{
-				Object	person	= fixedname ? "person"+j : "person"+(numpersons+j);
+				Object	person	= fixedname ? "person0" : "person"+j;// : "person"+(numpersons+j);
 				fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
 					new CreationInfo(Collections.singletonMap("person", person)), null));
 			}
@@ -312,7 +318,8 @@ public class HelplineEvaluation
 		out.write("# of SPs;# of Platforms;# of Services;"
 			+ "Creation Time ("	+ (spcnt==0?"Awa":"SP")	+ ");"
 			+ "Search Time ("	+ (spcnt==0?"Awa":"SP")	+ ");"
-			+ "Found Services;Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
+			+ "Found Services;"
+			+ (spcnt==0?"Awa":"SP") + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
 		out.close();
 	}
 	
@@ -328,7 +335,7 @@ public class HelplineEvaluation
 		avgcreation.add(creation);
 		avgsearch.add(search);
 		
-		if(numplatforms%10==0)
+		if(platformcnt>=0 || numplatforms%10==0)
 		{
 			creation	= 0;
 			for(long c: avgcreation)
@@ -355,5 +362,25 @@ public class HelplineEvaluation
 	protected static IPlatformConfiguration	createConfig()
 	{
 		return PlatformConfigurationHandler.getDefaultNoGui();
+	}
+
+	// https://stackoverflow.com/questions/18489273/how-to-get-percentage-of-cpu-usage-of-os-from-java/21962037
+	public static double getProcessCpuLoad() throws Exception
+	{
+	    // usually takes a couple of seconds before we get real values
+		double	ret	= -1;
+	    MBeanServer	mbs	= ManagementFactory.getPlatformMBeanServer();
+	    ObjectName	name	= ObjectName.getInstance("java.lang:type=OperatingSystem");
+	    AttributeList	list	= mbs.getAttributes(name, new String[]{ "ProcessCpuLoad" });
+
+	    if(!list.isEmpty())
+	    {
+		    Attribute	att	= (Attribute)list.get(0);
+		    ret	= (Double)att.getValue();
+	    }
+	    
+	    System.out.println("### cpu: "+ret);
+	    
+	    return ret;
 	}
 }
