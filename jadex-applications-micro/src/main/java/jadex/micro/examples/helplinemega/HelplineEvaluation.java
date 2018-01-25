@@ -218,6 +218,9 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
 	{
+		if(config==null)
+			System.out.println("hh");
+		
 		config.setPlatformName(type+"_*");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
@@ -225,7 +228,7 @@ public class HelplineEvaluation
 		long	start	= System.nanoTime();
 		for(int i=0; i<cnt; i++)
 		{
-			fubar.addFuture(Starter.createPlatform(config));
+			fubar.addFuture(Starter.createPlatform(config!=null? config.clone(): null));
 		}
 		platforms	= fubar.waitForResults().get().toArray(new IExternalAccess[cnt]);
 		long	end	= System.nanoTime();

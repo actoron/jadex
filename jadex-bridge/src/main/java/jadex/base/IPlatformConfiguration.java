@@ -27,4 +27,9 @@ public interface IPlatformConfiguration extends IStarterConfiguration, IRootComp
 	 *  that are set in the other config.
 	 */
 	public void enhanceWith(IPlatformConfiguration other);
+	
+	/**
+	 *  Clone this configuration.
+	 */
+	public IPlatformConfiguration clone();
 }
