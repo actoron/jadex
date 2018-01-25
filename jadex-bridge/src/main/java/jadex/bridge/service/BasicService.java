@@ -454,7 +454,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 
 		if(ex)
 		{
-			ret.setException(new RuntimeException("Already running."));
+			ret.setException(new RuntimeException("Already running: "+System.identityHashCode(this)));
 		}
 		else 
 		{

@@ -166,12 +166,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 //				System.out.println("forwardRes: "+fini);
 				
-//				if(fini)
-//				{
-//					// add superpeers as last chance
-//					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-//						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
-//				}
+				if(fini)
+				{
+					// add superpeers as last chance
+					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+				}
 				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)

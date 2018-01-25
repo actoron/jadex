@@ -1822,6 +1822,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByAskAll(final ServiceQuery<T> query)
 	{
+//		System.out.println("searchServicesAsyncByAskAll: "+query);
+		
 		SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		IIntermediateResultListener<T> reslis = new IntermediateDelegationResultListener<T>(ret)
 		{
@@ -2204,7 +2206,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		// Get all proxy agents (represent other platforms)
 		Collection<IService> sers = getLocalServicesByClass(new ClassInfo(IProxyAgentService.class));
-//		System.out.println("LOCAL:" + ((IService) rms).getServiceIdentifier().getProviderId().getRoot() + " SERS: " + sers);
+//		System.out.println("LOCAL:" + cid + " SERS: " + sers);
 		if(sers!=null && sers.size()>0)
 		{
 			FutureBarrier<IComponentIdentifier> bar = new FutureBarrier<IComponentIdentifier>();
@@ -2246,7 +2248,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 									try
 									{
 //										if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
-//											System.out.println("searchRemoteServices1: "+result+", "+query);
+//											System.out.println("searchRemoteServices1: "+result.getComponentIdentifier()+", "+platid+", "+query);
 										result.scheduleStep(new IComponentStep<Collection<T>>()
 										{
 											public IFuture<Collection<T>> execute(IInternalAccess ia)
