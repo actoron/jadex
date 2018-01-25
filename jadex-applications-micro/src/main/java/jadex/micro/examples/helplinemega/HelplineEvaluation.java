@@ -26,13 +26,13 @@ public class HelplineEvaluation
 	// may also be specified as command line parameter (e.g. '-spcnt 0').
 	
 	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
-	private static int	spcnt	= 3;
+	private static int	spcnt	= 0;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
 	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 1000;
+	private static int	personcnt	= 1;
 	
 	/** Fixed name true means that all ever created services match the query.
 	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
@@ -85,7 +85,7 @@ public class HelplineEvaluation
 		// Loop to start additional components/platforms/SPs until program is interrupted.
 		
 		while(true)
-//		while(numplatforms<10)
+//		while(numplatforms<1)
 		{
 			if(spcnt<0)
 			{
@@ -97,12 +97,12 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
+			Thread.sleep(/*spcnt==0 ? numplatforms*500 :*/ 50);	// Wait for registration/connection?
 
 			System.gc();
 			String creation = createPersons(platforms, personcnt);
 
-			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
+			Thread.sleep(/*spcnt==0 ? numplatforms*500 :*/ 50);	// Wait for registration/connection?
 
 			// Search for first person to check if searches get slower.
 			System.gc();
@@ -133,11 +133,12 @@ public class HelplineEvaluation
 	protected static IPlatformConfiguration parseArgs(String[] args)
 	{
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
+//		config.setLogging(true);
 		config.setChat(false);	// Keep platform at minimum. Todo: minimal server config
 		config.setSimulation(false);	// Todo: fix sim delay in registry!?
 		config.setNetworkName("helpline");
 		config.setNetworkPass("p09 p6rfzb pß7pv0 78rtvo0b 67rf");
-		config.setAwaMechanisms("Local");
+		config.setAwaMechanisms("IntraVM");
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
@@ -147,6 +148,10 @@ public class HelplineEvaluation
 		platformcnt	= (Integer) config.getArgs().get("platformcnt");
 		personcnt	= (Integer) config.getArgs().get("personcnt");
 		fixedname	= (Boolean) config.getArgs().get("fixedname");
+
+		config.setRelayTransport(spcnt!=0);	
+		config.setSuperpeerClient(spcnt!=0);
+
 		return config;
 	}
 

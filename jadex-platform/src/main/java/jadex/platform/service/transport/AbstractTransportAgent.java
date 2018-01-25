@@ -193,6 +193,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentCreated
 	protected IFuture<Void>	init()
 	{
+		System.out.println("Transport: "+agent);
+		
 		this.codec = MessageComponentFeature.getSerializationServices(agent.getComponentIdentifier().getRoot());
 		this.secser	= SServiceProvider.getLocalService(agent, ISecurityService.class, Binding.SCOPE_PLATFORM, false);
 		this.cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
@@ -238,6 +240,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 //						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
 						ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, Binding.SCOPE_PLATFORM, false);
 						
+//						System.out.println("Transport addresses: "+agent+", "+saddresses);
 						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					catch(Exception e)

@@ -89,7 +89,8 @@ import jadex.micro.annotation.RequiredServices;
 	@ComponentType(name="multicast", filename="jadex/platform/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
 	@ComponentType(name="scanner", filename="jadex/platform/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
 	@ComponentType(name="registry", filename="jadex/platform/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
-	@ComponentType(name="local", filename="jadex/platform/service/awareness/discovery/local/LocalDiscoveryAgent.class")
+	@ComponentType(name="local", filename="jadex/platform/service/awareness/discovery/local/LocalDiscoveryAgent.class"),
+	@ComponentType(name="intravm", filename="jadex/platform/service/awareness/discovery/intravm/IntraVMDiscoveryAgent.class")	// Use only for testing!
 })
 /**@Configurations(
 {
