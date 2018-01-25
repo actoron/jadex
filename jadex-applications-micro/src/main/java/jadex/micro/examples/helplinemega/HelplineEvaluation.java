@@ -2,8 +2,10 @@ package jadex.micro.examples.helplinemega;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -29,7 +31,7 @@ public class HelplineEvaluation
 	private static int	spcnt	= 0;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= -10;
+	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
 	private static int	personcnt	= 1;
@@ -54,6 +56,12 @@ public class HelplineEvaluation
 
 	/** First created platform, used for searching. */
 	private static IExternalAccess	firstplatform;
+	
+	/** Average creation time (exp). */
+	private static List<Long>	avgcreation	= new ArrayList<Long>();
+	
+	/** Average search time (exp). */
+	private static List<Long>	avgsearch	= new ArrayList<Long>();
 
 	
 	//-------- methods --------
@@ -97,31 +105,32 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			Thread.sleep(/*spcnt==0 ? numplatforms*500 :*/ 50);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*20 : 50);	// Wait for registration/connection?
 
 			System.gc();
-			String creation = createPersons(platforms, personcnt);
+			long creation = createPersons(platforms, personcnt);
 
-			Thread.sleep(/*spcnt==0 ? numplatforms*500 :*/ 50);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*20 : 50);	// Wait for registration/connection?
 
 			// Search for first person to check if searches get slower.
 			System.gc();
+			Collection<IHelpline>	found	= null;
 			long	start	= System.nanoTime();
-			int numfound	= 0;
 			try
 			{
-				Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
-				numfound = found.size();
+				found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
 			long	end	= System.nanoTime();
+			int numfound	= found!=null ? found.size() : 0;
 			String	search	= (""+((end-start)/1000000.0)).replace('.', ',');
 			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
+//			System.out.println("Services: "+found);
 			
-			writeEntry(creation, search, numfound);
+			writeEntry(creation, end-start, numfound);
 		}
 	}
 
@@ -268,7 +277,7 @@ public class HelplineEvaluation
 	 *  @param cnt	The number of components to create on each platform.
 	 *  @return	The time needed for creation as preformatted string.
 	 */
-	protected static String createPersons(IExternalAccess[] platforms, int cnt)
+	protected static long createPersons(IExternalAccess[] platforms, int cnt)
 	{
 		FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
 		long start	= System.nanoTime();
@@ -288,7 +297,7 @@ public class HelplineEvaluation
 		numpersons	+= cnt*platforms.length;
 		String	creation	= (""+((end-start)/1000000.0)).replace('.', ',');
 		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
-		return creation;
+		return end-start;
 	}
 
 	/**
@@ -314,11 +323,30 @@ public class HelplineEvaluation
 	 *  @param numfound	Number of services found by search.
 	 *  @throws IOException
 	 */
-	protected static void writeEntry(String creation, String search, int numfound) throws IOException
+	protected static void writeEntry(long creation, long search, int numfound) throws IOException
 	{
-		FileWriter	out	= new FileWriter(filename, true);
-		out.write(numsps+";"+numplatforms+";"+numpersons+";"+creation+";"+search+";"+numfound+"\n");
-		out.close();
+		avgcreation.add(creation);
+		avgsearch.add(search);
+		
+		if(numplatforms%10==0)
+		{
+			creation	= 0;
+			for(long c: avgcreation)
+				creation	+= c/avgcreation.size();
+			avgcreation.clear();
+			
+			search	= 0;
+			for(long s: avgsearch)
+				search	+= s/avgsearch.size();
+			avgsearch.clear();
+			
+			String	screation	= (""+(creation/1000000.0)).replace('.', ',');
+			String	ssearch	= (""+(search/1000000.0)).replace('.', ',');
+			
+			FileWriter	out	= new FileWriter(filename, true);
+			out.write(numsps+";"+numplatforms+";"+numpersons+";"+screation+";"+ssearch+";"+numfound+"\n");
+			out.close();
+		}
 	}
 	
 	/**
