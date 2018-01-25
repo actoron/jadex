@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -57,7 +56,7 @@ public class VmHacks
 	public static boolean DISABLE = false;
 	
 	/** Set to true to see debug infos during startup. */
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	/**
 	 *  Provides access to unsafe operations.
@@ -295,7 +294,7 @@ public class VmHacks
 				enhanceClassLoader(cl);
 				IByteCodeClassLoader bcl = SASM.createByteCodeClassLoader(cl);
 				ret = bcl.doDefineClass(bytecode);
-				injectionclassstore.put(new Object[] { cl, clazz.getName() }, ret);
+				injectClassIntoStore(injectionclassstore, cl, clazz.getName(), ret);
 			}
 			catch (Exception e)
 			{
@@ -969,5 +968,18 @@ public class VmHacks
 		}
 	}
 	
-	
+	/**
+	 *  Trampoline function for injection into the class redefinition store.
+	 *  This allows the stack trace to come from VmHacks instead of VmHacks$Unsafe,
+	 *  avoiding potential inner class naming inconsistencies.
+	 *  
+	 *  @param classstore The class store.
+	 *  @param cl The targeted classloader.
+	 *  @param classname Name of the class.
+	 *  @param clazz The class.
+	 */
+	protected static final void injectClassIntoStore(Map<Object[], Class<?>> classstore, ClassLoader cl, String classname, Class<?> clazz)
+	{
+		classstore.put(new Object[] { cl, clazz.getName() }, clazz);
+	}
 }
