@@ -27,16 +27,16 @@ public class HelplineEvaluation
 	private static int	spcnt	= 3;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= 10;
+	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 100;
+	private static int	personcnt	= 1000;
 	
 	/** Fixed name true means that all ever created services match the query.
 	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
 	private static boolean	fixedname	= true;
 	
-	//-------- counters for creates elements --------
+	//-------- variables for created elements --------
 	
 	/** Number of created SPs. */
 	private static int	numsps	= 0;
@@ -49,6 +49,9 @@ public class HelplineEvaluation
 
 	/** Output file name. */
 	private static String filename;
+
+	/** First created platform, used for searching. */
+	private static IExternalAccess	firstplatform;
 
 	
 	//-------- methods --------
@@ -90,19 +93,29 @@ public class HelplineEvaluation
 			{
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
-			
+
+			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
+
 			System.gc();
 			String creation = createPersons(platforms, personcnt);
-			
-//			Thread.sleep(5000);	// Wait for registration?
+
+			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
 
 			// Search for first person to check if searches get slower.
 			System.gc();
 			long	start	= System.nanoTime();
-			Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(platforms[0], IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
+			int numfound	= 0;
+			try
+			{
+				Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
+				numfound = found.size();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 			long	end	= System.nanoTime();
-			String	search	= (""+((end-start)/1000000)).replace('.', ',');
-			int	numfound	= found.size();
+			String	search	= (""+((end-start)/1000000.0)).replace('.', ',');
 			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
 			
 			writeEntry(creation, search, numfound);
@@ -121,6 +134,7 @@ public class HelplineEvaluation
 		config.setSimulation(false);	// Todo: fix sim delay in registry!?
 		config.setNetworkName("helpline");
 		config.setNetworkPass("p09 p6rfzb pﬂ7pv0 78rtvo0b 67rf");
+		config.setAwaMechanisms("Local");
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
@@ -185,6 +199,11 @@ public class HelplineEvaluation
 		config.setSuperpeer(false);
 		IExternalAccess[]	ret	= createPlatforms(config, cnt, "helpline");
 		numplatforms	+= cnt;
+		
+		if(firstplatform==null)
+		{
+			firstplatform	= ret[0];
+		}
 		return ret;
 	}
 
@@ -224,14 +243,14 @@ public class HelplineEvaluation
 			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
 			for(int j=0; j<cnt; j++)
 			{
-				Object	person	= fixedname ? "person0" : "person"+numpersons;
+				Object	person	= fixedname ? "person"+j : "person"+(numpersons+j);
 				cms.createComponent(HelplineAgent.class.getName()+".class",
 					new CreationInfo(Collections.singletonMap("person", person))).getFirstResult();
 			}
 		}
 		numpersons	+= cnt*platforms.length;
 		long end	= System.nanoTime();
-		String	creation	= (""+((end-start)/1000000));//.replace('.', ',');
+		String	creation	= (""+((end-start)/1000000.0)).replace('.', ',');
 		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
 		return creation;
 	}
@@ -245,7 +264,10 @@ public class HelplineEvaluation
 	{
 		filename	= "eval_"+spcnt+"_"+platformcnt+"_"+personcnt+"_"+fixedname+"_"+System.currentTimeMillis()+".csv";
 		FileWriter	out	= new FileWriter(filename, true);
-		out.write("# of SPs;# of Platforms;# of Services;Service Creation Time;Service Search Time;Found Services;Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
+		out.write("# of SPs;# of Platforms;# of Services;"
+			+ "Creation Time ("	+ (spcnt==0?"Awa":"SP")	+ ");"
+			+ "Search Time ("	+ (spcnt==0?"Awa":"SP")	+ ");"
+			+ "Found Services;Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
 		out.close();
 	}
 	
