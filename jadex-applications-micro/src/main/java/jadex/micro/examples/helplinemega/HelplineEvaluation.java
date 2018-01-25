@@ -30,7 +30,7 @@ public class HelplineEvaluation
 	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 0;
+	private static int	personcnt	= 1000;
 	
 	/** Fixed name true means that all ever created services match the query.
 	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
@@ -94,12 +94,12 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			Thread.sleep(spcnt==0 ? numplatforms*500 : 500);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
 
 			System.gc();
 			String creation = createPersons(platforms, personcnt);
 
-			Thread.sleep(spcnt==0 ? numplatforms*500 : 500);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
 
 			// Search for first person to check if searches get slower.
 			System.gc();
@@ -115,7 +115,7 @@ public class HelplineEvaluation
 				e.printStackTrace();
 			}
 			long	end	= System.nanoTime();
-			String	search	= (""+((end-start)/1000000)).replace('.', ',');
+			String	search	= (""+((end-start)/1000000.0)).replace('.', ',');
 			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
 			
 			writeEntry(creation, search, numfound);
@@ -250,7 +250,7 @@ public class HelplineEvaluation
 		}
 		numpersons	+= cnt*platforms.length;
 		long end	= System.nanoTime();
-		String	creation	= (""+((end-start)/1000000));//.replace('.', ',');
+		String	creation	= (""+((end-start)/1000000.0)).replace('.', ',');
 		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
 		return creation;
 	}
