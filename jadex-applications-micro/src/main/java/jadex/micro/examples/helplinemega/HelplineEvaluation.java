@@ -11,7 +11,6 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -140,6 +139,7 @@ public class HelplineEvaluation
 		config.setNetworkName("helpline");
 		config.setNetworkPass("p09 p6rfzb pﬂ7pv0 78rtvo0b 67rf");
 		config.setAwaMechanisms("IntraVM");
+		config.setWsTransport(false);
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
