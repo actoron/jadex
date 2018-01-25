@@ -3,6 +3,7 @@ package jadex.platform.service.registry;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -65,10 +66,16 @@ public abstract class LocalRegistryObserver extends EventCollector
 		localregsub = SServiceProvider.addQuery(component, query, true);
 		localregsub.addIntermediateResultListener(new IIntermediateResultListener<ServiceEvent<IService>>()
 		{
+			AtomicInteger c = new AtomicInteger();
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
+				int cnt = c.incrementAndGet();
+				System.out.println("start: "+cnt);
 				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+				{
+					System.out.println("Thread: "+Thread.currentThread());
 					throw new RuntimeException("wrooong");
+				}
 				
 				try
 				{
@@ -103,6 +110,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 				{
 					e.printStackTrace();
 				}
+				System.out.println("end: "+cnt);
 			}
 
 			public void exceptionOccurred(Exception exception)

@@ -899,17 +899,17 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		Future<ARegistryResponseEvent> ret = new Future<ARegistryResponseEvent>();
 		
-		if(event instanceof MultiRegistryEvent && ((MultiRegistryEvent)(event)).getEvents()!=null)
-		{
-			System.out.println("received multi event from client: "+getComponent().getComponentIdentifier()+" "+((MultiRegistryEvent)(event)).getEvents().size());
-		}
-		else if(event instanceof RegistryEvent)
-		{
-//			RegistryEvent re = (RegistryEvent)event;
-//			int added = re.getAddedServices()!=null? re.getAddedServices().size(): 0;
-//			int removed = re.getRemovedServices()!=null? re.getRemovedServices().size(): 0;
-			System.out.println("received event from client: "+System.currentTimeMillis()+" "+getComponent().getComponentIdentifier()+" event: "+event);
-		}
+//		if(event instanceof MultiRegistryEvent && ((MultiRegistryEvent)(event)).getEvents()!=null)
+//		{
+//			System.out.println("received multi event from client: "+getComponent().getComponentIdentifier()+" "+((MultiRegistryEvent)(event)).getEvents().size());
+//		}
+//		else if(event instanceof RegistryEvent)
+//		{
+////			RegistryEvent re = (RegistryEvent)event;
+////			int added = re.getAddedServices()!=null? re.getAddedServices().size(): 0;
+////			int removed = re.getRemovedServices()!=null? re.getRemovedServices().size(): 0;
+//			System.out.println("received event from client: "+System.currentTimeMillis()+" "+getComponent().getComponentIdentifier()+" event: "+event);
+//		}
 		
 		final IComponentIdentifier cid = ServiceCall.getCurrentInvocation().getCaller().getRoot();
 

@@ -330,6 +330,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						// Not a problem because on first occurrence sends full data (removeds are lost)
 					}
 				}, component));
+				
 			}
 		};
 	}
