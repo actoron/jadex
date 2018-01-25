@@ -17,7 +17,7 @@ public class ClassStore implements Map<Object[], Class<?>>
 	private Map<ClassLoader, Map<String, WeakReference<Class<?>>>> injections = new WeakHashMap<ClassLoader, Map<String, WeakReference<Class<?>>>>();
 	
 	/** Name of the calling class that is allowed to write to the store. */
-	private String allowedcaller = "jadex.bytecode.vmhacks.VmHacks$Unsafe";
+	private String allowedcaller = "jadex.bytecode.vmhacks.VmHacks";
 	
 	/**
 	 *  Creates the store.

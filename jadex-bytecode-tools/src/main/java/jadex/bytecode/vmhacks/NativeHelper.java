@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sun.jna.Function;
+import com.sun.jna.JNIEnv;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
@@ -59,6 +60,9 @@ public final class NativeHelper implements INativeHelper
 	/** Pointer to the JavaVM. */
 	private Pointer javavm;
 	
+	/** Pointer to the JNI function table. */
+	private Pointer jnifunctiontable;
+	
 	/** Field ID of AccessibleObject override field, if found. */
 	private Pointer overridefieldid;
 	
@@ -77,17 +81,27 @@ public final class NativeHelper implements INativeHelper
 		if (Pointer.nativeValue(javavm) == 0)
 			throw new IllegalStateException("NativeHelper could not find Java VM.");
 		
-		invokeEnv(JNI_GETVERSION_OFFSET, int.class);
+		PointerByReference envref = new PointerByReference();
+		Function getenv = Function.getFunction(javavm.getPointer(0).getPointer(JAVAVM_GETENV_OFFSET));
+		getenv.invokeInt(new Object[] { javavm, envref, JNI_VERSION_1_6 });
+		Pointer env = envref.getPointer().getPointer(0);
+		
+		if (Pointer.nativeValue(env) == 0)
+			throw new IllegalStateException("Unable to acquire JNI environment.");
+		
+		jnifunctiontable = env.getPointer(0);
+		
+		invokeJni(JNI_GETVERSION_OFFSET, int.class);
 		
 		try
 		{
-			overridefieldid = invokeEnv(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "override", "Z");
+			overridefieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "override", "Z");
 		}
 		catch (Throwable e)
 		{
 			try
 			{
-				overridefieldid = invokeEnv(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "flag", "Z");
+				overridefieldid = invokeJni(JNI_GETFIELDID_OFFSET, Pointer.class, AccessibleObject.class, "flag", "Z");
 			}
 			catch (Throwable e1)
 			{
@@ -103,7 +117,7 @@ public final class NativeHelper implements INativeHelper
 	 */
 	public void setAccessible(String flagname, AccessibleObject accobj, boolean flag)
 	{
-		invokeEnv(JNI_SETBOOLEANFIELD_OFFSET, void.class, accobj, overridefieldid, flag);
+		invokeJni(JNI_SETBOOLEANFIELD_OFFSET, void.class, accobj, overridefieldid, flag);
 	}
 	
 	/**
@@ -120,7 +134,7 @@ public final class NativeHelper implements INativeHelper
      */
 	public Class<?> defineClass(String name, byte[] b, ClassLoader loader)
 	{
-		Class<?> ret = (Class<?>) invokeEnv(JNI_DEFINECLASS_OFFSET, Object.class, name, loader, b, b.length);
+		Class<?> ret = (Class<?>) invokeJni(JNI_DEFINECLASS_OFFSET, Object.class, name, loader, b, b.length);
 		return ret;
 	}
 	
@@ -229,43 +243,22 @@ public final class NativeHelper implements INativeHelper
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> T invokeEnv(long offset, Class<T> rettype, Object... params)
+	private <T> T invokeJni(long offset, Class<T> rettype, Object... params)
 	{
-		Function getenv = getFunctionFromTable(javavm, JAVAVM_GETENV_OFFSET);
-		PointerByReference envref = new PointerByReference();
-		getenv.invokeInt(new Object[] { javavm, envref, JNI_VERSION_1_6 });
-		Pointer env = envref.getPointer().getPointer(0);
-		
-		if (Pointer.nativeValue(env) == 0)
-			throw new IllegalStateException("Unable to acquire JNI environment.");
-		
 		Object[] extparams = null;
 		if (params == null)
 		{
-			extparams = new Object[] { env };
+			extparams = new Object[] { JNIEnv.CURRENT };
 		}
 		else
 		{
 			extparams = new Object[params.length + 1];
-			extparams[0] = env;
+			extparams[0] = JNIEnv.CURRENT;
 			System.arraycopy(params, 0, extparams, 1, params.length);
 		}
 		
-		return (T) getFunctionFromTable(env, offset).invoke(rettype, extparams, envoptions);
-	}
-	
-	/**
-	 *  Gets function from a function table provided by JavaVM or JNIENV.
-	 *  
-	 *  @param p The pointer to JavaVM or JNIENV.
-	 *  @param offset Function table offset.
-	 *  @return The function.
-	 */
-	private Function getFunctionFromTable(Pointer p, long offset)
-	{
-		Pointer functiontable = p.getPointer(0);
-		Pointer functionp = functiontable.getPointer(offset);
-		return Function.getFunction(functionp);
+		Function jnifun = Function.getFunction(jnifunctiontable.getPointer(offset));
+		return (T) jnifun.invoke(rettype, extparams, envoptions);
 	}
 	
 	/**
