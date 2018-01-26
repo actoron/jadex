@@ -126,7 +126,7 @@ public class HelplineEvaluation
 
 			// Search for first person to check if searches get slower.
 			System.gc();
-			System.in.read();
+//			System.in.read();
 			Collection<IHelpline>	found	= null;
 			long	start	= System.nanoTime();
 			try
