@@ -40,7 +40,7 @@ public class HelplineEvaluation
 	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 1;
+	private static int	personcnt	= 1000;
 	
 	/** Fixed name true means that all services match the query.
 	 *  Fixed name false means that only the first person on each platform in each round matches. */
@@ -63,11 +63,11 @@ public class HelplineEvaluation
 	/** First created platform, used for searching. */
 	private static IExternalAccess	firstplatform;
 	
-	/** Average creation time (exp). */
-	private static List<Long>	avgcreation	= new ArrayList<Long>();
+	/** Values for average creation time. */
+	private static List<Double>	avgcreation	= new ArrayList<Double>();
 	
-	/** Average search time (exp). */
-	private static List<Long>	avgsearch	= new ArrayList<Long>();
+	/** Values for average search time. */
+	private static List<Double>	avgsearch	= new ArrayList<Double>();
 
 	
 	//-------- methods --------
@@ -111,21 +111,22 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			while(getProcessCpuLoad()>0.5)
+			while(getProcessCpuLoad()>0.1)
 			{
-				Thread.sleep(50);	// Wait for registration/connection?
+				Thread.sleep(500);	// Wait for registration/connection?
 			}
 
 			System.gc();
 			long creation = createPersons(platforms, personcnt);
 
-			while(getProcessCpuLoad()>0.5)
+			while(getProcessCpuLoad()>0.1)
 			{
-				Thread.sleep(50);	// Wait for registration/connection?
+				Thread.sleep(500);	// Wait for registration/connection?
 			}
 
 			// Search for first person to check if searches get slower.
 			System.gc();
+			System.in.read();
 			Collection<IHelpline>	found	= null;
 			long	start	= System.nanoTime();
 			try
@@ -330,21 +331,25 @@ public class HelplineEvaluation
 	 *  @param numfound	Number of services found by search.
 	 *  @throws IOException
 	 */
-	protected static void writeEntry(long creation, long search, int numfound) throws IOException
+	protected static void writeEntry(double creation, double search, int numfound) throws IOException
 	{
 		avgcreation.add(creation);
 		avgsearch.add(search);
 		
 		if(platformcnt>=0 || numplatforms%10==0)
 		{
+			System.out.println("++++ "+numplatforms+": "+avgcreation+" "+avgsearch);
+			
 			creation	= 0;
-			for(long c: avgcreation)
-				creation	+= c/avgcreation.size();
+			for(double c: avgcreation)
+				creation	+= c;
+			creation	/= avgcreation.size();
 			avgcreation.clear();
 			
 			search	= 0;
-			for(long s: avgsearch)
-				search	+= s/avgsearch.size();
+			for(double s: avgsearch)
+				search	+= s;
+			search	/= avgsearch.size();
 			avgsearch.clear();
 			
 			String	screation	= (""+(creation/1000000.0)).replace('.', ',');
