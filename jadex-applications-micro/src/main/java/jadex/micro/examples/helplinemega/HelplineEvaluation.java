@@ -126,7 +126,7 @@ public class HelplineEvaluation
 
 			// Search for first person to check if searches get slower.
 			System.gc();
-//			System.in.read();
+//			System.in.read(new byte[16]);	// For profiling -> press key before search
 			Collection<IHelpline>	found	= null;
 			long	start	= System.nanoTime();
 			try
@@ -293,7 +293,7 @@ public class HelplineEvaluation
 			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
 			for(int j=0; j<cnt; j++)
 			{
-				Object	person	= fixedname ? "person0" : "person"+j;// : "person"+(numpersons+j);
+				Object	person	= fixedname ? /*"person0" :*/ "person"+j : "person"+(numpersons+j);
 				fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
 					new CreationInfo(Collections.singletonMap("person", person)), null));
 			}

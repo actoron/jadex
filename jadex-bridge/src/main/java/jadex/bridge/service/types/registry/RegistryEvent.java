@@ -12,7 +12,7 @@ public class RegistryEvent extends ARegistryEvent
 {
 	/** The service entry lease time. */
 	// TODO. fix lease time vs collection time!!!
-	public static final long	LEASE_TIME	= 300000;
+	public static final long	LEASE_TIME	= 36000000;
 	
 	/** The added services. */
 	protected Set<IService> addedservices;
