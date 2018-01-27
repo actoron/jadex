@@ -146,7 +146,7 @@ public class HelplineEvaluation
 			long	start	= System.nanoTime();
 			try
 			{
-				found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
+				found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, fixedname ? "person0" : "person"+personcnt).get();
 			}
 			catch(Exception e)
 			{
@@ -156,7 +156,8 @@ public class HelplineEvaluation
 			int numfound	= found!=null ? found.size() : 0;
 			String	search	= (""+((end-start)/1000000.0)).replace('.', ',');
 			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
-//			System.out.println("Services: "+found);
+			if(found.size()==1)
+				System.out.println("First platform: "+firstplatform+" found: "+found);
 			
 			writeEntry(creation, end-start, numfound);
 		}
