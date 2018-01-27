@@ -116,17 +116,32 @@ public class HelplineEvaluation
 				Thread.sleep(500);	// Wait for registration/connection?
 			}
 
-			System.gc();
+			// No manual GC required thanks to median?
+//			double memfree	= 1.0-Runtime.getRuntime().freeMemory()/Runtime.getRuntime().totalMemory(); 
+//			if(memfree<0.2)
+//			{
+//				System.out.println("+++ GC due to mem "+((int)(memfree*100))/100+"%");
+//				System.gc();
+//			}
 			long creation = createPersons(platforms, personcnt);
 
+			// Wait until background processes have settled.
 			while(getProcessCpuLoad()>0.1)
 			{
-				Thread.sleep(500);	// Wait for registration/connection?
+				Thread.sleep(500);
 			}
 
-			// Search for first person to check if searches get slower.
-			System.gc();
+//			// No manual GC required thanks to median?
+//			memfree	= 1.0-Runtime.getRuntime().freeMemory()/Runtime.getRuntime().totalMemory(); 
+//			if(memfree<0.2)
+//			{
+//				System.out.println("+++ GC due to mem "+((int)(memfree*100))/100+"%");
+//				System.gc();
+//			}
+			
 //			System.in.read(new byte[16]);	// For profiling -> press key before search
+
+			// Search for first person to check if searches get slower.
 			Collection<IHelpline>	found	= null;
 			long	start	= System.nanoTime();
 			try
