@@ -3,10 +3,10 @@ package jadex.micro.examples.helplinemega;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -64,10 +64,10 @@ public class HelplineEvaluation
 	private static IExternalAccess	firstplatform;
 	
 	/** Values for average creation time. */
-	private static List<Double>	avgcreation	= new ArrayList<Double>();
+	private static Set<Double>	avgcreation	= new TreeSet<Double>();
 	
 	/** Values for average search time. */
-	private static List<Double>	avgsearch	= new ArrayList<Double>();
+	private static Set<Double>	avgsearch	= new TreeSet<Double>();
 
 	
 	//-------- methods --------
@@ -340,16 +340,12 @@ public class HelplineEvaluation
 		{
 			System.out.println("++++ "+numplatforms+": "+avgcreation+" "+avgsearch);
 			
-			creation	= 0;
-			for(double c: avgcreation)
-				creation	+= c;
-			creation	/= avgcreation.size();
+			Double[]	vals	= avgcreation.toArray(new Double[avgcreation.size()]);
+			creation	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
 			avgcreation.clear();
 			
-			search	= 0;
-			for(double s: avgsearch)
-				search	+= s;
-			search	/= avgsearch.size();
+			vals	= avgsearch.toArray(new Double[avgsearch.size()]);
+			search	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
 			avgsearch.clear();
 			
 			String	screation	= (""+(creation/1000000.0)).replace('.', ',');
