@@ -239,7 +239,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					throw new RuntimeException("wrooong2");
 				
 				if(event.size()>0)
-					System.out.println("notify obs: "+event);
+					System.out.println("notify obs: "+component+", events="+event.size());
 				
 				getSuperpeerService(false).addResultListener(new ComponentResultListener<ISuperpeerRegistrySynchronizationService>(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
