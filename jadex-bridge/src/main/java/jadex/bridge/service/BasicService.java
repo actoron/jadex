@@ -378,8 +378,16 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 								Indexer<IService> indexer = reg.getIndexer();
 								String	sid	= getServiceIdentifier().toString();
 								Set<IService> origs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_SID, sid);
-								IService orig = origs.iterator().next();
-								indexer.addValue(orig);
+								// Hack!!! Race condition bug in init???
+								if(origs!=null)
+								{
+									IService orig = origs.iterator().next();
+									indexer.addValue(orig);
+								}
+								else
+								{
+									internalaccess.getLogger().severe("Cannot add service to indexer (init bug?): "+this);
+								}
 							}
 							ret.setResult(null);
 						}
