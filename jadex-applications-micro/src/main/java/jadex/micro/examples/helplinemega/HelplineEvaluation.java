@@ -332,11 +332,12 @@ public class HelplineEvaluation
 	{
 		filename	= "eval_"+spcnt+"_"+platformcnt+"_"+personcnt+"_"+fixedname+"_"+System.currentTimeMillis()+".csv";
 		FileWriter	out	= new FileWriter(filename, true);
+		String	scenario	= (spcnt==0?"P2P":"SP")	+ "-" + (fixedname?"multi":"single") + ")";
 		out.write("# of SPs;# of Platforms;# of Services;"
-			+ "Creation Time ("	+ (spcnt==0?"Awa":"SP")	+ ");"
-			+ "Search Time ("	+ (spcnt==0?"Awa":"SP")	+ ");"
+			+ "Creation Time "+scenario+";"
+			+ "Search Time "+scenario+";"
 			+ "Found Services;"
-			+ (spcnt==0?"Awa":"SP") + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
+			+ scenario + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
 		out.close();
 	}
 	
