@@ -832,7 +832,8 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 					}
 				}
 				
-				doWaitFor(5000, this);
+				System.err.println("Hack!!! Removed polling from awa management agent. TODO: Adaptive removal behavior based on shortest lease time.");
+//				doWaitFor(5000, this);
 				return IFuture.DONE;
 			}
 		});
