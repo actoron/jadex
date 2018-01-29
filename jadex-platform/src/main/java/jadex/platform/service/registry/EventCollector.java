@@ -31,7 +31,7 @@ public abstract class EventCollector
 	 */
 	public EventCollector(IComponentIdentifier cid, final IDelayRunner timer)
 	{
-		this(cid, timer, 1000, 10000);
+		this(cid, timer, 1000, RegistryEvent.LEASE_TIME);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public abstract class EventCollector
 				// uses timelimit for event and for waiting
 				if(registryevent!=null)
 				{
-					if(registryevent.isDue())
+					if(registryevent.isDue())// TODO: shoudln't send empty events??? && registryevent.size()>0)
 					{
 						ARegistryEvent r = registryevent;
 						registryevent = createEvent();

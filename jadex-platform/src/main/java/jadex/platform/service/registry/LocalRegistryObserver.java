@@ -43,7 +43,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	 */
 	public LocalRegistryObserver(IInternalAccess component, final IDelayRunner timer, boolean globalscope)
 	{
-		this(component, timer, 1000, 10000, globalscope);
+		this(component, timer, 1000, RegistryEvent.LEASE_TIME, globalscope);
 	}
 	
 	/**

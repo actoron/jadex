@@ -10,6 +10,10 @@ import jadex.bridge.service.IService;
  */
 public class RegistryEvent extends ARegistryEvent
 {
+	/** The service entry lease time. */
+	// TODO. fix lease time vs collection time!!! -> wait until next year for now :P
+	public static final long	LEASE_TIME	= 1000*60*60*24*365;
+	
 	/** The added services. */
 	protected Set<IService> addedservices;
 //	protected Set<IServiceIdentifier> addedservices;
@@ -34,7 +38,7 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public RegistryEvent(boolean delta)
 	{
-		this(null, null, 1000, 10000, delta, null);
+		this(null, null, 1000, LEASE_TIME, delta, null);
 	}
 	
 	/**
@@ -42,7 +46,7 @@ public class RegistryEvent extends ARegistryEvent
 	 */
 	public RegistryEvent(boolean delta, String clienttype)
 	{
-		this(null, null, 1000, 10000, delta, clienttype);
+		this(null, null, 1000, LEASE_TIME, delta, clienttype);
 	}
 	
 	/**

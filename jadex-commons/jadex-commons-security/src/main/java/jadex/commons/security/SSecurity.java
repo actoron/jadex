@@ -216,9 +216,15 @@ public class SSecurity
 									{
 										Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
 										Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
-										int explen = ret.length;
-										ret = (byte[]) getrandomfromwindows.invoke(null, ret.length);
-										noseed = ret == null || ret.length != explen;
+										byte[]	tmpret = (byte[]) getrandomfromwindows.invoke(null, ret.length);
+										if(tmpret == null || ret.length != tmpret.length)
+										{
+											noseed	= true;
+										}
+										else
+										{
+											ret	= tmpret;
+										}
 									}
 									catch(Throwable e)
 									{

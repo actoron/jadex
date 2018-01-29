@@ -25,6 +25,7 @@ import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.search.Indexer;
 import jadex.bridge.service.search.ServiceKeyExtractor;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.IValueFetcher;
@@ -374,8 +375,19 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 								((ServiceIdentifier)sid).setTags(tags);
 								// Hack!!! re-index
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
-								IService orig = reg.getIndexer().getValues(ServiceKeyExtractor.KEY_TYPE_SID, getServiceIdentifier().toString()).iterator().next();
-								reg.getIndexer().addValue(orig);
+								Indexer<IService> indexer = reg.getIndexer();
+								String	sid	= getServiceIdentifier().toString();
+								Set<IService> origs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_SID, sid);
+								// Hack!!! Race condition bug in init???
+								if(origs!=null)
+								{
+									IService orig = origs.iterator().next();
+									indexer.addValue(orig);
+								}
+								else
+								{
+									internalaccess.getLogger().severe("Cannot add service to indexer (init bug?): "+this);
+								}
 							}
 							ret.setResult(null);
 						}
@@ -456,7 +468,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 
 		if(ex)
 		{
-			ret.setException(new RuntimeException("Already running."));
+			ret.setException(new RuntimeException("Already running: "+System.identityHashCode(this)));
 		}
 		else 
 		{

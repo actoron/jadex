@@ -353,9 +353,12 @@ public class TransportAddressAgent implements ITransportAddressService
 		try
 		{
 			IAwarenessManagementService awa = SServiceProvider.getLocalService0(agent, IAwarenessManagementService.class, Binding.SCOPE_PLATFORM, null, true);
-			DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
-			if (info != null)
-				addAddresses(info.getAddresses());
+			if(awa!=null)
+			{
+				DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
+				if (info != null)
+					addAddresses(info.getAddresses());
+			}
 		}
 		catch (Exception e)
 		{

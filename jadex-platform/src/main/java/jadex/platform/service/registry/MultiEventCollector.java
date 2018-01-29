@@ -3,6 +3,7 @@ package jadex.platform.service.registry;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.registry.ARegistryEvent;
 import jadex.bridge.service.types.registry.MultiRegistryEvent;
+import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.collection.IDelayRunner;
 
 /**
@@ -15,7 +16,7 @@ public abstract class MultiEventCollector extends EventCollector
 	 */
 	public MultiEventCollector(IComponentIdentifier cid, final IDelayRunner timer)
 	{
-		this(cid, timer, 1000, 10000);
+		this(cid, timer, 1000, RegistryEvent.LEASE_TIME);
 	}
 	
 	/**
