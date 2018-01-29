@@ -34,7 +34,7 @@ public class HelplineEvaluation
 	// may also be specified as command line parameter (e.g. '-spcnt 0').
 	
 	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
-	private static int	spcnt	= 3;
+	private static int	spcnt	= 0;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
 	private static int	platformcnt	= -1;
@@ -332,12 +332,12 @@ public class HelplineEvaluation
 	{
 		filename	= "eval_"+spcnt+"_"+platformcnt+"_"+personcnt+"_"+fixedname+"_"+System.currentTimeMillis()+".csv";
 		FileWriter	out	= new FileWriter(filename, true);
-		String	scenario	= (spcnt==0?"P2P":"SP")	+ "-" + (fixedname?"multi":"single") + ")";
+		String	scenario	= (spcnt==0?"P2P":"SP")	+ "-" + (fixedname?"multi":"single");
 		out.write("# of SPs;# of Platforms;# of Services;"
-			+ "Creation Time "+scenario+";"
-			+ "Search Time "+scenario+";"
+			+ "Creation Time ("+scenario+");"
+			+ "Search Time ("+scenario+");"
 			+ "Found Services;"
-			+ scenario + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+"'\n");
+			+ scenario + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+" -fixedname "+fixedname+"'\n");
 		out.close();
 	}
 	
