@@ -850,20 +850,44 @@ public interface IRootComponentConfiguration
      *  Get the network name (used at startup).
      *  @return The network name.
      */
-    public String getNetworkName();
+    public String[] getNetworkName();
 
     /**
      *  Set the network name (used at startup).
      *  @param value The network name.
      */
+    public void setNetworkNames(String[] value);
+    
+    /**
+     *  Set the network name (used at startup).
+     *  @param value The network name.
+     */
     public void setNetworkName(String value);
+    
+//    /**
+//     *  Add the network name (used at startup).
+//     *  @param value The network name.
+//     */
+//    public void addNetworkName(String value);
+    
+//    /**
+//     *  Set the network names (used at startup).
+//     *  @param value The network name.
+//     */
+//    public void setNetworkNames(String[] values);
 
     /**
      *  Get the network pass (used at startup).
      *  @return The network pass.
      */
-    public String getNetworkPass();
+    public String[] getNetworkPass();
 
+    /**
+     *  Set the network pass (used at startup).
+     *  @param value The network pass.
+     */
+    public void setNetworkPass(String[] value);
+    
     /**
      *  Set the network pass (used at startup).
      *  @param value The network pass.

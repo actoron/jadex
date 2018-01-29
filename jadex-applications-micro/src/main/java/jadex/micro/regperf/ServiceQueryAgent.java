@@ -65,6 +65,6 @@ public class ServiceQueryAgent
 			}
 		};
 		
-		agent.getComponentFeature(IExecutionFeature.class).repeatStep(0, 2000, step);
+		agent.getComponentFeature(IExecutionFeature.class).repeatStep(0, 4000, step);
 	}
 }
