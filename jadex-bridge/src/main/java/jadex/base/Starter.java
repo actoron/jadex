@@ -892,6 +892,8 @@ public class Starter
 	 */
 	public static synchronized Object getPlatformValue(IComponentIdentifier platform, String key)
 	{
+		//System.out.println("getPV: "+platform.getRoot()+" "+key);
+		
 		Object ret = null;
 		Map<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem != null)

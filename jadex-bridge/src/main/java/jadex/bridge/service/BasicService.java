@@ -458,10 +458,12 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		if(started)
 		{
 			ex = true;
+//			System.out.println("setting started true ex: "+this);
 		}
 		else
 		{
 			started = true;
+//			System.out.println("setting started true: "+this);
 		}
 
 		if(ex)

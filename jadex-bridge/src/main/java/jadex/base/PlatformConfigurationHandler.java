@@ -103,6 +103,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	            values.put(entry.getKey(), entry.getValue());
 	        }
 		}
+		else if(mname.equals("clone"))
+		{
+			PlatformConfigurationHandler h = new PlatformConfigurationHandler();
+			h.values = new HashMap<String, Object>(values);
+			ret = getPlatformConfiguration(null, h);
+		}
 //		else if(mname.equals("getComponentFactory"))
 //		{
 //			 return (String)values.get(IStarterConfiguration.COMPONENT_FACTORY)!=null?
@@ -388,7 +394,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public static IPlatformConfiguration getPlatformConfiguration()
 	{
-		return getPlatformConfiguration((ClassLoader)IPlatformConfiguration.class.getClassLoader());
+		return getPlatformConfiguration((ClassLoader)null);
 	}
 	
 	/**
@@ -398,7 +404,18 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public static IPlatformConfiguration getPlatformConfiguration(ClassLoader cl)
 	{
-		IPlatformConfiguration ret = (IPlatformConfiguration)ProxyFactory.newProxyInstance(cl, new Class[]{IPlatformConfiguration.class}, new PlatformConfigurationHandler());
+		return getPlatformConfiguration(cl, new PlatformConfigurationHandler());
+	}
+	
+	/**
+	 *  Get the default platform configuration.
+	 *  @param cl The classloader.
+	 *  @return The default configuration.
+	 */
+	public static IPlatformConfiguration getPlatformConfiguration(ClassLoader cl, PlatformConfigurationHandler h)
+	{
+		cl = cl==null? (ClassLoader)IPlatformConfiguration.class.getClassLoader(): cl;
+		IPlatformConfiguration ret = (IPlatformConfiguration)ProxyFactory.newProxyInstance(cl, new Class[]{IPlatformConfiguration.class}, h);
 		return ret;
 	}
 	

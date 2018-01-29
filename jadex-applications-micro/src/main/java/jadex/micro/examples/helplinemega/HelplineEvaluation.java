@@ -277,12 +277,14 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
 	{
+		config.setPlatformName(type+"_*");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
 		FutureBarrier<IExternalAccess>	fubar	= new FutureBarrier<IExternalAccess>();
 		long	start	= System.nanoTime();
 		for(int i=0; i<cnt; i++)
 		{
+//			fubar.addFuture(Starter.createPlatform(config!=null? config.clone(): null));
 			IPlatformConfiguration pconf	= createConfig();
 			pconf.enhanceWith(config);
 			pconf.setPlatformName(type+"_****");
