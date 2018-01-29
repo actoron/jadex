@@ -93,8 +93,6 @@ public abstract class PeerSearchFunctionality
 		}
 		else
 		{
-			// Should not happen
-			System.out.println("blub");
 			ret.setException(new RuntimeException("Waiting for next search"));
 		}
 		
