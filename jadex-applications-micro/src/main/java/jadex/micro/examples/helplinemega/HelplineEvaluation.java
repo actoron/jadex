@@ -2,8 +2,10 @@ package jadex.micro.examples.helplinemega;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -26,13 +28,13 @@ public class HelplineEvaluation
 	// may also be specified as command line parameter (e.g. '-spcnt 0').
 	
 	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
-	private static int	spcnt	= 3;
+	private static int	spcnt	= 0;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
 	private static int	platformcnt	= -1;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
-	private static int	personcnt	= 1000;
+	private static int	personcnt	= 1;
 	
 	/** Fixed name true means that all ever created services match the query.
 	 *  Fixed name false means that number of found services should be constant as only the initially created services match. */
@@ -54,6 +56,12 @@ public class HelplineEvaluation
 
 	/** First created platform, used for searching. */
 	private static IExternalAccess	firstplatform;
+	
+	/** Average creation time (exp). */
+	private static List<Long>	avgcreation	= new ArrayList<Long>();
+	
+	/** Average search time (exp). */
+	private static List<Long>	avgsearch	= new ArrayList<Long>();
 
 	
 	//-------- methods --------
@@ -85,7 +93,7 @@ public class HelplineEvaluation
 		// Loop to start additional components/platforms/SPs until program is interrupted.
 		
 		while(true)
-//		while(numplatforms<10)
+//		while(numplatforms<1)
 		{
 			if(spcnt<0)
 			{
@@ -97,31 +105,32 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*20 : 50);	// Wait for registration/connection?
 
 			System.gc();
-			String creation = createPersons(platforms, personcnt);
+			long creation = createPersons(platforms, personcnt);
 
-			Thread.sleep(spcnt==0 ? numplatforms*500 : 50);	// Wait for registration/connection?
+			Thread.sleep(spcnt==0 ? numplatforms*20 : 50);	// Wait for registration/connection?
 
 			// Search for first person to check if searches get slower.
 			System.gc();
+			Collection<IHelpline>	found	= null;
 			long	start	= System.nanoTime();
-			int numfound	= 0;
 			try
 			{
-				Collection<IHelpline>	found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
-				numfound = found.size();
+				found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person0").get();
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
 			long	end	= System.nanoTime();
+			int numfound	= found!=null ? found.size() : 0;
 			String	search	= (""+((end-start)/1000000.0)).replace('.', ',');
 			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
+//			System.out.println("Services: "+found);
 			
-			writeEntry(creation, search, numfound);
+			writeEntry(creation, end-start, numfound);
 		}
 	}
 
@@ -133,11 +142,13 @@ public class HelplineEvaluation
 	protected static IPlatformConfiguration parseArgs(String[] args)
 	{
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
+//		config.setLogging(true);
 		config.setChat(false);	// Keep platform at minimum. Todo: minimal server config
 		config.setSimulation(false);	// Todo: fix sim delay in registry!?
 		config.setNetworkName("helpline");
-		config.setNetworkPass("p09 p6rfzb pﬂ7pv0 78rtvo0b 67rf");
-		config.setAwaMechanisms("Local");
+		config.setNetworkPass("key:wlXEahZlSgTfqiv0LwNbsdUZ8qlgtKSSQaKK74XkJxU");
+		config.setAwaMechanisms("IntraVM");
+		config.setWsTransport(false);
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
@@ -147,6 +158,10 @@ public class HelplineEvaluation
 		platformcnt	= (Integer) config.getArgs().get("platformcnt");
 		personcnt	= (Integer) config.getArgs().get("personcnt");
 		fixedname	= (Boolean) config.getArgs().get("fixedname");
+
+		config.setRelayTransport(spcnt!=0);	
+		config.setSuperpeerClient(spcnt!=0);
+
 		return config;
 	}
 
@@ -156,25 +171,34 @@ public class HelplineEvaluation
 	 */
 	protected static void createRelayAndSSPs(IPlatformConfiguration config)
 	{
-		IPlatformConfiguration relayconf	= PlatformConfigurationHandler.getDefaultNoGui();
+		IPlatformConfiguration relayconf	= createConfig();
 		relayconf.enhanceWith(config);
 		relayconf.setPlatformName("relay");
 		relayconf.setTcpPort(2091);
 		relayconf.setRelayForwarding(true);
 		Starter.createPlatform(relayconf).get();
 		
+		// Set relay address for all platforms created from now on.
 		config.setRelayAddresses("tcp://relay@localhost:2091");
 		
-		IPlatformConfiguration sspconf	= PlatformConfigurationHandler.getDefaultNoGui();
+		IPlatformConfiguration sspconf	= createConfig();
 		sspconf.enhanceWith(config);
 		sspconf.setSupersuperpeer(true);
-		
+		sspconf.setSuperpeerClient(false);		
 		sspconf.setPlatformName("ssp1");
 		Starter.createPlatform(sspconf).get();
 		
+		sspconf	= createConfig();
+		sspconf.enhanceWith(config);
+		sspconf.setSupersuperpeer(true);
+		sspconf.setSuperpeerClient(false);
 		sspconf.setPlatformName("ssp2");
 		Starter.createPlatform(sspconf).get();
 		
+		sspconf	= createConfig();
+		sspconf.enhanceWith(config);
+		sspconf.setSupersuperpeer(true);
+		sspconf.setSuperpeerClient(false);
 		sspconf.setPlatformName("ssp3");
 		Starter.createPlatform(sspconf).get();
 	}
@@ -186,8 +210,18 @@ public class HelplineEvaluation
 	 */
 	protected static void createSPs(IPlatformConfiguration config, int cnt)
 	{
-		config.setSuperpeer(true);
-		createPlatforms(config, cnt, "SP");
+		System.out.println("Starting "+cnt+" SP platforms.");
+		for(int i=0; i<cnt; i++)
+		{
+			IPlatformConfiguration spconf	= createConfig();
+			spconf.enhanceWith(config);
+			spconf.setSupersuperpeer(true);
+			spconf.setSuperpeerClient(false);
+			spconf.setSuperpeer(true);
+			spconf.setPlatformName("SP_****");
+			Starter.createPlatform(spconf).get();	// Hack!!! Bug when started in parallel
+		}
+
 		numsps	+= cnt;
 	}
 	
@@ -199,6 +233,8 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt)
 	{
+		
+		
 		config.setSuperpeer(false);
 		IExternalAccess[]	ret	= createPlatforms(config, cnt, "helpline");
 		numplatforms	+= cnt;
@@ -218,9 +254,6 @@ public class HelplineEvaluation
 	 */
 	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
 	{
-		if(config==null)
-			System.out.println("hh");
-		
 		config.setPlatformName(type+"_*");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
 		IExternalAccess[]	platforms	= new IExternalAccess[cnt];
@@ -242,7 +275,7 @@ public class HelplineEvaluation
 	 *  @param cnt	The number of components to create on each platform.
 	 *  @return	The time needed for creation as preformatted string.
 	 */
-	protected static String createPersons(IExternalAccess[] platforms, int cnt)
+	protected static long createPersons(IExternalAccess[] platforms, int cnt)
 	{
 		FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
 		long start	= System.nanoTime();
@@ -252,8 +285,8 @@ public class HelplineEvaluation
 			for(int j=0; j<cnt; j++)
 			{
 				Object	person	= fixedname ? "person"+j : "person"+(numpersons+j);
-				cms.createComponent(null, HelplineAgent.class.getName()+".class",
-					new CreationInfo(Collections.singletonMap("person", person)), null);
+				fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
+					new CreationInfo(Collections.singletonMap("person", person)), null));
 			}
 		}
 		fubar.waitFor().get();
@@ -262,7 +295,7 @@ public class HelplineEvaluation
 		numpersons	+= cnt*platforms.length;
 		String	creation	= (""+((end-start)/1000000.0)).replace('.', ',');
 		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
-		return creation;
+		return end-start;
 	}
 
 	/**
@@ -288,10 +321,37 @@ public class HelplineEvaluation
 	 *  @param numfound	Number of services found by search.
 	 *  @throws IOException
 	 */
-	protected static void writeEntry(String creation, String search, int numfound) throws IOException
+	protected static void writeEntry(long creation, long search, int numfound) throws IOException
 	{
-		FileWriter	out	= new FileWriter(filename, true);
-		out.write(numsps+";"+numplatforms+";"+numpersons+";"+creation+";"+search+";"+numfound+"\n");
-		out.close();
+		avgcreation.add(creation);
+		avgsearch.add(search);
+		
+		if(numplatforms%10==0)
+		{
+			creation	= 0;
+			for(long c: avgcreation)
+				creation	+= c/avgcreation.size();
+			avgcreation.clear();
+			
+			search	= 0;
+			for(long s: avgsearch)
+				search	+= s/avgsearch.size();
+			avgsearch.clear();
+			
+			String	screation	= (""+(creation/1000000.0)).replace('.', ',');
+			String	ssearch	= (""+(search/1000000.0)).replace('.', ',');
+			
+			FileWriter	out	= new FileWriter(filename, true);
+			out.write(numsps+";"+numplatforms+";"+numpersons+";"+screation+";"+ssearch+";"+numfound+"\n");
+			out.close();
+		}
+	}
+	
+	/**
+	 *  Create a new default config.
+	 */
+	protected static IPlatformConfiguration	createConfig()
+	{
+		return PlatformConfigurationHandler.getDefaultNoGui();
 	}
 }
