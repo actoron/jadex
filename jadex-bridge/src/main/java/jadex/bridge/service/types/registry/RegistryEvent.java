@@ -11,8 +11,8 @@ import jadex.bridge.service.IService;
 public class RegistryEvent extends ARegistryEvent
 {
 	/** The service entry lease time. */
-	// TODO. fix lease time vs collection time!!! -> wait until next year for now :P
-	public static final long	LEASE_TIME	= 1000*60*60*24*365;
+	// Set this variable to another value in your app NOT HERE
+	public static long LEASE_TIME = 10000;
 	
 	/** The added services. */
 	protected Set<IService> addedservices;

@@ -829,7 +829,7 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Void result)
 			{
-				if(!(filter instanceof IAsyncFilter) && !RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+				if(!(filter instanceof IAsyncFilter) && RequiredServiceInfo.isScopeOnLocalPlatform(scope))
 				{
 					ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
 					Collection<T> sers = ServiceRegistry.getRegistry(component).searchServicesSync(query);

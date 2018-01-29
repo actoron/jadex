@@ -36,7 +36,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	static
 	{
 		namemappings.put("configurationfile", IStarterConfiguration.CONFIGURATION_FILE);
-		namemappings.put("networkname", "networknames");
+		namemappings.put("networknames", "networkname");
 	}
 	
 	/**

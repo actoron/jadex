@@ -1,10 +1,14 @@
 package jadex.micro.regperf;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
@@ -37,6 +41,7 @@ public class ServiceQueryAgent
 				SServiceProvider.getServices(agent, IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK)
 					.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
 				{
+					Set<IComponentIdentifier> plats = new HashSet<IComponentIdentifier>();
 					int cnt = 0;
 					public void exceptionOccurred(Exception exception)
 					{
@@ -46,22 +51,25 @@ public class ServiceQueryAgent
 					
 					public void resultAvailable(Collection<IExampleService> result)
 					{
+						for(IExampleService res: result)
+							intermediateResultAvailable(res);
 						cnt = result.size();
 					}
 					
 					public void intermediateResultAvailable(IExampleService result)
 					{
+						plats.add(((IService)result).getServiceIdentifier().getProviderId().getRoot());
 						cnt++;
 					}
 					
 					public void finished()
 					{
 						long end = System.currentTimeMillis();
-						System.out.println("Found services: "+cnt+" took ms: "+(end-start));
+						System.out.println(agent.getComponentIdentifier()+" found services: "+cnt+" took ms: "+(end-start)+" "+plats);
 						cnt = 0;
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		};
 		

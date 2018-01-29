@@ -314,7 +314,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 							}
 						};
 						
-//						System.out.println("updateCientData called: "+System.currentTimeMillis());
+//						System.out.println("updateCientData called: "+event);
 						spser.updateClientData(event).addResultListener(lis);
 //						if(event.size()>0)
 //						{
