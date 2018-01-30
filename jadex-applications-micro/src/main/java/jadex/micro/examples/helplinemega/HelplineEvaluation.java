@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -35,17 +33,20 @@ public class HelplineEvaluation
 	// may also be specified as command line parameter (e.g. '-spcnt 0').
 	
 	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
-	private static int	spcnt	= 3;
+	private static int	spcnt	= 0;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= -5;
+	private static int	platformcnt	= -20;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
 	private static int	personcnt	= 1000;
 	
-	/** Fixed name true means that all services match the query.
-	 *  Fixed name false means that only the first person on each platform in each round matches. */
-	private static boolean	fixedname	= false;
+	/** True means that one service per platform matches.
+	 *  False (single) means that only one service matches, regardless how many are created. */
+	private static boolean	multi	= true;
+	
+	/** Number of measurements to perform in each round. Written value will be averaged. */
+	private static int	measurecnt	= 4;
 	
 	//-------- variables for created elements --------
 	
@@ -63,13 +64,6 @@ public class HelplineEvaluation
 
 	/** First created platform, used for searching. */
 	private static IExternalAccess	firstplatform;
-	
-	/** Values for average creation time. */
-	private static Set<Double>	avgcreation	= new TreeSet<Double>();
-	
-	/** Values for average search time. */
-	private static Set<Double>	avgsearch	= new TreeSet<Double>();
-
 	
 	//-------- methods --------
 	
@@ -112,55 +106,46 @@ public class HelplineEvaluation
 				platforms	= createHelplinePlatforms(config, -platformcnt);			
 			}
 
-			while(getProcessCpuLoad()>0.1)
-			{
-				Thread.sleep(500);	// Wait for registration/connection?
-			}
-
-			// No manual GC required thanks to median?
-//			double memfree	= 1.0-Runtime.getRuntime().freeMemory()/Runtime.getRuntime().totalMemory(); 
-//			if(memfree<0.2)
-//			{
-//				System.out.println("+++ GC due to mem "+((int)(memfree*100))/100+"%");
-//				System.gc();
-//			}
 			long creation = createPersons(platforms, personcnt);
-
-			// Wait until background processes have settled.
-			while(getProcessCpuLoad()>0.1)
-			{
-				Thread.sleep(500);
-			}
-
-//			// No manual GC required thanks to median?
-//			memfree	= 1.0-Runtime.getRuntime().freeMemory()/Runtime.getRuntime().totalMemory(); 
-//			if(memfree<0.2)
-//			{
-//				System.out.println("+++ GC due to mem "+((int)(memfree*100))/100+"%");
-//				System.gc();
-//			}
 			
-//			System.in.read(new byte[16]);	// For profiling -> press key before search
-
-			// Search for first person to check if searches get slower.
-			Collection<IHelpline>	found	= null;
-			long	start	= System.nanoTime();
-			try
+			long	sum	= 0;
+			int	minfound	= -1;
+			for(int m=0; m<measurecnt; m++)
 			{
-				found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, fixedname ? "person0" : "person"+personcnt).get();
+				// Wait until background processes have settled.
+				while(getProcessCpuLoad()>0.1)
+				{
+					Thread.sleep(500);
+				}
+	
+	//			System.in.read(new byte[16]);	// For profiling -> press key before search
+	
+				// Search for first person to check if searches get slower.
+				Collection<IHelpline>	found	= null;
+				long	start	= System.nanoTime();
+				// For more accurate results: do #measurecnt measures of #measurecnt searches each.
+				for(int m2=0; m2<measurecnt; m2++)	
+				{
+					try
+					{
+						// search for person 1 (single: only present on second platform, multi: present once on each platform)
+						found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person1").get();
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				long	end	= System.nanoTime();
+				sum	+= end-start;
+				minfound	= minfound==-1 ? found!=null ? found.size() : 0 : Math.min(minfound, found!=null ? found.size() : 0);
+//				if(found.size()==1)
+//					System.out.println("First platform: "+firstplatform+" found: "+found);
 			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-			long	end	= System.nanoTime();
-			int numfound	= found!=null ? found.size() : 0;
-			String	search	= (""+((end-start)/1000000.0)).replace('.', ',');
-			System.out.println("Found "+numfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
-			if(found.size()==1)
-				System.out.println("First platform: "+firstplatform+" found: "+found);
+			String	search	= (""+(sum/1000000.0/measurecnt/measurecnt)).replace('.', ',');
+			System.out.println("Found "+minfound+" of "+numpersons+" helpline apps in "+search+" milliseconds.");
 			
-			writeEntry(creation, end-start, numfound);
+			writeEntry(creation, sum/(double)measurecnt/measurecnt, minfound);
 		}
 	}
 
@@ -184,12 +169,14 @@ public class HelplineEvaluation
 		config.setValue("spcnt", spcnt);
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
-		config.setValue("fixedname", fixedname);
+		config.setValue("multi", multi);
+		config.setValue("measurecnt", measurecnt);
 		config.enhanceWith(Starter.processArgs(args));
 		spcnt	= (Integer) config.getArgs().get("spcnt");
 		platformcnt	= (Integer) config.getArgs().get("platformcnt");
 		personcnt	= (Integer) config.getArgs().get("personcnt");
-		fixedname	= (Boolean) config.getArgs().get("fixedname");
+		multi	= (Boolean) config.getArgs().get("multi");
+		measurecnt	= (Integer) config.getArgs().get("measurecnt");
 
 		config.setRelayTransport(spcnt!=0);	
 		config.setSuperpeerClient(spcnt!=0);
@@ -303,29 +290,41 @@ public class HelplineEvaluation
 	 *  Create a number of person-specific helpline components on the given platforms.
 	 *  @param platforms	The platforms to create new nodes on.
 	 *  @param cnt	The number of components to create on each platform.
-	 *  @return	The time needed for creation as preformatted string.
+	 *  @return	The time needed for creation of cnt services as preformatted string.
 	 */
-	protected static long createPersons(IExternalAccess[] platforms, int cnt)
+	protected static long createPersons(IExternalAccess[] platforms, int cnt)	throws Exception
 	{
-		FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
-		long start	= System.nanoTime();
-		for(int i=0; i<platforms.length; i++)
+		long	sum	= 0;
+		for(int m=0; m<measurecnt; m++)
 		{
-			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
-			for(int j=0; j<cnt; j++)
+			// Wait for CPU idle before starting measurement
+			while(getProcessCpuLoad()>0.1)
 			{
-				Object	person	= fixedname ? /*"person0" :*/ "person"+j : "person"+(numpersons+j);
-				fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
-					new CreationInfo(Collections.singletonMap("person", person)), null));
+				Thread.sleep(500);
 			}
+			FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
+			long start	= System.nanoTime();
+			for(int i=0; i<platforms.length; i++)
+			{
+				IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
+				for(int j=0; j<cnt/measurecnt; j++)
+				{
+					int num	= multi
+						? m*cnt/measurecnt + j	// multi: same person numbers used on for all platforms.
+						: numpersons + m*platforms.length + i*cnt/measurecnt + j;	// single: different person numbers for each platform
+					fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
+						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))), null));
+				}
+			}
+			fubar.waitFor().get();
+			long end	= System.nanoTime();
+			sum	+= end-start;
 		}
-		fubar.waitFor().get();
-		long end	= System.nanoTime();
 
 		numpersons	+= cnt*platforms.length;
-		String	creation	= (""+((end-start)/1000000.0)).replace('.', ',');
-		System.out.println("Started "+cnt*platforms.length+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
-		return end-start;
+		String	creation	= (""+(sum/1000000.0/platforms.length)).replace('.', ',');
+		System.out.println("Started "+cnt+" helpline apps in "+creation+" milliseconds. Total: "+numpersons+", per platform: "+(numpersons/numplatforms));
+		return sum/platforms.length;
 	}
 
 	/**
@@ -335,14 +334,14 @@ public class HelplineEvaluation
 	 */
 	protected static void	createOutputFile() throws IOException
 	{
-		filename	= "eval_"+spcnt+"_"+platformcnt+"_"+personcnt+"_"+fixedname+"_"+System.currentTimeMillis()+".csv";
+		filename	= "eval_"+spcnt+"_"+platformcnt+"_"+personcnt+"_"+(multi?"multi":"single")+"_"+System.currentTimeMillis()+".csv";
 		FileWriter	out	= new FileWriter(filename, true);
-		String	scenario	= (spcnt==0?"P2P":"SP")	+ "-" + (fixedname?"multi":"single");
+		String	scenario	= (spcnt==0?"P2P":"SP")	+ "-" + (multi?"multi":"single");
 		out.write("# of SPs;# of Platforms;# of Services;"
 			+ "Creation Time ("+scenario+");"
 			+ "Search Time ("+scenario+");"
 			+ "Found Services;"
-			+ scenario + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+" -fixedname "+fixedname+"'\n");
+			+ scenario + " Settings: '-spcnt "+spcnt+" -platformcnt "+platformcnt+" -personcnt "+personcnt+" -multi "+multi+"'\n");
 		out.close();
 	}
 	
@@ -355,30 +354,12 @@ public class HelplineEvaluation
 	 */
 	protected static void writeEntry(double creation, double search, int numfound) throws IOException
 	{
-		avgcreation.add(creation);
-		avgsearch.add(search);
+		String	screation	= (""+(creation/1000000.0)).replace('.', ',');
+		String	ssearch	= (""+(search/1000000.0)).replace('.', ',');
 		
-		if(platformcnt>=0 || numplatforms%10==0)
-		{
-			System.out.println("++++ "+numplatforms+": "+avgcreation+" "+avgsearch);
-			
-			Double[]	vals	= avgcreation.toArray(new Double[avgcreation.size()]);
-//			creation	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
-			creation	= vals[0];	// min=best value:
-			avgcreation.clear();
-			
-			vals	= avgsearch.toArray(new Double[avgsearch.size()]);
-//			search	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
-			search	= vals[0];
-			avgsearch.clear();
-			
-			String	screation	= (""+(creation/1000000.0)).replace('.', ',');
-			String	ssearch	= (""+(search/1000000.0)).replace('.', ',');
-			
-			FileWriter	out	= new FileWriter(filename, true);
-			out.write(numsps+";"+numplatforms+";"+numpersons+";"+screation+";"+ssearch+";"+numfound+"\n");
-			out.close();
-		}
+		FileWriter	out	= new FileWriter(filename, true);
+		out.write(numsps+";"+numplatforms+";"+numpersons+";"+screation+";"+ssearch+";"+numfound+"\n");
+		out.close();
 	}
 	
 	/**
