@@ -22,6 +22,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.future.FutureBarrier;
 
 /**
@@ -34,7 +35,7 @@ public class HelplineEvaluation
 	// may also be specified as command line parameter (e.g. '-spcnt 0').
 	
 	/** The number of SPs (positive: create only once, negative: create in each round, 0: don't create SPs). */
-	private static int	spcnt	= 0;
+	private static int	spcnt	= 3;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
 	private static int	platformcnt	= -1;
@@ -44,7 +45,7 @@ public class HelplineEvaluation
 	
 	/** Fixed name true means that all services match the query.
 	 *  Fixed name false means that only the first person on each platform in each round matches. */
-	private static boolean	fixedname	= true;
+	private static boolean	fixedname	= false;
 	
 	//-------- variables for created elements --------
 	
@@ -170,6 +171,8 @@ public class HelplineEvaluation
 	 */
 	protected static IPlatformConfiguration parseArgs(String[] args)
 	{
+		RegistryEvent.LEASE_TIME	= 1000*60*60*24*365;
+		
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 //		config.setLogging(true);
 		config.setChat(false);	// Keep platform at minimum. Todo: minimal server config
