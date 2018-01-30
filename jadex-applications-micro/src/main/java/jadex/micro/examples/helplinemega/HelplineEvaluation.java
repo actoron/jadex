@@ -38,7 +38,7 @@ public class HelplineEvaluation
 	private static int	spcnt	= 3;
 	
 	/** The number of platforms (positive: create only once, negative: create in each round). */
-	private static int	platformcnt	= -1;
+	private static int	platformcnt	= -5;
 	
 	/** The number of persons (components) to create on each (new) platform in each round. */
 	private static int	personcnt	= 1000;
@@ -363,11 +363,13 @@ public class HelplineEvaluation
 			System.out.println("++++ "+numplatforms+": "+avgcreation+" "+avgsearch);
 			
 			Double[]	vals	= avgcreation.toArray(new Double[avgcreation.size()]);
-			creation	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
+//			creation	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
+			creation	= vals[0];	// min=best value:
 			avgcreation.clear();
 			
 			vals	= avgsearch.toArray(new Double[avgsearch.size()]);
-			search	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
+//			search	= vals.length%2==1 ? vals[vals.length/2] : (vals[vals.length/2-1] + vals[vals.length/2])/2;
+			search	= vals[0];
 			avgsearch.clear();
 			
 			String	screation	= (""+(creation/1000000.0)).replace('.', ',');
