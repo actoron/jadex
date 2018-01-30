@@ -313,7 +313,7 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration config)
 	{
-		if (!config.getStarterConfig().isKeepPrivileges())
+		if (config.getStarterConfig().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
 		
 		IRootComponentConfiguration rootconf = config.getRootConfig();
