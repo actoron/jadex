@@ -44,7 +44,7 @@ public class HelplineEvaluation
 	
 	/** Fixed name true means that all services match the query.
 	 *  Fixed name false means that only the first person on each platform in each round matches. */
-	private static boolean	fixedname	= false;
+	private static boolean	fixedname	= true;
 	
 	//-------- variables for created elements --------
 	
