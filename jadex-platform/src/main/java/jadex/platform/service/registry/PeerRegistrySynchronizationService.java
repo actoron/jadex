@@ -70,7 +70,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		
 		this.psfunc = new PeerSearchFunctionality()
 		{
-			protected Iterator<IComponentIdentifier> it;
+//			protected Iterator<IComponentIdentifier> it;
+			protected int listpos;
 			
 			protected List<ISuperpeerRegistrySynchronizationService> res = new ArrayList<ISuperpeerRegistrySynchronizationService>();
 			protected ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> currentsearch;
@@ -87,14 +88,17 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				
 				if(reset)
 				{
-					it = superpeers.iterator();
+//					it = superpeers.iterator();
+					listpos = 0;
 					pos = 0;
 				}
 				
 				// First check the list of superpeers
-				if(it!=null && it.hasNext())
+//				if(it!=null && it.hasNext())
+				if (listpos < superpeers.size())
 				{
-					ret.setResult(it.next());
+//					ret.setResult(it.next());
+					ret.setResult(superpeers.get(listpos++));
 				}
 				// has results from search?
 				else if(pos<res.size())
