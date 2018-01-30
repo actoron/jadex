@@ -244,7 +244,7 @@ public interface IStarterConfiguration
      *  
      *  @param value True, if the platform should retain root privileges.
      */
-    public void setKeepPrivileges(boolean value);
+    public void setDropPrivileges(boolean value);
 
     /**
      *  Gets if the platform should keep admin/root privileges
@@ -252,7 +252,7 @@ public interface IStarterConfiguration
      *  
      *  @return True, if the platform should retain root privileges.
      */
-    public boolean isKeepPrivileges();
+    public boolean isDropPrivileges();
 
     /**
      *  Set the debug futures flag.
