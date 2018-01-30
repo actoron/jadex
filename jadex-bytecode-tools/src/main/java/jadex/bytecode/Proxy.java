@@ -36,6 +36,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.WeakValueMap;
 
 /**
  *  Proxy class allows for generating proxy objects for
@@ -57,7 +58,7 @@ public class Proxy
 
 	public static final AtomicInteger COUNTER = new AtomicInteger();
 	
-	public static final Map<Tuple2<ClassLoader, Set<Class<?>>>, Class<?>> CLASSCACHE = Collections.synchronizedMap(new WeakHashMap<Tuple2<ClassLoader,Set<Class<?>>>, Class<?>>());
+	public static final Map<Tuple2<ClassLoader, Set<Class<?>>>, Class<?>> CLASSCACHE = Collections.synchronizedMap(new WeakValueMap<Tuple2<ClassLoader,Set<Class<?>>>, Class<?>>());
 	
 	/**
      *  Get the invocation handler of a proxy.
@@ -128,11 +129,13 @@ public class Proxy
 			def.add(clazz);
 		loader = loader==null? Proxy.class.getClassLoader(): loader;
 
-		// Try fetch from cache
-		Tuple2<ClassLoader, Set<Class<?>>> key = new Tuple2<ClassLoader, Set<Class<?>>>(loader, def);
+		// Try fetch from cache (use handler class loader to enable sharing between multiple platforms, todo: extra class loader to get rid of proxies?)
+		Tuple2<ClassLoader, Set<Class<?>>> key = new Tuple2<ClassLoader, Set<Class<?>>>(handler.getClass().getClassLoader(), def);
+//		Tuple2<ClassLoader, Set<Class<?>>> key = new Tuple2<ClassLoader, Set<Class<?>>>(loader, def);
 		Class<?> ret = CLASSCACHE.get(key);
 		if(ret!=null)
 		{
+//			System.out.println("cache hit: "+key);
 			try
 			{
 //				System.out.println("Cache hit: "+ret+" "+def);
@@ -145,6 +148,8 @@ public class Proxy
 				SUtil.rethrowAsUnchecked(e);
 			}
 		}
+		
+//		System.out.println("cache miss: "+key);
 		
 		ClassNode cn = new ClassNode();
 		try
@@ -271,7 +276,9 @@ public class Proxy
 			Constructor<?> c = cl.getConstructor(new Class[]{InvocationHandler.class});
 			Object o = c.newInstance(handler);
 		
-			CLASSCACHE.put(new Tuple2<ClassLoader, Set<Class<?>>>(loader, def), cl);
+//			CLASSCACHE.put(new Tuple2<ClassLoader, Set<Class<?>>>(loader, def), cl);
+			CLASSCACHE.put(key, cl);
+//			System.out.println("put into proxy class cache: "+key+", "+loader);
 			return o;
 		}
 		catch(Throwable t)
