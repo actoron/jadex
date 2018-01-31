@@ -104,6 +104,11 @@ public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThr
 		t.start();
 	}
 	
+	/**
+	 *  Service shutdown.
+	 *  
+	 *  @return Null, when done.
+	 */
 	@ServiceShutdown
 	public IFuture<Void> shutdown()
 	{
@@ -161,6 +166,9 @@ public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThr
 		}
 	}
 	
+	/**
+	 *  Test main.
+	 */
 	public static void main(String[] args)
 	{
 		int count = 200;

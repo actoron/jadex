@@ -9,6 +9,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.commons.SUtil;
 
+/**
+ *  Thread pool executor based on the Java 5 ThreadPoolExecutor class.
+ *  Uses a monitoring thread to monitor pool thread behavior to adjust
+ *  pool size.
+ *
+ */
 public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 {
 	/** Print debug messages */
