@@ -182,11 +182,11 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				Method registermethod = pathclazz.getMethod("register", new Class<?>[] { wsclazz, kindsarray.getClass() });
 				registermethod.invoke(path, new Object[]{watchservice, kindsarray});
 				
-				IFuture<IThreadPool> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("threadpool");
-				IThreadPool tp = fut.get();
+				IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("threadpool");
+				IDaemonThreadPoolService tp = fut.get();
 				final IExternalAccess ea = agent.getExternalAccess();
 				
-				tp.execute(new Runnable()
+				tp.executeForever(new Runnable()
 				{
 					public void run()
 					{

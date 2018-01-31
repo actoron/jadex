@@ -215,7 +215,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				proceed(null);
 			}
 			
-			protected void proceed(final IThreadPool tp)
+			protected void proceed(final IDaemonThreadPoolService tp)
 			{
 				Runnable reader = new Runnable()
 				{
@@ -317,7 +317,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				};
 				if(tp!=null)
 				{
-					tp.execute(reader);
+					tp.executeForever(reader);
 				}
 				else
 				{
