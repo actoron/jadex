@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 import jadex.commons.SUtil;
 
@@ -18,13 +19,13 @@ import jadex.commons.SUtil;
 public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 {
 	/** Print debug messages */
-	protected static final boolean DEBUG = true;
+	protected static final boolean DEBUG = false;
 	
 	/** Threshold for activating monitoring. */
 	protected static final int MONIT_THRESHOLD = Runtime.getRuntime().availableProcessors();
 	
 	/** Starting number of threads. */
-	protected static final int BASE_TCNT = Runtime.getRuntime().availableProcessors() + (MONIT_THRESHOLD << 1);
+	protected static final int BASE_TCNT = MONIT_THRESHOLD << 1;
 	
 	/** Min. wait time between monitoring cycles. */
 	protected static final long MONIT_CYCLE = 500;
@@ -32,8 +33,8 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	/** Threshold after which a _blocking_ thread is considered stolen. */
 	protected static final long LOSS_THRESHOLD = 1000;
 	
-	/** Threshold after which a _running_ thread is considered stolen. */
-	protected static final long LOSS_THRESHOLD_BUSY = 60000;
+	/** Threshold after which a _non-blocking_ thread is considered stolen. */
+	protected static final long LOSS_THRESHOLD_BUSY = 10000;
 	
 	/** Number of idle threads in the pool. */
 	protected AtomicInteger idle;
@@ -43,6 +44,19 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	
 	/** The lock for the monitoring thread. */
 	protected volatile Semaphore monitoringlock = new Semaphore(0);
+	
+	/** Flag whether monitoring lock is enabled. */
+//	protected volatile boolean lockenabled = true;
+	
+	/** The monitoring thread. */
+	protected Thread monitthread;
+	
+	/** 
+	 *  Lock used if the monitoring thread should wait before next round,
+	 *  This is set released manually for borrowing events, so a replacement
+	 *  thread can be issued quickly.
+	 */
+//	protected Object monitoringwaitlock = new Object();
 	
 	/** Flag for monitoring thread activity. */
 	protected boolean monitoring = true;
@@ -64,7 +78,8 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					public void run()
 					{
 						r.run();
-						System.out.println("Thread exit: " + currentThread().getNumber());
+						if (DEBUG)
+							System.out.println("Thread exit: " + currentThread().getNumber());
 						synchronized(MonitoredThreadPoolExecutor.this)
 						{
 							int i = currentThread().getNumber();
@@ -88,31 +103,37 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 						}
 					}
 				}
-				idle.incrementAndGet();
 				return t;
 			}
 		});
 		
-		Thread monit = new Thread(new Runnable()
+		monitthread = new Thread(new Runnable()
 		{
 			public void run()
 			{
 				while (monitoring)
 				{
+					if (DEBUG)
+						System.out.println("ThreadPool Monitoring Wait");
+					LockSupport.parkUntil(System.currentTimeMillis() + MONIT_CYCLE);
+					if (DEBUG)
+						System.out.println("ThreadPool Monitoring Wait DONE:" + idle.get());
+					
 					try
 					{
+//						if (lockenabled)
+						Semaphore mlock = monitoringlock;
+						if (mlock != null)
+							mlock.acquire();
+						int perms = monitoringlock.drainPermits();
 						if (DEBUG)
-							System.out.println("ThreadPool Monitoring Wait");
-						SUtil.sleep(MONIT_CYCLE);
-						monitoringlock.drainPermits();
-						if (DEBUG)
-							System.out.println("ThreadPool Monitoring Unlocked");
+							System.out.println("ThreadPool Monitoring Unlocked, drained " + perms + " permits.");
 					}
 					catch (Exception e)
 					{
 					}
 					
-					int exceeded = 0;
+					int unavailable = 0;
 					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
 					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
 					for (int i = 0; i < threads.length; ++i)
@@ -124,26 +145,33 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 							if ((thread.getDeparture() < thres && thread.isBlocked()) ||
 								 thread.getDeparture() < thresbusy)
 							{
-								++exceeded;
-								if (DEBUG)
-								{
-									System.out.println("Thread stolen: " + thread);
-									StackTraceElement[] trace = thread.getStackTrace();
-									for (StackTraceElement traceElement : trace)
-										System.err.println("\tat " + traceElement);
-								}
-	//							System.out.println("Thread exceeded return time; " + threads[i]);
+								++unavailable;
+//								if (DEBUG)
+//									System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
 							}
+							
+							if (thread.isBorrowed())
+							{
+								++unavailable;
+							}
+							
+							if (thread.getDeparture() != Long.MAX_VALUE)
+								SUtil.getStackTraceString("", thread.getStackTrace());
 						}
 					}
 					
-					exceeded = -(getMaximumPoolSize() - BASE_TCNT - exceeded);
-					if (exceeded > 0)
+					int newsize = getMaximumPoolSize();
+					
+					int adjustment = -(getMaximumPoolSize() - BASE_TCNT - unavailable);
+					if (adjustment != 0)
 					{
-						System.err.println("Thread loss detected, adjusting pool by " + exceeded);
+						newsize += adjustment;
 						
-						int newsize = getMaximumPoolSize() + exceeded;
-						System.err.println("Old size="+getMaximumPoolSize() + " new size=" +newsize);
+						if (DEBUG)
+						{
+							System.out.println("Adjusting pool by " + adjustment);
+							System.out.println("Old size="+getMaximumPoolSize() + " new size=" +newsize);
+						}
 						
 						if (newsize > threads.length)
 						{
@@ -155,14 +183,27 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 							}
 						}
 						
-						setMaximumPoolSize(newsize);
-						setCorePoolSize(newsize);
+						if (idle.addAndGet(adjustment) > MONIT_THRESHOLD)
+							monitoringlock = new Semaphore(1);
+						
+						if (adjustment < 0)
+						{
+							//Shrink
+							setCorePoolSize(newsize);
+							setMaximumPoolSize(newsize);
+						}
+						else
+						{
+							//Grow
+							setMaximumPoolSize(newsize);
+							setCorePoolSize(newsize);
+						}
 					}
 				}
 			}
 		});
-		monit.setDaemon(true);
-		monit.start();
+		monitthread.setDaemon(true);
+		monitthread.start();
 	}
 	
 	public void execute(final Runnable command)
@@ -174,20 +215,46 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 				currentThread().setDeparture(System.currentTimeMillis());
 				
 				if (idle.decrementAndGet() < MONIT_THRESHOLD)
-					monitoringlock.release();
+				{
+					Semaphore mlock = monitoringlock;
+					monitoringlock = null;
+					if (mlock != null)
+						releaseLock(mlock);
+				}
 				
 				command.run();
+				
 				currentThread().setDeparture(Long.MAX_VALUE);
-				idle.incrementAndGet();
+				
+				if (currentThread().isBorrowed())
+				{
+					currentThread().borrowed = false;
+					releaseLock(monitoringlock);
+					LockSupport.unpark(monitthread);
+				}
+				
+				if (idle.incrementAndGet() > MONIT_THRESHOLD && monitoringlock == null)
+					monitoringlock = new Semaphore(1);
 			}
 		});
 	}
 	
 	protected void borrow()
 	{
+		MonitoredThread thread = currentThread();
+		releaseLock(monitoringlock);
+		LockSupport.unpark(monitthread);
+		if (DEBUG)
+			System.out.println("Borrowed: " + thread + " " + thread.getNumber());
 	}
 	
-	protected static MonitoredThread currentThread()
+	protected static final void releaseLock(Semaphore lock)
+	{
+		if (lock != null)
+			lock.release();
+	}
+	
+	protected static final MonitoredThread currentThread()
 	{
 		return (MonitoredThread) Thread.currentThread();
 	}

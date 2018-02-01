@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -17,12 +18,13 @@ import jadex.commons.concurrent.java5.MonitoredThreadPoolExecutor;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ThreadSuspendable;
 
 
 /**
  *  A thread pool based on the java.util.concurrent package.
  */
-public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThreadPoolService
+public class AdvancedThreadPoolService extends BasicService implements IThreadPoolService, IDaemonThreadPoolService
 {
 	/** The global executor. */
 	protected static volatile ExecutorService GLOBAL_EXECUTOR;
@@ -41,18 +43,11 @@ public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThr
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new ThreadPool5.
+	 *  Create a new ThreadPool.
 	 */
-	public AdvancedThreadPoolService()
+	public AdvancedThreadPoolService(IComponentIdentifier provider, boolean daemon)
 	{
-		this(false);
-	}
-	
-	/**
-	 *  Create a new ThreadPool5.
-	 */
-	public AdvancedThreadPoolService(boolean daemon)
-	{
+		super(provider, daemon ? IDaemonThreadPoolService.class : IThreadPoolService.class, null);
 		if (GLOBAL_EXECUTOR == null)
 		{
 			synchronized(JavaThreadPool.class)
@@ -76,6 +71,18 @@ public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThr
 				notifyFinishListeners();
 			}
 		});
+		
+		if (!daemon)
+		{
+			Thread holder = new Thread(new Runnable()
+			{
+				public void run()
+				{
+					shutdown.get();
+				}
+			});
+			holder.start();
+		}
 	}
 	
 	//-------- IThreadPool interface --------
@@ -171,7 +178,7 @@ public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThr
 	 */
 	public static void main(String[] args)
 	{
-		int count = 200;
+		int count = 50;
 		ThreadPoolExecutor pool = new MonitoredThreadPoolExecutor();
 		
 		for (int i = 0; i < count; ++i)
@@ -182,7 +189,7 @@ public class AdvancedThreadPoolService implements IThreadPoolService, IDaemonThr
 				public void run()
 				{
 					System.out.println("Running: " + num);
-					if (Math.random() < 0.5)
+//					if (Math.random() < 0.8)
 					{
 						System.out.println("Blocking: " + num);
 						SUtil.sleep(100000000);

@@ -13,8 +13,11 @@ public class MonitoredThread extends Thread
 	/** The thread number assigned to the thread. */
 	protected int number;
 	
-	/** Departure time of the thread from the pool */
-	protected long departure = Long.MAX_VALUE;
+	/** Departure time of the thread from the pool. */
+	protected volatile long departure = Long.MAX_VALUE;
+	
+	/** Flag if the thread was borrowed. */
+	protected volatile boolean borrowed;
 	
 	/**
 	 *  Creates the thread.
@@ -72,9 +75,21 @@ public class MonitoredThread extends Thread
 	 *  Notify the pool that the thread is borrowed and return
 	 *  the return to the pool is expected to be delayed.
 	 */
-	public void borrow()
+	protected void borrow()
 	{
-		
+		borrowed = true;
+		departure = Long.MAX_VALUE;
+		origin.borrow();
+	}
+	
+	/**
+	 *  Returns if the thread is currently borrowed.
+	 *  
+	 *  @return True, if borrowed.
+	 */
+	public boolean isBorrowed()
+	{
+		return borrowed;
 	}
 	
 	/**
@@ -86,5 +101,17 @@ public class MonitoredThread extends Thread
 	{
 		State threadstate = getState();
 		return State.BLOCKED == threadstate || State.WAITING == threadstate || State.TIMED_WAITING == threadstate;
+	}
+	
+	/**
+	 *  Try to borrow the thread.
+	 *  If thread is non-monitored,
+	 *  this does nothing.
+	 */
+	public static final void tryBorrow()
+	{
+		Thread t = Thread.currentThread();
+		if (t instanceof MonitoredThread)
+			((MonitoredThread) t).borrow();
 	}
 }
