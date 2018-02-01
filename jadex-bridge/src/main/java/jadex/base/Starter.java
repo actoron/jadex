@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
@@ -46,7 +44,9 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -100,10 +100,8 @@ public class Starter
     
 
 	/** Global platform data. For each platform stored by  */
-	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
-	
-	/** Lock used to access the global data for specific platforms. */
-	protected static final ReentrantReadWriteLock platformmemlock = new ReentrantReadWriteLock(false);
+    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
+//	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
 
 //	/** The shutdown in progress flag. */
 //	protected static boolean	shutdown;
@@ -899,9 +897,7 @@ public class Starter
 		//System.out.println("getPV: "+platform.getRoot()+" "+key);
 		
 		Object ret = null;
-		platformmemlock.readLock().lock();
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		platformmemlock.readLock().unlock();
+		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem != null)
 			ret = mem.get(key);
 		return ret;
@@ -916,19 +912,17 @@ public class Starter
 	 */
 	public static void putPlatformValue(IComponentIdentifier platform, String key, Object value)
 	{
-		platformmemlock.readLock().lock();
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		platformmemlock.readLock().unlock();
+		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem == null)
 		{
-			platformmemlock.writeLock().lock();
+			platformmem.writeLock().lock();
 			mem = platformmem.get(platform.getRoot());
 			if (mem == null)
 			{
-				mem = Collections.synchronizedMap(new HashMap<String, Object>());
+				mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
 				platformmem.put(platform, mem);
 			}
-			platformmemlock.writeLock().unlock();
+			platformmem.writeLock().unlock();
 		}
 		mem.put(key, value);
 	}
@@ -943,9 +937,7 @@ public class Starter
 	public static boolean hasPlatformValue(IComponentIdentifier platform, String key)
 	{
 		boolean ret = false;
-		platformmemlock.readLock().lock();
 		Map<String, Object> mem = platformmem.get(platform.getRoot());
-		platformmemlock.readLock().unlock();
 		if(mem != null)
 			ret = mem.containsKey(key);
 		return ret;
@@ -958,9 +950,7 @@ public class Starter
 	 */
 	public static void removePlatformMemory(IComponentIdentifier platform)
 	{
-		platformmemlock.writeLock().lock();
 		platformmem.remove(platform.getRoot());
-		platformmemlock.writeLock().unlock();
 	}
 
 	/**
