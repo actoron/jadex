@@ -1561,7 +1561,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //		@SuppressWarnings("unchecked")
 		
 		// Only added events are of interest for observers that are not interested in events
-		if(ServiceEvent.SERVICE_ADDED!=type && !ServiceEvent.CLASSINFO.getTypeName().equals(queryinfo.getQuery().getReturnType().getTypeName()))
+		if(ServiceEvent.SERVICE_ADDED!=type && (queryinfo.getQuery().getReturnType()==null || !ServiceEvent.CLASSINFO.getTypeName().equals(queryinfo.getQuery().getReturnType().getTypeName())))
 		{	
 			ret.setResult(Boolean.FALSE);
 		}
