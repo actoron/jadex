@@ -297,7 +297,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	 * @return
 	 * @throws Exception
 	 */
-	public double getProcessCpuLoad()
+	protected double getProcessCpuLoad()
 	{
 		double ret = -1.0;
 	    
@@ -314,8 +314,6 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 			{
 			}
 		}
-	    
-		System.out.println("### cpu: "+ret);
 	    
 	    return ret;
 	}
