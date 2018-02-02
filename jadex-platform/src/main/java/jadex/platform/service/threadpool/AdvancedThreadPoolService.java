@@ -27,7 +27,7 @@ import jadex.commons.future.ThreadSuspendable;
 public class AdvancedThreadPoolService extends BasicService implements IThreadPoolService, IDaemonThreadPoolService
 {
 	/** The global executor. */
-	protected static volatile ExecutorService GLOBAL_EXECUTOR;
+	protected static volatile MonitoredThreadPoolExecutor GLOBAL_EXECUTOR;
 	
 	//-------- attributes --------
 	

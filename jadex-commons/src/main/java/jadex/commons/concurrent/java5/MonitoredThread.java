@@ -77,9 +77,7 @@ public class MonitoredThread extends Thread
 	 */
 	protected void borrow()
 	{
-		borrowed = true;
-		departure = Long.MAX_VALUE;
-		origin.borrow();
+		origin.borrow(this);
 	}
 	
 	/**

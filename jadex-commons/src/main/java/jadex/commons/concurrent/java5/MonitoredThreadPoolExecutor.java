@@ -25,7 +25,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	protected static final int MONIT_THRESHOLD = Runtime.getRuntime().availableProcessors();
 	
 	/** Starting number of threads. */
-	protected static final int BASE_TCNT = MONIT_THRESHOLD << 1;
+	protected static final int BASE_TCNT = (MONIT_THRESHOLD << 1) + 2;
 	
 	/** Min. wait time between monitoring cycles. */
 	protected static final long MONIT_CYCLE = 500;
@@ -133,7 +133,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					{
 					}
 					
-					int unavailable = 0;
+					int borrowed = 0;
 					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
 					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
 					for (int i = 0; i < threads.length; ++i)
@@ -141,18 +141,20 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 						MonitoredThread thread = threads[i];
 						if (thread != null)
 						{
-						
-							if ((thread.getDeparture() < thres && thread.isBlocked()) ||
-								 thread.getDeparture() < thresbusy)
+							if (!thread.isBorrowed())
 							{
-								++unavailable;
-								if (DEBUG)
-									System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
+								if ((thread.getDeparture() < thres && thread.isBlocked()) ||
+									 thread.getDeparture() < thresbusy)
+								{
+									borrow(thread);
+									if (DEBUG)
+										System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
+								}
 							}
 							
 							if (thread.isBorrowed())
 							{
-								++unavailable;
+								++borrowed;
 							}
 							
 							if (thread.getDeparture() != Long.MAX_VALUE)
@@ -160,12 +162,10 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 						}
 					}
 					
-					int newsize = getMaximumPoolSize();
-					
-					int adjustment = -(getMaximumPoolSize() - BASE_TCNT - unavailable);
+					int adjustment = -(getMaximumPoolSize() - BASE_TCNT - borrowed);
 					if (adjustment != 0)
 					{
-						newsize += adjustment;
+						int newsize = getMaximumPoolSize() + adjustment;
 						
 						if (DEBUG)
 						{
@@ -239,9 +239,13 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 		});
 	}
 	
-	protected void borrow()
+	/**
+	 *  Borrows the thread.
+	 * @param thread Thre thread being borrowed.
+	 */
+	protected void borrow(MonitoredThread thread)
 	{
-		MonitoredThread thread = currentThread();
+		thread.borrowed = true;
 		releaseLock(monitoringlock);
 		LockSupport.unpark(monitthread);
 		if (DEBUG)
