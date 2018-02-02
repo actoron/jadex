@@ -137,12 +137,15 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					}
 					
 					int borrowed = 0;
-					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
+					long thres = LOSS_THRESHOLD;
+					long thresbusy = LOSS_THRESHOLD_BUSY;
 					
 					if (AGGRESSIVE)
-						thres = thres / (getQueue().size() / MONIT_THRESHOLD + 1);
+						thres = thres >>> Math.max(((getQueue().size() / MONIT_THRESHOLD) - 1), 0);
+							
+					thres = System.currentTimeMillis() - thres;
+					thresbusy  = System.currentTimeMillis() - thresbusy;
 					
-					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
 					for (int i = 0; i < threads.length; ++i)
 					{
 						MonitoredThread thread = threads[i];
@@ -204,6 +207,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 							//Grow
 							setMaximumPoolSize(newsize);
 							setCorePoolSize(newsize);
+							prestartAllCoreThreads();
 						}
 					}
 				}
@@ -211,6 +215,8 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 		});
 		monitthread.setDaemon(true);
 		monitthread.start();
+		
+		prestartAllCoreThreads();
 	}
 	
 	public void execute(final Runnable command)
@@ -225,8 +231,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 				{
 					Semaphore mlock = monitoringlock;
 					monitoringlock = null;
-					if (mlock != null)
-						releaseLock(mlock);
+					releaseLock(mlock);
 				}
 				
 				command.run();
@@ -237,7 +242,6 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 				{
 					currentThread().borrowed = false;
 					releaseLock(monitoringlock);
-					LockSupport.unpark(monitthread);
 				}
 				
 				if (idle.incrementAndGet() > MONIT_THRESHOLD && monitoringlock == null)
