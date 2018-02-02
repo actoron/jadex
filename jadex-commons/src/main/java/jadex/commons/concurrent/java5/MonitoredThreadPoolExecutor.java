@@ -21,6 +21,9 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	/** Print debug messages */
 	protected static final boolean DEBUG = false;
 	
+	/** If true, be more aggressive when creating threads. */
+	protected static final boolean AGGRESSIVE = true;
+	
 	/** Threshold for activating monitoring. */
 	protected static final int MONIT_THRESHOLD = Runtime.getRuntime().availableProcessors();
 	
@@ -135,6 +138,10 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					
 					int borrowed = 0;
 					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
+					
+					if (AGGRESSIVE)
+						thres = thres / (getQueue().size() / MONIT_THRESHOLD + 1);
+					
 					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
 					for (int i = 0; i < threads.length; ++i)
 					{
@@ -146,7 +153,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 								if ((thread.getDeparture() < thres && thread.isBlocked()) ||
 									 thread.getDeparture() < thresbusy)
 								{
-									borrow(thread);
+									borrowNoUnpark(thread);
 									if (DEBUG)
 										System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
 								}
@@ -245,19 +252,37 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	 */
 	protected void borrow(MonitoredThread thread)
 	{
-		thread.borrowed = true;
-		releaseLock(monitoringlock);
+		borrowNoUnpark(thread);
 		LockSupport.unpark(monitthread);
 		if (DEBUG)
 			System.out.println("Borrowed: " + thread + " " + thread.getNumber());
 	}
 	
+	/**
+	 *  Borrows the thread without unparking.
+	 * @param thread Thre thread being borrowed.
+	 */
+	protected void borrowNoUnpark(MonitoredThread thread)
+	{
+		thread.borrowed = true;
+		releaseLock(monitoringlock);
+	}
+	
+	/**
+	 *  Releases the semaphore, includes null check.
+	 *  @param lock The lock.
+	 */
 	protected static final void releaseLock(Semaphore lock)
 	{
 		if (lock != null)
 			lock.release();
 	}
 	
+	/**
+	 *  Gets the current MonitoredThread, for convenience.
+	 *  
+	 *  @return Current MonitoredThread.
+	 */
 	protected static final MonitoredThread currentThread()
 	{
 		return (MonitoredThread) Thread.currentThread();
