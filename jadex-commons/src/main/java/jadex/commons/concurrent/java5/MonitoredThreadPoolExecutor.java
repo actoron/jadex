@@ -1,6 +1,5 @@
 package jadex.commons.concurrent.java5;
 
-import java.lang.management.ManagementFactory;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
@@ -8,11 +7,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import jadex.commons.SUtil;
 
@@ -60,12 +54,6 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	/** The monitoring thread. */
 	protected Thread monitthread;
 	
-	/** Bean server for monitoring CPU load. */
-	protected MBeanServer beanserver;
-	
-	/** CPU load attribute name. */
-	protected ObjectName cpuloadname;
-	
 	/** 
 	 *  Lock used if the monitoring thread should wait before next round,
 	 *  This is set released manually for borrowing events, so a replacement
@@ -80,18 +68,6 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	{
 		super(BASE_TCNT, BASE_TCNT,
 			  Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
-		
-		if (AGGRESSIVE)
-		{
-			try
-			{
-				beanserver = ManagementFactory.getPlatformMBeanServer();
-			    cpuloadname = ObjectName.getInstance("java.lang:type=OperatingSystem");
-			}
-			catch (Exception e)
-			{
-			}
-		}
 		
 		idle = new AtomicInteger(BASE_TCNT);
 		
@@ -163,7 +139,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					int borrowed = 0;
 					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
 					
-					if (AGGRESSIVE && getProcessCpuLoad() < 0.9)
+					if (AGGRESSIVE)
 						thres = thres >>> (getQueue().size() / MONIT_THRESHOLD);
 					
 					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
@@ -290,32 +266,6 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	{
 		thread.borrowed = true;
 		releaseLock(monitoringlock);
-	}
-	
-	/**
-	 *  Gets the current CPU load.
-	 * @return
-	 * @throws Exception
-	 */
-	protected double getProcessCpuLoad()
-	{
-		double ret = -1.0;
-	    
-		if (cpuloadname != null)
-		{
-			try
-			{
-				AttributeList list = beanserver.getAttributes(cpuloadname, new String[]{ "ProcessCpuLoad" });
-			    
-			    if(!list.isEmpty())
-				    ret = (Double) ((Attribute)list.get(0)).getValue();
-			}
-			catch (Exception e)
-			{
-			}
-		}
-	    
-	    return ret;
 	}
 	
 	/**
