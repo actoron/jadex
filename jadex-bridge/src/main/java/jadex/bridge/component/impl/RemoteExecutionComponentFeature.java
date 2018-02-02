@@ -17,6 +17,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IRemoteCommand;
@@ -367,7 +368,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						term	= null;
 					}
 					
-					retfut.addResultListener(new IIntermediateFutureCommandResultListener()
+					retfut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener()
 					{
 						/** Result counter. */
 						int counter = Integer.MIN_VALUE;
@@ -442,7 +443,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								fut.addResultListener(term);
 							}
 						}
-					});
+					}));
 				}
 				else
 				{
