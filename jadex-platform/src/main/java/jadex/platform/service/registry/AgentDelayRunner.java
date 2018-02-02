@@ -58,7 +58,7 @@ public class AgentDelayRunner implements IDelayRunner
 			{
 				return valid[0] && !cancelled;
 			}
-		}).addResultListener(new IResultListener<Void>()
+		}, true).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{

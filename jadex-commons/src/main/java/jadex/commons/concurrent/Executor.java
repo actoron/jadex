@@ -427,4 +427,12 @@ public class Executor implements Runnable
 	{
 		return "Executor("+executable+")";
 	}
+	
+	/**
+	 *  Check if the executor wants to switch threads.
+	 */
+	public boolean	isSwitching()
+	{
+		return switchtos!=null && !switchtos.isEmpty();
+	}
 }

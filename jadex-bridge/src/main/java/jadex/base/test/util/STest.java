@@ -30,8 +30,8 @@ public class STest {
         config.setTcpTransport(true);
         
         // TODO: Why is simulation broken?
-//      config.setSimul(true);
-//      config.setSimulation(true);
+      config.setSimul(true);
+      config.setSimulation(true);
                 
         return config;
     }

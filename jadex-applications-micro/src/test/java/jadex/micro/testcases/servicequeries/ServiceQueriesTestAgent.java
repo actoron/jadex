@@ -8,6 +8,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -21,6 +22,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -38,6 +40,8 @@ import jadex.micro.testcases.TestAgent;
 	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
+// Todo: long timeouts really necessary?
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
 public class ServiceQueriesTestAgent extends TestAgent
 {
 	//-------- attributes --------
