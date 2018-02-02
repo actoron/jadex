@@ -677,7 +677,10 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type, String scope, IAsyncFilter<T> filter)
 	{
 		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, getComponent().getComponentIdentifier(), filter);
-		return ServiceRegistry.getRegistry(getComponent()).addQuery(query);
+		@SuppressWarnings("unchecked")
+		ISubscriptionIntermediateFuture<T>	ret	= (ISubscriptionIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(
+			ServiceRegistry.getRegistry(getComponent()).addQuery(query), new ComponentFutureFunctionality(getComponent()));
+		return ret;
 	}
 
 	/**
