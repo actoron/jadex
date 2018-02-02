@@ -146,8 +146,8 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 								 thread.getDeparture() < thresbusy)
 							{
 								++unavailable;
-//								if (DEBUG)
-//									System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
+								if (DEBUG)
+									System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
 							}
 							
 							if (thread.isBorrowed())
