@@ -117,7 +117,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 						System.out.println("ThreadPool Monitoring Wait");
 					LockSupport.parkUntil(System.currentTimeMillis() + MONIT_CYCLE);
 					if (DEBUG)
-						System.out.println("ThreadPool Monitoring Wait DONE:" + idle.get());
+						System.out.println("ThreadPool Monitoring started, state idle=:" + idle.get() + " queue=" + getQueue().size() + " pool=" + getMaximumPoolSize());
 					
 					try
 					{
