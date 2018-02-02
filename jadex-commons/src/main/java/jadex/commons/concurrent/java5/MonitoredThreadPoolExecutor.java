@@ -71,7 +71,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 		threads = new MonitoredThread[BASE_TCNT];
 		setThreadFactory(new ThreadFactory()
 		{
-			public synchronized Thread newThread(final Runnable r)
+			public Thread newThread(final Runnable r)
 			{
 				Runnable innerr = new Runnable()
 				{
