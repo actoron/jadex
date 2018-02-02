@@ -5628,6 +5628,27 @@ public class SUtil
 	}
 	
 	/**
+	 *  Converts a stack trace array to a printable string.
+	 *  
+	 *  @param topline The first line to be printed with info, if needed.
+	 *  @param trace The stack trace.
+	 *  @return Printable string.
+	 */
+	public static final String getStackTraceString(String topline, StackTraceElement[] trace)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(topline);
+		sb.append("\n");
+		for (StackTraceElement traceele : trace)
+		{
+			sb.append("\tat ");
+			sb.append(traceele);
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+	
+	/**
 	 *  Try to find the correct classpath root directories for current build tool chain.
 	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.

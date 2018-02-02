@@ -7,6 +7,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.java5.MonitoredThread;
 
 /**
  *  A continuous clock represents a real time clock that
@@ -339,6 +340,10 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					{
 						try
 						{
+							// Notify advanced thread pool that the thread is
+							// borrowed / about to be blocked.
+							MonitoredThread.tryBorrow();
+							
 //							System.out.println("timer waiting for "+diff+" millis at "+System.currentTimeMillis());
 							ContinuousClock.this.wait(diff);
 //							System.out.println("timer awake at "+System.currentTimeMillis());
