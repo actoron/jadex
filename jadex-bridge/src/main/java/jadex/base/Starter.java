@@ -44,7 +44,9 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -98,8 +100,8 @@ public class Starter
     
 
 	/** Global platform data. For each platform stored by  */
-	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
-
+    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
+//	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
 
 //	/** The shutdown in progress flag. */
 //	protected static boolean	shutdown;
@@ -914,12 +916,12 @@ public class Starter
 	 * @param key The key.
 	 * @return The value.
 	 */
-	public static synchronized Object getPlatformValue(IComponentIdentifier platform, String key)
+	public static Object getPlatformValue(IComponentIdentifier platform, String key)
 	{
 		//System.out.println("getPV: "+platform.getRoot()+" "+key);
 		
 		Object ret = null;
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
+		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem != null)
 			ret = mem.get(key);
 		return ret;
@@ -932,13 +934,19 @@ public class Starter
 	 * @param key The key.
 	 * @param value The value.
 	 */
-	public static synchronized void putPlatformValue(IComponentIdentifier platform, String key, Object value)
+	public static void putPlatformValue(IComponentIdentifier platform, String key, Object value)
 	{
-		Map<String, Object> mem = platformmem.get(platform.getRoot());
+		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem == null)
 		{
-			mem = new HashMap<String, Object>();
-			platformmem.put(platform, mem);
+			platformmem.writeLock().lock();
+			mem = platformmem.get(platform.getRoot());
+			if (mem == null)
+			{
+				mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
+				platformmem.put(platform, mem);
+			}
+			platformmem.writeLock().unlock();
 		}
 		mem.put(key, value);
 	}
@@ -950,7 +958,7 @@ public class Starter
 	 * @param key The key.
 	 * @return The value.
 	 */
-	public static synchronized boolean hasPlatformValue(IComponentIdentifier platform, String key)
+	public static boolean hasPlatformValue(IComponentIdentifier platform, String key)
 	{
 		boolean ret = false;
 		Map<String, Object> mem = platformmem.get(platform.getRoot());
@@ -964,7 +972,7 @@ public class Starter
 	 *
 	 * @param platform The platform name.
 	 */
-	public static synchronized void removePlatformMemory(IComponentIdentifier platform)
+	public static void removePlatformMemory(IComponentIdentifier platform)
 	{
 		platformmem.remove(platform.getRoot());
 	}
@@ -972,7 +980,7 @@ public class Starter
 	/**
 	 * Get the remote default timeout.
 	 */
-	public static synchronized long getRemoteDefaultTimeout(IComponentIdentifier platform)
+	public static long getRemoteDefaultTimeout(IComponentIdentifier platform)
 	{
 		if(platform == null)
 			return IStarterConfiguration.DEFAULT_REMOTE_TIMEOUT;
@@ -984,7 +992,7 @@ public class Starter
 	/**
 	 * Get the scaled remote default timeout.
 	 */
-	public static synchronized long getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale)
+	public static long getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale)
 	{
 		long ret = getRemoteDefaultTimeout(platform);
 		return ret == -1 ? -1 : (long)(ret * scale);
@@ -993,7 +1001,7 @@ public class Starter
 	/**
 	 * Get the local default timeout.
 	 */
-	public static synchronized long getLocalDefaultTimeout(IComponentIdentifier platform)
+	public static long getLocalDefaultTimeout(IComponentIdentifier platform)
 	{
 		if(platform == null)
 			return IStarterConfiguration.DEFAULT_LOCAL_TIMEOUT;
@@ -1005,7 +1013,7 @@ public class Starter
 	/**
 	 * Get the scaled local default timeout.
 	 */
-	public static synchronized long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
+	public static long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
 	{
 		long ret = getLocalDefaultTimeout(platform);
 		return ret == -1 ? -1 : (long)(ret * scale);
@@ -1014,7 +1022,7 @@ public class Starter
 	/**
 	 * Set the remote default timeout.
 	 */
-	public static synchronized void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout)
+	public static void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout)
 	{
 		putPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT, timeout);
 	}
@@ -1022,7 +1030,7 @@ public class Starter
 	/**
 	 * Set the local default timeout.
 	 */
-	public static synchronized void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
+	public static void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
 	{
 		putPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT, timeout);
 	}
@@ -1030,7 +1038,7 @@ public class Starter
 	/**
 	 * Check if the real time timeout flag is set for a platform.
 	 */
-	public static synchronized boolean isRealtimeTimeout(IComponentIdentifier platform)
+	public static boolean isRealtimeTimeout(IComponentIdentifier platform)
 	{
 		// Hack!!! Should default to false?
 		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_REALTIMETIMEOUT));
@@ -1039,7 +1047,7 @@ public class Starter
 	/**
 	 * Check if the parameter copy flag is set for a platform.
 	 */
-	public static synchronized boolean isParameterCopy(IComponentIdentifier platform)
+	public static boolean isParameterCopy(IComponentIdentifier platform)
 	{
 		// not equals false to make true the default.
 		return !Boolean.FALSE.equals(getPlatformValue(platform, DATA_PARAMETERCOPY));

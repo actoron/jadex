@@ -246,22 +246,15 @@ public class SSecurity
 						}
 					};
 					
-					if (PARANOID_PRNG)
+					ENTROPY_SOURCE = new IEntropySource()
 					{
-						ENTROPY_SOURCE = new IEntropySource()
+						public synchronized void getEntropy(byte[] bytes)
 						{
-							public synchronized void getEntropy(byte[] bytes)
-							{
-								byte[] addent = SecureRandom.getSeed(bytes.length);
-								basicsource.getEntropy(bytes);
-								xor(bytes, addent);
-							}
-						};
-					}
-					else
-					{
-						ENTROPY_SOURCE = basicsource;
-					}
+							byte[] addent = SecureRandom.getSeed(bytes.length);
+							basicsource.getEntropy(bytes);
+							xor(bytes, addent);
+						}
+					};
 				}
 			}
 		}

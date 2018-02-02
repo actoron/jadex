@@ -257,6 +257,21 @@ public class ThreadPool implements IThreadPool
 		
 		tasks.enqueue(task);
 	}
+	
+	/**
+	 *  Execute a task in its own thread.
+	 *  The pool expects the thread executing the task to never return.
+	 *  Preferably use this method if you want to permanently retrieve
+	 *  a thread e.g. for repeated blocking operations.
+	 *  
+	 *  @param task The task to execute.
+	 */
+	public void executeForever(Runnable task)
+	{
+		Thread t = new Thread(task);
+		t.setDaemon(daemon);
+		t.start();
+	}
 
 	/**
 	 *  Shutdown the task pool

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.java5.MonitoredThread;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -366,6 +367,10 @@ public class Executor implements Runnable
 			// Todo: decide if a new thread is needed
 			// Hack!!! create new thread anyways
 			execute();
+			
+			// Notify advanced thread pool that the thread is
+			// borrowed / about to be blocked.
+			MonitoredThread.tryBorrow();
 			
 			try
 			{
