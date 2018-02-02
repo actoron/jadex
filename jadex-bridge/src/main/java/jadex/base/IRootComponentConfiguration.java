@@ -56,13 +56,12 @@ public interface IRootComponentConfiguration
 
     // ----- arguments set by starter for root or platform component -----
 
-    /** The IPlatformComponentAccess instance **/
-    public static final String	PLATFORM_ACCESS		= "platformaccess";
+//    /** The IPlatformComponentAccess instance **/
+//    public static final String	PLATFORM_ACCESS		= "platformaccess";
 
-    /** The component factory instance. */
-    public static final String	COMPONENT_FACTORY	= IStarterConfiguration.COMPONENT_FACTORY;
+//    /** The component factory instance. */
+//    public static final String	COMPONENT_FACTORY	= IStarterConfiguration.COMPONENT_FACTORY;
 
-    /** The saved program arguments. **/
     public static final String	PROGRAM_ARGUMENTS	= "programarguments";						// class:
     // String[]
     // default:
@@ -499,14 +498,20 @@ public interface IRootComponentConfiguration
             LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER, SUPERPEERCLIENT
     };
 
-
-    public Map<String, Object> getArgs();
-
     /**
-     *  Set program arguments to be available at runtime.
-     *  @param args The arguments.
+     *  Get all values of the configuration as map.
+     *  @return The values.
      */
-    public void setProgramArguments(String[] args);
+    public Map<String, Object> getValues();
+    
+
+//    public Map<String, Object> getArgs();
+//
+//    /**
+//     *  Set program arguments to be available at runtime.
+//     *  @param args The arguments.
+//     */
+//    public void setProgramArguments(String[] args);
 
     /**
      *  Get the welcome flag.
@@ -520,23 +525,23 @@ public interface IRootComponentConfiguration
      */
     public void setWelcome(boolean value);
 
-    /**
-     *  Set the platform access.
-     *  @param value The platform access.
-     */
-    void setPlatformAccess(IPlatformComponentAccess value);
-
-    /**
-     *  Get the component factory.
-     *  @return value The component factory.
-     */
-    IComponentFactory getBootstrapFactory(IComponentFactory value);
-
-    /**
-     *  Set the bootstrap component factory.
-     *  @param value The component factory.
-     */
-    void setBootstrapFactory(IComponentFactory value);
+//    /**
+//     *  Set the platform access.
+//     *  @param value The platform access.
+//     */
+//    public  void setPlatformAccess(IPlatformComponentAccess value);
+//
+//    /**
+//     *  Get the component factory.
+//     *  @return value The component factory.
+//     */
+//    public IComponentFactory getBootstrapFactory(IComponentFactory value);
+//
+//    /**
+//     *  Set the bootstrap component factory.
+//     *  @param value The component factory.
+//     */
+//    public void setBootstrapFactory(IComponentFactory value);
 
     /**
      *  Get the flag if gui is opened.

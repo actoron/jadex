@@ -2,6 +2,7 @@ package jadex.micro.features.impl;
 
 import java.util.Collections;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -101,6 +102,10 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		{
 			return getPojoAgent();
 		}
+		else if(Starter.hasPlatformValue(getComponent().getComponentIdentifier(), name))
+		{
+			return Starter.getPlatformValue(getComponent().getComponentIdentifier(), name);
+		}
 		else
 		{
 			throw new RuntimeException("Value not found: "+name);
@@ -115,9 +120,7 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 	public IParameterGuesser	getParameterGuesser()
 	{
 		if(guesser==null)
-		{
 			guesser	= new SimpleParameterGuesser(super.getParameterGuesser(), Collections.singleton(pojoagent));
-		}
 		return guesser;
 	}
 }

@@ -19,8 +19,8 @@ public class Main
 		config.setValue("relaytransport", true);
 		config.setValue("relayforwarding", true);
 		
-		config.enhanceWith(Starter.processArgs(args));
+//		config.enhanceWith(Starter.processArgs(args));
 		
-		Starter.createPlatform(config).get();
+		Starter.createPlatform(config, args).get();
 	}
 }

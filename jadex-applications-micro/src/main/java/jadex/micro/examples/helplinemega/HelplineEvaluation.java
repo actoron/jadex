@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -74,24 +75,30 @@ public class HelplineEvaluation
 	
 	public static void main(String[] args)	throws Exception
 	{
-		IPlatformConfiguration config = parseArgs(args);
+		IPlatformConfiguration config = getConfig(args);
+		Map<String, Object> argmap = Starter.parseArgs(args);
+		//config.enhanceWith(Starter.processArgs(args));
+		spcnt	= (Integer)argmap.get("spcnt");
+		platformcnt	= (Integer)argmap.get("platformcnt");
+		personcnt	= (Integer)argmap.get("personcnt");
+		fixedname	= (Boolean)argmap.get("fixedname");
 		
 		if(spcnt!=0)
 		{
 			// When using SSPs -> disable awareness.
 			config.setAwareness(false);
-			createRelayAndSSPs(config);
+			createRelayAndSSPs(config, args);
 		}
 
 		if(spcnt>0)
 		{
-			createSPs(config, spcnt);
+			createSPs(config, spcnt, args);
 		}
 		
 		IExternalAccess[]	platforms	= null;
 		if(platformcnt>0)
 		{
-			platforms	= createHelplinePlatforms(config, platformcnt);			
+			platforms	= createHelplinePlatforms(config, platformcnt, args);			
 		}
 		
 		createOutputFile();
@@ -103,12 +110,12 @@ public class HelplineEvaluation
 		{
 			if(spcnt<0)
 			{
-				createSPs(config, -spcnt);
+				createSPs(config, -spcnt, args);
 			}
 			
 			if(platformcnt<0)
 			{
-				platforms	= createHelplinePlatforms(config, -platformcnt);			
+				platforms	= createHelplinePlatforms(config, -platformcnt, args);			
 			}
 
 			while(getProcessCpuLoad()>0.1)
@@ -123,7 +130,7 @@ public class HelplineEvaluation
 //				System.out.println("+++ GC due to mem "+((int)(memfree*100))/100+"%");
 //				System.gc();
 //			}
-			long creation = createPersons(platforms, personcnt);
+			long creation = createPersons(platforms, personcnt, args);
 
 			// Wait until background processes have settled.
 			while(getProcessCpuLoad()>0.1)
@@ -168,7 +175,7 @@ public class HelplineEvaluation
 	 *  @param args	The program arguments.
 	 *  @return	The parsed platform configuration.
 	 */
-	protected static IPlatformConfiguration parseArgs(String[] args)
+	protected static IPlatformConfiguration getConfig(String[] args)
 	{
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 //		config.setLogging(true);
@@ -182,12 +189,6 @@ public class HelplineEvaluation
 		config.setValue("platformcnt", platformcnt);
 		config.setValue("personcnt", personcnt);
 		config.setValue("fixedname", fixedname);
-		config.enhanceWith(Starter.processArgs(args));
-		spcnt	= (Integer) config.getArgs().get("spcnt");
-		platformcnt	= (Integer) config.getArgs().get("platformcnt");
-		personcnt	= (Integer) config.getArgs().get("personcnt");
-		fixedname	= (Boolean) config.getArgs().get("fixedname");
-
 		config.setRelayTransport(spcnt!=0);	
 		config.setSuperpeerClient(spcnt!=0);
 
@@ -198,7 +199,7 @@ public class HelplineEvaluation
 	 *  Create a local relay and SSP platforms
 	 *  @param config	The platform config.
 	 */
-	protected static void createRelayAndSSPs(IPlatformConfiguration config)
+	protected static void createRelayAndSSPs(IPlatformConfiguration config, String[] args)
 	{
 		IPlatformConfiguration relayconf	= createConfig();
 		relayconf.enhanceWith(config);
@@ -215,21 +216,21 @@ public class HelplineEvaluation
 		sspconf.setSupersuperpeer(true);
 		sspconf.setSuperpeerClient(false);		
 		sspconf.setPlatformName("ssp1");
-		Starter.createPlatform(sspconf).get();
+		Starter.createPlatform(sspconf, args).get();
 		
 		sspconf	= createConfig();
 		sspconf.enhanceWith(config);
 		sspconf.setSupersuperpeer(true);
 		sspconf.setSuperpeerClient(false);
 		sspconf.setPlatformName("ssp2");
-		Starter.createPlatform(sspconf).get();
+		Starter.createPlatform(sspconf, args).get();
 		
 		sspconf	= createConfig();
 		sspconf.enhanceWith(config);
 		sspconf.setSupersuperpeer(true);
 		sspconf.setSuperpeerClient(false);
 		sspconf.setPlatformName("ssp3");
-		Starter.createPlatform(sspconf).get();
+		Starter.createPlatform(sspconf, args).get();
 	}
 	
 	/**
@@ -237,13 +238,13 @@ public class HelplineEvaluation
 	 *  @param config	The platform config.
 	 *  @param cnt	The number of platforms
 	 */
-	protected static void createSPs(IPlatformConfiguration config, int cnt)
+	protected static void createSPs(IPlatformConfiguration config, int cnt, String[] args)
 	{
 		IPlatformConfiguration spconf	= createConfig();
 		spconf.enhanceWith(config);
 		spconf.setSuperpeerClient(false);
 		spconf.setSuperpeer(true);
-		createPlatforms(spconf, cnt, "SP");
+		createPlatforms(spconf, cnt, "SP", args);
 
 		numsps	+= cnt;
 	}
@@ -254,18 +255,16 @@ public class HelplineEvaluation
 	 *  @param cnt	The number of platforms
 	 *  @return The created platforms.
 	 */
-	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt)
+	protected static IExternalAccess[] createHelplinePlatforms(IPlatformConfiguration config, int cnt, String[] args)
 	{
 		IPlatformConfiguration helpconf	= createConfig();
 		helpconf.enhanceWith(config);
 		helpconf.setSuperpeer(false);
-		IExternalAccess[]	ret	= createPlatforms(helpconf, cnt, "helpline");
+		IExternalAccess[]	ret	= createPlatforms(helpconf, cnt, "helpline", args);
 		numplatforms	+= cnt;
 		
 		if(firstplatform==null)
-		{
 			firstplatform	= ret[0];
-		}
 		return ret;
 	}
 
@@ -275,7 +274,7 @@ public class HelplineEvaluation
 	 *  @param cnt	The number of platforms
 	 *  @return The created platforms.
 	 */
-	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type)
+	protected static IExternalAccess[] createPlatforms(IPlatformConfiguration config, int cnt, String type, String[] args)
 	{
 		config.setPlatformName(type+"_*");
 		System.out.println("Starting "+cnt+" "+type+" platforms.");
@@ -288,7 +287,7 @@ public class HelplineEvaluation
 			IPlatformConfiguration pconf	= createConfig();
 			pconf.enhanceWith(config);
 			pconf.setPlatformName(type+"_****");
-			fubar.addFuture(Starter.createPlatform(pconf));
+			fubar.addFuture(Starter.createPlatform(pconf, args));
 		}
 		platforms	= fubar.waitForResults().get().toArray(new IExternalAccess[cnt]);
 		long	end	= System.nanoTime();
@@ -302,7 +301,7 @@ public class HelplineEvaluation
 	 *  @param cnt	The number of components to create on each platform.
 	 *  @return	The time needed for creation as preformatted string.
 	 */
-	protected static long createPersons(IExternalAccess[] platforms, int cnt)
+	protected static long createPersons(IExternalAccess[] platforms, int cnt, String[] args)
 	{
 		FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
 		long start	= System.nanoTime();

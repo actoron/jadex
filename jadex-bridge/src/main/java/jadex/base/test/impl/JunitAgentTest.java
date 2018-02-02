@@ -13,16 +13,16 @@ import jadex.bridge.IExternalAccess;
  * Junit compatible test class to be extended either by agents that provide test results
  * or by separate classes that provide a name of an agent that provides test results using the constructor.
  */
-public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
-
+public abstract class JunitAgentTest extends ComponentTestLazyPlatform 
+{
 
     private IPlatformConfiguration config;
 
     /**
      * Empty constructor, will try to use this.getClass().getName() as Agent under test.
      */
-    public JunitAgentTest() {
-        super();
+    public JunitAgentTest() 
+    {
 //        Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
@@ -33,7 +33,8 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
      * Constructor.
      * @param clazz class (agent) to test
      */
-    public JunitAgentTest(Class clazz) {
+    public JunitAgentTest(Class<?> clazz) 
+    {
         this(clazz.getName() + ".class");
     }
 
@@ -41,7 +42,8 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
      * Constructor.
      * @param component class (agent) to test
      */
-    public JunitAgentTest(String component) {
+    public JunitAgentTest(String component) 
+    {
         super(extendWithClassIfNeeded(component), null);
         this.config = STest.getDefaultTestConfig();
     }
@@ -51,10 +53,10 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
      * Set platform config.
      * @param config
      */
-    public void setConfig(IPlatformConfiguration config) {
-        if (cms == null) {
+    public void setConfig(IPlatformConfiguration config) 
+    {
+        if (cms == null) 
             throw new IllegalStateException("Platform already started.");
-        }
         this.config = config;
     }
 
@@ -62,12 +64,14 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
      * Returns the platform config.
      * Can be overridden to apply special settings. 
      */
-    public IPlatformConfiguration getConfig() {
+    public IPlatformConfiguration getConfig() 
+    {
         return config;
     }
 
     @Override
-    public void runBare() {
+    public void runBare() 
+    {
         IExternalAccess platform = STest.createPlatform(getConfig());
         cms = STest.getCMS(platform);
         setPlatform(platform, cms);
@@ -76,7 +80,8 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
     }
 
     @Test
-    public void testComponent() {
+    public void testComponent() 
+    {
         fail("dummy test");
     }
 
@@ -85,7 +90,8 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform {
      * @param component
      * @return
      */
-    private static String extendWithClassIfNeeded(String component) {
+    private static String extendWithClassIfNeeded(String component) 
+    {
         return component.endsWith(".class") ? component : component + ".class";
     }
 }

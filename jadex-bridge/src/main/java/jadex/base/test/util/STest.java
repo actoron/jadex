@@ -12,18 +12,24 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+/**
+ * 
+ */
 public class STest {
 
-    public static IExternalAccess createPlatform() {
+    public static IExternalAccess createPlatform() 
+    {
         return createPlatform(getDefaultTestConfig());
     }
 
-    public static IExternalAccess createPlatform(IPlatformConfiguration config) {
+    public static IExternalAccess createPlatform(IPlatformConfiguration config) 
+    {
         IExternalAccess access = Starter.createPlatform(config).get();
         return access;
     }
 
-    public static IPlatformConfiguration getDefaultTestConfig() {
+    public static IPlatformConfiguration getDefaultTestConfig() 
+    {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT);
         config.setSecurity(true);
@@ -36,10 +42,12 @@ public class STest {
         return config;
     }
 
-    public static IComponentManagementService getCMS(IExternalAccess platform) {
+    public static IComponentManagementService getCMS(IExternalAccess platform) 
+    {
         IFuture<IComponentManagementService> fut = platform.scheduleStep(new IComponentStep<IComponentManagementService>() {
             @Override
-            public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
+            public IFuture<IComponentManagementService> execute(IInternalAccess ia) 
+            {
                 IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class);
                 return new Future<IComponentManagementService>(cms);
             }
@@ -48,7 +56,8 @@ public class STest {
         return cms;
     }
 
-    public static void terminatePlatform(IExternalAccess platform) {
+    public static void terminatePlatform(IExternalAccess platform) 
+    {
         platform.killComponent().get();
     }
 }

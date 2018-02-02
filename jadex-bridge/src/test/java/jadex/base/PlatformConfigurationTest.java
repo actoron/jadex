@@ -34,13 +34,13 @@ public class PlatformConfigurationTest
 	}
 
 
-	@Test
-	public void testParse()
-	{
-		IPlatformConfiguration config = Starter.processArgs(new String[]{"-gui", "false", "-rspublish", "true"});
-		assertTrue(config.getRsPublish());
-		assertFalse(config.getGui());
-	}
+//	@Test
+//	public void testParse()
+//	{
+//		IPlatformConfiguration config = Starter.processArgs(new String[]{"-gui", "false", "-rspublish", "true"});
+//		assertTrue(config.getRsPublish());
+//		assertFalse(config.getGui());
+//	}
 
 	@Test
 	public void testKernels()

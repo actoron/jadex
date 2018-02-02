@@ -98,11 +98,11 @@ public interface IStarterConfiguration
     /** The reserved platform parameters. Those are (usually) not handled by the root component. */
     public static final Set<String> RESERVED = PlatformConfigurationHandler.createReserved();
 
-    /**
-     *  Set the platform model.
-     *  @param model The model info of the platform.
-     */
-    public void setPlatformModel(IModelInfo model);
+//    /**
+//     *  Set the platform model.
+//     *  @param model The model info of the platform.
+//     */
+//    public void setPlatformModel(IModelInfo model);
 
     /**
      *  Get the platform name.
@@ -140,7 +140,6 @@ public interface IStarterConfiguration
      */
     public void setAutoShutdown(boolean value);
 
-    // todo: make classinfo
     /**
      *  Get the platform component.
      *  @return The platform component class.
@@ -148,7 +147,6 @@ public interface IStarterConfiguration
 //    public Class<?> getPlatformComponent();
     public ClassInfo getPlatformComponent();
 
-    // todo: make classinfo
     /**
      *  Set the platform component.
      *  @param value The platform component.
@@ -333,13 +331,13 @@ public interface IStarterConfiguration
      */
     public void setPrintExceptions(boolean printex);
     
-    /**
-     *  Parse an argument.
-     *  @param key The key.
-     *  @param strval The value.
-     *  @param value The object value.
-     */
-    public void parseArg(String key, String strval, Object value);
+//    /**
+//     *  Parse an argument.
+//     *  @param key The key.
+//     *  @param strval The value.
+//     *  @param value The object value.
+//     */
+//    public void parseArg(String key, String strval, Object value);
     
     /**
 	 *  Check the consistency.
@@ -357,5 +355,12 @@ public interface IStarterConfiguration
 	 *  @param key The key.
 	 *  @return The value.
 	 */
-	public Object getValue(String key);
+	public Object getValue(String key, IModelInfo model);
+	
+//	/**
+//	 *  Get a value per key.
+//	 *  @param key The key.
+//	 *  @return The value.
+//	 */
+//	public Object getValue(String key);
 }

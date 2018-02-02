@@ -277,13 +277,10 @@ public class Starter
 	 *  Create the platform.
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
-	 *  @deprecated since 3.0.7. Use other createPlatform methods instead.
 	 */
-	@Deprecated
 	public static IFuture<IExternalAccess> createPlatform(Map<String, String> args)
 	{
-		IPlatformConfiguration config = processArgs(args);
-		return createPlatform(config);
+		return createPlatform(null, (Map)args);
 	}
 	
 	/**
@@ -293,8 +290,16 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(String... args)
 	{
-		IPlatformConfiguration config = processArgs(args);
-		return createPlatform(config);
+		return createPlatform(null, parseArgs(args));
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(IPlatformConfiguration config)
+	{
+		return createPlatform(config, (Map<String,Object>)null);
 	}
 	
 	/**
@@ -303,7 +308,17 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform()
 	{
-		return createPlatform(PlatformConfigurationHandler.getDefault());
+		return createPlatform(null, (Map<String,Object>)null);
+	}
+	
+	/**
+	 *  Create the platform.
+	 *  @param config The PlatformConfiguration object.
+	 *  @return The external access of the root component.
+	 */
+	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final String[] args)
+	{
+		return createPlatform(pconfig, parseArgs(args));
 	}
 
 	/**
@@ -311,9 +326,13 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration config)
+	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final Map<String, Object> args)
 	{
-		if (config.getStarterConfig().isDropPrivileges())
+		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
+		
+		//config.setReadOnly(true);
+		
+		if(config.getStarterConfig().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
 		
 		IRootComponentConfiguration rootconf = config.getRootConfig();
@@ -355,7 +374,7 @@ public class Starter
 			// after loading the first component model.
 			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
-			rootconf.setBootstrapFactory(cfac);
+			
 			// Hack: what to use as rid? should not have dependency to standalone.
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
 //				"org.activecomponents.jadex:jadex-standalone-launch:2.1");
@@ -369,8 +388,7 @@ public class Starter
 				ret.setException(new RuntimeException("Error loading model:\n"+model.getReport().getErrorText()));
 			}
 			else
-			{
-				config.setPlatformModel(model);
+			{		
 //				config.checkConsistency(); // todo?
 				Class<?> pc = config.getPlatformComponent().getType(cl);
 //				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
@@ -381,21 +399,24 @@ public class Starter
 				}
 				else
 				{
-					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
-					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
-					rootconf.setPlatformAccess(component);
-//					final IComponentInterpreter	interpreter	= cfac.createComponentInterpreter(model, component.getInternalAccess(), null).get(null); // No execution yet, can only work if method is synchronous.
-					
 					// Build platform name.
 					String pfname = config.getPlatformName();
 //					Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //					rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
 					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
 					if(IComponentIdentifier.LOCAL.get()==null)
-					{
 						IComponentIdentifier.LOCAL.set(cid);
-					}
-
+					
+					Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
+					final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
+					
+					/** Here */
+//					rootconf.setPlatformAccess(component);
+					putPlatformValue(cid, "$platformaccess", component);
+					putPlatformValue(cid, "$bootstrapfactory", cfac);
+//					rootconf.setBootstrapFactory(cfac);
+//					config.setPlatformModel(model);
+					
 					// Perform manual switch to allow users specify next call properties
 					ServiceCall sc = CallAccess.getCurrentInvocation();
 					ServiceCall scn = CallAccess.getNextInvocation();
@@ -433,9 +454,9 @@ public class Starter
 						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
 						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
 
-					putPlatformValue(cid, DATA_REALTIMETIMEOUT, config.getValue(DATA_REALTIMETIMEOUT));
+					putPlatformValue(cid, DATA_REALTIMETIMEOUT, config.getValue(DATA_REALTIMETIMEOUT, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
-					putPlatformValue(cid, DATA_PARAMETERCOPY, config.getValue(DATA_PARAMETERCOPY));
+					putPlatformValue(cid, DATA_PARAMETERCOPY, config.getValue(DATA_PARAMETERCOPY, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
 
 					putPlatformValue(cid, DATA_NETWORKNAMESCACHE, new TransformSet<String>());
@@ -467,7 +488,10 @@ public class Starter
 					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
 					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
 
-					ComponentCreationInfo cci = new ComponentCreationInfo(model, config.getConfigurationName(), rootconf.getArgs(), desc, null, null);
+					Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
+					if(args!=null)
+						argsmap.putAll(args);
+					ComponentCreationInfo cci = new ComponentCreationInfo(model, config.getConfigurationName(), argsmap, desc, null, null);
 					Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
@@ -482,7 +506,7 @@ public class Starter
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getValue(IRootComponentConfiguration.WELCOME)))
+									if(Boolean.TRUE.equals(config.getValue(IRootComponentConfiguration.WELCOME, model)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
@@ -1028,53 +1052,117 @@ public class Starter
 	 * @param args The command line arguments.
 	 * @return StarterConfiguration
 	 */
-	public static IPlatformConfiguration processArgs(String args)
+	public static Map<String, Object> parseArgs(String args)
 	{
-		return processArgs(args.split("\\s+"));
+		return parseArgs(args.split("\\s+"));
+	}
+	
+	/**
+	 *
+	 * @param args
+	 * @param config
+	 */
+	public static Map<String, Object> parseArgs(String[] args)
+	{
+		Map<String, Object> ret = new HashMap<String, Object>();
+		for(int i=0; args!=null && i < args.length; i+=2)
+		{
+			parseArg(args[i], args[i + 1], ret);
+		}
+		return ret;
 	}
 
 	/**
-	 * Create a platform configuration.
 	 *
-	 * @param args The command line arguments.
-	 * @return StarterConfiguration
+	 * @param okey
+	 * @param val
+	 * @param config
 	 */
-	public static IPlatformConfiguration processArgs(String[] args)
+	public static void parseArg(String okey, String val, Map<String, Object> vals)
 	{
-		IPlatformConfiguration config = PlatformConfigurationHandler.getPlatformConfiguration(args);
-		if(args != null)
-		{
-			for(int i = 0; args != null && i + 1 < args.length; i += 2)
+		String key = okey.startsWith("-") ? okey.substring(1) : okey;
+		Object value = val;
+//		if(!IStarterConfiguration.RESERVED.contains(key))
+//		{
+			// if not reserved, value is parsed and written to root config.
+			try
 			{
-				parseArg(args[i], args[i + 1], config);
+				value = SJavaParser.evaluateExpression(val, null);
 			}
-		}
-		config.getRootConfig().setProgramArguments(args);
+			catch(Exception e)
+			{
+				System.out.println("Argument parse exception using as string: " + key + " \"" + val + "\"");
+			}
+			vals.put(key, value);
+//			config.getRootConfig().setValue(key, value);
+//		}
 
-		return config;
+//		config.getStarterConfig().parseArg(key, val, value);
 	}
 
-	/**
-	 * Create a platform configuration.
-	 *
-	 * @param args The command line arguments.
-	 * @return StarterConfiguration
-	 * @deprecated since 3.0.7. Use other processArgs methods instead.
-	 */
-	@Deprecated
-	public static IPlatformConfiguration processArgs(Map<String, String> args)
-	{
-		IPlatformConfiguration config = PlatformConfigurationHandler.getPlatformConfiguration();
-		// ?! hmm needs to be passed as parameter also?
-		if(args != null)
-		{
-			for(Map.Entry<String, String> arg : args.entrySet())
-			{
-				parseArg(arg.getKey(), arg.getValue(), config);
-			}
-		}
-		return config;
-	}
+//	/**
+//	 * Create a platform configuration.
+//	 *
+//	 * @param args The command line arguments.
+//	 * @return StarterConfiguration
+//	 */
+//	public static IPlatformConfiguration processArgs(String[] args)
+//	{
+//		IPlatformConfiguration config = PlatformConfigurationHandler.getPlatformConfiguration(args);
+//		if(args != null)
+//		{
+//			for(int i = 0; args != null && i + 1 < args.length; i += 2)
+//			{
+//				parseArg(args[i], args[i + 1], config);
+//			}
+//		}
+//		config.getRootConfig().setProgramArguments(args);
+//
+//		return config;
+//	}
+	
+//	/**
+//	 * Create a platform configuration.
+//	 *
+//	 * @param args The command line arguments.
+//	 * @return StarterConfiguration
+//	 */
+//	public static IPlatformConfiguration processArgs(String[] args)
+//	{
+//		IPlatformConfiguration config = PlatformConfigurationHandler.getPlatformConfiguration(args);
+//		if(args != null)
+//		{
+//			for(int i = 0; args != null && i + 1 < args.length; i += 2)
+//			{
+//				parseArg(args[i], args[i + 1], config);
+//			}
+//		}
+//		config.getRootConfig().setProgramArguments(args);
+//
+//		return config;
+//	}
+
+//	/**
+//	 * Create a platform configuration.
+//	 *
+//	 * @param args The command line arguments.
+//	 * @return StarterConfiguration
+//	 * @deprecated since 3.0.7. Use other processArgs methods instead.
+//	 */
+//	@Deprecated
+//	public static IPlatformConfiguration processArgs(Map<String, String> args)
+//	{
+//		IPlatformConfiguration config = PlatformConfigurationHandler.getPlatformConfiguration();
+//		// ?! hmm needs to be passed as parameter also?
+//		if(args != null)
+//		{
+//			for(Map.Entry<String, String> arg : args.entrySet())
+//			{
+//				parseArg(arg.getKey(), arg.getValue(), config);
+//			}
+//		}
+//		return config;
+//	}
 
 	// public static void parseArg(String key, String stringValue,
 	// PlatformConfiguration config) {
@@ -1100,44 +1188,6 @@ public class Starter
 //		parseArg(key, val, this);
 //	}
 
-	/**
-	 *
-	 * @param args
-	 * @param config
-	 */
-	public static void parseArgs(String[] args, IPlatformConfiguration config)
-	{
-		for(int i = 0; args != null && i < args.length; i += 2)
-		{
-			parseArg(args[i], args[i + 1], config);
-		}
-	}
-
-	/**
-	 *
-	 * @param okey
-	 * @param val
-	 * @param config
-	 */
-	public static void parseArg(String okey, String val, IPlatformConfiguration config)
-	{
-		String key = okey.startsWith("-") ? okey.substring(1) : okey;
-		Object value = val;
-		if(!IStarterConfiguration.RESERVED.contains(key))
-		{
-			// if not reserved, value is parsed and written to root config.
-			try
-			{
-				value = SJavaParser.evaluateExpression(val, null);
-			}
-			catch(Exception e)
-			{
-				System.out.println("Argument parse exception using as string: " + key + " \"" + val + "\"");
-			}
-			config.getRootConfig().setValue(key, value);
-		}
-
-		config.getStarterConfig().parseArg(key, val, value);
-	}
+	
 }
 

@@ -32,4 +32,16 @@ public interface IPlatformConfiguration extends IStarterConfiguration, IRootComp
 	 *  Clone this configuration.
 	 */
 	public IPlatformConfiguration clone();
+	
+	/**
+	 *  Set the readonly state.
+	 *  @param readonly The readonly state.
+	 */
+	public void setReadOnly(boolean readonly);
+	
+	/**
+	 *  Get the readonly state.
+	 *  @return The readonly state.
+	 */
+	public boolean isReadOnly();
 }
