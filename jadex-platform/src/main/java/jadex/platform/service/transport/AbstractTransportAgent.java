@@ -392,14 +392,13 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				public void customResultAvailable(final byte[] ebheader) throws Exception
 				{
 					VirtualConnection handler = getVirtualConnection(getTarget(header));
-					Con con	= handler.getConnection();
-					if(handler==null || con==null)
+					if(handler==null ||  handler.getConnection()==null)
 					{
 						ret.setException(new RuntimeException("No connection to " + getTarget(header)));
 					}
 					else
 					{
-						trySend(con, handler, ebheader);
+						trySend(handler.getConnection(), handler, ebheader);
 					}
 				}
 

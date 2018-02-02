@@ -425,7 +425,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public static IPlatformConfiguration getPlatformConfiguration(String[] args)
 	{
-		return getPlatformConfiguration(args, null);
+		return getPlatformConfiguration(args, Thread.currentThread().getContextClassLoader());
 	}
 	
 	/**
