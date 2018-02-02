@@ -90,14 +90,14 @@ public class JavaThreadPool implements IThreadPool
 				{
 					try
 					{
-						executor.awaitTermination(10000, TimeUnit.SECONDS);
+						executor.awaitTermination(10000, TimeUnit.MILLISECONDS);	// Hack???
 					}
 					catch(Exception e)
 					{
 					}
 					notifyFinishListeners();
 				}
-			});
+			}).start();
 		}
 	}
 	
