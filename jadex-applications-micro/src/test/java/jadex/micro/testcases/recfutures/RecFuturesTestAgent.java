@@ -41,7 +41,7 @@ import jadex.micro.annotation.Results;
 import jadex.micro.testcases.RemoteTestBaseAgent;
 
 /**
- *  !!! unfinished !!!
+ *  !!! outdated, only applies to Jadex pre v3, no support in current Jadex planned !!!
  * 
  *  This test case is a first check if future in future results
  *  could possible made to work.
