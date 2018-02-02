@@ -1,5 +1,6 @@
 package jadex.commons.concurrent.java5;
 
+import java.lang.management.ManagementFactory;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
@@ -7,6 +8,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import jadex.commons.SUtil;
 
@@ -20,6 +26,9 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 {
 	/** Print debug messages */
 	protected static final boolean DEBUG = false;
+	
+	/** If true, be more aggressive when creating threads. */
+	protected static final boolean AGGRESSIVE = true;
 	
 	/** Threshold for activating monitoring. */
 	protected static final int MONIT_THRESHOLD = Runtime.getRuntime().availableProcessors();
@@ -51,6 +60,12 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	/** The monitoring thread. */
 	protected Thread monitthread;
 	
+	/** Bean server for monitoring CPU load. */
+	protected MBeanServer beanserver;
+	
+	/** CPU load attribute name. */
+	protected ObjectName cpuloadname;
+	
 	/** 
 	 *  Lock used if the monitoring thread should wait before next round,
 	 *  This is set released manually for borrowing events, so a replacement
@@ -65,6 +80,18 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	{
 		super(BASE_TCNT, BASE_TCNT,
 			  Long.MAX_VALUE, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+		
+		if (AGGRESSIVE)
+		{
+			try
+			{
+				beanserver = ManagementFactory.getPlatformMBeanServer();
+			    cpuloadname = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			}
+			catch (Exception e)
+			{
+			}
+		}
 		
 		idle = new AtomicInteger(BASE_TCNT);
 		
@@ -135,6 +162,10 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					
 					int borrowed = 0;
 					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
+					
+					if (AGGRESSIVE && getProcessCpuLoad() < 0.9)
+						thres = thres >>> (getQueue().size() / MONIT_THRESHOLD);
+					
 					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
 					for (int i = 0; i < threads.length; ++i)
 					{
@@ -146,7 +177,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 								if ((thread.getDeparture() < thres && thread.isBlocked()) ||
 									 thread.getDeparture() < thresbusy)
 								{
-									borrow(thread);
+									borrowNoUnpark(thread);
 									if (DEBUG)
 										System.out.println(SUtil.getStackTraceString("Thread stolen: " + thread, thread.getStackTrace()));
 								}
@@ -245,19 +276,65 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 	 */
 	protected void borrow(MonitoredThread thread)
 	{
-		thread.borrowed = true;
-		releaseLock(monitoringlock);
+		borrowNoUnpark(thread);
 		LockSupport.unpark(monitthread);
 		if (DEBUG)
 			System.out.println("Borrowed: " + thread + " " + thread.getNumber());
 	}
 	
+	/**
+	 *  Borrows the thread without unparking.
+	 * @param thread Thre thread being borrowed.
+	 */
+	protected void borrowNoUnpark(MonitoredThread thread)
+	{
+		thread.borrowed = true;
+		releaseLock(monitoringlock);
+	}
+	
+	/**
+	 *  Gets the current CPU load.
+	 * @return
+	 * @throws Exception
+	 */
+	public double getProcessCpuLoad()
+	{
+		double ret = -1.0;
+	    
+		if (cpuloadname != null)
+		{
+			try
+			{
+				AttributeList list = beanserver.getAttributes(cpuloadname, new String[]{ "ProcessCpuLoad" });
+			    
+			    if(!list.isEmpty())
+				    ret = (Double) ((Attribute)list.get(0)).getValue();
+			}
+			catch (Exception e)
+			{
+			}
+		}
+	    
+		System.out.println("### cpu: "+ret);
+	    
+	    return ret;
+	}
+	
+	/**
+	 *  Releases the semaphore, includes null check.
+	 *  @param lock The lock.
+	 */
 	protected static final void releaseLock(Semaphore lock)
 	{
 		if (lock != null)
 			lock.release();
 	}
 	
+	/**
+	 *  Gets the current MonitoredThread, for convenience.
+	 *  
+	 *  @return Current MonitoredThread.
+	 */
 	protected static final MonitoredThread currentThread()
 	{
 		return (MonitoredThread) Thread.currentThread();
