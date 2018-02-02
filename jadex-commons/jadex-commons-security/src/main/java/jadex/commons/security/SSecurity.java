@@ -185,12 +185,14 @@ public class SSecurity
 //							bcount += ret.length;
 //							System.out.println("Entropy bytes: " + bcount);
 							boolean noseed = true;
+							boolean urandomworked = false;
 							if (urandomis != null)
 							{
 								try
 								{
 									SUtil.readStream(ret, urandomis);
 									noseed = false;
+									urandomworked = true;
 								}
 								catch (Exception e)
 								{
@@ -237,6 +239,14 @@ public class SSecurity
 								// Fallback to Java if nothing works.
 								ret = SecureRandom.getSeed(ret.length);
 							}
+							else
+							{
+								if (!urandomworked)
+								{
+									byte[] addent = SecureRandom.getSeed(ret.length);
+									xor(ret, addent);
+								}
+							}
 						}
 						
 						protected void finalize() throws Throwable
@@ -246,15 +256,7 @@ public class SSecurity
 						}
 					};
 					
-					ENTROPY_SOURCE = new IEntropySource()
-					{
-						public synchronized void getEntropy(byte[] bytes)
-						{
-							byte[] addent = SecureRandom.getSeed(bytes.length);
-							basicsource.getEntropy(bytes);
-							xor(bytes, addent);
-						}
-					};
+					ENTROPY_SOURCE = basicsource;
 				}
 			}
 		}
