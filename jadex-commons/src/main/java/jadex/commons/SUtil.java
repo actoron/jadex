@@ -1237,7 +1237,7 @@ public class SUtil
 	 * @return The input stream for the resource or null when the resource was
 	 *         not found.
 	 */
-	public synchronized static InputStream getResource0(String name, ClassLoader classloader)
+	public static InputStream getResource0(String name, ClassLoader classloader)
 	{
 		InputStream is = null;
 		File file;
@@ -1299,7 +1299,7 @@ public class SUtil
 	 * @return The info object for the resource or null when the resource was
 	 *         not found.
 	 */
-	public synchronized static ResourceInfo getResourceInfo0(String name, ClassLoader classloader)
+	public static ResourceInfo getResourceInfo0(String name, ClassLoader classloader)
 	{
 		ResourceInfo ret = null;
 		File file;
@@ -1430,9 +1430,12 @@ public class SUtil
 							? name.substring(1) : name);
 						URLConnection con = url.openConnection();
 						con.setDefaultUseCaches(false); // See Java Bug ID 4386865
-						for(int i=0; ret==null && i<RESOURCEINFO_MAPPERS.length; i++)
+						synchronized(SUtil.class)
 						{
-							ret	= RESOURCEINFO_MAPPERS[i].execute(con);
+							for(int i=0; ret==null && i<RESOURCEINFO_MAPPERS.length; i++)
+							{
+								ret	= RESOURCEINFO_MAPPERS[i].execute(con);
+							}
 						}
 					}
 					catch(IOException e)
