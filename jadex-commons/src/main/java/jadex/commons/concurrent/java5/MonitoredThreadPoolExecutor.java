@@ -140,7 +140,7 @@ public class MonitoredThreadPoolExecutor extends ThreadPoolExecutor
 					long thres = System.currentTimeMillis() - LOSS_THRESHOLD;
 					
 					if (AGGRESSIVE)
-						thres = thres / (getQueue().size() / MONIT_THRESHOLD + 1);
+						thres = thres >>> Math.max(((getQueue().size() / MONIT_THRESHOLD) - 1), 0);
 					
 					long thresbusy = System.currentTimeMillis() - LOSS_THRESHOLD_BUSY;
 					for (int i = 0; i < threads.length; ++i)
