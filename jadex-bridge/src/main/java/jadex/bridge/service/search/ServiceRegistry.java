@@ -1371,9 +1371,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		Set<ServiceQueryInfo<IService>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceIdentifier().getServiceType().toString());
 		Set<ServiceQueryInfo<IService>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
 		Set<ServiceQueryInfo<IService>> sqis = r1;
-		if(sqis!=null)
-			sqis.addAll(r2);
-		else
+		if(sqis!=null && r2!=null)
+			sqis.addAll(r2);	// safe because indexer returns copy
+		else if(r2!=null)
 			sqis=r2;
 		
 //		if(removed)
