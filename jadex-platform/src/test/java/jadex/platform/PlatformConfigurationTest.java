@@ -77,9 +77,11 @@ public class PlatformConfigurationTest
 					if (SReflect.isBasicType(setterParamType) && !SReflect.isBasicType(modelParamType)) {
 						setterParamType = SReflect.getWrappedType(setterParamType);
 					}
-					// this parameter has another parameter type in config object
+					// this parameters have another parameter type in config object (-> varargs)
 					if (!(name.equals(IRootComponentConfiguration.KERNELS)
-						|| name.equals(IRootComponentConfiguration.AWAMECHANISMS))) {
+						|| name.equals(IRootComponentConfiguration.AWAMECHANISMS)
+						|| name.equals(IRootComponentConfiguration.NETWORKNAME)
+						|| name.equals(IRootComponentConfiguration.NETWORKPASS))) {
 						assertEquals("Field " + name + " has not the same type.", modelParamType, setterParamType);
 					}
 					
