@@ -29,7 +29,7 @@ import jadex.micro.annotation.Results;
 @Arguments(@Argument(name = TagProperty.NAME, clazz = String.class, defaultvalue="null"))
 @NFProperties(@NFProperty(value = TagProperty.class))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-@Ignore
+@Ignore	// Todo: returns empty list instead of [null]
 public class NullTagAgent extends JunitAgentTest
 {
 	@Agent

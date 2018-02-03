@@ -9,8 +9,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -47,6 +45,7 @@ public class FirstAgent
 	{
 //		System.out.println("MY PLATFORM :" + ia.getComponentIdentifier().getPlatformName());
 		
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		Collection<IMessageService> services = (Collection)ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("MessageService").get();
 		IServiceIdentifier[] res = new IServiceIdentifier[services!=null? services.size(): 0];
 		if(services!=null)

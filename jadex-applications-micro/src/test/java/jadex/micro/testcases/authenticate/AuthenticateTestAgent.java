@@ -30,7 +30,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Ignore
+@Ignore	// Todo: test new role system
 public class AuthenticateTestAgent extends TestAgent
 {
 	/**
