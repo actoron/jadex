@@ -134,7 +134,7 @@ public final class NativeHelper implements INativeHelper
      */
 	public Class<?> defineClass(String name, byte[] b, ClassLoader loader)
 	{
-		name = name.replace('.', '/');
+		name = name!=null ? name.replace('.', '/') : null;
 		Class<?> ret = (Class<?>) invokeJni(JNI_DEFINECLASS_OFFSET, Object.class, name, loader, b, b.length);
 		return ret;
 	}
