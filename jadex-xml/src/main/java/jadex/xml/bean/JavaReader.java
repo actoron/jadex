@@ -932,9 +932,19 @@ public class JavaReader
 						}
 						catch(Exception e)
 						{
-							// Try find empty constructor
-							Constructor<?> con = cl.getConstructor(new Class<?>[0]);
-							ret = con.newInstance(new Object[0]);
+							try
+							{
+								// Try find empty constructor
+								Constructor<?> con = cl.getConstructor(new Class<?>[0]);
+								ret = con.newInstance(new Object[0]);
+							}
+							catch(Exception e2)
+							{
+								// Try private constructor for error exception (hack???)
+								Constructor<?> con = cl.getDeclaredConstructor(new Class<?>[0]);
+								con.setAccessible(true);
+								ret = con.newInstance(new Object[0]);
+							}
 						}
 						return ret;
 					}
