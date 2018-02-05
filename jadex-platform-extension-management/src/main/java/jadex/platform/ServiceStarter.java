@@ -165,10 +165,10 @@ public class ServiceStarter implements Daemon
 		if(platform==null)
 		{
 			IPlatformConfiguration	config	= getConfig();
-			config.setProgramArguments(args);
-			Starter.parseArgs(args, config);
+//			config.setProgramArguments(args);
+//			Starter.parseArgs(args, config);
 			
-			platform = Starter.createPlatform(config).get();
+			platform = Starter.createPlatform(config, args).get();
 		}		
 	}
 	

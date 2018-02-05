@@ -27,6 +27,9 @@ import jadex.javaparser.SJavaParser;
  */
 public class PlatformConfigurationHandler implements InvocationHandler
 {
+	/** Readonly flag. */
+	protected boolean readonly;
+	
 	/** The map of values. */
 	protected Map<String, Object> values = new HashMap<String, Object>();
 	
@@ -77,26 +80,38 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		// Convert class to name.
 		else if(mname.equals("addComponent") && args[0] instanceof Class<?>)
 		{
+			checkReadOnly();
 			((IStarterConfiguration)proxy).addComponent(((Class<?>)args[0]).getName()+".class");
+		}
+		else if(mname.equals("setReadOnly"))
+		{
+			readonly = ((Boolean)args[0]).booleanValue();
+		}
+		else if(mname.equals("isReadOnly"))
+		{
+			ret = readonly;
 		}
 		else if(mname.equals("setValue"))
 		{
+			checkReadOnly();
 			values.put((String)args[0], args[1]);
 		}
 		else if(mname.equals("getValue"))
 		{
 			ret = values.get(args[0]);
 		}
-		else if(mname.equals("parseArg"))
+//		else if(mname.equals("parseArg"))
+//		{
+//			checkReadOnly();
+//			parseArg((IPlatformConfiguration)proxy, (String)args[0], (String)args[1], args[2]);
+//		}
+		else if(mname.equals("getValues"))
 		{
-			parseArg((IPlatformConfiguration)proxy, (String)args[0], (String)args[1], args[2]);
-		}
-		else if(mname.equals("getArgs"))
-		{
-			ret = values;
+			ret = new HashMap<String, Object>(values);
 		}
 		else if(mname.equals("enhanceWith"))
 		{
+			checkReadOnly();
 			Map<String, Object>	other	= ((PlatformConfigurationHandler)ProxyFactory.getInvocationHandler(args[0])).values;
 	        for(Map.Entry<String, Object> entry : other.entrySet())
 	        {
@@ -117,10 +132,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		
 		else if(mname.startsWith("set"))
 		{
+			checkReadOnly();
 			values.put(getKeyForMethodname(mname, 3), args[0]);
 		}
 		else if(mname.startsWith("add"))
 		{
+			checkReadOnly();
 			String prop	= getKeyForMethodname(SUtil.getPlural(mname), 3);
 			Collection<Object> vals = (Collection<Object>)values.get(prop);
 			if(vals==null)
@@ -133,8 +150,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		else if(mname.startsWith("get") || method.getName().startsWith("has"))
 		{
 //			ret = values.get(getKeyForMethodname(mname, 3));
-			
-			ret = getValue(getKeyForMethodname(mname, 3));
+			ret = getValue(getKeyForMethodname(mname, 3), args.length>0? (IModelInfo)args[1]: null);
 		}
 		else if(method.getName().startsWith("is"))
 		{
@@ -142,6 +158,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		}
 		else if(mname.startsWith("remove"))
 		{
+			checkReadOnly();
 			String prop	= getKeyForMethodname(SUtil.getPlural(mname), 3);
 			Collection<Object> vals = (Collection<Object>)values.get(prop);
 			if(vals!=null)
@@ -158,6 +175,15 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		System.out.println("config: "+method.getName()+" "+hashCode()+" "+method.getDeclaringClass());
 		
 		return ret;
+	}
+	
+	/**
+	 *  Check the readonly state.
+	 */
+	protected void checkReadOnly()
+	{
+		if(readonly)
+			throw new RuntimeException("Config is readonly");
 	}
 	
 	/**
@@ -244,6 +270,43 @@ public class PlatformConfigurationHandler implements InvocationHandler
     }
     
     // for starter
+//    /**
+//     * Generic getter for configuration parameters.
+//     * Retrieves values in 3 stages:
+//     * 1. From given command line arguments.
+//     * 2. From given model configuration ("auto", "fixed", ...)
+//     * 3. From model default values.
+//     *
+//     * For retrieval from model, setPlatformModel has to be called before.
+//     * @param key
+//     * @return
+//     */
+//    protected Object getValue(String key) 
+//    {
+//        Object val = values.get(key);
+//        if(val==null && getModel()!= null && getConfigurationInfo(getModel()) != null)
+//        {
+//            val = getArgumentValueFromModel(key);
+//        }
+//        else if(val instanceof String)
+//        {
+//            // Try to parse value from command line.
+//            try
+//            {
+//                Object newval = SJavaParser.evaluateExpression((String)val, null);
+//                if(newval!=null)
+//                {
+//                    val	= newval;
+//                }
+//            }
+//            catch(RuntimeException e)
+//            {
+//            }
+//        }
+//
+//        return val;
+//    }
+    
     /**
      * Generic getter for configuration parameters.
      * Retrieves values in 3 stages:
@@ -255,12 +318,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
      * @param key
      * @return
      */
-    protected Object getValue(String key) 
+    protected Object getValue(String key, IModelInfo model) 
     {
         Object val = values.get(key);
-        if(val==null && getModel()!= null && getConfigurationInfo(getModel()) != null)
+        if(val==null && getModel()!= null && getConfigurationInfo(getConfigurationName(), model) != null)
         {
-            val = getArgumentValueFromModel(key);
+            val = getArgumentValueFromModel(key, model);
         }
         else if(val instanceof String)
         {
@@ -281,6 +344,36 @@ public class PlatformConfigurationHandler implements InvocationHandler
         return val;
     }
     
+//    /**
+//     * 
+//     */
+//    public static Object getValue(String key, IPlatformConfiguration config, IModelInfo model)
+//    {
+//    	 Object val = config.getValue(key);
+//    	 String configname = config.getConfigurationName();
+//         if(val==null && model!= null && getConfigurationInfo(configname, model) != null)
+//         {
+//             val = getArgumentValueFromModel(key, model);
+//         }
+//         else if(val instanceof String)
+//         {
+//             // Try to parse value from command line.
+//             try
+//             {
+//                 Object newval = SJavaParser.evaluateExpression((String)val, null);
+//                 if(newval!=null)
+//                 {
+//                     val	= newval;
+//                 }
+//             }
+//             catch(RuntimeException e)
+//             {
+//             }
+//         }
+//
+//         return val;
+//    }
+    
     /**
      * 
      */
@@ -289,12 +382,38 @@ public class PlatformConfigurationHandler implements InvocationHandler
     	return (IModelInfo)values.get("platformmodel");
     }
     
+//    /**
+//     *  Get the configuration name.
+//     */
+//    protected ConfigurationInfo	getConfigurationInfo(IModelInfo model)
+//    {
+//        String	configname	= getConfigurationName();//(String)cmdargs.get(CONFIGURATION_NAME);
+//        if(configname==null)
+//        {
+//            Object	val	= null;
+//            IArgument	arg	= model.getArgument(IStarterConfiguration.CONFIGURATION_NAME);
+//            if(arg!=null)
+//            {
+//                val	= arg.getDefaultValue();
+//            }
+//            val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
+////			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
+//            configname	= val!=null ? val.toString() : null;
+//        }
+//
+//        ConfigurationInfo	compConfig	= configname!=null
+//                ? model.getConfiguration(configname)
+//                : model.getConfigurations().length>0 ? model.getConfigurations()[0] : null;
+//
+//        return compConfig;
+//    }
+    
     /**
      *  Get the configuration name.
      */
-    protected ConfigurationInfo	getConfigurationInfo(IModelInfo model)
+    public static ConfigurationInfo	getConfigurationInfo(String configname, IModelInfo model)
     {
-        String	configname	= getConfigurationName();//(String)cmdargs.get(CONFIGURATION_NAME);
+       // String	configname	= getConfigurationName();//(String)cmdargs.get(CONFIGURATION_NAME);
         if(configname==null)
         {
             Object	val	= null;
@@ -323,20 +442,57 @@ public class PlatformConfigurationHandler implements InvocationHandler
         return (String)values.get(IStarterConfiguration.CONFIGURATION_NAME);
     }
     
+//    /**
+//     * 
+//     * @param name
+//     * @return
+//     */
+//    protected Object getArgumentValueFromModel(String name)
+//    {
+//        Object val = null;
+//
+//        boolean	found	= false;
+//        // first try to get the value from choosen configuration
+//        if(getConfigurationInfo(getModel())!=null)
+//        {
+//            UnparsedExpression[]	upes	= getConfigurationInfo(getModel()).getArguments();
+//            for(int i=0; !found && i<upes.length; i++)
+//            {
+//                if(name.equals(upes[i].getName()))
+//                {
+//                    found	= true;
+//                    val	= upes[i];
+//                }
+//            }
+//        }
+//        // if this fails, get default value.
+//        if(!found)
+//        {
+//            IArgument arg	= getModel().getArgument(name);
+//            if(arg!=null)
+//            {
+//                val	= arg.getDefaultValue();
+//            }
+//        }
+//        val	= SJavaParser.getParsedValue(val, getModel().getAllImports(), null, Starter.class.getClassLoader());
+////		val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
+//        return val;
+//    }
+    
     /**
      * 
      * @param name
      * @return
      */
-    protected Object getArgumentValueFromModel(String name)
+    public static Object getArgumentValueFromModel(String name, IModelInfo model)
     {
         Object val = null;
 
         boolean	found	= false;
         // first try to get the value from choosen configuration
-        if(getConfigurationInfo(getModel())!=null)
+        if(getConfigurationInfo(name, model)!=null)
         {
-            UnparsedExpression[]	upes	= getConfigurationInfo(getModel()).getArguments();
+            UnparsedExpression[]	upes	= getConfigurationInfo(name, model).getArguments();
             for(int i=0; !found && i<upes.length; i++)
             {
                 if(name.equals(upes[i].getName()))
@@ -349,13 +505,11 @@ public class PlatformConfigurationHandler implements InvocationHandler
         // if this fails, get default value.
         if(!found)
         {
-            IArgument arg	= getModel().getArgument(name);
+            IArgument arg	= model.getArgument(name);
             if(arg!=null)
-            {
                 val	= arg.getDefaultValue();
-            }
         }
-        val	= SJavaParser.getParsedValue(val, getModel().getAllImports(), null, Starter.class.getClassLoader());
+        val	= SJavaParser.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
 //		val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
         return val;
     }
@@ -419,26 +573,26 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		return ret;
 	}
 	
-	/**
-	 *  Get the default platform configuration.
-	 *  @return The default configuration.
-	 */
-	public static IPlatformConfiguration getPlatformConfiguration(String[] args)
-	{
-		return getPlatformConfiguration(args, Thread.currentThread().getContextClassLoader());
-	}
-	
-	/**
-	 *  Get the default platform configuration.
-	 *  @param cl The classloader.
-	 *  @return The default configuration.
-	 */
-	public static IPlatformConfiguration getPlatformConfiguration(String[] args, ClassLoader cl)
-	{
-		IPlatformConfiguration ret = (IPlatformConfiguration)ProxyFactory.newProxyInstance(cl, new Class[]{IPlatformConfiguration.class}, new PlatformConfigurationHandler());
-		ret.setProgramArguments(args);
-		return ret;
-	}
+//	/**
+//	 *  Get the default platform configuration.
+//	 *  @return The default configuration.
+//	 */
+//	public static IPlatformConfiguration getPlatformConfiguration(String[] args)
+//	{
+//		return getPlatformConfiguration(args, null);
+//	}
+//	
+//	/**
+//	 *  Get the default platform configuration.
+//	 *  @param cl The classloader.
+//	 *  @return The default configuration.
+//	 */
+//	public static IPlatformConfiguration getPlatformConfiguration(String[] args, ClassLoader cl)
+//	{
+//		IPlatformConfiguration ret = (IPlatformConfiguration)ProxyFactory.newProxyInstance(cl, new Class[]{IPlatformConfiguration.class}, new PlatformConfigurationHandler());
+//		ret.setProgramArguments(args);
+//		return ret;
+//	}
 	
 	/**
 	 * 

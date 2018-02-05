@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
@@ -256,13 +257,16 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			args = newargs;
 		}
 		
-		IPlatformConfiguration conf = Starter.processArgs(args);
+		IPlatformConfiguration conf = PlatformConfigurationHandler.getDefault();
+//		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
 		this.timeout	= conf.getLocalDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
-		if (tests != null) {
-			for (int i = 0; i < tests.length; i++) {
+		if (tests != null) 
+		{
+			for (int i = 0; i < tests.length; i++) 
+			{
 				tests[i] = tests[i].replace('.', File.separatorChar);
 			}
 		}
@@ -270,7 +274,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		// Tests must be available after constructor execution.
 
 //		System.out.println("start platform");
-		platform	= Starter.createPlatform(conf).get();
+		platform	= Starter.createPlatform(conf, args).get();
 //		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
