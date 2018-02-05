@@ -202,6 +202,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 						String[]	progargs	= (String[])rootargs.get(IRootComponentConfiguration.PROGRAM_ARGUMENTS);
 						String[]	defargs	= new String[]
 						{
+//							"-logging", "true",
 //							"-libpath", url,
 							"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 							"-saveonexit", "false",
@@ -213,7 +214,6 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 							"-simulation", "false",
 							"-printpass", "false",
 							"-superpeerclient", "false"
-//							"-logging", "true",
 ////							"-relaytransport", "false",
 //							"-gui", "false", "-usepass", "false", "-simulation", "false"
 //							"-binarymessages", "false",

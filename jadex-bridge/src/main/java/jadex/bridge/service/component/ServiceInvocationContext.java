@@ -597,6 +597,8 @@ public class ServiceInvocationContext
 			method.remove(method.size()-1);
 			arguments.remove(arguments.size()-1);
 			Object res = this.result.remove(this.result.size()-1);
+			if(res==null)
+				System.out.println("result nulls");
 			result.set(result.size()-1, res);
 		}
 	}

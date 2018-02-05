@@ -21,13 +21,12 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  Allow calling a method only from an authenticated user.
 	 */
-//	@Authenticated(names={"VSISSTAFF17", "Alex-PC-neu", "Lars-PC", "willi", "hans"})
 	@Authenticated(virtuals="testuser")
 	public IFuture<Void> method(String msg)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-//		System.out.println("Called method: "+msg+" "+sc.getTimeout()
-//			+" "+sc.isRealtime()+" "+sc.getProperties());
+		System.out.println("Called method: "+msg+" "+sc.getTimeout()
+			+" "+sc.isRealtime()+" "+sc.getProperties());
 		return IFuture.DONE;
 	}
 }

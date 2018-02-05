@@ -83,7 +83,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	 */
 	public IFuture<Void> execute(final ServiceInvocationContext context)
 	{
-		final Future<Void> ret = new Future<Void>();
+//		final Future<Void> ret = new Future<Void>();
 		
 //		if(send)
 //		{
@@ -106,7 +106,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 //			});
 //		}
 		
-		return ret;
+		return context.invoke();
 	}
 	
 	/**
