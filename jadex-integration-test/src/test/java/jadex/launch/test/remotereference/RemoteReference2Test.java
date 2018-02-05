@@ -5,11 +5,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.SUtil;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
@@ -25,30 +26,15 @@ public class RemoteReference2Test //extends TestCase
 	{
 		long timeout	= Starter.getLocalDefaultTimeout(null);
 		
-		// Underscore in platform name assures both platforms use same password.
-		String	pid	= SUtil.createPlainRandomId(name.getMethodName(), 3)+"-*";
-		
 		// Start platform1 used for remote access.
-		final IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", pid,
-//			"-relaytransport", "false",
-//			"-deftimeout", Long.toString(timeout),
-//			"-logging", "true",
-//			"-deftimeout", "-1",
-			"-superpeerclient", "false",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-			}).get(timeout);
+		final IExternalAccess	platform1	= Starter.createPlatform(STest.getDefaultTestConfig()).get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
 		// Start platform2 with services.
-		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", pid,
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-//			"-relaytransport", "false",
-//			"-deftimeout", Long.toString(timeout),
-//			"-logging", "true",
-//			"-deftimeout", "-1",
-			"-superpeerclient", "false",
-			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class",
-			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
+		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
+		config2.addComponent(SearchServiceProviderAgent.class);		
+		config2.addComponent(LocalServiceProviderAgent.class);		
+		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		
 		// Connect platforms by creating proxy agents.
 		Starter.createProxy(platform1, platform2).get(timeout);

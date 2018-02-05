@@ -3,7 +3,9 @@ package jadex.launch.test.remotereference;
 import org.junit.Assert;
 import org.junit.Test;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -23,26 +25,20 @@ public class RemoteReferenceTest //extends TestCase
 	{
 		long timeout = Starter.getLocalDefaultTimeout(null);
 		
-		// Start platform1 with local service. (underscore in name assures both platforms use same password)
-		final IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
-			"-gui", "false",
-//			"-logging", "true",
-			"-awareness", "false", "-printpass", "false",
-			"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
-			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
+		// Start platform1 with local service.
+		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
+		config1.addComponent(LocalServiceProviderAgent.class);
+		final IExternalAccess	platform1	= Starter.createPlatform(config1).get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
 		// Find local service (as local provided service proxy).
 		ILocalService	service1	= SServiceProvider
 			.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
 		
-		// Start platform2 with (remote) search service. (underscore in name assures both platforms use same password)
-		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
-//			"-logging", "true",
-			"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
-			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(timeout);
+		// Start platform2 with (remote) search service.
+		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
+		config2.addComponent(SearchServiceProviderAgent.class);
+		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		
 		// Connect platforms by creating proxy agents.
 		Starter.createProxy(platform1, platform2).get(timeout);
