@@ -7,6 +7,9 @@ package jadex.commons.future;
  */
 public class ErrorException extends Exception
 {
+	// Hack for XML reader
+	private ErrorException() {}
+	
 	/**
 	 *  Create an error exception.
 	 */

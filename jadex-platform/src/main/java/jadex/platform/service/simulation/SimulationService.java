@@ -517,6 +517,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Advancing clock");
 				if(getClockService().advanceEvent())
 				{
+//					System.out.println("Advanced clock");
 					if(idlelistener==null)
 						idlelistener	= new IdleListener();
 					getExecutorService().getNextIdleFuture().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(idlelistener));
@@ -543,6 +544,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 											// Resume execution if still executing.
 											if(MODE_NORMAL.equals(mode) && executing)
 											{
+//												System.out.println("Schedule advancing clock");
 												scheduleAdvanceClock();
 											}
 											return IFuture.DONE;
@@ -600,7 +602,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		 */
 		public void resultAvailable(Object result)
 		{
-//			System.out.println("Executor idle");
+//			System.err.println("Executor idle");
 			if(executing && !outdated)
 			{
 				if(MODE_NORMAL.equals(mode) || MODE_TIME_STEP.equals(mode) || !continued)

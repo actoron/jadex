@@ -3,6 +3,7 @@ package jadex.micro.testcases.blocking;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -10,6 +11,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -49,8 +52,10 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 	{
 		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();
 		
+//		System.out.println("Calling perform steps: "+SServiceProvider.getLocalService(agent, IClockService.class).getTime());
 		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+//		System.out.println("Calling perform steps: "+SServiceProvider.getLocalService(agent, IClockService.class).getTime());
 		IIntermediateFuture<Integer>	second	= step.performSteps(3, 1000);
 
 		final List<Integer>	steps	= new ArrayList<Integer>();
@@ -78,4 +83,12 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", false, "Wrong steps: "+steps)}));
 		}
 	}
+//	
+//	@Override
+//	public IPlatformConfiguration getConfig()
+//	{
+//		IPlatformConfiguration	ret	= super.getConfig();
+//		ret.setLogging(true);
+//		return ret;
+//	}
 }

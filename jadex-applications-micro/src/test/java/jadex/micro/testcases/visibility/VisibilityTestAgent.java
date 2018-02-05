@@ -1,10 +1,11 @@
 package jadex.micro.testcases.visibility;
 
-import org.junit.Ignore;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
+
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -13,7 +14,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -31,7 +31,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-@Ignore
+@Ignore	// Todo: also finds remote service with publication scope platform
 public class VisibilityTestAgent extends JunitAgentTest
 {
 	@Agent
@@ -48,10 +48,12 @@ public class VisibilityTestAgent extends JunitAgentTest
 //		config.addComponent(SecondAgent.class.getName()+".class");
 //		final IExternalAccess plat = jadex.base.Starter.createPlatform(config).get();
 		final IExternalAccess plat = TestAgent.createPlatform(agent, null).get();// new String[]{"-component", FirstAgent.class.getName()+".class", "-component", SecondAgent.class.getName()+".class"}).get();
-		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null);
-		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null);
+		Starter.createProxy(agent.getExternalAccess(), plat).get();
+		Starter.createProxy(plat, agent.getExternalAccess()).get();
+		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();
+		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();
 		
-		IComponentManagementService cms = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class);
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);
 		ITuple2Future<IComponentIdentifier, Map<String, Object>> ag = cms.createComponent(FirstAgent.class.getName()+".class", new CreationInfo(null, args, agent.getModel().getResourceIdentifier()));

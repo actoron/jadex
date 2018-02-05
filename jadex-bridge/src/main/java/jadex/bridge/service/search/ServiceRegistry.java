@@ -96,7 +96,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public ServiceRegistry(IComponentIdentifier cid, long delay)
 	{
 		this.cid = cid;
-		this.rwlock = new ReentrantReadWriteLock(true);
+		this.rwlock = new ReentrantReadWriteLock(false);
 		this.indexer = new Indexer<IService>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<IService>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.delay = delay;

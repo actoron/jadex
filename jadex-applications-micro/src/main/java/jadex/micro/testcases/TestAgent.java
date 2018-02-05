@@ -22,7 +22,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -303,10 +302,12 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 														"-awareness", "false",
 														"-gui", "false",
 														"-cli", "false",
+														"-superpeerclient", "false",
+														"-superpeer", "false",
+														"-relaytransport", "false",
 														"-simulation", "false",
+														"-logging", "true",
 														"-printpass", "false"
-//							"-logging", "true",
-////							"-relaytransport", "false",
 //							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
 //							"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
 //							"-gui", "false", "-usepass", "false", "-simulation", "false"

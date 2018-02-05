@@ -101,7 +101,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		{
 //			new RuntimeException().printStackTrace(System.out);
 			added = queue.add(task);
-//			if(DEBUG)
+//			if(queue.toString().indexOf("simulation")!=-1)
 //				System.out.println("Task added: "+queue+", "+this.task);
 		}
 		
@@ -213,7 +213,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									try
 									{
 //										if(DEBUG)
-//											System.out.println("Executing task: "+task);
+//											System.out.println("Executing task: "+task+", "+this);
 										again = task.execute();
 									}
 									catch(Throwable e)
@@ -246,8 +246,8 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									}
 									
 									task = null;
-//									System.out.println("task finished: "+running+", "+queue.isEmpty());
-									if(state==State.RUNNING && queue.isEmpty())
+//									System.out.println("task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching());
+									if(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())
 									{
 										idf = idlefuture;
 										idlefuture = null;
@@ -255,7 +255,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									}
 
 									// Perform next task when queue is not empty and service is running.
-									again	= state==State.RUNNING && !queue.isEmpty();
+									again	= state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching();
 								}
 
 								

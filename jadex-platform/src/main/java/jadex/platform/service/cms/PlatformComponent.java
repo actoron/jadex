@@ -23,6 +23,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.StepAbortedException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.FeatureNotAvailableException;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -360,6 +361,12 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					{
 						return cf.body();
 					}
+					
+					@Override
+					public String toString()
+					{
+						return "PlatformComponent.executeBodyOnFeatures() "+cf;
+					}
 				});
 			}
 			else
@@ -401,6 +408,20 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							killComponent();
 						}
 						fut.setResult(null);
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// Ignore step aborted due to component shutdown (hack?)
+						if(exception instanceof StepAbortedException)
+						{
+							customResultAvailable(null);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
 					}
 				});
 				

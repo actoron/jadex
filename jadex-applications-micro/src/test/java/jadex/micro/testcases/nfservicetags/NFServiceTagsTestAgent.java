@@ -47,7 +47,7 @@ import jadex.micro.annotation.Results;
 
 @ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.nfservicetags.ProviderAgent.class"))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-@Ignore
+//@Ignore
 public class NFServiceTagsTestAgent extends JunitAgentTest
 {
 	/** The agent. */
