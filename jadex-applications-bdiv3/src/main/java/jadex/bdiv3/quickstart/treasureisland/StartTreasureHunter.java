@@ -16,7 +16,7 @@ public class StartTreasureHunter
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-        config.setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_BDIV3);
+        config.setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_BDIV3);
 //		config.getRootConfig().setLogging(true);
 		config.addComponent("jadex.bdiv3.quickstart.treasureisland.TreasureHunterB1BDI.class");
 		Starter.createPlatform(config).get();
