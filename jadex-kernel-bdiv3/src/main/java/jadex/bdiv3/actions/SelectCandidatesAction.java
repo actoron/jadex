@@ -71,8 +71,8 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		if(element.toString().indexOf("go_home")!=-1)
-//			System.out.println("select candidates: "+element);
+		if(element.toString().indexOf("cnp_make_proposal")!=-1)
+			System.out.println("select candidates: "+element);
 		
 		Future<Void> ret = new Future<Void>();
 

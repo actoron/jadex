@@ -808,6 +808,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						
 						public void timeEventOccurred(long currenttime)
 						{
+//							System.out.println("belief update "+component+", "+mbel);
 							try
 							{
 								component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()

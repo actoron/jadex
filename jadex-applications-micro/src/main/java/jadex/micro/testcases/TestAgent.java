@@ -9,6 +9,7 @@ import jadex.base.IRootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -183,188 +184,25 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
-//		agent.getLogger().severe("Testagent create platform: "+agent.getComponentDescription());
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-		
-		// Fetch own arguments
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
-			.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+		// Start platform
+		Starter.createPlatform(STest.getDefaultTestConfig(), args).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+			new DelegationResultListener<IExternalAccess>(ret)
 		{
-			public void customResultAvailable(IExternalAccess root)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				root.getArguments()
-					.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, IExternalAccess>(ret)
-				{
-					public void customResultAvailable(Map<String,Object> rootargs)
-					{
-						Map<String, String> argsmap = new HashMap<String, String>();
-						String[]	progargs	= (String[])rootargs.get(IRootComponentConfiguration.PROGRAM_ARGUMENTS);
-						String[]	defargs	= new String[]
-						{
-//							"-logging", "true",
-//							"-libpath", url,
-							"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-							"-saveonexit", "false",
-							"-welcome", "false",
-							"-autoshutdown", "false",
-							"-awareness", "false",
-							"-gui", "false",
-							"-cli", "false",
-							"-simulation", "false",
-							"-printpass", "false",
-							"-superpeerclient", "false"
-////							"-relaytransport", "false",
-//							"-gui", "false", "-usepass", "false", "-simulation", "false"
-//							"-binarymessages", "false",
-						};
-						
-						// Build argsmap as program args (e.g. relay address) overridden by defargs, overridden by supplied args.
-						for(int i=0; progargs!=null && i+1<progargs.length; i++)
-						{
-							argsmap.put(progargs[i], progargs[++i]);
-						}
-						for(int i=0; i<defargs.length; i++)
-						{
-							argsmap.put(defargs[i], defargs[++i]);
-						}
-						for(int i=0; args!=null && i<args.length; i++)
-						{
-							argsmap.put(args[i], args[++i]);
-						}
-						
-						defargs = new String[argsmap.size()*2];
-						int i=0;
-						for(String key: argsmap.keySet())
-						{
-							defargs[i*2]= key; 
-							defargs[i*2+1] = argsmap.get(key);
-							i++;
-						}
-
-//						System.out.println("platform args: "+SUtil.arrayToString(defargs));
-						
-						// Start platform
-						Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-							new DelegationResultListener<IExternalAccess>(ret)
-						{
-							public void customResultAvailable(IExternalAccess result)
-							{
-//								final DelegationResultListener<IExternalAccess> self = this;
-								agent.getLogger().severe("Testagent create platform done: "+agent.getComponentDescription());
-								platforms.add(result);
-								super.customResultAvailable(result);
-							}
-
-							public void superCustomResultAvailable(IExternalAccess result)
-							{
-								super.customResultAvailable(result);
-							}
-						}));
-
-
-					}
-				});
+				platforms.add(result);
+				super.customResultAvailable(result);
 			}
-		});
-				
+
+			public void superCustomResultAvailable(IExternalAccess result)
+			{
+				super.customResultAvailable(result);
+			}
+		}));
 		return ret;
 	}
 
-	/**
-	 *
-	 */
-	public static IFuture<IExternalAccess> createPlatform(final IInternalAccess agent, final String[] args)
-	{
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-
-		// Fetch own arguments
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
-				.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
-				{
-					public void customResultAvailable(IExternalAccess root)
-					{
-						root.getArguments()
-								.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, IExternalAccess>(ret)
-								{
-									public void customResultAvailable(Map<String,Object> rootargs)
-									{
-										Map<String, String> argsmap = new HashMap<String, String>();
-										String[]	progargs	= (String[])rootargs.get(IRootComponentConfiguration.PROGRAM_ARGUMENTS);
-										String[]	defargs	= new String[]
-												{
-//							"-libpath", url,
-														"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-														"-saveonexit", "false",
-														"-welcome", "false",
-														"-autoshutdown", "false",
-														"-awareness", "false",
-														"-gui", "false",
-														"-cli", "false",
-														"-superpeerclient", "false",
-														"-superpeer", "false",
-														"-relaytransport", "false",
-														"-simulation", "false",
-														"-logging", "true",
-														"-printpass", "false"
-//							"-niotcptransport", "false",	// Use tcp instead of nio to test both transports (original testcase platform uses nio)
-//							"-tcptransport", "true",	// Todo: make autoterminate work also with niotcp
-//							"-gui", "false", "-usepass", "false", "-simulation", "false"
-//							"-binarymessages", "false",
-												};
-
-										// Build argsmap as program args (e.g. relay address) overridden by defargs, overridden by supplied args.
-										for(int i=0; progargs!=null && i<progargs.length; i++)
-										{
-											argsmap.put(progargs[i], progargs[++i]);
-										}
-										for(int i=0; i<defargs.length; i++)
-										{
-											argsmap.put(defargs[i], defargs[++i]);
-										}
-										for(int i=0; args!=null && i<args.length; i++)
-										{
-											argsmap.put(args[i], args[++i]);
-										}
-
-										defargs = new String[argsmap.size()*2];
-										int i=0;
-										for(String key: argsmap.keySet())
-										{
-											defargs[i*2]= key;
-											defargs[i*2+1] = argsmap.get(key);
-											i++;
-										}
-
-//						System.out.println("platform args: "+SUtil.arrayToString(defargs));
-
-										// Start platform
-										Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-												new DelegationResultListener<IExternalAccess>(ret)
-												{
-													public void customResultAvailable(IExternalAccess result)
-													{
-														try
-														{
-															Thread.sleep(5000);
-														}
-														catch(InterruptedException e)
-														{
-														}
-
-//								platforms.add(result);
-														super.customResultAvailable(result);
-													}
-												}));
-									}
-								});
-					}
-				});
-
-		return ret;
-	}
-	
 	/**
 	 * 
 	 */

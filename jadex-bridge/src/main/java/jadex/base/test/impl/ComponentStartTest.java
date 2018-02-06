@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
 import jadex.base.test.IAbortableTestSuite;
+import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -168,7 +169,7 @@ public class ComponentStartTest extends	ComponentTest
 	 */
 	public static void main(String[] args) throws IOException
 	{
-		IExternalAccess	platform	= Starter.createPlatform(ComponentTestSuite.DEFARGS).get();
+		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig()).get();
 		IComponentManagementService	cms	= SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		String	filename	= null;

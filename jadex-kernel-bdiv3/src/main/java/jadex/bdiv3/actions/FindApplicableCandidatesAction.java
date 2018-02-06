@@ -54,7 +54,8 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		System.out.println("Select app cands for: "+element.getId());
+		if(element.toString().indexOf("cnp_make_proposal")!=-1)
+			System.out.println("Select app cands for: "+element.getId());
 		
 //		if(element!=null && element.toString().indexOf("testgoal")!=-1)
 //			System.out.println("find applicable candidates: "+element);

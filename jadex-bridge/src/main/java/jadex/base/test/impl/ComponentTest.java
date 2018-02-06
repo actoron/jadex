@@ -2,7 +2,6 @@ package jadex.base.test.impl;
 
 
 import java.io.File;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
@@ -46,6 +45,9 @@ public class ComponentTest extends TestCase
 	
 	/** The platform configuration */
 	protected IPlatformConfiguration	conf;
+	
+	/** Additional config args. */
+	protected String[]	args;
 	
 	/** The dirs for rids (e.g. classes and resources dirs). */
 	protected File[][]	dirs;
@@ -107,9 +109,10 @@ public class ComponentTest extends TestCase
 	 *  Run on separate platform.
 	 *  @param conf	The config for the new platform.
 	 */
-	public ComponentTest(IPlatformConfiguration conf, File[][] dirs, IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
+	public ComponentTest(IPlatformConfiguration conf, String[] args,  File[][] dirs, IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
 	{
 		this.conf	= conf;
+		this.args	= args;
 		this.dirs	= dirs;
 		//	this.cms	= cms; // Don't store suite cms -> use for own cms later.
 		this.filename	= comp.getFilename();
@@ -182,7 +185,7 @@ public class ComponentTest extends TestCase
 		
 		if(conf!=null)
 		{
-			IExternalAccess	exta	= Starter.createPlatform(conf).get(timeout, true);
+			IExternalAccess	exta	= Starter.createPlatform(conf, args).get(timeout, true);
 			cms	= SServiceProvider.getService(exta, IComponentManagementService.class).get(timeout, true);
 			ILibraryService	libsrv	= SServiceProvider.getService(exta, ILibraryService.class).get(timeout, true);
 			
