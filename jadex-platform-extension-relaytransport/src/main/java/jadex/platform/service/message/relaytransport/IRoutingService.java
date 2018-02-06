@@ -12,7 +12,7 @@ import jadex.commons.future.IIntermediateFuture;
  *
  */
 @Service
-@Security(Security.UNRESTRICTED)
+@Security(roles=Security.UNRESTRICTED)
 public interface IRoutingService
 {
 	/**

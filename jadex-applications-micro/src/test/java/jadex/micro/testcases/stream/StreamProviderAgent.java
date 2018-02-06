@@ -2,14 +2,12 @@ package jadex.micro.testcases.stream;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -80,65 +78,65 @@ public class StreamProviderAgent implements IStreamService
 	}
 	
 	
-	/**
-	 *  Pass an input stream to the user.
-	 *  @return The input stream.
-	 */
-	@SecureTransmission
-	public IFuture<IInputConnection> getSecureInputStream()
-	{
-		return getInputStream();
-	}
-
-	/**
-	 *  Pass an output stream to the user.
-	 *  @return The input stream.
-	 */
-	@SecureTransmission
-	public IFuture<IOutputConnection> getSecureOutputStream()
-	{
-		return getOutputStream();
-	}
-
-	/**
-	 *  Pass an Input stream to the user.
-	 *  @return The Input stream.
-	 */
-	@SecureTransmission
-	public IFuture<Long> passSecureInputStream(IInputConnection con)
-	{
+//	/**
+//	 *  Pass an input stream to the user.
+//	 *  @return The input stream.
+//	 */
+//	@SecureTransmission
+//	public IFuture<IInputConnection> getSecureInputStream()
+//	{
+//		return getInputStream();
+//	}
+//
+//	/**
+//	 *  Pass an output stream to the user.
+//	 *  @return The input stream.
+//	 */
+//	@SecureTransmission
+//	public IFuture<IOutputConnection> getSecureOutputStream()
+//	{
+//		return getOutputStream();
+//	}
+//
+//	/**
+//	 *  Pass an Input stream to the user.
+//	 *  @return The Input stream.
+//	 */
+//	@SecureTransmission
+//	public IFuture<Long> passSecureInputStream(IInputConnection con)
+//	{
+////		System.out.println("rec: "+con.getNonFunctionalProperties());
+//		Map<String, Object> props = con.getNonFunctionalProperties();
+//		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+//		if(sec==null || !sec.booleanValue())
+//		{
+//			return new Future<Long>(new RuntimeException("Received unsecure stream in 'passSecureInputStream'"));
+//		}
+//		else
+//		{
+//			return passInputStream(con);
+//		}
+//	}
+//	
+//	/**
+//	 *  Pass an output stream from the user.
+//	 *  @param con The output stream.
+//	 */
+//	@SecureTransmission
+//	public IFuture<Long> passSecureOutputStream(IOutputConnection con)
+//	{
 //		System.out.println("rec: "+con.getNonFunctionalProperties());
-		Map<String, Object> props = con.getNonFunctionalProperties();
-		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
-		if(sec==null || !sec.booleanValue())
-		{
-			return new Future<Long>(new RuntimeException("Received unsecure stream in 'passSecureInputStream'"));
-		}
-		else
-		{
-			return passInputStream(con);
-		}
-	}
-	
-	/**
-	 *  Pass an output stream from the user.
-	 *  @param con The output stream.
-	 */
-	@SecureTransmission
-	public IFuture<Long> passSecureOutputStream(IOutputConnection con)
-	{
-		System.out.println("rec: "+con.getNonFunctionalProperties());
-		Map<String, Object> props = con.getNonFunctionalProperties();
-		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
-		if(sec==null || !sec.booleanValue())
-		{
-			return new Future<Long>(new RuntimeException("Received unsecure stream in 'passSecureOutputStream'"));
-		}
-		else
-		{
-			return passOutputStream(con);
-		}
-	}
+//		Map<String, Object> props = con.getNonFunctionalProperties();
+//		Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+//		if(sec==null || !sec.booleanValue())
+//		{
+//			return new Future<Long>(new RuntimeException("Received unsecure stream in 'passSecureOutputStream'"));
+//		}
+//		else
+//		{
+//			return passOutputStream(con);
+//		}
+//	}
 	
 	/**
 	 *  Read data from an input connection.

@@ -28,7 +28,6 @@ import jadex.bdiv3.runtime.IGoal.GoalProcessingState;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.ICandidateInfo;
-import jadex.bdiv3x.runtime.IElement;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
 import jadex.bridge.IComponentStep;
@@ -406,14 +405,17 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	{
 		Future<Object> ret = new Future<Object>();
 		
-//		if(rplan.getModelElement().getName().toLowerCase().indexOf("go_home")!=-1)
-//			System.out.println("execute plan: "+rplan);
+		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
+			System.out.println("execute plan: "+rplan);
 		
 //		executePlan(rplan, ia, null);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
 		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(action);
 		
 		rplan.addListener(new DelegationResultListener<Object>(ret));
+		
+		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
+			System.out.println("scheduled plan: "+rplan);
 		
 		return ret;
 	}

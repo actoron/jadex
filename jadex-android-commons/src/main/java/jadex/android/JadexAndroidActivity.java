@@ -123,16 +123,16 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	protected void setPlatformKernels(String ... kernels) {
 		this.platformConfiguration.getRootConfig().setKernels(kernels);
 	}
-	
-	/**
-	 * Sets platform options.
-	 * @param options
-	 * @deprecated use setPlatformConfiguration
-	 */
-	protected void setPlatformOptions(String options) {
-		this.platformConfiguration.enhanceWith(Starter.processArgs(options));
-	}
-	
+//	
+//	/**
+//	 * Sets platform options.
+//	 * @param options
+//	 * @deprecated use setPlatformConfiguration
+//	 */
+//	protected void setPlatformOptions(String options) {
+//		this.platformConfiguration.enhanceWith(Starter.processArgs(options));
+//	}
+//	
 	/**
 	 * Sets the name of the platform that is started by this activity.
 	 * @param name

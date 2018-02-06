@@ -1,28 +1,15 @@
 package jadex.bridge.service.component.interceptors;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Set;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Authenticated;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 
 /**
  *  Interceptor that can be used to realize authenticated end-to-end communication.
- *  - generates a signed version of the message that is attached to it (in non-functional properties)
- *  - verifies that a call is authenticated by checking the singed version with public key of the sender
+ *  - verifies that a call is authenticated by checking the requested/annotated role(s) against the actual role(s) authenticated by the security service.
  */
 public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 {
@@ -74,7 +61,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	 */
 	protected boolean isAuthenticated(Annotation anno)
 	{
-		return anno instanceof Authenticated;
+		return anno instanceof Security;
 	}
 	
 	/**
@@ -83,7 +70,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	 */
 	public IFuture<Void> execute(final ServiceInvocationContext context)
 	{
-		final Future<Void> ret = new Future<Void>();
+//		final Future<Void> ret = new Future<Void>();
 		
 //		if(send)
 //		{
@@ -106,7 +93,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 //			});
 //		}
 		
-		return ret;
+		return context.invoke();
 	}
 	
 	/**

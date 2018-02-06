@@ -14,6 +14,8 @@ dependencies
 	// Add transports, otherwise test fails due to consistency check.
 	testCompile project(':jadex-platform-extension-relaytransport')
 	testCompile project(':jadex-platform-extension-websockettransport')
+	// required for test suite (why?)
+	testCompile project(':jadex-kernel-component')
 
 	compile 'commons-daemon:commons-daemon:1.0.10'
 	compileNoAndroidRuntime 'javassist:javassist:3.12.1.GA'

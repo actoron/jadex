@@ -183,7 +183,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
 			Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-			level	= secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+			level	= secreq!=null ? secreq.roles()[0] : null;	// TODO: multiple roles
 		}
 		else
 		{

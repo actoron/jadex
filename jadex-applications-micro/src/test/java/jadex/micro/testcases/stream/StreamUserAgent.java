@@ -10,7 +10,6 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -360,112 +359,112 @@ public class StreamUserAgent extends TestAgent
 	
 	
 	
-	/**
-	 *  Test 'getSecureInputStream()'.
-	 */
-	protected IFuture<TestReport> testSecureGetInputStream(int testno, IStreamService ss)
-	{
-		final Future<TestReport> ret = new Future<TestReport>();
-		final TestReport tr = new TestReport("#"+testno, "Test getSecureInputStream()");
-		
-		ss.getSecureInputStream().addResultListener(new IResultListener<IInputConnection>()
-		{
-			public void resultAvailable(IInputConnection con)
-			{
-				System.out.println("received icon: "+con);//.getNonFunctionalProperties());
-				Map<String, Object> props = con.getNonFunctionalProperties();
-				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
-				if(sec==null || !sec.booleanValue())
-				{
-					tr.setFailed("Received unsecure input stream in 'getSecureInputStream'");
-					ret.setResult(tr);
-				}
-				else
-				{
-					StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				System.out.println("ex: "+exception);
-				tr.setFailed("Exception: "+exception.getMessage());
-				ret.setResult(tr);
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Test 'getSecureOututStream()'.
-	 */
-	protected IFuture<TestReport> testSecureGetOutputStream(int testno, IStreamService ss)
-	{
-		final Future<TestReport> ret = new Future<TestReport>();
-		final TestReport tr = new TestReport("#"+testno, "Test getSecureOutputStream()");
-		
-		ss.getSecureOutputStream().addResultListener(new IResultListener<IOutputConnection>()
-		{
-			public void resultAvailable(final IOutputConnection con)
-			{
-				System.out.println("received ocon: "+con.getNonFunctionalProperties());
-				Map<String, Object> props = con.getNonFunctionalProperties();
-				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
-				if(sec==null || !sec.booleanValue())
-				{
-					tr.setFailed("Received unsecure output stream in 'getSecureOutputStream'");
-					ret.setResult(tr);
-				}
-				else
-				{
-					StreamProviderAgent.write(con, agent).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				System.out.println("ex: "+exception);
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Test 'passSecureInputStream()'.
-	 */
-	protected IFuture<TestReport> testSecurePassInputStream(int testno, IStreamService ss)
-	{
-		final Future<TestReport> ret = new Future<TestReport>();
-		final TestReport tr = new TestReport("#"+testno, "Test passSecureInputStream()");
-		
-		final ServiceOutputConnection con = new ServiceOutputConnection();
-		
-		ss.passSecureInputStream(con.getInputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
-
-		StreamProviderAgent.write(con, agent);
-		
-		return ret;
-	}
-	
-
-	/**
-	 *  Test 'passSecureOututStream()'.
-	 */
-	protected IFuture<TestReport> testSecurePassOutputStream(int testno, IStreamService ss)
-	{
-		final Future<TestReport> ret = new Future<TestReport>();
-		final TestReport tr = new TestReport("#"+testno, "Test passSecureInputStream()");
-		
-		ServiceInputConnection con = new ServiceInputConnection();
-		
-		ss.passSecureOutputStream(con.getOutputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
-		
-		StreamProviderAgent.read(con);
-		
-		return ret;
-	}
+//	/**
+//	 *  Test 'getSecureInputStream()'.
+//	 */
+//	protected IFuture<TestReport> testSecureGetInputStream(int testno, IStreamService ss)
+//	{
+//		final Future<TestReport> ret = new Future<TestReport>();
+//		final TestReport tr = new TestReport("#"+testno, "Test getSecureInputStream()");
+//		
+//		ss.getSecureInputStream().addResultListener(new IResultListener<IInputConnection>()
+//		{
+//			public void resultAvailable(IInputConnection con)
+//			{
+//				System.out.println("received icon: "+con);//.getNonFunctionalProperties());
+//				Map<String, Object> props = con.getNonFunctionalProperties();
+//				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+//				if(sec==null || !sec.booleanValue())
+//				{
+//					tr.setFailed("Received unsecure input stream in 'getSecureInputStream'");
+//					ret.setResult(tr);
+//				}
+//				else
+//				{
+//					StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				System.out.println("ex: "+exception);
+//				tr.setFailed("Exception: "+exception.getMessage());
+//				ret.setResult(tr);
+//			}
+//		});
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Test 'getSecureOututStream()'.
+//	 */
+//	protected IFuture<TestReport> testSecureGetOutputStream(int testno, IStreamService ss)
+//	{
+//		final Future<TestReport> ret = new Future<TestReport>();
+//		final TestReport tr = new TestReport("#"+testno, "Test getSecureOutputStream()");
+//		
+//		ss.getSecureOutputStream().addResultListener(new IResultListener<IOutputConnection>()
+//		{
+//			public void resultAvailable(final IOutputConnection con)
+//			{
+//				System.out.println("received ocon: "+con.getNonFunctionalProperties());
+//				Map<String, Object> props = con.getNonFunctionalProperties();
+//				Boolean sec = props!=null? (Boolean)props.get(SecureTransmission.SECURE_TRANSMISSION): null;
+//				if(sec==null || !sec.booleanValue())
+//				{
+//					tr.setFailed("Received unsecure output stream in 'getSecureOutputStream'");
+//					ret.setResult(tr);
+//				}
+//				else
+//				{
+//					StreamProviderAgent.write(con, agent).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				System.out.println("ex: "+exception);
+//				ret.setException(exception);
+//			}
+//		});
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Test 'passSecureInputStream()'.
+//	 */
+//	protected IFuture<TestReport> testSecurePassInputStream(int testno, IStreamService ss)
+//	{
+//		final Future<TestReport> ret = new Future<TestReport>();
+//		final TestReport tr = new TestReport("#"+testno, "Test passSecureInputStream()");
+//		
+//		final ServiceOutputConnection con = new ServiceOutputConnection();
+//		
+//		ss.passSecureInputStream(con.getInputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+//
+//		StreamProviderAgent.write(con, agent);
+//		
+//		return ret;
+//	}
+//	
+//
+//	/**
+//	 *  Test 'passSecureOututStream()'.
+//	 */
+//	protected IFuture<TestReport> testSecurePassOutputStream(int testno, IStreamService ss)
+//	{
+//		final Future<TestReport> ret = new Future<TestReport>();
+//		final TestReport tr = new TestReport("#"+testno, "Test passSecureInputStream()");
+//		
+//		ServiceInputConnection con = new ServiceInputConnection();
+//		
+//		ss.passSecureOutputStream(con.getOutputConnection()).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
+//		
+//		StreamProviderAgent.read(con);
+//		
+//		return ret;
+//	}
 
 }

@@ -31,7 +31,7 @@ public class STest {
     public static IPlatformConfiguration getDefaultTestConfig() 
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT);
+		config.setKernels(IRootComponentConfiguration.KERNEL_MULTI);
         config.setSecurity(true);
         config.setTcpTransport(true);
         

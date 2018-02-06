@@ -95,8 +95,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //		if(!isReasonValid())
 //			System.out.println("executing invalid candidate: "+rplan);
 		
-//		if(rplan.toString().indexOf("go_home")!=-1)
-//			System.out.println("plan exe: "+rplan);
+		if(rplan.toString().indexOf("cnp_make_proposal")!=-1)
+			System.out.println("plan exe: "+rplan);
 		
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 

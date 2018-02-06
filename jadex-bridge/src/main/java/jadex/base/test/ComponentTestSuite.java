@@ -24,11 +24,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.impl.ComponentLoadTest;
 import jadex.base.test.impl.ComponentStartTest;
 import jadex.base.test.impl.ComponentTest;
+import jadex.base.test.util.STest;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -60,38 +60,38 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	// Set to true for old behavior 
 	public static final boolean	SAME_PLATFORM	= false;
 	
-	/**
-	 *  The default test platform arguments.
-	 */
-	public static final String[]	DEFARGS	= new String[]
-	{
-		"-platformname", "testcases_*",
-//		"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
-		"-simulation", "true",
-		"-asyncexecution", "true",
-//		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//		"-logging", "true",
-//		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
-		"-logging_level", "java.util.logging.Level.WARNING",
-//		"-debugfutures", "true",
-//		"-nostackcompaction", "true",
-		"-gui", "false",
-		"-awareness", "false",
-		"-saveonexit", "false",
-		"-welcome", "false",
-		"-autoshutdown", "false",
-		"-opengl", "false",
-		"-cli", "false",
-//		"-persist", "true", // for testing persistence
-//		"-deftimeout", "-1",
-		"-printpass", "false",
-		"-superpeerclient", "false",
-		"-wstransport", "false",
-		"-relaytransport", "false",
-//		"-tcptransport", "false"
-		// Hack!!! include ssl transport if available
-//		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-	};
+//	/**
+//	 *  The default test platform arguments.
+//	 */
+//	public static final String[]	DEFARGS	= new String[]
+//	{
+//		"-platformname", "testcases_*",
+////		"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
+//		"-simulation", "true",
+//		"-asyncexecution", "true",
+////		"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
+////		"-logging", "true",
+////		"-logging", path.toString().indexOf("bdiv3")!=-1 ? "true" : "false",
+//		"-logging_level", "java.util.logging.Level.WARNING",
+////		"-debugfutures", "true",
+////		"-nostackcompaction", "true",
+//		"-gui", "false",
+//		"-awareness", "false",
+//		"-saveonexit", "false",
+//		"-welcome", "false",
+//		"-autoshutdown", "false",
+//		"-opengl", "false",
+//		"-cli", "false",
+////		"-persist", "true", // for testing persistence
+////		"-deftimeout", "-1",
+//		"-printpass", "false",
+//		"-superpeerclient", "false",
+//		"-wstransport", "false",
+//		"-relaytransport", "false",
+////		"-tcptransport", "false"
+//		// Hack!!! include ssl transport if available
+////		"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
+//	};
 
 	//-------- attributes --------
 	
@@ -175,7 +175,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	 */
 	public ComponentTestSuite(File[][] roots, String[] tests, String[] excludes, boolean test, boolean load, boolean start) throws Exception
 	{
-		this(DEFARGS, roots, tests, excludes, test, load, start);
+		this(null, roots, tests, excludes, test, load, start);
 	}
 	
 	protected void startTimer()
@@ -228,36 +228,36 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		super(roots[0][0].toString());
 		
-		/* Attempt to extract user command line args. */
-		String cmdline = System.getProperty("sun.java.command");
-//		System.out.println("COMMAND: " + cmdline);
-		if (cmdline != null)
-		{
-			String[] cmdlinetokens = cmdline.split(" ");
-			List<String> cmdargs = new ArrayList<String>();
-			for (int i = 1; i < cmdlinetokens.length; ++i)
-			{
-				if (cmdlinetokens[i].length() > 0)
-					if ("-version".equals(cmdlinetokens[i]))
-						break;
-					else
-						cmdargs.add(cmdlinetokens[i]);
-			}
-			int len = args != null? args.length : 0;
-			len += cmdargs.size();
-			String[] newargs = new String[len];
-			int pos = 0;
-			if (args != null)
-			{
-				System.arraycopy(args, pos, newargs, pos, args.length);
-				pos += args.length;
-			}
-			for (String cmdarg : cmdargs)
-				newargs[pos++] = cmdarg;
-			args = newargs;
-		}
-		
-		IPlatformConfiguration conf = PlatformConfigurationHandler.getDefault();
+//		/* Attempt to extract user command line args. */
+//		String cmdline = System.getProperty("sun.java.command");
+////		System.out.println("COMMAND: " + cmdline);
+//		if (cmdline != null)
+//		{
+//			String[] cmdlinetokens = cmdline.split(" ");
+//			List<String> cmdargs = new ArrayList<String>();
+//			for (int i = 1; i < cmdlinetokens.length; ++i)
+//			{
+//				if (cmdlinetokens[i].length() > 0)
+//					if ("-version".equals(cmdlinetokens[i]))
+//						break;
+//					else
+//						cmdargs.add(cmdlinetokens[i]);
+//			}
+//			int len = args != null? args.length : 0;
+//			len += cmdargs.size();
+//			String[] newargs = new String[len];
+//			int pos = 0;
+//			if (args != null)
+//			{
+//				System.arraycopy(args, pos, newargs, pos, args.length);
+//				pos += args.length;
+//			}
+//			for (String cmdarg : cmdargs)
+//				newargs[pos++] = cmdarg;
+//			args = newargs;
+//		}
+//		
+		IPlatformConfiguration conf = STest.getDefaultTestConfig();
 //		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
 		this.timeout	= conf.getLocalDefaultTimeout();	// Initial timeout for starting platform.
@@ -358,7 +358,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 									if (runtests) {
 										ComponentTest test = SAME_PLATFORM
 											? new ComponentTest(cms, model, this)
-											: new ComponentTest(conf, roots, cms, model, this);
+											: new ComponentTest(conf, args, roots, cms, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if (ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE) {

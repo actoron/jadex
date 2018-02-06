@@ -103,14 +103,14 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 //		return platformConfiguration.getRootConfig().;
 //	}
 
-	/**
-	 * Sets platform options.
-	 * @param options
-	 * @deprecated use setPlatformConfiguration
-	 */
-	protected void setPlatformOptions(String options) {
-		this.platformConfiguration.enhanceWith(Starter.processArgs(options));
-	}
+//	/**
+//	 * Sets platform options.
+//	 * @param options
+//	 * @deprecated use setPlatformConfiguration
+//	 */
+//	protected void setPlatformOptions(String options) {
+//		this.platformConfiguration.enhanceWith(Starter.processArgs(options));
+//	}
 
 	/**
 	 * Sets platform configuration.

@@ -15,7 +15,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  */
 @Service(system=true)
 // Depending on the supersuperpeer setting make the service unrestricted or default accessible
-@Security("%{$args.supersuperpeer? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
+@Security(roles="%{$args.supersuperpeer? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
 public interface ISuperpeerRegistrySynchronizationService 
 {
 	/** Predefined supersuperpeers. */

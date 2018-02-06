@@ -8,7 +8,7 @@ import jadex.commons.future.IIntermediateFuture;
  *  Allows to get local information about a person and
  *  add information about a person.
  */
-@Security(Security.UNRESTRICTED)
+@Security(roles=Security.UNRESTRICTED)
 public interface IHelpline
 {
 	/**

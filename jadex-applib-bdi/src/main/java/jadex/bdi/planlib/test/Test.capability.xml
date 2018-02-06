@@ -46,7 +46,7 @@
 		</belief>
 
 		<!-- The indicator for a timeout (when no time left and reports incomplete). -->
-		<belief name="timeout_failure" class="boolean" updaterate="1000">
+		<belief name="timeout_failure" class="boolean" updaterate="$beliefbase.timeout">
 			<fact>((Number)$beliefbase.getBelief("timeout").getFact()).longValue()>0 
 				&amp;&amp; ((Number)$beliefbase.getBelief("starttime").getFact()).longValue()
 					+((Number)$beliefbase.getBelief("timeout").getFact()).longValue() &lt;= $scope.getTime()
