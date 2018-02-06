@@ -175,23 +175,20 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	 *  Overridden by subclasses.
 	 */
 	@Override
-	protected String	getSecurityLevel(IInternalAccess access)
+	protected Security	getSecurityLevel(IInternalAccess access)
 	{
-		String	level;
+		Security	level;
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
-			Security	secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-			level	= secreq!=null ? secreq.roles()[0] : null;	// TODO: multiple roles
+			level	= type!=null ? type.getAnnotation(Security.class) : null;
 		}
 		else
 		{
 			level	= super.getSecurityLevel(access);
 		}
-		
-		return level==null ? super.getSecurityLevel(access)
-			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+		return level;
 	}
 
 	

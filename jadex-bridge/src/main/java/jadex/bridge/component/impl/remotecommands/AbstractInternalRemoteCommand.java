@@ -55,23 +55,13 @@ public abstract class AbstractInternalRemoteCommand
 	}
 	
 	//-------- security methods --------
-	
+
 	/**
 	 *  Method to provide the required security level.
 	 *  Overridden by subclasses.
 	 */
-	protected String getSecurityLevel(IInternalAccess access)
+	protected Security getSecurityLevel(IInternalAccess access)
 	{
-		return Security.DEFAULT;
-	}
-	
-	/**
-	 *  Check if it is ok to execute the command.
-	 *  Override for specific checks.
-	 */
-	public boolean checkSecurity(IInternalAccess access, IMsgSecurityInfos secinfos, IMsgHeader header)
-	{
-		String	seclevel	= getSecurityLevel(access);
-		return Security.UNRESTRICTED.equals(seclevel) || secinfos.isAuthenticated();
+		return null;
 	}
 }
