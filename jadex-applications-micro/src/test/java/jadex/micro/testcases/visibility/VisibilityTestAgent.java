@@ -9,6 +9,7 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -43,11 +44,7 @@ public class VisibilityTestAgent extends JunitAgentTest
 	@AgentCreated
 	public IFuture<Void> test()
 	{
-//		PlatformConfiguration config = PlatformConfiguration.getDefault();
-//		config.addComponent(FirstAgent.class.getName()+".class");
-//		config.addComponent(SecondAgent.class.getName()+".class");
-//		final IExternalAccess plat = jadex.base.Starter.createPlatform(config).get();
-		final IExternalAccess plat = TestAgent.createPlatform(agent, null).get();// new String[]{"-component", FirstAgent.class.getName()+".class", "-component", SecondAgent.class.getName()+".class"}).get();
+		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();
 		Starter.createProxy(agent.getExternalAccess(), plat).get();
 		Starter.createProxy(plat, agent.getExternalAccess()).get();
 		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();

@@ -13,7 +13,6 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ITargetResolver;
 import jadex.commons.MethodInfo;
-import jadex.commons.SUtil;
 
 /**
  *  Info struct that holds all necessary model information to generate
@@ -353,48 +352,7 @@ public class ProxyInfo
 	public boolean isSynchronous(Method m)
 	{
 		return synchronous!=null && synchronous.contains(new MethodInfo(m));
-	}
-
-	/**
-	 *  Get the secure.
-	 *  @return the secure.
-	 */
-	public Set<MethodInfo> getSecureMethods()
-	{
-		return secure;
-	}
-
-	/**
-	 *  Set the secure.
-	 *  @param secure The secure to set.
-	 */
-	public void setSecureMethods(Set<MethodInfo> secure)
-	{
-		this.secure = secure;
-	}
-	
-	/**
-	 *  Add an secure method.
-	 *  @param m Method.
-	 */
-	public void addSecureMethod(MethodInfo m)
-	{
-		if(secure==null)
-			secure = new HashSet<MethodInfo>();
-		secure.add(m);
-	}
-	
-	/**
-	 *  Test if method is secure.
-	 *  @param m Method to test.
-	 *  @return True, if is secure.
-	 */
-	public boolean isSecure(Method m)
-	{
-		return secure!=null && secure.contains(new MethodInfo(m));
-	}
-	
-	
+	}	
 	
 	/**
 	 *  Get the target determiner clazz.

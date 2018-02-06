@@ -13,7 +13,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
  *  Global chat service. Called to send messages,
  *  send files and user status.
  */
-@Security(Security.UNRESTRICTED)
+@Security(roles=Security.UNRESTRICTED)
 @Service(system=true)
 public interface IChatService
 {

@@ -315,7 +315,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	public static String getSecurityLevel(IInternalAccess access, Class<?> ctype)
 	{
 		Security secreq	= ctype!=null ? ctype.getAnnotation(Security.class) : null;
-		String	level = secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
+		String	level = secreq!=null ? secreq.roles()[0] : null;	// TODO: multiple roles
 		return (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
 	}
 	

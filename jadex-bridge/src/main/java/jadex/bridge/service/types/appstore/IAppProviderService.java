@@ -1,14 +1,13 @@
 package jadex.bridge.service.types.appstore;
 
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
  *  Interface for applications that want to provider
  *  themselves as app in the store.
  */
-@Security(Security.UNRESTRICTED)
+@Security(roles=Security.UNRESTRICTED)
 public interface IAppProviderService<T>
 {
 	/**

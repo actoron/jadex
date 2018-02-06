@@ -11,7 +11,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  and provides no sensitive information, no security
  *  restrictions are required. 
  */
-@Security(Security.UNRESTRICTED)
+@Security(roles=Security.UNRESTRICTED)
 @Service
 public interface ITimeService
 {

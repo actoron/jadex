@@ -18,7 +18,7 @@ import jadex.commons.future.IIntermediateFuture;
  *  The person's name for the service instance is annotated as a tag,
  *  derived from the component argument named 'person'.
  */
-@Security(Security.UNRESTRICTED)
+@Security(roles=Security.UNRESTRICTED)
 @NFProperties(@NFProperty(value=TagProperty.class, parameters=@NameValue(name=TagProperty.ARGUMENT, value="\"person\"")))
 @Service
 public interface IHelpline

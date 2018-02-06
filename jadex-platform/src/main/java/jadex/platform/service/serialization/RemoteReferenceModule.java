@@ -40,7 +40,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Replacement;
-import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Synchronous;
 import jadex.bridge.service.annotation.Timeout;
@@ -403,7 +402,6 @@ public class RemoteReferenceModule
 //			}
 			
 			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
-			boolean	allsec	= allinterfaces[i].isAnnotationPresent(SecureTransmission.class);
 			
 //			if(allinterfaces[i].isAnnotationPresent(TargetResolver.class))
 //			{
@@ -418,12 +416,6 @@ public class RemoteReferenceModule
 				if(allex || methods[j].isAnnotationPresent(Excluded.class))
 				{
 					ret.addExcludedMethod(new MethodInfo(methods[j]));
-				}
-				
-				// Secured
-				if(allsec || methods[j].isAnnotationPresent(SecureTransmission.class))
-				{
-					ret.addSecureMethod(new MethodInfo(methods[j]));
 				}
 				
 				// Uncached
