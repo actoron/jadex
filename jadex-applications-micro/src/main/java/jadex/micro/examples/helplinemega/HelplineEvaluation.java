@@ -201,13 +201,13 @@ public class HelplineEvaluation
 		
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 //		config.setLogging(true);
-		config.setChat(false);	// Keep platform at minimum. Todo: minimal server config
-		config.setSimulation(false);	// Todo: fix sim delay in registry!?
+		config.getExtendedPlatformConfiguration().setChat(false);	// Keep platform at minimum. Todo: minimal server config
+		config.getExtendedPlatformConfiguration().setSimulation(false);	// Todo: fix sim delay in registry!?
 		config.setNetworkName("helpline");
 		config.setNetworkPass("key:wlXEahZlSgTfqiv0LwNbsdUZ8qlgtKSSQaKK74XkJxU");
-		config.setAwaMechanisms("IntraVM");
+		config.getExtendedPlatformConfiguration().setAwaMechanisms("IntraVM");
 //		config.setWsTransport(false);
-		config.setRelayTransport(spcnt!=0);	
+		config.getExtendedPlatformConfiguration().setRelayTransport(spcnt!=0);	
 		config.setSuperpeerClient(spcnt!=0);
 
 		return config;
@@ -222,12 +222,12 @@ public class HelplineEvaluation
 		IPlatformConfiguration relayconf	= createConfig();
 		relayconf.enhanceWith(config);
 		relayconf.setPlatformName("relay");
-		relayconf.setTcpPort(2091);
-		relayconf.setRelayForwarding(true);
+		relayconf.getExtendedPlatformConfiguration().setTcpPort(2091);
+		relayconf.getExtendedPlatformConfiguration().setRelayForwarding(true);
 		Starter.createPlatform(relayconf).get();
 		
 		// Set relay address for all platforms created from now on.
-		config.setRelayAddresses("tcp://relay@localhost:2091");
+		config.getExtendedPlatformConfiguration().setRelayAddresses("tcp://relay@localhost:2091");
 		
 		IPlatformConfiguration sspconf	= createConfig();
 		sspconf.enhanceWith(config);

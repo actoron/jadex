@@ -27,9 +27,9 @@ public class PlatformConfigurationTest
 	@Test
 	public void testSetAndGet()
 	{
-		config.setRsPublish(true);
+		config.getExtendedPlatformConfiguration().setRsPublish(true);
 
-		boolean rsPublish = config.getRsPublish();
+		boolean rsPublish = config.getExtendedPlatformConfiguration().getRsPublish();
 		assertTrue(rsPublish);
 	}
 
@@ -46,7 +46,7 @@ public class PlatformConfigurationTest
 	public void testKernels()
 	{
 //		IRootComponentConfiguration.KERNEL[] kernels = config.getRootConfig().getKernels();
-		String[] kernels = config.getRootConfig().getKernels();
+		String[] kernels = config.getKernels();
 		assertTrue(kernels.length > 0);
 	}
 

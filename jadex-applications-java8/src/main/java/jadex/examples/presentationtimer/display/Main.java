@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -69,12 +68,11 @@ public class Main
 	public void init()
 	{
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
-		IRootComponentConfiguration rootConfig = config.getRootConfig();
 
 		config.setPlatformName("presentationtimer-*");
 
-		rootConfig.setNetworkName("jadexnetwork");
-		rootConfig.setNetworkPass("laxlax");
+		config.setNetworkName("jadexnetwork");
+		config.setNetworkPass("laxlax");
 
 		// config.setDht(true);
 

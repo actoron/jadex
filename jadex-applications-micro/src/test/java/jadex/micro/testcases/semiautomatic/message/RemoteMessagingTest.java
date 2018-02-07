@@ -3,7 +3,6 @@ package jadex.micro.testcases.semiautomatic.message;
 import java.util.Collections;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -28,10 +27,10 @@ public class RemoteMessagingTest
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
-		config1.setSecurity(true);
-		config1.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_LOCAL);
+		config1.getExtendedPlatformConfiguration().setSecurity(true);
+		config1.getExtendedPlatformConfiguration().setAwaMechanisms(IPlatformConfiguration.AWAMECHANISM_LOCAL);
 		config1.setAwareness(true);
-        config1.setTcpTransport(true);
+        config1.getExtendedPlatformConfiguration().setTcpTransport(true);
 //		config1.addComponent("jadex.platform.service.message.websockettransport.WebSocketTransportAgent.class");
 		config1.addComponent(ReceiverAgent.class);
 //		config1.setNetworkName("remotemessagetest");
@@ -44,10 +43,10 @@ public class RemoteMessagingTest
 		IPlatformConfiguration	config2	= PlatformConfigurationHandler.getMinimal();
 //		config2.setLogging(true);
 //		config2.setDefaultTimeout(-1);
-		config2.setSecurity(true);
-		config2.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_LOCAL);
+		config2.getExtendedPlatformConfiguration().setSecurity(true);
+		config2.getExtendedPlatformConfiguration().setAwaMechanisms(IPlatformConfiguration.AWAMECHANISM_LOCAL);
 		config2.setAwareness(true);
-        config2.setTcpTransport(true);
+        config2.getExtendedPlatformConfiguration().setTcpTransport(true);
 //		config2.addComponent("jadex.platform.service.message.websockettransport.WebSocketTransportAgent.class");
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);

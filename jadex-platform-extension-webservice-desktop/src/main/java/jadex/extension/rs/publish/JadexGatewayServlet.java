@@ -164,8 +164,8 @@ public class JadexGatewayServlet extends HttpServlet
 			if(ret==null)
 			{
 				IPlatformConfiguration pc = PlatformConfigurationHandler.getDefault();
-			    pc.getRootConfig().setGui(false);
-			    pc.getRootConfig().setRsPublish(true);
+			    pc.setGui(false);
+			    pc.getExtendedPlatformConfiguration().setRsPublish(true);
 			
 			    ret = Starter.createPlatform(pc).get();
 			    

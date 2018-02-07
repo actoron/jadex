@@ -3,7 +3,6 @@ package jadex.micro.testcases.semiautomatic.message;
 import java.util.Collections;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -30,10 +29,10 @@ public class MessagingTest
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 //		config.setLogging(true);
 //		config.setDefaultTimeout(-1);
-		config.setSecurity(true);
-		config.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_LOCAL);
+		config.getExtendedPlatformConfiguration().setSecurity(true);
+		config.getExtendedPlatformConfiguration().setAwaMechanisms(IPlatformConfiguration.AWAMECHANISM_LOCAL);
 		config.setAwareness(true);
-		config.setTcpTransport(true);
+		config.getExtendedPlatformConfiguration().setTcpTransport(true);
 //		config.setNetworkName("remotemessagetest");
 //		config.setNetworkPass(key);
 

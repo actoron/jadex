@@ -1,26 +1,5 @@
 package jadex.base;
 
-import static jadex.base.IRootComponentConfiguration.BOOLEAN_ARGS;
-import static jadex.base.IRootComponentConfiguration.KERNELS;
-import static jadex.base.IRootComponentConfiguration.KERNEL_BDI;
-import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
-import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
-import static jadex.base.IRootComponentConfiguration.RSPUBLISHCOMPONENT;
-import static jadex.base.IRootComponentConfiguration.USEPASS;
-import static jadex.base.IRootComponentConfiguration.WSTRANSPORT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import jadex.commons.SReflect;
-
-
-
 public class RootComponentConfigurationTest
 {
 //	private IRootComponentConfiguration	config;

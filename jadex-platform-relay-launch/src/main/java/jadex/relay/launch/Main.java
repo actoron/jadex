@@ -12,7 +12,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getMinimal();
-		config.setSecurity(true);	
+		config.getExtendedPlatformConfiguration().setSecurity(true);	
 		config.setPlatformName("PublicRelay1");
 		config.setValue("wstransport", true);
 		config.setValue("wsport", 8080);

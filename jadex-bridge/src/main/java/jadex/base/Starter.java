@@ -58,7 +58,7 @@ import jadex.javaparser.SJavaParser;
 
 
 /**
- *  Starter class for  
+ *  Starter class for starting the Jadex platform. 
  */
 public class Starter
 {
@@ -67,10 +67,10 @@ public class Starter
 	//-------- Platform data keys --------
 
     /** Flag if copying parameters for local service calls is allowed. */
-    public static String DATA_PARAMETERCOPY = IStarterConfiguration.PARAMETERCOPY;
+    public static String DATA_PARAMETERCOPY = IPlatformConfiguration.PARAMETERCOPY;
 
     /**  Flag if local timeouts should be realtime (instead of clock dependent). */
-    public static String DATA_REALTIMETIMEOUT = IStarterConfiguration.REALTIMETIMEOUT;
+    public static String DATA_REALTIMETIMEOUT = IPlatformConfiguration.REALTIMETIMEOUT;
 
     /** The local service registry data key. */
     public static String DATA_SERVICEREGISTRY = "serviceregistry";
@@ -334,17 +334,17 @@ public class Starter
 		
 		//config.setReadOnly(true);
 		
-		if(config.getStarterConfig().isDropPrivileges())
+		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
 		
-		IRootComponentConfiguration rootconf = config.getRootConfig();
+//		IRootComponentConfiguration rootconf = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:
-		MethodInvocationInterceptor.DEBUG = config.getDebugServices();
-		ExecutionComponentFeature.DEBUG = config.getDebugSteps();
+		MethodInvocationInterceptor.DEBUG = config.getExtendedPlatformConfiguration().getDebugServices();
+		ExecutionComponentFeature.DEBUG = config.getExtendedPlatformConfiguration().getDebugSteps();
 //		Future.NO_STACK_COMPACTION	= true;
-		Future.NO_STACK_COMPACTION	= config.getNoStackCompaction();
-		Future.DEBUG = config.getDebugFutures();
+		Future.NO_STACK_COMPACTION	= config.getExtendedPlatformConfiguration().getNoStackCompaction();
+		Future.DEBUG = config.getExtendedPlatformConfiguration().getDebugFutures();
 		
 //		final Object args, final Map<String, Object> cmdargs, final Map<String, Object> compargs, final List<String> components
 		
@@ -369,8 +369,8 @@ public class Starter
 		
 			// Load the platform (component) model.
 			final ClassLoader cl = Starter.class.getClassLoader();
-			final String configfile = config.getConfigurationFile();
-			String cfclname = config.getComponentFactory();
+			final String configfile = config.getExtendedPlatformConfiguration().getConfigurationFile();
+			String cfclname = config.getExtendedPlatformConfiguration().getComponentFactory();
 			Class<?> cfclass = SReflect.classForName(cfclname, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
@@ -392,7 +392,7 @@ public class Starter
 			else
 			{		
 //				config.checkConsistency(); // todo?
-				Class<?> pc = config.getPlatformComponent().getType(cl);
+				Class<?> pc = config.getExtendedPlatformConfiguration().getPlatformComponent().getType(cl);
 //				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_COMPONENT, pc);
 				if(pc==null)
@@ -402,7 +402,7 @@ public class Starter
 				else
 				{
 					// Build platform name.
-					String pfname = config.getPlatformName();
+					String pfname = args!=null && args.containsKey(IPlatformConfiguration.PLATFORM_NAME)? (String)args.get(IPlatformConfiguration.PLATFORM_NAME): config.getPlatformName();
 //					Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //					rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
 					final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
@@ -447,10 +447,10 @@ public class Starter
 					Cause cause = sc==null? null: sc.getCause();
 					assert cause!=null;
 					
-					Boolean autosd = config.getAutoShutdown();
+					Boolean autosd = config.getExtendedPlatformConfiguration().getAutoShutdown();
 //					Boolean autosd = (Boolean)config.getValue(RootComponentConfiguration.AUTOSHUTDOWN);
 //					rootConfig.setValue(RootComponentConfiguration.AUTOSHUTDOWN, autosd);
-					PublishEventLevel monitoring = config.getMonitoring();
+					PublishEventLevel monitoring = config.getExtendedPlatformConfiguration().getMonitoring();
 	
 					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
 						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
@@ -487,8 +487,8 @@ public class Starter
 
 					putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 					
-					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, config.getLocalDefaultTimeout());
-					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, config.getRemoteDefaultTimeout());
+					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, config.getExtendedPlatformConfiguration().getLocalDefaultTimeout());
+					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, config.getExtendedPlatformConfiguration().getRemoteDefaultTimeout());
 
 					Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 					if(args!=null)
@@ -497,7 +497,7 @@ public class Starter
 					Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
 					component.create(cci, features);
 
-					initRescueThread(cid, rootconf);	// Required for bootstrapping init.
+					initRescueThread(cid, config);	// Required for bootstrapping init.
 
 					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
@@ -508,7 +508,7 @@ public class Starter
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getValue(IRootComponentConfiguration.WELCOME, model)))
+									if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
 									{
 										long startup = System.currentTimeMillis() - starttime;
 										// platform.logger.info("Platform startup time: " + startup + " ms.");
@@ -732,15 +732,15 @@ public class Starter
 	/**
 	 *  Init the rescue thread for a platform..
 	 */
-	public synchronized static void initRescueThread(IComponentIdentifier cid, IRootComponentConfiguration rootconfig)
+	public synchronized static void initRescueThread(IComponentIdentifier cid, IPlatformConfiguration rootconfig)
 	{
 		IThreadPool	tp	= null;
-		if(rootconfig.getThreadpoolClass()!=null)
+		if(rootconfig.getExtendedPlatformConfiguration().getThreadpoolClass()!=null)
 		{
 			try
 			{
-				tp	= (IThreadPool)SReflect.classForName(
-					rootconfig.getThreadpoolClass(), Starter.class.getClassLoader()).newInstance();
+				tp = (IThreadPool)SReflect.classForName(
+					rootconfig.getExtendedPlatformConfiguration().getThreadpoolClass(), Starter.class.getClassLoader()).newInstance();
 			}
 			catch(Exception e)
 			{
@@ -750,13 +750,11 @@ public class Starter
 		
 		assert cid.getParent()==null;
 		if(rescuethreads==null)
-		{
 			rescuethreads = new HashMap<IComponentIdentifier, Tuple2<BlockingQueue, Thread>>();
-		}	
 		
 		final BlockingQueue bq = new BlockingQueue();
 		final IComponentIdentifier fcid = cid;
-		Runnable	run	= new Runnable()
+		Runnable run = new Runnable()
 		{
 			public void run()
 			{
@@ -786,7 +784,7 @@ public class Starter
 		}
 		else
 		{
-			Thread rescuethread =new Thread(run, "rescue_thread_"+cid.getName());
+			Thread rescuethread = new Thread(run, "rescue_thread_"+cid.getName());
 			Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
 			rescuethreads.put(cid, tup);
 			// rescue thread must not be daemon, otherwise shutdown code like writing platform settings might be interrupted by vm exit. 
@@ -983,10 +981,10 @@ public class Starter
 	public static long getRemoteDefaultTimeout(IComponentIdentifier platform)
 	{
 		if(platform == null)
-			return IStarterConfiguration.DEFAULT_REMOTE_TIMEOUT;
+			return IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT;
 
 		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue() :IStarterConfiguration.DEFAULT_REMOTE_TIMEOUT;
+		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue() :IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT;
 	}
 
 	/**
@@ -1004,10 +1002,10 @@ public class Starter
 	public static long getLocalDefaultTimeout(IComponentIdentifier platform)
 	{
 		if(platform == null)
-			return IStarterConfiguration.DEFAULT_LOCAL_TIMEOUT;
+			return IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT;
 
 		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue() : IStarterConfiguration.DEFAULT_LOCAL_TIMEOUT;
+		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue() : IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT;
 	}
 
 	/**
