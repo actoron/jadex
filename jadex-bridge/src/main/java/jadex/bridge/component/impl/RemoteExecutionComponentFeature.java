@@ -25,6 +25,7 @@ import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.component.impl.remotecommands.AbstractInternalRemoteCommand;
 import jadex.bridge.component.impl.remotecommands.AbstractResultCommand;
+import jadex.bridge.component.impl.remotecommands.ISecuredRemoteCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
@@ -34,6 +35,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
@@ -536,16 +538,88 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 */
 		protected boolean checkSecurity(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
+			boolean	trusted	= false;
 			
-//			return level==null ? super.getSecurityLevel(access)
-//				: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
-
-			return true;	// For relay testing.
-//			return secinfos.isTrustedPlatform()	// Trusted -> always ok
-//				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
-//				|| secinfos.isAuthenticated() && SAFE_COMMANDS.contains(msg.getClass())	// Safe (internal) command
-//					&& ( !(msg instanceof AbstractInternalRemoteCommand)						// -> ok when no special security
-//						|| ((AbstractInternalRemoteCommand)msg).checkSecurity(getComponent(), secinfos, header));	// or ok when special security (eg. search or method invocation of unrestricted service) checks out.
+			// Trusted platforms (i.e. in possession  of our platform key) can do anything.
+			if(secinfos.isTrustedPlatform())
+			{
+				trusted	= true;
+			}
+			
+			// Internal command -> safe to check as stated by command.
+			else if(SAFE_COMMANDS.contains(msg.getClass()))
+			{
+				if(msg instanceof ISecuredRemoteCommand)
+				{
+					Security	sec	= ((ISecuredRemoteCommand)msg).getSecurityLevel(getComponent());
+					
+					// No security setting means disallow
+					if(sec==null)
+					{
+						trusted	= false;
+					}
+					
+					// needs special security handling (e.g. method invocation or service search)
+					else
+					{
+						String[]	roles	= sec.roles();
+						
+						// No roles means default role means any authenticated platform or network.
+						if(roles==null)
+						{
+							trusted	= secinfos.isAuthenticated() || secinfos.getNetworks()!=null && secinfos.getNetworks().length>0;
+						}
+						else
+						{
+							// Roles required by command. Check if at least one is authenticated.
+							Set<String>	sroles	= new HashSet<String>();
+							// Evaluate, if a role is given as expression.
+							for(String role: roles)
+							{
+								sroles.add((String)SJavaParser.evaluateExpressionPotentially(role, getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader()));
+							}
+							
+							// Always allow 'unrestricted' access
+							if(sroles.contains(Security.UNRESTRICTED))
+							{
+								trusted	= true;
+							}
+							
+							// TODO: map networks and/or platform names to local roles.
+							
+							// Check remote platform name
+							// TODO: specify explicit platform names not as roles/not at all?
+							else if(sroles.contains(secinfos.getAuthenticatedPlatformName()))
+							{
+								trusted	= true;
+							}
+							
+							// Check networks
+							// TODO: specify explicit networks not as roles/not at all?
+							else
+							{
+								for(int i=0; !trusted && secinfos.getNetworks()!=null && i<secinfos.getNetworks().length; i++)
+								{
+									trusted	= sroles.contains(secinfos.getNetworks()[i]);
+								}
+								secinfos.getNetworks();
+							}
+						}
+					}
+				}
+				else
+				{
+					// safe command without special security, e.g. intermediate result
+					trusted	= true;
+				}
+			}
+			
+			if(!trusted)
+			{
+				System.out.println("Untrusted command not executed: "+msg);
+			}
+			
+			return trusted;
 		}
 	}
 	

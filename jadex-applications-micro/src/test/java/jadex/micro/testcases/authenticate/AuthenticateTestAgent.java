@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.junit.Ignore;
-
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -16,7 +14,6 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -36,7 +33,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Ignore // security checks not yet implemented
+//@Ignore // security checks not yet implemented
 public class AuthenticateTestAgent extends TestAgent
 {
 	/**
@@ -48,9 +45,9 @@ public class AuthenticateTestAgent extends TestAgent
 		boolean[][]	tests	= new boolean[][]
 		{
 			// Annot.:		un		def		cus		cus2	def		cus		un		def
-			new boolean[] {true,	false,	false,	false,	false,	false,	true,	false},	
-			new boolean[] {true,	true,	false,	false,	true,	false,	true,	true},
-			new boolean[] {true,	true,	true,	true,	true,	true,	true,	true}	
+			new boolean[] {true,	false,	false,	false},//	false,	false,	true,	false},	
+//			new boolean[] {true,	true,	false,	false},//	true,	false,	true,	true},
+//			new boolean[] {true,	true,	true,	true},//	true,	true,	true,	true}	
 		};
 		tc.setTestCount(tests.length);
 		
@@ -126,7 +123,7 @@ public class AuthenticateTestAgent extends TestAgent
 		
 		// Add agents.
 		conf.addComponent(BasicProviderAgent.class);
-		conf.addComponent(OverridingProviderAgent.class);
+//		conf.addComponent(OverridingProviderAgent.class);
 		
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		createPlatform(conf, null)
@@ -160,7 +157,7 @@ public class AuthenticateTestAgent extends TestAgent
 			@Override
 			public void customResultAvailable(Collection<ITestService> result) throws Exception
 			{
-				if(result.size()!=2)
+				if(result.size()!=1)
 				{
 					ret.setException(new RuntimeException("Found wrong services: "+result));
 				}
@@ -180,22 +177,22 @@ public class AuthenticateTestAgent extends TestAgent
 					
 					final Iterator<ITestService>	it	= sorted.iterator();
 					invokeService(it.next())
-						.addResultListener(new DelegationResultListener<boolean[]>(ret)
-					{
-						@Override
-						public void customResultAvailable(final boolean[] result1)
-						{
-							invokeService(it.next())
-								.addResultListener(new DelegationResultListener<boolean[]>(ret)
-							{
-								@Override
-								public void customResultAvailable(boolean[] result2)
-								{
-									ret.setResult((boolean[])SUtil.joinArrays(result1, result2));
-								}
-							});
-						}
-					});
+						.addResultListener(new DelegationResultListener<boolean[]>(ret));
+//					{
+//						@Override
+//						public void customResultAvailable(final boolean[] result1)
+//						{
+//							invokeService(it.next())
+//								.addResultListener(new DelegationResultListener<boolean[]>(ret)
+//							{
+//								@Override
+//								public void customResultAvailable(boolean[] result2)
+//								{
+//									ret.setResult((boolean[])SUtil.joinArrays(result1, result2));
+//								}
+//							});
+//						}
+//					});
 				}
 			}
 		});

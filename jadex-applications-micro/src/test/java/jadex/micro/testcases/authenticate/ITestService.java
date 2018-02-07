@@ -6,6 +6,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Test service interface for authentication.
  */
+@Security(roles=Security.UNRESTRICTED)	// always allow searching 
 public interface ITestService
 {
 	/**
