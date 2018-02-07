@@ -11,7 +11,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
-import jadex.javaparser.SJavaParser;
 
 
 /**
@@ -303,7 +302,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Method to provide the security level.
 	 */
-	public static String getSecurityLevel(IInternalAccess access, ClassInfo ctype)
+	public static Security getSecurityLevel(IInternalAccess access, ClassInfo ctype)
 	{
 		Class<?> type = ctype!=null? ctype.getType(access.getClassLoader(), access.getModel().getAllImports()) : null;
 		return getSecurityLevel(access, type);
@@ -312,11 +311,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Method to provide the security level.
 	 */
-	public static String getSecurityLevel(IInternalAccess access, Class<?> ctype)
+	public static Security getSecurityLevel(IInternalAccess access, Class<?> ctype)
 	{
-		Security secreq	= ctype!=null ? ctype.getAnnotation(Security.class) : null;
-		String	level = secreq!=null ? secreq.roles()[0] : null;	// TODO: multiple roles
-		return (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+		return ctype!=null ? ctype.getAnnotation(Security.class) : null;
 	}
 	
 	/**

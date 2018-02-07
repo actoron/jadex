@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.IRootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -184,19 +185,22 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
+		return createPlatform(STest.getDefaultTestConfig(), args);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IExternalAccess> createPlatform(IPlatformConfiguration config, String[] args)
+	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		// Start platform
-		Starter.createPlatform(STest.getDefaultTestConfig(), args).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		Starter.createPlatform(config, args).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
 				platforms.add(result);
-				super.customResultAvailable(result);
-			}
-
-			public void superCustomResultAvailable(IExternalAccess result)
-			{
 				super.customResultAvailable(result);
 			}
 		}));

@@ -150,7 +150,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		else if(mname.startsWith("get") || method.getName().startsWith("has"))
 		{
 //			ret = values.get(getKeyForMethodname(mname, 3));
-			ret = getValue(getKeyForMethodname(mname, 3), args.length>0? (IModelInfo)args[1]: null);
+			ret = getValue(getKeyForMethodname(mname, 3), args!=null && args.length>0? (IModelInfo)args[1]: null);
 		}
 		else if(method.getName().startsWith("is"))
 		{

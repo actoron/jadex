@@ -100,27 +100,17 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	 *  Overridden by subclasses.
 	 */
 	@Override
-	protected String getSecurityLevel(IInternalAccess access)
+	protected Security getSecurityLevel(IInternalAccess access)
 	{
-//		Class<?> type = query.getServiceType()!=null ? query.getServiceType().getType(access.getClassLoader()) : null;
-//		Security secreq	= type!=null ? type.getAnnotation(Security.class) : null;
-//		String	level	= secreq!=null ? secreq.value()[0] : null;	// TODO: multiple roles
-//		return level==null ? super.getSecurityLevel(access)
-//			: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
-		
 		// Search access depends on the (imaginary) registry service access
 		// Because no explicit service is available it checks if a global-superpeer is used
 		// This is checked by fetching the level of ISuperpeerRegistrySynchronizationService.class (if available)
-		String ret = null;
+		Security ret = null;
 		IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
 		ISuperpeerRegistrySynchronizationService srss = reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
 		if(srss!=null)
 		{
 			ret = ServiceIdentifier.getSecurityLevel(access, ISuperpeerRegistrySynchronizationService.class);
-		}
-		else
-		{
-			ret = Security.DEFAULT;
 		}
 		return ret;
 	}

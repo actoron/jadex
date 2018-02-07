@@ -1,16 +1,27 @@
 package jadex.micro.testcases.authenticate;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.junit.Ignore;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -25,7 +36,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Ignore // work in progress...
+@Ignore // security checks not yet implemented
 public class AuthenticateTestAgent extends TestAgent
 {
 	/**
@@ -41,6 +52,7 @@ public class AuthenticateTestAgent extends TestAgent
 			new boolean[] {true,	true,	false,	false,	true,	false,	true,	true},
 			new boolean[] {true,	true,	true,	true,	true,	true,	true,	true}	
 		};
+		tc.setTestCount(tests.length);
 		
 		return performTest(tc, tests, 0);
 	}
@@ -57,22 +69,32 @@ public class AuthenticateTestAgent extends TestAgent
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			@Override
-			public void customResultAvailable(IExternalAccess platform) throws Exception
+			public void customResultAvailable(final IExternalAccess platform) throws Exception
 			{
-				platform.killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+				invokeServices().addResultListener(new ExceptionDelegationResultListener<boolean[], Void>(ret)
 				{
 					@Override
-					public void customResultAvailable(Map<String, Object> result) throws Exception
+					public void customResultAvailable(boolean[] result) throws Exception
 					{
-						if(test<tests.length)
+						tc.addReport(new TestReport("#"+test, "Test security checks of service invocations ("+test+")", 
+							Arrays.equals(tests[test], result), "Expected "+Arrays.toString(tests[test])+" but was "+Arrays.toString(result)));
+						
+						platform.killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 						{
-							performTest(tc, tests, test+1)
-								.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						else
-						{
-							ret.setResult(null);
-						}
+							@Override
+							public void customResultAvailable(Map<String, Object> result) throws Exception
+							{
+								if(test<tests.length-1)
+								{
+									performTest(tc, tests, test+1)
+										.addResultListener(new DelegationResultListener<Void>(ret));
+								}
+								else
+								{
+									ret.setResult(null);
+								}
+							}
+						});
 					}
 				});
 			}
@@ -88,7 +110,185 @@ public class AuthenticateTestAgent extends TestAgent
 	 */
 	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, boolean cus)
 	{
-		return null;
+		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
+		
+		// Not default visibility means test unrestricted access -> use different platform name / key etc.
+		if(!def)
+		{
+			conf.setPlatformName("other_*");
+		}
+		
+		// Access with custom roles should work -> add roles to new platform.
+		if(cus)
+		{
+//			conf.setVirtualNames(value); ???
+		}
+		
+		// Add agents.
+		conf.addComponent(BasicProviderAgent.class);
+		conf.addComponent(OverridingProviderAgent.class);
+		
+		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
+		createPlatform(conf, null)
+			.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+		{
+			@Override
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+				createProxies(exta).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+				{
+					@Override
+					public void customResultAvailable(Void result) throws Exception
+					{
+						ret.setResult(exta);
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Search and invoke services and return the success flags.
+	 */
+	protected IFuture<boolean[]>	invokeServices()
+	{
+		final Future<boolean[]>	ret	= new Future<boolean[]>();
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(ITestService.class, Binding.SCOPE_GLOBAL)
+			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
+		{
+			@Override
+			public void customResultAvailable(Collection<ITestService> result) throws Exception
+			{
+				if(result.size()!=2)
+				{
+					ret.setException(new RuntimeException("Found wrong services: "+result));
+				}
+				else
+				{
+					// Sort results by toString -->  Basic... goes first, then Overriding...
+					Collection<ITestService>	sorted	= new TreeSet<ITestService>(new Comparator<ITestService>()
+					{
+						@Override
+						public int compare(ITestService o1, ITestService o2)
+						{
+							return o1.toString().compareTo(o2.toString());
+						}
+					});
+					sorted.addAll(result);
+					System.out.println("Sorted services: "+sorted);
+					
+					final Iterator<ITestService>	it	= sorted.iterator();
+					invokeService(it.next())
+						.addResultListener(new DelegationResultListener<boolean[]>(ret)
+					{
+						@Override
+						public void customResultAvailable(final boolean[] result1)
+						{
+							invokeService(it.next())
+								.addResultListener(new DelegationResultListener<boolean[]>(ret)
+							{
+								@Override
+								public void customResultAvailable(boolean[] result2)
+								{
+									ret.setResult((boolean[])SUtil.joinArrays(result1, result2));
+								}
+							});
+						}
+					});
+				}
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Invoke one service.
+	 */
+	protected IFuture<boolean[]>	invokeService(final ITestService ts)
+	{
+		final Future<boolean[]>	fret	= new Future<boolean[]>();
+		final boolean[]	ret	= new boolean[4];
+		ts.unrestrictedMethod().addResultListener(new IResultListener<Void>()
+		{			
+			@Override
+			public void resultAvailable(Void result)
+			{
+				proceed(true);
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				proceed(false);
+			}
+			
+			private void proceed(boolean val)
+			{
+				ret[0]	= val;
+				ts.defaultMethod().addResultListener(new IResultListener<Void>()
+				{			
+					@Override
+					public void resultAvailable(Void result)
+					{
+						proceed(true);
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						proceed(false);
+					}
+					
+					private void proceed(boolean val)
+					{
+						ret[1]	= val;
+						ts.customMethod().addResultListener(new IResultListener<Void>()
+						{			
+							@Override
+							public void resultAvailable(Void result)
+							{
+								proceed(true);
+							}
+							
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								proceed(false);
+							}
+							
+							private void proceed(boolean val)
+							{
+								ret[2]	= val;
+								ts.custom1Method().addResultListener(new IResultListener<Void>()
+								{			
+									@Override
+									public void resultAvailable(Void result)
+									{
+										proceed(true);
+									}
+									
+									@Override
+									public void exceptionOccurred(Exception exception)
+									{
+										proceed(false);
+									}
+									
+									private void proceed(boolean val)
+									{
+										ret[3]	= val;
+										fret.setResult(ret);
+									}
+								});
+							}
+						});
+
+					}
+				});
+
+			}
+		});
+		return fret;
 	}
 	
 //	/**

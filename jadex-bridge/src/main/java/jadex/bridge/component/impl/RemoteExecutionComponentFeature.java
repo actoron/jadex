@@ -47,6 +47,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Feature for securely sending and handling remote execution commands.
@@ -535,6 +536,10 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 */
 		protected boolean checkSecurity(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 		{
+			
+//			return level==null ? super.getSecurityLevel(access)
+//				: (String)SJavaParser.evaluateExpressionPotentially(level, access.getModel().getAllImports(), access.getFetcher(), access.getClassLoader());
+
 			return true;	// For relay testing.
 //			return secinfos.isTrustedPlatform()	// Trusted -> always ok
 //				|| msg==null && header.getProperty(MessageComponentFeature.EXCEPTION) instanceof Exception	// Exception reply -> always ok
