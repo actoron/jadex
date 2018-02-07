@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;

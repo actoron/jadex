@@ -1,7 +1,6 @@
 package jadex.base.test.util;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
@@ -31,13 +30,13 @@ public class STest {
     public static IPlatformConfiguration getDefaultTestConfig() 
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setKernels(IRootComponentConfiguration.KERNEL_MULTI);
-        config.setSecurity(true);
-        config.setTcpTransport(true);
+		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
+        config.getExtendedPlatformConfiguration().setSecurity(true);
+        config.getExtendedPlatformConfiguration().setTcpTransport(true);
         
         // TODO: Why is simulation broken?
-      config.setSimul(true);
-      config.setSimulation(true);
+        config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
+        config.getExtendedPlatformConfiguration().setSimulation(true);
                 
         return config;
     }

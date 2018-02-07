@@ -19,7 +19,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-relaytransport true -relayaddresses \&quot;tcp://reg2@35.185.67.200:8000\&quot; -gui false"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-relaytransport true -relayaddresses \&quot;tcp://reg2@35.185.67.200:8000\&quot; -gui false -platformname wurst"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-platform-standalone-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea"/>
 </launchConfiguration>

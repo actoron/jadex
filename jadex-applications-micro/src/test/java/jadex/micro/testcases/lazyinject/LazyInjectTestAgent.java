@@ -214,8 +214,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 	{
 		// Start platform with agent.
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
-		config1.setSecurity(true);
-		config1.setTcpTransport(true);
+		config1.getExtendedPlatformConfiguration().setSecurity(true);
+		config1.getExtendedPlatformConfiguration().setTcpTransport(true);
 //		config1.addComponent(UserAgent.class);
 		for (int i = 0; i < 2000; ++i)
 		{

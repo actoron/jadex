@@ -187,9 +187,9 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 	{
 		// Start platform with agent.
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
-		config1.setSecurity(true);
-		config1.setTcpTransport(true);
-		config1.setCli(true);
+		config1.getExtendedPlatformConfiguration().setSecurity(true);
+		config1.getExtendedPlatformConfiguration().setTcpTransport(true);
+		config1.getExtendedPlatformConfiguration().setCli(true);
 //		config1.addComponent(UserAgent.class);
 		for (int i = 0; i < 100; ++i)
 		{
@@ -222,11 +222,11 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
-		config1.setSecurity(true);
+		config1.getExtendedPlatformConfiguration().setSecurity(true);
 //		config1.setAwaMechanisms(AWAMECHANISM.local);
 //		config1.setAwareness(true);
-		config1.setTcpTransport(false);
-		config1.setWsTransport(true);
+		config1.getExtendedPlatformConfiguration().setTcpTransport(false);
+		config1.getExtendedPlatformConfiguration().setWsTransport(true);
 		config1.addComponent(AutoTerminateTestAgent.class);
 		Starter.createPlatform(config1).get();
 	}

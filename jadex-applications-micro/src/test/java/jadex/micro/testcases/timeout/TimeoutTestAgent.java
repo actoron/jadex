@@ -250,10 +250,10 @@ public class TimeoutTestAgent extends TestAgent
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
-		config1.setSecurity(true);
+		config1.getExtendedPlatformConfiguration().setSecurity(true);
 //		config1.setAwaMechanisms(AWAMECHANISM.local);
 //		config1.setAwareness(true);
-        config1.setTcpTransport(false);
+        config1.getExtendedPlatformConfiguration().setTcpTransport(false);
 		config1.addComponent(TimeoutTestAgent.class);
 		Starter.createPlatform(config1).get();
 	}

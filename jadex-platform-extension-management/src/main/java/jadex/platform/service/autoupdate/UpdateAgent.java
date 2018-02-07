@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jadex.base.IRootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -550,7 +550,7 @@ public class UpdateAgent implements IUpdateService
 								// Set program args according to the original ones
 								// Will change the argument with the update agent to have the creator cid
 								
-								String[] oldargs = (String[])args.get(IRootComponentConfiguration.PROGRAM_ARGUMENTS);
+								String[] oldargs = (String[])args.get(IPlatformConfiguration.PROGRAM_ARGUMENTS);
 								List<String> newargs = new ArrayList<String>();
 								
 								if(oldargs!=null)

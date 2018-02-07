@@ -250,7 +250,7 @@ public class DFTestAgent extends JunitAgentTest
 	@Override
 	public IPlatformConfiguration getConfig()
 	{
-		super.getConfig().setDf(true);
+		super.getConfig().getExtendedPlatformConfiguration().setDf(true);
 		return super.getConfig();
 	}
 	

@@ -16,7 +16,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.modelinfo.IArgument;
@@ -53,8 +53,8 @@ public class PlatformConfigurationTest
 		
 		IArgument[] arguments = defmodel.getArguments();
 		
-		HashMap<String,Field> staticFieldContents = getStaticFieldContents(IRootComponentConfiguration.class);
-		Map<String, Method> setters = getSettersByName(IRootComponentConfiguration.class, staticFieldContents.keySet());
+		HashMap<String,Field> staticFieldContents = getStaticFieldContents(IPlatformConfiguration.class);
+		Map<String, Method> setters = getSettersByName(IPlatformConfiguration.class, staticFieldContents.keySet());
 		
 		for(IArgument argument : arguments)
 		{
@@ -68,7 +68,7 @@ public class PlatformConfigurationTest
 				assertTrue("RootComponentConfiguration should contain parameter: " + name,field != null);
 				
 				// this parameter does not have a getter
-				if (!name.equals(IRootComponentConfiguration.PROGRAM_ARGUMENTS)) {
+				if (!name.equals(IPlatformConfiguration.PROGRAM_ARGUMENTS)) {
 					String prettyName = makePrettyName(name);
 					Method method = setters.get(prettyName);
 					assertNotNull("No setter for: " + prettyName, method);
@@ -78,10 +78,10 @@ public class PlatformConfigurationTest
 						setterParamType = SReflect.getWrappedType(setterParamType);
 					}
 					// this parameters have another parameter type in config object (-> varargs)
-					if (!(name.equals(IRootComponentConfiguration.KERNELS)
-						|| name.equals(IRootComponentConfiguration.AWAMECHANISMS)
-						|| name.equals(IRootComponentConfiguration.NETWORKNAME)
-						|| name.equals(IRootComponentConfiguration.NETWORKPASS))) {
+					if (!(name.equals(IPlatformConfiguration.KERNELS)
+						|| name.equals(IPlatformConfiguration.AWAMECHANISMS)
+						|| name.equals(IPlatformConfiguration.NETWORKNAME)
+						|| name.equals(IPlatformConfiguration.NETWORKPASS))) {
 						assertEquals("Field " + name + " has not the same type.", modelParamType, setterParamType);
 					}
 					
@@ -98,8 +98,8 @@ public class PlatformConfigurationTest
 //		{
 //			boolean contains = false;
 //			// those dont have to be in the agent model
-//			if (!(argument.equals(IRootComponentConfiguration.COMPONENT_FACTORY) 
-//				|| argument.equals(IRootComponentConfiguration.PLATFORM_ACCESS)))
+//			if (!(argument.equals(IPlatformConfiguration.COMPONENT_FACTORY) 
+//				|| argument.equals(IPlatformConfiguration.PLATFORM_ACCESS)))
 //			{
 //					for(IArgument iArgument : arguments)
 //					{
@@ -118,12 +118,12 @@ public class PlatformConfigurationTest
 	public void testMinimalPlatform() 
 	{
 		IPlatformConfiguration minimal = PlatformConfigurationHandler.getMinimal();
-		minimal.setRelayTransport(false);
-		minimal.setWsTransport(false);
+		minimal.getExtendedPlatformConfiguration().setRelayTransport(false);
+		minimal.getExtendedPlatformConfiguration().setWsTransport(false);
 		Starter.createPlatform(minimal).get();
 	}
 
-	private Map<String,Method> getSettersByName(Class<IRootComponentConfiguration> class1, Set<String> names)
+	private Map<String,Method> getSettersByName(Class<IPlatformConfiguration> class1, Set<String> names)
 	{
 		HashSet<String> myNames = new HashSet<String>();
 		for(String string : names)
@@ -153,7 +153,7 @@ public class PlatformConfigurationTest
 		return name.toLowerCase().replace("_", "");
 	}
 
-	private HashMap<String, Field> getStaticFieldContents(Class<IRootComponentConfiguration> class1)
+	private HashMap<String, Field> getStaticFieldContents(Class<IPlatformConfiguration> class1)
 	{
 		HashMap<String,Field> hashMap = new HashMap<String, Field>();
 		Field[] fields = class1.getFields();

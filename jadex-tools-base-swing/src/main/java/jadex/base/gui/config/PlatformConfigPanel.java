@@ -27,7 +27,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IStarterConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.SBootstrapLoader;
@@ -234,7 +233,7 @@ public class PlatformConfigPanel	extends JPanel
 						
 						if(props.getStringProperty(IPlatformConfiguration.CONFIGURATION_FILE)!=null)
 						{
-							factory.setSelectedItem(props.getStringProperty(IStarterConfiguration.COMPONENT_FACTORY));
+							factory.setSelectedItem(props.getStringProperty(IPlatformConfiguration.COMPONENT_FACTORY));
 							model.setSelectedItem(props.getStringProperty(IPlatformConfiguration.CONFIGURATION_FILE));
 							
 							loadModel(model, factory, config)
@@ -270,7 +269,7 @@ public class PlatformConfigPanel	extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				Properties	props	= new Properties();
-				props.addProperty(new Property(IStarterConfiguration.COMPONENT_FACTORY, (String)factory.getSelectedItem()));
+				props.addProperty(new Property(IPlatformConfiguration.COMPONENT_FACTORY, (String)factory.getSelectedItem()));
 				props.addProperty(new Property(IPlatformConfiguration.CONFIGURATION_FILE, (String)model.getSelectedItem()));
 				
 				if(config.isEnabled())
@@ -315,7 +314,7 @@ public class PlatformConfigPanel	extends JPanel
 			{
 				List<String>	args	= new ArrayList<String>();
 				
-				args.add("-"+IStarterConfiguration.COMPONENT_FACTORY);
+				args.add("-"+IPlatformConfiguration.COMPONENT_FACTORY);
 				args.add((String)factory.getSelectedItem());
 				
 				args.add("-"+IPlatformConfiguration.CONFIGURATION_FILE);

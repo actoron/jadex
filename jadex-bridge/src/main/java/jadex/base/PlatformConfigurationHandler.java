@@ -38,7 +38,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	
 	static
 	{
-		namemappings.put("configurationfile", IStarterConfiguration.CONFIGURATION_FILE);
+		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
 		namemappings.put("networknames", "networkname");
 	}
 	
@@ -47,11 +47,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	 */
 	public PlatformConfigurationHandler()
 	{
-		values.put(IStarterConfiguration.COMPONENT_FACTORY, IStarterConfiguration.FALLBACK_COMPONENT_FACTORY);
-		values.put(IStarterConfiguration.CONFIGURATION_FILE, IStarterConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
-		values.put("localdefaulttimeout", IStarterConfiguration.DEFAULT_LOCAL_TIMEOUT);
-		values.put("remotedefaulttimeout", IStarterConfiguration.DEFAULT_REMOTE_TIMEOUT);
+		values.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
+		values.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
+		values.put("localdefaulttimeout", IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT);
+		values.put("remotedefaulttimeout", IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT);
 		values.put("components", new ArrayList<String>());
+		values.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
 //		System.out.println("PlatformConfigurationHandler: "+values+" "+hashCode());
 	}
 	
@@ -68,20 +69,20 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		String mname = method.getName();
 		
 		// from IPlatformConfiguration
-		if(mname.equals("getRootConfig"))
+		if(mname.equals("getExtendedPlatformConfiguration"))
 		{
 			ret = proxy;
 		}
 		// from IPlatformConfiguration
-		else if(mname.equals("getStarterConfig"))
-		{
-			ret = proxy;
-		}
+//		else if(mname.equals("getStarterConfig"))
+//		{
+//			ret = proxy;
+//		}
 		// Convert class to name.
 		else if(mname.equals("addComponent") && args[0] instanceof Class<?>)
 		{
 			checkReadOnly();
-			((IStarterConfiguration)proxy).addComponent(((Class<?>)args[0]).getName()+".class");
+			((IPlatformConfiguration)proxy).addComponent(((Class<?>)args[0]).getName()+".class");
 		}
 		else if(mname.equals("setReadOnly"))
 		{
@@ -207,23 +208,23 @@ public class PlatformConfigurationHandler implements InvocationHandler
      */
     public void parseArg(IPlatformConfiguration config, String key, String strval, Object value)
     {
-        if(IStarterConfiguration.COMPONENT.equals(key))
+        if(IPlatformConfiguration.COMPONENT.equals(key))
         {
             config.addComponent((String)strval);
         }
-        else if(IStarterConfiguration.DEBUGFUTURES.equals(key) && "true".equals(strval))
+        else if(IPlatformConfiguration.DEBUGFUTURES.equals(key) && "true".equals(strval))
         {
-        	config.setDebugFutures(true);
+        	config.getExtendedPlatformConfiguration().setDebugFutures(true);
         }
-        else if(IStarterConfiguration.DEBUGSERVICES.equals(key) && "true".equals(strval))
+        else if(IPlatformConfiguration.DEBUGSERVICES.equals(key) && "true".equals(strval))
         {
-        	config.setDebugServices(true);
+        	config.getExtendedPlatformConfiguration().setDebugServices(true);
         }
-        else if(IStarterConfiguration.DEBUGSTEPS.equals(key) && "true".equals(strval))
+        else if(IPlatformConfiguration.DEBUGSTEPS.equals(key) && "true".equals(strval))
         {
-        	config.setDebugSteps(true);
+        	config.getExtendedPlatformConfiguration().setDebugSteps(true);
         }
-        else if(IStarterConfiguration.DEFTIMEOUT.equals(key))
+        else if(IPlatformConfiguration.DEFTIMEOUT.equals(key))
         {
         	value = SJavaParser.evaluateExpression(strval, null);
 //			BasicService.DEFTIMEOUT	= ((Number)stringValue).longValue();
@@ -236,18 +237,18 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //			BasicService.setLocalDefaultTimeout(to);
 //			System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
         }
-        else if(IStarterConfiguration.NOSTACKCOMPACTION.equals(key) && "true".equals(strval))
+        else if(IPlatformConfiguration.NOSTACKCOMPACTION.equals(key) && "true".equals(strval))
         {
-        	config.setNoStackCompaction(true);
+        	config.getExtendedPlatformConfiguration().setNoStackCompaction(true);
         }
-        else if(IStarterConfiguration.OPENGL.equals(key) && "false".equals(strval))
+        else if(IPlatformConfiguration.OPENGL.equals(key) && "false".equals(strval))
         {
-        	config.setOpenGl(false);
+        	config.getExtendedPlatformConfiguration().setOpenGl(false);
         }
-        else if(IStarterConfiguration.MONITORING.equals(key))
+        else if(IPlatformConfiguration.MONITORING.equals(key))
         {
 //            Object tmpmoni = getValue(IStarterConfiguration.MONITORING);
-            Object tmpmoni = values.get(IStarterConfiguration.MONITORING);
+            Object tmpmoni = values.get(IPlatformConfiguration.MONITORING);
             IMonitoringService.PublishEventLevel moni = IMonitoringService.PublishEventLevel.OFF;
             if(tmpmoni instanceof Boolean)
             {
@@ -261,7 +262,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
             {
                 moni = (IMonitoringService.PublishEventLevel)tmpmoni;
             }
-            config.setMonitoring(moni);
+            config.getExtendedPlatformConfiguration().setMonitoring(moni);
         }
         else
         {
@@ -417,7 +418,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
         if(configname==null)
         {
             Object	val	= null;
-            IArgument	arg	= model.getArgument(IStarterConfiguration.CONFIGURATION_NAME);
+            IArgument	arg	= model.getArgument(IPlatformConfiguration.CONFIGURATION_NAME);
             if(arg!=null)
             {
                 val	= arg.getDefaultValue();
@@ -439,7 +440,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
      */
     public String getConfigurationName()
     {
-        return (String)values.get(IStarterConfiguration.CONFIGURATION_NAME);
+        return (String)values.get(IPlatformConfiguration.CONFIGURATION_NAME);
     }
     
 //    /**
@@ -569,7 +570,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getPlatformConfiguration(ClassLoader cl, PlatformConfigurationHandler h)
 	{
 		cl = cl==null? (ClassLoader)IPlatformConfiguration.class.getClassLoader(): cl;
-		IPlatformConfiguration ret = (IPlatformConfiguration)ProxyFactory.newProxyInstance(cl, new Class[]{IPlatformConfiguration.class}, h);
+		IPlatformConfiguration ret = (IPlatformConfiguration)ProxyFactory.newProxyInstance(cl, new Class[]{IPlatformConfiguration.class, IExtendedPlatformConfiguration.class}, h);
 		return ret;
 	}
 	
@@ -602,25 +603,25 @@ public class PlatformConfigurationHandler implements InvocationHandler
     {
 		Set<String> RESERVED = new HashSet<String>();
         RESERVED = new HashSet<String>();
-        RESERVED.add(IStarterConfiguration.CONFIGURATION_FILE);
-        RESERVED.add(IStarterConfiguration.CONFIGURATION_NAME);
-        RESERVED.add(IStarterConfiguration.PLATFORM_NAME);
-        RESERVED.add(IStarterConfiguration.COMPONENT_FACTORY);
-        RESERVED.add(IStarterConfiguration.PLATFORM_COMPONENT);
-        RESERVED.add(IStarterConfiguration.AUTOSHUTDOWN);
-        RESERVED.add(IStarterConfiguration.MONITORING);
-        RESERVED.add(IRootComponentConfiguration.WELCOME);
-        RESERVED.add(IStarterConfiguration.COMPONENT);
-        RESERVED.add(IStarterConfiguration.PARAMETERCOPY);
-        RESERVED.add(IStarterConfiguration.REALTIMETIMEOUT);
-        RESERVED.add(IStarterConfiguration.PERSIST);
-        RESERVED.add(IStarterConfiguration.DEBUGFUTURES);
-        RESERVED.add(IStarterConfiguration.DEBUGSERVICES);
-        RESERVED.add(IStarterConfiguration.DEBUGSTEPS);
-        RESERVED.add(IStarterConfiguration.NOSTACKCOMPACTION);
-        RESERVED.add(IStarterConfiguration.OPENGL);
-        RESERVED.add(IStarterConfiguration.DEFTIMEOUT);
-        RESERVED.add(IStarterConfiguration.PRINTEXCEPTIONS);
+        RESERVED.add(IPlatformConfiguration.CONFIGURATION_FILE);
+        RESERVED.add(IPlatformConfiguration.CONFIGURATION_NAME);
+        RESERVED.add(IPlatformConfiguration.PLATFORM_NAME);
+        RESERVED.add(IPlatformConfiguration.COMPONENT_FACTORY);
+        RESERVED.add(IPlatformConfiguration.PLATFORM_COMPONENT);
+        RESERVED.add(IPlatformConfiguration.AUTOSHUTDOWN);
+        RESERVED.add(IPlatformConfiguration.MONITORING);
+        RESERVED.add(IPlatformConfiguration.WELCOME);
+        RESERVED.add(IPlatformConfiguration.COMPONENT);
+        RESERVED.add(IPlatformConfiguration.PARAMETERCOPY);
+        RESERVED.add(IPlatformConfiguration.REALTIMETIMEOUT);
+        RESERVED.add(IPlatformConfiguration.PERSIST);
+        RESERVED.add(IPlatformConfiguration.DEBUGFUTURES);
+        RESERVED.add(IPlatformConfiguration.DEBUGSERVICES);
+        RESERVED.add(IPlatformConfiguration.DEBUGSTEPS);
+        RESERVED.add(IPlatformConfiguration.NOSTACKCOMPACTION);
+        RESERVED.add(IPlatformConfiguration.OPENGL);
+        RESERVED.add(IPlatformConfiguration.DEFTIMEOUT);
+        RESERVED.add(IPlatformConfiguration.PRINTEXCEPTIONS);
         return RESERVED;
 	}
 	
@@ -670,68 +671,68 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getDefault()
 	{
 		IPlatformConfiguration config = getPlatformConfiguration();
+		IExtendedPlatformConfiguration econfig = (IExtendedPlatformConfiguration)config;
 		// config.setPlatformName("jadex");
-		config.getStarterConfig().setPlatformName(null);
-		config.getStarterConfig().setConfigurationName("auto");
-		config.getStarterConfig().setAutoShutdown(false);
-		config.getStarterConfig().setPlatformComponent(new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
-//		config.getStarterConfig().setPlatformComponent(new ClassInfo("jadex.platform.service.cms.PlatformComponent").getType(null));
-		IRootComponentConfiguration rootconf = config.getRootConfig();
-		rootconf.setWelcome(true);
-		rootconf.setGui(true);
-		rootconf.setCliConsole(true);
-		rootconf.setSaveOnExit(true);
-		rootconf.setJccPlatforms(null);
-		rootconf.setLogging(false);
-		rootconf.setLoggingLevel(Level.SEVERE);
-		rootconf.setThreadpoolDefer(true);
+		config.setPlatformName(null);
+		config.setConfigurationName("auto");
+		econfig.setAutoShutdown(false);
+//		config.setPlatformComponent(new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
+//		config.getExtendedPlatformConfiguration().setPlatformComponent(new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
+		config.setWelcome(true);
+		config.setGui(true);
+		econfig.setCliConsole(true);
+		econfig.setSaveOnExit(true);
+		econfig.setJccPlatforms(null);
+		config.setLogging(false);
+		config.setLoggingLevel(Level.SEVERE);
+		econfig.setThreadpoolDefer(true);
 //		rootconf.setPersist(false);
-		rootconf.setUniqueIds(true);
+		econfig.setUniqueIds(true);
 
-		rootconf.setChat(true);
+		econfig.setChat(true);
 
-		rootconf.setAwareness(true);
+		config.setAwareness(true);
 //		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM.broadcast, IRootComponentConfiguration.AWAMECHANISM.multicast, IRootComponentConfiguration.AWAMECHANISM.message,
 //			IRootComponentConfiguration.AWAMECHANISM.relay, IRootComponentConfiguration.AWAMECHANISM.local);
-		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_BROADCAST, IRootComponentConfiguration.AWAMECHANISM_MULTICAST, IRootComponentConfiguration.AWAMECHANISM_LOCAL);
-		rootconf.setAwaDelay(20000);
-		rootconf.setAwaIncludes("");
-		rootconf.setAwaExcludes("");
+		econfig.setAwaMechanisms(IPlatformConfiguration.AWAMECHANISM_BROADCAST, IPlatformConfiguration.AWAMECHANISM_MULTICAST, IPlatformConfiguration.AWAMECHANISM_LOCAL);
+		econfig.setAwaDelay(20000);
+		econfig.setAwaIncludes("");
+		econfig.setAwaExcludes("");
 
-		rootconf.setBinaryMessages(true);
-		rootconf.setStrictCom(false);
-		rootconf.setPrintPass(true);
+		econfig.setBinaryMessages(true);
+		econfig.setStrictCom(false);
+//		econfig.setPrintPass(true);
 
-		rootconf.setLocalTransport(true);
-		rootconf.setTcpTransport(true);
-		rootconf.setTcpPort(0);
+//		config.setLocalTransport(true);
+		econfig.setTcpTransport(true);
+		econfig.setTcpPort(0);
 		// rootConfig.setRelayTransport(true);
 		// rootConfig.setRelayAddress("jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS");
 		// rootConfig.setRelaySecurity(true);
 		// rootConfig.setSslTcpTransport(false);
 		// rootConfig.setSslTcpPort(0);
 
-		rootconf.setWsPublish(false);
-		rootconf.setRsPublish(false);
+		econfig.setWsPublish(false);
+		econfig.setRsPublish(false);
 //		rootconf.setKernels(IRootComponentConfiguration.KERNEL.multi);
-		rootconf.setKernels(IRootComponentConfiguration.KERNEL_MULTI);
-		rootconf.setMavenDependencies(false);
-		rootconf.setSensors(false);
-		rootconf.setThreadpoolClass(null);
-		rootconf.setContextServiceClass(null);
+		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
+//		econfig.setMavenDependencies(false);
+		config.setSensors(false);
+//		econfig.setThreadpoolClass(null);
+//		econfig.setContextServiceClass(null);
 
-		rootconf.setMonitoringComp(true);
-		rootconf.setDf(true);
-		rootconf.setClock(true);
+		econfig.setMonitoringComp(true);
+//		econfig.setDf(true);
+		econfig.setClock(true);
 		// rootConfig.setMessage(true);
-		rootconf.setSimul(true);
-		rootconf.setFiletransfer(true);
-		rootconf.setMarshal(true);
-		rootconf.setSecurity(true);
-		rootconf.setLibrary(true);
-		rootconf.setSettings(true);
-		rootconf.setContext(true);
-		rootconf.setAddress(true);
+		econfig.setSimul(true);
+		econfig.setFiletransfer(true);
+		econfig.setMarshal(true);
+		econfig.setSecurity(true);
+		econfig.setLibrary(true);
+		econfig.setSettings(true);
+		econfig.setContext(true);
+		econfig.setAddress(true);
 		// rootConfig.setRegistrySync(false);
 		return config;
 	}
@@ -742,7 +743,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getDefaultNoGui()
 	{
 		IPlatformConfiguration config = getDefault();
-		config.getRootConfig().setGui(false);
+		config.setGui(false);
 		return config;
 	}
 
@@ -752,12 +753,11 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getAndroidDefault()
 	{
 		IPlatformConfiguration config = getDefault();
-		IRootComponentConfiguration rootconf = config.getRootConfig();
-		rootconf.setGui(false);
-		rootconf.setChat(false);
-		rootconf.setKernels(IRootComponentConfiguration.KERNEL_COMPONENT, 
-			IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_BPMN, IRootComponentConfiguration.KERNEL_BDIV3);
-		rootconf.setLoggingLevel(Level.INFO);
+		config.setGui(false);
+		config.getExtendedPlatformConfiguration().setChat(false);
+		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, 
+			IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_BPMN, IPlatformConfiguration.KERNEL_BDIV3);
+		config.setLoggingLevel(Level.INFO);
 		// config.setDebugFutures(true);
 		return config;
 	}
@@ -769,43 +769,42 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getMinimal()
 	{
 		IPlatformConfiguration config = getDefault();
-		IRootComponentConfiguration rootconf = config.getRootConfig();
-		rootconf.setWelcome(false);
-		rootconf.setGui(false);
-		rootconf.setCli(false);
-		rootconf.setCliConsole(false);
+		config.setWelcome(false);
+		config.setGui(false);
+		config.getExtendedPlatformConfiguration().setCli(false);
+		config.getExtendedPlatformConfiguration().setCliConsole(false);
 
-		rootconf.setChat(false);
+		config.getExtendedPlatformConfiguration().setChat(false);
 
-		rootconf.setAwareness(false);
-		rootconf.setAwaMechanisms();
+		config.setAwareness(false);
+		config.getExtendedPlatformConfiguration().setAwaMechanisms();
 
-		rootconf.setLocalTransport(true); // needed by message
-		rootconf.setTcpTransport(false);
-		rootconf.setWsTransport(false);
-		rootconf.setRelayTransport(false);
+//		config.setLocalTransport(true); // needed by message
+		config.getExtendedPlatformConfiguration().setTcpTransport(false);
+		config.getExtendedPlatformConfiguration().setWsTransport(false);
+		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
 
-		rootconf.setKernels(IRootComponentConfiguration.KERNEL_MICRO);
+		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
 		// rootConfig.setThreadpoolClass(null);
 		// rootConfig.setContextServiceClass(null);
 
-		rootconf.setMonitoringComp(false);
-		rootconf.setDf(false);
-		rootconf.setClock(true);
+		config.getExtendedPlatformConfiguration().setMonitoringComp(false);
+		config.getExtendedPlatformConfiguration().setDf(false);
+		config.getExtendedPlatformConfiguration().setClock(true);
 		// rootConfig.setMessage(true); // needed by rms
-		rootconf.setSimul(false);
-		rootconf.setFiletransfer(false);
-		rootconf.setMarshal(true);
-		rootconf.setSecurity(false);
-		rootconf.setLibrary(true); // needed by micro
-		rootconf.setSettings(true);
-		rootconf.setContext(true);
-		rootconf.setAddress(true);
+		config.getExtendedPlatformConfiguration().setSimul(false);
+		config.getExtendedPlatformConfiguration().setFiletransfer(false);
+		config.getExtendedPlatformConfiguration().setMarshal(true);
+		config.getExtendedPlatformConfiguration().setSecurity(false);
+		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
+		config.getExtendedPlatformConfiguration().setSettings(true);
+		config.getExtendedPlatformConfiguration().setContext(true);
+		config.getExtendedPlatformConfiguration().setAddress(true);
 
-		rootconf.setSuperpeer(false);
-		rootconf.setSuperpeerClient(false);
-		rootconf.setSupersuperpeer(false);
+		config.setSuperpeer(false);
+		config.setSuperpeerClient(false);
+		config.setSupersuperpeer(false);
 
 		return config;
 	}
@@ -816,15 +815,14 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getMinimalRelayAwareness()
 	{
 		IPlatformConfiguration config = getMinimal();
-		IRootComponentConfiguration rootconf = config.getRootConfig();
 
-		rootconf.setAwareness(true);
+		config.setAwareness(true);
 //		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_RELAY);
-		rootconf.setAwaFast(true); // Make sure awareness finds other
+//		config.getExtendedPlatformConfiguration().setAwaFast(true); // Make sure awareness finds other
 										// platforms quickly
 		// rootConfig.setRelayTransport(true);
 
-		rootconf.setSecurity(true); // enable security when remote comm.
+		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
 
 		throw new RuntimeException("Sorry, no relay available.");
 //		return config;

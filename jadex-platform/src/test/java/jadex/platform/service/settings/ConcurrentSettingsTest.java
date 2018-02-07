@@ -34,7 +34,7 @@ public class ConcurrentSettingsTest
 		long	timeout	= Starter.getLocalDefaultTimeout(null);
 		
 		IPlatformConfiguration	conf	= PlatformConfigurationHandler.getMinimal();
-		conf.setSecurity(true);	// enabled to write/read password
+		conf.getExtendedPlatformConfiguration().setSecurity(true);	// enabled to write/read password
 		conf.setPlatformName("settingstest_*");
 		
 		// Delete settings to generate new password

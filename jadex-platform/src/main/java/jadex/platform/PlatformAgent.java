@@ -1,66 +1,66 @@
 package jadex.platform;
 
-import static jadex.base.IRootComponentConfiguration.ADDRESS;
-import static jadex.base.IRootComponentConfiguration.ASYNCEXECUTION;
-import static jadex.base.IRootComponentConfiguration.AWADELAY;
-import static jadex.base.IRootComponentConfiguration.AWAEXCLUDES;
-import static jadex.base.IRootComponentConfiguration.AWAFAST;
-import static jadex.base.IRootComponentConfiguration.AWAINCLUDES;
-import static jadex.base.IRootComponentConfiguration.AWAMECHANISMS;
-import static jadex.base.IRootComponentConfiguration.AWARENESS;
-import static jadex.base.IRootComponentConfiguration.BASECLASSLOADER;
-import static jadex.base.IRootComponentConfiguration.BINARYMESSAGES;
-import static jadex.base.IRootComponentConfiguration.CHAT;
-import static jadex.base.IRootComponentConfiguration.CLI;
-import static jadex.base.IRootComponentConfiguration.CLICONSOLE;
-import static jadex.base.IRootComponentConfiguration.CLOCK;
-import static jadex.base.IRootComponentConfiguration.CONTEXT;
-import static jadex.base.IRootComponentConfiguration.CONTEXTSERVICECLASS;
-import static jadex.base.IRootComponentConfiguration.DF;
-import static jadex.base.IRootComponentConfiguration.FILETRANSFER;
-import static jadex.base.IRootComponentConfiguration.GUI;
-import static jadex.base.IRootComponentConfiguration.JCCPLATFORMS;
-import static jadex.base.IRootComponentConfiguration.KERNELS;
-import static jadex.base.IRootComponentConfiguration.LIBPATH;
-import static jadex.base.IRootComponentConfiguration.LIBRARY;
-import static jadex.base.IRootComponentConfiguration.LOCALTRANSPORT;
-import static jadex.base.IRootComponentConfiguration.LOGGING;
-import static jadex.base.IRootComponentConfiguration.LOGGING_LEVEL;
-import static jadex.base.IRootComponentConfiguration.MARSHAL;
-import static jadex.base.IRootComponentConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.IRootComponentConfiguration.MONITORINGCOMP;
-import static jadex.base.IRootComponentConfiguration.NETWORKNAME;
-import static jadex.base.IRootComponentConfiguration.NETWORKPASS;
-import static jadex.base.IRootComponentConfiguration.PRINTPASS;
-import static jadex.base.IRootComponentConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.IRootComponentConfiguration.RELAYADDRESSES;
-import static jadex.base.IRootComponentConfiguration.RELAYFORWARDING;
-import static jadex.base.IRootComponentConfiguration.RELAYTRANSPORT;
-import static jadex.base.IRootComponentConfiguration.RSPUBLISH;
-import static jadex.base.IRootComponentConfiguration.RSPUBLISHCOMPONENT;
-import static jadex.base.IRootComponentConfiguration.SAVEONEXIT;
-import static jadex.base.IRootComponentConfiguration.SECURITY;
-import static jadex.base.IRootComponentConfiguration.SENSORS;
-import static jadex.base.IRootComponentConfiguration.SETTINGS;
-import static jadex.base.IRootComponentConfiguration.SIMUL;
-import static jadex.base.IRootComponentConfiguration.SIMULATION;
-import static jadex.base.IRootComponentConfiguration.STRICTCOM;
-import static jadex.base.IRootComponentConfiguration.SUPERPEER;
-import static jadex.base.IRootComponentConfiguration.SUPERPEERCLIENT;
-import static jadex.base.IRootComponentConfiguration.TCPPORT;
-import static jadex.base.IRootComponentConfiguration.TCPTRANSPORT;
-import static jadex.base.IRootComponentConfiguration.THREADPOOLCLASS;
-import static jadex.base.IRootComponentConfiguration.THREADPOOLDEFER;
-import static jadex.base.IRootComponentConfiguration.TRUSTEDLAN;
-import static jadex.base.IRootComponentConfiguration.UNIQUEIDS;
-import static jadex.base.IRootComponentConfiguration.USEPASS;
-import static jadex.base.IRootComponentConfiguration.VALIDITYDURATION;
-import static jadex.base.IRootComponentConfiguration.VIRTUALNAMES;
-import static jadex.base.IRootComponentConfiguration.WELCOME;
-import static jadex.base.IRootComponentConfiguration.WSPORT;
-import static jadex.base.IRootComponentConfiguration.WSPUBLISH;
-import static jadex.base.IRootComponentConfiguration.WSTRANSPORT;
-import static jadex.base.IRootComponentConfiguration.SUPERSUPERPEER;
+import static jadex.base.IPlatformConfiguration.ADDRESS;
+import static jadex.base.IPlatformConfiguration.ASYNCEXECUTION;
+import static jadex.base.IPlatformConfiguration.AWADELAY;
+import static jadex.base.IPlatformConfiguration.AWAEXCLUDES;
+import static jadex.base.IPlatformConfiguration.AWAFAST;
+import static jadex.base.IPlatformConfiguration.AWAINCLUDES;
+import static jadex.base.IPlatformConfiguration.AWAMECHANISMS;
+import static jadex.base.IPlatformConfiguration.AWARENESS;
+import static jadex.base.IPlatformConfiguration.BASECLASSLOADER;
+import static jadex.base.IPlatformConfiguration.BINARYMESSAGES;
+import static jadex.base.IPlatformConfiguration.CHAT;
+import static jadex.base.IPlatformConfiguration.CLI;
+import static jadex.base.IPlatformConfiguration.CLICONSOLE;
+import static jadex.base.IPlatformConfiguration.CLOCK;
+import static jadex.base.IPlatformConfiguration.CONTEXT;
+import static jadex.base.IPlatformConfiguration.CONTEXTSERVICECLASS;
+import static jadex.base.IPlatformConfiguration.DF;
+import static jadex.base.IPlatformConfiguration.FILETRANSFER;
+import static jadex.base.IPlatformConfiguration.GUI;
+import static jadex.base.IPlatformConfiguration.JCCPLATFORMS;
+import static jadex.base.IPlatformConfiguration.KERNELS;
+import static jadex.base.IPlatformConfiguration.LIBPATH;
+import static jadex.base.IPlatformConfiguration.LIBRARY;
+import static jadex.base.IPlatformConfiguration.LOCALTRANSPORT;
+import static jadex.base.IPlatformConfiguration.LOGGING;
+import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
+import static jadex.base.IPlatformConfiguration.MARSHAL;
+import static jadex.base.IPlatformConfiguration.MAVEN_DEPENDENCIES;
+import static jadex.base.IPlatformConfiguration.MONITORINGCOMP;
+import static jadex.base.IPlatformConfiguration.NETWORKNAME;
+import static jadex.base.IPlatformConfiguration.NETWORKPASS;
+import static jadex.base.IPlatformConfiguration.PRINTPASS;
+import static jadex.base.IPlatformConfiguration.PROGRAM_ARGUMENTS;
+import static jadex.base.IPlatformConfiguration.RELAYADDRESSES;
+import static jadex.base.IPlatformConfiguration.RELAYFORWARDING;
+import static jadex.base.IPlatformConfiguration.RELAYTRANSPORT;
+import static jadex.base.IPlatformConfiguration.RSPUBLISH;
+import static jadex.base.IPlatformConfiguration.RSPUBLISHCOMPONENT;
+import static jadex.base.IPlatformConfiguration.SAVEONEXIT;
+import static jadex.base.IPlatformConfiguration.SECURITY;
+import static jadex.base.IPlatformConfiguration.SENSORS;
+import static jadex.base.IPlatformConfiguration.SETTINGS;
+import static jadex.base.IPlatformConfiguration.SIMUL;
+import static jadex.base.IPlatformConfiguration.SIMULATION;
+import static jadex.base.IPlatformConfiguration.STRICTCOM;
+import static jadex.base.IPlatformConfiguration.SUPERPEER;
+import static jadex.base.IPlatformConfiguration.SUPERPEERCLIENT;
+import static jadex.base.IPlatformConfiguration.TCPPORT;
+import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
+import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
+import static jadex.base.IPlatformConfiguration.THREADPOOLDEFER;
+import static jadex.base.IPlatformConfiguration.TRUSTEDLAN;
+import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
+import static jadex.base.IPlatformConfiguration.USEPASS;
+import static jadex.base.IPlatformConfiguration.VALIDITYDURATION;
+import static jadex.base.IPlatformConfiguration.VIRTUALNAMES;
+import static jadex.base.IPlatformConfiguration.WELCOME;
+import static jadex.base.IPlatformConfiguration.WSPORT;
+import static jadex.base.IPlatformConfiguration.WSPUBLISH;
+import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
+import static jadex.base.IPlatformConfiguration.SUPERSUPERPEER;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -249,9 +249,9 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.AdvancedThreadPoolService($component.getComponentIdentifier(), true)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.java5.JavaThreadPool(), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-	// hack!!! no daemon here
-	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.java5.JavaThreadPool(), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.java5.JavaThreadPool(false), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	// hack!!! no daemon here (possibly fixed?)
+	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.java5.JavaThreadPool(true), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="$args.contextserviceclass!=null ? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : jadex.commons.SReflect.isAndroid() ? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()}): jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})")),
 	@ProvidedService(type=IExecutionService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="	($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(SettingsService.class)),

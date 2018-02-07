@@ -257,10 +257,10 @@ public class ServiceCallTestAgent extends TestAgent
 		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
-		config1.setSecurity(true);
+		config1.getExtendedPlatformConfiguration().setSecurity(true);
 //		config1.setAwaMechanisms(AWAMECHANISM.local);
 //		config1.setAwareness(true);
-		config1.setTcpTransport(true);
+		config1.getExtendedPlatformConfiguration().setTcpTransport(true);
 		config1.addComponent(ServiceCallTestAgent.class);
 		Starter.createPlatform(config1).get();
 	}

@@ -70,13 +70,13 @@ public class ServiceCallTestNFClearTest
 //		config.setLogging(true);
 //		config.setDefaultTimeout(-1);
 		config.setPlatformName(pid);
-		config.setSaveOnExit(false);
-		config.setAutoShutdown(false);
-		config.setSecurity(true);
+		config.getExtendedPlatformConfiguration().setSaveOnExit(false);
+		config.getExtendedPlatformConfiguration().setAutoShutdown(false);
+		config.getExtendedPlatformConfiguration().setSecurity(true);
 //		config.setAwaMechanisms(AWAMECHANISM.local);
 //		config.setAwareness(true);
 		config.setAwareness(false);
-		config.setTcpTransport(true);
+		config.getExtendedPlatformConfiguration().setTcpTransport(true);
 
 		platform1 = Starter.createPlatform(config).get(timeout);
 
