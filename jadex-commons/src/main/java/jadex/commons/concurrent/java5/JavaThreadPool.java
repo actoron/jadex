@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.Future;
 
 
 /**
@@ -22,21 +24,59 @@ public class JavaThreadPool implements IThreadPool
 	protected ExecutorService	executor;
 	
 	/** The finished listeners. */
-	protected List<IChangeListener<Void>> listeners; 
+	protected List<IChangeListener<Void>> listeners;
 	
-	/** Boolean if already finished. */
-	protected boolean finished;
+	/** Future used for performing shutdown. */
+	protected Future<Void> shutdown;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new ThreadPool5.
 	 */
-	public JavaThreadPool()
+	public JavaThreadPool(boolean daemon)
 	{
-		System.out.println("Using Java 5.0 ThreadPool");
-		executor	= Executors.newCachedThreadPool();
+//		System.out.println("Using Java 5.0 ThreadPool");
+		executor	= Executors.newCachedThreadPool(new ThreadFactory()
+		{
+			public Thread newThread(final Runnable r)
+			{
+				return new Thread(r)
+				{
+					/**
+					 *  Get the string representation.
+					 */
+					public String toString()
+					{
+						return super.toString()+":"+hashCode()+", task="+r;
+					}
+				};
+			}
+		});
 //		executor	= Executors.newFixedThreadPool(20);
+		
+		
+		shutdown = new Future<Void>();
+		
+		Thread shutdownthread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				shutdown.get();
+				
+				executor.shutdown();
+				try
+				{
+					executor.awaitTermination(10000, TimeUnit.MILLISECONDS);	// Hack???
+				}
+				catch(Exception e)
+				{
+				}
+				notifyFinishListeners();
+			}
+		});
+		shutdownthread.setDaemon(daemon);
+		shutdownthread.start();
 	}
 	
 	//-------- IThreadPool interface --------
@@ -70,35 +110,7 @@ public class JavaThreadPool implements IThreadPool
 	 */
 	public void dispose()
 	{
-		boolean notify = false;
-		synchronized(this)
-		{
-			if(!finished)
-			{
-				finished = true;
-				notify = true;
-			}
-		}
-		
-		if(notify)
-		{
-			executor.shutdown();
-			
-			new Thread(new Runnable()
-			{
-				public void run()
-				{
-					try
-					{
-						executor.awaitTermination(10000, TimeUnit.MILLISECONDS);	// Hack???
-					}
-					catch(Exception e)
-					{
-					}
-					notifyFinishListeners();
-				}
-			}).start();
-		}
+		shutdown.setResultIfUndone(null);
 	}
 	
 	
