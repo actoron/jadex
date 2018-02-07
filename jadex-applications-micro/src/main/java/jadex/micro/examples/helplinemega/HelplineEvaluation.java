@@ -75,11 +75,16 @@ public class HelplineEvaluation
 		IPlatformConfiguration config = getConfig(args);
 		Map<String, Object> argmap = Starter.parseArgs(args);
 		//config.enhanceWith(Starter.processArgs(args));
-		spcnt	= (Integer)argmap.get("spcnt");
-		platformcnt	= (Integer)argmap.get("platformcnt");
-		personcnt	= (Integer)argmap.get("personcnt");
-		multi	= (Boolean)argmap.get("multi");
-		measurecnt	= (Integer)argmap.get("measurecnt");
+		config.setValue("spcnt", spcnt);
+		config.setValue("platformcnt", platformcnt);
+		config.setValue("personcnt", personcnt);
+		config.setValue("multi", multi);
+		config.setValue("measurecnt", measurecnt);
+		spcnt	= argmap.containsKey("spcnt")? (Integer)argmap.get("spcnt"): spcnt;
+		platformcnt	= argmap.containsKey("platformcnt")? (Integer)argmap.get("platformcnt"): platformcnt;
+		personcnt	= argmap.containsKey("personcnt")? (Integer)argmap.get("personcnt"): personcnt;
+		multi	= argmap.containsKey("multi")? (Boolean)argmap.get("multi"): multi;
+		measurecnt	= argmap.containsKey("measurecnt")? (Integer)argmap.get("measurecnt"): measurecnt;
 		
 		if(spcnt!=0)
 		{
@@ -202,11 +207,6 @@ public class HelplineEvaluation
 		config.setNetworkPass("key:wlXEahZlSgTfqiv0LwNbsdUZ8qlgtKSSQaKK74XkJxU");
 		config.setAwaMechanisms("IntraVM");
 //		config.setWsTransport(false);
-		config.setValue("spcnt", spcnt);
-		config.setValue("platformcnt", platformcnt);
-		config.setValue("personcnt", personcnt);
-		config.setValue("multi", multi);
-		config.setValue("measurecnt", measurecnt);
 		config.setRelayTransport(spcnt!=0);	
 		config.setSuperpeerClient(spcnt!=0);
 
