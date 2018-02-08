@@ -110,9 +110,9 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 				Set<String> r = rolemap.get(network);
 				if (r != null)
 					roles.addAll(r);
+				else
+					roles.add(network);
 			}
-			
-			roles.addAll(Arrays.asList(secinf.getNetworks()));
 		}
 		
 		secinf.setRoles(roles);
