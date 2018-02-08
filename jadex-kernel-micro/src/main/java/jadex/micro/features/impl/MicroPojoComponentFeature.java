@@ -102,6 +102,10 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		{
 			return getPojoAgent();
 		}
+		else if(name.startsWith("$platformargs"))
+		{
+			return Starter.getPlatformValue(getComponent().getComponentIdentifier(), name.substring(14));
+		}
 		else if(Starter.hasPlatformValue(getComponent().getComponentIdentifier(), name))
 		{
 			return Starter.getPlatformValue(getComponent().getComponentIdentifier(), name);
