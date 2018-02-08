@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -16,6 +17,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *
  */
 @Service(system=true)
+@Security(roles=Security.UNRESTRICTED)	// TODO: platform flag to turn on/off unrestricted
 public interface ITransportAddressService
 {
 	/**
