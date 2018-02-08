@@ -6,7 +6,6 @@ import jadex.android.applications.demos.rest.view.ChartDataRowAdapter;
 import jadex.android.applications.demos.rest.view.RestImageActivity;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -61,7 +60,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("restDemoPlatform");
-		config.getRootConfig().setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT);
+		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT);
 	}
 
 	@Override

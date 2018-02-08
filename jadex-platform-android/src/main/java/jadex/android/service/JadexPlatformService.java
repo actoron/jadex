@@ -91,7 +91,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
 	 */
 	protected void setPlatformKernels(String ... kernels) {
-		this.platformConfiguration.getRootConfig().setKernels(kernels);
+		this.platformConfiguration.setKernels(kernels);
 	}
 	
 	/**
@@ -162,7 +162,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
-		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getRootConfig().getKernels()));
+		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getKernels()));
 		return startJadexPlatform(platformConfiguration);
 	}
 	

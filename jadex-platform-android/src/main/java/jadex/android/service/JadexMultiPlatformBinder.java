@@ -3,7 +3,6 @@ package jadex.android.service;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;

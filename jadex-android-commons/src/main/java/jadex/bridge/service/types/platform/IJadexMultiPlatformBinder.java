@@ -3,7 +3,6 @@ package jadex.bridge.service.types.platform;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;

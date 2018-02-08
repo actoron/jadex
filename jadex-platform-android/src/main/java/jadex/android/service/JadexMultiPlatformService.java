@@ -14,7 +14,6 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -150,14 +149,14 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	@Override
 	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels) {
 		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
-		config.getRootConfig().setKernels(kernels);
+		config.setKernels(kernels);
 		return startJadexPlatform(config);
 	}
 
 	@Override
 	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId) {
 		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
-		config.getRootConfig().setKernels(kernels);
+		config.setKernels(kernels);
 		config.setPlatformName(platformId);
 		return startJadexPlatform(config);
 	}

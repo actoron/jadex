@@ -4,7 +4,6 @@ import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -37,7 +36,7 @@ public class BDIDemoActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("bdiDemoPlatform");
-		config.getRootConfig().setKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_BDI);
+		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_BDI);
 	}
 
 	@Override
