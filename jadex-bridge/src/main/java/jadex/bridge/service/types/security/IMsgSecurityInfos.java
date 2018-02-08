@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.security;
 
+import java.util.Set;
+
 /**
  *  Security meta-information of a message;
  *
@@ -33,4 +35,11 @@ public interface IMsgSecurityInfos
 	 *  @return The authenticated networks of the sender (sorted).
 	 */
 	public String[] getNetworks();
+	
+	/**
+	 *  Gets the roles associated with the sender.
+	 *
+	 *  @return The roles.
+	 */
+	public Set<String> getRoles();
 }

@@ -1,5 +1,6 @@
 package jadex.platform.service.security.impl;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -109,6 +110,8 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 				Set<String> r = rolemap.get(network);
 				if (r != null)
 					roles.addAll(r);
+				else
+					roles.add(network);
 			}
 		}
 		
