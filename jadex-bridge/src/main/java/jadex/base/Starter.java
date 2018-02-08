@@ -332,7 +332,7 @@ public class Starter
 	{
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
-		//config.setReadOnly(true);
+		config.setReadOnly(true);
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
