@@ -70,12 +70,12 @@ public abstract class LocalRegistryObserver extends EventCollector
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
 				int cnt = c.incrementAndGet();
-				System.out.println("start: "+cnt+" "+Thread.currentThread());
-				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-				{
-					System.out.println("Thread: "+Thread.currentThread());
-					throw new RuntimeException("wrooong");
-				}
+//				System.out.println("start: "+cnt+" "+Thread.currentThread());
+//				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+//				{
+//					System.out.println("Thread: "+Thread.currentThread());
+//					throw new RuntimeException("wrooong");
+//				}
 				
 				try
 				{
@@ -97,20 +97,20 @@ public abstract class LocalRegistryObserver extends EventCollector
 				
 				if(registryevent.isDue())
 				{
-//					ARegistryEvent r = registryevent;
-//					registryevent = createEvent();
-//					notifyObservers(r);
-					
-					((RegistryEvent)registryevent).fini = true;
-					notifyObservers(registryevent);
+					ARegistryEvent r = registryevent;
 					registryevent = createEvent();
+					notifyObservers(r);
+					
+//					((RegistryEvent)registryevent).fini = true;
+//					notifyObservers(registryevent);
+//					registryevent = createEvent();
 				}
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 				}
-				System.out.println("end: "+cnt+" "+Thread.currentThread());
+//				System.out.println("end: "+cnt+" "+Thread.currentThread());
 			}
 
 			public void exceptionOccurred(Exception exception)

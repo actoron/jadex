@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import java.util.Map;
 
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
@@ -35,6 +36,7 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	 *  Get the map of properties (considered as constant).
 	 *  @return The service property map (if any).
 	 */
+	@Raw
 	public Map<String, Object> getPropertyMap();
 
 //	/**

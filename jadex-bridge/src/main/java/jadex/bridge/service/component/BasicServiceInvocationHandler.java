@@ -29,6 +29,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -205,6 +206,32 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			Object	cmp	= ProxyFactory.isProxyClass(args[0].getClass()) ? ProxyFactory.getInvocationHandler(args[0]) : args[0];
 			ret	= equals(cmp);
+		}
+		else if(method.getAnnotation(Raw.class)!=null)
+		{
+			Object ser;
+			if(service instanceof IInternalService)
+			{
+				ser = service;
+			}
+			else if(service instanceof ServiceInfo)
+			{
+				ServiceInfo si = (ServiceInfo)service;
+				if(ResolveInterceptor.SERVICEMETHODS.contains(method))
+				{
+					ser = si.getManagementService();
+				}
+				else
+				{
+					ser = si.getDomainService();
+				}
+			}
+			else
+			{
+				throw new RuntimeException("Raw service cannot be invoked on: "+service);
+			}
+			
+			ret = method.invoke(ser, args);
 		}
 //		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
 //		{
