@@ -19,7 +19,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Search for remote services.
  */
-public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implements IRemoteCommand<Collection<T>>
+public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implements IRemoteCommand<Collection<T>>, ISecuredRemoteCommand
 {
 	/** The query. */
 	private ServiceQuery<T> query;
@@ -100,18 +100,30 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	 *  Overridden by subclasses.
 	 */
 	@Override
-	protected Security getSecurityLevel(IInternalAccess access)
+	public Security getSecurityLevel(IInternalAccess access)
 	{
+		Security ret = null;
+		
+		if(query.getServiceType()!=null)
+		{
+			Class<?>	type	= query.getServiceType().getType(access.getClassLoader());
+			ret	= type!=null ? type.getAnnotation(Security.class) : null;
+		}
+		
+		// TODO: Lars, why not Security of service?
 		// Search access depends on the (imaginary) registry service access
 		// Because no explicit service is available it checks if a global-superpeer is used
 		// This is checked by fetching the level of ISuperpeerRegistrySynchronizationService.class (if available)
-		Security ret = null;
-		IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
-		ISuperpeerRegistrySynchronizationService srss = reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
-		if(srss!=null)
+		if(ret==null)
 		{
-			ret = ServiceIdentifier.getSecurityLevel(access, ISuperpeerRegistrySynchronizationService.class);
+			IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
+			ISuperpeerRegistrySynchronizationService srss = reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
+			if(srss!=null)
+			{
+				ret = ServiceIdentifier.getSecurityLevel(access, ISuperpeerRegistrySynchronizationService.class);
+			}
 		}
+		
 		return ret;
 	}
 	

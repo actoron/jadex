@@ -3,12 +3,10 @@ package jadex.platform.service.registry;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IServiceRegistry;
@@ -66,19 +64,19 @@ public abstract class LocalRegistryObserver extends EventCollector
 		localregsub = SServiceProvider.addQuery(component, query, true);
 		localregsub.addIntermediateResultListener(new IIntermediateResultListener<ServiceEvent<IService>>()
 		{
-			AtomicInteger c = new AtomicInteger();
+//			AtomicInteger c = new AtomicInteger();
 			public void intermediateResultAvailable(ServiceEvent<IService> event)
 			{
-				int cnt = c.incrementAndGet();
-				System.out.println("start: "+cnt+" "+Thread.currentThread());
-				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-				{
-					System.out.println("Thread: "+Thread.currentThread());
-					throw new RuntimeException("wrooong");
-				}
+//				int cnt = c.incrementAndGet();
+//				System.out.println("start: "+cnt+" "+Thread.currentThread());
+//				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+//				{
+//					System.out.println("Thread: "+Thread.currentThread());
+//					throw new RuntimeException("wrooong");
+//				}
 				
-				try
-				{
+//				try
+//				{
 //				System.out.println("Local registry changed: "+event);
 				
 				String pubscope = event.getService().getServiceIdentifier().getScope();
@@ -97,20 +95,20 @@ public abstract class LocalRegistryObserver extends EventCollector
 				
 				if(registryevent.isDue())
 				{
-//					ARegistryEvent r = registryevent;
-//					registryevent = createEvent();
-//					notifyObservers(r);
-					
-					((RegistryEvent)registryevent).fini = true;
-					notifyObservers(registryevent);
+					ARegistryEvent r = registryevent;
 					registryevent = createEvent();
+					notifyObservers(r);
+					
+//					((RegistryEvent)registryevent).fini = true;
+//					notifyObservers(registryevent);
+//					registryevent = createEvent();
 				}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-				System.out.println("end: "+cnt+" "+Thread.currentThread());
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//				System.out.println("end: "+cnt+" "+Thread.currentThread());
 			}
 
 			public void exceptionOccurred(Exception exception)

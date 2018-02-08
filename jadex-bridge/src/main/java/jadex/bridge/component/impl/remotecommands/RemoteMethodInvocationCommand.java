@@ -1,7 +1,6 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -16,12 +15,11 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  Invoke a remote method.
  */
-public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteCommand<T>
+public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteCommand<T>, ISecuredRemoteCommand
 {
 	//-------- attributes --------
 	
@@ -175,19 +173,25 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	 *  Overridden by subclasses.
 	 */
 	@Override
-	protected Security	getSecurityLevel(IInternalAccess access)
+	public Security	getSecurityLevel(IInternalAccess access)
 	{
 		Security	level;
-		if(target instanceof IServiceIdentifier)
+		
+		// Use annotation from method, if given.
+		Method	m	= method.getMethod(access.getClassLoader());
+		level	= m!=null ? m.getAnnotation(Security.class) : null;
+		
+		// Otherwise use annotation from service type, if service call.
+		if(level==null && target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
 			level	= type!=null ? type.getAnnotation(Security.class) : null;
 		}
-		else
-		{
-			level	= super.getSecurityLevel(access);
-		}
+
+		//else
+		// null -> disallow direct access to components (overridden by trusted platform)
+		
 		return level;
 	}
 
