@@ -316,11 +316,19 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 			@NameValue(name="networkpass", value="$args.networkpass"),
 			@NameValue(name="virtualnames", value="$args.virtualnames"),
 			@NameValue(name="validityduration", value="$args.validityduration")
-		}),
+		}),	
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+		arguments={
+			@NameValue(name="mechanisms", value="$args.awamechanisms"),
+			@NameValue(name="delay", value="$args.awadelay"),
+			@NameValue(name="fast", value="$args.awafast"),
+			@NameValue(name="includes", value="$args.awaincludes"),
+			@NameValue(name="excludes", value="$args.awaexcludes")}),
+		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
 			arguments={
 				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
@@ -354,15 +362,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				@NameValue(name="addresses", value="$args.relayaddresses"),
 				@NameValue(name="forwarding", value="$args.relayforwarding"),
 				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
-			}),
-		
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-		arguments={
-			@NameValue(name="mechanisms", value="$args.awamechanisms"),
-			@NameValue(name="delay", value="$args.awadelay"),
-			@NameValue(name="fast", value="$args.awafast"),
-			@NameValue(name="includes", value="$args.awaincludes"),
-			@NameValue(name="excludes", value="$args.awaexcludes")}),
+			})
 	}),
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
@@ -407,6 +407,12 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
 		
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+		arguments={
+			@NameValue(name="mechanisms", value="$args.awamechanisms"),
+			@NameValue(name="includes", value="$args.awaincludes"),
+			@NameValue(name="excludes", value="$args.awaexcludes")}),
+		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
 			arguments={
 				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
@@ -439,13 +445,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				@NameValue(name="addresses", value="$args.relayaddresses"),
 				@NameValue(name="forwarding", value="$args.relayforwarding"),
 				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
-			}),
-		
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-		arguments={
-			@NameValue(name="mechanisms", value="$args.awamechanisms"),
-			@NameValue(name="includes", value="$args.awaincludes"),
-			@NameValue(name="excludes", value="$args.awaexcludes")}),
+			})
 	}),
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
@@ -475,7 +475,19 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		}),
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
+			arguments={
+				@NameValue(name="mechanisms", value="$args.awamechanisms"),
+				@NameValue(name="delay", value="$args.awadelay"),
+				@NameValue(name="fast", value="$args.awafast"),
+				@NameValue(name="includes", value="$args.awaincludes"),
+				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
+			arguments={
+				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
+			}
+		),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
@@ -494,16 +506,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				@NameValue(name="addresses", value="$args.relayaddresses"),
 				@NameValue(name="forwarding", value="$args.relayforwarding"),
 				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
-			}),
-		
-		// not requested as service
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-			arguments={
-				@NameValue(name="mechanisms", value="$args.awamechanisms"),
-				@NameValue(name="delay", value="$args.awadelay"),
-				@NameValue(name="fast", value="$args.awafast"),
-				@NameValue(name="includes", value="$args.awaincludes"),
-				@NameValue(name="excludes", value="$args.awaexcludes")}),
+			})
 	}),
 })
 @Agent

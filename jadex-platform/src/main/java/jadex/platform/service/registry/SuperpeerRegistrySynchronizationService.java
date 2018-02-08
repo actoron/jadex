@@ -751,8 +751,15 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			{
 				for(IService ser: added)
 				{
-	//				System.out.println("added ser: "+ser);
-					reg.addService(ser);
+					if(checkScope(ser))
+					{
+						System.out.println("added ser: "+ser);
+						reg.addService(ser);
+					}
+					else
+					{
+						System.out.println("Not responsible for: "+ser+" level="+level);
+					}
 					
 					if(plat==null)
 						plat = ser.getServiceIdentifier().getProviderId().getRoot();
@@ -788,6 +795,38 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			}
 		}
 	}
+	
+	/**
+	 *  Check if the service is handled by this superpeer.
+	 */
+	protected boolean checkScope(IService ser) // String clienttype
+	{
+		boolean ret = false;
+		
+		String scope = ser.getServiceIdentifier().getScope();
+		// SSP L0
+		if(level==0)
+		{
+			// SSP L0 should not store local data  
+			if(!RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope)
+				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			{
+				ret = false;
+			}
+		}
+		else
+		{
+			// SSP L1 should not store global data
+			if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope)
+				|| RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			{
+				ret = false;
+			}
+		}
+		
+		return ret;
+	}
+	
 	
 	/**
 	 *  Called on shutdown.

@@ -88,7 +88,7 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 	 *  by providing an optional value fetcher. The fetch order is the reverse
 	 *  init order, i.e., later features can override values from earlier features.
 	 */
-	public IValueFetcher	getValueFetcher()
+	public IValueFetcher getValueFetcher()
 	{
 		return this;
 	}
