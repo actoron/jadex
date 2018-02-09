@@ -7,7 +7,7 @@ import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.exception.JadexAndroidException;
 import jadex.android.service.JadexPlatformService;
 import jadex.base.IPlatformConfiguration;
-import jadex.base.IRootComponentConfiguration;
+import jadex.base.IExtendedPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -101,20 +101,20 @@ public class AndroidChatService extends JadexPlatformService
 		newMessages = new LinkedList<ChatEvent>();
 
 		setPlatformAutostart(true);
-		setPlatformKernels(IRootComponentConfiguration.KERNEL_MICRO);
+		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO);
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
-		IRootComponentConfiguration rootConfig = config.getRootConfig();
+		config.setLogging(false);
+		config.setNetworkName("jadexnetwork");
+		config.setNetworkPass("laxlax");
+		IExtendedPlatformConfiguration rootConfig = config.getExtendedPlatformConfiguration();
 		rootConfig.setChat(true);
-		rootConfig.setLogging(false);
-		rootConfig.setNetworkName("jadexnetwork");
-		rootConfig.setNetworkPass("laxlax");
 		rootConfig.setAwaMechanisms(
-				IRootComponentConfiguration.AWAMECHANISM_BROADCAST,
-				IRootComponentConfiguration.AWAMECHANISM_MULTICAST,
-//				IRootComponentConfiguration.AWAMECHANISM_MESSAGE,
-//				IRootComponentConfiguration.AWAMECHANISM_RELAY,
-				IRootComponentConfiguration.AWAMECHANISM_LOCAL
-//				RootComponentConfiguration.AWAMECHANISM.bluetooth)
+			IPlatformConfiguration.AWAMECHANISM_BROADCAST,
+			IPlatformConfiguration.AWAMECHANISM_MULTICAST,
+//			IPlatformConfiguration.AWAMECHANISM_MESSAGE,
+//			IPlatformConfiguration.AWAMECHANISM_RELAY,
+			IPlatformConfiguration.AWAMECHANISM_LOCAL
+//			IPlatformConfiguration.AWAMECHANISM.bluetooth)
 		);
 
 //		setPlatformOptions(

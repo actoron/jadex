@@ -2,7 +2,7 @@ package jadex.android.puzzle;
 
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.service.JadexPlatformService;
-import jadex.base.IRootComponentConfiguration;
+import jadex.base.IPlatformConfiguration;
 import jadex.bdi.examples.puzzle.Board;
 import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.SokratesBDI;
@@ -53,8 +53,8 @@ public class SokratesService extends JadexPlatformService
 	public SokratesService()
 	{
 		setPlatformAutostart(false);
-		setPlatformKernels(IRootComponentConfiguration.KERNEL_MICRO, IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_BDIV3,
-				IRootComponentConfiguration.KERNEL_BDI);
+		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_BDIV3,
+			IPlatformConfiguration.KERNEL_BDI);
 		setPlatformName("Sokrates");
 		setSharedPlatform(false);
 		handler = new Handler();
