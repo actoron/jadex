@@ -34,7 +34,7 @@ public class RSHelloTest //extends TestCase
 	public void setUp() throws Exception
 	{
 		hello = new Hello();
-		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null, false);
+//		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null); // ???
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new GrizzlyRestServicePublishService();

@@ -30,11 +30,9 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.IInternalArgumentsResultsFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
-import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -3275,47 +3273,23 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IFuture<IComponentManagementService>	getRemoteCMS(final IComponentIdentifier cid)
 	{
-		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
-		
-		ServiceQuery<IComponentManagementService> query = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_PLATFORM, null, cid, null);
-		 ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
-			.executeRemoteSearch(cid, query).addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, IComponentManagementService>(ret)
-		{
-			@Override
-			public void customResultAvailable(Collection<IComponentManagementService> result) throws Exception
-			{
-				assert result!=null && !result.isEmpty();
-				ret.setResult(result.iterator().next());
-			}
-		});
-
-//		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
-//		sq.setPlatform(cid.getRoot());
-//		return ServiceRegistry.getRegistry(agent).searchServiceAsync(sq);
-		
-//		SServiceProvider.getService(agent, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
+//		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
+//		ServiceQuery<IComponentManagementService> query = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_PLATFORM, null, cid, null);
+//		 ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
+//			.executeRemoteSearch(cid, query).addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, IComponentManagementService>(ret)
 //		{
-//			public void customResultAvailable(IRemoteServiceManagementService rms)
+//			@Override
+//			public void customResultAvailable(Collection<IComponentManagementService> result) throws Exception
 //			{
-//				IFuture<IComponentManagementService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), cid, new ClassInfo(IComponentManagementService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
-//				fut.addResultListener(createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
-//			}
-//		}));
-		
-//		ret.addResultListener(new IResultListener<IComponentManagementService>() 
-//		{
-//			public void resultAvailable(IComponentManagementService result)
-//			{
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
-//				exception.printStackTrace();
+//				assert result!=null && !result.isEmpty();
+//				ret.setResult(result.iterator().next());
 //			}
 //		});
-		
-		return ret;
+//		return ret;
+
+		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
+		sq.setPlatform(cid.getRoot());
+		return ((ServiceRegistry)ServiceRegistry.getRegistry(agent)).searchServiceAsyncByAskOnePlatform(sq, cid);		
 	}
 	
 //	/**

@@ -31,7 +31,7 @@ public interface IInternalService extends IService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted);
+	public void setServiceIdentifier(IServiceIdentifier sid);
 	
 //	/**
 //	 *  Get the implementation type.

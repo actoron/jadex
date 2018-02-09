@@ -169,7 +169,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                for(ProvidedServiceInfo psi: psis)
 	        	                {
 	        	                    final Class<?> servicetype = psi.getType().getType(cl);
-	        	                    final IServiceIdentifier fsid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), SUtil.createPlainRandomId(servicetype.getName(), 3), servicetype, null, model.getResourceIdentifier(), null, ServiceIdentifier.isUnrestricted(agent, servicetype));
+	        	                    final IServiceIdentifier fsid = BasicService.createServiceIdentifier(agent, SUtil.createPlainRandomId(servicetype.getName(), 3), servicetype, null, model.getResourceIdentifier(), null);
 	        	                    
 	        	                    Object serviceproxy = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, new InvocationHandler()
 	        	                    {

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -33,11 +32,6 @@ import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModelLoader;
-import jadex.micro.features.impl.MicroInjectionComponentFeature;
-import jadex.micro.features.impl.MicroLifecycleComponentFeature;
-import jadex.micro.features.impl.MicroMessageComponentFeature;
-import jadex.micro.features.impl.MicroPojoComponentFeature;
-import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 
 
 /**
@@ -133,7 +127,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	{
 		this.provider = component;
 		this.providerid = provider.getComponentIdentifier();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null, ServiceIdentifier.isUnrestricted(component, IComponentFactory.class));
+		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
 	

@@ -97,7 +97,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		this.provider = component;
 		this.providerid = provider.getComponentIdentifier();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null, ServiceIdentifier.isUnrestricted(component, IComponentFactory.class));
+		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
 	

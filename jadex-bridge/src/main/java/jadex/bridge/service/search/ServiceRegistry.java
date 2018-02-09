@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,10 +20,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -566,6 +570,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public <T> T searchServiceSync(final ServiceQuery<T> query)
 	{
+		enhanceQuery(query);
+		
 		T ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
@@ -613,6 +619,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public <T> Set<T> searchServicesSync(final ServiceQuery<T> query)
 	{
+		enhanceQuery(query);
+		
 		Set<T> ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
@@ -713,6 +721,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// read
 	public <T> IFuture<T> searchServiceAsync(final ServiceQuery<T> query)
 	{
+		enhanceQuery(query);
+		
 		final Future<T> ret = new Future<T>();
 		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
@@ -771,7 +781,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	// read
 	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsync(final ServiceQuery<T> query)
-	{	
+	{
+		enhanceQuery(query);
+		
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
@@ -823,6 +835,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
+		enhanceQuery(query);
+		
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
@@ -865,7 +879,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	// write
 //	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <T> ServiceQueryInfo<T> addQueryByAskMe(final ServiceQuery<T> query)
+	protected <T> ServiceQueryInfo<T> addQueryByAskMe(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> fut = new SubscriptionIntermediateFuture<T>();
 		ServiceQueryInfo<T> ret = null;
@@ -1039,6 +1053,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	@SuppressWarnings("unchecked")
 	public <T> T searchService(ServiceQuery<T> query, boolean excluded)
 	{
+		enhanceQuery(query);
+		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 			return null;
 
@@ -1820,8 +1836,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Search for services.
 	 */
+	// TODO: Should be internal, but needed by PeerRegistrySynchronizationService
 	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByAskAll(final ServiceQuery<T> query)
 	{
+		enhanceQuery(query);
+		
 //		System.out.println("searchServicesAsyncByAskAll: "+query);
 		
 		SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
@@ -2079,8 +2098,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Search for services.
 	 */
 	// read
-	protected <T> IFuture<T> searchServiceAsyncByAskOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier spcid)
+	// Todo: public because needed by CMS to get remote CMS for external access
+	public <T> IFuture<T> searchServiceAsyncByAskOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier spcid)
 	{
+		enhanceQuery(query);
+		
 		final Future<T> ret = new Future<T>();
 
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
@@ -2135,7 +2157,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/**
 	 *  Search for services.
 	 */
-	public <T> IFuture<T> searchServiceAsyncByAskAll(final ServiceQuery<T> query)
+	protected <T> IFuture<T> searchServiceAsyncByAskAll(final ServiceQuery<T> query)
 	{
 //		if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //			System.out.println("searchServiceAsyncByAskAll: "+query);
@@ -2538,7 +2560,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Perform a remote search via remote search command.
 	 *  @param agent
 	 */
-	public <T> IFuture<Collection<T>> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
+	protected <T> IFuture<Collection<T>> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
 	{
 		IComponentIdentifier tcid = cid!=null? cid: query.getTargetPlatform();
 		return ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
@@ -2549,7 +2571,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Perform a remote search via remote search command.
 	 *  @param agent
 	 */
-	public <T> IFuture<T> performRemoteSearchService(IInternalAccess agent, final ServiceQuery<T> query, IComponentIdentifier cid)
+	protected <T> IFuture<T> performRemoteSearchService(IInternalAccess agent, final ServiceQuery<T> query, IComponentIdentifier cid)
 	{
 		final Future<T> ret = new Future<T>();
 
@@ -2610,4 +2632,30 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		addQueriesToNewSuperpeer();
 	}
 
+	/**
+	 *  Enhance a query before processing.
+	 *  Does some necessary preprocessing and needs to be called at least once before processing the query,
+	 *  e.g. at start of a registry method or before sending a remote query.
+	 *  Safe to be called multiple times, only the first time will have effect.
+	 *  @param query	The query to be enhanced.
+	 */
+	protected <T> void	enhanceQuery(ServiceQuery<T> query)
+	{
+		// Network names not set by user?
+		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
+		{
+			// Unrestricted?
+			if(Boolean.TRUE.equals(query.isUnrestricted())
+				|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(ExecutionComponentFeature.LOCAL.get(), query.getServiceType().getType0()))	// hack!!! Exefeature.LOCAL should be right, but is there a better way? 
+			{
+				// Unrestricted -> Don't check networks.
+				query.setNetworkNames(null);
+			}
+			else
+			{
+				// Not unrestricted -> only find services from my local networks
+				query.setNetworkNames(ServiceQuery.getNetworkNames(cid));
+			}
+		}		
+	}
 }

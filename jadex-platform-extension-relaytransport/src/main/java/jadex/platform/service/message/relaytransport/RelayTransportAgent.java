@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -851,7 +852,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			Class<?>[] interfaces = new Class[] { IRoutingService.class, IService.class };
 			
 			ProxyInfo pi = new ProxyInfo(interfaces);
-			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, "routing", IRoutingService.class, IRoutingService.class, null, Binding.SCOPE_GLOBAL, true);
+			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, new ClassInfo(IRoutingService.class), null, "routing", null, Binding.SCOPE_GLOBAL, null, true);
 			RemoteReference rr = new RemoteReference(relay, si);
 			ProxyReference pr = new ProxyReference(pi, rr);
 			

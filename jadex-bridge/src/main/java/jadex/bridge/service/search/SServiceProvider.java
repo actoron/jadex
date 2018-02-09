@@ -2492,7 +2492,7 @@ public class SServiceProvider
 		{
 			try
 			{
-				final IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, "NULL", servicetype, null, null, RequiredServiceInfo.SCOPE_GLOBAL, true);
+				final IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, new ClassInfo(servicetype), null, "NULL", null, RequiredServiceInfo.SCOPE_GLOBAL, null, true);
 
 				Class<?>[] interfaces = new Class[]{servicetype, IService.class};
 				ProxyInfo pi = new ProxyInfo(interfaces);

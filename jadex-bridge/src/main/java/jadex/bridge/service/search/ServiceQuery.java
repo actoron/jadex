@@ -28,6 +28,11 @@ import jadex.commons.future.IFuture;
  */
 public class ServiceQuery<T>
 {
+	/** Marker for networks not set. */
+	protected static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
+	
+	//-------- attributes --------
+	
 	/** The service type. */
 	protected ClassInfo servicetype;
 	
@@ -230,7 +235,7 @@ public class ServiceQuery<T>
 		this.returntype = returntype;
 		
 		this.id = SUtil.createUniqueId();
-		this.networknames = getNetworkNames(owner); // Set the networknames to the current set of network names.
+		this.networknames = NETWORKS_NOT_SET;
 	}
 	
 	/**
@@ -506,6 +511,7 @@ public class ServiceQuery<T>
 
 	/**
 	 *  Gets the specification for the indexer.
+	 *  Query needs to be enhanced before calling this method. See ServiceRegistry.enhanceQuery()
 	 *  
 	 *  @return The specification for the indexer.
 	 */
@@ -528,11 +534,15 @@ public class ServiceQuery<T>
 		if(serviceidentifier != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
 		
+		assert !Arrays.equals(networknames, NETWORKS_NOT_SET) : "Problem: query not enhanced before processing.";
+		
 		if(networknames != null && networknames.length>0)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
 		
 		return ret;
 	}
+	
+	
 		
 	/**
 	 *  Get the matching mode for a key.

@@ -16,7 +16,6 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -127,7 +126,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		this.provider = component;
 		this.providerid = provider.getComponentIdentifier();
-		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class, null, ServiceIdentifier.isUnrestricted(component, IComponentFactory.class));
+		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
 	

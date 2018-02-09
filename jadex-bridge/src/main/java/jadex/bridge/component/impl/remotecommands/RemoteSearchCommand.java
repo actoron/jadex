@@ -120,7 +120,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 			ISuperpeerRegistrySynchronizationService srss = reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
 			if(srss!=null)
 			{
-				ret = ServiceIdentifier.getSecurityLevel(access, ISuperpeerRegistrySynchronizationService.class);
+				ret = ServiceIdentifier.getSecurityLevel(ISuperpeerRegistrySynchronizationService.class);
 			}
 		}
 		

@@ -1,9 +1,11 @@
 package jadex.bridge.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -11,6 +13,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
+import jadex.javaparser.SJavaParser;
 
 
 /**
@@ -63,8 +66,13 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, Class<?> type, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
+	public ServiceIdentifier(IInternalAccess provider, Class<?> type, String servicename, IResourceIdentifier rid, String scope)
 	{
+//		if(!type.isInterface())
+//		{
+//			System.out.println("dreck");
+//		}
+		
 		List<ClassInfo> superinfos = new ArrayList<ClassInfo>();
 		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
 		{
@@ -73,14 +81,16 @@ public class ServiceIdentifier implements IServiceIdentifier
 				superinfos.add(new ClassInfo(sin));
 			}
 		}
-		this.providerid = providerid;
+		this.providerid = provider.getComponentIdentifier();
 		this.type	= new ClassInfo(type);
 		this.supertypes = superinfos.toArray(new ClassInfo[superinfos.size()]);
 		this.servicename = servicename;
 		this.rid = rid;
 		this.scope = scope;
-		this.networknames = networknames;
-		this.unrestricted = unrestricted;
+		@SuppressWarnings("unused")
+		Set<String>	networknames = (Set<String>)Starter.getPlatformValue(providerid, Starter.DATA_NETWORKNAMESCACHE);
+		this.networknames	= networknames;
+		this.unrestricted = isUnrestricted(provider, type);
 	}
 	
 	/**
@@ -302,16 +312,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Method to provide the security level.
 	 */
-	public static Security getSecurityLevel(IInternalAccess access, ClassInfo ctype)
-	{
-		Class<?> type = ctype!=null? ctype.getType(access.getClassLoader(), access.getModel().getAllImports()) : null;
-		return getSecurityLevel(access, type);
-	}
-	
-	/**
-	 *  Method to provide the security level.
-	 */
-	public static Security getSecurityLevel(IInternalAccess access, Class<?> ctype)
+	public static Security getSecurityLevel(Class<?> ctype)
 	{
 		return ctype!=null ? ctype.getAnnotation(Security.class) : null;
 	}
@@ -324,7 +325,8 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public static boolean isUnrestricted(IInternalAccess access, ClassInfo ctype)
 	{
-		return Security.UNRESTRICTED.equals(getSecurityLevel(access, ctype));
+		Set<String>	roles	= getRoles(getSecurityLevel(ctype.getType(access.getClassLoader(), access.getModel().getAllImports())), access);
+		return roles!=null && roles.contains(Security.UNRESTRICTED);
 	}
 	
 	/**
@@ -335,7 +337,30 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 */
 	public static boolean isUnrestricted(IInternalAccess access, Class<?> ctype)
 	{
-		return Security.UNRESTRICTED.equals(getSecurityLevel(access, ctype));
+		Set<String>	roles	= getRoles(getSecurityLevel(ctype), access);
+		return roles!=null && roles.contains(Security.UNRESTRICTED);
+	}
+	
+	/**
+	 *  Get the roles from an annotation.
+	 *  @param sec	The security annotation or null.
+	 *  @param provider	The component that owns the service.
+	 *  @return The roles, if any or null, if none given or sec==null.
+	 */
+	public static Set<String>	getRoles(Security sec, IInternalAccess provider)
+	{
+		Set<String>	ret	= null;
+		String[]	roles	= sec!=null ? sec.roles() : null;
+		if(roles!=null && roles.length>0)
+		{
+			// Evaluate, if a role is given as expression.
+			ret	= new HashSet<String>();
+			for(String role: roles)
+			{
+				ret.add((String)SJavaParser.evaluateExpressionPotentially(role, provider.getModel().getAllImports(), provider.getFetcher(), provider.getClassLoader()));
+			}
+		}
+		return ret;
 	}
 
 	/**

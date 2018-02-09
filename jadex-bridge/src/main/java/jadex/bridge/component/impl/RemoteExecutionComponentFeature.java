@@ -35,6 +35,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -49,7 +50,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  Feature for securely sending and handling remote execution commands.
@@ -551,59 +551,36 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			{
 				if(msg instanceof ISecuredRemoteCommand)
 				{
-					Security	sec	= ((ISecuredRemoteCommand)msg).getSecurityLevel(getComponent());
+					Set<String>	secroles	= ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getComponent()), getComponent());
 					
-					// No security setting means disallow
-					if(sec==null)
+					// No roles or default role means any authenticated platform or network.
+					if(secroles==null || secroles.contains(Security.DEFAULT))
 					{
-						trusted	= false;
+						trusted	= secinfos.isAuthenticated();
 					}
 					
-					// needs special security handling (e.g. method invocation or service search)
+					// Always allow 'unrestricted' access
+					else if(secroles.contains(Security.UNRESTRICTED))
+					{
+						trusted	= true;
+					}
+					
+					// TODO: currently no platform authentication in place
+//					// Check remote platform name
+//					else if(secroles.contains(secinfos.getAuthenticatedPlatformName()))
+//					{
+//						trusted	= true;
+//					}
+					
+					// Custom roles required by command. Check if at least one is authenticated.
 					else
 					{
-						String[]	roles	= sec.roles();
-						
-						// No roles means default role means any authenticated platform or network.
-						if(roles==null)
+						// Assumption: secinfo role set (defined/authenticated roles of platform) usually larger than role set annotated at service / method.
+						for(String role: secroles)
 						{
-							trusted	= secinfos.isAuthenticated() || secinfos.getNetworks()!=null && secinfos.getNetworks().length>0;
-						}
-						else
-						{
-							// Roles required by command. Check if at least one is authenticated.
-							Set<String>	sroles	= new HashSet<String>();
-							// Evaluate, if a role is given as expression.
-							for(String role: roles)
-							{
-								sroles.add((String)SJavaParser.evaluateExpressionPotentially(role, getComponent().getModel().getAllImports(), getComponent().getFetcher(), getComponent().getClassLoader()));
-							}
-							
-							// Always allow 'unrestricted' access
-							if(sroles.contains(Security.UNRESTRICTED))
-							{
-								trusted	= true;
-							}
-							
-							// TODO: map networks and/or platform names to local roles.
-							
-							// Check remote platform name
-							// TODO: specify explicit platform names not as roles/not at all?
-							else if(sroles.contains(secinfos.getAuthenticatedPlatformName()))
-							{
-								trusted	= true;
-							}
-							
-							// Check networks
-							// TODO: specify explicit networks not as roles/not at all?
-							else
-							{
-								for(int i=0; !trusted && secinfos.getNetworks()!=null && i<secinfos.getNetworks().length; i++)
-								{
-									trusted	= sroles.contains(secinfos.getNetworks()[i]);
-								}
-								secinfos.getNetworks();
-							}
+							trusted	= secinfos.getRoles().contains(role);
+							if(trusted)
+								break;
 						}
 					}
 				}
@@ -618,6 +595,10 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			{
 				System.out.println("Untrusted command not executed: "+msg);
 			}
+//			else
+//			{
+//				System.out.println("Trusted command allowed: "+msg);
+//			}
 			
 			return trusted;
 		}

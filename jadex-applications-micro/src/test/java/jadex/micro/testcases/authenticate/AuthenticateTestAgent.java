@@ -36,21 +36,30 @@ import jadex.micro.testcases.TestAgent;
 //@Ignore // security checks not yet implemented
 public class AuthenticateTestAgent extends TestAgent
 {
+	//-------- test settings --------
+	
+	// Define expected test results for scenarios (un=unrestricted, cus=custom, def=default).
+	protected static boolean[][]	tests	= new boolean[][]
+	{
+		// Annot.:		un		def		cus		cus2	def		cus		un		def
+		new boolean[] {true,	false,	false,	false},//	false,	false,	true,	false},	
+		new boolean[] {true,	true,	false,	false},//	true,	false,	true,	true},
+//		new boolean[] {true,	true,	true,	true},//	true,	true,	true,	true}	
+	};
+
+	@Override
+	protected int getTestCount()
+	{
+		return tests.length;
+	}
+	
+	//-------- test execution --------
+	
 	/**
 	 *  Perform the tests.
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
-		// Define expected test results for scenarios (un=unrestricted, cus=custom, def=default).
-		boolean[][]	tests	= new boolean[][]
-		{
-			// Annot.:		un		def		cus		cus2	def		cus		un		def
-			new boolean[] {true,	false,	false,	false},//	false,	false,	true,	false},	
-//			new boolean[] {true,	true,	false,	false},//	true,	false,	true,	true},
-//			new boolean[] {true,	true,	true,	true},//	true,	true,	true,	true}	
-		};
-		tc.setTestCount(tests.length);
-		
 		return performTest(tc, tests, 0);
 	}
 	

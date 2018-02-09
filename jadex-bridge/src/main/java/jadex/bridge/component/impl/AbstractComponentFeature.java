@@ -28,12 +28,12 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 		
 	//-------- constructors --------
 	
-	/**
-	 *  Bean constructor for type level.
-	 */
-	public AbstractComponentFeature()
-	{
-	}
+//	/**
+//	 *  Bean constructor for type level.
+//	 */
+//	public AbstractComponentFeature()
+//	{
+//	}
 	
 	/**
 	 *  Factory method constructor for instance level.

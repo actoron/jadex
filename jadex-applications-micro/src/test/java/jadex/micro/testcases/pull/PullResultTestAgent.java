@@ -235,11 +235,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-						SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
-						{
-							public void customResultAvailable(final IClockService clock)
-							{
+				final IClockService clock	= SServiceProvider.getLocalService(root, IClockService.class);
 								IResourceIdentifier	rid	= new ResourceIdentifier(
 									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		//						System.out.println("Using rid: "+rid);
@@ -311,8 +307,6 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 										}));
 									}
 								});
-							}
-						}));
 			}	
 		});
 		
@@ -347,11 +341,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
-				{
-					public void customResultAvailable(final IClockService clock)
-					{
+				final IClockService clock	= SServiceProvider.getLocalService(root, IClockService.class);
 								IResourceIdentifier	rid	= new ResourceIdentifier(
 									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		//						System.out.println("Using rid: "+rid);
@@ -427,8 +417,6 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 										}));
 									}
 								});
-							}
-						}));
 			}	
 		});
 		

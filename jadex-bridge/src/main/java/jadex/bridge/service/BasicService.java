@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -263,9 +263,9 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
+	public void setServiceIdentifier(IServiceIdentifier sid)
 	{
-		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid, scope, unrestricted);
+		this.sid = sid;
 	}
 	
 	/**
@@ -527,29 +527,22 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	}
 	
 	/**
-	 *  Create a new service identifier.
-	 *  @param providerid The provider id.
-	 *  @param servicename The service name.
-	 *  @return A service identifier.
+	 *  Create a new service identifier for the own component.
 	 */
-	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, boolean unrestricted)
+	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
 	{
-		Set<String> networknames = (Set<String>)Starter.getPlatformValue(providerid, Starter.DATA_NETWORKNAMESCACHE);
-		return createServiceIdentifier(providerid, servicename, servicetype, serviceimpl, rid, scope, networknames, unrestricted);
+		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope);
 	}
 	
 	/**
-	 *  Create a new service identifier.
-	 *  @param providerid The provider id.
-	 *  @param servicename The service name.
-	 *  @return A service identifier.
+	 *  Create a new service identifier for a potentially remote component.
 	 */
-	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
+	public static ServiceIdentifier	createServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
 	{
-		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope, networknames, unrestricted);
+		return new ServiceIdentifier(providerid, type, supertypes, servicename, rid, scope, networknames, unrestricted);
 	}
+
 	
 	/**
 	 *  Get the internal access.

@@ -14,14 +14,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Reference;
@@ -204,7 +203,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(port >= 0)
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+			impl.openPort(port)
+				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 			{
 				@Override
 				public void customResultAvailable(Integer port)
@@ -246,7 +246,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						ret.setException(e);
 					}
 				}
-			});
+			}));
 			
 			return ret;
 		}
@@ -1132,13 +1132,13 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 *  Sets the access for the component.
 	 *  @param access Component access.
 	 */
-	public IFuture<Void> setComponentAccess(@Reference IInternalAccess access) {return IFuture.DONE;}
-	
+	public IFuture<Void> setComponentAccess(@Reference IInternalAccess access) {return IFuture.DONE;}	
+
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class<?> implclazz, IResourceIdentifier rid, Class<?> type, String scope, boolean unrestricted)
+	public void setServiceIdentifier(IServiceIdentifier sid)
 	{
-		this.sid = BasicService.createServiceIdentifier(agent.getComponentIdentifier(), name, type, implclazz, rid, scope, unrestricted);
+		this.sid = sid;
 	}
 }

@@ -526,7 +526,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			throw new RuntimeException("Service implementation '"+service.getClass().getName()+"' does not implement service interface: "+type.getName());
 		
 		if(service instanceof IInternalService)
-			((IInternalService)service).createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope, jadex.bridge.service.ServiceIdentifier.isUnrestricted(ia, type));
+		{
+			((IInternalService)service).setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
+		}
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
 //			System.out.println("hijijij");
@@ -640,7 +642,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
-			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type, scope, jadex.bridge.service.ServiceIdentifier.isUnrestricted(ia, type));
+			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
 			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
 			

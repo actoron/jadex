@@ -27,14 +27,18 @@ public class STest {
         return access;
     }
 
+//    // one time network pass for this vm.
+//    private static final String	testnetwork	= SUtil.createUniqueId();
+    
     public static IPlatformConfiguration getDefaultTestConfig() 
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
+//		config.setNetworkName("test");
+//		config.setNetworkPass(testnetwork);
+		
         config.getExtendedPlatformConfiguration().setSecurity(true);
         config.getExtendedPlatformConfiguration().setTcpTransport(true);
-        
-        // TODO: Why is simulation broken?
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
                 
