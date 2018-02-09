@@ -1,7 +1,6 @@
 package jadex.webservice.examples.rs.hello;
 import static org.junit.Assert.assertEquals;
 
-import jadex.base.IRootComponentConfiguration;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -92,8 +91,8 @@ public class RSHelloTest
 		}
 
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setKernels(IRootComponentConfiguration.KERNEL_COMPONENT, IRootComponentConfiguration.KERNEL_MICRO);
-		config.setTcpTransport(false);
+		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_MICRO);
+		config.getExtendedPlatformConfiguration().setTcpTransport(false);
 		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
