@@ -58,6 +58,7 @@ import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -427,11 +428,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					}
 				}
 				
-//				@Override
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					// Ignore (TODO: why happens during shutdown!?)
-//				}
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// TODO: why soemtimes happens during shutdown!?
+					getComponent().getLogger().warning(SUtil.getExceptionStacktrace(exception));
+				}
 			}));
 		}
 		else
