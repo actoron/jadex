@@ -1,12 +1,5 @@
 package jadex.tools.jcc.test;
 
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.util.List;
-import java.util.jar.JarEntry;
-
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;
@@ -14,29 +7,25 @@ import org.junit.Test;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.base.gui.ClassChooserPanel;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IFilter;
 import jadex.commons.SNonAndroid;
-import jadex.commons.SReflect;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.tools.jcc.ControlCenter;
 import jadex.tools.jcc.JCCAgent;
 import jadex.tools.jcc.PlatformControlCenter;
-import jadex.tools.jcc.PlatformControlCenterPanel;
 
 /**
  *  Test if all JCC plugins can be activated.
@@ -116,7 +105,7 @@ public class JCCTest //extends TestCase
 			{
 				public void customResultAvailable(Void result)
 				{
-					jcca.getComponentFeature(IExecutionFeature.class).waitForDelay(500, new IComponentStep<Void>()
+					jcca.getExternalAccess().waitForDelay(500, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
@@ -129,7 +118,21 @@ public class JCCTest //extends TestCase
 							});
 							return IFuture.DONE;
 						}
-					}, true);
+					}, true)
+						.addResultListener(new IResultListener<Void>()
+					{
+						@Override
+						public void resultAvailable(Void result)
+						{
+							// ignore.
+						}
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+						}
+					});
 				}
 			});
 		}

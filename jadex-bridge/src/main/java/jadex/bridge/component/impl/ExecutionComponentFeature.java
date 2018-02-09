@@ -398,9 +398,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		if(delay>=0)
 		{
-			// todo: support getLocal... with proxy==false
-	//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+			// External access because allowed to by called on non-component thread (cf. ExternalAccess.waitForDelay())
+			SServiceProvider.getService(getComponent().getExternalAccess(), IClockService.class)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 			{
 				public void customResultAvailable(IClockService cs)
@@ -428,11 +427,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					}
 				}
 				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					// Ignore (TODO: why happens during shutdown!?)
-				}
+//				@Override
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					// Ignore (TODO: why happens during shutdown!?)
+//				}
 			}));
 		}
 		else
