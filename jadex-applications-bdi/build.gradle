@@ -14,6 +14,11 @@ dependencies
 	compile project(':jadex-kernel-extension-agr')
 	compile project(':jadex-kernel-application')
 	
+	testCompile project(':jadex-platform')
+	testCompile project(':jadex-platform-extension-websockettransport')
+	testCompile project(':jadex-platform-extension-relaytransport')
+	
+	
 	compile 'com.toedter:jcalendar:1.3.2' 
 	compile 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0' 
 }

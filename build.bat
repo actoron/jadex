@@ -1,3 +1,3 @@
 @REM perform a clean distribution build
-gradlew -Pdist=publishdists clean test distZips -x javadoc
+gradlew --profile -Pdist=publishdists clean test distZips -x javadoc
 @rem  --parallel --continue

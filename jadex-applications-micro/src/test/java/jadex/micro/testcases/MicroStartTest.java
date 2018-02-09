@@ -1,4 +1,4 @@
-package jadex.launch.test;
+package jadex.micro.testcases;
 
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;

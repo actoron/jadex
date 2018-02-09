@@ -1,4 +1,4 @@
-package jadex.launch.test;
+package jadex.bdi.testcases;
 
 import java.io.File;
 

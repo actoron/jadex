@@ -1,4 +1,4 @@
-package jadex.launch.test;
+package jadex.bpmn.testcases;
 
 import java.util.Map;
 

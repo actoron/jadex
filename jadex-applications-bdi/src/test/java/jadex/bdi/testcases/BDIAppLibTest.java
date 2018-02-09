@@ -1,6 +1,4 @@
-package jadex.launch.test;
-import java.io.File;
-
+package jadex.bdi.testcases;
 import jadex.base.test.ComponentTestSuite;
 import junit.framework.Test;
 

@@ -1,4 +1,5 @@
-package jadex.launch.test;
+package jadex.bdiv3.testcases;
+
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import junit.framework.Test;
