@@ -4,7 +4,6 @@ import static jadex.base.IPlatformConfiguration.ADDRESS;
 import static jadex.base.IPlatformConfiguration.ASYNCEXECUTION;
 import static jadex.base.IPlatformConfiguration.AWADELAY;
 import static jadex.base.IPlatformConfiguration.AWAEXCLUDES;
-import static jadex.base.IPlatformConfiguration.AWAFAST;
 import static jadex.base.IPlatformConfiguration.AWAINCLUDES;
 import static jadex.base.IPlatformConfiguration.AWAMECHANISMS;
 import static jadex.base.IPlatformConfiguration.AWARENESS;
@@ -47,6 +46,7 @@ import static jadex.base.IPlatformConfiguration.SIMULATION;
 import static jadex.base.IPlatformConfiguration.STRICTCOM;
 import static jadex.base.IPlatformConfiguration.SUPERPEER;
 import static jadex.base.IPlatformConfiguration.SUPERPEERCLIENT;
+import static jadex.base.IPlatformConfiguration.SUPERSUPERPEER;
 import static jadex.base.IPlatformConfiguration.TCPPORT;
 import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
 import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
@@ -60,7 +60,6 @@ import static jadex.base.IPlatformConfiguration.WELCOME;
 import static jadex.base.IPlatformConfiguration.WSPORT;
 import static jadex.base.IPlatformConfiguration.WSPUBLISH;
 import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
-import static jadex.base.IPlatformConfiguration.SUPERSUPERPEER;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -144,7 +143,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
 	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
 	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
-	@Argument(name=AWAFAST, clazz=boolean.class, defaultvalue="false"),
 
 	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),

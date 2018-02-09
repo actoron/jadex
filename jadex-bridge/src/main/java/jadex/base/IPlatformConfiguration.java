@@ -279,12 +279,6 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // default:
       // 20000
 
-      /** The awareness fast flag **/
-      public static final String	AWAFAST				= "awafast";								// class:
-      // boolean
-      // default:
-      // false
-
       /** Include entries for awareness agent. **/
       public static final String	AWAINCLUDES			= "awaincludes";							// class:
       // String

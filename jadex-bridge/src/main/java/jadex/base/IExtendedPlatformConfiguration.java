@@ -1,8 +1,5 @@
 package jadex.base;
 
-import java.util.Map;
-import java.util.logging.Level;
-
 import jadex.bridge.ClassInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 
@@ -335,18 +332,6 @@ public interface IExtendedPlatformConfiguration
      *  @param value The delay in millis.
      */
     public void setAwaDelay(long value);
-
-//    /**
-//     *  Mode in which awareness is blocking startup.
-//     *  @return flag for fast awa.
-//     */
-//    public boolean isAwaFast();
-//
-//    /**
-//     *  Mode in which awareness is blocking startup.
-//     *  @return value Flag for fast awa.
-//     */
-//    public void setAwaFast(boolean value);
 
     /**
      *  Get the awareness platform includes.
