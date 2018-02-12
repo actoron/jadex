@@ -70,7 +70,9 @@ after_script:
 
 mac_and_cheese:
   stage: build
+  variables:
+    GIT_STRATEGY: fetch
   script:
-    - cd ~/git/jadex && git pull && ./gradlew --parallel clean :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x processSchemas
+    - ./gradlew --parallel clean :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x processSchemas
   tags:
     - mac
