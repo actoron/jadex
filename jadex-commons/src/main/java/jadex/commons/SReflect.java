@@ -206,7 +206,7 @@ public class SReflect
 	 *  Is basic type.
 	 *  @return True, if the class is a basic type.
 	 */
-	public static boolean isBasicType(Class clazz)
+	public static boolean isBasicType(Class<?> clazz)
 	{
 		return wrappedtypes.get(clazz)!=null;
 	}

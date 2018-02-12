@@ -1832,7 +1832,6 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
 	}
 	
-	
 	/**
 	 *  Search for services.
 	 */

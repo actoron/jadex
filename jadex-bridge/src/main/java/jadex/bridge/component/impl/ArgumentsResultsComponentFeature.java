@@ -1,12 +1,17 @@
 package jadex.bridge.component.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -17,6 +22,7 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
 import jadex.commons.future.IFuture;
@@ -68,10 +74,66 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			{
 				Map.Entry<String, Object> entry = it.next();
 				if(arguments==null)
-				{
 					this.arguments	= new LinkedHashMap<String, Object>();
-				}
 				arguments.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		// Get the reverse name (agent1@app1.plat1 -> app1.agent1.<argname>)
+		IComponentIdentifier cid = getComponent().getComponentIdentifier();
+		String dotname = cid.getDotName();
+		int idx = dotname.lastIndexOf(".");
+		if(idx!=-1)
+		{
+			dotname = dotname.substring(0, idx);
+			dotname = getReverseName(dotname);
+		}
+		
+		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getComponentIdentifier().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
+		if(platformargs!=null)
+		{
+			IArgument[] margs = component.getModel().getArguments();
+			for(int i=0; i<margs.length; i++)
+			{
+				if((arguments==null || !arguments.containsKey(margs[i].getName())))
+				{
+					if(arguments==null)
+						this.arguments	= new LinkedHashMap<String, Object>();
+					
+					String argname = margs[i].getName();
+					
+					// Test different versions of argument names
+					// a) name directly contained
+					if(platformargs.containsKey(argname))
+					{
+						arguments.put(argname, platformargs.get(argname));
+					}
+					// b1) agent name hierarchy aarg
+					else if(platformargs.containsKey(cid.getLocalName()+argname))
+					{
+						arguments.put(argname, platformargs.get(cid.getLocalName()+argname));
+					}
+					// b2) agent name hierarchy a.arg
+					else if(platformargs.containsKey(cid.getLocalName()+"."+argname))
+					{
+						arguments.put(argname, platformargs.get(cid.getLocalName()+"."+argname));
+					}
+					// c) agent name hierarchy b.a.arg
+					else if(platformargs.containsKey(dotname+"."+argname))
+					{
+						arguments.put(argname, platformargs.get(dotname+"."+argname));
+					}
+					// d) agent type name
+					else if(platformargs.containsKey(getComponent().getModel().getName()+"."+argname))
+					{
+						arguments.put(argname, platformargs.get(getComponent().getModel().getName()+"."+argname));
+					}
+//					// todo: e) agent type hierarchy name
+//					else if(platformargs.containsKey(getComponent().getModel().getName()))
+//					{
+//						
+//					}
+				}
 			}
 		}
 		
@@ -104,6 +166,28 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	}
 	
 	/**
+	 *  Get the reverse name of a dot name (component id).
+	 *  @return The reverse name as string.
+	 */
+	public static String getReverseName(String dotname)
+	{
+		List<String> res = new ArrayList<String>();
+		StringTokenizer stok = new StringTokenizer(dotname, "@,");
+		while(stok.hasMoreTokens())
+		{
+			res.add(0, stok.nextToken());
+		}
+		StringBuilder b = new StringBuilder();
+		for(int i=0; i<res.size(); i++)
+		{
+			b.append(res.get(0));
+			if(i+1<res.size())
+				b.append(".");
+		}
+		return b.toString();
+	}
+	
+	/**
 	 *  Check if the feature potentially executed user code in body.
 	 *  Allows blocking operations in user bodies by using separate steps for each feature.
 	 *  Non-user-body-features are directly executed for speed.
@@ -113,7 +197,6 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	{
 		return false;
 	}
-
 
 	/**
 	 *  Init unset arguments from default values.
@@ -130,9 +213,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				if(arguments==null || !arguments.containsKey(upes[i].getName()))
 				{
 					if(arguments==null)
-					{
 						this.arguments	= new LinkedHashMap<String, Object>();
-					}
 					arguments.put(upes[i].getName(), SJavaParser.getParsedValue(upes[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 				}
 			}
@@ -142,13 +223,20 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		{
 			// Prevents unset arguments being added to be able to check whether a user has
 			// set an argument explicitly to null or if it just is null (e.g. for field injections)
-			if((arguments==null || !arguments.containsKey(margs[i].getName())) && margs[i].getDefaultValue().getValue()!=null)
+			if((arguments==null || !arguments.containsKey(margs[i].getName())))
 			{
 				if(arguments==null)
-				{
 					this.arguments	= new LinkedHashMap<String, Object>();
+				
+				Class<?> argclass = margs[i].getClazz().getType(getComponent().getClassLoader());
+				if(margs[i].getDefaultValue().getValue()!=null)
+				{
+					arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 				}
-				arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
+				else if(SReflect.isBasicType(argclass))
+				{
+					arguments.put(margs[i].getName(), SReflect.getDefaultValue(argclass));
+				}
 			}
 		}
 	}

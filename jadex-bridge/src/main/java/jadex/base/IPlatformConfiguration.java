@@ -549,6 +549,8 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 
       public static final String RELAYFORWARDING = "relayforwarding";
 
+      public static final String PLATFORMARGS = "$platformargs";
+      
       /**
        * This is used for consistency checks and includes all argument names which refer to boolean
        * arguments.

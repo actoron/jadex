@@ -281,15 +281,13 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //		@NameValue(name=SSLTCPPORT, value="0"),
 		@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
-//		@Component(name="system", type="system", daemon=Boolean3.TRUE),
-//		@Component(name="marshal", type="marshal", daemon=Boolean3.TRUE, number="$args.marshal? 1 : 0"),
 		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
-			@NameValue(name="libpath", value="$args.libpath"),
-			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
-			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
+//			@NameValue(name="libpath", value="$args.libpath"),
+//			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
+//			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
 		}),
 		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0", arguments={
-			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
+//			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
 		}),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
 		
@@ -307,13 +305,13 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
-			@NameValue(name="usepass", value="$args.usepass"),
-			@NameValue(name="printpass", value="$args.printpass"),
-			@NameValue(name="trustedlan", value="$args.trustedlan"),
-			@NameValue(name="networkname", value="$args.networkname"),
-			@NameValue(name="networkpass", value="$args.networkpass"),
-			@NameValue(name="virtualnames", value="$args.virtualnames"),
-			@NameValue(name="validityduration", value="$args.validityduration")
+//			@NameValue(name="usepass", value="$args.usepass"),
+//			@NameValue(name="printpass", value="$args.printpass"),
+//			@NameValue(name="trustedlan", value="$args.trustedlan"),
+//			@NameValue(name="networkname", value="$args.networkname"),
+//			@NameValue(name="networkpass", value="$args.networkpass"),
+//			@NameValue(name="virtualnames", value="$args.virtualnames"),
+//			@NameValue(name="validityduration", value="$args.validityduration")
 		}),	
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
@@ -321,11 +319,12 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 		arguments={
-			@NameValue(name="mechanisms", value="$args.awamechanisms"),
-			@NameValue(name="delay", value="$args.awadelay"),
-			@NameValue(name="fast", value="$args.awafast"),
-			@NameValue(name="includes", value="$args.awaincludes"),
-			@NameValue(name="excludes", value="$args.awaexcludes")}),
+//			@NameValue(name="mechanisms", value="$args.awamechanisms"),
+//			@NameValue(name="delay", value="$args.awadelay"),
+//			@NameValue(name="fast", value="$args.awafast"),
+//			@NameValue(name="includes", value="$args.awaincludes"),
+//			@NameValue(name="excludes", value="$args.awaexcludes")
+		}),
 		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
 			arguments={
@@ -362,6 +361,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
 			})
 	}),
+	
 	@Configuration(name="fixed", arguments={
 		//@NameValue(name="tcpport", value="0"),
 		//@NameValue(name="ssltcpport", value="0"),
@@ -445,6 +445,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
 			})
 	}),
+	
 	@Configuration(name="minimal", arguments={
 		@NameValue(name=TCPPORT, value="0"),
 //		@NameValue(name=SSLTCPPORT, value="0"),
@@ -458,7 +459,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
 
 		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, arguments={
-//			@NameValue(name="paargs", value="new jadex.bridge.NotCopyHashMap($args)")}),
 			@NameValue(name="paargs", value="$args")}),
 		
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),

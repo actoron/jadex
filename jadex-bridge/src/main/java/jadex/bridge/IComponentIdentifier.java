@@ -58,6 +58,12 @@ public interface IComponentIdentifier
 	 */
 	public IComponentIdentifier getRoot();
 	
+	/**
+	 *  Get the dot name.
+	 *  @return The dot name.
+	 */
+	public String getDotName();
+	
 //	/**
 //	 *  Get the application name. Equals the local component name in case it is a child of the platform.
 //	 *  broadcast@awa.plat1 -> awa

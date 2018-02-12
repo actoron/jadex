@@ -342,6 +342,15 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 		return ret;
 	}
 	
+	/**
+	 *  Get the name without @ replaced by dot.
+	 */
+	public String getDotName()
+	{
+		return getName().replace('@', '.');
+//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+	}
+	
 //	/**
 //	 *  Get the application name. Equals the local component name in case it is a child of the platform.
 //	 *  broadcast@awa.plat1 -> awa

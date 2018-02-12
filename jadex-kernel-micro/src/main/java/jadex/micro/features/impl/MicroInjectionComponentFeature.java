@@ -3,6 +3,7 @@ package jadex.micro.features.impl;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -60,8 +61,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
-		
-		Map<String, Object>	args	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+				
+		Map<String, Object>	args = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults();
 		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
 		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();

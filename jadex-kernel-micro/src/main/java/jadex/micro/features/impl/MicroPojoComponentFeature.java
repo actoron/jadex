@@ -2,6 +2,7 @@ package jadex.micro.features.impl;
 
 import java.util.Collections;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -102,7 +103,7 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		{
 			return getPojoAgent();
 		}
-		else if(name!=null && name.startsWith("$platformargs"))
+		else if(name!=null && name.startsWith(IPlatformConfiguration.PLATFORMARGS))
 		{
 			return Starter.getPlatformValue(getComponent().getComponentIdentifier(), name.substring(14));
 		}
