@@ -67,3 +67,10 @@ test:
 
 after_script:
 - echo "End CI"
+
+mac_and_cheese:
+  stage: build
+  script:
+    - cd ~/git/jadex && git pull && ./gradlew --parallel clean :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x processSchemas
+  tags:
+    - mac
