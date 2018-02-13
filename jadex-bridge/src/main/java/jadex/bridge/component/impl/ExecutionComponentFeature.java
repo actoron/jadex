@@ -910,6 +910,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			boolean	threaddeath	= false;
 			try
 			{
+				wakeup();
 				exe.blockThread(monitor);
 				// Todo: wait for blocked threads to be resumed before terminating component
 				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
