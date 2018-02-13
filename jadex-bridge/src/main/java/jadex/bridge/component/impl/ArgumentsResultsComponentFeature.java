@@ -68,6 +68,9 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	{
 //		System.out.println("cl: "+getComponent().getClassLoader());
 		
+		if(getComponent().getComponentIdentifier().getName().indexOf("secu")!=-1)
+			System.out.println("here");
+		
 		// Init the arguments with parameters.
 		if(cinfo.getArguments()!=null)
 		{
@@ -230,7 +233,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 					this.arguments	= new LinkedHashMap<String, Object>();
 				
 //				Class<?> argclass = margs[i].getClazz().getType(getComponent().getClassLoader());
-				if(margs[i].getDefaultValue().getValue()!=null)
+				if(margs[i].getDefaultValue().getValue()!=null && !arguments.containsKey(margs[i].getName()))
 				{
 					arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 				}

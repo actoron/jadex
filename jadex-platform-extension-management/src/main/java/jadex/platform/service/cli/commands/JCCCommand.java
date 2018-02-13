@@ -22,7 +22,7 @@ import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
 
 /**
- * 
+ *  Start or stop the JCC/gui.
  */
 public class JCCCommand extends CreateComponentCommand
 {
