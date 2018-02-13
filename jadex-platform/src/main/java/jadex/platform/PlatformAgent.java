@@ -305,13 +305,13 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
-//			@NameValue(name="usepass", value="$args.usepass"),
-//			@NameValue(name="printpass", value="$args.printpass"),
-//			@NameValue(name="trustedlan", value="$args.trustedlan"),
-//			@NameValue(name="networkname", value="$args.networkname"),
-//			@NameValue(name="networkpass", value="$args.networkpass"),
-//			@NameValue(name="virtualnames", value="$args.virtualnames"),
-//			@NameValue(name="validityduration", value="$args.validityduration")
+//			@NameValue(name="usepass", value="$args.usepass"), // usesecret
+//			@NameValue(name="printpass", value="$args.printpass"), // printsecret
+//			@NameValue(name="trustedlan", value="$args.trustedlan"), // x
+//			@NameValue(name="networkname", value="$args.networkname"), // networkname
+//			@NameValue(name="networkpass", value="$args.networkpass"), // networksecret
+//			@NameValue(name="virtualnames", value="$args.virtualnames"), // roles
+//			@NameValue(name="validityduration", value="$args.validityduration") // x
 		}),	
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
@@ -328,7 +328,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		
 		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
 			arguments={
-				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
+//				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
 			}
 		),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
@@ -336,29 +336,34 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={
-				@NameValue(name="saveonexit", value="$args.saveonexit"),
-				@NameValue(name="platforms", value="$args.jccplatforms")}),
+//				@NameValue(name="saveonexit", value="$args.saveonexit"),
+//				@NameValue(name="platforms", value="$args.jccplatforms")
+			}
+		),
 //		@Component(name="rspub", type="$args.RSPUBLISHCOMPONENT", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
 		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-			arguments={@NameValue(name="console", value="$args.cliconsole")}),
+			arguments={
+//				@NameValue(name="console", value="$args.cliconsole")
+			}
+		),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
 			arguments={
-				@NameValue(name="port", value="$args.tcpport")
+//				@NameValue(name="port", value="$args.tcpport")
 			}),
 		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
 		arguments={
-			@NameValue(name="port", value="$args.wsport")
+//				@NameValue(name="port", value="$args.wsport")
 			}),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
+		@Component(name="relay", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
 			arguments={
-				@NameValue(name="addresses", value="$args.relayaddresses"),
-				@NameValue(name="forwarding", value="$args.relayforwarding"),
-				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
+//				@NameValue(name="addresses", value="$args.relayaddresses"),
+//				@NameValue(name="forwarding", value="$args.relayforwarding"),
+//				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
 			})
 	}),
 	

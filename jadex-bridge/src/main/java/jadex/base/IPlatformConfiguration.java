@@ -551,6 +551,10 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 
       public static final String PLATFORMARGS = "$platformargs";
       
+      public static final String PLATFORMCONFIG = "$platformconfig";
+      
+      public static final String PLATFORMMODEL = "$platformmodel";
+      
       /**
        * This is used for consistency checks and includes all argument names which refer to boolean
        * arguments.

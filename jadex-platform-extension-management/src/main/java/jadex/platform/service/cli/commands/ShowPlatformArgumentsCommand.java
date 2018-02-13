@@ -8,6 +8,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -46,7 +47,7 @@ public class ShowPlatformArgumentsCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "sp awamechanisms : list the content of the argument named awamechanisms";
+		return "sa awamechanisms : list the content of the argument named awamechanisms";
 	}
 	
 	/**
@@ -64,26 +65,24 @@ public class ShowPlatformArgumentsCommand extends ACliCommand
 		
 		Map<String, Object> params = (Map<String, Object>)Starter.getPlatformValue(comp.getComponentIdentifier().getRoot(), IPlatformConfiguration.PLATFORMARGS);
 
+		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(comp.getComponentIdentifier().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
+		
+		IModelInfo model = (IModelInfo)Starter.getPlatformValue(comp.getComponentIdentifier().getRoot(), IPlatformConfiguration.PLATFORMMODEL);
+		
 		Map<String, Object> res = new HashMap<String, Object>();
 		
 		if(argname!=null)
 		{
-//			if(params.containsKey(argname))
-//			{
+			if(params.containsKey(argname))
+			{
 				Object val = params.get(argname);
 				res.put(argname, val);
-//			}
-//			else
-//			{
-//				comp.scheduleStep(new IComponentStep<Void>()
-//				{
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						ia.get
-//						return null;
-//					}
-//				});
-//			}
+			}
+			else
+			{
+				Object val = config.getValue(argname, model);
+				res.put(argname, val);
+			}
 		}
 		else
 		{

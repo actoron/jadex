@@ -44,6 +44,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
@@ -63,6 +65,13 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
  *  Agent that provides the security service.
  */
 @Agent
+@Arguments(value={
+	@Argument(name="usesecret", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="printsecret", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="networkname", clazz=String[].class),
+	@Argument(name="networksecret", clazz=String[].class),
+	@Argument(name="roles", clazz=String.class)
+})
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
@@ -134,7 +143,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if(!agent.getComponentIdentifier().getLocalName().equals("security"))
 			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
 		
-		Map<String, String> activeprops = new HashMap<String, String>();
+		Map<String, Object> activeprops = new HashMap<String, Object>();
 		Map<String, String> networkprops = new HashMap<String, String>();
 		Map<String, String> remotepfprops = new HashMap<String, String>();
 		roles = new HashMap<String, Set<String>>();
@@ -170,6 +179,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						
 						eroles.add(prop.getValue());
 					}
+					else if(ISecurityService.PROPERTY_PRINTSECRET.equals(prop.getType()) || ISecurityService.PROPERTY_USESECRET.equals(prop.getType()))
+					{
+						activeprops.put(prop.getType(), Boolean.parseBoolean(prop.getValue()));
+					}
 				}
 			}
 		}
@@ -186,8 +199,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 			for (Map.Entry<String, Object> arg : args.entrySet())
 			{
-				if (!argexcluded.contains(arg.getKey()) && arg.getValue() instanceof String)
-					activeprops.put(arg.getKey(), (String) arg.getValue());
+				if (!argexcluded.contains(arg.getKey()))
+					activeprops.put(arg.getKey(), arg.getValue());
 			}
 			
 			Object name = args.get(PROPERTY_NETWORK);
@@ -237,9 +250,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (!activeprops.containsKey(ISecurityService.PROPERTY_PRINTSECRET))
 			activeprops.put(ISecurityService.PROPERTY_PRINTSECRET, "true");
 		
-		String secretstr = activeprops.get(ISecurityService.PROPERTY_PLATFORMSECRET);
-		printsecret = "true".equals(activeprops.get(ISecurityService.PROPERTY_PRINTSECRET).toLowerCase());
-		usesecret = "true".equals(activeprops.get(ISecurityService.PROPERTY_USESECRET).toLowerCase());
+		String secretstr = (String)activeprops.get(ISecurityService.PROPERTY_PLATFORMSECRET);
+		printsecret = activeprops.containsKey(ISecurityService.PROPERTY_PRINTSECRET)? (Boolean)activeprops.get(ISecurityService.PROPERTY_PRINTSECRET): true;
+		usesecret = activeprops.containsKey(ISecurityService.PROPERTY_USESECRET)? (Boolean)activeprops.get(ISecurityService.PROPERTY_USESECRET): true;
 		
 		if (usesecret && secretstr == null)
 		{
