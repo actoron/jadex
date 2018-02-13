@@ -68,8 +68,8 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	{
 //		System.out.println("cl: "+getComponent().getClassLoader());
 		
-		if(getComponent().getComponentIdentifier().getName().indexOf("secu")!=-1)
-			System.out.println("here");
+//		if(getComponent().getComponentIdentifier().getName().indexOf("secu")!=-1)
+//			System.out.println("here");
 		
 		// Init the arguments with parameters.
 		if(cinfo.getArguments()!=null)
