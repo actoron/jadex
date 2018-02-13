@@ -61,8 +61,6 @@ public class BDITest	extends	ComponentTestSuite
 	{
 		super(new String[]
 		{
-			"-asyncexecution", "true",	// TODO: why problems with sync? e.g. CNP test, scheduled make proposal plan not executed!?
-//			"-logging", "true",	// for debugging CNP
 			"-df", "true"	// Required for some old BDI (start) tests
 		}, new File[][]{SUtil.findOutputDirs("jadex-applications-bdi", true)}, null, EXCLUDES, true, true, true);
 	}
