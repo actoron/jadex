@@ -29,12 +29,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.javaparser.IMapAccess;
 import jadex.javaparser.SJavaParser;
 
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature
+public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature, IMapAccess
 {
 	//-------- attributes --------
 	
@@ -228,15 +229,18 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				if(arguments==null)
 					this.arguments	= new LinkedHashMap<String, Object>();
 				
-				Class<?> argclass = margs[i].getClazz().getType(getComponent().getClassLoader());
+//				Class<?> argclass = margs[i].getClazz().getType(getComponent().getClassLoader());
 				if(margs[i].getDefaultValue().getValue()!=null)
 				{
 					arguments.put(margs[i].getName(), SJavaParser.getParsedValue(margs[i].getDefaultValue(), component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader()));
 				}
-				else if(SReflect.isBasicType(argclass))
-				{
-					arguments.put(margs[i].getName(), SReflect.getDefaultValue(argclass));
-				}
+				
+				// Don't set basic type default values here, as they would overwrite java field initializer values.
+				// Done lazy in get() instead.
+//				else if(SReflect.isBasicType(argclass))
+//				{
+//					arguments.put(margs[i].getName(), SReflect.getDefaultValue(argclass));
+//				}
 			}
 		}
 	}
@@ -336,7 +340,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		Object	ret;
 		if("$args".equals(name) || "$arguments".equals(name))
 		{
-			ret	= arguments;
+			ret	= this;	// Use map access interface to provide default values for unset basic type args.
 		}
 		else
 		{
@@ -345,6 +349,34 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		
 		return ret;
 	}
+	
+	//-------- IMapAccess --------
+	
+	/**
+	 *  Provide default values for basic types, if not set. 
+	 */
+	public Object get(Object key)
+	{
+		Object	ret	= null;
+		if(arguments.containsKey(key))
+		{
+			ret	= arguments.get(key);
+		}
+		else if(key instanceof String)
+		{
+			IArgument	arg	=	getComponent().getModel().getArgument((String)key);
+			if(arg!=null)
+			{
+				Class<?> argclass = arg.getClazz().getType(getComponent().getClassLoader());
+				if(SReflect.isBasicType(argclass))
+				{
+					ret	= SReflect.getDefaultValue(argclass);
+				}
+			}
+		}
+		return ret;
+	}
+
 	
 	//-------- IArgumentsFeature interface --------
 	

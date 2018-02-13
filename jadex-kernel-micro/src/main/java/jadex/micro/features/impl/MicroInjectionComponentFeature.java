@@ -3,7 +3,6 @@ package jadex.micro.features.impl;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -91,26 +90,29 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			{
 				for(int i=0; i<names.length; i++)
 				{
-					Object val = args.get(names[i]);
-					
-//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
-					final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
-					
-					try
+					if(args.containsKey(names[i]))
 					{
-						for(int j=0; j<infos.length; j++)
+						Object val = args.get(names[i]);
+						
+	//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
+						final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
+						
+						try
 						{
-							Field field = infos[j].getFirstEntity().getField(getComponent().getClassLoader());
-							String convert = infos[j].getSecondEntity();
-//							System.out.println("seting arg: "+names[i]+" "+val);
-							setFieldValue(val, field, convert);
+							for(int j=0; j<infos.length; j++)
+							{
+								Field field = infos[j].getFirstEntity().getField(getComponent().getClassLoader());
+								String convert = infos[j].getSecondEntity();
+	//							System.out.println("seting arg: "+names[i]+" "+val);
+								setFieldValue(val, field, convert);
+							}
 						}
-					}
-					catch(Exception e)
-					{
-						getComponent().getLogger().warning("Field injection failed: "+e);
-						if(!ret.isDone())
-							ret.setException(e);
+						catch(Exception e)
+						{
+							getComponent().getLogger().warning("Field injection failed: "+e);
+							if(!ret.isDone())
+								ret.setException(e);
+						}
 					}
 				}
 			}
