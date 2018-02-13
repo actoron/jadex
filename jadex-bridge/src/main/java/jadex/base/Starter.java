@@ -417,6 +417,8 @@ public class Starter
 					putPlatformValue(cid, "$platformaccess", component);
 					putPlatformValue(cid, "$bootstrapfactory", cfac);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
+					putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
+					putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
 //					rootconf.setBootstrapFactory(cfac);
 //					config.setPlatformModel(model);
 					
