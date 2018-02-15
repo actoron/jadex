@@ -707,17 +707,17 @@ public interface IExtendedPlatformConfiguration
      */
     public void setFiletransfer(boolean value);
 
-    /**
-     *  Get the marshal flag.
-     *  @return The marshal flag.
-     */
-    public boolean getMarshal();
-
-    /**
-     *  Set the marshal flag.
-     *  @param value The marshal flag.
-     */
-    public void setMarshal(boolean value);
+//    /**
+//     *  Get the marshal flag.
+//     *  @return The marshal flag.
+//     */
+//    public boolean getMarshal();
+//
+//    /**
+//     *  Set the marshal flag.
+//     *  @param value The marshal flag.
+//     */
+//    public void setMarshal(boolean value);
 
     /**
      *  Get the security flag.

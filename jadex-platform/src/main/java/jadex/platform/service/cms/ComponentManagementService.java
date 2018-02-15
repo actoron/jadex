@@ -39,6 +39,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -390,15 +391,15 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param resultlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, 
+	public IFuture<IComponentIdentifier> createComponent(final String oname, final String modelname, CreationInfo info, 
 		final IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{			
 		if(modelname==null)
-			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + name + " : Modelname must not be null."));
+			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
 //		System.out.println("create: "+name+" "+modelname+" "+agent.getComponentIdentifier());
 		
-//		if(name!=null && name.toLowerCase().indexOf("provider")!=-1)
+//		if(oname!=null && oname.toLowerCase().indexOf("clock")!=-1)
 //			System.out.println("create compo: "+modelname+" "+info);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
@@ -436,7 +437,7 @@ public class ComponentManagementService implements IComponentManagementService
 					// will deliver the platform (as this second call is performed by the cms itself)
 					
 					// Map remote subscription events to local result listener (avoids the need for listener as plain remote object)
-					rcms.createComponent(cinfo, name, modelname).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+					rcms.createComponent(cinfo, oname, modelname).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 					{
 						Collection<Tuple2<String, Object>>	results;
 						
@@ -511,7 +512,7 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 	//		System.out.println("create start1: "+model+" "+cinfo.getParent());
 			
-			if(name!=null && name.indexOf('@')!=-1)
+			if(oname!=null && oname.indexOf('@')!=-1)
 			{
 				inited.setException(new ComponentCreationException("No '@' allowed in component name.", ComponentCreationException.REASON_WRONG_ID));
 			}
@@ -528,10 +529,11 @@ public class ComponentManagementService implements IComponentManagementService
 							{
 //								System.out.println("loading: "+modelname+" "+rid);
 
-								resolveFilename(modelname, cinfo, rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<String, IComponentIdentifier>(inited)
+								resolveFilename(modelname, cinfo, rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<String, ClassLoader>, IComponentIdentifier>(inited)
 								{
-									public void customResultAvailable(final String model)
+									public void customResultAvailable(final Tuple2<String, ClassLoader> tup)
 									{
+										final String model = tup.getFirstEntity();
 										getComponentFactory(model, cinfo, rid, false, false)
 											.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IComponentIdentifier>(inited)
 										{
@@ -550,6 +552,8 @@ public class ComponentManagementService implements IComponentManagementService
 														}
 														else
 														{
+															final String name = (String)SJavaParser.evaluateExpressionPotentially(oname, lmodel.getAllImports(), null, tup.getSecondEntity());
+															
 //															System.out.print("<"+lmodel.getName()+" "+factory.getClass());
 															IFuture fut = factory.getComponentFeatures(lmodel);
 															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
@@ -1014,25 +1018,25 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  Find the file name and local component type name
 	 *  for a component to be started.
 	 */
-	protected IFuture<String>	resolveFilename(final String modelname, final CreationInfo cinfo, final IResourceIdentifier rid)
+	protected IFuture<Tuple2<String, ClassLoader>> resolveFilename(final String modelname, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
-		final Future<String>	ret	= new Future<String>();
+		final Future<Tuple2<String, ClassLoader>> ret = new Future<Tuple2<String, ClassLoader>>();
 		
 		try
 		{
 			// Hack for platform init
 			ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			libservice.getClassLoader(rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<ClassLoader, String>(ret)
+			libservice.getClassLoader(rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
 			{
 				public void customResultAvailable(ClassLoader cl)
 				{
-					String	filename	= modelname;
+					String filename = modelname;
 					
 					if(cinfo.getParent()!=null)
 					{
 						// Try to find file for local type.
-						String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
-						filename	= null;
+						String localtype = modelname!=null ? modelname : cinfo.getLocalType();
+						filename = null;
 						IInternalAccess pad = getParentComponent(cinfo);
 						IExternalAccess parent = pad.getExternalAccess();
 						final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
@@ -1082,7 +1086,7 @@ public class ComponentManagementService implements IComponentManagementService
 						}
 					}
 					
-					ret.setResult(filename);
+					ret.setResult(new Tuple2<String, ClassLoader>(filename, cl));
 				}
 			}));
 		}
@@ -1095,7 +1099,7 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				// Try to find file for local type.
 				String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
-				filename	= null;
+				filename = null;
 				IInternalAccess pad = getParentComponent(cinfo);
 				IExternalAccess parent = pad.getExternalAccess();
 				final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
@@ -1109,11 +1113,11 @@ public class ComponentManagementService implements IComponentManagementService
 				}
 				if(filename==null)
 				{
-					filename	= modelname;
+					filename = modelname;
 				}
 			}
 			
-			ret.setResult(filename);
+			ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
 		}
 		
 		return ret;
@@ -1153,7 +1157,9 @@ public class ComponentManagementService implements IComponentManagementService
 							List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
 							for(IComponentFactory fac: facts)
 							{
-								if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+//								if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+								if(isMultiFactory(fac))
+//								if(((IService)fac).getServiceIdentifier().getProviderId().getLocalName().indexOf("multi")!=-1)
 								{
 									multies.add(fac);
 								}
@@ -1188,9 +1194,7 @@ public class ComponentManagementService implements IComponentManagementService
 				{
 					// Todo: sometimes nullpointerexception is caused below (because agent is null???).
 					if(!(exception instanceof ComponentCreationException))
-					{
 						System.out.println("factory ex: "+exception+", "+agent);
-					}
 
 					// If not found in cache but not yet searched, invoke again to start fresh search due to cache miss.
 					if(!searched)
@@ -1208,6 +1212,15 @@ public class ComponentManagementService implements IComponentManagementService
 			}));
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Test if factory is a multi factory.
+	 */
+	protected boolean isMultiFactory(IComponentFactory fac)
+	{
+//		if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+		return ((IService)fac).getServiceIdentifier().getProviderId().getLocalName().indexOf("multi")!=-1;
 	}
 	
 	/**
@@ -1241,7 +1254,8 @@ public class ComponentManagementService implements IComponentManagementService
 					if(res.booleanValue())
 					{
 						// If multi factory, clear cache and invoke again to obtain real factory.
-						if(factory.toString().toLowerCase().indexOf("multi")!=-1)
+//						if(factory.toString().toLowerCase().indexOf("multi")!=-1)
+						if(isMultiFactory(factory))
 						{
 							ComponentManagementService.this.factories	= null;
 							getComponentFactory(model, cinfo, rid, false, false)

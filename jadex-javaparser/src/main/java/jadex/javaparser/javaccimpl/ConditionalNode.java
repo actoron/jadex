@@ -90,9 +90,7 @@ public class ConditionalNode	extends ExpressionNode
 	public Object	getValue(IValueFetcher fetcher) //throws Exception
 	{
 		if(isConstant())
-		{
 			return getConstantValue();
-		}
 
 		Object	ret;
 		ExpressionNode	choice	= (ExpressionNode)jjtGetChild(0);
@@ -101,7 +99,7 @@ public class ConditionalNode	extends ExpressionNode
 		Object	cval	= choice.getValue(fetcher);
 //		if(cval==null)
 //			System.out.println("choice: "+choice);
-		boolean	val	= ((Boolean)cval).booleanValue();
+		boolean	val	= cval==null? false: ((Boolean)cval).booleanValue();
 		if(val)
 		{
 			ret	= node1.getValue(fetcher);

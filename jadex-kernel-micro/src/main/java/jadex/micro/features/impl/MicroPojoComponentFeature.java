@@ -105,7 +105,8 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		}
 		else if(name!=null && name.startsWith(IPlatformConfiguration.PLATFORMARGS))
 		{
-			return Starter.getPlatformValue(getComponent().getComponentIdentifier(), name.substring(14));
+			String valname = name.length()>13? name.substring(14): null;
+			return valname==null? Starter.getPlatformValue(getComponent().getComponentIdentifier(), IPlatformConfiguration.PLATFORMARGS): Starter.getPlatformValue(getComponent().getComponentIdentifier(), valname);
 		}
 		else if(Starter.hasPlatformValue(getComponent().getComponentIdentifier(), name))
 		{

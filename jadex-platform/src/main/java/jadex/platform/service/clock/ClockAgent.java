@@ -3,6 +3,8 @@ package jadex.platform.service.clock;
 
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -20,5 +22,16 @@ import jadex.micro.annotation.ProvidedServices;
 //@Properties(value=@NameValue(name="system", value="true"))
 public class  ClockAgent
 {
+//	@AgentCreated
+//	public void started()
+//	{
+//		System.out.println("start");
+//	}
+//	
+//	@AgentKilled
+//	public void killed(Exception e)
+//	{
+//		e.printStackTrace();
+//	}
 }
 

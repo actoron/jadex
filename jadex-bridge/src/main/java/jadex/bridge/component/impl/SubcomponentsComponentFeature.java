@@ -192,13 +192,19 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	protected void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
 	{
 		if(i<components.length)
-		{
-			int num = getNumber(components[i], model);
+		{			
+			final int num = getNumber(components[i], model);
+			
+//			if(num>0)
+//				System.out.println("create comp: "+components[i].getName());
+			
 			IResultListener<IComponentIdentifier> crl = new CollectionResultListener<IComponentIdentifier>(num, false, 
 				component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IComponentIdentifier>, Void>(fut)
 			{
 				public void customResultAvailable(Collection<IComponentIdentifier> result)
 				{
+//					if(num>0)
+//						System.out.println("created comp: "+components[i].getName());
 					cids.addAll(result);
 					createComponent(components, cms, model, i+1, fut, cids);
 				}
@@ -307,7 +313,10 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 			fetcher.setValue("$n", Integer.valueOf(cnt));
 			try
 			{
-				ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, this.component.getClassLoader());
+				if(SJavaParser.isExpressionString(component.getName()))
+					ret = (String)SJavaParser.evaluateExpressionPotentially(component.getName(), model.getAllImports(), fetcher, this.component.getClassLoader());
+				else
+					ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, this.component.getClassLoader());
 				if(ret==null)
 					ret = component.getName();
 			}

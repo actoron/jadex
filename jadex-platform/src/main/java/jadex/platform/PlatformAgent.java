@@ -1,6 +1,5 @@
 package jadex.platform;
 
-import static jadex.base.IPlatformConfiguration.ADDRESS;
 import static jadex.base.IPlatformConfiguration.ASYNCEXECUTION;
 import static jadex.base.IPlatformConfiguration.AWADELAY;
 import static jadex.base.IPlatformConfiguration.AWAEXCLUDES;
@@ -12,22 +11,14 @@ import static jadex.base.IPlatformConfiguration.BINARYMESSAGES;
 import static jadex.base.IPlatformConfiguration.CHAT;
 import static jadex.base.IPlatformConfiguration.CLI;
 import static jadex.base.IPlatformConfiguration.CLICONSOLE;
-import static jadex.base.IPlatformConfiguration.CLOCK;
-import static jadex.base.IPlatformConfiguration.CONTEXT;
 import static jadex.base.IPlatformConfiguration.CONTEXTSERVICECLASS;
-import static jadex.base.IPlatformConfiguration.DF;
-import static jadex.base.IPlatformConfiguration.FILETRANSFER;
 import static jadex.base.IPlatformConfiguration.GUI;
 import static jadex.base.IPlatformConfiguration.JCCPLATFORMS;
-import static jadex.base.IPlatformConfiguration.KERNELS;
 import static jadex.base.IPlatformConfiguration.LIBPATH;
-import static jadex.base.IPlatformConfiguration.LIBRARY;
 import static jadex.base.IPlatformConfiguration.LOCALTRANSPORT;
 import static jadex.base.IPlatformConfiguration.LOGGING;
 import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
-import static jadex.base.IPlatformConfiguration.MARSHAL;
 import static jadex.base.IPlatformConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.IPlatformConfiguration.MONITORINGCOMP;
 import static jadex.base.IPlatformConfiguration.NETWORKNAME;
 import static jadex.base.IPlatformConfiguration.NETWORKPASS;
 import static jadex.base.IPlatformConfiguration.PRINTPASS;
@@ -38,15 +29,8 @@ import static jadex.base.IPlatformConfiguration.RELAYTRANSPORT;
 import static jadex.base.IPlatformConfiguration.RSPUBLISH;
 import static jadex.base.IPlatformConfiguration.RSPUBLISHCOMPONENT;
 import static jadex.base.IPlatformConfiguration.SAVEONEXIT;
-import static jadex.base.IPlatformConfiguration.SECURITY;
-import static jadex.base.IPlatformConfiguration.SENSORS;
-import static jadex.base.IPlatformConfiguration.SETTINGS;
-import static jadex.base.IPlatformConfiguration.SIMUL;
 import static jadex.base.IPlatformConfiguration.SIMULATION;
 import static jadex.base.IPlatformConfiguration.STRICTCOM;
-import static jadex.base.IPlatformConfiguration.SUPERPEER;
-import static jadex.base.IPlatformConfiguration.SUPERPEERCLIENT;
-import static jadex.base.IPlatformConfiguration.SUPERSUPERPEER;
 import static jadex.base.IPlatformConfiguration.TCPPORT;
 import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
 import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
@@ -169,39 +153,48 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
 //	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
 
+	@Argument(name=THREADPOOLCLASS, clazz=String.class, defaultvalue="null"),
+
+	@Argument(name=CONTEXTSERVICECLASS, clazz=String.class, defaultvalue="null"),
+	
 	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	
 	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=RSPUBLISHCOMPONENT, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)"),
 
-	@Argument(name=KERNELS, clazz=String[].class, defaultvalue="new String[]{\"multi\"}"),
-	
 	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
-		
-	@Argument(name=SENSORS, clazz=boolean.class, defaultvalue="false"),
-	
-	@Argument(name=THREADPOOLCLASS, clazz=String.class, defaultvalue="null"),
 
-	@Argument(name=CONTEXTSERVICECLASS, clazz=String.class, defaultvalue="null"),
+	// No argument default values because configuration has defaults! todo: remove all arg defaults
 	
-	@Argument(name=MONITORINGCOMP, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=DF, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=CLOCK, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SIMUL, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=FILETRANSFER, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=MARSHAL, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SECURITY, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=LIBRARY, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SETTINGS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=CONTEXT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=ADDRESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SUPERPEER, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=SUPERSUPERPEER, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=SUPERPEERCLIENT, clazz=boolean.class, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer")
+	@Argument(name="kernel_multi", clazz=Boolean.class),
+	@Argument(name="kernel_micro", clazz=Boolean.class),
+	@Argument(name="kernel_component", clazz=Boolean.class),
+	@Argument(name="kernel_application", clazz=Boolean.class),
+	@Argument(name="kernel_bdiv3", clazz=Boolean.class),
+	@Argument(name="kernel_bdi", clazz=Boolean.class),
+	@Argument(name="kernel_bpmn", clazz=Boolean.class),
+	@Argument(name="kernel_bpmn", clazz=Boolean.class),
+	@Argument(name="kernel_bdibpmn", clazz=Boolean.class),
+	@Argument(name="kernel_gpmn", clazz=Boolean.class),
+	
+	@Argument(name="sensors", clazz=boolean.class),
+	@Argument(name="mon", clazz=boolean.class),
+	@Argument(name="df", clazz=boolean.class),
+	@Argument(name="clock", clazz=boolean.class),
+	@Argument(name="simul", clazz=boolean.class),
+	@Argument(name="filetransfer", clazz=boolean.class),
+	@Argument(name="security", clazz=boolean.class),
+	@Argument(name="library", clazz=boolean.class),
+	@Argument(name="settings", clazz=boolean.class),
+	@Argument(name="context", clazz=boolean.class),
+	@Argument(name="address", clazz=boolean.class),
+	
+	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="superpeerclient", clazz=boolean.class, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
 })
 
 @ComponentTypes({
-//	@ComponentType(name="system", clazz=SystemAgent.class),
 	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
 	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
 	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
@@ -209,7 +202,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="kernel_bdiv3", filename="jadex/bdiv3/KernelBDIV3Agent.class"),
 	@ComponentType(name="kernel_bdi", filename="jadex/bdiv3x/KernelBDIX.component.xml"),
 	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
-//	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
 	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),
 	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
 	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
@@ -229,7 +221,6 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="filetransfer", clazz=FileTransferAgent.class),
 	@ComponentType(name="security", clazz=SecurityAgent.class),
 	@ComponentType(name="library", clazz=LibraryAgent.class),
-//	@ComponentType(name="dependency", clazz=DependencyAgent.class),
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
@@ -242,25 +233,11 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 })
 
 @ProvidedServices({
-	//Advanced Threadpool
-//	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.AdvancedThreadPoolService($component.getComponentIdentifier(), false)", proxytype=Implementation.PROXYTYPE_RAW)),
-//	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.AdvancedThreadPoolService($component.getComponentIdentifier(), true)", proxytype=Implementation.PROXYTYPE_RAW)),
-//	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-//	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.java5.JavaThreadPool(false), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.java5.JavaThreadPool(true), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-//	@ProvidedService(type=IContextService.class, implementation=@Implementation(expression="$args.contextserviceclass!=null ? jadex.commons.SReflect.classForName0($args.contextserviceclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : jadex.commons.SReflect.isAndroid() ? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()}): jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.IComponentIdentifier.class}).newInstance(new Object[]{$component.getComponentIdentifier()})")),
-	@ProvidedService(type=IExecutionService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="	($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
-//	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(SettingsService.class)),
-//	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="$args.maven_dependencies ? jadex.platform.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.platform.service.library.BasicDependencyService()")),
-//	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="jadex.commons.SReflect.isAndroid() ? jadex.platform.service.library.AndroidLibraryService.class.newInstance() : $args.libpath==null? new jadex.platform.service.library.LibraryService(): new jadex.platform.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath), $args.baseclassloader==null ? jadex.platform.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))")),
-//	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component, $args.simulation): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component, $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
-//	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new jadex.platform.service.security.SecurityService($args.usepass, $args.printpass, $args.trustedlan, $args.networkname==null? null: new String[]{$args.networkname}, $args.networkpass==null? null: new String[]{$args.networkpass}, null, $args.virtualnames, $args.validityduration)")),
+	@ProvidedService(type=IExecutionService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
-//	@ProvidedService(type=IDF.class, implementation=@Implementation(DirectoryFacilitatorService.class)),
-//	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(SimulationService.class)),
-//	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(DeploymentService.class)),
 })
 
 @RequiredServices(
@@ -277,94 +254,47 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 @Configurations(
 {
 	@Configuration(name="auto", arguments={
-//		@NameValue(name=TCPPORT, value="0"),
-//		@NameValue(name=SSLTCPPORT, value="0"),
-//		@NameValue(name=IPlatformConfiguration.PLATFORM_NAME, value="null")
 	}, components={
-		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0", arguments={
-//			@NameValue(name="libpath", value="$args.libpath"),
-//			@NameValue(name="baseclassloader", value="$args.baseclassloader"),
-//			@NameValue(name="maven_dependencies", value="$args.maven_dependencies")
-		}),
-		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0", arguments={
-//			@NameValue(name="contextserviceclass", value="$args.contextserviceclass"),
-		}),
+		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0"),
+		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0"),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
+		//@Component(name="%{jadex.base.IPlatformConfiguration.MONITORINGCOMP}", type="monitor", daemon=Boolean3.TRUE, number="$args.get(jadex.base.IPlatformConfiguration.MONITORINGCOMP)? 1 : 0"),
+		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.mon? 1 : 0"),
 		
-		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="kernels", type="kernel_multi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"multi\")!=-1? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"micro\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"component\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"application\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"v3\")!=-1 ? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdi\")!=-1 && java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")==-1 ? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bdibpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"bpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"gpmn\")!=-1 || java.util.Arrays.toString((Object[])$args.get(\"kernels\")).indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="kernel_multi", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.kernel_multi? 1 : 0"),
+		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.kernel_micro? 1 : 0"),
+		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.kernel_component? 1 : 0"),
+		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.kernel_application? 1 : 0"),
+		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.kernel_bdiv3? 1 : 0"),
+		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.kernel_bdi? 1 : 0"),
+		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.kernel_bpmn? 1 : 0"),
+		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.kernel_bdibpmn? 1 : 0"),
+		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.kernel_gpmn? 1 : 0"),
+
+//		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, number="$args.compregistry? 1 : 0"),
 		
-//		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
-		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0", arguments={
-//			@NameValue(name="usepass", value="$args.usepass"), // usesecret
-//			@NameValue(name="printpass", value="$args.printpass"), // printsecret
-//			@NameValue(name="trustedlan", value="$args.trustedlan"), // x
-//			@NameValue(name="networkname", value="$args.networkname"), // networkname
-//			@NameValue(name="networkpass", value="$args.networkpass"), // networksecret
-//			@NameValue(name="virtualnames", value="$args.virtualnames"), // roles
-//			@NameValue(name="validityduration", value="$args.validityduration") // x
-		}),	
+		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0"),
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
 		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
-
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
-		arguments={
-//			@NameValue(name="mechanisms", value="$args.awamechanisms"),
-//			@NameValue(name="delay", value="$args.awadelay"),
-//			@NameValue(name="fast", value="$args.awafast"),
-//			@NameValue(name="includes", value="$args.awaincludes"),
-//			@NameValue(name="excludes", value="$args.awaexcludes")
-		}),
 		
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0",
-			arguments={
-//				@NameValue(name="supersuperpeer", value="$args.supersuperpeer")
-			}
-		),
+		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0"),
+		
+		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
 		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1 : 0"),
 		
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
-		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
-			arguments={
-//				@NameValue(name="saveonexit", value="$args.saveonexit"),
-//				@NameValue(name="platforms", value="$args.jccplatforms")
-			}
-		),
-//		@Component(name="rspub", type="$args.RSPUBLISHCOMPONENT", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
+		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0"),
 		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
-		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-			arguments={
-//				@NameValue(name="console", value="$args.cliconsole")
-			}
-		),
+		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0"),
 		
 		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0",
-			arguments={
-//				@NameValue(name="port", value="$args.tcpport")
-			}),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0",
-		arguments={
-//				@NameValue(name="port", value="$args.wsport")
-			}),
-		@Component(name="relay", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0",
-			arguments={
-//				@NameValue(name="addresses", value="$args.relayaddresses"),
-//				@NameValue(name="forwarding", value="$args.relayforwarding"),
-//				@NameValue(name="dynamicrouting", value="$args.relaydynamicrouting")
-			})
+		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0"),
+		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0"),
+		@Component(name="relay", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
 	})
 })
 @Agent

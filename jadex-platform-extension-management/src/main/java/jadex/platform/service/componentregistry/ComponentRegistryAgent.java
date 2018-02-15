@@ -60,7 +60,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Imports("jadex.bridge.service.types.cms.*")
 @Arguments(
 {
-	@Argument(name="paargs", clazz=Map.class, description="The parent arguments"),
+	@Argument(name="paargs", clazz=Map.class, description="The parent arguments", defaultvalue="$platformargs"),
 	// MonitoringAgent
     @Argument(name="componentinfos", clazz=CreationInfo.class, description="The component models to add initially.",
     	defaultvalue="new CreationInfo[]{"
@@ -153,7 +153,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
                 final String fn = (String)SJavaParser.evaluateExpressionPotentially(info.getFilename(), info.getImports(), agent.getFetcher(), cl);
 //              System.out.println("reg component model: "+fn);
                 
-                if (fn != null)
+                if(fn != null)
                 {
 	                SComponentFactory.loadModel(agent.getExternalAccess(), fn, info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<IModelInfo, Void>(ret)
 	                {

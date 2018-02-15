@@ -5,9 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.types.monitoring.IMonitoringService;
 
 /**
  *  Interface for platform configuration.
@@ -73,14 +71,14 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
     /** The opengl disable flag argument. */
     public static final String OPENGL = "opengl";
 
-    /** Flag to enable or disable the platform as superpeer. **/
-    public static final String SUPERPEER = "superpeer";
-    
-    /** Flag to enable or disable the platform as supersuperpeer. **/
-    public static final String SUPERSUPERPEER = "supersuperpeer";
-
-    /** Flag to enable or disable the platform as superpeern client. **/
-    public static final String SUPERPEERCLIENT = "superpeerclient";
+//    /** Flag to enable or disable the platform as superpeer. **/
+//    public static final String SUPERPEER = "superpeer";
+//    
+//    /** Flag to enable or disable the platform as supersuperpeer. **/
+//    public static final String SUPERSUPERPEER = "supersuperpeer";
+//
+//    /** Flag to enable or disable the platform as superpeern client. **/
+//    public static final String SUPERPEERCLIENT = "superpeerclient";
 
     /** Flag if exceptions should be printed. */
     public static final String PRINTEXCEPTIONS = "printexceptions";
@@ -452,19 +450,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // boolean
       // default:
       // false
-
-      /** Flag if global monitoring is turned on. **/
-      public static final String	MONITORINGCOMP		= "monitoringcomp";							// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if sensors are turned on. **/
-      public static final String	SENSORS				= "sensors";								// class:
-      // boolean
-      // default:
-      // false
-
+      
       /** Optionally provide alternative thread pool implementation. **/
       public static final String	THREADPOOLCLASS		= "threadpoolclass";						// class:
       // String
@@ -477,71 +463,85 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // default:
       // null
 
-      /** Flag if df component and service should be started. **/
-      public static final String	DF					= "df";										// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if clock component and service should be started. **/
-      public static final String	CLOCK				= "clock";									// class:
-      // boolean
-      // default:
-      // true
-
-//      /** Flag if message component and service should be started. **/
-//      public static final String	MESSAGE				= "message";								// class:
+      
+      
+//      /** Flag if global monitoring is turned on. **/
+//      public static final String	MONITORINGCOMP		= "mon";									// class:
 //      // boolean
 //      // default:
 //      // true
-
-      /** Flag if simulation component and service should be started. **/
-      public static final String	SIMUL				= "simul";									// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if filetransfer component and service should be started. **/
-      public static final String	FILETRANSFER		= "filetransfer";							// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if marshal component and service should be started. **/
-      public static final String	MARSHAL				= "marshal";								// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if security component and service should be started. **/
-      public static final String	SECURITY			= "security";								// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if library component and service should be started. **/
-      public static final String	LIBRARY				= "library";								// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if settings component and service should be started. **/
-      public static final String	SETTINGS			= "settings";								// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if context component and service should be started. **/
-      public static final String	CONTEXT				= "context";								// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if address component and service should be started. **/
-      public static final String	ADDRESS				= "address";								// class:
-      // boolean
-      // default:
-      // true
+//
+//      /** Flag if sensors are turned on. **/
+//      public static final String	SENSORS				= "sensors";								// class:
+//      // boolean
+//      // default:
+//      // false
+//
+//      /** Flag if df component and service should be started. **/
+//      public static final String	DF					= "df";										// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if clock component and service should be started. **/
+//      public static final String	CLOCK				= "clock";									// class:
+//      // boolean
+//      // default:
+//      // true
+//
+////      /** Flag if message component and service should be started. **/
+////      public static final String	MESSAGE				= "message";								// class:
+////      // boolean
+////      // default:
+////      // true
+//
+//      /** Flag if simulation component and service should be started. **/
+//      public static final String	SIMUL				= "simul";									// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if filetransfer component and service should be started. **/
+//      public static final String	FILETRANSFER		= "filetransfer";							// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if marshal component and service should be started. **/
+//      public static final String	MARSHAL				= "marshal";								// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if security component and service should be started. **/
+//      public static final String	SECURITY			= "security";								// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if library component and service should be started. **/
+//      public static final String	LIBRARY				= "library";								// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if settings component and service should be started. **/
+//      public static final String	SETTINGS			= "settings";								// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if context component and service should be started. **/
+//      public static final String	CONTEXT				= "context";								// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if address component and service should be started. **/
+//      public static final String	ADDRESS				= "address";								// class:
+//      // boolean
+//      // default:
+//      // true
 
       public static final String WSPORT = "wsport";
 
@@ -568,10 +568,11 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 //              RELAYSECURITY, RELAYAWAONLY,
 //              SSLTCPTRANSPORT,
               WSPUBLISH, RSPUBLISH, MAVEN_DEPENDENCIES,
-              MONITORINGCOMP, SENSORS, DF, CLOCK,
+//              MONITORINGCOMP, SENSORS, DF, CLOCK,
 //              MESSAGE,
-              SIMUL, FILETRANSFER, MARSHAL, SECURITY,
-              LIBRARY, SETTINGS, CONTEXT, ADDRESS, SUPERPEER, SUPERPEERCLIENT
+//              SIMUL, FILETRANSFER, MARSHAL, SECURITY,
+//              LIBRARY, SETTINGS, CONTEXT, ADDRESS, 
+//              SUPERPEER, SUPERPEERCLIENT
       };
     
       /**

@@ -109,6 +109,14 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		else if(mname.equals("getValues"))
 		{
 			ret = new HashMap<String, Object>(values);
+			String[] kernels = (String[])values.get("kernels");
+			if(kernels!=null)
+			{
+				for(String kernel: kernels)
+				{
+					((Map<String, Object>)ret).put("kernel_"+kernel, Boolean.TRUE);
+				}
+			}
 		}
 		else if(mname.equals("enhanceWith"))
 		{
@@ -715,25 +723,28 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		econfig.setWsPublish(false);
 		econfig.setRsPublish(false);
 //		rootconf.setKernels(IRootComponentConfiguration.KERNEL.multi);
-		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
+//		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
 //		econfig.setMavenDependencies(false);
 		config.setSensors(false);
 //		econfig.setThreadpoolClass(null);
 //		econfig.setContextServiceClass(null);
 
+		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
 		econfig.setMonitoringComp(true);
 //		econfig.setDf(true);
 		econfig.setClock(true);
 		// rootConfig.setMessage(true);
 		econfig.setSimul(true);
-		econfig.setFiletransfer(true);
-		econfig.setMarshal(true);
+//		econfig.setFiletransfer(true);
+//		econfig.setMarshal(true);
 		econfig.setSecurity(true);
 		econfig.setLibrary(true);
 		econfig.setSettings(true);
 		econfig.setContext(true);
 		econfig.setAddress(true);
 		// rootConfig.setRegistrySync(false);
+		config.setValue("compregistry", Boolean.TRUE);
+		
 		return config;
 	}
 
@@ -792,16 +803,16 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setMonitoringComp(false);
 		config.getExtendedPlatformConfiguration().setDf(false);
 		config.getExtendedPlatformConfiguration().setClock(true);
-		// rootConfig.setMessage(true); // needed by rms
 		config.getExtendedPlatformConfiguration().setSimul(false);
 		config.getExtendedPlatformConfiguration().setFiletransfer(false);
-		config.getExtendedPlatformConfiguration().setMarshal(true);
+//		config.getExtendedPlatformConfiguration().setMarshal(true);
 		config.getExtendedPlatformConfiguration().setSecurity(false);
 		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
 		config.getExtendedPlatformConfiguration().setSettings(true);
 		config.getExtendedPlatformConfiguration().setContext(true);
 		config.getExtendedPlatformConfiguration().setAddress(true);
-
+		config.setValue("compregistry", Boolean.TRUE);
+		
 		config.setSuperpeer(false);
 		config.setSuperpeerClient(false);
 		config.setSupersuperpeer(false);
