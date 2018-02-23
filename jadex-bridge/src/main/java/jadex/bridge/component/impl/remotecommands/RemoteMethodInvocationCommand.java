@@ -183,7 +183,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Object	impl	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
-			Class<?>	implclass	= impl.getClass();
+			Class<?>	implclass	= impl!=null ? impl.getClass() : null;
 			
 			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
 			while(level==null && implclass!=null)
