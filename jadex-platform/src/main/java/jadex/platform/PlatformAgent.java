@@ -19,9 +19,6 @@ import static jadex.base.IPlatformConfiguration.LOCALTRANSPORT;
 import static jadex.base.IPlatformConfiguration.LOGGING;
 import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
 import static jadex.base.IPlatformConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.IPlatformConfiguration.NETWORKNAME;
-import static jadex.base.IPlatformConfiguration.NETWORKPASS;
-import static jadex.base.IPlatformConfiguration.PRINTPASS;
 import static jadex.base.IPlatformConfiguration.PROGRAM_ARGUMENTS;
 import static jadex.base.IPlatformConfiguration.RELAYADDRESSES;
 import static jadex.base.IPlatformConfiguration.RELAYFORWARDING;
@@ -35,17 +32,12 @@ import static jadex.base.IPlatformConfiguration.TCPPORT;
 import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
 import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
 import static jadex.base.IPlatformConfiguration.THREADPOOLDEFER;
-import static jadex.base.IPlatformConfiguration.TRUSTEDLAN;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
-import static jadex.base.IPlatformConfiguration.USEPASS;
-import static jadex.base.IPlatformConfiguration.VALIDITYDURATION;
-import static jadex.base.IPlatformConfiguration.VIRTUALNAMES;
 import static jadex.base.IPlatformConfiguration.WELCOME;
 import static jadex.base.IPlatformConfiguration.WSPORT;
 import static jadex.base.IPlatformConfiguration.WSPUBLISH;
 import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
 
-import java.util.Map;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -131,13 +123,13 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
 	
-	@Argument(name=USEPASS, clazz=Boolean.class),
-	@Argument(name=PRINTPASS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=TRUSTEDLAN, clazz=Boolean.class),
-	@Argument(name=NETWORKNAME, clazz=String.class),
-	@Argument(name=NETWORKPASS, clazz=String.class),
-	@Argument(name=VIRTUALNAMES, clazz=Map.class),
-	@Argument(name=VALIDITYDURATION, clazz=long.class),
+//	@Argument(name=USEPASS, clazz=Boolean.class),
+//	@Argument(name=PRINTPASS, clazz=boolean.class, defaultvalue="true"),
+//	@Argument(name=TRUSTEDLAN, clazz=Boolean.class),
+//	@Argument(name=NETWORKNAME, clazz=String.class),
+//	@Argument(name=NETWORKPASS, clazz=String.class),
+//	@Argument(name=VIRTUALNAMES, clazz=Map.class),
+//	@Argument(name=VALIDITYDURATION, clazz=long.class),
 
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),

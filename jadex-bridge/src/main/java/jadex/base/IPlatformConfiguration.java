@@ -301,49 +301,49 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // default:
       // false
 
-      /**
-       * Flag if the platform should be protected with password. If a value is
-       * provided this value overrides the settings value.
-       **/
-      public static final String	USEPASS				= "usepass";								// class:
-      // Boolean
-      // default:
-      // emptyvalue
-
-      /** Flag if the platform password should be printed to the console. **/
-      public static final String	PRINTPASS			= "printpass";								// class:
-      // boolean
-      // default:
-      // true
-
-      /** Flag if trusted lan should be used. **/
-      public static final String	TRUSTEDLAN			= "trustedlan";								// class:
-      // Boolean
-      // default:
-      // emptyvalue
-
-      /** Network name. **/
-      public static final String	NETWORKNAME			= "networkname";							// class:
-      // String
-      // default:
-      // emptyvalue
-
-      /** Network pass. **/
-      public static final String	NETWORKPASS			= "networkpass";							// class:
-      // String
-      // default:
-      // emptyvalue
-
-      /** Virtual names that are used for authentication **/
-      public static final String	VIRTUALNAMES		= "virtualnames";							// class:
-      // java.util.Map
-      // default:
-      // emptyvalue
-
-      /** The message validity duration (in minutes) **/
-      public static final String	VALIDITYDURATION	= "validityduration";						// class:
-      // long
-      // default:
+//      /**
+//       * Flag if the platform should be protected with password. If a value is
+//       * provided this value overrides the settings value.
+//       **/
+//      public static final String	USEPASS				= "usepass";								// class:
+//      // Boolean
+//      // default:
+//      // emptyvalue
+//
+//      /** Flag if the platform password should be printed to the console. **/
+//      public static final String	PRINTPASS			= "printpass";								// class:
+//      // boolean
+//      // default:
+//      // true
+//
+//      /** Flag if trusted lan should be used. **/
+//      public static final String	TRUSTEDLAN			= "trustedlan";								// class:
+//      // Boolean
+//      // default:
+//      // emptyvalue
+//
+//      /** Network name. **/
+//      public static final String	NETWORKNAME			= "networkname";							// class:
+//      // String
+//      // default:
+//      // emptyvalue
+//
+//      /** Network pass. **/
+//      public static final String	NETWORKPASS			= "networkpass";							// class:
+//      // String
+//      // default:
+//      // emptyvalue
+//
+//      /** Virtual names that are used for authentication **/
+//      public static final String	VIRTUALNAMES		= "virtualnames";							// class:
+//      // java.util.Map
+//      // default:
+//      // emptyvalue
+//
+//      /** The message validity duration (in minutes) **/
+//      public static final String	VALIDITYDURATION	= "validityduration";						// class:
+//      // long
+//      // default:
 
       /** Flag if local transport is enabled. **/
       public static final String	LOCALTRANSPORT		= "localtransport";							// class:
@@ -562,8 +562,9 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       public static final String[] BOOLEAN_ARGS = {
               WELCOME, GUI, CLI, CLICONSOLE, SAVEONEXIT, LOGGING, SIMULATION, ASYNCEXECUTION,
 //              PERSIST,
-              UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM, USEPASS,
-              PRINTPASS, TRUSTEDLAN, LOCALTRANSPORT, TCPTRANSPORT,
+              UNIQUEIDS, THREADPOOLDEFER, CHAT, AWARENESS, BINARYMESSAGES, STRICTCOM,
+//              USEPASS, PRINTPASS, TRUSTEDLAN,
+              LOCALTRANSPORT, TCPTRANSPORT,
               RELAYTRANSPORT,
 //              RELAYSECURITY, RELAYAWAONLY,
 //              SSLTCPTRANSPORT,
@@ -850,20 +851,20 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 //    public void setNetworkNames(String[] values);
 
     /**
-     *  Get the network pass (used at startup).
-     *  @return The network pass.
+     *  Get the network secret (used at startup).
+     *  @return The network secret.
      */
-    public String[] getNetworkPass();
+    public String[] getNetworkSecret();
 
     /**
-     *  Set the network pass (used at startup).
-     *  @param value The network pass.
+     *  Set the network secret (used at startup).
+     *  @param value The network secret.
      */
-    public void setNetworkPass(String[] value);
+    public void setNetworkSecret(String[] value);
     
     /**
      *  Set the network pass (used at startup).
      *  @param value The network pass.
      */
-    public void setNetworkPass(String value);
+    public void setNetworkSecret(String value);
 }

@@ -72,7 +72,7 @@ public class Main
 		config.setPlatformName("presentationtimer-*");
 
 		config.setNetworkName("jadexnetwork");
-		config.setNetworkPass("laxlax");
+		config.setNetworkSecret("laxlax");
 
 		// config.setDht(true);
 

@@ -38,7 +38,7 @@ public class ConcurrentSettingsTest
 		conf.setPlatformName("settingstest_*");
 		
 		// Delete settings to generate new password
-		new File("settingstest"+SettingsService.SETTINGS_EXTENSION).delete();
+		new File("settingstest"+SettingsAgent.SETTINGS_EXTENSION).delete();
 
 		// Start platforms
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();

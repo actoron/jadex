@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -27,15 +28,16 @@ public class STest {
         return access;
     }
 
-//    // one time network pass for this vm.
-//    private static final String	testnetwork	= SUtil.createUniqueId();
+    // one time network pass for this vm.
+    public static final String	testnetwork_name	= "test";
+    public static final String	testnetwork_pass	= SUtil.createUniqueId();
     
     public static IPlatformConfiguration getDefaultTestConfig() 
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
-//		config.setNetworkName("test");
-//		config.setNetworkPass(testnetwork);
+		config.setNetworkName(testnetwork_name);
+		config.setNetworkSecret(testnetwork_pass);
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);
         config.getExtendedPlatformConfiguration().setTcpTransport(true);
