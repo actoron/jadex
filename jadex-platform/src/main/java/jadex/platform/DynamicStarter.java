@@ -46,7 +46,7 @@ public class DynamicStarter
 				starter = Thread.currentThread().getContextClassLoader().loadClass("jadex.base.Starter");
 				platformconf = Thread.currentThread().getContextClassLoader().loadClass("jadex.base.IPlatformConfiguration");
 //				cfg = platformconf.getMethod("processArgs", String[].class).invoke(null, ((Object) args));
-				cfg = starter.getMethod("processArgs", String[].class).invoke(null, ((Object) args));
+//				cfg = starter.getMethod("processArgs", String[].class).invoke(null, ((Object) args));
 			}
 		}
 		catch (Exception e)
@@ -58,7 +58,7 @@ public class DynamicStarter
 		
 		try
 		{
-			starter.getMethod("createPlatform", platformconf).invoke(null, cfg);
+			starter.getMethod("createPlatform", platformconf).invoke(cfg, args);
 		}
 		catch (IllegalAccessException e)
 		{
