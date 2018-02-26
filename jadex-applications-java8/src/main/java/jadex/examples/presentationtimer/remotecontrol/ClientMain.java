@@ -33,7 +33,7 @@ public class ClientMain  {
 
 		config.setPlatformName("presentationtimer-*");
 		config.setNetworkName("jadexnetwork");
-		config.setNetworkPass("laxlax");
+		config.setNetworkSecret("laxlax");
 //		config.setDht(true);
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);

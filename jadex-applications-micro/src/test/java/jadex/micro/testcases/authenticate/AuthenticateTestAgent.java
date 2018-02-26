@@ -14,6 +14,9 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -42,9 +45,9 @@ public class AuthenticateTestAgent extends TestAgent
 	protected static boolean[][]	tests	= new boolean[][]
 	{
 		// Annot.:		un		def		cus		cus2	def		cus		un		def
-		new boolean[] {true,	false,	false,	false},//	false,	false,	true,	false},	
-		new boolean[] {true,	true,	false,	false},//	true,	false,	true,	true},
-//		new boolean[] {true,	true,	true,	true},//	true,	true,	true,	true}	
+		new boolean[] {true,	false,	false,	false,	false,	false,	true,	false},
+		new boolean[] {true,	true,	false,	false,	true,	false,	true,	true},
+		new boolean[] {true,	true,	true,	true,	true,	true,	true,	true}
 	};
 
 	@Override
@@ -114,25 +117,23 @@ public class AuthenticateTestAgent extends TestAgent
 	 *  @param def	Allow default communication.
 	 *  @param cus	Allow successful custom role authentication.
 	 */
-	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, boolean cus)
+	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, final boolean cus)
 	{
 		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
+		// use different platform name / key etc.
+		conf.setPlatformName("other_*");
+		conf.setValue("settings.readonly", Boolean.TRUE);	// Do not save settings (hack!!! security isn't read from config, when settings file exists)
 		
-		// Not default visibility means test unrestricted access -> use different platform name / key etc.
+		// Not default visibility means test unrestricted access -> don't use test network.
 		if(!def)
 		{
-			conf.setPlatformName("other_*");
-		}
-		
-		// Access with custom roles should work -> add roles to new platform.
-		if(cus)
-		{
-//			conf.setVirtualNames(value); ???
+			conf.setNetworkNames(null);
+			conf.setNetworkSecret((String[])null);
 		}
 		
 		// Add agents.
 		conf.addComponent(BasicProviderAgent.class);
-//		conf.addComponent(OverridingProviderAgent.class);
+		conf.addComponent(OverridingProviderAgent.class);
 		
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		createPlatform(conf, null)
@@ -146,7 +147,31 @@ public class AuthenticateTestAgent extends TestAgent
 					@Override
 					public void customResultAvailable(Void result) throws Exception
 					{
-						ret.setResult(exta);
+						// Access with custom roles should work -> add roles to new platform.
+						if(cus)
+						{
+							SServiceProvider.getService(exta, ISecurityService.class)
+								.addResultListener(new ExceptionDelegationResultListener<ISecurityService, IExternalAccess>(ret)
+							{
+								@Override
+								public void customResultAvailable(ISecurityService result) throws Exception
+								{
+									result.addRole(STest.testnetwork_name, "custom")
+										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+									{
+										@Override
+										public void customResultAvailable(Void result) throws Exception
+										{
+											ret.setResult(exta);
+										}
+									});
+								}
+							});
+						}
+						else
+						{
+							ret.setResult(exta);
+						}
 					}
 				});
 			}
@@ -166,7 +191,7 @@ public class AuthenticateTestAgent extends TestAgent
 			@Override
 			public void customResultAvailable(Collection<ITestService> result) throws Exception
 			{
-				if(result.size()!=1)
+				if(result.size()!=2)
 				{
 					ret.setException(new RuntimeException("Found wrong services: "+result));
 				}
@@ -186,22 +211,22 @@ public class AuthenticateTestAgent extends TestAgent
 					
 					final Iterator<ITestService>	it	= sorted.iterator();
 					invokeService(it.next())
-						.addResultListener(new DelegationResultListener<boolean[]>(ret));
-//					{
-//						@Override
-//						public void customResultAvailable(final boolean[] result1)
-//						{
-//							invokeService(it.next())
-//								.addResultListener(new DelegationResultListener<boolean[]>(ret)
-//							{
-//								@Override
-//								public void customResultAvailable(boolean[] result2)
-//								{
-//									ret.setResult((boolean[])SUtil.joinArrays(result1, result2));
-//								}
-//							});
-//						}
-//					});
+						.addResultListener(new DelegationResultListener<boolean[]>(ret)
+					{
+						@Override
+						public void customResultAvailable(final boolean[] result1)
+						{
+							invokeService(it.next())
+								.addResultListener(new DelegationResultListener<boolean[]>(ret)
+							{
+								@Override
+								public void customResultAvailable(boolean[] result2)
+								{
+									ret.setResult((boolean[])SUtil.joinArrays(result1, result2));
+								}
+							});
+						}
+					});
 				}
 			}
 		});

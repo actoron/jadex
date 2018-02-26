@@ -416,7 +416,7 @@ public class Starter
 //					rootconf.setPlatformAccess(component);
 					putPlatformValue(cid, "$platformaccess", component);
 					putPlatformValue(cid, "$bootstrapfactory", cfac);
-					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
+//					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
 //					rootconf.setBootstrapFactory(cfac);
@@ -496,6 +496,7 @@ public class Starter
 					Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 					if(args!=null)
 						argsmap.putAll(args);
+					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, argsmap);
 					ComponentCreationInfo cci = new ComponentCreationInfo(model, config.getConfigurationName(), argsmap, desc, null, null);
 					Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
 					component.create(cci, features);

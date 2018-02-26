@@ -175,22 +175,57 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	@Override
 	public Security	getSecurityLevel(IInternalAccess access)
 	{
-		Security	level;
+		Security	level	= null;
+		Method	m0	= method.getMethod(access.getClassLoader());
 		
-		// Use annotation from method, if given.
-		Method	m	= method.getMethod(access.getClassLoader());
-		level	= m!=null ? m.getAnnotation(Security.class) : null;
-		
-		// Otherwise use annotation from service type, if service call.
-		if(level==null && target instanceof IServiceIdentifier)
+		// For service call -> look for annotation in impl class hierarchy
+		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
-			level	= type!=null ? type.getAnnotation(Security.class) : null;
+			Object	impl	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
+			Class<?>	implclass	= impl!=null ? impl.getClass() : null;
+			
+			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
+			while(level==null && implclass!=null)
+			{
+				// Todo: cache for speed?
+				try
+				{
+					level	= implclass.getDeclaredMethod(m0.getName(), m0.getParameterTypes()).getAnnotation(Security.class);
+				}
+				catch(Exception e)
+				{
+					// ignore (e.g. NoSuchMethodException)
+				}
+				
+				if(level==null)
+				{
+					level	= implclass.getAnnotation(Security.class);
+				}
+				
+				implclass	= implclass.getSuperclass();
+			}
+			
+			// Default to interface if not specified in impl.
+			if(level==null)
+			{
+				// Specificity: method before class
+				level	= m0.getAnnotation(Security.class);
+				if(level==null)
+				{
+					Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
+					level	= type!=null ? type.getAnnotation(Security.class) : null;
+				}
+			}
 		}
-
-		//else
-		// null -> disallow direct access to components (overridden by trusted platform)
+		
+		// Default: use method annotation, if any.
+		else
+		{
+			level	= m0.getAnnotation(Security.class);
+		}
+		
+		// level==null -> disallow direct access to components (overridden by trusted platform)
 		
 		return level;
 	}

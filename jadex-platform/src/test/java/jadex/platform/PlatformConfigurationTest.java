@@ -83,8 +83,9 @@ public class PlatformConfigurationTest
 					// this parameters have another parameter type in config object (-> varargs)
 					if (!(name.equals(IPlatformConfiguration.KERNELS)
 						|| name.equals(IPlatformConfiguration.AWAMECHANISMS)
-						|| name.equals(IPlatformConfiguration.NETWORKNAME)
-						|| name.equals(IPlatformConfiguration.NETWORKPASS))) {
+//						|| name.equals(IPlatformConfiguration.NETWORKNAME)
+//						|| name.equals(IPlatformConfiguration.NETWORKPASS)
+						)) {
 						assertEquals("Field " + name + " has not the same type.", modelParamType, setterParamType);
 					}
 					

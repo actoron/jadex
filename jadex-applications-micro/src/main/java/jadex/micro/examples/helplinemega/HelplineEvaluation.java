@@ -204,7 +204,7 @@ public class HelplineEvaluation
 		config.getExtendedPlatformConfiguration().setChat(false);	// Keep platform at minimum. Todo: minimal server config
 		config.getExtendedPlatformConfiguration().setSimulation(false);	// Todo: fix sim delay in registry!?
 		config.setNetworkName("helpline");
-		config.setNetworkPass("key:wlXEahZlSgTfqiv0LwNbsdUZ8qlgtKSSQaKK74XkJxU");
+		config.setNetworkSecret("key:wlXEahZlSgTfqiv0LwNbsdUZ8qlgtKSSQaKK74XkJxU");
 		config.getExtendedPlatformConfiguration().setAwaMechanisms("IntraVM");
 //		config.setWsTransport(false);
 		config.getExtendedPlatformConfiguration().setRelayTransport(spcnt!=0);	

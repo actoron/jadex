@@ -3,7 +3,6 @@ package jadex.platform.service.awareness.discovery.ipmulticast;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
@@ -11,7 +10,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;
@@ -23,7 +21,7 @@ import jadex.platform.service.awareness.discovery.SendHandler;
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(replace=false, value=
 {
-	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
+	@Argument(name="multicastaddress", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents.")
 })
 //@Properties(@NameValue(name="system", value="true"))
@@ -35,7 +33,8 @@ public class MulticastDiscoveryAgent extends DiscoveryAgent
 	
 	/** The multicast internet address. */
 	@AgentArgument(convert="java.net.InetAddress.getByName($value)")
-	protected InetAddress address;
+	// Long name to avoid name clash with platform settings -adress(service) true/false
+	protected InetAddress multicastaddress;
 	
 	/** The receiver port. */
 	@AgentArgument
@@ -71,7 +70,7 @@ public class MulticastDiscoveryAgent extends DiscoveryAgent
 	 */
 	public Object[] getAddressInfo()
 	{
-		return new Object[]{address, Integer.valueOf(port)};
+		return new Object[]{multicastaddress, Integer.valueOf(port)};
 	}
 
 	/**
@@ -81,7 +80,7 @@ public class MulticastDiscoveryAgent extends DiscoveryAgent
 	public void setAddressInfo(InetAddress address, int port)
 	{
 //		System.out.println("setAddress: "+address+" "+port);
-		this.address = address;
+		this.multicastaddress = address;
 		this.port = port;
 	}
 	
