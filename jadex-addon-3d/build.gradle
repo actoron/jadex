@@ -1,0 +1,6 @@
+description 'Jadex 3d support for environments.'
+
+dependencies
+{
+	compile project(':jadex-kernel-extension-envsupport-jmonkey')
+}

@@ -543,8 +543,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected IFuture<Void> doSendMessage(final MsgHeader header, Object message)
 	{
-		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-			throw new RuntimeException("wrooongMMMM");
+//		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+//			throw new RuntimeException("wrooongMMMM");
 		
 		final Future<Void> ret = new Future<Void>();
 

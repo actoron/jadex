@@ -1,0 +1,6 @@
+description 'Jadex BPMN editor.'
+
+dependencies
+{
+	compile project(':jadex-editor-bpmn')
+}
