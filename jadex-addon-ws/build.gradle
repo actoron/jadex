@@ -1,0 +1,10 @@
+description 'Jadex webservices publication addon.'
+
+dependencies
+{
+	compile project(':jadex-applications-webservice')
+	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-platform-extension-webservice-desktop')
+	compile project(':jadex-platform-extension-webservice-desktop-grizzly')
+	compile project(':jadex-platform-extension-webservice-desktop-jetty')
+}

@@ -321,22 +321,23 @@ subprojects
 }
 
 // Hack, helper to generate dep-tree
-task genDepList << {
-
-	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/src/main/buildutils/dependencies.conf', 'UTF-8')
-	project.ext.subprojectmap.entrySet().each { entry ->
-		def sp = entry.getValue()
-		out. println ('### ' + entry.getKey())
-		def founddeps = new HashSet<String>()
-		sp.configurations.each { conf ->
-			conf.getAllDependencies().withType(ProjectDependency).each { dep ->
-				if (!founddeps.contains(dep.getName()))
-					out.println dep.getDependencyProject().getPath()
-				founddeps.add(dep.getName())
+task genDepList {
+	doLast {
+		def out = new PrintStream(project.projectDir.getCanonicalPath() + '/src/main/buildutils/dependencies.conf', 'UTF-8')
+		project.ext.subprojectmap.entrySet().each { entry ->
+			def sp = entry.getValue()
+			out. println ('### ' + entry.getKey())
+			def founddeps = new HashSet<String>()
+			sp.configurations.each { conf ->
+				conf.getAllDependencies().withType(ProjectDependency).each { dep ->
+					if (!founddeps.contains(dep.getName()))
+						out.println dep.getDependencyProject().getPath()
+					founddeps.add(dep.getName())
+				}
 			}
 		}
+		out.close()
 	}
-	out.close()
 }
 
 task copyJavaDocSources(type: Copy) {
@@ -451,29 +452,37 @@ task exampleZips {
 	}
 }
 
-task srcZip(dependsOn: createVersionInfo) << {
-	createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+task srcZip(dependsOn: createVersionInfo) {
+	doLast {
+		createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	}
 }
 
-task srcZips(dependsOn: createVersionInfo) << {
-	gradle.ext.selecteddists.each { selecteddist ->
-		def arts = gradle.ext.distartmap.get(selecteddist)
-		createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
+task srcZips(dependsOn: createVersionInfo) {
+	doLast {
+		gradle.ext.selecteddists.each { selecteddist ->
+			def arts = gradle.ext.distartmap.get(selecteddist)
+			createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
+		}
 	}
 }
 
 task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
 	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-} << {
-	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	
+	doLast {
+		createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	}
 }
 
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-} << {
-	gradle.ext.selecteddists.each { selecteddist ->
-		def arts = gradle.ext.distartmap.get(selecteddist)
-		createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
+	
+	doLast {
+		gradle.ext.selecteddists.each { selecteddist ->
+			def arts = gradle.ext.distartmap.get(selecteddist)
+			createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
+		}
 	}
 }
 

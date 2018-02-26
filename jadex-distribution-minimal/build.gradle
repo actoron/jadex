@@ -3,5 +3,9 @@ description 'Jadex minimal distribution for running the middleware with core fea
 dependencies
 {
 	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-microservice')
 	compile project(':jadex-platform')
+	compile project(':jadex-platform-extension-relaytransport')
+	compile project(':jadex-platform-extension-websockettransport')
+	
 }

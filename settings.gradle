@@ -1,10 +1,66 @@
 apply from: "$rootDir/src/main/buildutils/util.gradle"
 
-def artifactselectionmarker = 'X'
-def buildconfigsfile = 'src/main/buildutils/buildconfigs.csv'
-def depconfigfile = 'src/main/buildutils/dependencies.conf'
-//gradle.ext.publishdists='minimal,standard,pro,android,addon3d,addonws,addonsecure,addonmaven,addonmgmt,editorbpmn,editorgpmn,relaystandalone'
+/** Standard distributions */
 gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,addonmaven,addonmgmt,editorbpmn' // no editorgpmn until kernel not available
+
+/* Generated dependency config file. */
+def depconfigfile = 'src/main/buildutils/dependencies.conf'
+
+/* Prefix used for distribution meta-packages. */
+def metaprefix = 'jadex-distribution-';
+def addonprefix = 'jadex-addon-';
+
+/* Blacklist of ignored projects. */
+def projectblacklist = new HashSet<String>();
+
+/* Not marked as included for 'everything' in original .csv */
+projectblacklist.add('jadex-android-integration-test')
+projectblacklist.add('jadex-android-maven-plugin')
+projectblacklist.add('jadex-android-testlauncher')
+projectblacklist.add('jadex-applications-bdibpmn')
+projectblacklist.add('jadex-applications-gpmn')
+projectblacklist.add('jadex-kernel-bdibpmn')
+projectblacklist.add('jadex-kernel-gpmn')
+
+/* Not included in original .csv at all. */
+projectblacklist.add('jadex-platform-extension-securetransport')
+projectblacklist.add('jadex-platform-extension-relay')
+projectblacklist.add('jadex-applications-dungeonkeeper')
+projectblacklist.add('jadex-platform-extension-relay-standalone')
+projectblacklist.add('jadex-platform-extension-relay-web')
+
+/* Distribution->Artifacts map. */
+gradle.ext.distartmap = new HashMap<String, Set<String>>();
+
+/* Find all projects and add them as 'everything' distribution. */
+def allprojects = new HashSet<String>()
+addProjectDir(allprojects, settingsDir, projectblacklist, null)
+
+long ts = System.currentTimeMillis()
+def projdeps = new HashMap<String, Set<String>>()
+allprojects.parallelStream().forEach({ proj ->
+	def deps = getProjectDeps(proj)
+	synchronized(projdeps) {
+		projdeps.put(proj, deps)
+	}
+})
+println 'Project dependencies evaluated in ' + (System.currentTimeMillis() - ts) + 'ms.'
+
+gradle.ext.distartmap.put('everything', allprojects)
+
+/* Add metapackages */
+allprojects.each { proj ->
+	if (proj.startsWith(':' + metaprefix)) {
+		def metaname = proj.substring(1 + metaprefix.length())
+		HashSet set = new HashSet<String>();
+		addDependency(proj, projdeps, set);
+		gradle.ext.distartmap.put(metaname, set);
+	}
+	else if (proj.startsWith(':' + addonprefix)) {
+		def metaname = 'addon' + proj.substring(1 + addonprefix.length())
+		gradle.ext.distartmap.put(metaname, projdeps.get(proj));
+	}
+}
 
 gradle.rootProject {
 	def secpropfile = new File(settingsDir.getCanonicalPath() + File.separator + 'secret.properties')
@@ -21,51 +77,59 @@ gradle.rootProject {
 	}
 }
 
-/* Read the buildconfigs.csv and generate data structures */
-BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getCanonicalPath() + File.separator + buildconfigsfile)))
-def disttargets = new ArrayList<String>()
-def allbuildartifacts = new HashSet<String>()
-//def builddeps = new HashSet<String>()
-gradle.ext.distartmap = new HashMap<String, Set<String>>();
-boolean firstline = true
-br.eachLine { line ->
-	if (firstline)
-	{
-		line.split(',').each { tok ->
-			if (tok.trim().length() > 0)
-			{
-				disttargets.add(tok)
-				gradle.ext.distartmap.put(tok, new HashSet<String>())
-			}
-		}
-		firstline = false;
-	}
-	else
-	{
-		String[] toks = line.split(',');
-		// Only include artifacts available on disk (e.g. for building a downloaded minimal dist, etc.)
-		if(new File(settingsDir.getCanonicalPath() + File.separator + toks[0].replace((char)':', File.separatorChar)).exists())
+/* Add .csv-based distributions if available. */
+def buildconfigsfile = new File(settingsDir.getCanonicalPath() + File.separator + 'src/main/buildutils/buildconfigs.csv')
+if (buildconfigsfile.exists())
+{
+	def artifactselectionmarker = 'X'
+	
+	/* Read the buildconfigs.csv and generate data structures */
+	BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(buildconfigsfile)))
+	def disttargets = new ArrayList<String>()
+	def allbuildartifacts = new HashSet<String>()
+	
+	boolean firstline = true
+	br.eachLine { line ->
+		if (firstline)
 		{
-			if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
-			{
-				if (androidSdkExists() || !toks[0].contains('android'))
+			line.split(',').each { tok ->
+				if (tok.trim().length() > 0)
 				{
-					allbuildartifacts.add(':' + toks[0])
-					for (int i = 1; i < toks.length; ++i)
+					disttargets.add(tok)
+					gradle.ext.distartmap.put(tok, new HashSet<String>())
+				}
+			}
+			firstline = false;
+		}
+		else
+		{
+			String[] toks = line.split(',');
+			// Only include artifacts available on disk (e.g. for building a downloaded minimal dist, etc.)
+			if(new File(settingsDir.getCanonicalPath() + File.separator + toks[0].replace((char)':', File.separatorChar)).exists())
+			{
+				if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
+				{
+					if (androidSdkExists() || !toks[0].contains('android'))
 					{
-						if (artifactselectionmarker.equals(toks[i].trim().toUpperCase()))
+						allbuildartifacts.add(':' + toks[0])
+						for (int i = 1; i < toks.length; ++i)
 						{
-							Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
-							arts.add(':' + toks[0]);
+							if (artifactselectionmarker.equals(toks[i].trim().toUpperCase()))
+							{
+								Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
+								arts.add(':' + toks[0]);
+							}
 						}
 					}
 				}
 			}
 		}
 	}
+	br.close()
+	disttargets = null
 }
-br.close()
-disttargets = null
+
+println 'Available Distributions: ' + (new ArrayList<String>(gradle.ext.distartmap.keySet())).sort().join(',')
 
 /* Determine selected distributions */
 gradle.ext.selecteddists = new ArrayList<String>()
@@ -87,32 +151,6 @@ gradle.ext.selecteddists.each {
 }
 
 gradle.ext.includeartifacts = new HashSet<String>()
-
-def projdeps = new HashMap<String, Set<String>>()
-def subproj = ''
-if ((new File(settingsDir.getAbsolutePath() + File.separator + depconfigfile)).exists())
-{
-	def depconfreader = new BufferedReader(new InputStreamReader(new FileInputStream(settingsDir.getAbsolutePath() + File.separator + depconfigfile)))
-	depconfreader.eachLine { line ->
-		if (line.startsWith('### '))
-			subproj = line.substring(4)
-		else
-		{
-			def deps = projdeps.get(subproj)
-			if (deps == null)
-			{
-				deps = new HashSet<String>()
-				projdeps.put(subproj, deps)
-			}
-			deps.add(line)	
-		}
-	}
-	depconfreader.close()
-}
-
-/*gradle.ext.maindistartifacts.each { mainart ->
-	addDependency(mainart, projdeps, gradle.ext.includeartifacts)
-}*/
 
 // Add Dependencies for Addons
 gradle.ext.selecteddists.each { seldist ->
@@ -153,3 +191,144 @@ def addDependency(artifact, projdeps, includeartifacts)
 		}
 	}
 }
+
+def addProjectDir(projects, dir, blacklist, prefix)
+{
+	def subprojs = new ArrayList<File>();
+	def content = dir.listFiles()
+	boolean isgradle = false
+	for (int i = 0; i < content.length; ++i)
+	{
+		if (content[i].isDirectory() && !blacklist.contains(content[i].getName()) && !content[i].getName().startsWith('.'))
+		{
+			def pname = content[i].getName()
+			if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || pname.endsWith('-java8'))
+			{
+				if (androidSdkExists() || !pname.contains('android'))
+				{
+					subprojs.add(content[i])
+				}
+			}
+		}
+		else if ("build.gradle".equals(content[i].getName().toLowerCase()))
+		{
+			if (prefix != null)
+				projects.add(prefix + dir.getName())
+			isgradle = true
+		}
+	}
+	
+	if (isgradle)
+	{
+		prefix = prefix != null ? prefix + dir.getName() + ':' : ':'
+		subprojs.each { sp ->
+			addProjectDir(projects, sp, blacklist, prefix)
+		}
+	}
+}
+
+def getProjectDeps(String projectid)
+{
+	def ret = new HashSet<String>()
+	def maindelegate = new GroovyInterceptable() {
+		public Object invokeMethod(java.lang.String name, java.lang.Object args) {
+			// println "Called: " + name
+			
+			if ('project'.equals(name)) {
+				return new GroovyInterceptable() {
+					public def getProperty(String pname) {
+						Thread.sleep(10)
+						if ('getprojname'.equals(pname))
+							return args[0]
+						return this
+					}
+				};
+			}
+			
+			if (name.equals('compile')) {
+				if (args[0] instanceof GroovyInterceptable) {
+					def depname = args[0].getProperty('getprojname')
+					if (depname instanceof String)
+						ret.add(depname)
+				}
+			}
+			
+			args.each { arg ->
+				if (arg instanceof Closure) {
+					arg.setDelegate(this)
+					try {
+						arg.run()
+					}
+					catch (Exception e) { }
+				}
+			}
+			return this
+		}
+		
+		public void setProperty(String pname, Object value) {
+		}
+		
+		public def getProperty(String pname) {
+			return this
+		}
+	}
+	
+	Binding binding = new Binding() {
+		Object getProperty(String property) {
+			return maindelegate.getProperty(property)
+		}
+
+		Object getVariable(String name) {
+			return maindelegate
+		}
+		
+		Map getVariables() {
+			return new HashMap()
+		}
+		
+		boolean hasVariable(String name) {
+			return true;
+		}
+		
+		void setProperty(String property, Object newValue) {}
+		
+		void setVariable(String name, Object value) {}
+	}
+
+	org.codehaus.groovy.control.CompilerConfiguration cc = new org.codehaus.groovy.control.CompilerConfiguration()
+	cc.setScriptBaseClass(DelegatingScript.class.getName())
+	GroovyShell shell = new GroovyShell(binding, cc)
+	//throw new Exception("LOADING " + projectid)
+	File buildfile = new File(settingsDir.getAbsolutePath() + File.separator + projectid.substring(1).replace(':', File.separator) + File.separator + 'build.gradle')
+	DelegatingScript script = null
+	
+	List<String> lines = java.nio.file.Files.readAllLines(buildfile.toPath(), java.nio.charset.StandardCharsets.UTF_8)
+	int scriptsize = lines.size()
+	boolean reduced = false
+	while (script == null)
+	{
+		StringBuilder builder = new StringBuilder()
+		for (int i = 0; i < scriptsize; ++i) {
+			builder.append(lines.get(i))
+			builder.append("\n")
+		}
+		
+		try {
+			script = (DelegatingScript)shell.parse(builder.toString())
+		}
+		catch (Exception e)
+		{
+			reduced = true
+			--scriptsize;
+		}
+	}
+	
+	if (reduced)
+		println 'Warning: Build script reduced to find dependencies for project ' + projectid
+
+	script.setDelegate(maindelegate)
+	script.run()
+	return ret
+}
+
+
