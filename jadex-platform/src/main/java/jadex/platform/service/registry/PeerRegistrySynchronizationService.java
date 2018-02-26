@@ -95,7 +95,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				
 				// First check the list of superpeers
 //				if(it!=null && it.hasNext())
-				if (listpos < superpeers.size())
+				if(listpos < superpeers.size())
 				{
 //					ret.setResult(it.next());
 					ret.setResult(superpeers.get(listpos++));

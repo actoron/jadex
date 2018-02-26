@@ -53,7 +53,8 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
- *
+ *  The component registry is a component for creating proxy services.
+ *  Real services/components are created on demand on service call.
  */
 @Agent
 @Service

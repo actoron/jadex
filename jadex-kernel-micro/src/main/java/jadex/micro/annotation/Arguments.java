@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  *  The arguments annotation.
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Arguments
 {

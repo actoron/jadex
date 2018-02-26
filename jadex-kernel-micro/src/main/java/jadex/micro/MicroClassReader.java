@@ -1008,6 +1008,27 @@ public class MicroClassReader
 					checkMethodReturnType(AgentMessageArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
 				}
+				
+				if(isAnnotationPresent(methods[i], Arguments.class, cl))
+				{
+					try
+					{
+						jadex.bridge.modelinfo.Argument[] as = (jadex.bridge.modelinfo.Argument[])methods[i].invoke(null, new Object[0]);
+						for(jadex.bridge.modelinfo.Argument arg: as)
+						{
+							Map<String, Object> args = getOrCreateMap("arguments", toset);
+							
+							if(!args.containsKey(arg.getName()))
+							{
+								args.put(arg.getName(), arg);
+							}
+						}
+					}
+					catch(Exception e)
+					{
+						SUtil.rethrowAsUnchecked(e);
+					}
+				}
 			}
 
 			cma = cma.getSuperclass();
