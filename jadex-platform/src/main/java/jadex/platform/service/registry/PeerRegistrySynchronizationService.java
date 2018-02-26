@@ -73,6 +73,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //			protected Iterator<IComponentIdentifier> it;
 			protected int listpos;
 			
+			protected boolean searched = false;
+			
 			protected List<ISuperpeerRegistrySynchronizationService> res = new ArrayList<ISuperpeerRegistrySynchronizationService>();
 			protected ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> currentsearch;
 			protected int pos;
@@ -91,6 +93,12 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //					it = superpeers.iterator();
 					listpos = 0;
 					pos = 0;
+					searched = true;
+				}
+				else if (searched && pos>=res.size() && listpos >= superpeers.size())
+				{
+					ret.setException(new RuntimeException("No more potential peers"));
+					return ret;
 				}
 				
 				// First check the list of superpeers
