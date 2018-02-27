@@ -106,6 +106,9 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 					
 					String argname = margs[i].getName();
 					
+//					if(dotname.toLowerCase().indexOf("cli")!=-1)
+//						System.out.println("sdfhjsdf");
+					
 					// Test different versions of argument names
 					// a) name directly contained
 					if(platformargs.containsKey(argname))

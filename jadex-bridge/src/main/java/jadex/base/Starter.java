@@ -93,6 +93,7 @@ public class Starter
     /** Constant for remote default timeout name. */
     public static String DATA_DEFAULT_REMOTE_TIMEOUT = "default_remote_timeout";
     
+    
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */
 //    public static String DATA_SUPERPEER = "superpeer";
@@ -640,7 +641,7 @@ public class Starter
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		if(i<components.size())
+		if(components!=null && i<components.size())
 		{
 			SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
