@@ -1,6 +1,48 @@
 package jadex.platform;
 
+import static jadex.base.IPlatformConfiguration.ASYNCEXECUTION;
+import static jadex.base.IPlatformConfiguration.AWADELAY;
+import static jadex.base.IPlatformConfiguration.AWAEXCLUDES;
+import static jadex.base.IPlatformConfiguration.AWAINCLUDES;
+import static jadex.base.IPlatformConfiguration.AWAMECHANISMS;
+import static jadex.base.IPlatformConfiguration.AWARENESS;
+import static jadex.base.IPlatformConfiguration.BASECLASSLOADER;
+import static jadex.base.IPlatformConfiguration.BINARYMESSAGES;
+import static jadex.base.IPlatformConfiguration.CHAT;
+import static jadex.base.IPlatformConfiguration.CLI;
+import static jadex.base.IPlatformConfiguration.CLICONSOLE;
+import static jadex.base.IPlatformConfiguration.CONTEXTSERVICECLASS;
+import static jadex.base.IPlatformConfiguration.GUI;
+import static jadex.base.IPlatformConfiguration.JCCPLATFORMS;
+import static jadex.base.IPlatformConfiguration.LIBPATH;
+import static jadex.base.IPlatformConfiguration.LOCALTRANSPORT;
+import static jadex.base.IPlatformConfiguration.LOGGING;
+import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
+import static jadex.base.IPlatformConfiguration.MAVEN_DEPENDENCIES;
+import static jadex.base.IPlatformConfiguration.PROGRAM_ARGUMENTS;
+import static jadex.base.IPlatformConfiguration.RELAYADDRESSES;
+import static jadex.base.IPlatformConfiguration.RELAYFORWARDING;
+import static jadex.base.IPlatformConfiguration.RELAYTRANSPORT;
+import static jadex.base.IPlatformConfiguration.RSPUBLISH;
+import static jadex.base.IPlatformConfiguration.RSPUBLISHCOMPONENT;
+import static jadex.base.IPlatformConfiguration.SAVEONEXIT;
+import static jadex.base.IPlatformConfiguration.SIMULATION;
+import static jadex.base.IPlatformConfiguration.STRICTCOM;
+import static jadex.base.IPlatformConfiguration.TCPPORT;
+import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
+import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
+import static jadex.base.IPlatformConfiguration.THREADPOOLDEFER;
+import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
+import static jadex.base.IPlatformConfiguration.WELCOME;
+import static jadex.base.IPlatformConfiguration.WSPORT;
+import static jadex.base.IPlatformConfiguration.WSPUBLISH;
+import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
+
+import java.util.logging.Level;
+
+import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -12,6 +54,7 @@ import jadex.micro.KernelComponentAgent;
 import jadex.micro.KernelMicroAgent;
 import jadex.micro.KernelMultiAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
@@ -44,6 +87,105 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 /**
  *	Basic standalone platform services provided as a micro agent. 
  */
+@Arguments(
+{
+	@Argument(name=IPlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
+	@Argument(name=IPlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name=IPlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
+	@Argument(name=IPlatformConfiguration.PLATFORM_COMPONENT, clazz=ClassInfo.class, defaultvalue="new jadex.bridge.ClassInfo(jadex.platform.service.cms.PlatformComponent.class)"),
+	@Argument(name=WELCOME, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=PROGRAM_ARGUMENTS, clazz=String[].class),
+	
+	@Argument(name=GUI, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CLI, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=CLICONSOLE, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=SAVEONEXIT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=JCCPLATFORMS, clazz=String.class, defaultvalue="null"),
+	@Argument(name=LOGGING, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
+	@Argument(name=SIMULATION, clazz=Boolean.class),
+	@Argument(name=ASYNCEXECUTION, clazz=Boolean.class),
+	@Argument(name=THREADPOOLDEFER, clazz=boolean.class, defaultvalue="true"),
+	
+	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
+	
+	@Argument(name=LIBPATH, clazz=String.class),
+	@Argument(name=BASECLASSLOADER, clazz=ClassLoader.class),
+
+	@Argument(name=CHAT, clazz=boolean.class, defaultvalue="true"),
+	
+	@Argument(name=AWARENESS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Multicast, Local\""),
+//	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
+	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
+	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
+	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
+
+	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
+	
+//	@Argument(name=USESECRET, clazz=Boolean.class),
+//	@Argument(name=PRINTSECRET, clazz=boolean.class, defaultvalue="true"),
+//	@Argument(name=NETWORKNAME, clazz=String.class),
+//	@Argument(name=NETWORKSECRET, clazz=String.class),
+//	@Argument(name=ROLES, clazz=Map.class),
+
+	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="0"),
+	@Argument(name=WSTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=WSPORT, clazz=int.class, defaultvalue="-1"),
+	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
+//	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="\"relay,ws,127.0.0.1:8080\""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
+	@Argument(name=RELAYADDRESSES, clazz=String.class),//, defaultvalue=""),
+	@Argument(name=RELAYFORWARDING, clazz=boolean.class, defaultvalue="false"),
+//	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
+//	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
+//	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
+//	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
+
+	@Argument(name=THREADPOOLCLASS, clazz=String.class),//, defaultvalue="null"),
+
+	@Argument(name=CONTEXTSERVICECLASS, clazz=String.class),//, defaultvalue="null"),
+	
+	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
+	
+	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
+	@Argument(name=RSPUBLISHCOMPONENT, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)"),
+
+	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
+
+	@Argument(name="kernel_multi", clazz=Boolean.class, defaultvalue="true"),
+	@Argument(name="kernel_micro", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_component", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_application", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_bdiv3", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_bdi", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_bpmn", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_bpmn", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_bdibpmn", clazz=Boolean.class, defaultvalue="false"),
+	@Argument(name="kernel_gpmn", clazz=Boolean.class, defaultvalue="false"),
+	
+	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="mon", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="df", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="simul", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="filetransfer", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="security", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="library", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="settings", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="context", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="address", clazz=boolean.class, defaultvalue="true"),
+	
+	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="superpeerclient", clazz=boolean.class)//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
+
+	//@Argument(name=IPlatformConfiguration.COMPONENT_FACTORY, clazz=String.class, defaultvalue="IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY"),
+	//@Argument(name=IPlatformConfiguration.CONFIGURATION_FILE, clazz=String.class, defaultvalue="IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION")
+})
+
 @ComponentTypes({
 	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
 	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
@@ -150,9 +292,10 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 @Agent
 public class PlatformAgent
 {
-	@Arguments
-	public static jadex.bridge.modelinfo.Argument[] getArguments()
-	{
-		return PlatformConfigurationHandler.getArguments();
-	}
+	// where should the defaults be defined (here or in the config)
+//	@Arguments
+//	public static jadex.bridge.modelinfo.Argument[] getArguments()
+//	{
+//		return PlatformConfigurationHandler.getArguments();
+//	}
 }

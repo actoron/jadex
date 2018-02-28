@@ -58,7 +58,7 @@ import jadex.micro.annotation.RequiredServices;
 @Arguments(
 {
 	@Argument(name="console", clazz=boolean.class, description="Flag if a console reader should be opened.", defaultvalue="true"),
-	@Argument(name="gui", clazz=boolean.class, description="Flag if a gui for console in and out should be opened.", defaultvalue="false"),
+	@Argument(name="cgui", clazz=boolean.class, description="Flag if a gui for console in and out should be opened.", defaultvalue="false"),
 	@Argument(name="shelltimeout", clazz=boolean.class, description="The timeout after whichs shells become garbage collected (default = 5 mins).", defaultvalue="5*60*1000")
 })
 @ProvidedServices(
@@ -79,7 +79,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	protected IInternalAccess agent;
 	
 	/** The gui flag. */
-	@AgentArgument
+	@AgentArgument("cgui")
 	protected boolean gui;
 
 	/** The console flag. */

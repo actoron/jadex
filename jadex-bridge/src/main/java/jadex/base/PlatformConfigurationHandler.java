@@ -1,56 +1,17 @@
 package jadex.base;
 
-import static jadex.base.IPlatformConfiguration.ASYNCEXECUTION;
-import static jadex.base.IPlatformConfiguration.AWADELAY;
-import static jadex.base.IPlatformConfiguration.AWAEXCLUDES;
-import static jadex.base.IPlatformConfiguration.AWAINCLUDES;
-import static jadex.base.IPlatformConfiguration.AWAMECHANISMS;
-import static jadex.base.IPlatformConfiguration.AWARENESS;
-import static jadex.base.IPlatformConfiguration.BASECLASSLOADER;
-import static jadex.base.IPlatformConfiguration.BINARYMESSAGES;
-import static jadex.base.IPlatformConfiguration.CHAT;
-import static jadex.base.IPlatformConfiguration.CLI;
-import static jadex.base.IPlatformConfiguration.CLICONSOLE;
-import static jadex.base.IPlatformConfiguration.CONTEXTSERVICECLASS;
-import static jadex.base.IPlatformConfiguration.GUI;
-import static jadex.base.IPlatformConfiguration.JCCPLATFORMS;
-import static jadex.base.IPlatformConfiguration.LIBPATH;
-import static jadex.base.IPlatformConfiguration.LOCALTRANSPORT;
-import static jadex.base.IPlatformConfiguration.LOGGING;
-import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
-import static jadex.base.IPlatformConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.IPlatformConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.IPlatformConfiguration.RELAYFORWARDING;
-import static jadex.base.IPlatformConfiguration.RELAYTRANSPORT;
-import static jadex.base.IPlatformConfiguration.RSPUBLISH;
-import static jadex.base.IPlatformConfiguration.RSPUBLISHCOMPONENT;
-import static jadex.base.IPlatformConfiguration.SAVEONEXIT;
-import static jadex.base.IPlatformConfiguration.SIMULATION;
-import static jadex.base.IPlatformConfiguration.STRICTCOM;
-import static jadex.base.IPlatformConfiguration.TCPPORT;
-import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
-import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
-import static jadex.base.IPlatformConfiguration.THREADPOOLDEFER;
-import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
-import static jadex.base.IPlatformConfiguration.WELCOME;
-import static jadex.base.IPlatformConfiguration.WSPORT;
-import static jadex.base.IPlatformConfiguration.WSPUBLISH;
-import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ProxyFactory;
-import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -83,63 +44,65 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
 		namemappings.put("networknames", "networkname");
 		
+		// This stuff must be in the configuration because it configures the starter (not the platform component itself)
 //		defvalues.put(IPlatformConfiguration.PLATFORM_NAME, "jadex");
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_NAME, "auto");
 		defvalues.put(IPlatformConfiguration.AUTOSHUTDOWN, Boolean.FALSE);
-		defvalues.put(WELCOME, Boolean.TRUE);
-		defvalues.put(GUI, Boolean.TRUE);
-		defvalues.put(CLI, Boolean.TRUE);
-		defvalues.put(CLICONSOLE, Boolean.TRUE);
-		defvalues.put(SAVEONEXIT, Boolean.TRUE);
-		defvalues.put(LOGGING, Boolean.FALSE);
-		defvalues.put(LOGGING_LEVEL, java.util.logging.Level.SEVERE);
-		defvalues.put(THREADPOOLDEFER, Boolean.TRUE);
-		defvalues.put(UNIQUEIDS, Boolean.TRUE);
-		defvalues.put(CHAT, Boolean.TRUE);
-		defvalues.put(AWARENESS, Boolean.TRUE);
-		defvalues.put(AWAMECHANISMS, "Multicast, Local, Broadcast");
-		defvalues.put(AWADELAY, 20000);
-		defvalues.put(BINARYMESSAGES, Boolean.TRUE);
-		defvalues.put(STRICTCOM, Boolean.FALSE);
-		defvalues.put(LOCALTRANSPORT, Boolean.TRUE);
-		defvalues.put(TCPTRANSPORT, Boolean.TRUE);
-		defvalues.put(TCPPORT, 0);
-		defvalues.put(WSTRANSPORT, Boolean.TRUE);
-		defvalues.put(WSPORT, -1);
-		defvalues.put(RELAYTRANSPORT, Boolean.TRUE);
-//		defvalues.put(RELAYADDRESSES, "");
-		defvalues.put(RELAYFORWARDING, Boolean.FALSE);
-		defvalues.put(WSPUBLISH, Boolean.FALSE);
-		defvalues.put(RSPUBLISH, Boolean.FALSE);
-//		defvalues.put(RSPUBLISHCOMPONENT, "%{jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)}");
-		defvalues.put(RSPUBLISHCOMPONENT, SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS));
-		defvalues.put(MAVEN_DEPENDENCIES, Boolean.FALSE);
+		defvalues.put(IPlatformConfiguration.WELCOME, Boolean.TRUE);
 		defvalues.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
+		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
 		defvalues.put("localdefaulttimeout", IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT);
 		defvalues.put("remotedefaulttimeout", IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT);
-		defvalues.put("components", new ArrayList<String>());
-		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
-		defvalues.put("superpeer", Boolean.FALSE);
-		defvalues.put("supersuperpeer", Boolean.FALSE);
-		defvalues.put("kernel_multi", Boolean.TRUE);
-		defvalues.put("kernel_micro", Boolean.FALSE);
-		defvalues.put("kernel_component", Boolean.FALSE);
-		defvalues.put("kernel_application",  Boolean.FALSE);
-		defvalues.put("kernel_bdiv3",  Boolean.FALSE);
-		defvalues.put("kernel_bdi",  Boolean.FALSE);
-		defvalues.put("kernel_bpmn",  Boolean.FALSE);
-		defvalues.put("sensors", Boolean.FALSE);
-		defvalues.put("mon", Boolean.TRUE);
-		defvalues.put("df", Boolean.FALSE);
-		defvalues.put("clock", Boolean.TRUE);
-		defvalues.put("simul", Boolean.TRUE);
-		defvalues.put("filetransfer", Boolean.FALSE);
-		defvalues.put("security", Boolean.TRUE);
-		defvalues.put("library", Boolean.TRUE);
-		defvalues.put("settings", Boolean.TRUE);
-		defvalues.put("context", Boolean.TRUE);
-		defvalues.put("address", Boolean.TRUE);
+
+		//		defvalues.put("components", new ArrayList<String>());
+//		defvalues.put(GUI, Boolean.TRUE);
+//		defvalues.put(CLI, Boolean.TRUE);
+//		defvalues.put(CLICONSOLE, Boolean.FALSE);
+//		defvalues.put(SAVEONEXIT, Boolean.TRUE);
+//		defvalues.put(LOGGING, Boolean.FALSE);
+//		defvalues.put(LOGGING_LEVEL, java.util.logging.Level.SEVERE);
+//		defvalues.put(THREADPOOLDEFER, Boolean.TRUE);
+//		defvalues.put(UNIQUEIDS, Boolean.TRUE);
+//		defvalues.put(CHAT, Boolean.TRUE);
+//		defvalues.put(AWARENESS, Boolean.TRUE);
+//		defvalues.put(AWAMECHANISMS, "Multicast, Local, Broadcast");
+//		defvalues.put(AWADELAY, 20000);
+//		defvalues.put(BINARYMESSAGES, Boolean.TRUE);
+//		defvalues.put(STRICTCOM, Boolean.FALSE);
+//		defvalues.put(LOCALTRANSPORT, Boolean.TRUE);
+//		defvalues.put(TCPTRANSPORT, Boolean.TRUE);
+//		defvalues.put(TCPPORT, 0);
+//		defvalues.put(WSTRANSPORT, Boolean.TRUE);
+//		defvalues.put(WSPORT, -1);
+//		defvalues.put(RELAYTRANSPORT, Boolean.TRUE);
+////		defvalues.put(RELAYADDRESSES, "");
+//		defvalues.put(RELAYFORWARDING, Boolean.FALSE);
+//		defvalues.put(WSPUBLISH, Boolean.FALSE);
+//		defvalues.put(RSPUBLISH, Boolean.FALSE);
+////		defvalues.put(RSPUBLISHCOMPONENT, "%{jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)}");
+//		defvalues.put(RSPUBLISHCOMPONENT, SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS));
+//		defvalues.put(MAVEN_DEPENDENCIES, Boolean.FALSE);
+//		defvalues.put("superpeer", Boolean.FALSE);
+//		defvalues.put("supersuperpeer", Boolean.FALSE);
+//		defvalues.put("kernel_multi", Boolean.TRUE);
+//		defvalues.put("kernel_micro", Boolean.FALSE);
+//		defvalues.put("kernel_component", Boolean.FALSE);
+//		defvalues.put("kernel_application",  Boolean.FALSE);
+//		defvalues.put("kernel_bdiv3",  Boolean.FALSE);
+//		defvalues.put("kernel_bdi",  Boolean.FALSE);
+//		defvalues.put("kernel_bpmn",  Boolean.FALSE);
+//		defvalues.put("sensors", Boolean.FALSE);
+//		defvalues.put("mon", Boolean.TRUE);
+//		defvalues.put("df", Boolean.FALSE);
+//		defvalues.put("clock", Boolean.TRUE);
+//		defvalues.put("simul", Boolean.TRUE);
+//		defvalues.put("filetransfer", Boolean.FALSE);
+//		defvalues.put("security", Boolean.TRUE);
+//		defvalues.put("library", Boolean.TRUE);
+//		defvalues.put("settings", Boolean.TRUE);
+//		defvalues.put("context", Boolean.TRUE);
+//		defvalues.put("address", Boolean.TRUE);
 
 //		defvalues.put("superpeerclient", "%{$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer}");
 //		System.out.println("PlatformConfigurationHandler: "+defvalues+" "+hashCode());
@@ -156,40 +119,40 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		}
 	}	
 	
-	/**
-	 *  Get the argument declarations.
-	 *  @return The argument declarations.
-	 */
-	public static Argument[] getArguments()
-	{
-		List<Argument> ret = new ArrayList<Argument>();
-		
-		for(Map.Entry<String, Object> entry: defvalues.entrySet())
-		{
-			Object val = entry.getValue();
-			ret.add(new Argument(entry.getKey(), null, val!=null? val.getClass().getName(): null, null));
-		}
-		
-		ret.add(new Argument(IPlatformConfiguration.PLATFORM_NAME, "", String.class.getName(), null));
-		ret.add(new Argument(PROGRAM_ARGUMENTS, "", SReflect.getClassName(String[].class), null));
-		ret.add(new Argument(JCCPLATFORMS, "", String.class.getName(), null));
-		ret.add(new Argument(SIMULATION, "", Boolean.class.getName(), null));
-		ret.add(new Argument(ASYNCEXECUTION, "", Boolean.class.getName(), null));
-		ret.add(new Argument(LIBPATH, "", String.class.getName(), null));
-		ret.add(new Argument(BASECLASSLOADER, "", ClassLoader.class.getName(), null));
-		ret.add(new Argument(AWAINCLUDES, "", String.class.getName(), null));
-		ret.add(new Argument(AWAEXCLUDES, "", String.class.getName(), null));
-		ret.add(new Argument("usesecret", "", Boolean.class.getName(), null));
-		ret.add(new Argument("printsecret", "", Boolean.class.getName(), null));
-		ret.add(new Argument("networkname", "", String.class.getName(), null));
-		ret.add(new Argument("networksecret", "", String.class.getName(), null));
-		ret.add(new Argument("roles", "", String.class.getName(), null));
-		ret.add(new Argument(THREADPOOLCLASS, "", String.class.getName(), null));
-		ret.add(new Argument(CONTEXTSERVICECLASS, "", String.class.getName(), null));
-		ret.add(new Argument("superpeerclient", "", Boolean.class.getName(), null));
-		
-		return ret.toArray(new Argument[ret.size()]);
-	}
+//	/**
+//	 *  Get the argument declarations.
+//	 *  @return The argument declarations.
+//	 */
+//	public static Argument[] getArguments()
+//	{
+//		List<Argument> ret = new ArrayList<Argument>();
+//		
+//		for(Map.Entry<String, Object> entry: defvalues.entrySet())
+//		{
+//			Object val = entry.getValue();
+//			ret.add(new Argument(entry.getKey(), null, val!=null? val.getClass().getName(): null, null));
+//		}
+//		
+//		ret.add(new Argument(IPlatformConfiguration.PLATFORM_NAME, "", String.class.getName(), null));
+//		ret.add(new Argument(PROGRAM_ARGUMENTS, "", SReflect.getClassName(String[].class), null));
+//		ret.add(new Argument(JCCPLATFORMS, "", String.class.getName(), null));
+//		ret.add(new Argument(SIMULATION, "", Boolean.class.getName(), null));
+//		ret.add(new Argument(ASYNCEXECUTION, "", Boolean.class.getName(), null));
+//		ret.add(new Argument(LIBPATH, "", String.class.getName(), null));
+//		ret.add(new Argument(BASECLASSLOADER, "", ClassLoader.class.getName(), null));
+//		ret.add(new Argument(AWAINCLUDES, "", String.class.getName(), null));
+//		ret.add(new Argument(AWAEXCLUDES, "", String.class.getName(), null));
+//		ret.add(new Argument("usesecret", "", Boolean.class.getName(), null));
+//		ret.add(new Argument("printsecret", "", Boolean.class.getName(), null));
+//		ret.add(new Argument("networkname", "", String.class.getName(), null));
+//		ret.add(new Argument("networksecret", "", String.class.getName(), null));
+//		ret.add(new Argument("roles", "", String.class.getName(), null));
+//		ret.add(new Argument(THREADPOOLCLASS, "", String.class.getName(), null));
+//		ret.add(new Argument(CONTEXTSERVICECLASS, "", String.class.getName(), null));
+//		ret.add(new Argument("superpeerclient", "", Boolean.class.getName(), null));
+//		
+//		return ret.toArray(new Argument[ret.size()]);
+//	}
 	
 	/**
 	 *  Called on method invocation.
@@ -890,7 +853,6 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setClock(true);
 		config.getExtendedPlatformConfiguration().setSimul(false);
 		config.getExtendedPlatformConfiguration().setFiletransfer(false);
-//		config.getExtendedPlatformConfiguration().setMarshal(true);
 		config.getExtendedPlatformConfiguration().setSecurity(true);
 		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
 		config.getExtendedPlatformConfiguration().setSettings(true);
