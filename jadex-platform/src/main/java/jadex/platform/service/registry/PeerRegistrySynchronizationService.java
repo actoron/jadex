@@ -93,7 +93,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //					it = superpeers.iterator();
 					listpos = 0;
 					pos = 0;
-					searched = true;
+					searched = false;
 				}
 				else if (searched && pos>=res.size() && listpos >= superpeers.size())
 				{
@@ -133,6 +133,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						
 						public void finished() 
 						{
+							searched = true;
 							forwardResults(true, fcurrentsearch);
 						}
 						
