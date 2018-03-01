@@ -36,6 +36,8 @@ public class RSChartTest
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
+		config.setLogging(true);
+		config.setValue("settings.readonly", Boolean.TRUE);	// Do not save settings (TODO: fix android settings?)
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 //		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
