@@ -2,6 +2,43 @@ description 'The android distribution of the Jadex middleware including all typi
 
 dependencies
 {
+	compile project(':jadex-android-antlr')
+	compile project(':jadex-android-bluetooth')
+	compile project(':jadex-android-commons')
+	compile project(':jadex-android-xmlpull')
+	compile project(':jadex-applications-android-demos')
+	compile project(':jadex-applications-android:jadex-applications-android-chat')
+	compile project(':jadex-applications-android:jadex-applications-android-puzzle')
+	compile project(':jadex-bridge')
+	compile project(':jadex-commons')
+	compile project(':jadex-commons:jadex-commons-gui')
+	compile project(':jadex-commons:jadex-commons-security')
+	compile project(':jadex-bytecode-tools')
+	compile project(':jadex-javaparser')
+	compile project(':jadex-json')
+	compile project(':jadex-kernel-base')
+	compile project(':jadex-kernel-bdiv3')
+	compile project(':jadex-kernel-bdiv3-android')
+	compile project(':jadex-kernel-bpmn')
+	compile project(':jadex-kernel-component')
+	compile project(':jadex-kernel-micro')
+	compile project(':jadex-kernel-microservice')
+	compile project(':jadex-model-bpmn')
+	compile project(':jadex-platform')
+	compile project(':jadex-platform-android')
+	compile project(':jadex-platform-extension-relaytransport')
+	compile project(':jadex-platform-extension-websockettransport')
+	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-platform-extension-webservice-android')
+	compile project(':jadex-rules')
+	compile project(':jadex-rules-eca')
+	compile project(':jadex-runtimetools-android')
+	compile project(':jadex-tools-base')
+	compile project(':jadex-xml')
+	
+	
+	// Below this was the old stuff, all artifacts were already commented, so this packages had none?
+	
     // do not use distribution-minimal, because we do not need platform-standalone-launch
 //    compile project(':jadex-distribution-minimal')
 
