@@ -886,9 +886,9 @@ In the configurations section, predefined
 						<xs:documentation>The required Java class of the fact. Used for type checking objects that are asserted as facts.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name="updaterate" type="xs:long" use="optional" default="0">
+				<xs:attribute name="updaterate" type="xs:string" use="optional" default="0">
 					<xs:annotation>
-						<xs:documentation>For dynamic expressions the update rate defines in what intervals the fact will be re-evaluated. The default update rate is set to 0.</xs:documentation>
+						<xs:documentation>For dynamic expressions the update rate defines in what intervals the fact will be re-evaluated. The default update rate is set to 0. You can use a fixed long value or an expression, which is dynamically evaluated for each update.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="transient" type="xs:boolean" use="optional" default="false">
