@@ -10,6 +10,7 @@ gen
 keystore
 jadex_certstore.zip
 *.settings.xml
+settings_*
 alarmclock_settings.ser
 **/testkeystore
 jadex-platform-standalone-launch/highscore.dmp
