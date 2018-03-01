@@ -1139,7 +1139,7 @@ public class LoggerWrapper extends Logger
      */
     public void severe(String msg) 
     {
-        if (Level.SEVERE.intValue() < logger.getLevel().intValue()) 
+        if (logger!=null && Level.SEVERE.intValue() < logger.getLevel().intValue())	// TODO: why no logger in android jadex.webservice.examples.rs.chart.RSChartTest
         {
             return;
         }
