@@ -14,7 +14,6 @@ import java.util.concurrent.TimeoutException;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -32,7 +31,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -66,11 +64,13 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
  */
 @Agent
 @Arguments(value={
-	@Argument(name="usesecret", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="printsecret", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="networkname", clazz=String[].class),
-	@Argument(name="networksecret", clazz=String[].class),
-	@Argument(name="roles", clazz=String.class)
+	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
+	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
+	@Argument(name="allowunauth", clazz=Boolean.class, defaultvalue="null"),
+	@Argument(name="platformsecret", clazz=String[].class, defaultvalue="null"),
+	@Argument(name="networknames", clazz=String[].class, defaultvalue="null"),
+	@Argument(name="networksecrets", clazz=String[].class, defaultvalue="null"),
+	@Argument(name="roles", clazz=String.class, defaultvalue="null")
 })
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
@@ -91,10 +91,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected IInternalAccess agent;
 	
 	/** Flag whether to use the platform secret for authentication. */
-	protected boolean usesecret;
+	protected boolean usesecret = true;
 	
 	/** Flag whether the platform secret should be printed during start. */
-	protected boolean printsecret;
+	protected boolean printsecret = true;
+	
+	/** Flag whether to allow unauthenticated connections. */
+	protected boolean allowunauth = true;
 	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
@@ -106,7 +109,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected boolean allowplatformroles = false;
 	
 	/** Available virtual networks. */
-	protected Map<String, AbstractAuthenticationSecret> networks;
+	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
 	
 	/** Available crypt suites. */
 	protected Map<String, Class<?>> allowedcryptosuites;
@@ -122,7 +125,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //	protected Map<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
 	
 	/** Map of entities and associated roles. */
-	protected Map<String, Set<String>> roles;
+	protected Map<String, Set<String>> roles = new HashMap<String, Set<String>>();
 	
 	/** Crypto-Suite reset in progress. */
 	protected IFuture<Void> cryptoreset; 
@@ -136,7 +139,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Initialization.
 	 */
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	@AgentCreated
 	public IFuture<Void> start()
 	{
@@ -253,6 +256,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String secretstr = (String)activeprops.get(ISecurityService.PROPERTY_PLATFORMSECRET);
 		printsecret = activeprops.containsKey(ISecurityService.PROPERTY_PRINTSECRET)? (Boolean)activeprops.get(ISecurityService.PROPERTY_PRINTSECRET): true;
 		usesecret = activeprops.containsKey(ISecurityService.PROPERTY_USESECRET)? (Boolean)activeprops.get(ISecurityService.PROPERTY_USESECRET): true;
+		allowunauth = (Boolean) activeprops.get(ISecurityService.PROPERTY_ALLOWUNAUTH);
 		
 		if (usesecret && secretstr == null)
 		{
@@ -334,7 +338,117 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			}
 		}
 		agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
+		
 		return IFuture.DONE;
+	}*/
+	
+	/**
+	 *  Initialization.
+	 */
+	@AgentCreated
+	public IFuture<Void> start()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		loadSettings().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+		{
+			@SuppressWarnings("unchecked")
+			public void customResultAvailable(Map<String, Object> settings)
+			{
+				boolean savesettings = false;
+				Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+				for (Object val : args.values())
+					savesettings = val != null;
+				
+				usesecret = getProperty("usesecret", args, settings, usesecret);
+				printsecret = getProperty("printsecret", args, settings, usesecret);
+				
+				if (args.get("platformsecret") != null)
+					platformsecret = AbstractAuthenticationSecret.fromString((String) args.get("platformsecret"), false);
+				else
+					platformsecret = getProperty("platformsecret", args, settings, platformsecret);
+				
+				String[] nn = (String[]) args.remove("networknames");
+				String[] ns = (String[]) args.remove("networksecrets");
+				if (args.get("networknames") != null || args.get("networksecrets") != null)
+				{
+					
+					if (nn == null || ns == null || ns.length != nn.length)
+					{
+						agent.getLogger().warning("Network names and secrets do not match, ignoring...");
+						nn = null;
+						ns = null;
+					}
+				}
+				if (nn != null)
+				{
+					for (int i = 0; i < nn.length; ++i)
+						networks.put(nn[i], AbstractAuthenticationSecret.fromString(ns[i]));
+				}
+				else
+				{
+					networks = getProperty("networks", args, settings, networks);
+				}
+				
+				remoteplatformsecrets = getProperty("remoteplatformsecrets", args, settings, remoteplatformsecrets);
+				roles = getProperty("roles", args, settings, roles);
+				
+				if (printsecret)
+				{
+					for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+						System.out.println("Available network '" + entry.getKey() + "' with secret " + entry.getValue());
+				}
+				
+				if (usesecret && platformsecret == null)
+				{
+					platformsecret = KeySecret.createRandom();
+					savesettings = true;
+					System.out.println("Generated new platform access key: "+platformsecret.toString().substring(KeySecret.PREFIX.length() + 1));
+				}
+				
+				if (printsecret && platformsecret != null)
+				{
+					String secretstr = platformsecret.toString();
+					String pfname = agent.getComponentIdentifier().getPlatformName();
+					
+					if (platformsecret instanceof PasswordSecret)
+						System.out.println("Platform " + pfname + " access password: "+secretstr);
+					else if (platformsecret instanceof KeySecret)
+						System.out.println("Platform " + pfname + " access key: "+secretstr);
+					else if (platformsecret instanceof AbstractX509PemSecret)
+						System.out.println("Platform " + pfname + " access certificates: "+secretstr);
+					else
+						System.out.println("Platform " + pfname + " access secret: "+secretstr);
+				}
+				
+				networknames = (Set<String>)Starter.getPlatformValue(agent.getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
+				networknames.addAll(networks.keySet());
+				
+				// TODO: Make configurable
+				String[] cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
+				allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
+				for (String cryptsuite : cryptsuites)
+				{
+					try
+					{
+						Class<?> clazz = Class.forName(cryptsuite, true, agent.getClassLoader());
+						allowedcryptosuites.put(cryptsuite, clazz);
+					}
+					catch (Exception e)
+					{
+						ret.setException(e);
+						return;
+					}
+				}
+				
+				if (savesettings)
+					saveSettings();
+				
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 	
 	//---- ISecurityService methods. ----
@@ -699,6 +813,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@Excluded
 	public Set<String> getNetworkNamesSync()
 	{
+		@SuppressWarnings("unchecked")
 		Set<String> ret = Collections.EMPTY_SET;
 		
 		if(networknames!=null)
@@ -902,6 +1017,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public boolean getInternalUsePlatformSecret()
 	{
 		return usesecret;
+	}
+	
+	/**
+	 *  Checks whether to allow unauthenticated connections.
+	 *  
+	 *  @return True, if used.
+	 */
+	public boolean getInternalAllowUnauth()
+	{
+		return allowunauth;
 	}
 	
 	/**
@@ -1121,11 +1246,49 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
+	 *  Loads the settings.
+	 */
+	@SuppressWarnings("unchecked")
+	protected IFuture<Map<String, Object>> loadSettings()
+	{
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
+		getSettingsService().loadState(PROPERTIES_ID).addResultListener(new IResultListener<Object>()
+		{
+			public void resultAvailable(Object result)
+			{
+				ret.setResult(result != null ? (Map<String, Object>) result : new HashMap<String, Object>());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		});
+		return ret;
+	}
+	
+	/**
 	 *  Saves the current settings.
 	 */
 	protected void saveSettings()
 	{
-		jadex.commons.Properties settings = new jadex.commons.Properties();
+		Map<String, Object> settings = new HashMap<String, Object>();
+		
+		settings.put("usesecret", usesecret);
+		settings.put("printsecret", printsecret);
+		
+		if (platformsecret != null)
+			settings.put("platformsecret", platformsecret);
+		if(networks != null && networks.size() > 0)
+			settings.put("networks", networks);
+		if (remoteplatformsecrets != null && remoteplatformsecrets.size() > 0)
+			settings.put("remoteplatformsecrets", remoteplatformsecrets);
+		if (roles != null && roles.size() > 0)
+			settings.put("roles", roles);
+		
+		getSettingsService().saveState(PROPERTIES_ID, settings);
+		
+		/*jadex.commons.Properties settings = new jadex.commons.Properties();
 		
 		settings.addProperty(new Property(ISecurityService.PROPERTY_USESECRET, String.valueOf(usesecret)));
 		settings.addProperty(new Property(ISecurityService.PROPERTY_PRINTSECRET, String.valueOf(printsecret)));
@@ -1153,7 +1316,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		getSettingsService().setProperties(PROPERTIES_ID, settings);
-		getSettingsService().saveProperties().get();
+		getSettingsService().saveProperties().get();*/
 	}
 	
 	/**
@@ -1411,6 +1574,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public void setServiceIdentifier(IServiceIdentifier sid)
 	{
 		this.sid = sid;
+	}
+	
+	/**
+	 *  Gets the right property from arguments, settings and default.
+	 * 
+	 *  @param property Property name.
+	 *  @param args Arguments.
+	 *  @param settings Settings.
+	 *  @param defaultprop Default.
+	 *  @return The property.
+	 */
+	@SuppressWarnings("unchecked")
+	protected static final <T> T getProperty(String property, Map<String, Object> args, Map<String, Object> settings, T defaultprop)
+	{
+		T ret = defaultprop;
+		if (args.get(property) != null)
+			ret = (T) args.get(property);
+		else if (settings.containsKey(property))
+			ret = (T) settings.get(property);
+		return ret;
 	}
 	
 	/**

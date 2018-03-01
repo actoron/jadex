@@ -14,6 +14,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -38,7 +39,8 @@ public class ConcurrentSettingsTest
 		conf.setPlatformName("settingstest_*");
 		
 		// Delete settings to generate new password
-		new File("settingstest"+SettingsAgent.SETTINGS_EXTENSION).delete();
+		SUtil.deleteDirectory(new File(SUtil.getAppDir(), "settings_settingstest"));
+//		new File("settingstest"+SettingsAgent.SETTINGS_EXTENSION).delete();
 
 		// Start platforms
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();

@@ -1,9 +1,7 @@
 package jadex.platform.service.security.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +20,6 @@ import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.SSecurity;
-import jadex.platform.service.security.MsgSecurityInfos;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
@@ -238,6 +235,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
+			if (!agent.getInternalAllowUnauth() && !secinf.isAuthenticated())
+				throw new SecurityException("Unauthenticated connection not allowed.");
+			
 			ephemeralkey = createEphemeralKey();
 			byte[] pubkey = getPubKey();
 			
@@ -264,6 +264,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			setupSecInfos(remoteid, authnets, platformauth, agent);
+			
+			if (!agent.getInternalAllowUnauth() && !secinf.isAuthenticated())
+				throw new SecurityException("Unauthenticated connection not allowed.");
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;

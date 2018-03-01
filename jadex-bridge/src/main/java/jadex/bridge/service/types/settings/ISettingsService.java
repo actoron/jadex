@@ -21,7 +21,8 @@ public interface ISettingsService
 	 *  @param provider 	The properties provider.
 	 *  @return A future indicating when registration is finished.
 	 */
-	public IFuture<Void>	registerPropertiesProvider(String id, @Reference IPropertiesProvider provider);
+	@Deprecated
+	public IFuture<Void> registerPropertiesProvider(String id, @Reference IPropertiesProvider provider);
 	
 	/**
 	 *  Deregister a property provider.
@@ -30,7 +31,8 @@ public interface ISettingsService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @return A future indicating when registration is finished.
 	 */
-	public IFuture<Void>	deregisterPropertiesProvider(String id);
+	@Deprecated
+	public IFuture<Void> deregisterPropertiesProvider(String id);
 	
 	/**
 	 *  Set the properties for a given id.
@@ -39,14 +41,16 @@ public interface ISettingsService
 	 *  @param properties 	The properties to set.
 	 *  @return A future indicating when properties have been set.
 	 */
-	public IFuture<Void>	setProperties(String id, Properties props);
+	@Deprecated
+	public IFuture<Void> setProperties(String id, Properties props);
 	
 	/**
 	 *  Get the properties for a given id.
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @return A future containing the properties (if any).
 	 */
-	public IFuture<Properties>	getProperties(String id);
+	@Deprecated
+	public IFuture<Properties> getProperties(String id);
 
 	// todo: load/saveProperties(String filename)
 	
@@ -55,17 +59,38 @@ public interface ISettingsService
 	 *  @return A future indicating when properties have been loaded.
 	 */
 //	public IFuture<Properties>	loadProperties();
-	public IFuture<Void>	loadProperties();
+	@Deprecated
+	public IFuture<Void> loadProperties();
 	
 	/**
 	 *  Save the platform properties to the default location.
 	 *  @return A future indicating when properties have been saved.
 	 */
-	public IFuture<Void>	saveProperties();
+	@Deprecated
+	public IFuture<Void> saveProperties();
 	
 	/**
 	 *  Set the save on exit policy.
 	 *  @param saveonexit The saveonexit flag.
 	 */
+	@Deprecated
 	public IFuture<Void> setSaveOnExit(boolean saveonexit);
+	
+	/**
+	 *  Saves arbitrary state to a persistent directory as JSON.
+	 *  Object must be serializable and the ID must be unique.
+	 *  
+	 *  @param id Unique ID for the saved state.
+	 *  @param state The state being saved.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> saveState(String id, Object state);
+	
+	/**
+	 *  Loads arbitrary state form a persistent directory.
+	 *  
+	 *  @param id Unique ID for the saved state.
+	 *  @return The state or null if none was found or corrupt.
+	 */
+	public IFuture<Object> loadState(String id);
 }

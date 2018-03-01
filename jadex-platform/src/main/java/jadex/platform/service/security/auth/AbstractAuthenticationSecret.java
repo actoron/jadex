@@ -9,7 +9,7 @@ import java.util.Map;
  *  Class representing a secret used for authentication.
  *
  */
-public abstract class AbstractAuthenticationSecret
+public abstract class AbstractAuthenticationSecret implements Cloneable
 {
 	/** Types of authentication secret. */
 	public static Map<String, Class<?>> SECRET_TYPES = Collections.synchronizedMap(new HashMap<String, Class<?>>());
@@ -26,6 +26,14 @@ public abstract class AbstractAuthenticationSecret
 	 *  @return True, if the secret can be used for signing.
 	 */
 	public abstract boolean canSign();
+	
+	/**
+	 *  Clone support.
+	 */
+	public Object clone() throws CloneNotSupportedException
+	{
+		return fromString(toString(), true);
+	}
 	
 	/**
 	 *  Decodes a secret from a string.

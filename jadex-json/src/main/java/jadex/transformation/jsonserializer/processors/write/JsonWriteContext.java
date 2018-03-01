@@ -341,4 +341,58 @@ public class JsonWriteContext implements IRootObjectContext
 		sb.append('"');
 		return sb.toString();
 	}
+	
+	/**
+	 * Try.style monad for stateful write to the write context, handling first writes specially.
+	 *
+	 */
+	public static class TryWrite
+	{
+		/** First write state. */
+		protected boolean first = true;
+		
+		/** Write only first attempt. */
+		protected boolean onlyfirst = false;
+		
+		/** Wrute context. */
+		protected JsonWriteContext context;
+		
+		/**
+		 *  Initialized the monad.
+		 *  
+		 *  @param context Write context.
+		 */
+		public TryWrite(JsonWriteContext context)
+		{
+			this(context, false);
+		}
+		
+		/**
+		 *  Initialized the monad.
+		 *  
+		 *  @param context Write context.
+		 *  @param onlyfirst Write only on first write instead of every write except the first.
+		 */
+		public TryWrite(JsonWriteContext context, boolean onlyfirst)
+		{
+			this.context = context;
+			this.onlyfirst = onlyfirst;
+		}
+		
+		/**
+		 *  Write or not depending on state.
+		 *  
+		 *  @param value Value to write.
+		 *  @return The context for convenience.
+		 */
+		public JsonWriteContext write(String value)
+		{
+			if (first == onlyfirst)
+			{
+				context.write(value);
+			}
+			first = false;
+			return context;
+		}
+	}
 }

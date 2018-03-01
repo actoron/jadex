@@ -17,7 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
@@ -83,7 +82,6 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.ErrorException;
 import jadex.commons.random.FastThreadedRandom;
-import jadex.commons.random.Xoroshiro128Random;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -189,6 +187,9 @@ public class SUtil
 			"yyyy-MM-dd'T'HH:mm:ssX"
 		};
 	}
+	
+	/** Application directory, current working dir under normal Java, special with Android. */
+	protected static volatile File appdir = null;
 	
 	/**
 	 * Mapping from single characters to encoded version for displaying on
@@ -4929,6 +4930,62 @@ public class SUtil
 				out.close();
 			}
 		}
+	}
+	
+	/**
+	 *  Gets the "application directory", normally the current working directory,
+	 *  except in Android.
+	 * 
+	 *  @return Application directory.
+	 */
+	public static File getAppDir()
+	{
+		if (appdir == null)
+		{
+			synchronized(SUtil.class)
+			{
+				if (appdir == null)
+				{
+					if (SReflect.isAndroid())
+					{
+						try
+						{
+							Class<?> acmclass = Class.forName("jadex.android.AndroidContextManager");
+							Method getinstance = acmclass.getMethod("getInstance");
+							Object acm = getinstance.invoke(null);
+							Method getandroidcontext = acmclass.getMethod("getAndroidContext");
+							Object ac = null;
+							for (int i = 0; ac == null && i < 5; ++i)
+								ac = getandroidcontext.invoke(acm);
+							if (ac != null)
+							{
+								Method getfilesdir = ac.getClass().getMethod("getFilesDir");
+								File filesdir = null;
+								for (int i = 0; filesdir == null && i < 5; ++i)
+									filesdir = (File) getfilesdir.invoke(ac);
+								if (filesdir != null)
+									appdir = filesdir;
+								else
+									appdir = File.createTempFile("", "").getParentFile();
+							}
+							else
+							{
+								appdir = File.createTempFile("", "").getParentFile();
+							}
+						}
+						catch (Exception e)
+						{
+							appdir = (new File(System.getProperty("java.io.tmpdir"))).getAbsoluteFile();
+						}
+					}
+					else
+					{
+						appdir = (new File("")).getAbsoluteFile();
+					}
+				}
+			}
+		}
+		return appdir;
 	}
 	
 	/**

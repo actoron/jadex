@@ -2,35 +2,35 @@ package jadex.platform.service.settings;
 
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Boolean3;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
+import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.xml.PropertiesXMLHelper;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Agent that provides the settings service.
@@ -41,13 +41,16 @@ public class SettingsAgent	implements ISettingsService
 	// -------- constants --------
 
 	/** The filename extension for settings. */
-	public static final String	SETTINGS_EXTENSION	= ".settings.xml";
+//	public static final String	SETTINGS_EXTENSION = ".settings.xml";
 
 	//-------- attributes --------
 	
 	/** The service provider. */
 	@ServiceComponent
-	protected IInternalAccess	access;
+	protected IInternalAccess access;
+	
+	/** Directory used to save settings. */
+	protected File settingsdir;
 	
 	/** The properties filename. */
 	protected String filename;
@@ -67,7 +70,7 @@ public class SettingsAgent	implements ISettingsService
 	protected boolean	readonly;
 	
 	/** The context service. */
-	protected IContextService contextService;
+	//protected IContextService contextService;
 	
 	//-------- Service methods --------
 	
@@ -79,10 +82,19 @@ public class SettingsAgent	implements ISettingsService
 	public IFuture<Void>	startService()
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
-		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
+		this.filename	= "properties.json";
+		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getComponentIdentifier().getPlatformPrefix());
+		if (settingsdir.exists() && !settingsdir.isDirectory())
+		{
+			access.getLogger().log(Level.WARNING, "Invalid settings directory '" + settingsdir.getName() + "', switching to read-only.");
+			readonly = true;
+		}
+		else if (!settingsdir.exists() && !readonly)
+			settingsdir.mkdir();
+		//this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		contextService = SServiceProvider.getLocalService(access, IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		//contextService = SServiceProvider.getLocalService(access, IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
@@ -116,6 +128,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 *  @param provider 	The properties provider.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IFuture<Void>	registerPropertiesProvider(String id, IPropertiesProvider provider)
 	{
 		Future<Void>	ret	= new Future<Void>();
@@ -146,6 +159,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  before the property provider is removed.
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IFuture<Void>	deregisterPropertiesProvider(final String id)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -186,6 +200,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @param save 	Save platform properties after setting.
 	 *  @return A future indicating when properties have been set.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IFuture<Void>	setProperties(String id, Properties props)
 	{
 //		System.out.println("Set properties: "+id);
@@ -287,55 +302,25 @@ public class SettingsAgent	implements ISettingsService
 	{
 		final Future<Properties> ret = new Future<Properties>();
 		
-		// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-		getFile(filename).addResultListener(new ExceptionDelegationResultListener<File, Properties>(ret)
+		File file = new File(settingsdir, filename);
+		
+		try
 		{
-			public void customResultAvailable(File file)
-			{
-				if(!file.exists())
-				{
-					getFile("default"+SETTINGS_EXTENSION).addResultListener(new ExceptionDelegationResultListener<File, Properties>(ret)
-					{
-						public void customResultAvailable(File file)
-						{
-							proceed(file);
-						}
-					});
-				}
-				else
-				{
-					proceed(file);
-				}
-			}
-			
-			protected void proceed(File file)
-			{
-				FileInputStream fis = null;
-				try
-				{
-					fis = new FileInputStream(file);
-					Properties props = (Properties)PropertiesXMLHelper.read(fis, getClass().getClassLoader());
-					ret.setResult(props);
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
-				finally
-				{
-					if(fis!=null)
-					{
-						try
-						{
-							fis.close();
-						}
-						catch(Exception e)
-						{
-						}
-					}
-				}
-			}
-		});
+			String json = new String(SUtil.readFile(file), SUtil.UTF8);
+			ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 2);
+			rprocs.addAll(JsonTraverser.readprocs);
+			rprocs.add(rprocs.size() - 2, new JsonPropertiesProcessor());
+			rprocs.add(rprocs.size() - 2, new JsonPropertyProcessor());
+			Properties props = JsonTraverser.objectFromString(json, getClass().getClassLoader(), null, Properties.class, rprocs);
+			if (props == null)
+				throw new RuntimeException("Cannot load properties from file: " + file.getAbsolutePath());
+			else
+				ret.setResult(props);
+		}
+		catch (Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}
@@ -344,7 +329,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  Save the platform properties to the default location.
 	 *  @return A future indicating when properties have been saved.
 	 */
-	public IFuture<Void>	saveProperties()
+	public IFuture<Void> saveProperties()
 	{
 		return saveProperties(false);
 	}
@@ -354,7 +339,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @param shutdown	Flag indicating if called during shutdown.
 	 *  @return A future indicating when properties have been saved.
 	 */
-	public IFuture<Void>	saveProperties(boolean shutdown)
+	public IFuture<Void> saveProperties(boolean shutdown)
 	{
 		if(readonly)
 			return IFuture.DONE;
@@ -413,46 +398,47 @@ public class SettingsAgent	implements ISettingsService
 	 */
 	protected IFuture<Void> writePropertiesToStore(final Properties props) //throws FileNotFoundException, Exception, IOException 
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		//final Future<Void>	ret	= new Future<Void>();
 		// Todo: Which class loader to use? library service unavailable, because
 		// it depends on settings service?
-		getFile(filename).addResultListener(new IResultListener<File>()
-		{
-			public void resultAvailable(File file)
-			{
-				FileOutputStream os = null;
-				try
-				{
-					os = new FileOutputStream(file);
-					PropertiesXMLHelper.write(props, os, getClass().getClassLoader());
-				}
-				catch(Exception e)
-				{
-					System.out.println("Warning: Could not save settings: "+e);
-				}
-				finally
-				{
-					if(os!=null)
-					{
-						try
-						{
-							os.close();
-						}
-						catch(Exception e)
-						{
-						}
-					}
-					ret.setResult(null);	// TODO: pass exception to caller?
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				
-			}
-		});
 		
-		return ret;
+		if (!readonly)
+		{
+			FileOutputStream os = null;
+			
+			File file = new File(settingsdir, filename);
+			
+			try
+			{
+				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 2);
+				procs.addAll(JsonTraverser.writeprocs);
+				procs.add(procs.size() - 1, new JsonPropertiesProcessor());
+				procs.add(procs.size() - 1, new JsonPropertyProcessor());
+				String json = JsonTraverser.objectToString(props,
+											 getClass().getClassLoader(),
+											 false, false,
+											 null, null,
+											 procs);
+				json = JsonTraverser.prettifyJson(json);
+				
+				File tmpfile = File.createTempFile(file.getName(), "");
+				os = new FileOutputStream(tmpfile);
+				os.write(json.getBytes(SUtil.UTF8));
+				SUtil.close(os);
+				SUtil.moveFile(tmpfile, file);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Warning: Could not save settings: "+e);
+			}
+			finally
+			{
+				if (os != null)
+					SUtil.close(os);
+			}
+		}
+		
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -460,8 +446,89 @@ public class SettingsAgent	implements ISettingsService
 	 * @param path Path to the file
 	 * @return The File Object for the given path.
 	 */
-	protected IFuture<File> getFile(String path) 
+//	protected IFuture<File> getFile(String path) 
+//	{
+//		return contextService.getFile(path);
+//	}
+	
+	// -------------------------------- New API -------------------------------
+	
+	/**
+	 *  Saves arbitrary state to a persistent directory as JSON.
+	 *  Object must be serializable and the ID must be unique.
+	 *  
+	 *  @param id Unique ID for the saved state.
+	 *  @param state The state being saved.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> saveState(String id, Object state)
 	{
-		return contextService.getFile(path);
+		if (!readonly)
+		{
+			FileOutputStream os = null;
+			
+			File file = new File(settingsdir, id + ".json");
+			
+			try
+			{
+				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 2);
+				procs.addAll(JsonTraverser.writeprocs);
+				procs.add(procs.size() - 1, new JsonComponentIdentifierProcessor());
+				procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
+				String json = JsonTraverser.objectToString(state,
+											 getClass().getClassLoader(),
+											 true, false,
+											 null, null,
+											 procs);
+				json = JsonTraverser.prettifyJson(json);
+				
+				File tmpfile = File.createTempFile(file.getName(), "");
+				os = new FileOutputStream(tmpfile);
+				os.write(json.getBytes(SUtil.UTF8));
+				SUtil.close(os);
+				SUtil.moveFile(tmpfile, file);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Warning: Could not save state " + id + ": " + e);
+			}
+			finally
+			{
+				if (os != null)
+					SUtil.close(os);
+			}
+		}
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Loads arbitrary state form a persistent directory.
+	 *  
+	 *  @param id Unique ID for the saved state.
+	 *  @return The state or null if none was found or corrupt.
+	 */
+	public IFuture<Object> loadState(String id)
+	{
+		Future<Object> ret = new Future<Object>();
+		
+		File file = new File(settingsdir, id + ".json");
+		
+		try
+		{
+			ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 2);
+			rprocs.addAll(JsonTraverser.readprocs);
+			rprocs.add(rprocs.size() - 2, new JsonComponentIdentifierProcessor());
+			rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
+			String json = new String(SUtil.readFile(file), SUtil.UTF8);
+			Object state = JsonTraverser.objectFromString(json, getClass().getClassLoader(), null, null, rprocs);
+			ret.setResult(state);
+		}
+		catch (Exception e)
+		{
+			ret.setResultIfUndone(null);
+		}
+		
+		return ret;
 	}
 }

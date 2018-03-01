@@ -1,6 +1,7 @@
 package jadex.transformation.jsonserializer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Set;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import com.eclipsesource.json.PrettyPrint;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -507,6 +509,28 @@ public class JsonTraverser extends Traverser
 		{
 			throw SUtil.convertToRuntimeException(e);
 		}
+	}
+	
+	/**
+	 *  Prettifies a JSON source.
+	 *  
+	 *  @param json The JSON.
+	 *  @return Prettified JSON or the original JSON on error.
+	 */
+	public static String prettifyJson(String json)
+	{
+		try
+		{
+			JsonValue jv = Json.parse(json);
+			PrettyPrint pp = PrettyPrint.indentWithTabs();
+			StringWriter sw = new StringWriter();
+			jv.writeTo(sw, pp);
+			json = sw.toString();
+		}
+		catch (Exception e)
+		{
+		}
+		return json;
 	}
 	
 	/**

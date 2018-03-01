@@ -29,30 +29,6 @@ import jadex.commons.future.IFuture;
 @Service(system=true)
 public interface ISecurityService
 {
-	/** Allow the use of the local platform secret. */
-	public static final String PROPERTY_USESECRET = "usesecret";
-	
-	/** Print the local platform secret on start. */
-	public static final String PROPERTY_PRINTSECRET = "printsecret";
-	
-	/** The local platform secret. */
-	public static final String PROPERTY_PLATFORMSECRET = "platformsecret";
-	
-	/** Remote platform(s) to include. */
-	public static final String PROPERTY_REMOTEPLATFORM = "remoteplatform";
-
-	/** The Remote platform secret(s). */
-	public static final String PROPERTY_REMOTEPLATFORMSECRET = "remoteplatformsecret";
-	
-	/** Network(s) to include. */
-	public static final String PROPERTY_NETWORK = "networkname";
-	
-	/** Network password, alternative to secret. */
-	public static final String PROPERTY_NETWORKPASS = "networkpass";
-
-	/** The network secret(s). */
-	public static final String PROPERTY_NETWORKSECRET = "networksecret";
-	
 	//-------- message-level encryption/authentication -------
 	
 	/**
