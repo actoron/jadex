@@ -235,7 +235,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
-			if (!agent.getInternalAllowUnauth() && !secinf.isAuthenticated())
+			if (agent.getInternalRefuseUnauth() && !secinf.isAuthenticated())
 				throw new SecurityException("Unauthenticated connection not allowed.");
 			
 			ephemeralkey = createEphemeralKey();
@@ -265,7 +265,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
 			setupSecInfos(remoteid, authnets, platformauth, agent);
 			
-			if (!agent.getInternalAllowUnauth() && !secinf.isAuthenticated())
+			if (agent.getInternalRefuseUnauth() && !secinf.isAuthenticated())
 				throw new SecurityException("Unauthenticated connection not allowed.");
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
