@@ -444,6 +444,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (savesettings)
 					saveSettings();
 				
+				agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
+				
 				ret.setResult(null);
 			}
 		});
