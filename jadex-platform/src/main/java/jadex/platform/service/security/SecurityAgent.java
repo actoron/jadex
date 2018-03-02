@@ -358,7 +358,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				boolean savesettings = false;
 				Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 				for (Object val : args.values())
-					savesettings = val != null;
+					savesettings |= val != null;
 				
 				usesecret = getProperty("usesecret", args, settings, usesecret);
 				printsecret = getProperty("printsecret", args, settings, usesecret);
