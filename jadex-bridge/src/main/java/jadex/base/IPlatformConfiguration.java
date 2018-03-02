@@ -824,7 +824,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Get the network name (used at startup).
      *  @return The network name.
      */
-    public String[] getNetworkName();
+    public String[] getNetworkNames();
 
     /**
      *  Set the network name (used at startup).

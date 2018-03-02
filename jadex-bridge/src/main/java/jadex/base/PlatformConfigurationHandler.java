@@ -42,7 +42,6 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	static
 	{
 		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
-		namemappings.put("networknames", "networkname");
 		
 		// This stuff must be in the configuration because it configures the starter (not the platform component itself)
 //		defvalues.put(IPlatformConfiguration.PLATFORM_NAME, "jadex");
