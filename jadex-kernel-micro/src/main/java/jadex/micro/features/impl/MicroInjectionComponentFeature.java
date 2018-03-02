@@ -90,29 +90,26 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			{
 				for(int i=0; i<names.length; i++)
 				{
-					if(args.containsKey(names[i]))
+					Object val = args.get(names[i]);
+					
+//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
+					final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
+					
+					try
 					{
-						Object val = args.get(names[i]);
-						
-	//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
-						final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
-						
-						try
+						for(int j=0; j<infos.length; j++)
 						{
-							for(int j=0; j<infos.length; j++)
-							{
-								Field field = infos[j].getFirstEntity().getField(getComponent().getClassLoader());
-								String convert = infos[j].getSecondEntity();
-	//							System.out.println("seting arg: "+names[i]+" "+val);
-								setFieldValue(val, field, convert);
-							}
+							Field field = infos[j].getFirstEntity().getField(getComponent().getClassLoader());
+							String convert = infos[j].getSecondEntity();
+//							System.out.println("seting arg: "+names[i]+" "+val);
+							setFieldValue(val, field, convert);
 						}
-						catch(Exception e)
-						{
-							getComponent().getLogger().warning("Field injection failed: "+e);
-							if(!ret.isDone())
-								ret.setException(e);
-						}
+					}
+					catch(Exception e)
+					{
+						getComponent().getLogger().warning("Field injection failed: "+e);
+						if(!ret.isDone())
+							ret.setException(e);
 					}
 				}
 			}
@@ -126,24 +123,21 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			{
 				for(int i=0; i<names.length; i++)
 				{
-					if(results.containsKey(names[i]))
+					Object val = results.get(names[i]);
+					final Tuple3<FieldInfo, String, String> info = model.getResultInjection(names[i]);
+					
+					try
 					{
-						Object val = results.get(names[i]);
-						final Tuple3<FieldInfo, String, String> info = model.getResultInjection(names[i]);
-						
-						try
-						{
-							Field field = info.getFirstEntity().getField(getComponent().getClassLoader());
-							String convert = info.getSecondEntity();
-//							System.out.println("seting res: "+names[i]+" "+val);
-							setFieldValue(val, field, convert);
-						}
-						catch(Exception e)
-						{
-							getComponent().getLogger().warning("Field injection failed: "+e);
-							if(!ret.isDone())
-								ret.setException(e);
-						}
+						Field field = info.getFirstEntity().getField(getComponent().getClassLoader());
+						String convert = info.getSecondEntity();
+//						System.out.println("seting res: "+names[i]+" "+val);
+						setFieldValue(val, field, convert);
+					}
+					catch(Exception e)
+					{
+						getComponent().getLogger().warning("Field injection failed: "+e);
+						if(!ret.isDone())
+							ret.setException(e);
 					}
 				}
 			}
