@@ -1566,15 +1566,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(endstepcnt!=-1 && !ret && !endagenda.isDone())
 		{
-			setComponentThread(Thread.currentThread());
-//			this.componentthread	= Thread.currentThread();
-			this.executing = true;
+			cl	= setExecutionState();
 			
 			endagenda.setResult(null);
-			
-			setComponentThread(null);
-//			this.componentthread = null;
-			this.executing = false;
+
+			resetExecutionState(cl);
 		}
 		
 //		if(endstepcnt!=-1 && getComponent().getComponentIdentifier().equals(getComponent().getComponentIdentifier().getRoot()))
