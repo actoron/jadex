@@ -248,8 +248,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		{
 			public void notifyObservers(final ARegistryEvent event)
 			{
-				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-					throw new RuntimeException("wrooong2");
+//				if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+//					throw new RuntimeException("wrooong2");
 				
 				if(event.size()>0)
 					System.out.println("notify obs: "+component+", events="+event.size());
@@ -258,8 +258,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				{
 					public void resultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 					{
-						if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-							throw new RuntimeException("wrooong22");
+//						if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+//							throw new RuntimeException("wrooong22");
 						
 						final IResultListener<ISuperpeerRegistrySynchronizationService> searchlis = this; 
 //						System.out.println("spser !!!!!!"+lrobs.hashCode());
@@ -268,8 +268,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						{
 							public void resultAvailable(ARegistryResponseEvent spevent) 
 							{
-								if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-									throw new RuntimeException("wrooong5");
+//								if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+//									throw new RuntimeException("wrooong5");
 //								System.out.println("peer received: "+spevent.isUnknown()+" "+spevent.getReceiver()+" "+event);
 								
 								// Should clients receive multi responses?!

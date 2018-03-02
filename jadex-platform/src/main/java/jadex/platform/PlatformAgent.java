@@ -77,6 +77,7 @@ import jadex.platform.service.df.DirectoryFacilitatorAgent;
 import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
+import jadex.platform.service.registry.AutoConfigRegistryAgent;
 import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
 import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 import jadex.platform.service.security.SecurityAgent;
@@ -180,10 +181,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	
 	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="superpeerclient", clazz=boolean.class)//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
-
-	//@Argument(name=IPlatformConfiguration.COMPONENT_FACTORY, clazz=String.class, defaultvalue="IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY"),
-	//@Argument(name=IPlatformConfiguration.CONFIGURATION_FILE, clazz=String.class, defaultvalue="IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION")
+	@Argument(name="superpeerclient", clazz=boolean.class),//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
+	@Argument(name="acr", clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -221,7 +220,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
 	@ComponentType(name="tcp", clazz=TcpTransportAgent.class),
 	@ComponentType(name="ws", filename="jadex/platform/service/message/websockettransport/WebSocketTransportAgent.class"),
-	@ComponentType(name="rt", filename="jadex/platform/service/message/relaytransport/RelayTransportAgent.class")
+	@ComponentType(name="rt", filename="jadex/platform/service/message/relaytransport/RelayTransportAgent.class"),
+	@ComponentType(name="acr", clazz=AutoConfigRegistryAgent.class)
 })
 
 @ProvidedServices({
@@ -287,6 +287,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0"),
 		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0"),
 		@Component(name="relay", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
+		
+		@Component(name="acr", type="acr", daemon=Boolean3.TRUE, number="$args.acr? 1 : 0")
 	})
 })
 @Agent

@@ -71,7 +71,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	protected Set<PeerInfo> subscribedto;
 	
 	/** The currently blacklisted platforms (are not checked when newPlatformArrived() is called). */
-	protected LeaseTimeSet<IComponentIdentifier> blackplatforms;
+	protected LeaseTimeSet<IComponentIdentifier> blplatforms;
 	
 	/** The client platforms that are managed by this super-peer. */
 	protected LeaseTimeMap<IComponentIdentifier, PeerInfo> clients; 
@@ -82,7 +82,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	/** Event collector for parent. */
 	protected MultiEventCollector parentcol;
 	
-	/** Event collector for parent. */
+	/** Event collector for partners. */
 	protected MultiEventCollector partnercol;
 	
 	/** Handles resposabilities of clients. */
@@ -97,7 +97,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	//-------- super-super-peer handling --------
 	
 	/** The super-super-peer. */
-	protected IComponentIdentifier ssp;
+	protected ISuperpeerRegistrySynchronizationService ssp;
 	
 	/** Potential superpeers. */
 	protected List<IComponentIdentifier> potssps;
@@ -111,7 +111,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	
 	/** The general delay used. */
 	protected long delay;
-	
+
 	/**
 	 *  Create a new service.
 	 */
@@ -269,6 +269,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			}
 		};
 		
+		// Event collector for partners (superpeers of same level)
 		partnercol = new MultiEventCollector(component.getComponentIdentifier(), new AgentDelayRunner(component))
 		{
 			@Override
@@ -286,7 +287,6 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				return ret;
 			}
 		};
-		
 		
 		// Event collector for the supersuperpeer (contacting the ssp and send bunch updates from clients and myself)
 		if(level==1)
@@ -453,6 +453,11 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			public void resultAvailable(final ISuperpeerRegistrySynchronizationService ssp)
 			{
+				// If ssp changed request full state from clients (todo: request only partial state with L0 info)
+				if(SuperpeerRegistrySynchronizationService.this.ssp!=null && SuperpeerRegistrySynchronizationService.this.ssp != ssp)
+					requestClientFullState();
+				SuperpeerRegistrySynchronizationService.this.ssp = ssp;
+				
 //				System.out.println("Send update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
 				ssp.updateClientData(event).addResultListener(new IResultListener<ARegistryResponseEvent>()
 				{
@@ -498,7 +503,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //							System.out.println("Send full update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
 						}
 						
-						// todo: tell client (not only superpeer!) to send full update
+						// Tell client (not only superpeer!) to send full update
+						// Forwards response event to real (indirect) client
 						if(revent.getReceiver()!=null && !getComponent().getComponentIdentifier().getRoot().equals(revent.getReceiver()))
 						{
 							System.out.println("indirect answer: "+revent.getReceiver()+" "+getComponent().getComponentIdentifier().getRoot());
@@ -732,6 +738,23 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	}
 	
 	/**
+	 *  Request full state info from clients.
+	 *  Add response event to answer sections of clients.
+	 *  Will be sent in response to next request.
+	 */
+	protected void requestClientFullState()
+	{
+		if(clients!=null)
+		{
+			Collection<PeerInfo> pis = clients.values();
+			for(PeerInfo pi: pis)
+			{
+				pi.addAnswer(new RegistryResponseEvent(pi.getPlatformId(), true));
+			}	
+		}
+	}
+	
+	/**
 	 *  Handle the update event of a registry.
 	 *  @param event The event.
 	 */
@@ -913,12 +936,15 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		// Forward current state initially
 		// The current state consists of those parts that are managed as clients
+		
 		MultiRegistryEvent mre = new MultiRegistryEvent();
+		
 		for(IComponentIdentifier c: internalGetClients())
 		{
 			RegistryEvent ev = lrobs.getCurrentStateEvent(c);
 			mre.addEvent(ev);
 		}
+		
 		RegistryEvent ev = lrobs.getCurrentStateEvent(getComponent().getComponentIdentifier());
 		mre.addEvent(ev);
 		mre.setClients(internalGetClients());
@@ -1323,10 +1349,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected void addBlacklistedPlatform(IComponentIdentifier cid, long leasetime)
 	{
-		if(blackplatforms==null)
+		if(blplatforms==null)
 		{
 //			blackplatforms = new HashSet<IComponentIdentifier>();
-			blackplatforms = new LeaseTimeSet<IComponentIdentifier>(delay, new ICommand<Tuple2<IComponentIdentifier, Long>>()
+			blplatforms = new LeaseTimeSet<IComponentIdentifier>(delay, new ICommand<Tuple2<IComponentIdentifier, Long>>()
 			{
 				public void execute(Tuple2<IComponentIdentifier, Long> tup)
 				{
@@ -1342,7 +1368,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				}
 			}, new AgentDelayRunner(component));
 		}
-		blackplatforms.add(cid, leasetime>0? leasetime: delay);
+		blplatforms.add(cid, leasetime>0? leasetime: delay);
 	}
 	
 	/**
@@ -1352,7 +1378,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected boolean isBlacklistedPlatform(IComponentIdentifier cid)
 	{
-		return blackplatforms!=null? blackplatforms.contains(cid): false;
+		return blplatforms!=null? blplatforms.contains(cid): false;
 	}
 	
 	/**
@@ -1363,8 +1389,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 //		if(blackplatforms==null || !blackplatforms.contains(cid))
 //			throw new RuntimeException("platform not blacklisted: "+cid);
-		if(blackplatforms!=null)
-			blackplatforms.remove(cid);
+		if(blplatforms!=null)
+			blplatforms.remove(cid);
 	}
 	
 	/**

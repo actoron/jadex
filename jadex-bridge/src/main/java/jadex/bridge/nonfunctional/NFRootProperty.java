@@ -12,7 +12,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 /**
- * 
+ *  Injects properties on root component.
  */
 public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 {

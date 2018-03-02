@@ -163,9 +163,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	public INFPropertyProvider getComponentPropertyProvider()
 	{
 		if(compprovider==null)
-		{
 			this.compprovider = new NFPropertyProvider(getComponent().getComponentIdentifier().getParent(), getComponent()); 
-		}
 		
 		return compprovider;
 	}

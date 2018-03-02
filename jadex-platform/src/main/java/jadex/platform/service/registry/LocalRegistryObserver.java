@@ -142,7 +142,9 @@ public abstract class LocalRegistryObserver extends EventCollector
 	{
 		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
 		
-		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
+		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_GLOBAL, null, owner==null? cid: owner, null);
+//		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
 		Set<IService> added = reg.searchServicesSync(query);
 		
 		// Remove only non-globally-scoped services
@@ -158,6 +160,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 					it.remove();
 			}
 		}
+		
 		RegistryEvent event = new RegistryEvent(added, null, eventslimit, timelimit, false, null);
 //		clients.add(getComponentIdentifier());
 //		event.setClients(clients);
