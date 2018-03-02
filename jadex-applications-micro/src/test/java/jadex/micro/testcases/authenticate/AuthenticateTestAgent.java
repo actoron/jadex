@@ -127,8 +127,8 @@ public class AuthenticateTestAgent extends TestAgent
 		// Not default visibility means test unrestricted access -> don't use test network.
 		if(!def)
 		{
-			conf.setNetworkNames(null);
-			conf.setNetworkSecret((String[])null);
+			conf.setNetworkNames((String[]) null);
+			conf.setNetworkSecrets((String[])null);
 		}
 		
 		// Add agents.

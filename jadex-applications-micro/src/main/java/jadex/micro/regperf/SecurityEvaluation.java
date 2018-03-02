@@ -44,7 +44,7 @@ public class SecurityEvaluation
 		spconf.setSuperpeerClient(false);
 		spconf.setSuperpeer(true);
 		spconf.setNetworkNames(netnames);
-		spconf.setNetworkSecret(netpasses);
+		spconf.setNetworkSecrets(netpasses);
 		createPlatforms(spconf, 1, "SP");
 		
 		IExternalAccess[] platforms = null;
@@ -54,8 +54,8 @@ public class SecurityEvaluation
 		for(int i=0; i<len; i++)
 		{
 			IPlatformConfiguration conf = config.clone();
-			conf.setNetworkName(netnames[i]);
-			conf.setNetworkSecret(netpasses[i]);
+			conf.setNetworkNames(new String[] { netnames[i] });
+			conf.setNetworkSecrets(new String[] { netpasses[i] });
 			conf.setSuperpeer(false);
 			conf.setComponents(comps);
 			platforms = createPlatforms(conf, 1, "App"+i);			
