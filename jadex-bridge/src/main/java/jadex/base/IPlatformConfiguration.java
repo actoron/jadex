@@ -830,7 +830,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the network name (used at startup).
      *  @param value The network name.
      */
-    public void setNetworkNames(String[] value);
+    public void setNetworkNames(String... value);
     
 //    /**
 //     *  Add the network name (used at startup).
@@ -902,5 +902,5 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the network secret (used at startup).
      *  @param value The network secret.
      */
-    public void setNetworkSecrets(String[] value);
+    public void setNetworkSecrets(String... value);
 }

@@ -104,8 +104,8 @@ public class AndroidChatService extends JadexPlatformService
 		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO);
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
 		config.setLogging(false);
-		config.setNetworkName("jadexnetwork");
-		config.setNetworkSecret("laxlax");
+		config.setNetworkNames("jadexnetwork");
+		config.setNetworkSecrets("laxlax");
 		IExtendedPlatformConfiguration rootConfig = config.getExtendedPlatformConfiguration();
 		rootConfig.setChat(true);
 		rootConfig.setAwaMechanisms(
