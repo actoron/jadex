@@ -407,10 +407,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     protected synchronized boolean doSetResult(E result, boolean undone)
     {
     	if(undone)
-    	{
     		this.undone = true;
-    	}
 
+    	if(result instanceof Future)
+    		Logger.getLogger("future").warning("Future as result of future not supported");
+    	
     	// There is an exception when this is ok.
     	// In BDI when belief value is a future.
 //    	if(result instanceof IFuture)

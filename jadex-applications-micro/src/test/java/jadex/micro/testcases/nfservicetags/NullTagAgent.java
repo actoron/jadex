@@ -1,8 +1,7 @@
 package jadex.micro.testcases.nfservicetags;
 
-import org.junit.Ignore;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,10 +25,9 @@ import jadex.micro.annotation.Results;
  *  Test an agent with a tag that resolves to null.
  */
 @Agent
-@Arguments(@Argument(name = TagProperty.NAME, clazz = String.class, defaultvalue="null"))
+@Arguments(@Argument(name = TagProperty.NAME, clazz = String.class, defaultvalue="java.util.Arrays.asList(new Object[]{null})"))
 @NFProperties(@NFProperty(value = TagProperty.class))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-@Ignore	// Todo: returns empty list instead of [null]
 public class NullTagAgent extends JunitAgentTest
 {
 	@Agent
