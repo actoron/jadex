@@ -1,7 +1,10 @@
 package jadex.micro.testcases;
 
+import java.io.File;
+
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**
@@ -15,6 +18,32 @@ public class MicroStartTest extends ComponentTestSuite
 	private static final String[]	EXCLUDES = 	
 		new String[]
 	{
+//		// Fails on Java 9 (what is this test for anyways?)
+//		"Kill",
+//		
+//		// Broken, please fix (cf. David Georg Reichelt)
+//		"remotestepinservicecall",
+//		
+//		// Race condition. inner BlockAgent killed before body -> body fails -> shutdown fails (TODO fail after kill)
+//		"ShutdownAgent",
+//		
+//		// Hangs due to 5 sec repeat step in simulation
+//		"TimeProviderAgent",
+//
+		// excluded until maybe remote objects will be supported again
+		"RecFutures",
+		
+		// Test-support agents
+		"BodyExceptionAgent",
+		"PojoBodyExceptionAgent",
+//		"ProtectedBodyAgent",
+		"BrokenInitAgent",
+		"BrokenInit.component.xml",
+//		"CompositeCalculatorAgent",
+//		"blocking/Step",
+//		"blocking\\Step",
+//		"CallAllServicesAgent",
+		
 		// Manual tests requiring interaction
 		"ExternalAccessInvokerAgent",
 		
@@ -70,7 +99,12 @@ public class MicroStartTest extends ComponentTestSuite
 	 */
 	public MicroStartTest() 	throws Exception
 	{
-		super("jadex-applications-micro", EXCLUDES, false); // tests are already real tests in micro, exclude them here
+		super(new String[]
+		{
+			"-df", "true"	// Required for df test, when run in eclipse
+		},
+			new File[][]{SUtil.findOutputDirs("jadex-applications-micro", false)},// tests are already real tests in micro, exclude them here (ignored by eclipse, grrr)
+			null, EXCLUDES, true, true, true);
 	}
 	
 //	/**
