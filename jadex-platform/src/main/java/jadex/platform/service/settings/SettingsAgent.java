@@ -471,9 +471,8 @@ public class SettingsAgent	implements ISettingsService
 			
 			try
 			{
-				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 2);
+				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
 				procs.addAll(JsonTraverser.writeprocs);
-				procs.add(procs.size() - 1, new JsonComponentIdentifierProcessor());
 				procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
 				String json = JsonTraverser.objectToString(state,
 											 getClass().getClassLoader(),
@@ -516,9 +515,8 @@ public class SettingsAgent	implements ISettingsService
 		
 		try
 		{
-			ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 2);
+			ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 1);
 			rprocs.addAll(JsonTraverser.readprocs);
-			rprocs.add(rprocs.size() - 2, new JsonComponentIdentifierProcessor());
 			rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
 			String json = new String(SUtil.readFile(file), SUtil.UTF8);
 			Object state = JsonTraverser.objectFromString(json, getClass().getClassLoader(), null, null, rprocs);
