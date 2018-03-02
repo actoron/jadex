@@ -103,7 +103,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected AbstractAuthenticationSecret platformsecret;
 	
 	/** Remote platform authentication secrets. */
-	protected Map<IComponentIdentifier, AbstractAuthenticationSecret> remoteplatformsecrets;
+	protected Map<IComponentIdentifier, AbstractAuthenticationSecret> remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();;
 	
 	/** Flag whether to allow platforms to be associated with roles (clashes, spoofing problem?). */
 	protected boolean allowplatformroles = false;
@@ -112,16 +112,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
 	
 	/** Available crypt suites. */
-	protected Map<String, Class<?>> allowedcryptosuites;
+	protected Map<String, Class<?>> allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
 	
 	/** CryptoSuites currently initializing, value=Handshake state. */
-	protected Map<String, HandshakeState> initializingcryptosuites;
+	protected Map<String, HandshakeState> initializingcryptosuites = new HashMap<String, HandshakeState>();
 	
 	/** CryptoSuites currently in use. */
-	protected Map<String, ICryptoSuite> currentcryptosuites;
+	protected Map<String, ICryptoSuite> currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
 	
 	/** CryptoSuites that are expiring with expiration time. */
-	protected MultiCollection<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
+	protected MultiCollection<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites = new MultiCollection<String, Tuple2<ICryptoSuite,Long>>();
 //	protected Map<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites;
 	
 	/** Map of entities and associated roles. */
