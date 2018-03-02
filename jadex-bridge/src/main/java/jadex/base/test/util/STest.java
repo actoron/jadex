@@ -36,8 +36,8 @@ public class STest {
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
-		config.setNetworkName(testnetwork_name);
-		config.setNetworkSecret(testnetwork_pass);
+		config.setNetworkNames(new String[] { testnetwork_name });
+		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);
         config.getExtendedPlatformConfiguration().setTcpTransport(true);

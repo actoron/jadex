@@ -832,12 +832,6 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      */
     public void setNetworkNames(String[] value);
     
-    /**
-     *  Set the network name (used at startup).
-     *  @param value The network name.
-     */
-    public void setNetworkName(String value);
-    
 //    /**
 //     *  Add the network name (used at startup).
 //     *  @param value The network name.
@@ -854,17 +848,11 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Get the network secret (used at startup).
      *  @return The network secret.
      */
-    public String[] getNetworkSecret();
+    public String[] getNetworkSecrets();
 
     /**
      *  Set the network secret (used at startup).
      *  @param value The network secret.
      */
-    public void setNetworkSecret(String[] value);
-    
-    /**
-     *  Set the network pass (used at startup).
-     *  @param value The network pass.
-     */
-    public void setNetworkSecret(String value);
+    public void setNetworkSecrets(String[] value);
 }

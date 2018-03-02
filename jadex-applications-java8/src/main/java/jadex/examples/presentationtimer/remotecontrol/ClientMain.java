@@ -32,8 +32,8 @@ public class ClientMain  {
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
 
 		config.setPlatformName("presentationtimer-*");
-		config.setNetworkName("jadexnetwork");
-		config.setNetworkSecret("laxlax");
+		config.setNetworkNames(new String[] { "jadexnetwork" });
+		config.setNetworkSecrets(new String[] { "laxlax" });
 //		config.setDht(true);
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
