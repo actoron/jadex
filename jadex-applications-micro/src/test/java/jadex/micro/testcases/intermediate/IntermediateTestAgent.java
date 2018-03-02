@@ -2,9 +2,11 @@ package jadex.micro.testcases.intermediate;
 
 import java.util.Collection;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -21,7 +23,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -150,14 +151,19 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
-			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
-	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false",
-				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+//			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
+//	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+//			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+//	//			"-logging_level", "java.util.logging.Level.INFO",
+//				"-gui", "false", "-simulation", "false", "-printpass", "false",
+//				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
+//			})
+			
+			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+			config.getExtendedPlatformConfiguration().setSimulation(false);	// No simulaton, because we need to measure in real time
+			Starter.createPlatform(config)
+				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
