@@ -157,7 +157,7 @@ public class ComponentTest extends TestCase
 		Timer	t	= null;
 		final boolean[]	triggered	= new boolean[1];	
 		
-		if(timeout!=Timeout.NONE)
+		if(timeout!=Timeout.NONE && timeout>0)
 		{
 			t	= new Timer(true);
 			

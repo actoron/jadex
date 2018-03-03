@@ -64,7 +64,7 @@ public class SingleTest extends	ComponentTestSuite
 //		test = new SingleTest("jadex.platform.service.message.transport.ssltcpmtp");
 //		test = new SingleTest("jadex.micro.testcases.longcall.Initiator");
 //		test = new SingleTest("jadex.micro.testcases.remotestepinservicecall.Initiator");
-		test = new SingleTest("jadex.micro.testcases.visibility.VisibilityTest");
+//		test = new SingleTest("jadex.micro.testcases.visibility.VisibilityTest");
 		return test;
 	}
 
