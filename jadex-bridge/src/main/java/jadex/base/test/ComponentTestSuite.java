@@ -182,7 +182,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		final Thread	runner	= Thread.currentThread();
 
-		if(timeout!=Timeout.NONE)
+		if(timeout!=Timeout.NONE && timeout>0)
 		{
 			timer	= new Timer(true);
 			timer.schedule(new TimerTask()
