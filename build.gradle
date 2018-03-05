@@ -52,14 +52,6 @@ buildscript
     }
 }
 
-
-task testReport(type: TestReport) {
-    destinationDir = file("public")
-    // Include the results from the `test` task in all subprojects
-    //reportOn subprojects*.test
-	reportOn subprojects.collect { it.tasks.withType(Test) }
-}
-
 allprojects
 {
 	version = rootProject.version
@@ -234,6 +226,7 @@ subprojects
         	apply plugin: 'java'
 			test {
 				reports.html.enabled = false
+				println 'binResultsDir: '+binResultsDir
 			}
 		}
 
@@ -651,4 +644,11 @@ task copyJars(type: Copy) {
     from subprojects.collect { it.tasks.withType(AbstractArchiveTask) }
     exclude '**/*.jar', '**/*.aar'
     into "$buildDir/apps"
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("public")
+    // Include the results from the `test` task in all subprojects
+    //reportOn subprojects*.test
+	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
 }

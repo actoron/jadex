@@ -5,19 +5,19 @@ quicktest:
   variables:
     GIT_STRATEGY: fetch
   script:
-    - gradlew --no-daemon --parallel clean :jadex-applications-micro:test :jadex-integration-test:test test testReport -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x generatedebugJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x testDebugUnitTest -x processSchemas
+    - gradlew --no-daemon --parallel clean :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x generatedebugJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x testDebugUnitTest -x processSchemas
   tags:
     - win
-  artifacts:
+  cache:
     paths:
-    - "*/build/reports/tests/test"
-    expire_in: 4 week
-    when: always
+    - binaries/
+
     
 pages:
   stage: deploy
+  GIT_STRATEGY: none
   script:
-  - echo 'Nothing to do...'
+    - gradlew --no-daemon testReport
   tags:
     - win
   artifacts:
