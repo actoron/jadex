@@ -1,4 +1,5 @@
 quicktest:
+  only: master
   stage: test
   variables:
     GIT_STRATEGY: fetch
