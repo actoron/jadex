@@ -15,7 +15,8 @@ quicktest:
     
 pages:
   stage: deploy
-  GIT_STRATEGY: none
+  variables:
+    GIT_STRATEGY: none
   script:
     - gradlew --no-daemon testReport
   tags:
