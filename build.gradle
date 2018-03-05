@@ -52,6 +52,14 @@ buildscript
     }
 }
 
+
+task testReport(type: TestReport) {
+    destinationDir = file("public")
+    // Include the results from the `test` task in all subprojects
+    //reportOn subprojects*.test
+	reportOn subprojects.collect { it.tasks.withType(Test) }
+}
+
 allprojects
 {
 	version = rootProject.version
@@ -224,6 +232,9 @@ subprojects
 			apply plugin: 'war'
 		} else {
         	apply plugin: 'java'
+			test {
+				reports.html.enabled = false
+			}
 		}
 
         compileJava.options.encoding = 'UTF-8'
