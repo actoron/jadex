@@ -32,7 +32,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-@Ignore	// Todo: also finds remote service with publication scope platform
+//@Ignore	// Todo: also finds remote service with publication scope platform
 public class VisibilityTestAgent extends JunitAgentTest
 {
 	@Agent
