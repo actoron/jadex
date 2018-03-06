@@ -18,15 +18,15 @@ dependencies
 
 task mappings {
 	doLast {
-	conf2ScopeMappings.mappings.each {
-		Conf2ScopeMapping mapping = it.getValue()
-		println "${it.getKey()} -> $mapping.scope"
-		mapping.configuration.allDependencies.each {
-			println it
+		conf2ScopeMappings.mappings.each {
+			Conf2ScopeMapping mapping = it.getValue()
+			println "${it.getKey()} -> $mapping.scope"
+			mapping.configuration.allDependencies.each {
+				println it
+			}
 		}
 	}
 }
-
 
 //configurations {
 //	compile.extendsFrom compileNoAndroidRuntime
