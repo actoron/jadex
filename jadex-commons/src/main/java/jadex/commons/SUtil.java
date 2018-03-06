@@ -4355,7 +4355,7 @@ public class SUtil
 			try
 			{
 				internalMoveFile(source, target);
-				i = Integer.MAX_VALUE;
+				i = Integer.MAX_VALUE >> 1;
 				ex = null;
 			}
 			catch (IOException e)
