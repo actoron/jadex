@@ -5,7 +5,7 @@ quicktest:
   variables:
     GIT_STRATEGY: fetch
   script:
-    - gradlew --no-daemon :jadex-applications-micro:test
+    - gradlew --no-daemon --parallel --continue :jadex-applications-micro:test
   tags:
     - win
   cache:

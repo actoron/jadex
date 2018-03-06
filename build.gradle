@@ -226,7 +226,6 @@ subprojects
         	apply plugin: 'java'
 			test {
 				reports.html.enabled = false
-				println 'binResultsDir: '+binResultsDir
 			}
 		}
 
