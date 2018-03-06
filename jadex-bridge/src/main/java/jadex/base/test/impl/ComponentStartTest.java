@@ -56,7 +56,7 @@ public class ComponentStartTest extends	ComponentTest
 	{
 		super(cms, comp, suite);
 		// Hack??? 
-		delay = 400;	// Do not use scaled default timeout, because delay of Timeout.NONE makes no sense.
+		delay = 500;	// Do not use scaled default timeout, because delay of Timeout.NONE makes no sense.
 	}
 	
 	//-------- methods --------
