@@ -170,8 +170,6 @@ stage('preparation') {
                 println "building version: ${jadexVersion}"
                 currentBuild.displayName = "${jadexVersion}"
 
-                sh './gradlew gendeplist'
-
                 stash name: 'sources'
                 stash includes: '.git/**', name: 'git', useDefaultExcludes: false
                 // .git is excluded by default
