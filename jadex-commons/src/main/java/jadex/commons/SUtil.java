@@ -4348,14 +4348,14 @@ public class SUtil
 		// Antivirus programs in Windows sometimes read and therefore block files
 		// directly after writing, so we have to try a few times. 
 		if (isWindows())
-			maxtries = Math.min(100, Math.abs(16 + (int)(source.length() / (1 << 20)) << 3));
+			maxtries = 10;
 		
 		for (int i = 0; i < maxtries; ++i)
 		{
 			try
 			{
 				internalMoveFile(source, target);
-				i = Integer.MAX_VALUE >> 1;
+				i = maxtries;
 				ex = null;
 			}
 			catch (IOException e)
