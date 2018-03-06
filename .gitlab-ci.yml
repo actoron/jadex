@@ -5,7 +5,7 @@ quicktest:
   variables:
     GIT_STRATEGY: fetch
   script:
-    - gradlew --no-daemon --parallel --continue clean :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x generatedebugJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x testDebugUnitTest -x processSchemas
+    - gradlew --no-daemon --parallel --continue :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x generatedebugJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x testDebugUnitTest -x processSchemas
   tags:
     - win
   cache:
