@@ -237,11 +237,11 @@ def setBootClassPath(Project project) {
 
             def optionClosure = {
                 // provide same libs that are used in the default boot classpath
-                options.bootstrapClasspath = \
+                options.bootstrapClasspath = files(  \
                             ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
                             .collect {"$requestedHome"+File.separator+"jre"+File.separator+"lib"+File.separator+"$it"}\
                             .join(File.pathSeparator) +
-                        ":$requestedHome"+File.separator+"jre"+File.separator+"classes"
+                        ":$requestedHome"+File.separator+"jre"+File.separator+"classes")
 //                        options.fork = true
             }
             project.tasks.withType(JavaCompile, optionClosure)
