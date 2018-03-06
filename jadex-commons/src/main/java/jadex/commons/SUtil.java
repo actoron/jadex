@@ -4339,7 +4339,42 @@ public class SUtil
 	 *  @param source	The source file.
 	 *  @param target	The target file location (will be deleted first, if it exists).
 	 */
-	public static void	moveFile(File source, File target)	throws IOException
+	public static void moveFile(File source, File target) throws IOException
+	{
+		IOException ex = null;
+		
+		int maxtries = 1;
+		
+		// Some antivirus programs in Windows read and therefore block files
+		// directly after writing, so we have to try a few times.
+		if (isWindows())
+			maxtries = Math.min(100, Math.abs(16 + (int)(source.length() / (1 << 20)) << 3));
+		
+		for (int i = 0; i < maxtries; ++i)
+		{
+			try
+			{
+				internalMoveFile(source, target);
+				i = Integer.MAX_VALUE;
+				ex = null;
+			}
+			catch (IOException e)
+			{
+				ex = e;
+				sleep(10);
+			}
+		}
+		
+		if (ex != null)
+			throw ex;
+	}
+	
+	/**
+	 *  Moves a file to a target location.
+	 *  @param source	The source file.
+	 *  @param target	The target file location (will be deleted first, if it exists).
+	 */
+	protected static void internalMoveFile(File source, File target) throws IOException
 	{
 		Class<?> filesclazz = null;
 		try
@@ -5850,6 +5885,16 @@ public class SUtil
 		}  
 		long result = state0 + state1;  
 		return (int) result; 
+	}
+	
+	/**
+	 *  Tests if the OS is Windows.
+	 *  @return True, if Windows.
+	 */
+	public static final boolean isWindows()
+	{
+		String osname = System.getProperty("os.name");
+		return osname != null && osname.startsWith("Windows");
 	}
 	
 	/**

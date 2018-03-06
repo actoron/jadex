@@ -486,46 +486,17 @@ public class SettingsAgent	implements ISettingsService
 				os = new FileOutputStream(tmpfile);
 				os.write(json.getBytes(SUtil.UTF8));
 				SUtil.close(os);
+				SUtil.moveFile(tmpfile, file);
 			}
 			catch(Exception e)
 			{
-				System.out.println("Warning: Could not write state " + id + ": " + e);
+				System.out.println("Warning: Could not save state " + id + ": " + e);
 				e.printStackTrace();
-				return IFuture.DONE;
 			}
 			finally
 			{
 				if (os != null)
 					SUtil.close(os);
-			}
-			
-			try
-			{
-				SUtil.moveFile(tmpfile, file);
-			}
-			catch (Exception e)
-			{
-				// Stupid antivirus programs read and block files after writing sometimes!
-				Exception ex = null;
-				for (int i = 0; i < 5; ++i)
-				{
-					try
-					{
-						SUtil.sleep(400);
-						SUtil.moveFile(tmpfile, file);
-						ex = null;
-						i = Integer.MAX_VALUE;
-					}
-					catch(Exception e1)
-					{
-						ex = e1;
-					}
-				}
-				if (ex != null)
-				{
-					System.out.println("Warning: Could not save state " + id + ": " + ex);
-					ex.printStackTrace();
-				}
 			}
 		}
 		
