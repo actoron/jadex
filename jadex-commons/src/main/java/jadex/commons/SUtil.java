@@ -4345,8 +4345,8 @@ public class SUtil
 		
 		int maxtries = 1;
 		
-		// Some antivirus programs in Windows read and therefore block files
-		// directly after writing, so we have to try a few times.
+		// Antivirus programs in Windows sometimes read and therefore block files
+		// directly after writing, so we have to try a few times. 
 		if (isWindows())
 			maxtries = Math.min(100, Math.abs(16 + (int)(source.length() / (1 << 20)) << 3));
 		
