@@ -1,7 +1,8 @@
 apply from: "$rootDir/src/main/buildutils/util.gradle"
 
 /** Standard distributions */
-gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,addonmaven,addonmgmt,editorbpmn' // no editorgpmn until kernel not available
+//gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,addonmaven,addonmgmt,editorbpmn' // no editorgpmn until kernel not available
+gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,editorbpmn' // no editorgpmn until kernel not available
 
 /* Generated dependency config file. */
 def depconfigfile = 'src/main/buildutils/dependencies.conf'
