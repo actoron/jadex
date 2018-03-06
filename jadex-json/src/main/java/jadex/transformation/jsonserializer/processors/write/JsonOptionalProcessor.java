@@ -3,7 +3,6 @@ package jadex.transformation.jsonserializer.processors.write;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -23,23 +22,23 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	/**
 	 * Cached Class.
 	 */
-	private Class<?> optionalClass;
+	protected Class<?> optionalClass;
 	/**
 	 * Cached Method.
 	 */
-	private Method ofMethod;
+	protected Method ofMethod;
 	/**
 	 * Cached Method.
 	 */
-	private Method emptyMethod;
+	protected Method emptyMethod;
 	/**
 	 * Cached Method.
 	 */
-	private Method getMethod;
+	protected Method getMethod;
 	/**
 	 * Cached Method.
 	 */
-	private Method isPresentMethod;
+	protected Method isPresentMethod;
 
 	/**
 	 * Init caches if not initialized.
@@ -90,7 +89,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 		}
 
 		try {
-			Boolean isPresent = (Boolean) isPresentMethod.invoke(object, null);
+			Boolean isPresent = (Boolean) isPresentMethod.invoke(object);
 			if (!first)
 				wr.write(",");
 			wr.write("\"isPresent\":");
@@ -101,7 +100,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 				if (!first)
 					wr.write(",");
 				wr.write("\"subobject\":");
-				subobject = getMethod.invoke(object, null);
+				subobject = getMethod.invoke(object);
 				traverser.doTraverse(subobject, subobject.getClass(), conversionprocessors, processors, mode, targetcl, context);
 			}
 		} catch (Exception e) {
