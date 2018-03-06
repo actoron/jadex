@@ -200,6 +200,13 @@ subprojects
 			}
         }
 
+		android.variantFilter { variant ->
+			def build = variant.buildType.name
+			if(build.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
+				variant.setIgnore(true);
+			}
+		}
+
         // include all resources that are placed inside src dirs
 //        android.sourceSets.main.resources.srcDirs mainSrcDir
 //        android.sourceSets.test.resources.srcDirs testSrcDir
