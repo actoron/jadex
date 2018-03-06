@@ -490,6 +490,7 @@ public class SettingsAgent	implements ISettingsService
 			catch(Exception e)
 			{
 				System.out.println("Warning: Could not save state " + id + ": " + e);
+				e.printStackTrace();
 			}
 			finally
 			{
