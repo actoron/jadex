@@ -323,26 +323,6 @@ subprojects
     }
 }
 
-// Hack, helper to generate dep-tree
-task genDepList {
-	doLast {
-		def out = new PrintStream(project.projectDir.getCanonicalPath() + '/src/main/buildutils/dependencies.conf', 'UTF-8')
-		project.ext.subprojectmap.entrySet().each { entry ->
-			def sp = entry.getValue()
-			out. println ('### ' + entry.getKey())
-			def founddeps = new HashSet<String>()
-			sp.configurations.each { conf ->
-				conf.getAllDependencies().withType(ProjectDependency).each { dep ->
-					if (!founddeps.contains(dep.getName()))
-						out.println dep.getDependencyProject().getPath()
-					founddeps.add(dep.getName())
-				}
-			}
-		}
-		out.close()
-	}
-}
-
 task copyJavaDocSources(type: Copy) {
 	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocworkdir')
 	gradle.ext.maindistartifacts.each { artname ->

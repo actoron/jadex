@@ -241,11 +241,6 @@ def setBootClassPath(Project project) {
                             ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
                             .collect {"$requestedHome"+File.separator+"jre"+File.separator+"lib"+File.separator+"$it"}\
                             << "$requestedHome"+File.separator+"jre"+File.separator+"classes")
-                /*options.bootClasspath = \
-                            ["resources.jar", "rt.jar", "sunrsasign.jar", "jsse.jar", "jce.jar", "charsets.jar", "jfr.jar"]\
-                            .collect {"$requestedHome"+File.separator+"jre"+File.separator+"lib"+File.separator+"$it"}\
-                            .join(File.pathSeparator) +
-                        ":$requestedHome"+File.separator+"jre"+File.separator+"classes"*/
 //                        options.fork = true
             }
             project.tasks.withType(JavaCompile, optionClosure)

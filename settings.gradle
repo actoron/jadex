@@ -78,58 +78,6 @@ gradle.rootProject {
 	}
 }
 
-/* Add .csv-based distributions if available. */
-def buildconfigsfile = new File(settingsDir.getCanonicalPath() + File.separator + 'src/main/buildutils/buildconfigs.csv')
-if (buildconfigsfile.exists())
-{
-	def artifactselectionmarker = 'X'
-	
-	/* Read the buildconfigs.csv and generate data structures */
-	BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(buildconfigsfile)))
-	def disttargets = new ArrayList<String>()
-	def allbuildartifacts = new HashSet<String>()
-	
-	boolean firstline = true
-	br.eachLine { line ->
-		if (firstline)
-		{
-			line.split(',').each { tok ->
-				if (tok.trim().length() > 0)
-				{
-					disttargets.add(tok)
-					gradle.ext.distartmap.put(tok, new HashSet<String>())
-				}
-			}
-			firstline = false;
-		}
-		else
-		{
-			String[] toks = line.split(',');
-			// Only include artifacts available on disk (e.g. for building a downloaded minimal dist, etc.)
-			if(new File(settingsDir.getCanonicalPath() + File.separator + toks[0].replace((char)':', File.separatorChar)).exists())
-			{
-				if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || !toks[0].endsWith('-java8'))
-				{
-					if (androidSdkExists() || !toks[0].contains('android'))
-					{
-						allbuildartifacts.add(':' + toks[0])
-						for (int i = 1; i < toks.length; ++i)
-						{
-							if (artifactselectionmarker.equals(toks[i].trim().toUpperCase()))
-							{
-								Set<String> arts = gradle.ext.distartmap.get(disttargets.get(i - 1))
-								arts.add(':' + toks[0]);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	br.close()
-	disttargets = null
-}
-
 println 'Available Distributions: ' + (new ArrayList<String>(gradle.ext.distartmap.keySet())).sort().join(',')
 
 /* Determine selected distributions */
