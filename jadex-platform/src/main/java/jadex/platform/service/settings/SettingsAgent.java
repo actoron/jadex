@@ -511,7 +511,7 @@ public class SettingsAgent	implements ISettingsService
 				{
 					try
 					{
-						SUtil.sleep(500);
+						SUtil.sleep(400);
 						SUtil.moveFile(tmpfile, file);
 						ex = null;
 						i = Integer.MAX_VALUE;
