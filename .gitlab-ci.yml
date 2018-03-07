@@ -13,17 +13,17 @@ quicktest:
     - binaries/
 
     
-pages:
+testreport:
   stage: deploy
   variables:
     GIT_STRATEGY: none
   script:
-    - gradlew --no-daemon testReport
+    - gradlew testReport
   tags:
     - win
   artifacts:
     paths:
-    - public
+    - testreport
   only:
   - master
   when: always
