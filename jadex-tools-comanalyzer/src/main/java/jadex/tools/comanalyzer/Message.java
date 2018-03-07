@@ -12,7 +12,7 @@ import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 

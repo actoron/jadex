@@ -66,7 +66,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;

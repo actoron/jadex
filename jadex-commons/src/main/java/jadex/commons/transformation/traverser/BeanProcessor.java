@@ -8,7 +8,7 @@ import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**

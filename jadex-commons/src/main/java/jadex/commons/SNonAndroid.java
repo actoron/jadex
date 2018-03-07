@@ -21,13 +21,16 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
-import jadex.commons.future.Future;
+//import jadex.commons.future.Future;
 
 /**
  *  Helper class for methods used from non-android code.
@@ -322,7 +325,8 @@ public class SNonAndroid
 		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
 		// http://bugs.sun.com/view_bug.do?bug_id=4726458
 		
-		final Future<Void>	disposed	= new Future<Void>();
+//		final Future<Void>	disposed	= new Future<Void>();
+		final Semaphore sem = new Semaphore(0);
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -348,7 +352,8 @@ public class SNonAndroid
 									{
 //										System.out.println("cleanup dispose");
 										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-										disposed.setResult(null);
+										sem.release();
+//										disposed.setResult(null);
 									}
 								});
 								t.setRepeats(false);
@@ -367,7 +372,14 @@ public class SNonAndroid
 		
 //		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
 //		disposed.get(new ThreadSuspendable(), 30000);
-		disposed.get(30000);
+//		disposed.get(30000);
+		try
+		{
+			sem.tryAcquire(30000, TimeUnit.MILLISECONDS);
+		}
+		catch (InterruptedException e)
+		{
+		}
 		
 //		// Another bug not releasing the last drawn window.
 //		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676

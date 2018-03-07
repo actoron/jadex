@@ -43,6 +43,7 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
 
 import jadex.bridge.ClassInfo;
+import jadex.commons.ErrorException;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -51,7 +52,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.ErrorException;
 import jadex.commons.transformation.annotations.Classname;
 import junit.framework.TestCase;
 

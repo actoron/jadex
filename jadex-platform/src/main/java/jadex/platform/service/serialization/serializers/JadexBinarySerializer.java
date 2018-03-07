@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import jadex.binary.SBinarySerializer;
+import jadex.binary.SerializationConfig;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
-import jadex.commons.transformation.binaryserializer.SerializationConfig;
+import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**

@@ -7,7 +7,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.java5.MonitoredThread;
+import jadex.commons.concurrent.MonitoredThread;
 
 /**
  *  A continuous clock represents a real time clock that

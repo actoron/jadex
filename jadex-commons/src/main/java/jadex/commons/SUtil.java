@@ -80,10 +80,9 @@ import java.util.zip.ZipOutputStream;
 
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.ErrorException;
+import jadex.commons.ErrorException;
 import jadex.commons.random.FastThreadedRandom;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
+import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -5370,10 +5369,12 @@ public class SUtil
 	/** LRU for directory modification dates. */
 	protected static LRU<String, Long>	LASTMODS	= new LRU<String, Long>(1000);
 	
+	// Hash code cannot be done here since commons no longer has access to binaryserializer.
+	
 	/**
 	 *  Get the hash code for a file or directory.
 	 */
-	public static String	getHashCode(File f, boolean flat)
+	/*public static String	getHashCode(File f, boolean flat)
 	{
 //		long	start0	= System.nanoTime();
 		
@@ -5459,7 +5460,7 @@ public class SUtil
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Load the stored hashes.
@@ -5487,7 +5488,7 @@ public class SUtil
 	/**
 	 *  Save the caclulated hashes.
 	 */
-	protected static void	saveHashCache()
+	/*protected static void	saveHashCache()
 	{
 		File	cache	= new File(JADEXDIR, "hash.cache"); // TODO: will not work for android, needs writable dir!
 		try
@@ -5500,7 +5501,7 @@ public class SUtil
 		{
 			System.err.println("Warning: could not store hash cache: "+e);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Recursively get the newest last modified of a file or directory tree.

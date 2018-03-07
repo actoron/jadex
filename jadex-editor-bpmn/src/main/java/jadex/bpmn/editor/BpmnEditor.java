@@ -26,7 +26,7 @@ import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Class for starting the BPMN editor.
@@ -198,24 +198,14 @@ public class BpmnEditor
 	 */
 	public static final void initialize()
 	{
-		InputStream is = SUtil.getResource0("/jadex/bpmn/editor/task_infos.bin", BpmnEditor.class.getClassLoader());
+		InputStream is = SUtil.getResource0("/jadex/bpmn/editor/task_infos.json", BpmnEditor.class.getClassLoader());
 		if (is != null)
 		{
 			try
 			{
-				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-				int r;
-				do
-				{
-					r = is.read();
-					if (r != -1)
-					{
-						bytes.write(r);
-					}
-				}
-				while (r != -1);
+				byte[] bytes = SUtil.readStream(is);
 				
-				TASK_INFOS = (Map<String, TaskMetaInfo>) SBinarySerializer.readObjectFromByteArray(bytes.toByteArray(), null, null, BpmnEditor.class.getClassLoader(), null);
+				JsonTraverser.objectFromByteArray(bytes, BpmnEditor.class.getClassLoader(), "UTF-8");
 			}
 			catch (Exception e)
 			{

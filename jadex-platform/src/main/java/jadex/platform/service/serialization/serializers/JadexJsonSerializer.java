@@ -13,7 +13,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
