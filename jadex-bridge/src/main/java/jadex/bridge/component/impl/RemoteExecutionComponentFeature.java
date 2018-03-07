@@ -43,7 +43,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

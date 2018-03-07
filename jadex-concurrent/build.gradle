@@ -1,0 +1,7 @@
+description 'Future support for Jadex.'
+
+dependencies 
+{
+	compile project(':jadex-commons')
+	compile project(':jadex-binary')
+}

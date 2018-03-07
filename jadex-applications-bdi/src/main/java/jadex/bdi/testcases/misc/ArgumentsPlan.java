@@ -9,8 +9,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  Test if arguments can be accessed.

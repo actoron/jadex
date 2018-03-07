@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SUtil;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;

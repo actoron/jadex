@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.IInternalEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Handle internal events sent by initial event test.

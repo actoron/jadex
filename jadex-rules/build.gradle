@@ -6,6 +6,7 @@ description 'Jadex Rules is a small lightweight rule engine, which currently emp
 dependencies
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-concurrent')
 	compile project(':jadex-xml')
 	
 	compileNoAndroidRuntime 'org.antlr:antlr-runtime:3.1.3'

@@ -25,7 +25,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDefaultResultListener;

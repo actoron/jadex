@@ -11,7 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;

@@ -5,6 +5,7 @@ dependencies
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')
 	compile project(':jadex-model-bpmn')
+	compile project(':jadex-json')
 	compile project(':jadex-xml')
 	
 	//compile 'org.tinyjee.jgraphx:jgraphx:1.10.1.3'

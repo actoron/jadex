@@ -43,7 +43,6 @@ import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple3;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
 
 /**
  *  Class for providing images, either stored or generated, with a cache.
@@ -438,7 +437,7 @@ public class ImageProvider
 	 *	@param filepath Path to the file.
 	 * 	@throws IOException Exception on IO errors.
 	 */
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	public void loadCache(String filepath) throws IOException
 	{
 		File file = new File(filepath);
@@ -459,7 +458,7 @@ public class ImageProvider
 		{
 			file.delete();
 		}
-	}
+	}*/
 	
 	/**
 	 *  Saves the image cache to a file.
@@ -467,7 +466,7 @@ public class ImageProvider
 	 *	@param filepath Path to the file.
 	 * 	@throws IOException Exception on IO errors.
 	 */
-	public void saveCache(String filepath) throws IOException
+	/*public void saveCache(String filepath) throws IOException
 	{
 		Map<Object, Image> cache = imagecache;
 		Object[] keys = cache.keySet().toArray(new Object[cache.size()]);
@@ -492,7 +491,7 @@ public class ImageProvider
 		os.write(data);
 		os.close();
 		SUtil.moveFile(tmpfile, new File(filepath));
-	}
+	}*/
 	
 	/**
 	 *  Composites an image icon out of multiple images.

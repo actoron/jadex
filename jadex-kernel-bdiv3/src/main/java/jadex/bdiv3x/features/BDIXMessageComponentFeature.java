@@ -29,7 +29,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakList;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.javaparser.IParsedExpression;

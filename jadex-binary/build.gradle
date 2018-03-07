@@ -1,0 +1,6 @@
+description 'Binary serialization support for Jadex.'
+
+dependencies 
+{
+	compile project(':jadex-commons')
+}

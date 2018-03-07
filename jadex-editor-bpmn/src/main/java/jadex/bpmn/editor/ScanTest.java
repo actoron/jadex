@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.jar.JarEntry;
 
 import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.gui.SDirScan;
 
 /**
  *  Test to find perm gen space error.
@@ -48,7 +48,7 @@ public class ScanTest
 
 //		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		
-		SReflect.asyncScanForClasses(ScanTest.class.getClassLoader(), filefilter, classfilter, -1, true)
+		SDirScan.asyncScanForClasses(ScanTest.class.getClassLoader(), filefilter, classfilter, -1, true)
 			.addResultListener(new IIntermediateResultListener<Class<?>>()
 		{
 			public void exceptionOccurred(Exception exception)

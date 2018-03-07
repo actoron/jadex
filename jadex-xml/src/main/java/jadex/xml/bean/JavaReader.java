@@ -31,7 +31,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IStringObjectConverter;
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;

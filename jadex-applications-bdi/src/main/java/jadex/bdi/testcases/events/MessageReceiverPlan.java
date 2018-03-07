@@ -5,7 +5,7 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Receives messages sent by initial event test.

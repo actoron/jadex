@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 
 /**

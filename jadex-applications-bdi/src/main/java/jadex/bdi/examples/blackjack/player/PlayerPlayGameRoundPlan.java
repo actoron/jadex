@@ -14,7 +14,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 import jadex.commons.gui.GuiCreator;
 
 /**
