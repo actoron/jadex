@@ -1,4 +1,4 @@
-package jadex.commons.concurrent;
+package jadex.commons;
 
 /**
  *  Jadex timeout exception.

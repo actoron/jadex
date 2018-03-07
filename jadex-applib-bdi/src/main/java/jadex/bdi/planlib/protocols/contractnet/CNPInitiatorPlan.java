@@ -16,7 +16,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Handles the initiator side of a contract-net protocol.

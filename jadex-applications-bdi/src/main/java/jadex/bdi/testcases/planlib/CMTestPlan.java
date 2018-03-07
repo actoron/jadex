@@ -10,7 +10,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Test different cases of protocol cancellation.

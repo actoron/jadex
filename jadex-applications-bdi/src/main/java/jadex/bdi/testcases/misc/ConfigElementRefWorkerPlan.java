@@ -9,7 +9,7 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Check if the initial and end elements are correctly named.

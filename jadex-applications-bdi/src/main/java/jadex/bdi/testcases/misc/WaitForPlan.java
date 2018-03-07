@@ -9,7 +9,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Test various waitFor methods first from plan, then from external access.

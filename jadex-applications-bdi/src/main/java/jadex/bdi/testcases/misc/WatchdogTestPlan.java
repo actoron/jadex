@@ -10,7 +10,7 @@ import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Test the watchdog capability.

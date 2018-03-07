@@ -15,6 +15,7 @@ import jadex.commons.ErrorException;
 import jadex.commons.IChangeListener;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.SReflect;
+import jadex.commons.TimeoutException;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.future.Future;
