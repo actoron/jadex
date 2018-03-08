@@ -1,0 +1,6 @@
+description 'The traverser allows for realizing object transformations like cloning.'
+
+dependencies 
+{
+	compile project(':jadex-commons')
+}

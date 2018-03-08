@@ -6,6 +6,7 @@ description 'Jadex XML is an XML data binding framework for Java and also for ot
 dependencies 
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-traverser')
 //	testCompile project(':jadex-commons').sourceSets.test.output
 	testCompile files(project(':jadex-commons').sourceSets.test.output)
 	testRuntime files(project(':jadex-commons').sourceSets.test.runtimeClasspath)

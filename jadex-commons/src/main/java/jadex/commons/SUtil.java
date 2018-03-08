@@ -74,17 +74,12 @@ import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.ErrorException;
 import jadex.commons.random.FastThreadedRandom;
-import jadex.commons.transformation.BeanIntrospectorFactory;
-import jadex.commons.transformation.traverser.BeanProperty;
-import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 
 /**
@@ -4846,41 +4841,7 @@ public class SUtil
 		 return Pattern.compile("^\\Q" 
 			+glob.replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q")+"\\E$");
 	}
-	
-	/**
-	 *  Converts a bean to a string.
-	 *  
-	 *  @param bean The bean.
-	 *  @param cl The classloader.
-	 */
-	public static String beanToString(Object bean, ClassLoader cl)
-	{
-		if(cl == null)
-			cl = SUtil.class.getClassLoader();
-		StringBuilder beanstr = new StringBuilder("[");
-		IBeanIntrospector is = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
-		Map<String, BeanProperty> props = is.getBeanProperties(bean.getClass(), true, false);
-		boolean notfirst = false;
-		for(Map.Entry<String, BeanProperty> entry : props.entrySet())
-		{
-			if (notfirst)
-			{
-				beanstr.append(",");
-			}
-			else
-			{
-				notfirst = true;
-			}
-			String name = entry.getKey();
-			Object val = entry.getValue().getPropertyValue(bean);
-			beanstr.append(name);
-			beanstr.append("=");
-			beanstr.append(String.valueOf(val));
-		}
-		beanstr.append("]");
-		return beanstr.toString();
-	}
-	
+		
 	/**
 	 *  Read a file to string.
 	 *  @param filename The file name.

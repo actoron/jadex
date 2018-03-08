@@ -5,6 +5,7 @@ description 'JSON support for Jadex.'
 dependencies 
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-traverser')
 //	testCompile project(':jadex-commons').sourceSets.test.output
 	testCompile files(project(':jadex-commons').sourceSets.test.runtimeClasspath)
 

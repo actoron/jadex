@@ -1,8 +1,11 @@
 package jadex.commons.transformation;
 
 import java.lang.reflect.Constructor;
+import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -88,5 +91,39 @@ public class BeanIntrospectorFactory
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Converts a bean to a string.
+	 *  
+	 *  @param bean The bean.
+	 *  @param cl The classloader.
+	 */
+	public static String beanToString(Object bean, ClassLoader cl)
+	{
+		if(cl == null)
+			cl = SUtil.class.getClassLoader();
+		StringBuilder beanstr = new StringBuilder("[");
+		IBeanIntrospector is = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
+		Map<String, BeanProperty> props = is.getBeanProperties(bean.getClass(), true, false);
+		boolean notfirst = false;
+		for(Map.Entry<String, BeanProperty> entry : props.entrySet())
+		{
+			if(notfirst)
+			{
+				beanstr.append(",");
+			}
+			else
+			{
+				notfirst = true;
+			}
+			String name = entry.getKey();
+			Object val = entry.getValue().getPropertyValue(bean);
+			beanstr.append(name);
+			beanstr.append("=");
+			beanstr.append(String.valueOf(val));
+		}
+		beanstr.append("]");
+		return beanstr.toString();
 	}
 }

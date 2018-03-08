@@ -1,12 +1,11 @@
 package jadex.commons;
 
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
 import jadex.bridge.ClassInfo;
-import jadex.commons.transformation.annotations.Exclude;
+//import jadex.commons.transformation.annotations.Exclude;
 
 /**
  *  All info for identifying a method.
@@ -117,31 +116,31 @@ public class MethodInfo
 		this.name = name;
 	}
 	
-	/**
-	 *  This method only exists for backward compatibility
-	 *  and decoding purposes only, do not use.
-	 */
-	@Deprecated
-	@Exclude
-	public Class<?>[] getParameterTypes()
-	{
-		// hack
-//		return parametertypes2;
-//		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
-//		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
-		Class<?>[] ret = new Class<?>[parametertypes.length];
-		for (int i = 0; i < parametertypes.length; ++i)
-		{
-			try
-			{
-				ret[i] = parametertypes[i].getType(Thread.currentThread().getContextClassLoader());
-			}
-			catch(Exception e)
-			{
-			}
-		}
-		return ret;
-	}
+//	/**
+//	 *  This method only exists for backward compatibility
+//	 *  and decoding purposes only, do not use.
+//	 */
+//	@Deprecated
+//	@Exclude
+//	public Class<?>[] getParameterTypes()
+//	{
+//		// hack
+////		return parametertypes2;
+////		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
+////		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
+//		Class<?>[] ret = new Class<?>[parametertypes.length];
+//		for (int i = 0; i < parametertypes.length; ++i)
+//		{
+//			try
+//			{
+//				ret[i] = parametertypes[i].getType(Thread.currentThread().getContextClassLoader());
+//			}
+//			catch(Exception e)
+//			{
+//			}
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the parametertypes as classes.
