@@ -406,7 +406,7 @@ public class SettingsAgent	implements ISettingsService
 		{
 			FileOutputStream os = null;
 			
-			File file = new File(settingsdir, filename);
+			File file = (new File(settingsdir, filename)).getAbsoluteFile();
 			
 			try
 			{
@@ -467,7 +467,7 @@ public class SettingsAgent	implements ISettingsService
 		{
 			FileOutputStream os = null;
 			
-			File file = new File(settingsdir, id + ".json");
+			File file = (new File(settingsdir, id + ".json")).getAbsoluteFile();
 			File tmpfile = null;
 			
 			try
