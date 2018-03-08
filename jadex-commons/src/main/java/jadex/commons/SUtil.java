@@ -4442,34 +4442,19 @@ public class SUtil
 	 */
 	public static byte[] readFile(File file) throws IOException
 	{
-		FileInputStream fis = new FileInputStream(file);
-		FileChannel channel = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] ret = null;
+		FileInputStream fis = null;
 		try
 		{
-			channel = fis.getChannel();
-			MappedByteBuffer mbb = channel.map(FileChannel.MapMode.READ_ONLY, 0L, channel.size());
-			byte[] buf = new byte[4096];
-			while(mbb.hasRemaining())
-			{
-				int readbytes = Math.min(mbb.remaining(), 4096);
-			    mbb.get(buf, 0, readbytes);
-			    baos.write(buf, 0, readbytes);
-			}
+			fis = new FileInputStream(file);
+			ret = readStream(fis);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			if (channel != null)
-				close(channel);
 			close(fis);
 			throwUnchecked(e);
 		}
-		
-		if (channel != null)
-			close(channel);
 		close(fis);
-		
-		byte[] ret = baos.toByteArray();
 		
 		return ret;
 	}
