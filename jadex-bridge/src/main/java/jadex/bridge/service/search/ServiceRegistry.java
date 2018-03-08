@@ -819,8 +819,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 					// If superpeer is available ask it
 					searchServicesAsyncByOnePlatform(query, cid).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
-				else
-				{
+				// Only search by ask all if the owner is local to prevent loops.
+				else if (ServiceRegistry.this.cid.getPlatformName().equals(query.getOwner().getPlatformName()))
+				{ 
 					searchServicesAsyncByAskAll(query).addResultListener(new IntermediateDelegationResultListener<T>(ret));
 				}
 			}
@@ -1697,7 +1698,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			ret = true;
 		}
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
-		{
+		{if (ser.toString().startsWith("MessageService")) {
+			System.out.println("PROV SCOPE IS PLATFORM + " + ser.getServiceIdentifier() + " , CID IS " + cid); 
+			}
 			// Test if searcher and service are on same platform
 			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
 		}
@@ -2602,14 +2605,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public <T> ServiceQuery<T> adaptQuery(ServiceQuery<T> query, IComponentIdentifier targetpl)
 	{
-		IComponentIdentifier target = targetpl!=null? targetpl: query.getTargetPlatform();
+		/*IComponentIdentifier target = targetpl!=null? targetpl: query.getTargetPlatform();
 
 		ServiceQuery<T> ret = new ServiceQuery<T>(query);
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(ret.getScope()))
 			ret.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 		if(ret.getOwner()!=null && !target.equals(ret.getOwner().getRoot()))
 			ret.setOwner(target);
-		return ret;
+		return ret;*/
+		return query;
 	}
 
 	/**
