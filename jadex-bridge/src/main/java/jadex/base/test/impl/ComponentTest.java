@@ -25,7 +25,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -157,7 +157,7 @@ public class ComponentTest extends TestCase
 		Timer	t	= null;
 		final boolean[]	triggered	= new boolean[1];	
 		
-		if(timeout!=Timeout.NONE)
+		if(timeout!=Timeout.NONE && timeout>0)
 		{
 			t	= new Timer(true);
 			

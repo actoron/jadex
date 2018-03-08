@@ -200,6 +200,13 @@ subprojects
 			}
         }
 
+		android.variantFilter { variant ->
+			def build = variant.buildType.name
+			if(build.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
+				variant.setIgnore(true);
+			}
+		}
+
         // include all resources that are placed inside src dirs
 //        android.sourceSets.main.resources.srcDirs mainSrcDir
 //        android.sourceSets.test.resources.srcDirs testSrcDir
@@ -224,6 +231,9 @@ subprojects
 			apply plugin: 'war'
 		} else {
         	apply plugin: 'java'
+			test {
+				reports.html.enabled = false
+			}
 		}
 
         compileJava.options.encoding = 'UTF-8'
@@ -318,26 +328,6 @@ subprojects
 	        }
 	    }
     }
-}
-
-// Hack, helper to generate dep-tree
-task genDepList {
-	doLast {
-		def out = new PrintStream(project.projectDir.getCanonicalPath() + '/src/main/buildutils/dependencies.conf', 'UTF-8')
-		project.ext.subprojectmap.entrySet().each { entry ->
-			def sp = entry.getValue()
-			out. println ('### ' + entry.getKey())
-			def founddeps = new HashSet<String>()
-			sp.configurations.each { conf ->
-				conf.getAllDependencies().withType(ProjectDependency).each { dep ->
-					if (!founddeps.contains(dep.getName()))
-						out.println dep.getDependencyProject().getPath()
-					founddeps.add(dep.getName())
-				}
-			}
-		}
-		out.close()
-	}
 }
 
 task copyJavaDocSources(type: Copy) {
@@ -640,4 +630,11 @@ task copyJars(type: Copy) {
     from subprojects.collect { it.tasks.withType(AbstractArchiveTask) }
     exclude '**/*.jar', '**/*.aar'
     into "$buildDir/apps"
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("testreport")
+    // Include the results from the `test` task in all subprojects
+    //reportOn subprojects*.test
+	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
 }

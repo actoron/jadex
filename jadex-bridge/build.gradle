@@ -3,6 +3,7 @@ description 'Jadex bridge is a base package for kernels and platforms, i.e. it i
 dependencies
 {
 	compile project(':jadex-commons')
+	compile project(':jadex-concurrent')
 	compile project(':jadex-javaparser')
 	compile project(':jadex-bytecode-tools')
 	compile project(':jadex-rules-eca') // Remove this stuff, don't know how :-(

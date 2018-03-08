@@ -9,8 +9,8 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  This plan implements the receiver of the "FIPA Dutch Auction Interaction

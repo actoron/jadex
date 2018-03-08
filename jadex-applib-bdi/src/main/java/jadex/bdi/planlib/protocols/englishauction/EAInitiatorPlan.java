@@ -11,8 +11,8 @@ import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.TimeoutException;
 
 /**
  *  This plan implements the initiator of the "FIPA English Auction Interaction

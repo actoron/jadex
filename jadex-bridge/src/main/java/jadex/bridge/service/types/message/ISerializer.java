@@ -3,7 +3,7 @@ package jadex.bridge.service.types.message;
 import java.io.IOException;
 import java.io.InputStream;
 
-import jadex.commons.transformation.binaryserializer.IErrorReporter;
+import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**

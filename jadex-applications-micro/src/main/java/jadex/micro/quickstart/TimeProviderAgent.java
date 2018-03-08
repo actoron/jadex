@@ -167,7 +167,7 @@ public class TimeProviderAgent	implements ITimeService
 	 */
 	public static void	main(String[] args)
 	{
-		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalRelayAwareness();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getDefaultNoGui();
 		config.addComponent(TimeProviderAgent.class.getName()+".class");
 		Starter.createPlatform(config).get();
 	}

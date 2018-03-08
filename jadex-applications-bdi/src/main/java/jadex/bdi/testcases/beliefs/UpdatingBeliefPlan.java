@@ -2,7 +2,7 @@ package jadex.bdi.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Test if auto updating beliefs work.

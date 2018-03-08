@@ -80,10 +80,9 @@ import java.util.zip.ZipOutputStream;
 
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.ErrorException;
+import jadex.commons.ErrorException;
 import jadex.commons.random.FastThreadedRandom;
-import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
-import jadex.commons.transformation.binaryserializer.SBinarySerializer;
+import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
@@ -4339,7 +4338,42 @@ public class SUtil
 	 *  @param source	The source file.
 	 *  @param target	The target file location (will be deleted first, if it exists).
 	 */
-	public static void	moveFile(File source, File target)	throws IOException
+	public static void moveFile(File source, File target) throws IOException
+	{
+		IOException ex = null;
+		
+		int maxtries = 1;
+		
+		// Antivirus programs in Windows sometimes read and therefore block files
+		// directly after writing, so we have to try a few times. 
+		if (isWindows())
+			maxtries = 10;
+		
+		for (int i = 0; i < maxtries; ++i)
+		{
+			try
+			{
+				internalMoveFile(source, target);
+				i = maxtries;
+				ex = null;
+			}
+			catch (IOException e)
+			{
+				ex = e;
+				sleep(10);
+			}
+		}
+		
+		if (ex != null)
+			throw ex;
+	}
+	
+	/**
+	 *  Moves a file to a target location.
+	 *  @param source	The source file.
+	 *  @param target	The target file location (will be deleted first, if it exists).
+	 */
+	protected static void internalMoveFile(File source, File target) throws IOException
 	{
 		Class<?> filesclazz = null;
 		try
@@ -5335,10 +5369,12 @@ public class SUtil
 	/** LRU for directory modification dates. */
 	protected static LRU<String, Long>	LASTMODS	= new LRU<String, Long>(1000);
 	
+	// Hash code cannot be done here since commons no longer has access to binaryserializer.
+	
 	/**
 	 *  Get the hash code for a file or directory.
 	 */
-	public static String	getHashCode(File f, boolean flat)
+	/*public static String	getHashCode(File f, boolean flat)
 	{
 //		long	start0	= System.nanoTime();
 		
@@ -5424,7 +5460,7 @@ public class SUtil
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Load the stored hashes.
@@ -5452,7 +5488,7 @@ public class SUtil
 	/**
 	 *  Save the caclulated hashes.
 	 */
-	protected static void	saveHashCache()
+	/*protected static void	saveHashCache()
 	{
 		File	cache	= new File(JADEXDIR, "hash.cache"); // TODO: will not work for android, needs writable dir!
 		try
@@ -5465,7 +5501,7 @@ public class SUtil
 		{
 			System.err.println("Warning: could not store hash cache: "+e);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Recursively get the newest last modified of a file or directory tree.
@@ -5850,6 +5886,16 @@ public class SUtil
 		}  
 		long result = state0 + state1;  
 		return (int) result; 
+	}
+	
+	/**
+	 *  Tests if the OS is Windows.
+	 *  @return True, if Windows.
+	 */
+	public static final boolean isWindows()
+	{
+		String osname = System.getProperty("os.name");
+		return osname != null && osname.startsWith("Windows");
 	}
 	
 	/**

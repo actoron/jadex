@@ -66,7 +66,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 @Arguments(value={
 	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
 	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="allowunauth", clazz=Boolean.class, defaultvalue="null"),
+	@Argument(name="refuseunauth", clazz=Boolean.class, defaultvalue="null"),
 	@Argument(name="platformsecret", clazz=String[].class, defaultvalue="null"),
 	@Argument(name="networknames", clazz=String[].class, defaultvalue="null"),
 	@Argument(name="networksecrets", clazz=String[].class, defaultvalue="null"),
@@ -96,8 +96,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Flag whether the platform secret should be printed during start. */
 	protected boolean printsecret = true;
 	
-	/** Flag whether to allow unauthenticated connections. */
-	protected boolean allowunauth = true;
+	/** Flag whether to refuse unauthenticated connections. */
+	protected boolean refuseunauth = false;
 	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
@@ -358,10 +358,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				boolean savesettings = false;
 				Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 				for (Object val : args.values())
-					savesettings = val != null;
+					savesettings |= val != null;
 				
 				usesecret = getProperty("usesecret", args, settings, usesecret);
 				printsecret = getProperty("printsecret", args, settings, usesecret);
+				refuseunauth = getProperty("refuseunauth", args, settings, refuseunauth);
 				
 				if (args.get("platformsecret") != null)
 					platformsecret = AbstractAuthenticationSecret.fromString((String) args.get("platformsecret"), false);
@@ -1026,9 +1027,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @return True, if used.
 	 */
-	public boolean getInternalAllowUnauth()
+	public boolean getInternalRefuseUnauth()
 	{
-		return allowunauth;
+		return refuseunauth;
 	}
 	
 	/**
@@ -1278,6 +1279,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		settings.put("usesecret", usesecret);
 		settings.put("printsecret", printsecret);
+		settings.put("refuseunauth", refuseunauth);
 		
 		if (platformsecret != null)
 			settings.put("platformsecret", platformsecret);

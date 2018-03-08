@@ -17,6 +17,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.gui.SDirScan;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
@@ -255,7 +256,7 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 					}
 				};
 				
-				fut[0] = SReflect.asyncScanForClasses(getCombo().getClassLoader(), filefilter, classfilter, max, false);
+				fut[0] = SDirScan.asyncScanForClasses(getCombo().getClassLoader(), filefilter, classfilter, max, false);
 				
 				fut[0].addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
 				{

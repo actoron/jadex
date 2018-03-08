@@ -38,7 +38,7 @@ public class SUtilTest //extends TestCase
 	}
 	
 	@Test
-	public void	testFileZippingAndHashing() throws Exception
+	public void	testFileZipping() throws Exception
 	{
 		// for maven?:
 		File	src	= new File("../jadex-commons/src/main/java");
@@ -57,7 +57,8 @@ public class SUtilTest //extends TestCase
 		SUtil.writeDirectory(src, new BufferedOutputStream(fos));
 		fos.close();
 		
-		Assert.assertEquals(SUtil.getHashCode(src, false), SUtil.getHashCode(dest, false));
+		// Hashcode needs to be moved, binary serialization not accessible in commons.
+		//Assert.assertEquals(SUtil.getHashCode(src, false), SUtil.getHashCode(dest, false));
 		
 		SUtil.deleteDirectory(dest.getParentFile());
 	}

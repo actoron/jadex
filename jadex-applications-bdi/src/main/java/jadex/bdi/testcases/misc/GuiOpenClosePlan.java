@@ -14,7 +14,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 

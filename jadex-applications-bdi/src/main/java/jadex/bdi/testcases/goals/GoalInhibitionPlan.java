@@ -4,7 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.commons.concurrent.TimeoutException;
+import jadex.commons.TimeoutException;
 
 /**
  *  Check test cases of goal inhibition agent.

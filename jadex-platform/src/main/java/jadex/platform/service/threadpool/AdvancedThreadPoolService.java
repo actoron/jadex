@@ -13,12 +13,11 @@ import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.java5.JavaThreadPool;
-import jadex.commons.concurrent.java5.MonitoredThreadPoolExecutor;
+import jadex.commons.concurrent.JavaThreadPool;
+import jadex.commons.concurrent.MonitoredThreadPoolExecutor;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ThreadSuspendable;
 
 
 /**

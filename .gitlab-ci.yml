@@ -1,13 +1,29 @@
 quicktest:
+  only:
+    - master
   stage: test
   variables:
     GIT_STRATEGY: fetch
   script:
-    - gradlew --no-daemon --parallel clean :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x generatedebugJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x testDebugUnitTest -x processSchemas
+    - gradlew --parallel --continue :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x lintVitalRelease -x transformClassesWithDexForRelease -x processSchemas
+  tags:
+    - win
+  cache:
+    paths:
+    - binaries/
+
+    
+testreport:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - gradlew testReport
   tags:
     - win
   artifacts:
     paths:
-    - "*/build/reports/tests/test"
-    expire_in: 4 week
-    when: always
+    - testreport
+  only:
+  - master
+  when: always

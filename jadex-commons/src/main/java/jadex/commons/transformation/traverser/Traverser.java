@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.binaryserializer.OptionalCodec;
 
 /**
  *  The traverser allows to traverse an object graph deeply.

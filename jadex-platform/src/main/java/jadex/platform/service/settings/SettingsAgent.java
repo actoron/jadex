@@ -468,9 +468,11 @@ public class SettingsAgent	implements ISettingsService
 			FileOutputStream os = null;
 			
 			File file = new File(settingsdir, id + ".json");
+			File tmpfile = null;
 			
 			try
 			{
+				tmpfile = File.createTempFile(file.getName(), ".tmp");
 				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
 				procs.addAll(JsonTraverser.writeprocs);
 				procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
@@ -481,7 +483,6 @@ public class SettingsAgent	implements ISettingsService
 											 procs);
 				json = JsonTraverser.prettifyJson(json);
 				
-				File tmpfile = File.createTempFile(file.getName(), "");
 				os = new FileOutputStream(tmpfile);
 				os.write(json.getBytes(SUtil.UTF8));
 				SUtil.close(os);
@@ -490,6 +491,7 @@ public class SettingsAgent	implements ISettingsService
 			catch(Exception e)
 			{
 				System.out.println("Warning: Could not save state " + id + ": " + e);
+				e.printStackTrace();
 			}
 			finally
 			{

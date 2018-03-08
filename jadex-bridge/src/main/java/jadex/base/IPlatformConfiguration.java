@@ -830,7 +830,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the network name (used at startup).
      *  @param value The network name.
      */
-    public void setNetworkNames(String[] value);
+    public void setNetworkNames(String... value);
     
 //    /**
 //     *  Add the network name (used at startup).
@@ -844,6 +844,54 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 //     */
 //    public void setNetworkNames(String[] values);
 
+    // ---- Security Settings ----
+    
+    /**
+     *  Returns if the security service should use a platform secret for authentication.
+     *  If false only networks are considered for authentication.
+     *  
+     *  @return True if the security service should use a platform secret.
+     */
+    public boolean isUseSecret();
+    
+    /**
+     *  Sets if the security service should use a platform secret for authentication.
+     *  If false only networks are considered for authentication.
+     *  
+     *  @param usesecret Set true (default) if the security service should use a platform secret.
+     */
+    public void setUseSecret(boolean usesecret);
+    
+    /**
+     *  Returns if the security service should print the platform secret during start.
+     *  
+     *  @return True if the security service should print the platform secret during start.
+     */
+    public boolean isPrintSecret();
+    
+    /**
+     *  Returns if the security service should print the platform secret during start.
+     *  
+     *  @param Set true (default) if the security service should print the platform secret during start.
+     */
+    public void setPrintSecret(boolean printsecret);
+    
+    /**
+     *  Returns if the security service allows unauthenticated connections.
+     *  
+     *  @return True, if unauthenticated connections are refused.
+     */
+    public boolean isRefuseUnauth();
+    
+    /**
+     *  Configure the security service to whether to allow unauthenticated connections.
+     *  This must be set to false if Security.UNRESTRICTED services are used or offered.
+     *  Default is false.
+     *  
+     *  @param refuseunauth Flag if unauthenticated platforms are refused.
+     */
+    public void setRefuseUnauth(boolean refuseunauth);
+    
     /**
      *  Get the network secret (used at startup).
      *  @return The network secret.
@@ -854,5 +902,5 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  Set the network secret (used at startup).
      *  @param value The network secret.
      */
-    public void setNetworkSecrets(String[] value);
+    public void setNetworkSecrets(String... value);
 }

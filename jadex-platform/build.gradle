@@ -5,6 +5,7 @@ dependencies
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')
 	compile project(':jadex-commons:jadex-commons-security')
+	compile project(':jadex-binary')
 	compile project(':jadex-json')
 	compile project(':jadex-xml')
 	compile project(':jadex-bridge')
