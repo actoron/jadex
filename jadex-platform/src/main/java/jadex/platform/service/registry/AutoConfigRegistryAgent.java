@@ -1,8 +1,11 @@
 package jadex.platform.service.registry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
@@ -58,25 +61,34 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	@AgentArgument
 	protected long checkdelay = 3000;
 	
+	/** Minimum number of sps .*/
+	@AgentArgument
+	protected int min_sps = 2;
+	
+	/** Maximum number of sps .*/
+	@AgentArgument
+	protected int max_sps = 5;
+	
+	/** Repeat search until action.*/
+	@AgentArgument
+	protected int rep = 3;
+	
 	/**
 	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
 	{
-		searchForSuperpeers(0);
+		searchForSuperpeers(new ArrayList<Integer>(), new ArrayList<Integer>());
 	}
 	
 	/**
 	 * 
 	 */
-	protected void searchForSuperpeers(final int fnotfound)
+	protected void searchForSuperpeers(final List<Integer> foundless, final List<Integer> foundmore)
 	{
 		ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
 			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
-		
-		final int[] notfound = new int[1];
-		notfound[0] = fnotfound;
 		
 		search.addIntermediateResultListener(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
@@ -105,39 +117,79 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			
 			protected void proceed()
 			{
-				System.out.println("found: "+found);
-				System.out.println("notfound: "+fnotfound);
+				System.out.println("found: "+found+" "+foundless+" "+foundmore);
 				
-				if(found>0)
+				if(found<min_sps)
 				{
-					// found at least one SP -> wait before checking again
-					searchAfterDelay(0);
-				}
-				else
-				{
-					notfound[0]++;
+					foundmore.clear();
+					foundless.add(found);
 					
-					// search for all clients and ask them for 'power' value
-					if(notfound[0]>=3)
+					if(foundless.size()>rep)
 					{
-						notfound[0] = 0;
-						determineNewSuperpeer().addResultListener(new IResultListener<Void>()
+						determineSuperpeers().addResultListener(new IResultListener<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>()
 						{
-							public void resultAvailable(Void result)
+							public void resultAvailable(Set<Tuple2<IPeerRegistrySynchronizationService, Double>> peers)
 							{
-								searchAfterDelay(0);
+								// make the winner to a SP
+								Tuple2<IPeerRegistrySynchronizationService, Double> winner = peers.iterator().next();
+								System.out.println("new superpeer: "+winner);
+								makeSuperpeer(winner.getFirstEntity()==null? agent.getComponentIdentifier(): 
+									((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
+									.addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+										searchAfterDelay(foundless, foundmore);
+									}
+
+									public void exceptionOccurred(Exception exception)
+									{
+										searchAfterDelay(foundless, foundmore);
+									}
+								});
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								searchAfterDelay(notfound[0]);
+								searchAfterDelay(foundless, foundmore);
 							}
 						});
 					}
-					else
+				}
+				else if(found>max_sps)
+				{
+					foundless.clear();
+					foundmore.add(found);
+					
+					if(foundmore.size()>rep)
 					{
-						searchAfterDelay(notfound[0]);
+//						determineSuperpeers().addResultListener(new IResultListener<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>()
+//						{
+//							public void resultAvailable(Set<Tuple2<IPeerRegistrySynchronizationService, Double>> peers)
+//							{
+//								// make the winner to a SP
+//								Tuple2<IPeerRegistrySynchronizationService, Double> winner = peers.iterator().next();
+//								System.out.println("new superpeer: "+winner);
+//								makeSuperpeer(winner.getFirstEntity()==null? agent.getComponentIdentifier(): 
+//									((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
+//									.addResultListener(new DelegationResultListener<Void>(ret));
+//								searchAfterDelay(foundless, foundmore);
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								searchAfterDelay(foundless, foundmore);
+//							}
+//						});
 					}
+				}
+				else
+				{
+					foundless.clear();
+					foundmore.clear();
+					
+					// found at least one SP -> wait before checking again
+					searchAfterDelay(foundless, foundmore);
 				}
 			}
 		});
@@ -146,20 +198,20 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	/**
 	 * 
 	 */
-	protected void searchAfterDelay(final int notfound)
+	protected void searchAfterDelay(final List<Integer> foundless, final List<Integer> foundmore)
 	{
 		System.out.println("search after delay: "+checkdelay);
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(checkdelay).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				searchForSuperpeers(notfound);
+				searchForSuperpeers(foundless, foundmore);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				agent.getLogger().warning(exception.getMessage());
-				searchForSuperpeers(notfound);
+				searchForSuperpeers(foundless, foundmore);
 			}
 		});
 	}
@@ -167,13 +219,13 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	/**
 	 *  
 	 */
-	protected IFuture<Void> determineNewSuperpeer()
+	protected IFuture<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>> determineSuperpeers()
 	{
 		System.out.println("determine new superpeer");
 		
-		final Future<Void> ret = new Future<Void>();
+		final Future<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>> ret = new Future<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>();
 		
-		final TreeSet<Tuple2<IPeerRegistrySynchronizationService, Double>> peers  
+		final Set<Tuple2<IPeerRegistrySynchronizationService, Double>> peers  
 			 = new TreeSet<Tuple2<IPeerRegistrySynchronizationService, Double>>(new Comparator<Tuple2<IPeerRegistrySynchronizationService, Double>>()
 		{
 			public int compare(Tuple2<IPeerRegistrySynchronizationService, Double> o1, Tuple2<IPeerRegistrySynchronizationService, Double> o2)
@@ -182,7 +234,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			}
 		});
 		
-		computePower(agent.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<Double, Void>(ret)
+		computePower(agent.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<Double, Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>(ret)
 		{
 			public void customResultAvailable(Double result) throws Exception
 			{
@@ -208,7 +260,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 						Future<Double> fut = computePower(((IService)peer).getServiceIdentifier().getProviderId().getRoot());
 						bar.addFuture(fut);
 						
-						fut.addResultListener(new ExceptionDelegationResultListener<Double, Void>(ret)
+						fut.addResultListener(new ExceptionDelegationResultListener<Double, Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>(ret)
 						{
 							public void customResultAvailable(Double power) throws Exception
 							{
@@ -219,16 +271,11 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					
 					public void finished()
 					{
-						bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
+						bar.waitFor().addResultListener(new ExceptionDelegationResultListener<Void, Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
-								// make the winner to a SP
-								Tuple2<IPeerRegistrySynchronizationService, Double> winner = peers.first();
-								System.out.println("new superpeer: "+winner);
-								makeSuperpeer(winner.getFirstEntity()==null? agent.getComponentIdentifier(): 
-									((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
-									.addResultListener(new DelegationResultListener<Void>(ret));
+								ret.setResult(peers);
 							}
 						});
 					}
