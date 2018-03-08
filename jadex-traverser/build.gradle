@@ -3,4 +3,6 @@ description 'The traverser allows for realizing object transformations like clon
 dependencies 
 {
 	compile project(':jadex-commons')
+	
+	testCompile 'org.bouncycastle:bcprov-jdk15on:1.58'
 }
