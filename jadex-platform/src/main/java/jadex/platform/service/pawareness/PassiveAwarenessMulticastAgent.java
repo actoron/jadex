@@ -10,14 +10,10 @@ import java.net.MulticastSocket;
 import java.util.Collection;
 import java.util.List;
 
-import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
-import jadex.base.Starter;
 import jadex.binary.SBinarySerializer;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
-import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 
@@ -31,11 +27,11 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 	
 	/** The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255). */
 	// Long name to avoid name clash with platform settings -adress(service) true/false
-	protected String	multicastaddress	= "230.0.0.1";
+	protected String	multicastaddress	= "232.0.9.1";
 	
 	/** The receiver port. */
 	@AgentArgument
-	protected int port	= 4446;
+	protected int port	= 32091;
 	
 	/** The socket to send. */
 	protected DatagramSocket sendsocket;
@@ -74,32 +70,9 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 
 		// Start listening thread.
 		IDaemonThreadPoolService	dtps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class);
-		dtps.executeForever(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				// todo: max ip datagram length (is there a better way to determine length?)
-				byte[]	buffer = new byte[8192];
-				
-				while(true)
-				{
-					try
-					{
-						final DatagramPacket pack = new DatagramPacket(buffer, buffer.length);
-						recvsocket.receive(pack);
-						InputStream	is	= new ByteArrayInputStream(buffer, 0, pack.getLength());
-						@SuppressWarnings("unchecked")
-						Collection<TransportAddress>	addresses	= (Collection<TransportAddress>)SBinarySerializer.readObjectFromStream(is, agent.getClassLoader());
-						discovered(addresses);
-					}
-					catch(Throwable e)
-					{
-						System.err.println("Multicast awareness failed to read datagram: "+SUtil.getExceptionStacktrace(e));
-					}
-				}
-			}
-		});
+		dtps.executeForever(new Receiver(recvsocket));
+		// Also listen for single-cast response messages -> TODO: use NIO to spare one thread
+		dtps.executeForever(new Receiver(sendsocket));
 
 		super.start();
 	}
@@ -115,20 +88,57 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 	
 	//-------- methods --------
 	
+	/**
+	 *  Send the info to other platforms.
+	 *  @param source	If set, send only to source as provided in discovered().
+	 */
 	@Override
-	protected void doSendInfo(List<TransportAddress> addresses) throws Exception
+	protected void	doSendInfo(List<TransportAddress> addresses, Object source) throws Exception
 	{
 		System.out.println(agent+" sending: "+addresses);
 		byte[]	data	= SBinarySerializer.writeObjectToByteArray(addresses, agent.getClassLoader());
-		DatagramPacket p = new DatagramPacket(data, data.length, new InetSocketAddress(multicastaddress, port));
+		DatagramPacket p = source !=null
+			? new DatagramPacket(data, data.length, ((DatagramPacket)source).getAddress(), ((DatagramPacket)source).getPort())
+			: new DatagramPacket(data, data.length, new InetSocketAddress(multicastaddress, port));
 		sendsocket.send(p);
 	}
 	
-	public static void main(String[] args)
+	//-------- helper classes --------
+	
+	/**
+	 *  Code for receiver thread.
+	 */
+	class Receiver implements Runnable
 	{
-		IPlatformConfiguration	config	= PlatformConfigurationHandler.getDefault();
-		config.addComponent(PassiveAwarenessMulticastAgent.class);
-		config.setAwareness(false);	// old awareness
-		Starter.createPlatform(config, args).get();
+		DatagramSocket	socket;
+		
+		Receiver(DatagramSocket socket)
+		{
+			this.socket	= socket;
+		}
+		
+		@Override
+		public void run()
+		{
+			// todo: max ip datagram length (is there a better way to determine length?)
+			byte[]	buffer = new byte[8192];
+			
+			while(true)
+			{
+				try
+				{
+					DatagramPacket pack = new DatagramPacket(buffer, buffer.length);
+					socket.receive(pack);
+					InputStream	is	= new ByteArrayInputStream(buffer, 0, pack.getLength());
+					@SuppressWarnings("unchecked")
+					Collection<TransportAddress>	addresses	= (Collection<TransportAddress>)SBinarySerializer.readObjectFromStream(is, agent.getClassLoader());
+					discovered(addresses, pack);
+				}
+				catch(Throwable e)
+				{
+					agent.getLogger().warning("Multicast awareness failed to read datagram: "+e);//SUtil.getExceptionStacktrace(e));
+				}
+			}
+		}
 	}
 }

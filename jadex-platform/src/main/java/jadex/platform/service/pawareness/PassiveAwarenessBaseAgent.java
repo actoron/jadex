@@ -63,8 +63,8 @@ public abstract class PassiveAwarenessBaseAgent	implements IPassiveAwarenessServ
 		subscriptions	= new LinkedHashSet<SubscriptionIntermediateFuture<IComponentIdentifier>>();
 		platforms	= new LinkedHashSet<IComponentIdentifier>();
 		
-		// Send own info initially.
-		sendInfo();
+//		// Send own info initially.
+//		sendInfo(null);
 		
 		// TODO: send info on address changes?
 	}
@@ -100,25 +100,38 @@ public abstract class PassiveAwarenessBaseAgent	implements IPassiveAwarenessServ
 				search.addIntermediateResult(platform);
 			}
 
-			// TODO: issue search request to find missed/accidentally removed platforms
-			
-			// TODO: timeout from service call
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true)
-				.addResultListener(new IResultListener<Void>()
+			// issue search request to trigger replies from platforms
+			sendInfo(null).addResultListener(new IResultListener<Void>()
 			{
+				@Override
+				public void resultAvailable(Void result)
+				{
+					// TODO: timeout from service call
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true)
+						.addResultListener(new IResultListener<Void>()
+					{
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							search.setFinished();
+							search	= null;
+						}
+						@Override
+						public void resultAvailable(Void result)
+						{
+							search.setFinished();
+							search	= null;
+						}
+					});
+				}
+				
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
 					search.setFinished();
 					search	= null;
 				}
-				@Override
-				public void resultAvailable(Void result)
-				{
-					search.setFinished();
-					search	= null;
-				}
-			});
+			});			
 		}
 		
 		return search;
@@ -147,96 +160,94 @@ public abstract class PassiveAwarenessBaseAgent	implements IPassiveAwarenessServ
 	
 	/**
 	 *  To be called whenever platform addresses are discovered.
-	 *  May be called from external threads
+	 *  May be called from external threads.
 	 */
-	protected void	discovered(final Collection<TransportAddress> addresses)
+	protected void	discovered(final Collection<TransportAddress> addresses, final Object source)
 	{
-		System.out.println(agent + " discovered: "+addresses);
-		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		// Ignore my own addresses.
+		// TODO: what if data source and platform(s) of addresses differ (e.g. no point-to-point awareness)
+		if(addresses!=null && !addresses.isEmpty() && !agent.getComponentIdentifier().getRoot().equals(addresses.iterator().next().getPlatformId()))
 		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
+			System.out.println(agent + " discovered: "+addresses);
+			agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
-				// Add addresses to facilitate communication
-				// TODO: cleanup after removal?
-				// TODO: filter out my own addresses?
-				ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
-				tas.addManualAddresses(addresses).addResultListener(new IResultListener<Void>()
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					@Override
-					public void resultAvailable(Void result)
+					// Add addresses to facilitate communication
+					// TODO: cleanup after removal?
+					ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+					tas.addManualAddresses(addresses).addResultListener(new IResultListener<Void>()
 					{
-						// Extract platforms from address list
-						Set<IComponentIdentifier>	new_platforms	= new LinkedHashSet<IComponentIdentifier>();
-						for(TransportAddress address: addresses)
+						@Override
+						public void resultAvailable(Void result)
 						{
-							if(!agent.getComponentIdentifier().getRoot().equals(address.getPlatformId()))
-								new_platforms.add(address.getPlatformId());
-						}
-						
-						// Add platforms and notify about new.
-						for(IComponentIdentifier platform: new_platforms)
-						{
-							if(platforms.add(platform))
+							// Extract platforms from address list
+							Set<IComponentIdentifier>	new_platforms	= new LinkedHashSet<IComponentIdentifier>();
+							for(TransportAddress address: addresses)
 							{
-								if(search!=null)
+								if(!agent.getComponentIdentifier().getRoot().equals(address.getPlatformId()))
+									new_platforms.add(address.getPlatformId());
+							}
+							
+							// Add platforms and notify about new.
+							for(IComponentIdentifier platform: new_platforms)
+							{
+								if(platforms.add(platform))
 								{
-									search.addIntermediateResult(platform);
-								}
-								
-								for(SubscriptionIntermediateFuture<IComponentIdentifier> sub: subscriptions)
-								{
-									sub.addIntermediateResult(platform);
+									if(search!=null)
+									{
+										search.addIntermediateResult(platform);
+									}
+									
+									for(SubscriptionIntermediateFuture<IComponentIdentifier> sub: subscriptions)
+									{
+										sub.addIntermediateResult(platform);
+									}
 								}
 							}
+							
+							if(source!=null)
+							{
+								sendInfo(source);
+							}
 						}
-					}
-					
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						// shouldn't happen?
-					}
-				});
-
-				return IFuture.DONE;
-			}
-		});		
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							// shouldn't happen?
+						}
+					});
+	
+					return IFuture.DONE;
+				}
+			});
+		}
 	}
 	
 	/**
 	 *  Send the info to other platforms.
+	 *  @param source	If set, send only to source as provided in discovered().
 	 */
-	protected abstract void doSendInfo(List<TransportAddress> addresses) throws Exception;
+	protected abstract void doSendInfo(List<TransportAddress> addresses, Object source) throws Exception;
 	
 	//-------- helper methods --------
 	
 	/**
 	 *  Send address info to listening platforms.
 	 */
-	protected IFuture<Void>	sendInfo()
+	protected IFuture<Void>	sendInfo(final Object source)
 	{
-		Future<Void>	ret	= new Future<Void>();
+		final Future<Void>	ret	= new Future<Void>();
 		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override
-			public void customResultAvailable(List<TransportAddress> addresses)
+			public void customResultAvailable(List<TransportAddress> addresses)	throws	Exception
 			{
-				try
-				{
-					doSendInfo(addresses);
-				}
-				catch(Exception e)
-				{
-					agent.getLogger().severe("Could not send info "+e);
-				}
-			}
-			
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				// shouldn't happen?
+				doSendInfo(addresses, source);
+				ret.setResult(null);
 			}
 		});
 		return ret;

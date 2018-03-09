@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -64,25 +64,26 @@ public class ServiceCallTestNFClearTest
 	{
 		timeout = Starter.getLocalDefaultTimeout(null);
 
-		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
+//		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
-		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
-//		config.setLogging(true);
-//		config.setDefaultTimeout(-1);
-		config.setPlatformName(pid);
-		config.getExtendedPlatformConfiguration().setSaveOnExit(false);
-		config.getExtendedPlatformConfiguration().setAutoShutdown(false);
-		config.getExtendedPlatformConfiguration().setSecurity(true);
-//		config.setAwaMechanisms(AWAMECHANISM.local);
-//		config.setAwareness(true);
-		config.setAwareness(false);
-		config.getExtendedPlatformConfiguration().setTcpTransport(true);
+		IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+//		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
+////		config.setLogging(true);
+////		config.setDefaultTimeout(-1);
+//		config.setPlatformName(pid);
+//		config.getExtendedPlatformConfiguration().setSaveOnExit(false);
+//		config.getExtendedPlatformConfiguration().setAutoShutdown(false);
+//		config.getExtendedPlatformConfiguration().setSecurity(true);
+////		config.setAwaMechanisms(AWAMECHANISM.local);
+////		config.setAwareness(true);
+//		config.setAwareness(false);
+//		config.getExtendedPlatformConfiguration().setTcpTransport(true);
 
 		platform1 = Starter.createPlatform(config).get(timeout);
 
 		platform2 = Starter.createPlatform(config).get(timeout);
 
-		createProxies(platform1, platform2);
+//		createProxies(platform1, platform2);
 
 		CallAccess.resetNextInvocation();
 	}

@@ -2253,7 +2253,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				@Override
 				public void intermediateResultAvailable(final IComponentIdentifier platform)
 				{
-					System.out.println(cid + " searching rmeote platform: "+platform);
+					System.out.println(cid + " searching remote platform: "+platform+", "+query);
 					
 					// Only (continue to) search remote when future not yet finished or cancelled.
 					if(!ret.isDone())
@@ -2280,6 +2280,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 							@SuppressWarnings("unchecked")
 							public void resultAvailable(Collection<T> result)
 							{
+								System.out.println(cid + " searched remote platform: "+platform+", "+result);
 								if(result != null)
 								{
 									if(query.getFilter() instanceof IAsyncFilter)
@@ -2353,6 +2354,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				public void exceptionOccurred(Exception exception)
 				{
 					// ignore exception
+					doFinished();
 				}
 				
 				private void doFinished()
