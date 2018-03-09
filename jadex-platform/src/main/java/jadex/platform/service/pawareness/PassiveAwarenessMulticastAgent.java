@@ -95,7 +95,6 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 	@Override
 	protected void	doSendInfo(List<TransportAddress> addresses, Object source) throws Exception
 	{
-		System.out.println(agent+" sending: "+addresses);
 		byte[]	data	= SBinarySerializer.writeObjectToByteArray(addresses, agent.getClassLoader());
 		DatagramPacket p = source !=null
 			? new DatagramPacket(data, data.length, ((DatagramPacket)source).getAddress(), ((DatagramPacket)source).getPort())

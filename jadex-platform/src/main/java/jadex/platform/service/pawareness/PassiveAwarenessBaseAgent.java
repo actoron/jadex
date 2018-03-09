@@ -27,75 +27,79 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 
+
 /**
- *  Base agent for all passive awareness implementations (discovery and management).
- *  Adds addresses to transport service and collects and notifies about new platforms.
+ * Base agent for all passive awareness implementations (discovery and
+ * management). Adds addresses to transport service and collects and notifies
+ * about new platforms.
  */
 // TODO: passively remove platforms based on validity durations
 @Service
-@Agent(autoprovide=Boolean3.TRUE)
-public abstract class PassiveAwarenessBaseAgent	implements IPassiveAwarenessService
+@Agent(autoprovide = Boolean3.TRUE)
+public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessService
 {
-	//-------- attributes --------
-	
+	// -------- attributes --------
+
 	/** The agent. */
 	@Agent
 	protected IInternalAccess	agent;
-	
+
 	/** The current search, if any. */
 	protected IntermediateFuture<IComponentIdentifier>	search;
-	
+
 	/** The subscriptions. */
 	protected Set<SubscriptionIntermediateFuture<IComponentIdentifier>>	subscriptions;
-	
+
 	/** The currently known platforms. */
 	protected Set<IComponentIdentifier>	platforms;
-	
-	//-------- agent lifecycle --------
-	
+
+	// -------- agent lifecycle --------
+
 	/**
-	 *  Start the service.
-	 *  @throws Exception, e.g. when required socket can not be opened. 
+	 * Start the service.
+	 * 
+	 * @throws Exception, e.g. when required socket can not be opened.
 	 */
 	@ServiceStart
-	public void	start() throws Exception
+	public void start() throws Exception
 	{
-		subscriptions	= new LinkedHashSet<SubscriptionIntermediateFuture<IComponentIdentifier>>();
-		platforms	= new LinkedHashSet<IComponentIdentifier>();
-		
-//		// Send own info initially.
-//		sendInfo(null);
-		
+		subscriptions = new LinkedHashSet<SubscriptionIntermediateFuture<IComponentIdentifier>>();
+		platforms = new LinkedHashSet<IComponentIdentifier>();
+
+		// // Send own info initially.
+		// sendInfo(null);
+
 		// TODO: send info on address changes?
 	}
-	
+
 	/**
-	 *  Stop the service.
+	 * Stop the service.
 	 */
 	@ServiceShutdown
-	protected void	shutdown() throws Exception
+	protected void shutdown() throws Exception
 	{
-		for(SubscriptionIntermediateFuture<IComponentIdentifier> sub: subscriptions)
+		for(SubscriptionIntermediateFuture<IComponentIdentifier> sub : subscriptions)
 		{
 			// Undone, because might be cancelled already, but not yet removed.
 			sub.setFinishedIfUndone();
 		}
 	}
-	
-	//-------- IPassiveAwarenessService --------
-	
+
+	// -------- IPassiveAwarenessService --------
+
 	/**
-	 *  Try to find other platforms and finish after timeout.
-	 *  Immediately returns known platforms and concurrently issues a new search, waiting for replies until the timeout.
+	 * Try to find other platforms and finish after timeout. Immediately returns
+	 * known platforms and concurrently issues a new search, waiting for replies
+	 * until the timeout.
 	 */
-	public IIntermediateFuture<IComponentIdentifier>	searchPlatforms()
+	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
-		if(search==null)
+		if(search == null)
 		{
-			search	= new IntermediateFuture<IComponentIdentifier>();
-			
+			search = new IntermediateFuture<IComponentIdentifier>();
+
 			// Add initial results
-			for(IComponentIdentifier platform: platforms)
+			for(IComponentIdentifier platform : platforms)
 			{
 				search.addIntermediateResult(platform);
 			}
@@ -107,68 +111,69 @@ public abstract class PassiveAwarenessBaseAgent	implements IPassiveAwarenessServ
 				public void resultAvailable(Void result)
 				{
 					// TODO: timeout from service call
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true)
-						.addResultListener(new IResultListener<Void>()
+					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true).addResultListener(new IResultListener<Void>()
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
 							search.setFinished();
-							search	= null;
+							search = null;
 						}
+
 						@Override
 						public void resultAvailable(Void result)
 						{
 							search.setFinished();
-							search	= null;
+							search = null;
 						}
 					});
 				}
-				
+
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
 					search.setFinished();
-					search	= null;
+					search = null;
 				}
-			});			
+			});
 		}
-		
+
 		return search;
 	}
-	
+
 
 	/**
-	 *  Immediately return known platforms and continuously publish newly found platforms.
-	 *  Does no active searching.
+	 * Immediately return known platforms and continuously publish newly found
+	 * platforms. Does no active searching.
 	 */
-	public ISubscriptionIntermediateFuture<IComponentIdentifier>	subscribeToNewPlatforms()
+	public ISubscriptionIntermediateFuture<IComponentIdentifier> subscribeToNewPlatforms()
 	{
-		SubscriptionIntermediateFuture<IComponentIdentifier>	sub	= new SubscriptionIntermediateFuture<IComponentIdentifier>();
+		SubscriptionIntermediateFuture<IComponentIdentifier> sub = new SubscriptionIntermediateFuture<IComponentIdentifier>();
 		subscriptions.add(sub);
-		
+
 		// Add initial results
-		for(IComponentIdentifier platform: platforms)
+		for(IComponentIdentifier platform : platforms)
 		{
 			search.addIntermediateResult(platform);
 		}
 
 		return sub;
 	}
-	
-	//-------- template methods --------
-	
+
+	// -------- template methods --------
+
 	/**
-	 *  To be called whenever platform addresses are discovered.
-	 *  May be called from external threads.
+	 * To be called whenever platform addresses are discovered. May be called
+	 * from external threads.
 	 */
-	protected void	discovered(final Collection<TransportAddress> addresses, final Object source)
+	protected void discovered(final Collection<TransportAddress> addresses, final Object source)
 	{
 		// Ignore my own addresses.
-		// TODO: what if data source and platform(s) of addresses differ (e.g. no point-to-point awareness)
-		if(addresses!=null && !addresses.isEmpty() && !agent.getComponentIdentifier().getRoot().equals(addresses.iterator().next().getPlatformId()))
+		// TODO: what if data source and platform(s) of addresses differ (e.g.
+		// no point-to-point awareness)
+		if(addresses != null && !addresses.isEmpty() && !agent.getComponentIdentifier().getRoot().equals(addresses.iterator().next().getPlatformId()))
 		{
-			System.out.println(agent + " discovered: "+addresses);
+			agent.getLogger().info("discovered: " + addresses);
 			agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
 				@Override
@@ -183,69 +188,71 @@ public abstract class PassiveAwarenessBaseAgent	implements IPassiveAwarenessServ
 						public void resultAvailable(Void result)
 						{
 							// Extract platforms from address list
-							Set<IComponentIdentifier>	new_platforms	= new LinkedHashSet<IComponentIdentifier>();
-							for(TransportAddress address: addresses)
+							Set<IComponentIdentifier> new_platforms = new LinkedHashSet<IComponentIdentifier>();
+							for(TransportAddress address : addresses)
 							{
 								if(!agent.getComponentIdentifier().getRoot().equals(address.getPlatformId()))
 									new_platforms.add(address.getPlatformId());
 							}
-							
+
 							// Add platforms and notify about new.
-							for(IComponentIdentifier platform: new_platforms)
+							for(IComponentIdentifier platform : new_platforms)
 							{
 								if(platforms.add(platform))
 								{
-									if(search!=null)
+									if(search != null)
 									{
 										search.addIntermediateResult(platform);
 									}
-									
-									for(SubscriptionIntermediateFuture<IComponentIdentifier> sub: subscriptions)
+
+									for(SubscriptionIntermediateFuture<IComponentIdentifier> sub : subscriptions)
 									{
 										sub.addIntermediateResult(platform);
 									}
 								}
 							}
-							
-							if(source!=null)
+
+							if(source != null)
 							{
 								sendInfo(source);
 							}
 						}
-						
+
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
 							// shouldn't happen?
 						}
 					});
-	
+
 					return IFuture.DONE;
 				}
 			});
 		}
 	}
-	
+
 	/**
-	 *  Send the info to other platforms.
-	 *  @param source	If set, send only to source as provided in discovered().
+	 * Send the info to other platforms.
+	 * 
+	 * @param source If set, send only to source as provided in discovered().
 	 */
 	protected abstract void doSendInfo(List<TransportAddress> addresses, Object source) throws Exception;
-	
-	//-------- helper methods --------
-	
+
+	// -------- helper methods --------
+
 	/**
-	 *  Send address info to listening platforms.
+	 * Send address info to listening platforms.
 	 */
-	protected IFuture<Void>	sendInfo(final Object source)
+	protected IFuture<Void> sendInfo(final Object source)
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override
-			public void customResultAvailable(List<TransportAddress> addresses)	throws	Exception
+			public void customResultAvailable(List<TransportAddress> addresses) throws Exception
 			{
+				agent.getLogger().info("sending: "+addresses);
 				doSendInfo(addresses, source);
 				ret.setResult(null);
 			}
