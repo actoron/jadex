@@ -2253,6 +2253,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				@Override
 				public void intermediateResultAvailable(final IComponentIdentifier platform)
 				{
+					System.out.println(cid + " searching rmeote platform: "+platform);
+					
 					// Only (continue to) search remote when future not yet finished or cancelled.
 					if(!ret.isDone())
 					{
@@ -2357,7 +2359,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				{
 					if(cnt.decrementAndGet()==0)
 					{
-						ret.setFinished();
+						// Undone, because gets terminated on first result for search one
+						ret.setFinishedIfUndone();
 					}
 				}
 			});

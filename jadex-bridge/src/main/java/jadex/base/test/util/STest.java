@@ -39,6 +39,10 @@ public class STest {
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
+		// Enable new awareness
+		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
+		config.setAwareness(false);	// disable old awareness
+		
         config.getExtendedPlatformConfiguration().setSecurity(true);
         config.getExtendedPlatformConfiguration().setTcpTransport(true);
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
