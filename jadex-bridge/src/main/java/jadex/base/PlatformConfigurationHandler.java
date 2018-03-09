@@ -51,8 +51,9 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		defvalues.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
 		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
-		defvalues.put("localdefaulttimeout", IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT);
-		defvalues.put("remotedefaulttimeout", IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT);
+		Long	timeout	= PlatformConfigurationHandler.getDefaultTimeout();
+		defvalues.put("localdefaulttimeout", timeout);
+		defvalues.put("remotedefaulttimeout", timeout);
 
 		//		defvalues.put("components", new ArrayList<String>());
 //		defvalues.put(GUI, Boolean.TRUE);
