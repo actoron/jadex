@@ -89,16 +89,14 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
     /**  Flag if local timeouts should be realtime (instead of clock dependent). */
     public static final String REALTIMETIMEOUT = "realtimetimeout";
         
-    /** Constant for local default timeout. */
-    public static long DEFAULT_LOCAL_TIMEOUT = PlatformConfigurationHandler.getDefaultTimeout();
-
-    /** Constant for remote default timeout. */
-    public static long DEFAULT_REMOTE_TIMEOUT = DEFAULT_LOCAL_TIMEOUT;
-
-    /** The reserved platform parameters. Those are (usually) not handled by the root component. */
-    public static final Set<String> RESERVED = PlatformConfigurationHandler.createReserved();
-	
-
+//    /** Constant for local default timeout. */
+//    public static long DEFAULT_LOCAL_TIMEOUT = PlatformConfigurationHandler.getDefaultTimeout();
+//
+//    /** Constant for remote default timeout. */
+//    public static long DEFAULT_REMOTE_TIMEOUT = DEFAULT_LOCAL_TIMEOUT;
+//
+//    /** The reserved platform parameters. Those are (usually) not handled by the root component. */
+//    public static final Set<String> RESERVED = PlatformConfigurationHandler.createReserved();
     
     //-------- Kernel constants. --------
   	public static final String KERNEL_COMPONENT = "component";

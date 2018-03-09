@@ -986,10 +986,10 @@ public class Starter
 	public static long getRemoteDefaultTimeout(IComponentIdentifier platform)
 	{
 		if(platform == null)
-			return IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT;
+			return PlatformConfigurationHandler.getDefaultTimeout();
 
 		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue() :IPlatformConfiguration.DEFAULT_REMOTE_TIMEOUT;
+		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue() : PlatformConfigurationHandler.getDefaultTimeout();
 	}
 
 	/**
@@ -1007,10 +1007,10 @@ public class Starter
 	public static long getLocalDefaultTimeout(IComponentIdentifier platform)
 	{
 		if(platform == null)
-			return IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT;
+			return PlatformConfigurationHandler.getDefaultTimeout();
 
 		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue() : IPlatformConfiguration.DEFAULT_LOCAL_TIMEOUT;
+		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue() : PlatformConfigurationHandler.getDefaultTimeout();
 	}
 
 	/**
