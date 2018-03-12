@@ -76,10 +76,7 @@ public class SResultListener {
 					exception.printStackTrace();
 				}
 
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				exception.printStackTrace(pw);
-				getLogger().severe("Exception occurred: "+this+", "+ sw.toString());
+				getLogger().warning("Exception occurred: "+this+", "+ exception);
 			}
 		};
     }
