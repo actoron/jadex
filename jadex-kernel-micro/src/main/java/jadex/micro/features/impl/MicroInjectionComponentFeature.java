@@ -103,7 +103,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 							{
 								Field field = infos[j].getFirstEntity().getField(getComponent().getClassLoader());
 								String convert = infos[j].getSecondEntity();
-	//							System.out.println("seting arg: "+names[i]+" "+val);
+//								System.out.println("setting arg: "+names[i]+" "+val);
 								setFieldValue(val, field, convert);
 							}
 						}

@@ -19,6 +19,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -223,8 +224,11 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-//				System.out.println("root is: "+root);
-				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
+//				System.out.println("root is: "+root)
+				// Hack!!! use remote platform as search owner
+				ServiceQuery<IClockService>	query	= new ServiceQuery<IClockService>(IClockService.class, null, new BasicComponentIdentifier("clock", root), root, null);
+//				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
+				SServiceProvider.getService(agent, query)
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
 					public void customResultAvailable(final IClockService clock)

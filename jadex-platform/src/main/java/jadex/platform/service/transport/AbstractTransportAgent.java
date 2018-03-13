@@ -4,6 +4,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -276,95 +279,46 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	public IFuture<Integer> isReady(final IMsgHeader header)
 	{
 //		agent.getLogger().severe("isReady");
-		final Future<Integer>	ret	= new Future<Integer>();
 		VirtualConnection	handler;
 		final IComponentIdentifier	target	= getTarget(header);
 		
-		synchronized(this)
-		{
-			handler = getVirtualConnection(target);
-		}
-		if(handler==null)
-		{
-//			agent.getLogger().severe("isReady no handler");
-			getAddresses(header).addResultListener(new ExceptionDelegationResultListener<String[], Integer>(ret)
-			{
-				public void customResultAvailable(String[] addresses) throws Exception
-				{
-//					agent.getLogger().severe("isReady got addresses: "+addresses);
-					VirtualConnection handler;
-					boolean	create	= false;
-					synchronized(AbstractTransportAgent.this)
-					{
-						handler = getVirtualConnection(target);
-						if(handler==null && addresses!=null && addresses.length>0)
-						{
-							handler	= createVirtualConnection(target);
-							create	= true;
-						}
-					}
-					
-					if(create)
-						createConnections(handler, target, addresses);
-					
-					if(handler!=null)
-					{
-						handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));
-					}
-					else
-					{
-						ret.setException(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
-					}
-				}
-			});
-			
-		}
-		else
-		{
-//			agent.getLogger().severe("isReady handler: "+handler);
-			handler.isReady().addResultListener(new DelegationResultListener<Integer>(ret));;
-		}
-		
-		return ret;
-	}
-	/*public IFuture<Integer> isReady(final IMsgHeader header)
-	{
-		IFuture<Integer>	ret	= null;
 		boolean	create	= false;
-		String[]	addresses	= null;
-		VirtualConnection	handler;
-		IComponentIdentifier	target	= getTarget(header);
-		
 		synchronized(this)
 		{
 			handler = getVirtualConnection(target);
 			if(handler==null)
 			{
-				addresses = getAddresses(header);
-				if(addresses!=null && addresses.length>0)
-				{
-					handler	= createVirtualConnection(target);
-					create	= true;
-				}
-				else
-				{
-					ret	= new Future<Integer>(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
-				}
+				handler	= createVirtualConnection(target);
+				create	= true;
 			}
-		}
-		
-		if(ret==null)
-		{
-			ret	= handler.isReady();
 		}
 		
 		if(create)
 		{
-			createConnections(handler, target, addresses);
+			final VirtualConnection	fhandler	= handler;
+//			agent.getLogger().severe("isReady no handler");
+			getAddresses(header).addResultListener(new IResultListener<Collection<String>>()
+			{
+				public void resultAvailable(Collection<String> addresses)
+				{
+//					agent.getLogger().severe("isReady got addresses: "+addresses);
+					if(addresses!=null && !addresses.isEmpty())
+						createConnections(fhandler, target, addresses.toArray(new String[addresses.size()]));
+					
+					else
+						fhandler.fail(new RuntimeException("No addresses found for " + impl.getProtocolName() + ": " + header));
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					fhandler.fail(exception);
+				}
+			});
 		}
-		
-		return ret;
-	}*/
+
+		return handler.isReady();
+	}
 	
 	/**
 	 * Send a message. Fail fast implementation. Retry should be handled in
@@ -632,49 +586,25 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * @param The message header.
 	 * @return The addresses, if any.
 	 */
-	protected IFuture<String[]> getAddresses(IMsgHeader header)
+	protected IIntermediateFuture<String> getAddresses(IMsgHeader header)
 	{
 		IComponentIdentifier target = getTarget(header).getRoot();
-//		TransportAddressBook book = (TransportAddressBook)PlatformConfiguration.getPlatformValue(agent.getComponentIdentifier(), PlatformConfiguration.DATA_ADDRESSBOOK);
-//		String[] ret = book.getPlatformAddresses(target, impl.getProtocolName());
 		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, Binding.SCOPE_PLATFORM, false);
-//		String[] ret = null;
-//		try
-//		{
-//			List<TransportAddress> addrs = tas.resolveAddresses(target, impl.getProtocolName()).get();
-//			if (addrs != null)
-//			{
-//				ret = new String[addrs.size()];
-//				int i = 0;
-//				for (TransportAddress addr : addrs)
-//				{
-//					ret[i] = addr.getAddress();
-//					++i;
-//				}
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//		}
 		
-		final Future<String[]> ret = new Future<String[]>();
-		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, String[]>(ret)
+		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
+		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Collection<String>>(ret)
 		{
 			public void customResultAvailable(List<TransportAddress> addrs) throws Exception
 			{
-				String[] straddrs = null;
 				if (addrs != null && addrs.size() > 0)
 				{
-					straddrs = new String[addrs.size()];
-					int i = 0;
 					for (TransportAddress addr : addrs)
 					{
-						straddrs[i] = addr.getAddress();
-						++i;
+						ret.addIntermediateResult(addr.getAddress());
 					}
 				}
 				
-				ret.setResult(straddrs);
+				ret.setFinished();
 			}
 		});
 		
