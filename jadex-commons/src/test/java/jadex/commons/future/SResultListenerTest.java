@@ -121,6 +121,64 @@ public class SResultListenerTest {
         assertEquals("test1", nextRes);
     }
 
+    @Test
+    public void delegateWithTupleFutures_success() {
+        Tuple2Future<String, String> tfut = new Tuple2Future<String, String>();
+        Tuple2Future<String, String> delegationTarget = new Tuple2Future<String, String>();
+
+//        SResultListener.delegateFromTo(iFut, delegationTarget);
+
+        tfut.addResultListener(SResultListener.delegate(delegationTarget));
+
+        tfut.setFirstResult("first");
+        String first = delegationTarget.getFirstResult();
+
+        tfut.setSecondResult("second");
+        String second = delegationTarget.getSecondResult();
+
+        assertEquals("first", first);
+        assertEquals("second", second);
+    }
+
+
+    @Test
+    public void delegateWithTupleFutures_exception() {
+        Tuple2Future<String, String> tfut = new Tuple2Future<String, String>();
+        Tuple2Future<String, String> delegationTarget = new Tuple2Future<String, String>();
+
+        tfut.addResultListener(SResultListener.delegate(delegationTarget));
+
+        tfut.setException(new Exception("error"));
+
+
+        Exception ex = delegationTarget.getException();
+        assertEquals("error", ex.getMessage());
+
+        try {
+            delegationTarget.getFirstResult();
+            fail("should have thrown");
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    public void delegateWithTupleFutures_fromTo() {
+        Tuple2Future<String, String> tfut = new Tuple2Future<String, String>();
+        Tuple2Future<String, String> delegationTarget = new Tuple2Future<String, String>();
+
+        SResultListener.delegateFromTo(tfut, delegationTarget);
+
+        tfut.setFirstResult("first");
+        String first = delegationTarget.getFirstResult();
+
+        tfut.setSecondResult("second");
+        String second = delegationTarget.getSecondResult();
+
+        assertEquals("first", first);
+        assertEquals("second", second);
+    }
+
 
 
     // counter:
