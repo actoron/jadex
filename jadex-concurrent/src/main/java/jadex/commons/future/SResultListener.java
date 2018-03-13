@@ -191,6 +191,37 @@ public class SResultListener {
 	}
 
 	// -----------------------------------------------------
+	// -------------- tuple2 delegation methods ------
+	// -----------------------------------------------------
+
+	/**
+	 * Creates an {@link ITuple2ResultListener} that delegates results and exceptions to a given Future.
+	 * Supports creating delegations for Tuple2Future.
+	 *
+	 * @param delegate The future used for success delegation.
+	 * @return {@link IResultListener}
+	 */
+	public static <E,F> ITuple2ResultListener<E,F> delegate(final Tuple2Future<E,F> delegate) {
+		return new DefaultTuple2ResultListener<E, F>() {
+			@Override
+			public void firstResultAvailable(E result) {
+				delegate.setFirstResult(result);
+			}
+
+			@Override
+			public void secondResultAvailable(F result) {
+				delegate.setSecondResult(result);
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				delegate.setException(exception);
+			}
+		};
+	}
+
+
+	// -----------------------------------------------------
 	// -------------- exception delegation methods ------
 	// -----------------------------------------------------
 
