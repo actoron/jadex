@@ -18,9 +18,9 @@ public class BluetoothTransportAgent extends AbstractTransportAgent<BTChannel> {
         return new BTTransport(access);
     }
 
-    @Override
-    protected IFuture<String[]> getAddresses(IMsgHeader header) {
-        // TODO overwrite
-        return super.getAddresses(header);
-    }
+//    @Override
+//    protected IFuture<String[]> getAddresses(IMsgHeader header) {
+//        // TODO overwrite
+//        return super.getAddresses(header);
+//    }
 }
