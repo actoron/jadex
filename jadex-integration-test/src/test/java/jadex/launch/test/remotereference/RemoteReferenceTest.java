@@ -40,9 +40,9 @@ public class RemoteReferenceTest //extends TestCase
 		config2.addComponent(SearchServiceProviderAgent.class);
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		
-		// Connect platforms by creating proxy agents.
-		Starter.createProxy(platform1, platform2).get(timeout);
-		Starter.createProxy(platform2, platform1).get(timeout);
+//		// Connect platforms by creating proxy agents.
+//		Starter.createProxy(platform1, platform2).get(timeout);
+//		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
 		ISearchService	search = SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);

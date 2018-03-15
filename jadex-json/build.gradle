@@ -7,7 +7,7 @@ dependencies
 	compile project(':jadex-commons')
 	compile project(':jadex-traverser')
 //	testCompile project(':jadex-commons').sourceSets.test.output
-	testCompile files(project(':jadex-commons').sourceSets.test.runtimeClasspath)
+	testCompile files(project(':jadex-traverser').sourceSets.test.runtimeClasspath)
 
 	compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
 	

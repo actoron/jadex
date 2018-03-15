@@ -76,10 +76,7 @@ public class SResultListener {
 					exception.printStackTrace();
 				}
 
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				exception.printStackTrace(pw);
-				getLogger().severe("Exception occurred: "+this+", "+ sw.toString());
+				getLogger().warning("Exception occurred: "+this+", "+ exception);
 			}
 		};
     }
@@ -192,6 +189,37 @@ public class SResultListener {
 	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone, IFunctionalResultListener<Collection<E>> customResultListener, IFunctionalIntermediateResultListener<E> customIntermediateResultListener) {
 		return new IntermediateDelegationResultListener<E>(delegate, undone, customResultListener, customIntermediateResultListener);
 	}
+
+	// -----------------------------------------------------
+	// -------------- tuple2 delegation methods ------
+	// -----------------------------------------------------
+
+	/**
+	 * Creates an {@link ITuple2ResultListener} that delegates results and exceptions to a given Future.
+	 * Supports creating delegations for Tuple2Future.
+	 *
+	 * @param delegate The future used for success delegation.
+	 * @return {@link IResultListener}
+	 */
+	public static <E,F> ITuple2ResultListener<E,F> delegate(final Tuple2Future<E,F> delegate) {
+		return new DefaultTuple2ResultListener<E, F>() {
+			@Override
+			public void firstResultAvailable(E result) {
+				delegate.setFirstResult(result);
+			}
+
+			@Override
+			public void secondResultAvailable(F result) {
+				delegate.setSecondResult(result);
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				delegate.setException(exception);
+			}
+		};
+	}
+
 
 	// -----------------------------------------------------
 	// -------------- exception delegation methods ------

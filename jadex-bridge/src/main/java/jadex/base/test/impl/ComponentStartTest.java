@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
-import jadex.base.test.ComponentTestSuite;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
