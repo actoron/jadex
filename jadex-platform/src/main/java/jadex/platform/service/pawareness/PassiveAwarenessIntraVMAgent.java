@@ -19,7 +19,6 @@ public class PassiveAwarenessIntraVMAgent	extends PassiveAwarenessBaseAgent
 	/** The started discovery agents. */
 	protected static final Set<PassiveAwarenessIntraVMAgent>	discoveries	= Collections.synchronizedSet(new HashSet<PassiveAwarenessIntraVMAgent>());
 
-	//-------- attributes --------
 	
 	//-------- agent lifecycle --------
 
@@ -34,7 +33,7 @@ public class PassiveAwarenessIntraVMAgent	extends PassiveAwarenessBaseAgent
 	}
 	
 	@Override
-	protected void shutdown()	throws Exception
+	public void shutdown()	throws Exception
 	{
 		discoveries.remove(this);
 		super.shutdown();
@@ -49,10 +48,17 @@ public class PassiveAwarenessIntraVMAgent	extends PassiveAwarenessBaseAgent
 	@Override
 	protected void	doSendInfo(List<TransportAddress> addresses, Object source) throws Exception
 	{
-		PassiveAwarenessIntraVMAgent[]	agents	= discoveries.toArray(new PassiveAwarenessIntraVMAgent[0]);
-		for(PassiveAwarenessIntraVMAgent agent: agents)
+		if(source!=null)
 		{
-			agent.discovered(addresses, source);
+			((PassiveAwarenessBaseAgent)source).discovered(addresses, null);	
+		}
+		else
+		{
+			PassiveAwarenessIntraVMAgent[]	agents	= discoveries.toArray(new PassiveAwarenessIntraVMAgent[0]);
+			for(PassiveAwarenessIntraVMAgent agent: agents)
+			{
+				agent.discovered(addresses, this);
+			}
 		}
 	}	
 }

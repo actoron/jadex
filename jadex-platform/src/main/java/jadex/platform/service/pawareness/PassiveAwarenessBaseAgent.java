@@ -66,8 +66,8 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 		subscriptions = new LinkedHashSet<SubscriptionIntermediateFuture<IComponentIdentifier>>();
 		platforms = new LinkedHashSet<IComponentIdentifier>();
 
-		// // Send own info initially.
-		// sendInfo(null);
+		// Send own info initially.
+		sendInfo(null);
 
 		// TODO: send info on address changes?
 	}
@@ -76,7 +76,7 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 	 * Stop the service.
 	 */
 	@ServiceShutdown
-	protected void shutdown() throws Exception
+	public void shutdown() throws Exception
 	{
 		for(SubscriptionIntermediateFuture<IComponentIdentifier> sub : subscriptions)
 		{

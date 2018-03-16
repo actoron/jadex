@@ -78,7 +78,7 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 	}
 	
 	@Override
-	protected void shutdown()	throws Exception
+	public void shutdown()	throws Exception
 	{
 		super.shutdown();
 		recvsocket.leaveGroup(InetAddress.getByName(multicastaddress));
