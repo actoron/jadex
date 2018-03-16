@@ -861,8 +861,9 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setValue("compregistry", Boolean.TRUE);
 		
 		config.setSuperpeer(false);
-//		config.setSuperpeerClient(false);
+		config.setSuperpeerClient(false);
 		config.setSupersuperpeer(false);
+		config.setValue("acr", false);
 
 		return config;
 	}
