@@ -29,7 +29,7 @@ public class ClientMain  {
 	
 	public void setUp()
 	{
-		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalComm();
 
 		config.setPlatformName("presentationtimer-*");
 		config.setNetworkNames(new String[] { "jadexnetwork" });

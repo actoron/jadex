@@ -14,7 +14,7 @@ public class TimeServiceStarter extends ServiceStarter
 	@Override
 	protected IPlatformConfiguration getConfig()
 	{
-		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalRelayAwareness();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
 		config.addComponent("jadex.micro.quickstart.TimeProviderAgent.class");
 		return config;
 	}

@@ -18,7 +18,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 
 /**
- *  Implements the passive awareness system service (management).
+ *  Implements passive awareness via multicast.
  */
 @Agent
 public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
