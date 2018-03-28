@@ -688,7 +688,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 										Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
 										addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
 										ia.getComponentFeature(IMessageFeature.class)
-											.sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields)
+											.sendMessage(null, addheaderfields, (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER))
 											.addResultListener(new IResultListener<Void>()
 											{
 												@Override

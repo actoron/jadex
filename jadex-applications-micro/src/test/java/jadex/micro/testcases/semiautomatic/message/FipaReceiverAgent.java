@@ -23,6 +23,6 @@ public class FipaReceiverAgent
 		reply.setPerformative(FipaMessage.Performative.INFORM);
 		reply.setContent(message.getContent()+" World!");
 		
-		mf.sendMessage(null, reply);
+		mf.sendMessage(reply);
 	}
 }

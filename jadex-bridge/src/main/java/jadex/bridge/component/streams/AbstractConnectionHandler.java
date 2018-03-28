@@ -1,16 +1,8 @@
 package jadex.bridge.component.streams;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.Timer;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
@@ -25,7 +17,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Abstract base class for connection handlers.
@@ -542,7 +533,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		
 		IComponentIdentifier rec = task.receiver;
 		task.receiver = null;
-		IFuture<Void> ret = getMessageFeature().sendMessage(rec, task);
+		IFuture<Void> ret = getMessageFeature().sendMessage(task, rec);
 //		ret.addResultListener(new IResultListener<Void>()
 //		{
 //			public void resultAvailable(Void result)
