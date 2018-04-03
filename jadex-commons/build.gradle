@@ -6,16 +6,3 @@ dependencies
 	testCompile 'org.bouncycastle:bcprov-jdk15on:1.58'
 }
 
-// testjar is needed for jadex-android-xmlpull tests
-task testJar(type:Jar, dependsOn: testClasses) {
-	classifier = 'test'
-	from sourceSets.test.output
-}
-
-configurations {
-	testOutput.extendsFrom testCompile
-}
-
-artifacts {
-	testOutput testJar
-}

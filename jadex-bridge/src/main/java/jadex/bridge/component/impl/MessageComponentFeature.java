@@ -143,30 +143,31 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	
 	/**
 	 *  Send a message.
-	 *  @param receiver	The message receiver.
 	 *  @param message	The message.
+	 *  @param receiver	The message receiver(s). At least one required unless given in message object (e.g. FipaMessage).
 	 *  
 	 */
-	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message)
+	public IFuture<Void> sendMessage(Object message, IComponentIdentifier... receiver)
 	{
-		return sendMessage(receiver, message, null);
+		return sendMessage(message, null, receiver);
 	}
+	
 	
 	/**
 	 *  Send a message.
-	 *  @param receiver	The message receiver.
 	 *  @param message	The message.
 	 *  @param addheaderfields Additional header fields.
+	 *  @param receiver	The message receiver(s). At least one required unless given in message object (e.g. FipaMessage).
 	 *  
 	 */
-	public IFuture<Void> sendMessage(final IComponentIdentifier receiver, Object message, Map<String, Object> addheaderfields)
+	public IFuture<Void> sendMessage(Object message, Map<String, Object> addheaderfields, IComponentIdentifier... receiver)
 	{
 		final MsgHeader header = new MsgHeader();
 		if (addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
 				header.addProperty(entry.getKey(), entry.getValue());
 		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
-		header.addProperty(IMsgHeader.RECEIVER, receiver);
+		header.addProperty(IMsgHeader.RECEIVER, receiver!=null && receiver.length==1 ? receiver[0] : receiver);	// optimize send to one
 		
 		return sendMessage(header, message);
 	}
@@ -526,7 +527,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				copy.addProperty(IMsgHeader.RECEIVER, orec);
 				fubar.addFuture(doSendMessage(copy, message));
 			}
-			return fubar.waitFor();
+			
+			if(fubar.getCount()>0)
+			{
+				return fubar.waitFor();
+			}
+			else
+			{
+				return new Future<Void>(new IllegalArgumentException("No receivers specified in message: "+header+", "+message)); 
+			}
 		}
 		else
 		{

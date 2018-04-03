@@ -40,6 +40,6 @@ public class EchoAgent implements IEchoService
 		reply.put(SFipa.SENDER, agent.getComponentIdentifier());
 		reply.put(SFipa.RECEIVERS, new IComponentIdentifier[]{sender});
 		
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(sender, reply);
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(reply, sender);
 	}
 }

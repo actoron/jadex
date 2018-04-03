@@ -3,8 +3,6 @@ package jadex.micro.testcases.visibility;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
-
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -32,7 +30,6 @@ import jadex.micro.testcases.TestAgent;
  */
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
-@Ignore	// Todo: also finds remote service with publication scope platform
 public class VisibilityTestAgent extends JunitAgentTest
 {
 	@Agent

@@ -8,6 +8,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -254,13 +255,9 @@ public class ServiceCallTestAgent extends TestAgent
 	public static void main(String[] args) throws Exception
 	{
 		// Start platform with agent.
-		IPlatformConfiguration	config1	= PlatformConfigurationHandler.getMinimal();
+		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
-		config1.getExtendedPlatformConfiguration().setSecurity(true);
-//		config1.setAwaMechanisms(AWAMECHANISM.local);
-//		config1.setAwareness(true);
-		config1.getExtendedPlatformConfiguration().setTcpTransport(true);
 		config1.addComponent(ServiceCallTestAgent.class);
 		Starter.createPlatform(config1).get();
 	}

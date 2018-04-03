@@ -260,12 +260,12 @@ public class RecurBDI
 	{
 		this.money = money;
 	}
-}
+
 
 /**
  * 
  */
-class Item
+static class Item
 {
 	/** The item name. */
 	protected String name;
@@ -324,3 +324,4 @@ class Item
 	}
 }
 
+}

@@ -271,7 +271,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		Map<String, Object> header = new HashMap<String, Object>();
 		header.put(RX_ID, rxid);
 		
-		IFuture<Void> ret = component.getComponentFeature(IMessageFeature.class).sendMessage(receiver, msg, header);
+		IFuture<Void> ret = component.getComponentFeature(IMessageFeature.class).sendMessage(msg, header, receiver);
 //		ret.addResultListener(new IResultListener<Void>()
 //		{
 //			public void exceptionOccurred(Exception exception)

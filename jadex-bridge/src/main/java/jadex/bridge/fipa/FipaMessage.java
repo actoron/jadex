@@ -55,11 +55,17 @@ public class FipaMessage	implements IFilter<Object>
 	/**
 	 *  Constructor for most common fields (for sending).
 	 */
-	public FipaMessage(IComponentIdentifier receiver, String performative, Object content)
+	public FipaMessage(String performative, Object content, IComponentIdentifier... receiver)
 	{
 		this.performative	= performative;
 		this.content	= content;
-		addReceiver(receiver);
+		if(receiver!=null)
+		{
+			for(IComponentIdentifier rec: receiver)
+			{
+				addReceiver(rec);
+			}
+		}
 	}
 	
 	/**

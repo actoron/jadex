@@ -861,28 +861,34 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setValue("compregistry", Boolean.TRUE);
 		
 		config.setSuperpeer(false);
-//		config.setSuperpeerClient(false);
+		config.setSuperpeerClient(false);
 		config.setSupersuperpeer(false);
+		config.setValue("acr", false);
 
 		return config;
 	}
 
 	/**
-	 * Returns a minimal platform configuration that communicates via relay.
+	 * Returns a minimal platform configuration that allows communication.
 	 */
-	public static IPlatformConfiguration getMinimalRelayAwareness()
+	public static IPlatformConfiguration getMinimalComm()
 	{
 		IPlatformConfiguration config = getMinimal();
 
-		config.setAwareness(true);
+		// Enable new awareness
+		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
+//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
+		config.setAwareness(false);	// disable old awareness
+
+		//		config.setAwareness(true);
 //		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_RELAY);
 //		config.getExtendedPlatformConfiguration().setAwaFast(true); // Make sure awareness finds other
 										// platforms quickly
-		// rootConfig.setRelayTransport(true);
 
+		config.getExtendedPlatformConfiguration().setTcpTransport(true);
 		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
 
-		throw new RuntimeException("Sorry, no relay available.");
-//		return config;
+//		throw new RuntimeException("Sorry, no relay available.");
+		return config;
 	}
 }

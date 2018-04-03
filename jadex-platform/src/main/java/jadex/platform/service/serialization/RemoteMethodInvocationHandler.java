@@ -3,8 +3,8 @@ package jadex.platform.service.serialization;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
@@ -13,7 +13,6 @@ import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.commons.SReflect;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -197,23 +196,21 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //		CallAccess.resetNextInvocation(); // done in feature
 		// todo: also set last call in future
 		
-		
+		// TODO: synchronized remote methods
 		if(!comp.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
-			return comp.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
+			return comp.getComponentFeature(IExecutionFeature.class).scheduleStep(new ITypedComponentStep<Object>()
 			{
 				public IFuture<Object> execute(IInternalAccess ia)
 				{
-					Object ret = ((IInternalRemoteExecutionFeature)comp.getComponentFeature(IRemoteExecutionFeature.class))
+					return ((IInternalRemoteExecutionFeature)comp.getComponentFeature(IRemoteExecutionFeature.class))
 						.executeRemoteMethod(pr.getRemoteReference(), method, args);
-					if(ret instanceof IFuture)
-					{
-						return (IFuture<Object>)ret;
-					}
-					else
-					{
-						return new Future<Object>(ret);
-					}
+				}
+				
+				@Override
+				public Class<?> getReturnType()
+				{
+					return method.getReturnType();
 				}
 			});
 		}

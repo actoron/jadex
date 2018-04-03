@@ -229,7 +229,10 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		{
 			caller = new ThreadSuspendable();
 		}
-
+		
+		if(!isDone())
+			FutureHelper.notifyStackedListeners();	// Avoid self-blocking
+		
     	synchronized(this)
     	{
 	    	if(!isDone())

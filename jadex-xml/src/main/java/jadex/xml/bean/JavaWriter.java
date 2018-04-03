@@ -186,7 +186,7 @@ public class JavaWriter
 			// jadex.commons.MethodInfo	// Hack!!! also use parameterTypes for backwards compatibility.
 			TypeInfo ti_mi = new TypeInfo(null, new ObjectInfo(MethodInfo.class), 
 			new MappingInfo(null, null, null, null, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("parameterTypes", "parameterTypes"), null, false),
+				//new SubobjectInfo(new AccessInfo("parameterTypes", "parameterTypes"), null, false),
 				new SubobjectInfo(new AccessInfo("parameterTypeInfos", "parameterTypeInfos"), null, false)
 			}, true, null, null));
 					

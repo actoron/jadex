@@ -1,7 +1,7 @@
 quicktest:
+  stage: test
   only:
     - master
-  stage: test
   variables:
     GIT_STRATEGY: fetch
   script:
@@ -10,9 +10,8 @@ quicktest:
     - win
   cache:
     paths:
-    - binaries/
-
-    
+      - binaries/
+      
 testreport:
   stage: deploy
   variables:
@@ -24,7 +23,7 @@ testreport:
     - win
   artifacts:
     paths:
-    - testreport
+      - testreport
   only:
-  - master
+    - master
   when: always
