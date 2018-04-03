@@ -18,6 +18,7 @@ testreport:
   variables:
     GIT_STRATEGY: none
   script:
+    - ipconfig
     - gradlew testReport
   tags:
     - win
