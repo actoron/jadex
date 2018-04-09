@@ -605,7 +605,7 @@ public class ConversationPanel extends JSplitPane
 			@Classname("sendM")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
+				return ia.getComponentFeature(IMessageFeature.class).sendMessage(message, receiver);
 			}
 		}).addResultListener(new SwingDefaultResultListener<Void>(this)
 		{

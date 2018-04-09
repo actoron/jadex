@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  *  Marker for agent message arrived.
- *  Method arguments should adhere to:
- *  void messageArrived(Map<String, Object> msg, MessageType mt)
+ *  The received message object can be injected as method parameter, e.g.:
+ *  void messageArrived(FipaMessage msg)
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

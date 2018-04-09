@@ -71,7 +71,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		thread.setWaiting(true);
 //		System.out.println("sending message: "+msg.get(ri));
 		
-		instance.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message)
+		instance.getComponentFeature(IMessageFeature.class).sendMessage(message, receiver)
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)

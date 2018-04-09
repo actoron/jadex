@@ -42,7 +42,7 @@ public class REventbase extends RElement implements IEventbase
 	 */
 	public IFuture<Void> sendMessage(IMessageEvent<?> me)
 	{
-		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage(null, me.getMessage());
+		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage(me.getMessage());
 	}
 
 	/**

@@ -67,7 +67,7 @@ public class Main
 
 	public void init()
 	{
-		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalRelayAwareness();
+		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalComm();
 
 		config.setPlatformName("presentationtimer-*");
 

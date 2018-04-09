@@ -197,7 +197,7 @@ public class DFTestAgent extends JunitAgentTest
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(agent.getComponentIdentifier(), hlefMessage)
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(hlefMessage, agent.getComponentIdentifier())
 			.addResultListener(new IResultListener<Void>()
 		{
 			@Override
@@ -209,6 +209,7 @@ public class DFTestAgent extends JunitAgentTest
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed(exception);
+				agent.killComponent();
 			}
 		});
 		

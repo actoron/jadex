@@ -347,7 +347,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		public IFuture<Void> sendMessageEvent(IMessageEvent message)
 		{
 			IMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
-			return mf.sendMessage(null, message.getMessage());
+			return mf.sendMessage(message.getMessage());
 		}
 		
 		/**

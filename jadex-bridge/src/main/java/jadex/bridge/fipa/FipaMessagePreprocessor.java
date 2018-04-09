@@ -1,5 +1,9 @@
 package jadex.bridge.fipa;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
@@ -34,39 +38,44 @@ public class FipaMessagePreprocessor	implements IMessagePreprocessor<FipaMessage
 		
 		// Set/check consistent receiver.
 		Set<IComponentIdentifier>	frec	= msg.getReceivers();
-		IComponentIdentifier	hrec	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-		if(frec==null && hrec!=null)
+		
+		Object	hrec	= header.getProperty(IMsgHeader.RECEIVER);
+		
+		// At least one receiver should be set.
+		if((frec==null || frec.isEmpty())
+			&& (hrec==null || hrec instanceof IComponentIdentifier[] && ((IComponentIdentifier[])hrec).length==0))
 		{
-			msg.addReceiver(hrec);
+			throw new IllegalArgumentException("No receiver specified: "+msg);
 		}
-		else if(frec!=null)
-		{
-			// single receiver in msg object
-			if(frec.size()==1)
-			{
-				IComponentIdentifier	next	= frec.iterator().next();
-				if(hrec==null)
-				{
-					header.addProperty(IMsgHeader.RECEIVER, next);
-				}
-				else if(!SUtil.equals(hrec, next))
-				{
-					throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+hrec);				
-				}
-				// else equal -> NOP
-			}
 
-			// use multiple receivers from msg object
-			else if(hrec==null)
-			{
-				header.addProperty(IMsgHeader.RECEIVER, frec);
-			}
+		// Copy header receiver(s) to FIPA message object
+		if(frec==null && hrec instanceof IComponentIdentifier)
+		{
+			msg.addReceiver((IComponentIdentifier)hrec);
+		}
+		else if(frec==null && hrec instanceof IComponentIdentifier[])
+		{
+			msg.setReceivers(new LinkedHashSet<IComponentIdentifier>(Arrays.asList((IComponentIdentifier[])hrec)));
+		}
+		
+		// Copy FIPA receiver(s) to header
+		else if(frec!=null && hrec==null)
+		{
+			header.addProperty(IMsgHeader.RECEIVER, frec);
+		}
 			
-			// msg and header receivers given and not equal
-			else
+		// Check consistency of FIPA vs. header receivers.
+		else
+		{
+			Set<IComponentIdentifier>	tmp	= hrec instanceof IComponentIdentifier
+				? Collections.singleton((IComponentIdentifier)hrec)
+				: new HashSet<IComponentIdentifier>(Arrays.asList((IComponentIdentifier[])hrec));
+				
+			if(!frec.equals(tmp))
 			{
-				throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+hrec);
+				throw new IllegalArgumentException("Inconsistent msg/header receivers: "+frec+" vs. "+tmp);				
 			}
+			// else equal -> NOP
 		}
 		
 		// Set/check consistent conv id.

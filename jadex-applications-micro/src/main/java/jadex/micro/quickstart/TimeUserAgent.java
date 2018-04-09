@@ -35,7 +35,7 @@ public class TimeUserAgent
 	 */
 	public static void main(String[] args)
 	{
-		IPlatformConfiguration config = PlatformConfigurationHandler.getDefaultNoGui();
+		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
 		config.addComponent(TimeUserAgent.class);
 		Starter.createPlatform(config).get();
 	}

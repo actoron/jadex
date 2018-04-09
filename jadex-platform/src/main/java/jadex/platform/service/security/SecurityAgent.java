@@ -1335,7 +1335,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		Map<String, Object> addheader = new HashMap<String, Object>();
 		addheader.put(SECURITY_MESSAGE, Boolean.TRUE);
 		
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message, addheader);
+		return agent.getComponentFeature(IMessageFeature.class).sendMessage(message, addheader, receiver);
 	}
 	
 	/**
