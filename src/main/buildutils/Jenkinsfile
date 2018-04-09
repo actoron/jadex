@@ -7,7 +7,7 @@
 //publishToDummy = true
 // publishCommercial = true;
 
-defaultGradleArgs = " --info --stacktrace"
+defaultGradleArgs = " --info --stacktrace --no-daemon"
 
 
 def branchName
@@ -152,7 +152,7 @@ stage('preparation') {
             echo "Version suffix:" + versionSuffix
 
             withEnv(['BUILD_VERSION_SUFFIX=' + versionSuffix]) {
-                sh "./gradlew createVersionInfo"
+                sh './gradlew createVersionInfo' + defaultGradleArgs
                 def props = readProperties file: 'build/jadexversion.properties'
                 jadexVersion = props.jadexversion
 
@@ -243,8 +243,8 @@ if (deployDists) {
                 util.nodeWithVersion(versionSuffix) {
                     deleteDir()
                     unstash 'sources'
-                    sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf'
-                    sh './gradlew -Pdist=addonjavadoc clean javadocZip'
+                    sh './gradlew -b docs/mkdocs-ng/build.gradle clean buildDocsZip buildDocsPdf' + defaultGradleArgs
+                    sh './gradlew -Pdist=addonjavadoc clean javadocZip' + defaultGradleArgs
                     stash name: 'docs', includes: 'docs/mkdocs-ng/build/*.zip, docs/mkdocs-ng/build/*.pdf, build/distributions/*.zip'
                 }
             }
