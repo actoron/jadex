@@ -55,6 +55,9 @@ public class VmHacks
 	/** Globally disable all VM Hacks. */
 	public static boolean DISABLE = false;
 	
+	/** Disable all instrumentation-based Hacks. */
+	public static boolean DISABLE_INSTRUMENTATION = true;
+	
 	/** Set to true to see debug infos during startup. */
 	public static boolean DEBUG = false;
 	
@@ -488,7 +491,7 @@ public class VmHacks
 		@SuppressWarnings("unchecked")
 		private void startInstrumentationAgent()
 		{
-			if (!asm)
+			if (!asm || DISABLE_INSTRUMENTATION)
 				return;
 			
 			File jar = null;
