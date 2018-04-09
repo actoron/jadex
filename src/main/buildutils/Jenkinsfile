@@ -79,6 +79,7 @@ stage('preparation') {
             }
 
             // parse last git tag
+//            def git_tag = sh(returnStdout: true, script: 'grep jadexversion_m < src/main/buildutils/jadexversion.properties | tr -d "\n\r" | sed s/jadexversion_major=//g | sed s/jadexversion_minor=/./g | xargs -Ivernum bash -c "git tag | grep ^vernum | grep [.][0-9]$ | sort | tail -1 -"').trim()
             def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
             println "The tag used for generating a new version is: ${git_tag}"
             lastVersionTag = util.getVersionsFromTag(git_tag);
