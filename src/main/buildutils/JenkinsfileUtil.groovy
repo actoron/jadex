@@ -14,7 +14,7 @@ def getVersionsFromTag(gittag) {
     ]
 }
 
-def getVersionsFromProperties(propfile) {
+def getLastVersion(propfile) {
     def properties = readProperties file: propfile
 
     def v = [major: properties.jadexversion_major,

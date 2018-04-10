@@ -78,13 +78,12 @@ stage('preparation') {
                 println "On branch: ${branchName}"
             }
 
-            lastVersionTag = util.getVersionsFromProperties('src/main/buildutils/jadexversion.properties')
-            println "Version from props: ${lastVersionTag}"
+            lastVersionTag = util.getLastVersion('src/main/buildutils/jadexversion.properties')
+            println "Last detected jadex version is: ${lastVersionTag}"
 
             // parse last git tag
 //            def git_tag = sh(returnStdout: true, script: 'grep jadexversion_m < src/main/buildutils/jadexversion.properties | tr -d "\n\r" | sed s/jadexversion_major=//g | sed s/jadexversion_minor=/./g | xargs -Ivernum bash -c "git tag | grep ^vernum | grep [.][0-9]*$ | sort -V | tail -1 -"').trim()
-//            def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
-            println "The tag used for generating a new version is: ${git_tag}"
+//            println "The tag used for generating a new version is: ${git_tag}"
 //            lastVersionTag = util.getVersionsFromTag(git_tag);
 //            if (lastVersionTag == null) {
 //            	error("Could not determine (last) version from tag: " + git_tag)
@@ -97,7 +96,7 @@ stage('preparation') {
 
 
             if (isTagRebuild) {
-                currentBuild.description = "rebuild of tag: ${git_tag}"
+                currentBuild.description = "rebuild of tag: ${tagToBuild}"
                 if (lastVersionTag.branchName != null) {
                     versionSuffix = "${patch}${lastVersionTag.branchName}-${lastVersionTag.branchPatch}"
                 } else {
@@ -105,6 +104,7 @@ stage('preparation') {
                 }
             } else {
                 boolean headIsLastVersionTag = false
+                def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
                 def tags = util.runCmdAndSplit('git tag --points-at HEAD')
                 for (int i = 0; i < tags.length; i++) {
                     if (git_tag.equals(tags[i])) {
