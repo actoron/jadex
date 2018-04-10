@@ -78,6 +78,11 @@ stage('preparation') {
                 println "On branch: ${branchName}"
             }
 
+            def lastPropVersion = util.getVersionsFromProperties('src/main/buildutils/jadexversion.properties')
+            println lastPropVersion
+            def alltags = sh(returnStdout:true, script: "git tag | grep ${lastPropVersion.major}.${lastPropVersion.minor}.");
+            println alltags
+
             // parse last git tag
             def git_tag = sh(returnStdout: true, script: 'grep jadexversion_m < src/main/buildutils/jadexversion.properties | tr -d "\n\r" | sed s/jadexversion_major=//g | sed s/jadexversion_minor=/./g | xargs -Ivernum bash -c "git tag | grep ^vernum | grep [.][0-9]*$ | sort -V | tail -1 -"').trim()
 //            def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()

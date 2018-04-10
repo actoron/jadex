@@ -14,6 +14,18 @@ def getVersionsFromTag(gittag) {
     ]
 }
 
+def getVersionsFromProperties(propfile) {
+    Properties properties = new Properties()
+    File propertiesFile = new File(propfile)
+    propertiesFile.withInputStream {
+        properties.load(it)
+    }
+
+    return [major: properties.jadexversion_major,
+            minor: properties.jadexversion_minor,
+    ];
+}
+
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
         timeout(time:1, unit: 'HOURS') {
