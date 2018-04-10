@@ -15,11 +15,18 @@ def getVersionsFromTag(gittag) {
 }
 
 def getVersionsFromProperties(propfile) {
-    def properties = readPRoperties file: propfile
+    def properties = readProperties file: propfile
 
-    return [major: properties.jadexversion_major,
+    def v = [major: properties.jadexversion_major,
             minor: properties.jadexversion_minor,
     ];
+    def alltags = sh(returnStdout:true, script: "git tag | grep ${properties.jadexversion_major}.${properties.jadexversion_minor}.");
+    println alltags
+
+    def tagsArr = alltags.split("\n")
+    println tagsArr
+
+    return getVersionsFromTag(tagsArr[tagsArr.length-1]);
 }
 
 def nodeWithVersion(String label = '', version, cl) {
