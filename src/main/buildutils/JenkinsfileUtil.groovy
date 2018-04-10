@@ -14,13 +14,13 @@ def getVersionsFromTag(gittag) {
     ]
 }
 
-def getLastVersion(propfile) {
+def getLastVersionUsingProps(propfile) {
     def properties = readProperties file: propfile
 
     def v = [major: properties.jadexversion_major,
             minor: properties.jadexversion_minor,
     ];
-    def alltags = sh(returnStdout:true, script: "git tag | grep ${properties.jadexversion_major}.${properties.jadexversion_minor}.");
+    def alltags = sh(returnStdout:true, script: "git tag | grep ^${properties.jadexversion_major}.${properties.jadexversion_minor}.");
     println "Found tags matching major/minor: \n ${alltags}"
 
     def tagsArr = alltags.split("\n")

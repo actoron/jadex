@@ -78,10 +78,10 @@ stage('preparation') {
                 println "On branch: ${branchName}"
             }
 
-            lastVersionTag = util.getLastVersion('src/main/buildutils/jadexversion.properties')
+            // parse last git tag
+            lastVersionTag = util.getLastVersionUsingProps('src/main/buildutils/jadexversion.properties')
             println "Last detected jadex version is: ${lastVersionTag}"
 
-            // parse last git tag
 //            def git_tag = sh(returnStdout: true, script: 'grep jadexversion_m < src/main/buildutils/jadexversion.properties | tr -d "\n\r" | sed s/jadexversion_major=//g | sed s/jadexversion_minor=/./g | xargs -Ivernum bash -c "git tag | grep ^vernum | grep [.][0-9]*$ | sort -V | tail -1 -"').trim()
 //            println "The tag used for generating a new version is: ${git_tag}"
 //            lastVersionTag = util.getVersionsFromTag(git_tag);
@@ -148,12 +148,10 @@ stage('preparation') {
                         branchPatch = 1
                     }
                     versionSuffix = "${patch}${branchName}-${branchPatch}"
-                    // so we append something to our version. but what?
-                    //versionSuffix = "${result.rawBuild.environment.PATCH_VERSION}${branchName}"
                 }
 
             }
-            echo "Version suffix:" + versionSuffix
+            echo "New version suffix for this build:" + versionSuffix
 
             withEnv(['BUILD_VERSION_SUFFIX=' + versionSuffix]) {
                 sh './gradlew createVersionInfo' + defaultGradleArgs
