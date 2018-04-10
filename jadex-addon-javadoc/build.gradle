@@ -7,6 +7,7 @@ dependencies
 	compile project(':jadex-commons')
 	compile project(':jadex-commons:jadex-commons-gui')
 	compile project(':jadex-commons:jadex-commons-security')
+	compile project(':jadex-concurrent')
 	compile project(':jadex-bytecode-tools')
 	compile project(':jadex-javaparser')
 	compile project(':jadex-kernel-bdiv3')
