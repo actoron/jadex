@@ -21,12 +21,20 @@ def getVersionsFromProperties(propfile) {
             minor: properties.jadexversion_minor,
     ];
     def alltags = sh(returnStdout:true, script: "git tag | grep ${properties.jadexversion_major}.${properties.jadexversion_minor}.");
-    println alltags
+    println "Found tags matching major/minor: \n ${alltags}"
 
     def tagsArr = alltags.split("\n")
-    println tagsArr
+    def lastVersion = [major: 0, minor: 0, patch: 0];
 
-    return getVersionsFromTag(tagsArr[tagsArr.length-1]);
+    for (int i=0; i < tagsArr.length; i++) {
+        def ver = getVersionsFromTag(tagsArr[i])
+        if (ver.major >= lastVersion.major
+                && ver.minor >= lastVersion.minor
+                && ver.patch >= lastVersion.patch) {
+            lastVersion = ver;
+        }
+    }
+    return lastVersion;
 }
 
 def nodeWithVersion(String label = '', version, cl) {

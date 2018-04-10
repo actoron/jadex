@@ -78,14 +78,14 @@ stage('preparation') {
                 println "On branch: ${branchName}"
             }
 
-            def lastPropVersion = util.getVersionsFromProperties('src/main/buildutils/jadexversion.properties')
-            println "version from props: ${lastPropVersion}"
+            lastVersionTag = util.getVersionsFromProperties('src/main/buildutils/jadexversion.properties')
+            println "Version from props: ${lastVersionTag}"
 
             // parse last git tag
-            def git_tag = sh(returnStdout: true, script: 'grep jadexversion_m < src/main/buildutils/jadexversion.properties | tr -d "\n\r" | sed s/jadexversion_major=//g | sed s/jadexversion_minor=/./g | xargs -Ivernum bash -c "git tag | grep ^vernum | grep [.][0-9]*$ | sort -V | tail -1 -"').trim()
+//            def git_tag = sh(returnStdout: true, script: 'grep jadexversion_m < src/main/buildutils/jadexversion.properties | tr -d "\n\r" | sed s/jadexversion_major=//g | sed s/jadexversion_minor=/./g | xargs -Ivernum bash -c "git tag | grep ^vernum | grep [.][0-9]*$ | sort -V | tail -1 -"').trim()
 //            def git_tag = sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
             println "The tag used for generating a new version is: ${git_tag}"
-            lastVersionTag = util.getVersionsFromTag(git_tag);
+//            lastVersionTag = util.getVersionsFromTag(git_tag);
 //            if (lastVersionTag == null) {
 //            	error("Could not determine (last) version from tag: " + git_tag)
 //            }
