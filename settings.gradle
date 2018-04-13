@@ -56,16 +56,14 @@ allprojects.each { proj ->
 		HashSet set = new HashSet<String>();
 		addDependency(proj, projdeps, set);
 		List<String> extraarts = getExtraArtifacts(proj)
-		println "" + proj + " extra artifacts: " + Arrays.toString(extraarts.toArray())
 		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
 	}
 	else if (proj.startsWith(':' + addonprefix)) {
 		def metaname = 'addon' + proj.substring(1 + addonprefix.length())
 		List<String> extraarts = getExtraArtifacts(proj)
-		//println "" + proj + " extra artifacts: " + Arrays.toString(extraarts.toArray())
 		HashSet set = new HashSet<String>(projdeps.get(proj));
-		//set.addAll(extraarts);
+		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
 	}
 }
