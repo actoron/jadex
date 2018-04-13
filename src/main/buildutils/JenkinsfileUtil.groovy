@@ -14,6 +14,29 @@ def getVersionsFromTag(gittag) {
     ]
 }
 
+def getLastVersionUsingProps(propfile) {
+    def properties = readProperties file: propfile
+
+    def v = [major: properties.jadexversion_major,
+            minor: properties.jadexversion_minor,
+    ];
+    def alltags = sh(returnStdout:true, script: "git tag | grep ^${properties.jadexversion_major}.${properties.jadexversion_minor}.");
+    println "Found tags matching major/minor: \n ${alltags}"
+
+    def tagsArr = alltags.split("\n")
+    def lastVersion = [major: 0, minor: 0, patch: 0];
+
+    for (int i=0; i < tagsArr.length; i++) {
+        def ver = getVersionsFromTag(tagsArr[i])
+        if (ver.major >= lastVersion.major
+                && ver.minor >= lastVersion.minor
+                && ver.patch >= lastVersion.patch) {
+            lastVersion = ver;
+        }
+    }
+    return lastVersion;
+}
+
 def nodeWithVersion(String label = '', version, cl) {
     node(label) {
         timeout(time:1, unit: 'HOURS') {
