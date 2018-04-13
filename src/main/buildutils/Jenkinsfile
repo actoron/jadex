@@ -366,9 +366,9 @@ stage ('publish and deploy') {
 
                     // distributions:
 
-                    def TARGET = 'snapshots'
+                    def TARGET = 'nightlies'
                     for (TYPE in ['oss', 'pro']) {
-                        util.sshDownloads """# remove old snapshot with same version if exists
+                        util.sshDownloads """# remove old nightly with same version if exists
                                         if [ -d "/www/$TARGET/$TYPE/${jadexVersion}" ]; then
                                             rm -r "/www/$TARGET/$TYPE/${jadexVersion}"
                                         fi
@@ -386,8 +386,8 @@ stage ('publish and deploy') {
                     }
 
                     // exampleprojects:
-                    //util.sshDownloads "mkdir -p /www/snapshots/oss/${jadexVersion}/exampleprojects"
-                    util.copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/snapshots/oss/${jadexVersion}/"
+                    //util.sshDownloads "mkdir -p /www/nightlies/oss/${jadexVersion}/exampleprojects"
+                    util.copyDownloads 'deployment/distributions/exampleprojects/*.zip', "/www/nightlies/oss/${jadexVersion}/"
                 }
             }
         }
