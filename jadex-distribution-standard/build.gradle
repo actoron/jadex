@@ -6,6 +6,7 @@ dependencies
 
 	compile project(':jadex-runtimetools-swing')
 	compile project(':jadex-tools-bdi')
+	compile project(':jadex-applib-bdi')
 	compile project(':jadex-tools-bpmn')
 	compile project(':jadex-tools-comanalyzer')
 	compile project(':jadex-rules-tools')
