@@ -56,7 +56,7 @@ allprojects.each { proj ->
 		HashSet set = new HashSet<String>();
 		addDependency(proj, projdeps, set);
 		List<String> extraarts = getExtraArtifacts(proj)
-		//println "" + proj + " extra artifacts: " + Arrays.toString(extraarts.toArray())
+		println "" + proj + " extra artifacts: " + Arrays.toString(extraarts.toArray())
 		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
 	}
