@@ -14,7 +14,9 @@ dependencies
 	compile project(':jadex-kernel-extension-agr')
 	compile project(':jadex-kernel-extension-envsupport')
 	
-	// excluded?
-//	compile project(':jadex-platform-extension-webservice')
-//	compile project(':jadex-platform-extension-webservice-desktop')
+	// excluded? ---> why??? Comment removed
+	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-platform-extension-webservice-desktop')
+	compile project(':jadex-platform-extension-webservice-desktop-jetty')
+	compile project(':jadex-platform-extension-webservice-desktop-grizzly') // todo: remove grizzly dependency in jadex-application-webservice
 }
