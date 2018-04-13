@@ -76,14 +76,14 @@ stage('deploy to downloads') {
 	util.nodeWithVersion(versionSuffix) {
 		unstash 'built'
 		util.sshDownloads """
-			# copy oss snapshot
-			if [ -d "/www/snapshots/oss/${jadexVersion}" ]; then
-				cp -r "/www/snapshots/oss/${jadexVersion}" "/www/releases/oss/"
+			# copy oss nightly
+			if [ -d "/www/nightlies/oss/${jadexVersion}" ]; then
+				cp -r "/www/nightlies/oss/${jadexVersion}" "/www/releases/oss/"
 			fi
 
-			# copy pro snapshot
-			if [ -d "/www/snapshots/pro/${jadexVersion}" ]; then
-				cp -r "/www/snapshots/pro/${jadexVersion}" "/www/releases/pro/"
+			# copy pro nightly
+			if [ -d "/www/nightlies/pro/${jadexVersion}" ]; then
+				cp -r "/www/nightlies/pro/${jadexVersion}" "/www/releases/pro/"
 			fi
 
 			# copy docs
