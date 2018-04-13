@@ -6,6 +6,7 @@ dependencies
 	compile project(':jadex-platform-extension-maven')
 	//compile project(':jadex-platform-extension-securetransport')
 	//compile project(':jadex-platform-extension-relay-standalone')
+	compile project(':jadex-platform-extension-webservice')
 	compile project(':jadex-platform-extension-management')
 }
 
