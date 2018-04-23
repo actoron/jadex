@@ -194,7 +194,7 @@ def addSchemaTasks(Project project) {
         copy {
             // copy original unfiltered file and rename to -${jadex_build_version}
             from file("$project.projectDir/src/main/schema/")
-            into file("$project.buildDir/schemas")
+            into file("$project.buildDir/devschemas")
             rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
         }
     }
