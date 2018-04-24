@@ -874,21 +874,21 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	public static IPlatformConfiguration getMinimalComm()
 	{
 		IPlatformConfiguration config = getMinimal();
+		
+		// Security & Transports
+		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
+		config.getExtendedPlatformConfiguration().setTcpTransport(true);
+		config.getExtendedPlatformConfiguration().setWsTransport(true);
+		config.getExtendedPlatformConfiguration().setWsPort(-1);
+		config.getExtendedPlatformConfiguration().setRelayTransport(true);
+		config.setValue("rtdebug", true);
 
-		// Enable new awareness
-		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
+		// Registry & Awareness
+		config.setSuperpeerClient(true);
+//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 		config.setAwareness(false);	// disable old awareness
 
-		//		config.setAwareness(true);
-//		rootconf.setAwaMechanisms(IRootComponentConfiguration.AWAMECHANISM_RELAY);
-//		config.getExtendedPlatformConfiguration().setAwaFast(true); // Make sure awareness finds other
-										// platforms quickly
-
-		config.getExtendedPlatformConfiguration().setTcpTransport(true);
-		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
-
-//		throw new RuntimeException("Sorry, no relay available.");
 		return config;
 	}
 }
