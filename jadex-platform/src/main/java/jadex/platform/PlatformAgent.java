@@ -286,7 +286,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0"),
 		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0"),
-		@Component(name="relay", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
 		
 		@Component(name="acr", type="acr", daemon=Boolean3.TRUE, number="$args.acr? 1 : 0")
 	})
