@@ -43,14 +43,16 @@ public class AgentDelayRunner implements IDelayRunner
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				try
+//				try
 				{
+					// TODO: Users of AgentDelayRunner should handle their exceptions themselves!
+					// ...printStackTrace() is not a solution!
 					step.run();
 				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
 				return IFuture.DONE;
 			}
 			
@@ -58,19 +60,23 @@ public class AgentDelayRunner implements IDelayRunner
 			{
 				return valid[0] && !cancelled;
 			}
-		}, true).addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				if(!(exception instanceof StepInvalidException)
-					&& !(exception instanceof ComponentTerminatedException))
-					exception.printStackTrace();
-			}
-		});
+		}, true);
+		
+		// TODO: Users of AgentDelayRunner should handle their exceptions themselves!
+		// ...printStackTrace() is not a solution!
+//		.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				if(!(exception instanceof StepInvalidException)
+//					&& !(exception instanceof ComponentTerminatedException))
+//					exception.printStackTrace();
+//			}
+//		});
 		
 		// Set the valid flag of the step to invalid so that the step is not executed
 		return new Runnable()

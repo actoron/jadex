@@ -287,6 +287,14 @@ public class SServiceProvider
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
 			throw new ServiceNotFoundException(type.getName());
+//			{
+//				@Override
+//				public void printStackTrace()
+//				{
+//					Thread.dumpStack();
+//					super.printStackTrace();
+//				}
+//			};
 		
 		return proxy? createRequiredProxy(component, ret, type): ret;
 	}
