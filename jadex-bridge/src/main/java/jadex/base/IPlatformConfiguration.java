@@ -2,7 +2,6 @@ package jadex.base;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import jadex.bridge.modelinfo.IModelInfo;
@@ -371,7 +370,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
        * Address(es) for relay transport (one or more addresses separated by
        * commas).
        **/
-      public static final String	RELAYADDRESSES		= "relayaddresses";							// class:
+      public static final String	RELAYADDRESSES		= "rt.addresses";							// class:
       // String
       // default:
       // jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS
@@ -545,7 +544,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 
       public static final String WSTRANSPORT = "wstransport";
 
-      public static final String RELAYFORWARDING = "relayforwarding";
+      public static final String RELAYFORWARDING = "rt.forwarding";
 
       public static final String PLATFORMARGS = "$platformargs";
       

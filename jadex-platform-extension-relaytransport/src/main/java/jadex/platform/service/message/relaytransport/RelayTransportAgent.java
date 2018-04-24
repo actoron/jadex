@@ -42,7 +42,6 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
-import jadex.commons.Boolean3;
 import jadex.commons.SConfigParser;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -59,6 +58,8 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
@@ -71,10 +72,11 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  *  Agent implementing relay routing.
  */
 @Agent//(autoprovide=Boolean3.TRUE)
-// todo: see SuperpeerRegistrySynchronizationAgent
-//@Arguments({
+@Arguments({
+	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
-//})
+	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
+})
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=Binding.SCOPE_PLATFORM),
 		@ProvidedService(type=IRoutingService.class, name="routing", scope=Binding.SCOPE_GLOBAL)
@@ -123,7 +125,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected boolean forwarding;
 	
 	/** Relay addresses to use. */
-	@AgentArgument
+	@AgentArgument()
 	protected String addresses;
 	
 	/** Flag if the transport should dynamically acquire more routing services. */

@@ -20,7 +20,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.buildship.core.classpathprovider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-tcptransport false&#13;&#10;-awareness false&#13;&#10;-acr false&#13;&#10;-wsport -1&#13;&#10;-rt.addresses ws://ssp1@localhost:12345&#13;&#10;-logging true&#13;&#10;-rt.debug true&#13;&#10;-ws.idletimeout 5000"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-tcptransport false&#13;&#10;-awareness false&#13;&#10;-acr false&#13;&#10;-logging true&#13;&#10;-rt.debug true&#13;&#10;-wsport -1"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-platform-standalone-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea"/>
 </launchConfiguration>

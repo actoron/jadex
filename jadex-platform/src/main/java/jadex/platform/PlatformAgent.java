@@ -130,14 +130,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@Argument(name=NETWORKSECRET, clazz=String.class),
 //	@Argument(name=ROLES, clazz=Map.class),
 
+	
+	// TODO. Setting default values here doesn't work any more!
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="0"),
 	@Argument(name=WSTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=WSPORT, clazz=int.class, defaultvalue="-1"),
 	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="\"relay,ws,127.0.0.1:8080\""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
-	@Argument(name=RELAYADDRESSES, clazz=String.class),//, defaultvalue=""),
+	@Argument(name=RELAYADDRESSES, clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss
 	@Argument(name=RELAYFORWARDING, clazz=boolean.class, defaultvalue="false"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
