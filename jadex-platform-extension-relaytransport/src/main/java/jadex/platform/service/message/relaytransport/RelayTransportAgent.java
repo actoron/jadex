@@ -70,14 +70,14 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 /**
  *  Agent implementing relay routing.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent//(autoprovide=Boolean3.TRUE)
 // todo: see SuperpeerRegistrySynchronizationAgent
 //@Arguments({
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
 //})
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=Binding.SCOPE_PLATFORM),
-		@ProvidedService(type=IRoutingService.class, name="routing")
+		@ProvidedService(type=IRoutingService.class, name="routing", scope=Binding.SCOPE_GLOBAL)
 })
 @Features(additional=true, replace=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
 @Service

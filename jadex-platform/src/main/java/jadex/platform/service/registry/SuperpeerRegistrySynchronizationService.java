@@ -824,7 +824,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected boolean checkScope(IService ser) // String clienttype
 	{
-		boolean ret = false;
+		boolean ret = true;
 		
 		String scope = ser.getServiceIdentifier().getScope();
 		// SSP L0
