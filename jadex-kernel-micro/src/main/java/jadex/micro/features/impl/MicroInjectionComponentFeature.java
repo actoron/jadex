@@ -61,6 +61,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
+//		if(getComponent().toString().indexOf("rt")!=-1)
+//			System.out.println("relayinti");
 				
 		Map<String, Object>	args = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults();

@@ -140,7 +140,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Set to true for more verbose output. */
 	@AgentArgument
-	protected boolean debug = true;
+	protected boolean debug;
 	
 	/** Timestamp of the next clean for direct routes. */
 	protected long nextclean = System.currentTimeMillis();

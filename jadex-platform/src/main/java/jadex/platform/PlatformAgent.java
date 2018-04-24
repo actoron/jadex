@@ -41,7 +41,6 @@ import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;

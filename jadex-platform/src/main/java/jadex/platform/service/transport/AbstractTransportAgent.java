@@ -537,21 +537,21 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 	}
 	
-	/**
-	 *  Get or create a virtual connection.
-	 */
-	protected VirtualConnection getOrCreateVirtualConnection(IComponentIdentifier target)
-	{
-		synchronized(this)
-		{
-			VirtualConnection	ret	= getVirtualConnection(target);
-			if(ret==null)
-			{
-				ret	= createVirtualConnection(target);
-			}
-			return ret;
-		}
-	}
+//	/**
+//	 *  Get or create a virtual connection.
+//	 */
+//	protected VirtualConnection getOrCreateVirtualConnection(IComponentIdentifier target)
+//	{
+//		synchronized(this)
+//		{
+//			VirtualConnection	ret	= getVirtualConnection(target);
+//			if(ret==null)
+//			{
+//				ret	= createVirtualConnection(target);
+//			}
+//			return ret;
+//		}
+//	}
 	
 	/**
 	 *  Remove a virtual connection if it is still the current connection for the target.
@@ -566,6 +566,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				virtuals.remove(target);
 			}
 		}
+		getLogger().info("Removed connection to target "+target+": "+con);
 	}
 
 
@@ -924,6 +925,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			
 			if(log)
 			{
+//				System.out.println("Completed handshake for connection " + cand.getConnection() + " to: "+ cand.getTarget());
 				agent.getLogger().info("Completed handshake for connection " + cand.getConnection() + " to: "+ cand.getTarget());
 			}
 
