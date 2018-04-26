@@ -33,16 +33,21 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -59,8 +64,11 @@ import jadex.micro.annotation.ProvidedServices;
  * @param <Con> A custom object type to hold connection information as required by the concrete transport.
  */
 @Agent
-@ProvidedServices(@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
-public abstract class AbstractTransportAgent<Con> implements ITransportService, IInternalService, ITransportHandler<Con>
+@ProvidedServices({
+	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
+})
+public abstract class AbstractTransportAgent<Con> implements ITransportService, ITransportInfoService, IInternalService, ITransportHandler<Con>
 {
 	// -------- arguments --------
 
@@ -105,6 +113,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	
 	/** The cms (cached for speed). */
 	protected IComponentManagementService	cms;
+	
+	/** Listeners from transport info service. */
+	protected Collection<SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>>	infosubscribers;
+	
 
 	// -------- abstract methods to be provided by concrete transport --------
 
@@ -113,8 +125,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public abstract ITransport<Con> createTransportImpl();
 
-	// -------- ITransportHandler, i.e.methods to be called by concrete
-	// transport --------
+	// -------- ITransportHandler, i.e.methods to be called by concrete transport --------
 
 	/**
 	 * Get the internal access.
@@ -384,6 +395,49 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			return ret;
 		}
 	}
+	
+	//-------- ITransportInfoService interface --------
+	
+	/**
+	 *  Get the established connections.
+	 *  @return A list of connections specified by
+	 *  	1: platform id,
+	 *  	2: protocol name,
+	 *  	3: ready flag (false=connecting, true=connected, null=disconnected).
+	 */
+	public ISubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnections()
+	{
+		final SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	ret
+		= new SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>(null, true);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				synchronized(AbstractTransportAgent.this)
+				{
+					infosubscribers.remove(ret);
+				}
+			}
+		});
+		
+		synchronized(this)
+		{
+			if(infosubscribers==null)
+			{
+				infosubscribers	= new ArrayList<SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>>();
+			}
+			infosubscribers.add(ret);
+			
+			// Add initial data
+			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
+			{ 
+				ret.addIntermediateResult(new Tuple3<IComponentIdentifier, String, Boolean>(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
+			}
+		}
+		
+		return ret;
+	}
 
 	// -------- helper methods --------
 
@@ -524,17 +578,34 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected VirtualConnection createVirtualConnection(IComponentIdentifier target)
 	{
+		VirtualConnection vircon = new VirtualConnection();
+		SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	notify;
 		synchronized(this)
 		{
 			if(virtuals==null)
 			{
 				virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
 			}
-			VirtualConnection vircon = new VirtualConnection();
 			VirtualConnection prev = virtuals.put(target, vircon);
 			assert prev == null;
-			return vircon;
+			
+			@SuppressWarnings("unchecked")
+			SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	tmp
+				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
+			notify	= tmp;
 		}
+		
+		if(notify!=null)
+		{
+			// Newly created connection -> ready=false.
+			Tuple3<IComponentIdentifier, String, Boolean>	info	= new Tuple3<IComponentIdentifier, String, Boolean>(target, impl.getProtocolName(), false);
+			for(SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>> fut: notify)
+			{
+				fut.addIntermediateResult(info);
+			}
+		}
+		
+		return vircon;
 	}
 	
 //	/**
@@ -558,6 +629,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected void	removeVirtualConnection(IComponentIdentifier target, VirtualConnection con)
 	{
+		SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	notify;
 		synchronized(this)
 		{
 			VirtualConnection	vircon	= getVirtualConnection(target);
@@ -565,8 +637,22 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			{
 				virtuals.remove(target);
 			}
+			
+			@SuppressWarnings("unchecked")
+			SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	tmp
+				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
+			notify	= tmp;
 		}
-		getLogger().info("Removed connection to target "+target+": "+con);
+
+		if(notify!=null)
+		{
+			// Removed connection -> ready=null.
+			Tuple3<IComponentIdentifier, String, Boolean>	info	= new Tuple3<IComponentIdentifier, String, Boolean>(target, impl.getProtocolName(), null);
+			for(SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>> fut: notify)
+			{
+				fut.addIntermediateResult(info);
+			}
+		}
 	}
 
 
@@ -878,6 +964,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			Future<Integer>	fut	= null;
 			boolean log	= false;
 			boolean	close	= false;
+			SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	notify	= null;
+			IComponentIdentifier	mytarget	= null;
 			
 			synchronized(this)
 			{
@@ -912,6 +1000,13 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						{
 							unprefer	= cons.get(1);
 						}
+						
+						// (new) connection established -> notify listeners, if any
+						@SuppressWarnings("unchecked")
+						SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	tmp
+							= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
+						notify	= tmp;
+						mytarget	= SUtil.findKeyForValue(virtuals, this);
 					}
 		
 					// Keep connection but unprefer, to cause abort, if on client side.
@@ -942,6 +1037,17 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			if(close)
 			{
 				impl.closeConnection(cand.getConnection());
+			}
+			
+			if(notify!=null)
+			{
+				// Established Connection -> ready=true.
+				Tuple3<IComponentIdentifier, String, Boolean>	info
+					= new Tuple3<IComponentIdentifier, String, Boolean>(mytarget, impl.getProtocolName(), true);
+				for(SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>> subfut: notify)
+				{
+					subfut.addIntermediateResult(info);
+				}
 			}
 		}
 

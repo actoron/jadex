@@ -621,7 +621,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									}
 									else
 									{
-										ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+										ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
 									}
 								}
 								
@@ -633,7 +633,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						else
 						{
-							ret.setException(new SecurityException("Could not establish secure communication with: " + splat.toString()));
+							ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString()));
 						}
 					}
 					
