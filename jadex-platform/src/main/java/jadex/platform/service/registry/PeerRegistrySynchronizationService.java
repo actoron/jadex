@@ -386,7 +386,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							exception.printStackTrace();
+//							exception.printStackTrace();
 //							System.out.println("balabala "+exception.getMessage());
 							super.exceptionOccurred(exception);
 						}
