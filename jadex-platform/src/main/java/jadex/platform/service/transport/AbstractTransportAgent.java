@@ -399,16 +399,16 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	//-------- ITransportInfoService interface --------
 	
 	/**
-	 *  Get the established connections.
-	 *  @return A list of connections specified by
+	 *  Get events about established connections.
+	 *  @return Events for connections specified by
 	 *  	1: platform id,
 	 *  	2: protocol name,
 	 *  	3: ready flag (false=connecting, true=connected, null=disconnected).
 	 */
-	public ISubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnections()
+	public ISubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	subscribeToConnections()
 	{
 		final SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	ret
-		= new SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>(null, true);
+			= new SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>(null, true);
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override
@@ -420,7 +420,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				}
 			}
 		});
-		
+	
 		synchronized(this)
 		{
 			if(infosubscribers==null)
@@ -435,10 +435,36 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				ret.addIntermediateResult(new Tuple3<IComponentIdentifier, String, Boolean>(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
 			}
 		}
-		
+	
 		return ret;
 	}
-
+	
+	/**
+	 *  Get the established connections.
+	 *  @return A list of connections specified by
+	 *  	1: platform id,
+	 *  	2: protocol name,
+	 *  	3: ready flag (false=connecting, true=connected).
+	 */
+	public IIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnections()
+	{
+		final IntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	ret
+			= new IntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>();
+	
+		synchronized(this)
+		{			
+			// Add initial data
+			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
+			{ 
+				ret.addIntermediateResult(new Tuple3<IComponentIdentifier, String, Boolean>(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
+			}
+		}
+		
+		ret.setFinished();
+	
+		return ret;
+	}
+	
 	// -------- helper methods --------
 
 	/**

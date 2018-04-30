@@ -17,6 +17,7 @@ dependencies
 										   // Tools
 										   ':jadex-runtimetools-swing',':jadex-tools-bdi',':jadex-tools-bpmn',
 										   ':jadex-tools-comanalyzer',':jadex-rules-tools',
+										   ':jadex-runtimetools-web',
 										   
 										   // Extensions
 										   ':jadex-kernel-extension-agr',':jadex-kernel-extension-envsupport',

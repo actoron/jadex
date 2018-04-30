@@ -104,7 +104,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
                     throws IOException, ServletException
                 {
                 	if(service==null)
-                		service = (IService)SServiceProvider.getService(component, serviceid).get();
+                		service = (IService)SServiceProvider.getService(component.getExternalAccess(), serviceid).get();
                 	
                     // Hack to enable multi-part
                     // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html

@@ -1638,7 +1638,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	{
 		IAsyncContextInfo cinfo = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
 		if(cinfo==null)
-			System.out.println("warning, async context info is null: "+request.getRequestURL());
+			System.out.println("warning, async context info is null: "+request);//.getRequestURL());
 		return cinfo!=null? cinfo.isComplete(): response.isCommitted();
 	}
     

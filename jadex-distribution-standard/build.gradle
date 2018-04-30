@@ -5,6 +5,7 @@ dependencies
 	compile project(':jadex-distribution-minimal')
 
 	compile project(':jadex-runtimetools-swing')
+	compile project(':jadex-runtimetools-web')
 	compile project(':jadex-tools-bdi')
 	compile project(':jadex-applib-bdi')
 	compile project(':jadex-tools-bpmn')
