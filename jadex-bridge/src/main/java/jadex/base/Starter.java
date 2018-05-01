@@ -511,7 +511,7 @@ public class Starter
 						{
 							@SuppressWarnings("rawtypes")
 							List	comps	= config.getComponents();
-							if(args.containsKey("component"))
+							if(args!=null && args.containsKey("component"))
 							{
 								comps	= (List<?>)args.get("component");
 								if(config.getComponents()!=null)
