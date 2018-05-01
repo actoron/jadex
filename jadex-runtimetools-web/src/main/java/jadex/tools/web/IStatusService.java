@@ -1,9 +1,11 @@
 package jadex.tools.web;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple3;
-import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IFuture;
 
 @Service(system=true)
 public interface IStatusService
@@ -15,5 +17,6 @@ public interface IStatusService
 	 *  	2: protocol name,
 	 *  	3: ready flag (false=connecting, true=connected).
 	 */
-	public IIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnectedPlatforms();
+	// No intermediate for easier REST?
+	public IFuture<Collection<Tuple3<IComponentIdentifier,String,Boolean>>>	getConnectedPlatforms();
 }

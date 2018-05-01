@@ -931,10 +931,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        	{
 		        	for(String mediatype: sr)
 		        	{
-		        		mt = mediatype;
+		        		mediatype	= mediatype.trim();	// e.g. sent with leading space from edge, grrr 
 		        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
 		        		if(convs!=null && convs.size()>0)
 		        		{	
+			        		mt = mediatype;
 		        			Object input = result instanceof Response? ((Response) result).getEntity() : result;
 		        			ret = convs.iterator().next().convertObject(input, null);
 		        			break;
@@ -946,6 +947,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        {
 		        	if(response.getHeader("Content-Type")==null)
 		        		response.setHeader("Content-Type", mt);
+		        	if(ret==null)
+		        	{
+		        		System.out.println("dfhil");
+		        	}
 			        out.write(ret);
 		        }
 	        	else
@@ -1016,7 +1021,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     	}
     	catch(Exception e)
     	{
-    		throw new RuntimeException(e);
+    		SUtil.throwUnchecked(e);
     	}
     }
     
