@@ -1400,9 +1400,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ret.append("</div>");
 					ret.append("\n");
 
-					String link = baseuri.toString();
-					if(path!=null)
-						link = link+"/"+path; 
+//					String link = baseuri.toString();
+//					if(path!=null)	// Todo: cannot be null!?
+//						link = link+"/"+path;
+					String link = path; // Do not use absolute URL to allow reverse proxying
+
 //					System.out.println("path: "+link);
 					
 //					if(ptypes.length>0)
