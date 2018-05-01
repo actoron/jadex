@@ -12,6 +12,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -75,7 +76,7 @@ public class AuthenticateTestAgent extends TestAgent
 		
 		// Use expected results for def, cus to decide platform settings
 		setupTestPlatform(tests[test][1], tests[test][2])
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			@Override
 			public void customResultAvailable(final IExternalAccess platform) throws Exception
@@ -107,7 +108,7 @@ public class AuthenticateTestAgent extends TestAgent
 					}
 				});
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -185,6 +186,8 @@ public class AuthenticateTestAgent extends TestAgent
 	protected IFuture<boolean[]>	invokeServices()
 	{
 		final Future<boolean[]>	ret	= new Future<boolean[]>();
+//		System.out.println("invokeServices "+IComponentIdentifier.LOCAL.get());
+		
 		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(ITestService.class, Binding.SCOPE_GLOBAL)
 			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
 		{
