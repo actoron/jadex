@@ -712,35 +712,35 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		return ret;
 //	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public static Set<String> createReserved() 
-    {
-		Set<String> RESERVED = new HashSet<String>();
-        RESERVED = new HashSet<String>();
-        RESERVED.add(IPlatformConfiguration.CONFIGURATION_FILE);
-        RESERVED.add(IPlatformConfiguration.CONFIGURATION_NAME);
-        RESERVED.add(IPlatformConfiguration.PLATFORM_NAME);
-        RESERVED.add(IPlatformConfiguration.COMPONENT_FACTORY);
-        RESERVED.add(IPlatformConfiguration.PLATFORM_COMPONENT);
-        RESERVED.add(IPlatformConfiguration.AUTOSHUTDOWN);
-        RESERVED.add(IPlatformConfiguration.MONITORING);
-        RESERVED.add(IPlatformConfiguration.WELCOME);
-        RESERVED.add(IPlatformConfiguration.COMPONENT);
-        RESERVED.add(IPlatformConfiguration.PARAMETERCOPY);
-        RESERVED.add(IPlatformConfiguration.REALTIMETIMEOUT);
-        RESERVED.add(IPlatformConfiguration.PERSIST);
-        RESERVED.add(IPlatformConfiguration.DEBUGFUTURES);
-        RESERVED.add(IPlatformConfiguration.DEBUGSERVICES);
-        RESERVED.add(IPlatformConfiguration.DEBUGSTEPS);
-        RESERVED.add(IPlatformConfiguration.NOSTACKCOMPACTION);
-        RESERVED.add(IPlatformConfiguration.OPENGL);
-        RESERVED.add(IPlatformConfiguration.DEFTIMEOUT);
-        RESERVED.add(IPlatformConfiguration.PRINTEXCEPTIONS);
-        return RESERVED;
-	}
+//	/**
+//	 * 
+//	 * @return
+//	 */
+//	public static Set<String> createReserved() 
+//    {
+//		Set<String> RESERVED = new HashSet<String>();
+//        RESERVED = new HashSet<String>();
+//        RESERVED.add(IPlatformConfiguration.CONFIGURATION_FILE);
+//        RESERVED.add(IPlatformConfiguration.CONFIGURATION_NAME);
+//        RESERVED.add(IPlatformConfiguration.PLATFORM_NAME);
+//        RESERVED.add(IPlatformConfiguration.COMPONENT_FACTORY);
+//        RESERVED.add(IPlatformConfiguration.PLATFORM_COMPONENT);
+//        RESERVED.add(IPlatformConfiguration.AUTOSHUTDOWN);
+//        RESERVED.add(IPlatformConfiguration.MONITORING);
+//        RESERVED.add(IPlatformConfiguration.WELCOME);
+//        RESERVED.add(IPlatformConfiguration.COMPONENT);
+//        RESERVED.add(IPlatformConfiguration.PARAMETERCOPY);
+//        RESERVED.add(IPlatformConfiguration.REALTIMETIMEOUT);
+//        RESERVED.add(IPlatformConfiguration.PERSIST);
+//        RESERVED.add(IPlatformConfiguration.DEBUGFUTURES);
+//        RESERVED.add(IPlatformConfiguration.DEBUGSERVICES);
+//        RESERVED.add(IPlatformConfiguration.DEBUGSTEPS);
+//        RESERVED.add(IPlatformConfiguration.NOSTACKCOMPACTION);
+//        RESERVED.add(IPlatformConfiguration.OPENGL);
+//        RESERVED.add(IPlatformConfiguration.DEFTIMEOUT);
+//        RESERVED.add(IPlatformConfiguration.PRINTEXCEPTIONS);
+//        return RESERVED;
+//	}
 	
 	/**
 	 * 
