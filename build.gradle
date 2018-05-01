@@ -231,9 +231,9 @@ subprojects
 			apply plugin: 'war'
 		} else {
         	apply plugin: 'java'
-			test {
-				reports.html.enabled = false
-			}
+//			test {
+//				reports.html.enabled = false
+//			}
 		}
 
         compileJava.options.encoding = 'UTF-8'
