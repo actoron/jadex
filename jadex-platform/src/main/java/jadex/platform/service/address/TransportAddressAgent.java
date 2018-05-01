@@ -211,8 +211,9 @@ public class TransportAddressAgent implements ITransportAddressService
 								if (ret == null)
 									ret = searchAddressesByAskAwareness(platformid);
 								
-								if (ret == null)
-									ret = searchAddressesByAskAll(platformid);
+								// Case not needed?
+//								if (ret == null)
+//									ret = searchAddressesByAskAll(platformid);
 							}
 							
 							ret = getAddressesFromCache(platformid);
