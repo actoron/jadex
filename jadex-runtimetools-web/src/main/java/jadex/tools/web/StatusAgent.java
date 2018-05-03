@@ -9,14 +9,18 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple3;
 import jadex.commons.future.FutureBarrier;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -35,6 +39,13 @@ public class StatusAgent implements IStatusService
 {
 	@Agent
 	protected IInternalAccess	agent;
+	
+	@AgentCreated
+	protected IFuture<Void>	setup()
+	{
+		IWebPublishService	wps	= SServiceProvider.getLocalService(agent, IWebPublishService.class);
+		return wps.publishResources("[http://localhost:8081/]", SReflect.getPackageName(getClass()).replace(".", "/")+"/static_content");
+	}
 	
 	@Override
 	public IIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnectedPlatforms()
