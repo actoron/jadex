@@ -35,6 +35,7 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -115,7 +116,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IComponentManagementService	cms;
 	
 	/** Listeners from transport info service. */
-	protected Collection<SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>>	infosubscribers;
+	protected Collection<SubscriptionIntermediateFuture<PlatformData>>	infosubscribers;
 	
 
 	// -------- abstract methods to be provided by concrete transport --------
@@ -405,10 +406,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 *  	2: protocol name,
 	 *  	3: ready flag (false=connecting, true=connected, null=disconnected).
 	 */
-	public ISubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	subscribeToConnections()
+	public ISubscriptionIntermediateFuture<PlatformData>	subscribeToConnections()
 	{
-		final SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	ret
-			= new SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>(null, true);
+		final SubscriptionIntermediateFuture<PlatformData>	ret
+			= new SubscriptionIntermediateFuture<PlatformData>(null, true);
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override
@@ -425,14 +426,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		{
 			if(infosubscribers==null)
 			{
-				infosubscribers	= new ArrayList<SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>>();
+				infosubscribers	= new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();
 			}
 			infosubscribers.add(ret);
 			
 			// Add initial data
 			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
 			{ 
-				ret.addIntermediateResult(new Tuple3<IComponentIdentifier, String, Boolean>(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
+				ret.addIntermediateResult(new PlatformData(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
 			}
 		}
 	
@@ -446,17 +447,17 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 *  	2: protocol name,
 	 *  	3: ready flag (false=connecting, true=connected).
 	 */
-	public IIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnections()
+	public IIntermediateFuture<PlatformData>	getConnections()
 	{
-		final IntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	ret
-			= new IntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>();
+		final IntermediateFuture<PlatformData>	ret
+			= new IntermediateFuture<PlatformData>();
 	
 		synchronized(this)
 		{			
 			// Add initial data
 			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
 			{ 
-				ret.addIntermediateResult(new Tuple3<IComponentIdentifier, String, Boolean>(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
+				ret.addIntermediateResult(new PlatformData(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
 			}
 		}
 		

@@ -1,11 +1,11 @@
 btoa('Basic JS compatibility check.');
 
-var defroute='/download';
+var defroute='/platforms';
 
 var noscriptelement = document.getElementById("noscriptcontent");
 noscriptelement.parentElement.removeChild(noscriptelement);
 
-var app = angular.module('acmain', ['ngRoute', 'acdownload']);
+var app = angular.module('acmain', ['ngRoute', 'acplatforms']);
 var mobile=detectmobile();
 
 app.config(function($routeProvider)
@@ -15,7 +15,7 @@ app.config(function($routeProvider)
      	.when('/', {
      		redirectTo: defroute
      	})
-     	.when('/download', {
+     	.when('/platforms', {
      		templateUrl: 'partials/platforms.html'
      	})
      	.when('/contact', {

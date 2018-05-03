@@ -5,14 +5,13 @@ import java.util.Collection;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
+import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple3;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -48,14 +47,14 @@ public class StatusAgent implements IStatusService
 	}
 	
 	@Override
-	public IIntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	getConnectedPlatforms()
+	public IIntermediateFuture<PlatformData>	getConnectedPlatforms()
 	{
-		final IntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>	ret	= new IntermediateFuture<Tuple3<IComponentIdentifier,String,Boolean>>();
-		FutureBarrier<Collection<Tuple3<IComponentIdentifier, String, Boolean>>>	fubar	= new FutureBarrier<Collection<Tuple3<IComponentIdentifier, String, Boolean>>>();
+		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
+		FutureBarrier<Collection<PlatformData>>	fubar	= new FutureBarrier<Collection<PlatformData>>();
 		for(ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
 		{
-			IIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>	fut	= tis.getConnections();
-			fut.addIntermediateResultListener(new IntermediateDelegationResultListener<Tuple3<IComponentIdentifier,String,Boolean>>(ret)
+			IIntermediateFuture<PlatformData>	fut	= tis.getConnections();
+			fut.addIntermediateResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)

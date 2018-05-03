@@ -1,134 +1,20 @@
 <div class="actwtable section">
-	<h1>Download Jadex</h1>
+	<h3 id="HConnectedPlatforms">Connected Platforms</h3>
 	<p>
-		This page provides links to the latest release and nightly build files from
-		the download server
-		<a href="https://download.actoron.com/">https://download.actoron.com/</a>.
-		The current version of Jadex requires
-		<a href="http://www.javasoft.com">Java</a> version 1.6 or later. Other
-		required 3rd party jars are already included within the respective
-		distributions. Step-by-step
-		installation instructions can be found in the documentation in chapter
-		<a href="https://download.actoron.com/docs/releases/latest/jadex-mkdocs/getting-started/getting-started/">Getting Started</a>.
-		Further explanations are at the bottom of this page.
+		This page shows remote platforms connected to this Jadex platform.
 	</p>
-</div>
-<div class="actwtable section">
-	<h2 id="HLatestJadexReleaseFiles">Latest Jadex Release Files</h2>
-	<p>This section provides tested releases, which have been tested
-		for stability and are considered safe for use in production
-		environments.&nbsp;</p>
-	<h3 id="HJadexOpenSourceReleases">Jadex Open Source Releases</h3>
-	<table ng-controller="OSSRelease">
+	<table ng-controller="ConnPlats">
 		<tbody>
 			<tr>
-				<th>File</th>
-				<th>Size</th>
-				<th>Date</th>
+				<th>Name</th>
+				<th>Connected?</th>
+				<th>Protocol</th>
 			</tr>
-			<tr ng-repeat="x in distris | orderBy: 'name' | orderBy: 'priority'">
-				<td><a href="{{url+x.name}}">{{x.name}}</a></td>
-				<td>{{ x.size | bytes }}</td>
-				<td>{{ x.mtime | mydate }}</td>
+			<tr ng-repeat="x in platforms | orderBy: 'name' | orderBy: 'connected' | orderBy: 'protocol'">
+				<td>{{x.platform.name}}</td>
+				<td>{{x.connected}}</td>
+				<td>{{x.protocol}}</td>
 			</tr>
 		</tbody>
 	</table>
-	<h3 id="HJadexProReleases">
-		<span>Jadex Pro Releases</span>
-	</h3>
-	<table ng-controller="ProRelease">
-		<tbody>
-			<tr>
-				<th>File</th>
-				<th>Size</th>
-				<th>Date</th>
-			</tr>
-			<tr ng-repeat="x in distris | orderBy: 'name' | orderBy: 'priority'">
-				<td><a href="{{url+x.name}}">{{x.name}}</a></td>
-				<td>{{ x.size | bytes }}</td>
-				<td>{{ x.mtime | mydate }}</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-<div class="actwtable section">
-	<h2 id="HLatestJadexNightliesFiles">
-		<span>Latest Jadex Nightly Build Files</span>
-	</h2>
-	<p>This section provides nightly builds, which are automatically
-		produced from the current source code repository state. These builds
-		are provided for developers who want to keep track of the latest
-		developments. Thanks to automated unit tests, these builds should
-		usually be fine for use in development purposes, but should not be
-		used in production environments without manual stability testing,
-		first.</p>
-	<h3 id="HJadexOpenSourceNightlies">
-		<span>Jadex Open Source Nightlies</span>
-	</h3>
-	<table ng-controller="OSSNightlies">
-		<tbody>
-			<tr>
-				<th>File</th>
-				<th>Size</th>
-				<th>Date</th>
-			</tr>
-			<tr ng-repeat="x in distris | orderBy: 'name' | orderBy: 'priority'">
-				<td><a href="{{url+x.name}}">{{x.name}}</a></td>
-				<td>{{ x.size | bytes }}</td>
-				<td>{{ x.mtime | mydate }}</td>
-			</tr>
-		</tbody>
-	</table>
-	<h3 id="HJadexProNightlies">
-		<span>Jadex Pro Nightlies</span>
-	</h3>
-	<table ng-controller="ProNightlies">
-		<tbody>
-			<tr>
-				<th>File</th>
-				<th>Size</th>
-				<th>Date</th>
-			</tr>
-			<tr ng-repeat="x in distris | orderBy: 'name' | orderBy: 'priority'">
-				<td><a href="{{url+x.name}}">{{x.name}}</a></td>
-				<td>{{ x.size | bytes }}</td>
-				<td>{{ x.mtime | mydate }}</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-<div class="actwtable section">
-	<h2>License and Versions</h2>
-	<p>
-		The open source software (OSS) files are released under
-		<a href="#project/license">GPL-License</a>. Access to the Pro version and
-		commercial (e.g. redistribution) licensing can be requested from
-		<a href="http://www.actoron.com/">Actoron GmbH</a>.
-	</p>
-	<p>
-		The features currently described at <a href="#project/features">Jadex
-		Features</a> are available in both the OSS and the Pro version. We will try
-		keeping most <strong>functional features</strong> publicly available. The
-		Pro version mainly adds <strong>non-functional features</strong> that we
-		consider relevant for production environments. These features include:
-	</p>
-	<ul>
-		<li>Management Extensions (e.g. controlling Jadex platforms remotely from a shell, service pools with automatic load-balancing)</li>
-		<li>Security Features (e.g. SSL message transport)</li>
-		<li>Deployment Support (e.g. automatic load balancing)</li>
-	</ul>
-</div>
-<div class="actwtable section">
-	<h2>Which Distribution to Choose?</h2>
-	<p>
-		Several different packages are available for download. The
-		<strong>standard</strong> and <strong>pro</strong> packages
-		include all jars and sources of the main system and the standalone
-		platform. For size reasons, several addons as well as web application
-		deployment files have been excluded from the base package and can be
-		downloaded separately. The addons provide extra features such as
-		3D visualization and web services support. For a quick-start of using Jadex
-		in a Maven build environment, an example project is provided that can be
-		used for retrieving the required Jadex jars via Maven.
-	</p>
 </div>

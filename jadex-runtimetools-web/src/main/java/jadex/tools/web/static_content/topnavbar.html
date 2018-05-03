@@ -12,9 +12,9 @@
 		
 		<div id="navbarbdy" class="collapse navbar-collapse pull-right" style="padding-left:15px;padding-right:15px;">
 			<ul id="navbtns" class="nav navbar-nav">
-				<li routebutton=""><a id="download" href="#download">Connected Platforms</a></li>
+				<li routebutton=""><a id="platforms" href="#platforms">Connected Platforms</a></li>
 				<li class="nav-divider"></li>
-				<li><a id="liveplatforms" class="navbar-link" href="status">REST API</a></li>
+				<li><a id="restapi" class="navbar-link" href="status">REST API</a></li>
 			</ul>
 		</div>
 	</div>
@@ -99,7 +99,7 @@ function adjustLayout() {
 			+ '}');
 			
 	}
-	var dlbtnsty=window.getComputedStyle(document.getElementById('download'));
+	var dlbtnsty=window.getComputedStyle(document.getElementById('platforms'));
 	var barheight=parseInt(dlbtnsty.paddingTop)+parseInt(dlbtnsty.paddingBottom)+parseInt(dlbtnsty.lineHeight);
 	// document.getElementById('navbarbdy').style.paddingTop=((lheight-barheight)*0.5)+'px';
 	var paddingTop = ((lheight-barheight-(0.1*lheight))*0.5);
