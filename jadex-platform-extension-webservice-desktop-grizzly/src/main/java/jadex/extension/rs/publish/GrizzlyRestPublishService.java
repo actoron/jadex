@@ -285,7 +285,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
     /**
      *  Publish file resources from the classpath.
      */
-    public IFuture<Void> publishResources(URI uri, String rootpath)
+    public IFuture<Void> publishResources(String uri, String rootpath)
     {
         throw new UnsupportedOperationException();
     }

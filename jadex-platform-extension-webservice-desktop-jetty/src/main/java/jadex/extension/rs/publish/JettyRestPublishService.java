@@ -14,15 +14,25 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.Resource;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentCreated;
 
@@ -230,17 +240,55 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /**
      *  Publish file resources from the classpath.
      */
-    public IFuture<Void> publishResources(URI uri, String rootpath)
+    public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
-        throw new UnsupportedOperationException();
-    }
+		final Future<Void>	ret	= new Future<Void>();
+		IComponentManagementService	cms	= SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getComponentIdentifier();
+		cms.getComponentDescription(cid)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
+		{
+			public void customResultAvailable(IComponentDescription desc)
+			{
+				ILibraryService	ls	= SServiceProvider.getLocalService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ls.getClassLoader(desc.getResourceIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl) throws Exception 
+					{
+			    		String clpid = pid.replace("[", "").replace("]", "");
+			    		URI uri = new URI(clpid);
+			        	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+			        	
+			            Server server = (Server)getHttpServer(uri, null);
+			            System.out.println("Adding http handler to server: "+uri.getPath());
 
-    /**
-     *  Publish file resources from the file system.
-     */
-    public IFuture<Void> publishExternal(URI uri, String rootpath)
-    {
-        throw new UnsupportedOperationException();
+			            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+			            
+			            ResourceHandler	rh	= new ResourceHandler();
+			            ContextHandler	ch	= new ContextHandler()
+			            {
+			            	@Override
+			            	public void doHandle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+			            	{
+			            		// TODO Auto-generated method stub
+			            		super.doHandle(target, baseRequest, request, response);
+			            	}
+			            };
+			            ch.setBaseResource(Resource.newClassPathResource(rootpath));
+			            ch.setHandler(rh);
+			            ch.setContextPath(uri.getPath());
+			            collhandler.addHandler(ch);
+			            ch.start(); // must be started explicitly :-(((
+						
+						System.out.println("Resource published at: "+uri.getPath());
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		
+		return ret;
     }
 
 	
