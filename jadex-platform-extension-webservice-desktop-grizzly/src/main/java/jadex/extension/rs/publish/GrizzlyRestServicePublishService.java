@@ -3,6 +3,7 @@ package jadex.extension.rs.publish;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -376,7 +377,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	 *  The resources are searched with respect to the
 	 *  component classloader (todo: allow for specifiying RID).
 	 */
-	public IFuture<Void> publishResources(final URI uri, final String path)
+	public IFuture<Void> publishResources(final String uri, final String path)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		IComponentManagementService	cms	= SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
@@ -390,9 +391,9 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 				ls.getClassLoader(desc.getResourceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
-					public void customResultAvailable(ClassLoader cl)
+					public void customResultAvailable(ClassLoader cl) throws URISyntaxException
 					{
-						Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(uri, null);
+						Tuple2<MainHttpHandler, HttpServer> servertuple = getHttpServer(new URI(uri), null);
 //				        ServerConfiguration sc = server.getServerConfiguration();
 //						sc.addHttpHandler(new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
 //					    {
@@ -409,7 +410,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 //					    	}
 //						}, uri.getPath());
 						
-						servertuple.getFirstEntity().addSubhandler(null, uri.getPath(), new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
+						servertuple.getFirstEntity().addSubhandler(null, new URI(uri).getPath(), new CLStaticHttpHandler(cl, path.endsWith("/")? path: path+"/")
 					    {
 					    	public void service(Request request, Response response) throws Exception
 					    	{
@@ -424,7 +425,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 					    	}
 						});
 						
-						System.out.println("Resource published at: "+uri.getPath());
+						System.out.println("Resource published at: "+new URI(uri).getPath());
 						ret.setResult(null);
 					}
 				});

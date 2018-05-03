@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.SpringLayout.Constraints;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -328,7 +327,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/**
 	 *  Publish file resources from the classpath.
 	 */
-	public IFuture<Void> publishResources(URI uri, String rootpath)
+	public IFuture<Void> publishResources(String uri, String rootpath)
 	{
 	    throw new UnsupportedOperationException();
 	}

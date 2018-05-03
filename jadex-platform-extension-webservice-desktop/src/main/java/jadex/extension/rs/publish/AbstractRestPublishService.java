@@ -488,26 +488,26 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public abstract Object getHttpServer(URI uri, PublishInfo info);
 
-    /**
-     *  Unpublish a service.
-     *  @param sid The service identifier.
-     */
-    public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
-
-    /**
-     *  Publish a static page (without ressources).
-     */
-    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
-
-    /**
-     *  Publish file resources from the classpath.
-     */
-    public abstract IFuture<Void> publishResources(URI uri, String rootpath);
-
-    /**
-     *  Publish file resources from the file system.
-     */
-    public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
+//    /**
+//     *  Unpublish a service.
+//     *  @param sid The service identifier.
+//     */
+//    public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
+//
+//    /**
+//     *  Publish a static page (without ressources).
+//     */
+//    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
+//
+//    /**
+//     *  Publish file resources from the classpath.
+//     */
+//    public abstract IFuture<Void> publishResources(URI uri, String rootpath);
+//
+//    /**
+//     *  Publish file resources from the file system.
+//     */
+//    public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
 
     /**
      *  Get the async

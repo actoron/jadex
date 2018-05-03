@@ -468,7 +468,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 *  The resources are searched with respect to the
 	 *  component classloader (todo: allow for specifiying RID).
 	 */
-	public abstract IFuture<Void> publishResources(URI uri, String path);
+	public abstract IFuture<Void> publishResources(String uri, String path);
 	
 	/**
 	 *  Publish file resources from the file system.
