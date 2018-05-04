@@ -5,6 +5,9 @@ import jadex.commons.transformation.annotations.Include;
 
 /**
  *  Transfer object for information about a connected platform.
+ *  1: platform id,
+ *  2: protocol name,
+ *  3: ready flag (false=connecting, true=connected, null=disconnected).
  */
 public class PlatformData
 {

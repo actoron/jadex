@@ -165,3 +165,11 @@ a:visited,a:hover,a:active {
 table {
 	margin: 0 0 10px;
 }
+
+
+/* -------- custom styles -------- */
+
+/* grey out disconnected platforms. */
+.connecting {
+	color: graytext;
+}

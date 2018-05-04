@@ -10,7 +10,8 @@
 				<th>Connected?</th>
 				<th>Protocol</th>
 			</tr>
-			<tr ng-repeat="x in platforms | orderBy: 'name' | orderBy: 'connected' | orderBy: 'protocol'">
+			<tr ng-repeat="x in platforms | orderBy: 'connected' : reverse | orderBy: 'platform.name' | orderBy: 'protocol'"
+				ng-class="{'connecting': !x.connected}">
 				<td>{{x.platform.name}}</td>
 				<td>{{x.connected}}</td>
 				<td>{{x.protocol}}</td>

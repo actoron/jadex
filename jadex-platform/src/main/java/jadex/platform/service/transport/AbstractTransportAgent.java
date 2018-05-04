@@ -15,6 +15,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
@@ -38,7 +39,6 @@ import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -408,8 +408,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public ISubscriptionIntermediateFuture<PlatformData>	subscribeToConnections()
 	{
-		final SubscriptionIntermediateFuture<PlatformData>	ret
-			= new SubscriptionIntermediateFuture<PlatformData>(null, true);
+		final SubscriptionIntermediateFuture<PlatformData>	ret	= new SubscriptionIntermediateFuture<PlatformData>(null, true);
+		SFuture.avoidCallTimeouts(ret, agent);
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override
@@ -433,7 +433,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			// Add initial data
 			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
 			{ 
-				ret.addIntermediateResult(new PlatformData(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
+				ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
 			}
 		}
 	
@@ -449,15 +449,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public IIntermediateFuture<PlatformData>	getConnections()
 	{
-		final IntermediateFuture<PlatformData>	ret
-			= new IntermediateFuture<PlatformData>();
+		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
 	
 		synchronized(this)
 		{			
 			// Add initial data
 			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
 			{ 
-				ret.addIntermediateResult(new PlatformData(entry.getKey(), impl.getProtocolName(), entry.getValue().isReady().isDone()));
+				ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
 			}
 		}
 		
@@ -606,7 +605,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected VirtualConnection createVirtualConnection(IComponentIdentifier target)
 	{
 		VirtualConnection vircon = new VirtualConnection();
-		SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	notify;
+		SubscriptionIntermediateFuture<PlatformData>[]	notify;
 		synchronized(this)
 		{
 			if(virtuals==null)
@@ -617,7 +616,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			assert prev == null;
 			
 			@SuppressWarnings("unchecked")
-			SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	tmp
+			SubscriptionIntermediateFuture<PlatformData>[]	tmp
 				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
 			notify	= tmp;
 		}
@@ -625,8 +624,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(notify!=null)
 		{
 			// Newly created connection -> ready=false.
-			Tuple3<IComponentIdentifier, String, Boolean>	info	= new Tuple3<IComponentIdentifier, String, Boolean>(target, impl.getProtocolName(), false);
-			for(SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>> fut: notify)
+			PlatformData	info	= vircon.getPlatformdata(target);
+			for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
 			{
 				fut.addIntermediateResult(info);
 			}
@@ -656,17 +655,18 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected void	removeVirtualConnection(IComponentIdentifier target, VirtualConnection con)
 	{
-		SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	notify;
+		SubscriptionIntermediateFuture<PlatformData>[]	notify;
+		VirtualConnection	vircon;
 		synchronized(this)
 		{
-			VirtualConnection	vircon	= getVirtualConnection(target);
+			vircon	= getVirtualConnection(target);
 			if(vircon==con)
 			{
 				virtuals.remove(target);
 			}
 			
 			@SuppressWarnings("unchecked")
-			SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	tmp
+			SubscriptionIntermediateFuture<PlatformData>[]	tmp
 				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
 			notify	= tmp;
 		}
@@ -674,8 +674,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(notify!=null)
 		{
 			// Removed connection -> ready=null.
-			Tuple3<IComponentIdentifier, String, Boolean>	info	= new Tuple3<IComponentIdentifier, String, Boolean>(target, impl.getProtocolName(), null);
-			for(SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>> fut: notify)
+			PlatformData	info	= vircon.getPlatformdata(target);
+			for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
 			{
 				fut.addIntermediateResult(info);
 			}
@@ -991,8 +991,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			Future<Integer>	fut	= null;
 			boolean log	= false;
 			boolean	close	= false;
-			SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	notify	= null;
-			IComponentIdentifier	mytarget	= null;
+			boolean notify	= false;
 			
 			synchronized(this)
 			{
@@ -1028,12 +1027,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							unprefer	= cons.get(1);
 						}
 						
-						// (new) connection established -> notify listeners, if any
-						@SuppressWarnings("unchecked")
-						SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>>[]	tmp
-							= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
-						notify	= tmp;
-						mytarget	= SUtil.findKeyForValue(virtuals, this);
+						notify	= true;
 					}
 		
 					// Keep connection but unprefer, to cause abort, if on client side.
@@ -1066,16 +1060,47 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				impl.closeConnection(cand.getConnection());
 			}
 			
-			if(notify!=null)
+			if(notify)
 			{
-				// Established Connection -> ready=true.
-				Tuple3<IComponentIdentifier, String, Boolean>	info
-					= new Tuple3<IComponentIdentifier, String, Boolean>(mytarget, impl.getProtocolName(), true);
-				for(SubscriptionIntermediateFuture<Tuple3<IComponentIdentifier, String, Boolean>> subfut: notify)
+				IComponentIdentifier	mytarget	= null;
+				SubscriptionIntermediateFuture<PlatformData>[]	subs	= null;
+				synchronized(AbstractTransportAgent.this)
 				{
-					subfut.addIntermediateResult(info);
+					// (new) connection established -> notify listeners, if any
+					if(infosubscribers!=null)
+					{
+						@SuppressWarnings("unchecked")
+						SubscriptionIntermediateFuture<PlatformData>[]	tmp
+							= infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]);
+						subs	= tmp;
+						mytarget	= SUtil.findKeyForValue(virtuals, this);
+					}
+				}
+
+				if(subs!=null)
+				{
+					PlatformData info = getPlatformdata(mytarget);
+					for(SubscriptionIntermediateFuture<PlatformData> subfut: subs)
+					{
+						subfut.addIntermediateResult(info);
+					}
 				}
 			}
+		}
+
+		/**
+		 *  Transferrable info about the connection.
+		 *  @param target The target to this connection.
+		 */
+		protected PlatformData getPlatformdata(IComponentIdentifier target)
+		{
+			boolean	contained;
+			synchronized(AbstractTransportAgent.this)
+			{
+				// Not contained? removed connection -> ready=null.
+				contained	= virtuals.containsKey(target);
+			}
+			return new PlatformData(target, impl.getProtocolName(), contained ? isReady().isDone() : null);
 		}
 
 		/**

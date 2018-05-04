@@ -1,11 +1,14 @@
 package jadex.tools.web;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
@@ -16,8 +19,11 @@ import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
@@ -88,6 +94,44 @@ public class StatusAgent implements IStatusService
 		return ret;
 	}
 
+	@Override
+	public ISubscriptionIntermediateFuture<PlatformData>	subscribeToConnections()
+	{
+		final List<ISubscriptionIntermediateFuture<PlatformData>>	futs	= new ArrayList<ISubscriptionIntermediateFuture<PlatformData>>();
+		final SubscriptionIntermediateFuture<PlatformData>	ret	= new SubscriptionIntermediateFuture<PlatformData>(null, true);
+		SFuture.avoidCallTimeouts(ret, agent);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				for(ISubscriptionIntermediateFuture<PlatformData> fut: futs)
+				{
+					fut.terminate();
+				}
+			}
+		});
+		for(ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
+		{
+			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
+			fut.addResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
+			{
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// ignore
+				}
+								
+				@Override
+				public void finished()
+				{
+					//ignore
+				}
+			});
+			futs.add(fut);
+		}
+		return ret;
+	}
 	
 	public static void main(String[] args)
 	{
