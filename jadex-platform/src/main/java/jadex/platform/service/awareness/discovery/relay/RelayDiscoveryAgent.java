@@ -11,6 +11,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -201,7 +202,16 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 										public void resultAvailable(Void result)
 										{
 											agent.getLogger().info("Sending awareness info to server...success");
-											ret.setResult(null);
+											if(ret==init)
+											{
+												// wait for awareness infos being received (hack!!!)
+												agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000)
+													.addResultListener(new DelegationResultListener<Void>(ret));
+											}
+											else
+											{
+												ret.setResult(null);
+											}
 										}
 										
 										public void exceptionOccurred(Exception exception)
