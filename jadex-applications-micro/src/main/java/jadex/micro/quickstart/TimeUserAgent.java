@@ -36,26 +36,9 @@ public class TimeUserAgent
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
-		config.setValue("acr", false);
+//		config.setValue("rt.addresses", "ws://ssp1@localhost:12345");
 		config.addComponent(TimeUserAgent.class);
 		Starter.createPlatform(config).get();
-		
-		// Testing connection info.
-//		Thread.sleep(5000);
-//		
-//		Collection<ITransportInfoService>	services	= SServiceProvider.getServices(platform, ITransportInfoService.class).get();
-//		for(ITransportInfoService tis: services)
-//		{
-//			tis.getConnections().addResultListener(
-//				new IntermediateDefaultResultListener<Tuple3<IComponentIdentifier, String, Boolean>>()
-//			{
-//				@Override
-//				public void intermediateResultAvailable(Tuple3<IComponentIdentifier, String, Boolean> info)
-//				{
-//					System.out.println("Connection info: "+info);
-//				}
-//			});
-//		}
 	}
 }
 

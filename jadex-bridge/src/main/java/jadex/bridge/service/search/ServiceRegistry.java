@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
@@ -27,6 +28,7 @@ import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
@@ -53,7 +55,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.UnlimitedIntermediateDelegationResultListener;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.TransformSet;
 
 /**
@@ -238,45 +239,27 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected <T> ISubscriptionIntermediateFuture<T> addQueryOnPlatform(final IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
 	{
-		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
-		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-		if(cms!=null)
+		if(RequiredServiceInfo.SCOPE_NONE.equals(sqi.getQuery().getScope()))
 		{
-			cms.getExternalAccess(spcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
-			{
-				public void customResultAvailable(IExternalAccess result) throws Exception
-				{
-					try
-					{
-						// Set superpeer in query info for later removal
-						sqi.setSuperpeer(spcid);
-						
-						final ServiceQuery<T> query = sqi.getQuery();
-						
-						result.scheduleStep(new IComponentStep<Collection<T>>()
-						{
-							@Classname("addQueryOnSuperpeer")
-							public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
-							{
-								IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-								return reg.addQuery(query);
-							}
-						}).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-			});
+			return new SubscriptionIntermediateFuture<T>(new ServiceNotFoundException(sqi.getQuery().getServiceType() != null? sqi.getQuery().getServiceType().getTypeName() : sqi.getQuery().toString()));
 		}
 		else
 		{
-			ret.setException(new RuntimeException("RMS not found"));
+			@SuppressWarnings("unchecked")
+			ISubscriptionIntermediateFuture<T>	ret	= executeOnLocalComponent(ISubscriptionIntermediateFuture.class, new IComponentStep<Collection<T>>()
+			{
+				@Override
+				public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
+				{
+					// Set superpeer in query info for later removal
+					sqi.setSuperpeer(spcid);
+					enhanceQuery(sqi.getQuery());
+					ISuperpeerRegistrySynchronizationService	srs	= SServiceProvider.getServiceProxy(ia, spcid, ISuperpeerRegistrySynchronizationService.class);
+					return srs.addQuery(sqi.getQuery());
+				}
+			});
+			return ret;
 		}
-		
-		return ret;
 	}
 	
 	/**
@@ -285,46 +268,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 * @param sqi
 	 * @return
 	 */
-	protected <T> IFuture<Void> removeQueryOnPlatform(IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
+	protected <T> IFuture<Void> removeQueryOnPlatform(final IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-		if(cms!=null)
+		@SuppressWarnings("unchecked")
+		IFuture<Void>	ret	= executeOnLocalComponent(IFuture.class, new IComponentStep<Void>()
 		{
-			cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				public void customResultAvailable(IExternalAccess result) throws Exception
-				{
-					try
-					{
-						// Set superpeer in query info for later removal
-						sqi.setSuperpeer(null);
-						
-						final ServiceQuery<T> query = sqi.getQuery();
-						
-						result.scheduleStep(new IComponentStep<Void>()
-						{
-							@Classname("removeQueryOnSuperpeer")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-								return reg.removeQuery(query);
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-					catch(Exception e)
-					{
-						ret.setException(e);
-					}
-				}
-			});
-		}
-		else
-		{
-			ret.setException(new RuntimeException("RMS not found"));
-		}
-		
+				// Reset superpeer in query info
+				sqi.setSuperpeer(null);
+				ISuperpeerRegistrySynchronizationService	srs	= SServiceProvider.getServiceProxy(ia, spcid, ISuperpeerRegistrySynchronizationService.class);
+				return srs.removeQuery(sqi.getQuery());
+			}
+		});
 		return ret;
 	}
 	
@@ -859,7 +816,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				if(cid!=null)
 				{
 					// If superpeer is available ask it
-					fut = addQueryByAskSuperpeer(sqi, cid);
+					fut = addQueryOnPlatform(cid, sqi);
 				}
 				else
 				{
@@ -952,66 +909,66 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		return ret;
 	}
 	
-	/**
-	 *  Add a service query to the registry of a selected superpeer.
-	 *  @param query ServiceQuery.
-	 */
-	protected <T> ISubscriptionIntermediateFuture<T> addQueryByAskSuperpeer(final ServiceQueryInfo<T> sqi, final IComponentIdentifier cid)
-	{
-		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
-		final ServiceQuery<T> query = sqi.getQuery();
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
-		{
-			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
-		}
-		else
-		{
-//			if(getSuperpeerSync()!=null)
-			if(getSuperpeer()!=null)
-			{
-				final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-				if(cms!=null)
-				{
-					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
-					{
-						public void customResultAvailable(IExternalAccess result) throws Exception
-						{
-							try
-							{
-								// Set superpeer in query info for later removal
-								sqi.setSuperpeer(cid);
-								
-								result.scheduleStep(new IComponentStep<Collection<T>>()
-								{
-									@Classname("addQueryOnSuperpeer")
-									public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
-									{
-										IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-										return reg.addQuery(query);
-									}
-								}).addResultListener(new IntermediateDelegationResultListener<T>(ret));
-							}
-							catch(Exception e)
-							{
-								ret.setException(e);
-							}
-						}
-					});
-				}
-				else
-				{
-					ret.setException(new RuntimeException("RMS not found"));
-				}
-			}
-			else
-			{
-				ret.setException(new RuntimeException("No superpeer found"));
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Add a service query to the registry of a selected superpeer.
+//	 *  @param query ServiceQuery.
+//	 */
+//	protected <T> ISubscriptionIntermediateFuture<T> addQueryByAskSuperpeer(final ServiceQueryInfo<T> sqi, final IComponentIdentifier cid)
+//	{
+//		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+//		
+//		final ServiceQuery<T> query = sqi.getQuery();
+//		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+//		{
+//			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+//		}
+//		else
+//		{
+////			if(getSuperpeerSync()!=null)
+//			if(getSuperpeer()!=null)
+//			{
+//				final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+//				if(cms!=null)
+//				{
+//					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
+//					{
+//						public void customResultAvailable(IExternalAccess result) throws Exception
+//						{
+//							try
+//							{
+//								// Set superpeer in query info for later removal
+//								sqi.setSuperpeer(cid);
+//								
+//								result.scheduleStep(new IComponentStep<Collection<T>>()
+//								{
+//									@Classname("addQueryOnSuperpeer")
+//									public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
+//									{
+//										IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+//										return reg.addQuery(query);
+//									}
+//								}).addResultListener(new IntermediateDelegationResultListener<T>(ret));
+//							}
+//							catch(Exception e)
+//							{
+//								ret.setException(e);
+//							}
+//						}
+//					});
+//				}
+//				else
+//				{
+//					ret.setException(new RuntimeException("RMS not found"));
+//				}
+//			}
+//			else
+//			{
+//				ret.setException(new RuntimeException("No superpeer found"));
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Add a service query to the registry.
@@ -1106,7 +1063,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			
 			if(qinfo.getSuperpeer()!=null)
 			{
-				removeQueryFromSuperpeer(qinfo).addResultListener(new DelegationResultListener<Void>(ret));
+				removeQueryOnPlatform(qinfo.getSuperpeer(), qinfo).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
 			{
@@ -1121,51 +1078,51 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		return ret;
 	}
 	
-	/**
-	 *  Remove a query from the superpeer.
-	 */
-	protected <T> IFuture<Void> removeQueryFromSuperpeer(final ServiceQueryInfo<T> qinfo)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(qinfo.getSuperpeer()!=null)
-		{
-			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-			if(cms!=null)
-			{
-				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-				{
-					public void customResultAvailable(IExternalAccess result) throws Exception
-					{
-						try
-						{
-							final ServiceQuery<T> query = qinfo.getQuery();
-							result.scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("removeQueryOnSuperpeer")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-									reg.removeQuery(query);
-									return IFuture.DONE;
-								}
-							}).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-					}
-				});
-			}
-			else
-			{
-				ret.setException(new RuntimeException("RMS not found"));
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Remove a query from the superpeer.
+//	 */
+//	protected <T> IFuture<Void> removeQueryFromSuperpeer(final ServiceQueryInfo<T> qinfo)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(qinfo.getSuperpeer()!=null)
+//		{
+//			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+//			if(cms!=null)
+//			{
+//				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//				{
+//					public void customResultAvailable(IExternalAccess result) throws Exception
+//					{
+//						try
+//						{
+//							final ServiceQuery<T> query = qinfo.getQuery();
+//							result.scheduleStep(new IComponentStep<Void>()
+//							{
+//								@Classname("removeQueryOnSuperpeer")
+//								public IFuture<Void> execute(IInternalAccess ia)
+//								{
+//									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+//									reg.removeQuery(query);
+//									return IFuture.DONE;
+//								}
+//							}).addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//						catch(Exception e)
+//						{
+//							ret.setException(e);
+//						}
+//					}
+//				});
+//			}
+//			else
+//			{
+//				ret.setException(new RuntimeException("RMS not found"));
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
@@ -1204,7 +1161,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				qinfo.getFuture().setFinished();
 				
 				if(qinfo.getSuperpeer()!=null)
-					bar.addFuture(removeQueryFromSuperpeer(qinfo));
+					bar.addFuture(removeQueryOnPlatform(qinfo.getSuperpeer(), qinfo));
 			}
 			
 			bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
@@ -1273,7 +1230,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				qinfo.getFuture().setFinished();
 				
 				if(qinfo.getSuperpeer()!=null)
-					bar.addFuture(removeQueryFromSuperpeer(qinfo));
+					bar.addFuture(removeQueryOnPlatform(qinfo.getSuperpeer(), qinfo));
 			}
 			
 			bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret));
@@ -1469,6 +1426,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				@SuppressWarnings({"unchecked", "rawtypes"})
 				public void customResultAvailable(Boolean result) throws Exception
 				{
+					if(service.toString().indexOf("Time")!=-1)
+					{
+						System.out.println("checkQueries: "+service+", "+type+", "+result+", "+sqi.getQuery());
+					}
 					if(result.booleanValue())
 					{
 //						System.out.println("query: "+service);
@@ -1873,77 +1834,23 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// read
 	protected <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier cid)
 	{
-		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
-		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
-			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+			return new SubscriptionIntermediateFuture<T>(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
 		else
 		{
-			// Find component to schedule on (calling component or platform)
-			IComponentIdentifier origin	= IComponentIdentifier.LOCAL.get();
-			if(origin==null)	// TODO: shouldn't happen?
-				origin	= this.cid;
-
-			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-			if(cms!=null)
+			@SuppressWarnings("unchecked")
+			ISubscriptionIntermediateFuture<T>	ret	= executeOnLocalComponent(SubscriptionIntermediateFuture.class, new IComponentStep<Collection<T>>()
 			{
-				cms.getExternalAccess(origin).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<T>>(ret)
+				public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
 				{
-					public void customResultAvailable(IExternalAccess result) throws Exception
-					{
-						try
-						{
-							result.scheduleStep(new IComponentStep<Collection<T>>()
-							{
-								@Classname("searchServicesAsyncByAskSuperpeer")
-								public IFuture<Collection<T>> execute(IInternalAccess ia)
-								{
-									return performRemoteSearchServices(ia, query, cid);
-								}
-							}).addResultListener(new IntermediateDelegationResultListener<T>(ret)
-							{
-								public void customIntermediateResultAvailable(T result)
-								{
-									System.out.println("received by ask superpeer: "+result);
-									super.customIntermediateResultAvailable(result);
-								}
-
-								public void finished()
-								{
-//									System.out.println("finifini");
-									super.finished();
-								}
-								
-								public void customResultAvailable(Collection<T> result)
-								{
-//									System.out.println("custom");
-									super.customResultAvailable(result);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									System.out.println("ex in search by ask another platform: "+exception);
-									super.exceptionOccurred(exception);
-								}
-							});
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-
-					}
-				});
-			}
-			else
-			{
-				ret.setException(new RuntimeException("RMS not found"));
-			}
+					enhanceQuery(query);
+					return performRemoteSearchServices(ia, query, cid);
+				}
+			});
+			return ret;
 		}
-		
-		return ret;
 	}
 	
 
@@ -2104,57 +2011,67 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// Todo: public because needed by CMS to get remote CMS for external access
 	public <T> IFuture<T> searchServiceAsyncByAskOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier spcid)
 	{
-		enhanceQuery(query);
-		
-		final Future<T> ret = new Future<T>();
-
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
-			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
+			return	new Future<T>(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
 		else
 		{
-			// Find component to schedule on (calling component or platform)
-			IComponentIdentifier origin	= IComponentIdentifier.LOCAL.get();
-			if(origin==null)	// TODO: shouldn't happen?
-				origin	= cid;
-
-			final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
-			if(cms!=null)
+			@SuppressWarnings("unchecked")
+			IFuture<T>	ret	= executeOnLocalComponent(Future.class, new IComponentStep<T>()
 			{
-				cms.getExternalAccess(origin).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				public IFuture<T> execute(IInternalAccess ia)
 				{
-					public void customResultAvailable(IExternalAccess result) throws Exception
-					{
-						try
-						{
-							result.scheduleStep(new IComponentStep<T>()
-							{
-								@Classname("searchByAskOne")
-								public IFuture<T> execute(IInternalAccess ia)
-								{
-									return performRemoteSearchService(ia, query, null);
-//									IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
-////									if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
-////										query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-//									return reg.searchServiceAsync(query);
-								}
-							}).addResultListener(new DelegationResultListener<T>(ret));
-						}
-						catch(Exception e)
-						{
-							ret.setException(e);
-						}
-					}
-				});
-			}
-			else
+					enhanceQuery(query);
+					return performRemoteSearchService(ia, query, null);
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Generic code for running on a component.
+	 *  Used for executing remote requests.
+	 *  Hack??? should call remote registry service directly instead of using cid.
+	 */
+	protected <T, FUT extends IFuture<T>>	FUT executeOnLocalComponent(Class<FUT> clazz, final IComponentStep<T> step)
+	{
+		// Hack!!! Logger???
+		@SuppressWarnings("unchecked")
+		final Future<T> ret	= (Future<T>)FutureFunctionality.getDelegationFuture(clazz, new FutureFunctionality((Logger)null));
+		
+		// Find component to schedule on (calling component or platform)
+		IComponentIdentifier origin	= IComponentIdentifier.LOCAL.get();
+		if(origin==null)	// No local cid when called from external thread (e.g. swing).
+			origin	= cid;
+
+		final IComponentManagementService cms = getLocalServiceByClass(new ClassInfo(IComponentManagementService.class));
+		if(cms!=null)
+		{
+			cms.getExternalAccess(origin).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 			{
-				ret.setException(new RuntimeException("RMS not found"));
-			}
+				public void customResultAvailable(IExternalAccess result) throws Exception
+				{
+					try
+					{
+						FutureFunctionality.connectDelegationFuture(ret, result.scheduleStep(step));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
+		}
+		else
+		{
+			ret.setException(new RuntimeException("RMS not found"));
 		}
 		
-		return ret;
+		@SuppressWarnings("unchecked")
+		FUT	fret	= (FUT)ret;
+		return fret;
 	}
 	
 	/**
@@ -2719,10 +2636,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  Perform a remote search via remote search command.
 	 *  @param agent
 	 */
-	protected <T> IFuture<Collection<T>> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
+	protected <T> ISubscriptionIntermediateFuture<T> performRemoteSearchServices(IInternalAccess agent, ServiceQuery<T> query, IComponentIdentifier cid)
 	{
 		IComponentIdentifier tcid = cid!=null? cid: query.getTargetPlatform();
-		return ((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
+		// HACK!!! TODO: probably not subscription for search anyways???
+		return (ISubscriptionIntermediateFuture<T>)((IInternalRemoteExecutionFeature)agent.getComponentFeature(IRemoteExecutionFeature.class))
 			.executeRemoteSearch(tcid, query);
 	}
 

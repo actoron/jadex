@@ -6,6 +6,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -73,4 +74,16 @@ public interface ISuperpeerRegistrySynchronizationService
 //	 *  @return The clients this superpeer handles.
 //	 */
 //	public IFuture<Collection<IComponentIdentifier>>
+	
+	//-------- remote registry access --------
+	
+	/**
+	 *  Add (i.e. register) a query
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
+	
+	/**
+	 *  Remove a query.
+	 */
+	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query);
 }

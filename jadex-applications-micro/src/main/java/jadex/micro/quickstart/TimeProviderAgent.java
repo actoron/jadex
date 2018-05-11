@@ -170,6 +170,7 @@ public class TimeProviderAgent	implements ITimeService
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
 		config.addComponent(TimeProviderAgent.class);
+//		config.setValue("rt.addresses", "ws://ssp1@localhost:12345");
 		Starter.createPlatform(config).get();
 	}
 }

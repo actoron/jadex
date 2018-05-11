@@ -1411,6 +1411,26 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		return component;
 	}
 	
+	
+	//-------- remote registry access --------
+	
+	/**
+	 *  Add (i.e. register) a query
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
+	{
+		System.out.println("Adding query: "+query);
+		return getRegistry().addQuery(query);
+	}
+	
+	/**
+	 *  Remove a query.
+	 */
+	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query)
+	{
+		return getRegistry().removeQuery(query); 
+	}
+	
 //	/**
 //	 *  Info struct for subscriptions.
 //	 */
