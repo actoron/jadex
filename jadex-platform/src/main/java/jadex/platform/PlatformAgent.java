@@ -182,7 +182,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="superpeerclient", clazz=boolean.class),//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
-	@Argument(name="acr", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="acr", clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
