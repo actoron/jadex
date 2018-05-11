@@ -209,7 +209,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		if(superpeer!=null)
 		{
-			Set<ServiceQueryInfo<IService>> qs = queries.getValues(QueryInfoExtractor.KEY_TYPE_HASSUPERPEER, "true");
+			Set<ServiceQueryInfo<IService>> qs = queries.getValues(QueryInfoExtractor.KEY_TYPE_ISREMOTE, "true");
 			
 //			// get all queries in which the superpeer was set
 //			final Set<ServiceQueryInfo<?>> aqs = queries.getQueries(new IFilter<ServiceQueryInfo<?>>()
@@ -2788,8 +2788,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public synchronized void setSuperpeer(IComponentIdentifier superpeer)
 	{
-		this.superpeer = superpeer;
-		addQueriesToNewSuperpeer();
+		// TODO: Shouldn't be called w/o change?
+		if(!SUtil.equals(this.superpeer, superpeer))
+		{
+			this.superpeer = superpeer;
+			addQueriesToNewSuperpeer();
+		}
 	}
 
 	/**
@@ -2801,21 +2805,32 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected <T> void	enhanceQuery(ServiceQuery<T> query)
 	{
-		// Network names not set by user?
-		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
+		// Only enhance remote queries
+		// TODO: more extensible way of checking for remote query
+		if(query.isRemote())
 		{
-			// Unrestricted?
-			if(Boolean.TRUE.equals(query.isUnrestricted())
-				|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(ExecutionComponentFeature.LOCAL.get(), query.getServiceType().getType0()))	// hack!!! Exefeature.LOCAL should be right, but is there a better way? 
+			// Network names not set by user?
+			if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
 			{
-				// Unrestricted -> Don't check networks.
-				query.setNetworkNames(null);
+				// Unrestricted?
+				if(Boolean.TRUE.equals(query.isUnrestricted())
+					|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(ExecutionComponentFeature.LOCAL.get(), query.getServiceType().getType0()))	// hack!!! Exefeature.LOCAL should be right, but is there a better way? 
+				{
+					// Unrestricted -> Don't check networks.
+					query.setNetworkNames(null);
+				}
+				else
+				{
+					// Not unrestricted -> only find services from my local networks
+					query.setNetworkNames(ServiceQuery.getNetworkNames(cid));
+				}
 			}
-			else
-			{
-				// Not unrestricted -> only find services from my local networks
-				query.setNetworkNames(ServiceQuery.getNetworkNames(cid));
-			}
-		}		
+		}
+		
+		// Disable local checks by default
+		else if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
+		{
+			query.setNetworkNames(null);
+		}			
 	}
 }

@@ -586,6 +586,15 @@ public class ServiceQuery<T>
 	}
 
 	/**
+	 *  Check if a query is potentially remote.
+	 *  @return True, if scope is set to a remote scope (e.g. global or network).
+	 */
+	public boolean isRemote()
+	{
+		return scope!=null && (scope.contains("global") || scope.contains("network"));
+	}
+	
+	/**
 	 *  Tests if the query matches a service.
 	 *  
 	 *  @param service The service.

@@ -41,7 +41,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	public static final String KEY_TYPE_OWNER_PLATORM = "owner";
 	
 	/** Key type for the superpeer boolean. */
-	public static final String KEY_TYPE_HASSUPERPEER = "hassuperpeer";
+	public static final String KEY_TYPE_ISREMOTE = "isremote";
 	
 	/** Key type for the id. */
 	public static final String KEY_TYPE_ID = "id";
@@ -52,7 +52,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_NETWORKS};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_NETWORKS, KEY_TYPE_ISREMOTE};
 	
 	static
 	{
@@ -138,9 +138,9 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 			if(query.getOwner()!=null)
 				ret = new SetWrapper<String>(query.getOwner().getRoot().toString());
 		}
-		else if(KEY_TYPE_HASSUPERPEER.equals(keytype))
+		else if(KEY_TYPE_ISREMOTE.equals(keytype))
 		{
-			ret = new SetWrapper<String>(sqi.getSuperpeer()!=null? "true": "false");
+			ret = new SetWrapper<String>(sqi.getQuery().isRemote()? "true": "false");
 		}
 		else if(KEY_TYPE_ID.equals(keytype))
 		{
