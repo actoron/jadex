@@ -1,15 +1,22 @@
 package jadex.tools.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQueryInfo;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
@@ -132,6 +139,30 @@ public class StatusAgent implements IStatusService
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get registered queries of a given (set of) scope(s) or no scope for all queries.
+	 *  @return A list of queries.
+	 */
+	// No intermediate for easier REST?
+	// TODO: subscription in registry to get notified about new queries? -> please no polling!
+	public IFuture<Collection<ServiceQuery<?>>>	getQueries(String... scope)
+	{
+		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
+		IntermediateFuture<ServiceQuery<?>>	ret	= new IntermediateFuture<ServiceQuery<?>>();
+		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getComponentIdentifier());
+		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
+		{
+			if(scopes==null || scopes.contains(sqi.getQuery().getScope()))
+			{
+				ret.addIntermediateResult(sqi.getQuery());
+			}
+		}
+		ret.setFinished();
+
+		return ret;
+	}
+
 	
 	public static void main(String[] args)
 	{

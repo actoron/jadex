@@ -5,7 +5,7 @@ var defroute='/platforms';
 var noscriptelement = document.getElementById("noscriptcontent");
 noscriptelement.parentElement.removeChild(noscriptelement);
 
-var app = angular.module('acmain', ['ngRoute', 'acplatforms']);
+var app = angular.module('acmain', ['ngRoute', 'acplatforms', 'acqueries']);
 var mobile=detectmobile();
 
 app.config(function($routeProvider)
@@ -17,6 +17,12 @@ app.config(function($routeProvider)
      	})
      	.when('/platforms', {
      		templateUrl: 'partials/platforms.html'
+     	})
+     	.when('/services/providers', {
+     		templateUrl: 'partials/services.html'
+     	})
+     	.when('/services/queries', {
+     		templateUrl: 'partials/queries.html'
      	})
      	.when('/contact', {
      		templateUrl: 'partials/contact.html'

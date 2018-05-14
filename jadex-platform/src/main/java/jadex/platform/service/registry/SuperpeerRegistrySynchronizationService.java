@@ -1419,7 +1419,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
-		System.out.println("Adding query: "+query);
+//		System.out.println("Adding query: "+query);
 		return getRegistry().addQuery(query);
 	}
 	

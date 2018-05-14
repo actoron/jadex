@@ -14,6 +14,14 @@
 			<ul id="navbtns" class="nav navbar-nav">
 				<li routebutton=""><a id="platforms" href="#platforms">Connected Platforms</a></li>
 				<li class="nav-divider"></li>
+				<li routebutton="" class="dropdown">
+					<a id="services" class="dropdown-toggle" data-toggle="dropdown">Services<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li routebutton=""><a href="#services/providers">Provided Services</a></li>
+						<li routebutton=""><a href="#services/queries">Active Search Queries</a></li>
+					</ul>
+				</li>
+				<li class="nav-divider"></li>
 				<li><a id="restapi" class="navbar-link" href="status">REST API</a></li>
 			</ul>
 		</div>
@@ -27,15 +35,13 @@ styleSheetElement.id = "resizableStylesheet"
 document.getElementsByTagName('head')[0].appendChild(styleSheetElement);
 
 function adjustLayout() {
-	var collapsed=window.getComputedStyle(document.getElementById('hbtn')).display!='none';
 	var w = document.documentElement.clientWidth;
 	var h = document.documentElement.clientHeight;
 	var lheight=50;
-//	if (!mobile)
-	if(!collapsed)
+	if (!mobile)
 	{
 		lheight = h >> 3;
-//		lheight = Math.max(50, Math.min(lheight, w*0.08));
+		lheight = Math.max(50, Math.min(lheight, w*0.08));
 	}
 	var logo=document.getElementById('logo');
 	logo.style.height='' + (lheight*0.7) + 'px';
@@ -43,6 +49,7 @@ function adjustLayout() {
 	logo.style.marginTop=''+(lheight*0.1)+'px';
 	document.getElementById('topbar').style.height='' + lheight + 'px';
 	
+	var collapsed=window.getComputedStyle(document.getElementById('hbtn')).display!='none';
 	var navbtns=document.getElementById('navbtns');
 	// navbtns.classList.remove('navbar-shrink');
 	// navbtns.classList.remove('navbar-shrink2');
@@ -59,7 +66,7 @@ function adjustLayout() {
 	}
 		
 	if (!collapsed){
-		var scale=1;//Math.min(1,Math.max(0,(w-820))*0.002);
+		var scale=Math.min(1,Math.max(0,(w-420))*0.002);
 		var elems=document.querySelectorAll('#navbtns > li > a');
 		for(var i=0;i<elems.length;++i){
 			elems[i].style.fontSize=6*scale+10+'px';
