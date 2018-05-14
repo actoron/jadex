@@ -5,7 +5,7 @@ var defroute='/platforms';
 var noscriptelement = document.getElementById("noscriptcontent");
 noscriptelement.parentElement.removeChild(noscriptelement);
 
-var app = angular.module('acmain', ['ngRoute', 'acplatforms', 'acqueries']);
+var app = angular.module('acmain', ['ngRoute', 'acplatforms', 'acservices']);
 var mobile=detectmobile();
 
 app.config(function($routeProvider)

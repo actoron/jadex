@@ -13,7 +13,7 @@
 			<tr ng-repeat="x in queries | orderBy: 'scope' | orderBy: 'serviceType.value' | orderBy: 'owner.name'"
 				ng-class="{'connecting': !x.connected}">
 				<td>{{x.serviceType.value}}</td>
-				<td>{{x.owner.name}}</td>
+				<td>{{x.owner.name | cid}}</td>
 				<td>{{x.scope}}</td>
 			</tr>
 		</tbody>

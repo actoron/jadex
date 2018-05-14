@@ -12,6 +12,8 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
@@ -156,6 +158,29 @@ public class StatusAgent implements IStatusService
 			if(scopes==null || scopes.contains(sqi.getQuery().getScope()))
 			{
 				ret.addIntermediateResult(sqi.getQuery());
+			}
+		}
+		ret.setFinished();
+
+		return ret;
+	}
+	
+	/**
+	 *  Get provided services of a given (set of) scope(s) or no scope for all services.
+	 *  @return A list of services.
+	 */
+	// No intermediate for easier REST?
+	// TODO: subscription in registry to get notified about new services? -> please no polling!
+	public IFuture<Collection<IServiceIdentifier>>	getServices(String... scope)
+	{
+		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
+		IntermediateFuture<IServiceIdentifier>	ret	= new IntermediateFuture<IServiceIdentifier>();
+		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getComponentIdentifier());
+		for(IService ser: reg.getAllServices())
+		{
+			if(scopes==null || scopes.contains(ser.getServiceIdentifier().getScope()))
+			{
+				ret.addIntermediateResult(ser.getServiceIdentifier());
 			}
 		}
 		ret.setFinished();
