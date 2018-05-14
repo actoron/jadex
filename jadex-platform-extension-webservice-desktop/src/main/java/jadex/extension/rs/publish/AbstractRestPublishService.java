@@ -645,7 +645,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        	}
 	        	catch (Exception e)
 	        	{
-	        		e.printStackTrace();
+	        		component.getLogger().warning("No GET parameters and error parsing POST parameters for method: "+method+", "+e);
 	        	}
 	        }
 	 
@@ -706,6 +706,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            	else if(p instanceof String && ((String)p).length()>0 && BasicTypeConverter.isExtendedBuiltInType(ts[i]))
 	            	{
 	            		targetparams[i] = BasicTypeConverter.getExtendedStringConverter(ts[i]).convertString((String)p, null);
+	            	}
+	            	
+	            	// varargs support -> convert matching single value to singleton array
+	            	else if(p!=null && ts[i].isArray() && SReflect.isSupertype(ts[i].getComponentType(), p.getClass()))
+	            	{
+	            		targetparams[i] = Array.newInstance(ts[i].getComponentType(), 1);
+	            		Array.set(targetparams[i], 0, p);
 	            	}
 	            }
 	            
