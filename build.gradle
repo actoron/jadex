@@ -544,6 +544,12 @@ def createDistZip(distname, arts, isaddon)
 				def spbdir = sp.buildDir.getCanonicalPath()
 
 				if (isAndroidProject(sp)) {
+					
+					lintOptions {
+    					abortOnError false
+					}
+					
+					
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'
