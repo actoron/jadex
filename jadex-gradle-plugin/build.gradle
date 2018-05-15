@@ -5,6 +5,24 @@ description 'Gradle plugin for generating BDIV3 runtime code from agent annotati
 
 apply plugin: 'groovy'
 
+buildscript {
+    repositories {
+        maven
+        {
+            url "https://maven.google.com"
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven
+    {
+        url "https://maven.google.com"
+    }
+}
+
 def androidToolsVersion = android_gradlePluginVersion;
 dependencies {
     testCompile gradleTestKit()
@@ -43,10 +61,7 @@ dependencies {
     testRuntime files(createClasspathManifest)
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
+
 
 //configurations {
 //    gradlePluginArchives
