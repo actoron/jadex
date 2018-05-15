@@ -288,7 +288,7 @@ subprojects
 		}
 	}
 
-    sourceCompatibility = 1.6
+    sourceCompatibility = 1.8
     
     if(isTestParallel(project)) {
 		tasks.withType(Test) {
