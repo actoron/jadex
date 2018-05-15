@@ -222,6 +222,14 @@ subprojects
         // include all resources that are placed inside src dirs
 //        android.sourceSets.main.resources.srcDirs mainSrcDir
 //        android.sourceSets.test.resources.srcDirs testSrcDir
+
+		repositories {
+			maven
+			{
+				url "https://maven.google.com"
+			}
+			jcenter()
+		}
         dependencies
         {
             testCompile junit
