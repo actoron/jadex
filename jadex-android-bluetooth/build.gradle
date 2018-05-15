@@ -2,15 +2,15 @@ description 'Bluetooth ad-hoc communication for Jadex-Android.'
 
 dependencies
 {
-	compile project(':jadex-bridge')
-    compile project(':jadex-platform')
-    compile project(':jadex-runtimetools-android')
-    compile libraries.protobuf
-    androidTestCompile libraries.android_test
-    testCompile libraries.robolectric
-    compile libraries.android_support
-    androidTestCompile libraries.junit
-    testCompile libraries.junit
+	api project(':jadex-bridge')
+    api project(':jadex-platform')
+    api project(':jadex-runtimetools-android')
+    api libraries.protobuf
+    androidTestImplementation libraries.android_test
+    testImplementation libraries.robolectric
+    api libraries.android_support
+    androidTestImplementation libraries.junit
+    testImplementation libraries.junit
 
     //provided libraries.android
 }

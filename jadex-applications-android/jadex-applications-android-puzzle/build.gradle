@@ -5,13 +5,13 @@ description 'Jadex-Android BDIV3 puzzle sample application'
 
 dependencies
 {
-    compile project(':jadex-platform-android')
-    compile project(':jadex-android-commons')
-    compile project(':jadex-android-xmlpull')
-    compile project(':jadex-android-antlr')
-    compile project(':jadex-runtimetools-android')
-    compile project(':jadex-kernel-bdiv3-android')
-    compile project(':jadex-kernel-bpmn')
+    api project(':jadex-platform-android')
+    api project(':jadex-android-commons')
+    api project(':jadex-android-xmlpull')
+    api project(':jadex-android-antlr')
+    api project(':jadex-runtimetools-android')
+    api project(':jadex-kernel-bdiv3-android')
+    api project(':jadex-kernel-bpmn')
 
 //    compile project(':jadex-platform-extension-webservice-android')
 

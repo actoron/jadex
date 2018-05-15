@@ -3,8 +3,8 @@ description 'The Jadex android webservice platform extension package contains fu
 configurations
 {
     // exclude android spring framework in testCompile, because we use the desktop variant for junit
-    testCompile.exclude group: "org.springframework.android", module: "spring-android-rest-template"
-    testCompile.exclude group: "org.springframework.android", module: "spring-android-rest-core"
+    testImplementation.exclude group: "org.springframework.android", module: "spring-android-rest-template"
+    testImplementation.exclude group: "org.springframework.android", module: "spring-android-rest-core"
 }
 
 dependencies
@@ -18,23 +18,23 @@ dependencies
 //        exclude group: 'org.ow2.asm', module: 'asm-commons'}
 
 
-    testCompile 'org.springframework:spring-web:3.1.2.RELEASE'
-    compile project(':jadex-platform-extension-webservice')
+    testImplementation 'org.springframework:spring-web:3.1.2.RELEASE'
+    api project(':jadex-platform-extension-webservice')
 
     // rest client:
-    compile 'org.springframework.android:spring-android-rest-template:' + spring_android_version
-    compile 'org.springframework.android:spring-android-core:' + spring_android_version
+    api 'org.springframework.android:spring-android-rest-template:' + spring_android_version
+    api 'org.springframework.android:spring-android-core:' + spring_android_version
 
-    testCompile project(':jadex-platform')
-    testCompile project(':jadex-kernel-component')
-    testCompile project(':jadex-platform-android')
+    testImplementation project(':jadex-platform')
+    testImplementation project(':jadex-kernel-component')
+    testImplementation project(':jadex-platform-android')
 
     // rest server:
-    testCompile 'com.sun.jersey:jersey-server:' + jersey_version
-    testCompile 'com.sun.jersey:jersey-grizzly2:' + jersey_version
-    testCompile 'com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version
-    testCompile 'com.sun.jersey:jersey-bundle:' + jersey_version
-    //testCompile libraries.android
-    testCompile libraries.robolectric
-    testCompile libraries.robotium
+    testImplementation 'com.sun.jersey:jersey-server:' + jersey_version
+    testImplementation 'com.sun.jersey:jersey-grizzly2:' + jersey_version
+    testImplementation 'com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:' + jersey_version
+    testImplementation 'com.sun.jersey:jersey-bundle:' + jersey_version
+    //testImplementation libraries.android
+    testImplementation libraries.robolectric
+    testImplementation libraries.robotium
 }

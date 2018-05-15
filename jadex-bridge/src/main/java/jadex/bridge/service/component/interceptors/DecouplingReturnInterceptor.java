@@ -136,7 +136,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						if(!ServiceIdentifier.isSystemService(sic.getServiceIdentifier().getServiceType().getType(caller.getClassLoader())))
 						{
 							@SuppressWarnings({"rawtypes", "unchecked"})
-							IResultListener<Object>	lis	= new IIntermediateResultListener()
+							IResultListener<Object>	lis = new IIntermediateResultListener()
 							{
 	
 								@Override
@@ -167,12 +167,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 										new ServiceCallEvent(ServiceCallEvent.Type.FINISHED, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), null));
 								}
 	
-								@Override
-								public void resultAvailable(Collection result)
-								{
-									((IInternalServiceMonitoringFeature)feat).postServiceEvent(
-										new ServiceCallEvent(ServiceCallEvent.Type.RESULT, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), result));
-								}
+//								Not necessary?
+//								@Override
+//								public void resultAvailable(Collection<Object> result)
+//								{
+//									((IInternalServiceMonitoringFeature)feat).postServiceEvent(
+//										new ServiceCallEvent(ServiceCallEvent.Type.RESULT, sic.getServiceIdentifier(), new MethodInfo(sic.getMethod()), sic.getCaller(), result));
+//								}
 								
 							};
 							fut.addResultListener(lis);
