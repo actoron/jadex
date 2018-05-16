@@ -2,6 +2,13 @@ import java.nio.file.Paths
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
+// Disable Android lint nonsense.
+tasks.whenTaskAdded {task ->
+    if(task.name.contains("lint")) {
+        task.enabled = false
+    }
+}
+
 //apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
