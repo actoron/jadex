@@ -1247,9 +1247,10 @@ public abstract class Test extends TestCase
 	{
 		
 		//KeyStore ks = getKeystore("./testkeystore", "pass", "pass", "test");
-		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-		ks.load(new ByteArrayInputStream(TestKeyStore.KEYSTORE_DATA), "pass".toCharArray());
-		Certificate cert = ks.getCertificate("test");
+//		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+//		ks.load(new ByteArrayInputStream(TestKeyStore.KEYSTORE_DATA), "pass".toCharArray());
+//		Certificate cert = ks.getCertificate("test");
+		Certificate cert = TestCertificate.getCert();
 		doWriteAndRead(cert, new Comparator<Certificate>()
 		{
 			public int compare(Certificate o1, Certificate o2)
