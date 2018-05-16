@@ -2,13 +2,6 @@ import java.nio.file.Paths
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
-// Disable Android lint nonsense.
-tasks.whenTaskAdded {task ->
-    if(task.name.contains("lint")) {
-        task.enabled = false
-    }
-}
-
 //apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
 apply plugin: 'maven' // use gradle install to install in local .m2 
@@ -134,7 +127,7 @@ subprojects
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
-            robolectric: 'org.robolectric:robolectric:3.3.2'
+            robolectric: 'org.robolectric:robolectric:3.8'
     ]
 
 	configurations {
@@ -158,6 +151,14 @@ subprojects
 						version: "4.0.6"
 			}
 		}
+		
+		// Disable Android lint nonsense.
+		tasks.whenTaskAdded {task ->
+		    if(task.name.contains("lint")) {
+		        task.enabled = false
+		    }
+		}
+		
 	 	if (isAndroidLibraryProject(project))
         {
             apply plugin: 'com.android.library'
@@ -355,6 +356,11 @@ subprojects
 	        }
 	    }
     }
+    
+    subprojects
+    {
+		task allDeps(type: DependencyReportTask) {}
+	}
 }
 
 task copyJavaDocSources(type: Copy) {
