@@ -224,7 +224,7 @@ public class SUtil
 			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
 			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
 		}
-		catch (Throwable t)
+		catch (Exception e)
 		{
 			secrand = new SecureRandom();
 		}
