@@ -2,6 +2,7 @@ package jadex.platform.service.registry;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -708,7 +709,12 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	public IFuture<Collection<IComponentIdentifier>> getPartnerSuperpeers()
 	{
-		return new Future<Collection<IComponentIdentifier>>(partners.keySet());
+		Collection<IComponentIdentifier>	ret;
+		if(partners!=null)
+			ret	= partners.keySet();
+		else
+			ret	= Collections.emptySet();
+		return new Future<Collection<IComponentIdentifier>>((Collection<IComponentIdentifier>)(ret));
 	}
 	
 	/**
