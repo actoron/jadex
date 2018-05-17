@@ -5,7 +5,9 @@ dependencies
 	compile project(':jadex-distribution-minimal')
 
 	compile project(':jadex-runtimetools-swing')
+	compile project(':jadex-runtimetools-web')
 	compile project(':jadex-tools-bdi')
+	compile project(':jadex-applib-bdi')
 	compile project(':jadex-tools-bpmn')
 	compile project(':jadex-tools-comanalyzer')
 	compile project(':jadex-rules-tools')
@@ -13,7 +15,9 @@ dependencies
 	compile project(':jadex-kernel-extension-agr')
 	compile project(':jadex-kernel-extension-envsupport')
 	
-	// excluded?
-//	compile project(':jadex-platform-extension-webservice')
-//	compile project(':jadex-platform-extension-webservice-desktop')
+	// excluded? ---> why??? Comment removed
+	compile project(':jadex-platform-extension-webservice')
+	compile project(':jadex-platform-extension-webservice-desktop')
+	compile project(':jadex-platform-extension-webservice-desktop-jetty')
+	compile project(':jadex-platform-extension-webservice-desktop-grizzly') // todo: remove grizzly dependency in jadex-application-webservice
 }

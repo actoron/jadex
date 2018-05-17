@@ -36,6 +36,7 @@ public class TimeUserAgent
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
+//		config.setValue("rt.addresses", "ws://ssp1@localhost:12345");
 		config.addComponent(TimeUserAgent.class);
 		Starter.createPlatform(config).get();
 	}

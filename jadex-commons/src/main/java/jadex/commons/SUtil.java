@@ -34,8 +34,6 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -5660,6 +5658,23 @@ public class SUtil
 		{
 			return Collections.emptyMap();
 		}
+	}
+	
+	/**
+	 *  Helper to find first matching key (if any) for a value (identity check).
+	 */
+	public static <K, V> K	findKeyForValue(Map<K, V> map, V value)
+	{
+		K	key	= null;
+		for(K test: map.keySet())
+		{
+			if(map.get(test)==value)
+			{
+				key	= test;
+				break;
+			}
+		}
+		return key;
 	}
 	
 	/**

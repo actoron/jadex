@@ -14,20 +14,20 @@ public interface IMessageFeature
 {
 	/**
 	 *  Send a message.
-	 *  @param receiver	The message receiver.
 	 *  @param message	The message.
+	 *  @param receiver	The message receiver(s). At least one required unless given in message object (e.g. FipaMessage).
 	 *  
 	 */
-	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message);
+	public IFuture<Void> sendMessage(Object message, IComponentIdentifier... receiver);
 	
 	/**
 	 *  Send a message.
-	 *  @param receiver	The message receiver.
 	 *  @param message	The message.
 	 *  @param addheaderfields Additional header fields.
+	 *  @param receiver	The message receiver(s). At least one required unless given in message object (e.g. FipaMessage).
 	 *  
 	 */
-	public IFuture<Void> sendMessage(IComponentIdentifier receiver, Object message, Map<String, Object> addheaderfields);
+	public IFuture<Void> sendMessage(Object message, Map<String, Object> addheaderfields, IComponentIdentifier... receiver);
 	
 	/**
 	 *  Send a message and wait for a reply.
@@ -37,6 +37,7 @@ public interface IMessageFeature
 	 *  
 	 *  @return The reply.
 	 */
+	// Todo: intermediate future with multiple receivers?
 	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message);
 	
 	/**
@@ -48,6 +49,7 @@ public interface IMessageFeature
 	 *  
 	 *  @return The reply.
 	 */
+	// Todo: intermediate future with multiple receivers?
 	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message, Long timeout);
 	
 	/**

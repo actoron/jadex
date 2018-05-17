@@ -14,6 +14,7 @@ public class BPMNTest	extends ComponentTestSuite
 		{
 			// Not working in isolation
 			"NFNonBusyServiceUserFlow",
+			"D5_MessageSending",
 		
 			"AgentCreation",	// Sometimes doesn't stop.
 			"WaitForTick",	// Doesn't work in simulation?

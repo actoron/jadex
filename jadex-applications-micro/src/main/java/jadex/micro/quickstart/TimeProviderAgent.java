@@ -19,6 +19,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -28,7 +29,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITimeService.class))
+@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=Binding.SCOPE_GLOBAL))
 public class TimeProviderAgent	implements ITimeService
 {
 	//-------- attributes --------
@@ -150,7 +151,6 @@ public class TimeProviderAgent	implements ITimeService
 			
 			ret	= city!=null ? country!=null ? city+", "+country : city
 				: country!=null ? country : "unknown";
-				
 		}
 		catch(Exception e)
 		{
@@ -169,6 +169,9 @@ public class TimeProviderAgent	implements ITimeService
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
 		config.addComponent(TimeProviderAgent.class);
+//		config.setValue("rt.addresses", "ws://ssp1@localhost:12345");
+//		config.setLogging(true);
+//		config.setGui(true);
 		Starter.createPlatform(config).get();
 	}
 }

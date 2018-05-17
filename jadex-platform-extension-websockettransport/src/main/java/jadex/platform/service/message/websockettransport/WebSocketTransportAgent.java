@@ -27,7 +27,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	
 	/** Idle connection timeout. */
 	@AgentArgument
-	protected int idletimeout = 60000;
+	protected int idletimeout = 5000;	// TODO: support higher values
 	
 	/** Timeout on trying to connect. */
 	@AgentArgument

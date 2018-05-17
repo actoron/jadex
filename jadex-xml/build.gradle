@@ -7,9 +7,13 @@ dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-traverser')
-//	testCompile project(':jadex-commons').sourceSets.test.output
+	
+	// Wrong way: (doesn't work for eclipse, depends on generated jar from gradle build)
 //	testCompile files(project(':jadex-traverser').sourceSets.test.output)
-	testCompile files(project(':jadex-traverser').sourceSets.test.runtimeClasspath)
+//	testCompile files(project(':jadex-traverser').sourceSets.test.runtimeClasspath)
+	
+	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
+	testCompile project(path: ':jadex-traverser', configuration: 'testOutput')
 }
 //publishing
 //{

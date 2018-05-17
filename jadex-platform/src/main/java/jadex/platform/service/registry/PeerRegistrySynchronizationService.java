@@ -379,14 +379,14 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					{
 						public void customResultAvailable(final ISuperpeerRegistrySynchronizationService spser)
 						{
-//							System.out.println("Found sp service");
+							System.out.println("Found sp service: "+spser);
 							spregser = spser;
 							ret.setResult(spregser);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							exception.printStackTrace();
+//							exception.printStackTrace();
 //							System.out.println("balabala "+exception.getMessage());
 							super.exceptionOccurred(exception);
 						}

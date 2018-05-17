@@ -15,6 +15,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
@@ -33,7 +34,9 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -42,7 +45,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -59,8 +65,11 @@ import jadex.micro.annotation.ProvidedServices;
  * @param <Con> A custom object type to hold connection information as required by the concrete transport.
  */
 @Agent
-@ProvidedServices(@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
-public abstract class AbstractTransportAgent<Con> implements ITransportService, IInternalService, ITransportHandler<Con>
+@ProvidedServices({
+	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
+})
+public abstract class AbstractTransportAgent<Con> implements ITransportService, ITransportInfoService, IInternalService, ITransportHandler<Con>
 {
 	// -------- arguments --------
 
@@ -105,6 +114,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	
 	/** The cms (cached for speed). */
 	protected IComponentManagementService	cms;
+	
+	/** Listeners from transport info service. */
+	protected Collection<SubscriptionIntermediateFuture<PlatformData>>	infosubscribers;
+	
 
 	// -------- abstract methods to be provided by concrete transport --------
 
@@ -113,8 +126,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public abstract ITransport<Con> createTransportImpl();
 
-	// -------- ITransportHandler, i.e.methods to be called by concrete
-	// transport --------
+	// -------- ITransportHandler, i.e.methods to be called by concrete transport --------
 
 	/**
 	 * Get the internal access.
@@ -384,7 +396,75 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			return ret;
 		}
 	}
-
+	
+	//-------- ITransportInfoService interface --------
+	
+	/**
+	 *  Get events about established connections.
+	 *  @return Events for connections specified by
+	 *  	1: platform id,
+	 *  	2: protocol name,
+	 *  	3: ready flag (false=connecting, true=connected, null=disconnected).
+	 */
+	public ISubscriptionIntermediateFuture<PlatformData>	subscribeToConnections()
+	{
+		final SubscriptionIntermediateFuture<PlatformData>	ret	= new SubscriptionIntermediateFuture<PlatformData>(null, true);
+		SFuture.avoidCallTimeouts(ret, agent);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				synchronized(AbstractTransportAgent.this)
+				{
+					infosubscribers.remove(ret);
+				}
+			}
+		});
+	
+		synchronized(this)
+		{
+			if(infosubscribers==null)
+			{
+				infosubscribers	= new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();
+			}
+			infosubscribers.add(ret);
+			
+			// Add initial data
+			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
+			{ 
+				ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
+			}
+		}
+	
+		return ret;
+	}
+	
+	/**
+	 *  Get the established connections.
+	 *  @return A list of connections specified by
+	 *  	1: platform id,
+	 *  	2: protocol name,
+	 *  	3: ready flag (false=connecting, true=connected).
+	 */
+	public IIntermediateFuture<PlatformData>	getConnections()
+	{
+		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
+	
+		synchronized(this)
+		{			
+			// Add initial data
+			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
+			{ 
+				ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
+			}
+		}
+		
+		ret.setFinished();
+	
+		return ret;
+	}
+	
 	// -------- helper methods --------
 
 	/**
@@ -524,46 +604,80 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected VirtualConnection createVirtualConnection(IComponentIdentifier target)
 	{
+		VirtualConnection vircon = new VirtualConnection();
+		SubscriptionIntermediateFuture<PlatformData>[]	notify;
 		synchronized(this)
 		{
 			if(virtuals==null)
 			{
 				virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
 			}
-			VirtualConnection vircon = new VirtualConnection();
 			VirtualConnection prev = virtuals.put(target, vircon);
 			assert prev == null;
-			return vircon;
+			
+			@SuppressWarnings("unchecked")
+			SubscriptionIntermediateFuture<PlatformData>[]	tmp
+				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
+			notify	= tmp;
 		}
+		
+		if(notify!=null)
+		{
+			// Newly created connection -> ready=false.
+			PlatformData	info	= vircon.getPlatformdata(target);
+			for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
+			{
+				fut.addIntermediateResult(info);
+			}
+		}
+		
+		return vircon;
 	}
 	
-	/**
-	 *  Get or create a virtual connection.
-	 */
-	protected VirtualConnection getOrCreateVirtualConnection(IComponentIdentifier target)
-	{
-		synchronized(this)
-		{
-			VirtualConnection	ret	= getVirtualConnection(target);
-			if(ret==null)
-			{
-				ret	= createVirtualConnection(target);
-			}
-			return ret;
-		}
-	}
+//	/**
+//	 *  Get or create a virtual connection.
+//	 */
+//	protected VirtualConnection getOrCreateVirtualConnection(IComponentIdentifier target)
+//	{
+//		synchronized(this)
+//		{
+//			VirtualConnection	ret	= getVirtualConnection(target);
+//			if(ret==null)
+//			{
+//				ret	= createVirtualConnection(target);
+//			}
+//			return ret;
+//		}
+//	}
 	
 	/**
 	 *  Remove a virtual connection if it is still the current connection for the target.
 	 */
 	protected void	removeVirtualConnection(IComponentIdentifier target, VirtualConnection con)
 	{
+		SubscriptionIntermediateFuture<PlatformData>[]	notify;
+		VirtualConnection	vircon;
 		synchronized(this)
 		{
-			VirtualConnection	vircon	= getVirtualConnection(target);
+			vircon	= getVirtualConnection(target);
 			if(vircon==con)
 			{
 				virtuals.remove(target);
+			}
+			
+			@SuppressWarnings("unchecked")
+			SubscriptionIntermediateFuture<PlatformData>[]	tmp
+				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
+			notify	= tmp;
+		}
+
+		if(notify!=null)
+		{
+			// Removed connection -> ready=null.
+			PlatformData	info	= vircon.getPlatformdata(target);
+			for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
+			{
+				fut.addIntermediateResult(info);
 			}
 		}
 	}
@@ -688,7 +802,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 										Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
 										addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
 										ia.getComponentFeature(IMessageFeature.class)
-											.sendMessage((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), null, addheaderfields)
+											.sendMessage(null, addheaderfields, (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER))
 											.addResultListener(new IResultListener<Void>()
 											{
 												@Override
@@ -877,6 +991,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			Future<Integer>	fut	= null;
 			boolean log	= false;
 			boolean	close	= false;
+			boolean notify	= false;
 			
 			synchronized(this)
 			{
@@ -911,6 +1026,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						{
 							unprefer	= cons.get(1);
 						}
+						
+						notify	= true;
 					}
 		
 					// Keep connection but unprefer, to cause abort, if on client side.
@@ -924,6 +1041,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			
 			if(log)
 			{
+//				System.out.println("Completed handshake for connection " + cand.getConnection() + " to: "+ cand.getTarget());
 				agent.getLogger().info("Completed handshake for connection " + cand.getConnection() + " to: "+ cand.getTarget());
 			}
 
@@ -941,6 +1059,48 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			{
 				impl.closeConnection(cand.getConnection());
 			}
+			
+			if(notify)
+			{
+				IComponentIdentifier	mytarget	= null;
+				SubscriptionIntermediateFuture<PlatformData>[]	subs	= null;
+				synchronized(AbstractTransportAgent.this)
+				{
+					// (new) connection established -> notify listeners, if any
+					if(infosubscribers!=null)
+					{
+						@SuppressWarnings("unchecked")
+						SubscriptionIntermediateFuture<PlatformData>[]	tmp
+							= infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]);
+						subs	= tmp;
+						mytarget	= SUtil.findKeyForValue(virtuals, this);
+					}
+				}
+
+				if(subs!=null)
+				{
+					PlatformData info = getPlatformdata(mytarget);
+					for(SubscriptionIntermediateFuture<PlatformData> subfut: subs)
+					{
+						subfut.addIntermediateResult(info);
+					}
+				}
+			}
+		}
+
+		/**
+		 *  Transferrable info about the connection.
+		 *  @param target The target to this connection.
+		 */
+		protected PlatformData getPlatformdata(IComponentIdentifier target)
+		{
+			boolean	contained;
+			synchronized(AbstractTransportAgent.this)
+			{
+				// Not contained? removed connection -> ready=null.
+				contained	= virtuals.containsKey(target);
+			}
+			return new PlatformData(target, impl.getProtocolName(), contained ? isReady().isDone() : null);
 		}
 
 		/**

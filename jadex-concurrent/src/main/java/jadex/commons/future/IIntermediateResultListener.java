@@ -16,7 +16,7 @@ public interface IIntermediateResultListener<E> extends IResultListener<Collecti
 	 *  intermediateResultAvailable method has not been called.
 	 *  @param result The final result.
 	 */
-	public void resultAvailable(Collection<E> result);
+//	public void resultAvailable(Collection<E> result);
 	
 //	/**
 //	 *  Called when an exception occurred.

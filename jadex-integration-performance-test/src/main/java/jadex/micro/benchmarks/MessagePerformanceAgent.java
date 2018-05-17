@@ -268,7 +268,7 @@ public class MessagePerformanceAgent
 									}
 									
 //									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(receiver, request);
+									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(request, receiver);
 									fut.addResultListener(crl);
 									final int fi = i;
 									fut.addResultListener(new IResultListener<Void>()

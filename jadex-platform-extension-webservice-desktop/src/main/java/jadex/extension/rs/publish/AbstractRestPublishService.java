@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -478,26 +479,26 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public abstract Object getHttpServer(URI uri, PublishInfo info);
 
-    /**
-     *  Unpublish a service.
-     *  @param sid The service identifier.
-     */
-    public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
-
-    /**
-     *  Publish a static page (without ressources).
-     */
-    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
-
-    /**
-     *  Publish file resources from the classpath.
-     */
-    public abstract IFuture<Void> publishResources(URI uri, String rootpath);
-
-    /**
-     *  Publish file resources from the file system.
-     */
-    public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
+//    /**
+//     *  Unpublish a service.
+//     *  @param sid The service identifier.
+//     */
+//    public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
+//
+//    /**
+//     *  Publish a static page (without ressources).
+//     */
+//    public abstract IFuture<Void> publishHMTLPage(String uri, String vhost, String html);
+//
+//    /**
+//     *  Publish file resources from the classpath.
+//     */
+//    public abstract IFuture<Void> publishResources(URI uri, String rootpath);
+//
+//    /**
+//     *  Publish file resources from the file system.
+//     */
+//    public abstract IFuture<Void> publishExternal(URI uri, String rootpath);
 
     /**
      *  Get the async
@@ -635,7 +636,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        	}
 	        	catch (Exception e)
 	        	{
-	        		e.printStackTrace();
+	        		component.getLogger().warning("No GET parameters and error parsing POST parameters for method: "+method+", "+e);
 	        	}
 	        }
 	 
@@ -697,6 +698,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            	{
 	            		targetparams[i] = BasicTypeConverter.getExtendedStringConverter(ts[i]).convertString((String)p, null);
 	            	}
+	            	
+	            	// varargs support -> convert matching single value to singleton array
+	            	else if(p!=null && ts[i].isArray() && SReflect.isSupertype(ts[i].getComponentType(), p.getClass()))
+	            	{
+	            		targetparams[i] = Array.newInstance(ts[i].getComponentType(), 1);
+	            		Array.set(targetparams[i], 0, p);
+	            	}
 	            }
 	            
 	            // Add default values for basic types
@@ -749,6 +757,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         	}
         	catch(Exception e)
         	{
+        		e.printStackTrace();
         	}
         }
         
@@ -931,10 +940,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        	{
 		        	for(String mediatype: sr)
 		        	{
-		        		mt = mediatype;
+		        		mediatype	= mediatype.trim();	// e.g. sent with leading space from edge, grrr 
 		        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
 		        		if(convs!=null && convs.size()>0)
 		        		{	
+			        		mt = mediatype;
 		        			Object input = result instanceof Response? ((Response) result).getEntity() : result;
 		        			ret = convs.iterator().next().convertObject(input, null);
 		        			break;
@@ -946,6 +956,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        {
 		        	if(response.getHeader("Content-Type")==null)
 		        		response.setHeader("Content-Type", mt);
+		        	if(ret==null)
+		        	{
+		        		System.out.println("dfhil");
+		        	}
 			        out.write(ret);
 		        }
 	        	else
@@ -1016,7 +1030,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     	}
     	catch(Exception e)
     	{
-    		throw new RuntimeException(e);
+    		SUtil.throwUnchecked(e);
     	}
     }
     
@@ -1400,9 +1414,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					ret.append("</div>");
 					ret.append("\n");
 
-					String link = baseuri.toString();
-					if(path!=null)
-						link = link+"/"+path; 
+//					String link = baseuri.toString();
+//					if(path!=null)	// Todo: cannot be null!?
+//						link = link+"/"+path;
+					String link = path; // Do not use absolute URL to allow reverse proxying
+
 //					System.out.println("path: "+link);
 					
 //					if(ptypes.length>0)
@@ -1638,7 +1654,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	{
 		IAsyncContextInfo cinfo = (IAsyncContextInfo)request.getAttribute(IAsyncContextInfo.ASYNC_CONTEXT_INFO);
 		if(cinfo==null)
-			System.out.println("warning, async context info is null: "+request.getRequestURL());
+			System.out.println("warning, async context info is null: "+request);//.getRequestURL());
 		return cinfo!=null? cinfo.isComplete(): response.isCommitted();
 	}
     

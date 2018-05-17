@@ -62,7 +62,7 @@
       <semantic:intermediateThrowEvent name="Send Dunning" id="_WdGX0dVGEeC_1bBivy-cGg">
         <semantic:messageEventDefinition/>
         <semantic:extensionElements>
-	        <jadex:property name="message">new jadex.bridge.fipa.FipaMessage($component.getComponentIdentifier().getRoot(), jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Payment late!&quot;)</jadex:property>
+	        <jadex:property name="message">new jadex.bridge.fipa.FipaMessage(jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Payment late!&quot;, $component.getComponentIdentifier().getRoot())</jadex:property>
         </semantic:extensionElements>
       </semantic:intermediateThrowEvent>
       <semantic:extensionElements>
@@ -97,7 +97,7 @@
       <semantic:outgoing>XiLtq9AqSLQmMGfr</semantic:outgoing>
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
-        <jadex:property name="message">new jadex.bridge.fipa.FipaMessage($component.getComponentIdentifier().getRoot(), jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Please pay.&quot;)</jadex:property>
+        <jadex:property name="message">new jadex.bridge.fipa.FipaMessage(jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Please pay.&quot;, $component.getComponentIdentifier().getRoot())</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateThrowEvent>
     <semantic:endEvent id="_TXPssXLuEd-fEqakq96uUw">

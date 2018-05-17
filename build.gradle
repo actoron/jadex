@@ -37,19 +37,23 @@ def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 
 buildscript 
 {
-    apply from: "$rootDir/src/main/buildutils/util.gradle"
-
     repositories
     {
-        //mavenLocal()
+        mavenLocal()
         mavenCentral()
-        //jcenter()
+//        jcenter()
+		maven
+		{
+			url "https://maven.google.com"
+		}
     }
-    
+
     dependencies
     {
         classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
     }
+
+    apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
 allprojects
@@ -74,6 +78,10 @@ allprojects
 			name 'sonatype public'
 			url 'https://oss.sonatype.org/content/groups/public/'
 		}
+//		maven
+//		{
+//			url "https://maven.google.com"
+//		}
     }
     
     buildscript 
@@ -85,6 +93,10 @@ allprojects
 	        maven
 			{
 				url "http://nexus.actoron.com/content/repositories/oss-nightlies/"
+			}
+			maven
+			{
+				url "https://maven.google.com"
 			}
 	    }
 	}
@@ -115,7 +127,7 @@ subprojects
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
             robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
-            robolectric: 'org.robolectric:robolectric:3.3.2'
+            robolectric: 'org.robolectric:robolectric:3.8'
     ]
 
 	configurations {
@@ -133,12 +145,20 @@ subprojects
     {
 		buildscript {
 			dependencies {
-				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-						version: "$project.version.major.$project.version.minor.+"
 //				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-//						version: "3.0-DEVELOPMENT"
+//						version: "$project.version.major.$project.version.minor.+"
+				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
+						version: "4.0.6"
 			}
 		}
+		
+		// Disable Android lint nonsense.
+		tasks.whenTaskAdded {task ->
+		    if(task.name.contains("lint")) {
+		        task.enabled = false
+		    }
+		}
+		
 	 	if (isAndroidLibraryProject(project))
         {
             apply plugin: 'com.android.library'
@@ -152,8 +172,8 @@ subprojects
 
 		// strip "-debug" from .aar and .apks to include them in dist
 		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
-			def fileName = output.outputFile.getName()
-			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
+			def fileName = output.outputFileName
+			output.outputFileName = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}").getName()
 		}
 
     	android {
@@ -210,6 +230,14 @@ subprojects
         // include all resources that are placed inside src dirs
 //        android.sourceSets.main.resources.srcDirs mainSrcDir
 //        android.sourceSets.test.resources.srcDirs testSrcDir
+
+		repositories {
+			maven
+			{
+				url "https://maven.google.com"
+			}
+			jcenter()
+		}
         dependencies
         {
             testCompile junit
@@ -231,9 +259,9 @@ subprojects
 			apply plugin: 'war'
 		} else {
         	apply plugin: 'java'
-			test {
-				reports.html.enabled = false
-			}
+//			test {
+//				reports.html.enabled = false
+//			}
 		}
 
         compileJava.options.encoding = 'UTF-8'
@@ -288,7 +316,7 @@ subprojects
 		}
 	}
 
-    sourceCompatibility = 1.6
+    sourceCompatibility = 1.8
     
     if(isTestParallel(project)) {
 		tasks.withType(Test) {
@@ -328,6 +356,11 @@ subprojects
 	        }
 	    }
     }
+    
+    subprojects
+    {
+		task allDeps(type: DependencyReportTask) {}
+	}
 }
 
 task copyJavaDocSources(type: Copy) {
@@ -524,6 +557,12 @@ def createDistZip(distname, arts, isaddon)
 				def spbdir = sp.buildDir.getCanonicalPath()
 
 				if (isAndroidProject(sp)) {
+					
+					lintOptions {
+    					abortOnError false
+					}
+					
+					
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'

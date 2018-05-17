@@ -19,6 +19,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
@@ -60,45 +61,40 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();
+//		if(getComponent().toString().indexOf("rt")!=-1)
+//			System.out.println("relayinti");
 				
 		Map<String, Object>	args = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults();
 		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
 		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 
-		// Inject agent fields.
-		FieldInfo[] fields = model.getAgentInjections();
-		for(int i=0; i<fields.length; i++)
+		try
 		{
-			try
+			// Inject agent fields.
+			FieldInfo[] fields = model.getAgentInjections();
+			for(int i=0; i<fields.length; i++)
 			{
 				Field f = fields[i].getField(getComponent().getClassLoader());
 				f.setAccessible(true);
 				f.set(agent, getComponent());
 			}
-			catch(Exception e)
+	
+			// Inject argument values
+			if(args!=null)
 			{
-				getComponent().getLogger().warning("Agent injection failed: "+e);
-			}
-		}
-
-		// Inject argument values
-		if(args!=null)
-		{
-			String[] names = model.getArgumentInjectionNames();
-			if(names.length>0)
-			{
-				for(int i=0; i<names.length; i++)
+				String[] names = model.getArgumentInjectionNames();
+				if(names.length>0)
 				{
-					if(args.containsKey(names[i]))
+					for(int i=0; i<names.length; i++)
 					{
-						Object val = args.get(names[i]);
-						
-	//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
-						final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
-						
-						try
+						if(args.containsKey(names[i]))
 						{
+							Object val = args.get(names[i]);
+							
+		//					if(val!=null || getModel().getArgument(names[i]).getDefaultValue()!=null)
+							final Tuple2<FieldInfo, String>[] infos = model.getArgumentInjections(names[i]);
+							
 							for(int j=0; j<infos.length; j++)
 							{
 								Field field = infos[j].getFirstEntity().getField(getComponent().getClassLoader());
@@ -107,53 +103,35 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 								setFieldValue(val, field, convert);
 							}
 						}
-						catch(Exception e)
-						{
-							getComponent().getLogger().warning("Field injection failed: "+e);
-							if(!ret.isDone())
-								ret.setException(e);
-						}
 					}
 				}
 			}
-		}
-		
-		// Inject default result values
-		if(results!=null)
-		{
-			String[] names = model.getResultInjectionNames();
-			if(names.length>0)
+			
+			// Inject default result values
+			if(results!=null)
 			{
-				for(int i=0; i<names.length; i++)
+				String[] names = model.getResultInjectionNames();
+				if(names.length>0)
 				{
-					if(results.containsKey(names[i]))
+					for(int i=0; i<names.length; i++)
 					{
-						Object val = results.get(names[i]);
-						final Tuple3<FieldInfo, String, String> info = model.getResultInjection(names[i]);
-						
-						try
+						if(results.containsKey(names[i]))
 						{
+							Object val = results.get(names[i]);
+							final Tuple3<FieldInfo, String, String> info = model.getResultInjection(names[i]);
+							
 							Field field = info.getFirstEntity().getField(getComponent().getClassLoader());
 							String convert = info.getSecondEntity();
 //							System.out.println("seting res: "+names[i]+" "+val);
 							setFieldValue(val, field, convert);
 						}
-						catch(Exception e)
-						{
-							getComponent().getLogger().warning("Field injection failed: "+e);
-							if(!ret.isDone())
-								ret.setException(e);
-						}
 					}
 				}
 			}
-		}
-		
-		// Inject feature fields.
-		fields = model.getFeatureInjections();
-		for(int i=0; i<fields.length; i++)
-		{
-			try
+			
+			// Inject feature fields.
+			fields = model.getFeatureInjections();
+			for(int i=0; i<fields.length; i++)
 			{
 				Class<?> iface = getComponent().getClassLoader().loadClass(fields[i].getTypeName());
 				Object feat = getComponent().getComponentFeature(iface);
@@ -161,81 +139,79 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 				f.setAccessible(true);
 				f.set(agent, feat);
 			}
-			catch(Exception e)
+			
+			// Inject parent
+			final FieldInfo[]	pis	= model.getParentInjections();
+			if(pis.length>0)
 			{
-				getComponent().getLogger().warning("Feature injection failed: "+e);
-				if(!ret.isDone())
-					ret.setException(e);
-			}
-		}
-		
-		// Inject parent
-		final FieldInfo[]	pis	= model.getParentInjections();
-		if(pis.length>0)
-		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
-				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-			{
-				public void customResultAvailable(IExternalAccess exta)
+				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
+					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
-					final CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, new DelegationResultListener<Void>(ret));
-					
-					for(int i=0; i<pis.length; i++)
+					public void customResultAvailable(IExternalAccess exta)
 					{
-						final Field	f	= pis[i].getField(getComponent().getClassLoader());
-						if(IExternalAccess.class.equals(f.getType()))
+						final CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, new DelegationResultListener<Void>(ret));
+						
+						for(int i=0; i<pis.length; i++)
 						{
-							try
+							final Field	f	= pis[i].getField(getComponent().getClassLoader());
+							if(IExternalAccess.class.equals(f.getType()))
 							{
-								f.setAccessible(true);
-								f.set(agent, exta);
-								lis.resultAvailable(null);
-							}
-							catch(Exception e)
-							{
-								exceptionOccurred(e);
-							}
-						}
-						else if(getComponent().getComponentDescription().isSynchronous())
-						{
-							exta.scheduleStep(new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
+								try
 								{
-									Object pagent = ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-									if(SReflect.isSupertype(f.getType(), pagent.getClass()))
-									{
-										try
-										{
-											f.setAccessible(true);
-											f.set(agent, pagent);
-											lis.resultAvailable(null);
-										}
-										catch(Exception e)
-										{
-											exceptionOccurred(e);
-										}
-									}
-									else
-									{
-										throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
-									}
-									return IFuture.DONE;
+									f.setAccessible(true);
+									f.set(agent, exta);
+									lis.resultAvailable(null);
 								}
-							});
-						}
-						else
-						{
-							exceptionOccurred(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
+								catch(Exception e)
+								{
+									exceptionOccurred(e);
+								}
+							}
+							else if(getComponent().getComponentDescription().isSynchronous())
+							{
+								exta.scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										Object pagent = ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										if(SReflect.isSupertype(f.getType(), pagent.getClass()))
+										{
+											try
+											{
+												f.setAccessible(true);
+												f.set(agent, pagent);
+												lis.resultAvailable(null);
+											}
+											catch(Exception e)
+											{
+												exceptionOccurred(e);
+											}
+										}
+										else
+										{
+											throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
+										}
+										return IFuture.DONE;
+									}
+								});
+							}
+							else
+							{
+								exceptionOccurred(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
+							}
 						}
 					}
-				}
-			});
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
-		else
+		catch(Exception e)
 		{
-			ret.setResult(null);
+			ret.setException(e);
 		}
 		
 		return ret;
@@ -275,7 +251,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+				throw SUtil.throwUnchecked(e);
 			}
 		}
 	}

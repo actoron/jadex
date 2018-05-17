@@ -62,6 +62,7 @@ def jadex_version = '${jadex_build_version}'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:multidex:1.0.1' // For minSdkVersion 20 or lower, this is required for multidex
 
     compile 'org.activecomponents.jadex:jadex-platform-android:' + jadex_version
     compile 'org.activecomponents.jadex:jadex-kernel-bpmn:' + jadex_version

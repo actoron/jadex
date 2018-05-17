@@ -177,4 +177,13 @@ public class FutureBarrier<E>
 			throw new RuntimeException("Future not finished.");
 		return futures.get(index).get();
 	}
+	
+	/**
+	 *  Get the number of futures.
+	 *  May be called before the barrier is done.
+	 */
+	public int	getCount()
+	{
+		return futures!=null ? futures.size() : 0;
+	}
 }

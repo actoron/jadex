@@ -11,7 +11,7 @@ import jadex.commons.future.IIntermediateFuture;
  *  Service used to find routes for relay transports.
  *
  */
-@Service
+@Service(system=true)
 @Security(roles=Security.UNRESTRICTED)
 public interface IRoutingService
 {

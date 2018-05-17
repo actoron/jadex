@@ -2,14 +2,16 @@ description 'This project contains an android application to demonstrate some ja
 
 dependencies
 {
-    compile project(':jadex-platform-android')
-    compile project(':jadex-android-commons')
-    compile project(':jadex-kernel-component')
-    compile project(':jadex-kernel-bpmn')
-//    compile project(':jadex-kernel-bdi')
-    compile project(':jadex-kernel-bdiv3-android')
-    compile project(':jadex-runtimetools-android')
-    compile project(':jadex-platform-extension-webservice-android')
-    compile project(':jadex-android-xmlpull')
-    compile project(':jadex-android-antlr')
+    api project(':jadex-platform-android')
+    api project(':jadex-android-commons')
+    api project(':jadex-kernel-component')
+    api project(':jadex-kernel-bpmn')
+//    api project(':jadex-kernel-bdi')
+    api project(':jadex-kernel-bdiv3-android')
+    api project(':jadex-runtimetools-android')
+    api project(':jadex-platform-extension-webservice-android')
+    api project(':jadex-android-xmlpull')
+    api project(':jadex-android-antlr')
+
+    api 'com.android.support:multidex:1.0.1' // For minSdkVersion 20 or lower, this is required for multidex
 }

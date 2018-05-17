@@ -2,6 +2,7 @@ package jadex.base;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -508,7 +509,18 @@ public class Starter
 					{
 						public void customResultAvailable(Void result)
 						{
-							startComponents(0, config.getComponents(), component.getInternalAccess())
+							@SuppressWarnings("rawtypes")
+							List	comps	= config.getComponents();
+							if(args!=null && args.containsKey("component"))
+							{
+								comps	= (List<?>)args.get("component");
+								if(config.getComponents()!=null)
+								{
+									comps.addAll((List<?>)config.getComponents());
+								}
+							}
+							
+							startComponents(0, comps, component.getInternalAccess())
 								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 							{
 								public void customResultAvailable(Void result)
@@ -1104,7 +1116,34 @@ public class Starter
 			{
 				System.out.println("Argument parse exception using as string: " + key + " \"" + val + "\"");
 			}
-			vals.put(key, value);
+			
+			// Hack!!! Allow multiple "component" args, TODO: other "multi" args?
+			if("component".equals(key))
+			{
+				@SuppressWarnings("unchecked")
+				List<String>	comps	= (List<String>)vals.get(key);
+				if(comps==null)
+				{
+					comps	= new ArrayList<String>();
+					vals.put(key, comps);
+				}
+				if(value instanceof Class)
+				{
+					comps.add(((Class<?>)value).getName()+".class");
+				}
+				else
+				{
+					comps.add(value.toString());
+				}
+			}
+			else
+			{
+				Object	prev	= vals.put(key, value);
+				if(prev!=null)
+				{
+					System.out.println("Duplicate argument '"+key+"': ignoring value '"+prev+"' and using value '"+value+"'");
+				}
+			}
 //			config.getRootConfig().setValue(key, value);
 //		}
 

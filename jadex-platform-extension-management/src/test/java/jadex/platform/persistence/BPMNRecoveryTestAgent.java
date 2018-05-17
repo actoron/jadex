@@ -102,7 +102,7 @@ public class BPMNRecoveryTestAgent
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 //		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(fut.getFirstResult(), msg).get();
+		agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, fut.getFirstResult()).get();
 		
 		cres.get();
 		

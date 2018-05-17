@@ -2,7 +2,5 @@ description 'Jadex commons is a base package containing frequently used function
 
 dependencies
 {
-//	testCompile 'com.madgag.spongycastle:prov:1.54.0.0'
-	testCompile 'org.bouncycastle:bcprov-jdk15on:1.58'
 }
 

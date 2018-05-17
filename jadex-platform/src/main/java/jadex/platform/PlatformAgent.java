@@ -41,7 +41,6 @@ import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -131,14 +130,15 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 //	@Argument(name=NETWORKSECRET, clazz=String.class),
 //	@Argument(name=ROLES, clazz=Map.class),
 
+	
+	// TODO. Setting default values here doesn't work any more!
 	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="0"),
 	@Argument(name=WSTRANSPORT, clazz=boolean.class, defaultvalue="true"),
 	@Argument(name=WSPORT, clazz=int.class, defaultvalue="-1"),
 	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name=RELAYADDRESS, clazz=String.class, defaultvalue="\"relay,ws,127.0.0.1:8080\""), //jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
-	@Argument(name=RELAYADDRESSES, clazz=String.class),//, defaultvalue=""),
+	@Argument(name=RELAYADDRESSES, clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss
 	@Argument(name=RELAYFORWARDING, clazz=boolean.class, defaultvalue="false"),
 //	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
 //	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
@@ -182,7 +182,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="superpeerclient", clazz=boolean.class),//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
-	@Argument(name="acr", clazz=boolean.class, defaultvalue="true")
+	@Argument(name="acr", clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -286,7 +286,7 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0"),
 		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0"),
-		@Component(name="relay", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
+		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
 		
 		@Component(name="acr", type="acr", daemon=Boolean3.TRUE, number="$args.acr? 1 : 0")
 	})

@@ -2,6 +2,7 @@ package jadex.platform.service.registry;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -708,7 +709,12 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	public IFuture<Collection<IComponentIdentifier>> getPartnerSuperpeers()
 	{
-		return new Future<Collection<IComponentIdentifier>>(partners.keySet());
+		Collection<IComponentIdentifier>	ret;
+		if(partners!=null)
+			ret	= partners.keySet();
+		else
+			ret	= Collections.emptySet();
+		return new Future<Collection<IComponentIdentifier>>((Collection<IComponentIdentifier>)(ret));
 	}
 	
 	/**
@@ -824,7 +830,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected boolean checkScope(IService ser) // String clienttype
 	{
-		boolean ret = false;
+		boolean ret = true;
 		
 		String scope = ser.getServiceIdentifier().getScope();
 		// SSP L0
@@ -1409,6 +1415,26 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	public IInternalAccess getComponent()
 	{
 		return component;
+	}
+	
+	
+	//-------- remote registry access --------
+	
+	/**
+	 *  Add (i.e. register) a query
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
+	{
+//		System.out.println("Adding query: "+query);
+		return getRegistry().addQuery(query);
+	}
+	
+	/**
+	 *  Remove a query.
+	 */
+	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query)
+	{
+		return getRegistry().removeQuery(query); 
 	}
 	
 //	/**

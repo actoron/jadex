@@ -2,18 +2,6 @@ import groovy.lang.Closure
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.GroovyCompile;
 
-buildscript {
-    repositories
-    {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
-    }
-}
-
-
 def isApp(project) {
 	project.hasProperty('distasapp') && project.property('distasapp').toLowerCase().equals('true')
 }
@@ -203,7 +191,7 @@ def addSchemaTasks(Project project) {
         copy {
             // copy original unfiltered file and rename to -${jadex_build_version}
             from file("$project.projectDir/src/main/schema/")
-            into file("$project.buildDir/schemas")
+            into file("$project.buildDir/devschemas")
             rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
         }
     }
@@ -330,7 +318,7 @@ def addJavaDocJarTask(Project p) {
                 description "Generates Javadoc for $variant.name."
                 source = variant.javaCompile.source
                 ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
-                classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+                doFirst { classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar) }
             }
             def javadocJar = p.tasks.create("javadoc${variant.name}Jar", Jar) {
                 classifier = 'javadoc'

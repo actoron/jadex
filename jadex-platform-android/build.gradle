@@ -2,9 +2,8 @@ description 'The jadex-platform-android package contains extensions needed to ru
 
 dependencies
 {
-    compile(project(':jadex-platform'))
-    compile project(':jadex-android-commons')
-    compile 'com.android.support:multidex:1.0.1' // For minSdkVersion 20 or lower, this is required for multidex
-    testCompile libraries.robotium
-    testCompile libraries.robolectric
+    api(project(':jadex-platform'))
+    api project(':jadex-android-commons')
+    testImplementation libraries.robotium
+    testImplementation libraries.robolectric
 }

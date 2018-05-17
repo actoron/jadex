@@ -1,0 +1,7 @@
+description 'Some web gui functionality.'
+
+dependencies
+{
+	compile project(':jadex-platform')
+	compile project(':jadex-platform-extension-webservice')
+}
