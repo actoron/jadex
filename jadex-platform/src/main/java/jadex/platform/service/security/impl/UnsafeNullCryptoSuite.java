@@ -62,6 +62,23 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	}
 	
 	/**
+	 *  Decrypt and authenticates the message from a sender.
+	 *  
+	 *  @param content The content.
+	 *  @return Decrypted/authenticated message or null on invalid message.
+	 */
+	public byte[] decryptAndAuthLocal(byte[] content)
+	{
+		byte[] ret = null;
+		if (AUTH_SUITE_ID == Pack.littleEndianToInt(content, 0))
+		{
+			ret = new byte[content.length - 4];
+			System.arraycopy(content, 4, ret, 0, ret.length);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Gets the security infos related to the authentication state.
 	 *  
 	 *  @return The security infos for decrypted messages.
@@ -93,7 +110,7 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage)
 	{
 		secinf = new MsgSecurityInfos();
-		secinf.setAuthenticated(true);
+		secinf.setPlatformAuthenticated(true);
 		secinf.setTrustedPlatform(true);
 		secinf.setNetworks(agent.getInternalNetworks().keySet().toArray(new String[agent.getInternalNetworks().size()]));
 		
