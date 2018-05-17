@@ -155,16 +155,20 @@ public class JsonTraverser extends Traverser
 				public Object preemptProcessing(Object inputobject, Type inputtype, Object context)
 				{
 					JsonWriteContext wr = (JsonWriteContext)context;
-					wr.setCurrentInputObject(inputobject);
 					Object ret = null;
-
-					Integer ref = wr.getObjectId(inputobject);
-					if (ref != null)
+					
+					if(wr.isWriteId())
 					{
-						wr.write("{");
-						wr.writeNameValue(REFERENCE_MARKER, ref);
-						wr.write("}");
-						ret = inputobject;
+						wr.setCurrentInputObject(inputobject);
+						
+						Integer ref = wr.getObjectId(inputobject);
+						if(ref != null)
+						{
+							wr.write("{");
+							wr.writeNameValue(REFERENCE_MARKER, ref);
+							wr.write("}");
+							ret = inputobject;
+						}
 					}
 					return ret;
 				}
@@ -195,11 +199,10 @@ public class JsonTraverser extends Traverser
 				{
 					JsonReadContext jrc = (JsonReadContext) context;
 					Object ret = null;
-					if (inputobject instanceof JsonObject && ((JsonObject)inputobject).get(JsonTraverser.REFERENCE_MARKER)!=null)
+					if(inputobject instanceof JsonObject && ((JsonObject)inputobject).get(JsonTraverser.REFERENCE_MARKER)!=null)
 					{
 						JsonObject obj = (JsonObject)inputobject;
 						int num = obj.getInt(JsonTraverser.REFERENCE_MARKER, 0);
-
 						ret = jrc.getKnownObject(num);
 					}
 
@@ -211,7 +214,7 @@ public class JsonTraverser extends Traverser
 				{
 					JsonReadContext jrc = (JsonReadContext) context;
 					Integer idx = jrc.popIdStack();
-					if (convproc != null)
+					if(convproc != null)
 					{
 						if (idx != null)
 							jrc.setKnownObject(idx, outputobject);

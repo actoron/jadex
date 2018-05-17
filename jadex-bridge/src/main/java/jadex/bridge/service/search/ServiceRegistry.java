@@ -203,7 +203,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	
 	/**
 	 *  Adapt the existing queries to a new superpeer.
-	 *  (Needs not to remove from old superpeer to to lease time cleanup).
+	 *  (Needs not to remove from old superpeer to lease time cleanup).
 	 */
 	protected void addQueriesToNewSuperpeer()
 	{
