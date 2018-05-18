@@ -1376,9 +1376,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		try
 		{
 			BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
-			System.out.println("Before reencrypt msg: " + currentcryptosuites.get(platformname));
 			ret = (byte[]) agent.getComponentFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
-			System.out.println("After reencrypt msg: " + currentcryptosuites.get(platformname) + " " + ret);
 		}
 		catch (Exception e)
 		{
