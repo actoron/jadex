@@ -55,6 +55,7 @@ allprojects.each { proj ->
 		def metaname = proj.substring(1 + metaprefix.length())
 		HashSet set = new HashSet<String>();
 		addDependency(proj, projdeps, set);
+		println "PROJ DEPS " + proj + ": " + Arrays.toString(set.toArray());
 		List<String> extraarts = getExtraArtifacts(proj)
 		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
@@ -224,9 +225,14 @@ def getProjectDeps(String projectid)
 			if ('project'.equals(name)) {
 				return new GroovyInterceptable() {
 					public def getProperty(String pname) {
-						Thread.sleep(10)
 						if ('getprojname'.equals(pname))
+						{
+							if (args[0] instanceof String)
+								return args[0]
+							else if (args[0] instanceof Map && args[0].get("path") != null)
+								return args[0].get("path")
 							return args[0]
+						}
 						return this
 					}
 				};
