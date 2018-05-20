@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -31,6 +32,7 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -67,9 +69,10 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @ProvidedServices({
 	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
+	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(scope=Binding.SCOPE_PLATFORM, type=IMemstatService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
 })
-public abstract class AbstractTransportAgent<Con> implements ITransportService, ITransportInfoService, IInternalService, ITransportHandler<Con>
+public abstract class AbstractTransportAgent<Con> implements ITransportService, ITransportInfoService, IMemstatService,	IInternalService, ITransportHandler<Con>
 {
 	// -------- arguments --------
 
@@ -463,6 +466,23 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		ret.setFinished();
 	
 		return ret;
+	}
+	
+	/**
+	 *  Get info about stored data like connections and listeners.
+	 */
+	// For detecting/debugging memory leaks
+	public IFuture<Map<String, Object>>	getMemInfo()
+	{
+		synchronized(this)
+		{
+			Map<String, Object>	ret	= new LinkedHashMap<String, Object>();
+			ret.put("transport", impl.getProtocolName());
+			ret.put("subscribercnt", infosubscribers!=null ? infosubscribers.size() : 0);
+			ret.put("cons", candidates.values());
+			ret.put("virtuals", virtuals.keySet());
+			return new Future<Map<String,Object>>(ret);
+		}
 	}
 	
 	// -------- helper methods --------
@@ -894,17 +914,26 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		public void setTarget(IComponentIdentifier target)
 		{
-			synchronized(AbstractTransportAgent.this)
+			// Hack to allow ConnectionCandidate to be used as transfer bean w/o outer object.
+			if(AbstractTransportAgent.this==null)
 			{
-				assert this.target == null;
 				this.target = target;
-
-				VirtualConnection virt = getVirtualConnection(target);
-				if(virt == null)
+			}
+			
+			else
+			{
+				synchronized(AbstractTransportAgent.this)
 				{
-					virt = createVirtualConnection(target);
+					assert this.target == null;
+					this.target = target;
+	
+					VirtualConnection virt = getVirtualConnection(target);
+					if(virt == null)
+					{
+						virt = createVirtualConnection(target);
+					}
+					virt.addConnection(this);
 				}
-				virt.addConnection(this);
 			}
 		}
 

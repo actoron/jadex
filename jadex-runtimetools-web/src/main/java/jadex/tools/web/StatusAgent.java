@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.base.IPlatformConfiguration;
@@ -19,6 +20,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
@@ -35,6 +37,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -186,6 +189,22 @@ public class StatusAgent implements IStatusService
 		ret.setFinished();
 
 		return ret;
+	}
+	
+	/**
+	 *  Get all memory stats. cf IMemstatService
+	 */
+	// No intermediate for easier REST?
+	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
+	{
+		Collection<IMemstatService>	stats	= SServiceProvider.getLocalServices(agent, IMemstatService.class, Binding.SCOPE_PLATFORM);
+		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
+		for(IMemstatService stat: stats)
+		{
+			fubar.addFuture(stat.getMemInfo());
+		}
+		
+		return fubar.waitForResultsIgnoreFailures(null);
 	}
 
 	
