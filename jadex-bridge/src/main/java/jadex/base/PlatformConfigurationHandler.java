@@ -881,7 +881,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setWsTransport(true);
 		config.getExtendedPlatformConfiguration().setWsPort(-1);
 		config.getExtendedPlatformConfiguration().setRelayTransport(true);
-		config.setValue("rtdebug", true);
+//		config.setValue("rtdebug", true);
 
 		// Registry & Awareness
 		config.setSuperpeerClient(true);

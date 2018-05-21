@@ -159,12 +159,14 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			@Override
 			public void handleFinished(Collection<Object> results) throws Exception
 			{
+//				System.out.println("Remove due to finished: "+target+", "+command);
 				outcommands.remove(rxid);
 			}
 			
 			@Override
 			public Object handleResult(Object result) throws Exception
 			{
+//				System.out.println("Remove due to result: "+target+", "+command);
 				outcommands.remove(rxid);
 				return result;
 			}
@@ -172,6 +174,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			@Override
 			public void handleException(Exception exception)
 			{
+//				System.out.println("Remove due to exception: "+target+", "+command+", "+exception);
 				outcommands.remove(rxid);
 			}
 		});
@@ -201,6 +204,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println("Remove due to exception2: "+target+", "+command+", "+exception);
 				OutCommand outcmd = outcommands.remove(rxid);
 				if (outcmd != null)
 				{
@@ -523,6 +527,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				// Remotely executing command -> set local future to failed (i.e. abort to caller)
 				else if(outcommands!=null && outcommands.get(rxid) instanceof OutCommand)
 				{
+//					System.out.println("Remove due to exception3: "+header.getProperty(MessageComponentFeature.EXCEPTION));
 					((Future) ((OutCommand)outcommands.remove(rxid)).getFuture())
 						.setException((Exception)header.getProperty(MessageComponentFeature.EXCEPTION));
 				}
