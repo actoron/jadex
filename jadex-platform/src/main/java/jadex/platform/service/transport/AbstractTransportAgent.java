@@ -434,9 +434,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			infosubscribers.add(ret);
 			
 			// Add initial data
-			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
-			{ 
-				ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
+			if(virtuals!=null)
+			{
+				for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
+				{ 
+					ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
+				}
 			}
 		}
 	
@@ -455,11 +458,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
 	
 		synchronized(this)
-		{			
+		{
 			// Add initial data
-			for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
-			{ 
-				ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
+			if(virtuals!=null)
+			{
+				for(Map.Entry<IComponentIdentifier, VirtualConnection> entry: virtuals.entrySet())
+				{ 
+					ret.addIntermediateResult(entry.getValue().getPlatformdata(entry.getKey()));
+				}
 			}
 		}
 		
@@ -479,8 +485,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			Map<String, Object>	ret	= new LinkedHashMap<String, Object>();
 			ret.put("transport", impl.getProtocolName());
 			ret.put("subscribercnt", infosubscribers!=null ? infosubscribers.size() : 0);
-			ret.put("cons", candidates.values());
-			ret.put("virtuals", virtuals.keySet());
+			ret.put("cons", candidates!=null ? candidates.values() : null);
+			ret.put("virtuals", virtuals!=null ? virtuals.keySet() : null);
 			return new Future<Map<String,Object>>(ret);
 		}
 	}
