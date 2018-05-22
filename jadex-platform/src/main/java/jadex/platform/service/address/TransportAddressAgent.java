@@ -21,6 +21,7 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -412,13 +413,33 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
 	{
-		List<TransportAddress> ret = null;
+		List<TransportAddress> ret = new ArrayList<TransportAddress>();
 		try
 		{
 			IAwarenessManagementService awa = SServiceProvider.getLocalService(agent, IAwarenessManagementService.class);
 			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
 			if (info != null)
-				ret = info.getAddresses();
+				ret.addAll(info.getAddresses());
+		}
+		catch (Exception e)
+		{
+		}
+		
+		try
+		{
+			Collection<IPassiveAwarenessService> awas = SServiceProvider.getLocalServices(agent, IPassiveAwarenessService.class);
+			for (IPassiveAwarenessService awa : awas)
+			{
+				try
+				{
+					Collection<TransportAddress> result = awa.getPlatformAddresses(platformid).get();
+					if (result != null)
+						ret.addAll(result);
+				}
+				catch (Exception e1)
+				{
+				}
+			}
 		}
 		catch (Exception e)
 		{
