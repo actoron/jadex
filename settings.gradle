@@ -2,7 +2,10 @@ apply from: "$rootDir/src/main/buildutils/util.gradle"
 
 /** Standard distributions */
 //gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,addonmaven,addonmgmt,editorbpmn' // no editorgpmn until kernel not available
-gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,editorbpmn' // no editorgpmn until kernel not available
+gradle.ext.publishdists='minimal,standard,pro,addongradleplugin,addon3d,addonws,editorbpmn' // no editorgpmn until kernel not available
+Only add 'android' dist if SDK is available, right?
+if (androidSdkExists())
+	gradle.ext.publishdists=gradle.ext.publishdists+',android'
 
 /* Generated dependency config file. */
 def depconfigfile = 'src/main/buildutils/dependencies.conf'
