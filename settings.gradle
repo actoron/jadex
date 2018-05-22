@@ -55,7 +55,6 @@ allprojects.each { proj ->
 		def metaname = proj.substring(1 + metaprefix.length())
 		HashSet set = new HashSet<String>();
 		addDependency(proj, projdeps, set);
-		println "PROJ DEPS " + proj + ": " + Arrays.toString(set.toArray());
 		List<String> extraarts = getExtraArtifacts(proj)
 		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
