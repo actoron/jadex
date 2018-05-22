@@ -5,6 +5,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -20,7 +21,7 @@ public class BPMNStartElementsTest //extends TestCase
 	{
 //		System.err.println("starting platform");
 		String projectroot = new String("jadex-applications-bpmn");
-		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
+		IFuture<IExternalAccess>	fut	= Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-platformname", "testcases_*",
 //				"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 				"-simulation", "true",
 				"-asyncexecution", "true",

@@ -48,6 +48,8 @@ public class STest {
         config.getExtendedPlatformConfiguration().setTcpTransport(true);
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
+        
+        config.setValue("settings.readonly", true);
                 
         return config;
     }
