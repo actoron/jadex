@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+@Ignore("Test does not fail but causes massive delays (minutes!) esp. on Jenkins")
 public class DsdvPacketRouterTest extends PacketRouterTest {
 
 	@Test
