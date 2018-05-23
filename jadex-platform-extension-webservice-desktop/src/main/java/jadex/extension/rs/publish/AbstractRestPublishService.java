@@ -8,6 +8,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +16,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -62,14 +65,16 @@ import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ILeaseTimeSet;
 import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.STransformation;
@@ -110,7 +115,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
 
 	/** Finished result marker. */
-	public static final String FINISHED = "finished";
+	public static final String FINISHED = "__finished__";
 	
 	/** Some basic media types for service invocations. */
 	public static List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
@@ -125,8 +130,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //    /** The servers per port. */
 //    protected Map<Integer, Server> portservers;
     
-    /** The results per call (coming from the called Jadex service). */
-    protected MultiCollection<String, ResultInfo> resultspercall = new MultiCollection<String, ResultInfo>();
+    /** The internal request info containing also results per call (coming from the called Jadex service). */
+    protected Map<String, RequestInfo> requestinfos;
     
     /** The requests per call (coming from the rest client). 
         Signals on ongoing conversation as long as callid is contained (results are not immediately available). */
@@ -142,7 +147,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     public IFuture<Void> init()
     {
     	converters = new MultiCollection<String, IObjectStringConverter>();
-    	resultspercall = new MultiCollection<String, ResultInfo>();
+    	requestinfos	= new LinkedHashMap<String, RequestInfo>();
     	
     	// todo: move this code out
     	IObjectStringConverter jsonc = new IObjectStringConverter()
@@ -204,7 +209,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         			public void execute(AsyncContext ctx)
         			{
         				// Client timeout (nearly) occurred for the request
-        				System.out.println("sending timeout to client");
+        				System.out.println("sending timeout to client "+tup.getFirstEntity().getRequest());
         				writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, 
         					(HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 //        				ctx.complete();
@@ -304,17 +309,28 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //        	System.out.println("header: "+s+" "+request.getHeader(s));
 //        }
         
-        // requestpercall is used to signal an ongoing conversation
-        if(requestspercall.containsKey(callid))
+        // request info manages an ongoing conversation
+        if(requestinfos.containsKey(callid))
         {
-        	Collection<ResultInfo> results = resultspercall.get(callid);
-        	if(results!=null && results.size()>0)
+        	RequestInfo	rinfo	= requestinfos.get(callid);
+        	
+        	// Result already available?
+        	if(rinfo.checkForResult())
         	{
-        		ResultInfo result = results.iterator().next();
-        		results.remove(result);
-        		
-        		writeResponse(result.getResult(), callid, result.getMappingInfo(), request, response, false);
+				// Normal result (or FINISHED as handled in writeResponse())
+    			Object result = rinfo.getNextResult();
+    			result = FINISHED.equals(result) ? result : mapResult(rinfo.getMappingInfo().getMethod(), result);
+        		writeResponse(result, callid, rinfo.getMappingInfo(), request, response, false);
         	}
+        	
+        	// Exception in mean time?
+        	if(rinfo.getException()!=null)
+        	{
+				Object	result = mapResult(rinfo.getMappingInfo().getMethod(), rinfo.getException());
+        		writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true);
+        	}
+        	
+        	// No result yet -> store current request context until next result available
         	else
         	{
         		AsyncContext ctx = getAsyncContext(request);
@@ -354,56 +370,130 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     
                     // invoke the service method
                     final Method method = mi.getMethod();
-                	
-                	Object ret = method.invoke(service, params);
+                	final Object ret = method.invoke(service, params);
                 
                     if(ret instanceof IIntermediateFuture)
                     {
                     	final AsyncContext ctx = getAsyncContext(request);
                     	final String fcallid = SUtil.createUniqueId(methodname);
                     	saveRequestContext(fcallid, ctx);
+                    	final RequestInfo	rinfo	= new RequestInfo(mi);	
+                    	requestinfos.put(fcallid, rinfo);
 //                    	System.out.println("added context: "+fcallid+" "+ctx);
                     	
-                    	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateResultListener<Object>()
+                    	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateFutureCommandResultListener<Object>()
 						{
                     		public void resultAvailable(Collection<Object> result)
                     		{
+                    			// Shouldn't be called?
                     			for(Object res: result)
                     			{
                     				intermediateResultAvailable(res);
                     			}
+                    			finished();
                     		}
                     		
                     		public void exceptionOccurred(Exception exception)
                     		{
-                    			Object result = mapResult(method, exception);
-                    			writeResponse(result, null, mi, request, response, true);
+                    			handleResult(null, exception, null);
                     		}
                     		
                     		public void intermediateResultAvailable(Object result)
                     		{
-                    			result = mapResult(method, result);
-                    			
-                    			if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size()>0)
-                    			{
-                    				Collection<AsyncContext> cls = requestspercall.get(fcallid);
-                    				AsyncContext ctx = cls.iterator().next();
-                    				cls.remove(ctx);
-                    				
-//                    				System.out.println("removed context: "+fcallid+" "+ctx);
-                    				writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
-//                    				ctx.complete();
-                    			}
-                    			else
-                    			{
-                    				resultspercall.add(fcallid, new ResultInfo(result, fcallid, mi));
-                    			}
+                    			handleResult(result, null, null);
+                    		}
+                    		
+                    		@Override
+                    		public void commandAvailable(Object command)
+                    		{
+                    			handleResult(null, null, command);
                     		}
                     		
                     	    public void finished()
                     	    {
                     	    	// maps will be cleared when processing fin element in writeResponse
-                    	    	intermediateResultAvailable(FINISHED);
+                    			handleResult(FINISHED, null, null);
+                    	    }
+                    	    
+                    	    /**
+                    	     *  Handle a final or intermediate result/exception/command of a service call.
+                    	     */
+                    	    protected void handleResult(Object result, Throwable exception, Object command)
+                    	    {
+                    	    	if(rinfo.isTerminated())
+                    	    	{
+                    	    		// nop -> ignore late results (i.e. when terminated due to browser offline).
+                    	    	}
+                    	    	
+                    			// Browser waiting for result -> send immediately
+                    	    	else if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size()>0)
+                    			{
+                    				Collection<AsyncContext> cls = requestspercall.get(fcallid);
+                    				AsyncContext ctx = cls.iterator().next();
+                    				cls.remove(ctx);
+                    				
+//                    				System.out.println("removed context: "+callid+" "+ctx);
+                    				if(command!=null)
+                    				{
+                    					// Timer update (or other command???)
+                    					// HTTP 102 -> processing (not recognized by angular?)
+                    					// HTTP 202 -> accepted
+                    					writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
+                    				}
+                    				else if(exception!=null)
+                    				{
+                    					// Service call (finally) failed.
+                    					result = mapResult(method, exception);
+                    		        	writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), true);                        				
+                    				}
+                    				else
+                    				{
+                    					// Normal result (or FINISHED as handled in writeResponse())
+                            			result = FINISHED.equals(result) ? result : mapResult(method, result);
+                    		        	writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);                        				
+                    				}
+//                    				ctx.complete();
+                    			}
+                    			
+                    			// Browser not waiting -> check for timeout and store or terminate 
+                    			else
+                    			{
+                    				// Only check timeout when future not yet finished.
+                    				if(!FINISHED.equals(result) && exception==null)
+                    				{
+				        				System.out.println("checking "+result);
+				        				// if timeout -> cancel future.
+				        				// TODO: which timeout? (client vs server).
+				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getRemoteDefaultTimeout(component.getComponentIdentifier()))
+				        				{
+				        					System.out.println("terminating "+result);
+				        					rinfo.setTerminated();
+				        					if(ret instanceof ITerminableFuture<?>)
+				        					{
+				        						((ITerminableFuture<?>)ret).terminate(new TimeoutException());
+				        					}
+				        					else
+				        					{
+				        	    				// TODO: better handling of non-terminable futures?
+				        						throw new TimeoutException();
+				        					}
+				        				}
+                    				}
+                    				
+                    				// Exception -> store until requested.
+                    				if(!rinfo.isTerminated() && exception!=null)
+                    				{
+                    					rinfo.setException(exception);
+                    				}
+                    				
+                    				// Normal result -> store until requested. (check for command==null to also store null values as results).
+                    				else if(!rinfo.isTerminated() && command==null)
+                    				{
+                    					rinfo.addResult(result);
+                    				}
+                    				
+                    				//else nop (no need to store timer updates). what about other commands?
+                    			}
                     	    }
 						});
                     }
@@ -412,6 +502,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	final AsyncContext ctx = getAsyncContext(request);
                     	
                     	// todo: use timeout listener
+                    	// TODO: allow also longcalls (requires intermediate command responses -> use only when requested by browser?)
                     	((IFuture)ret).addResultListener(new IResultListener<Object>()
 						{
                     		public void resultAvailable(Object ret)
@@ -434,9 +525,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     {
 //	                    System.out.println("call finished: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
                     	// map the result by user defined mappers
-                    	ret = mapResult(method, ret);
+                    	Object	res = mapResult(method, ret);
                     	// convert content and write result to servlet response
-                    	writeResponse(ret, null, mi, request, response, true);
+                    	writeResponse(res, null, mi, request, response, true);
                     }
                 }
                 catch(Exception e)
@@ -457,7 +548,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 complete(request, response);
             }
         }
-    }
+    }    
     
     /**
      *  Publish a service.
@@ -811,7 +902,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
             }
             catch(Exception e)
             {
-                throw new RuntimeException(e);
+                SUtil.throwUnchecked(e);
             }
         }
 //        else
@@ -852,7 +943,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		   if(fin)
 		   {
 			   requestspercall.remove(callid);
-			   resultspercall.remove(callid);
+			   requestinfos.remove(callid);
 		   }
 	   }
    }
@@ -1059,10 +1150,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //			System.out.println("req timeout is: "+to);
 			((ILeaseTimeSet<AsyncContext>)requestspercall.getCollection(callid)).touch(ctx, to);
 		}
-		else
-		{
-			System.out.println("no req timeout for call: "+callid);
-		}
+//		else
+//		{
+//			System.out.println("no req timeout for call: "+callid);
+//		}
 	}
     
     /**
@@ -1833,56 +1924,58 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         }
     }
     
-    public static class ResultInfo
+    public static class RequestInfo
     {
-    	protected String callid;
-    	protected Object result;
+    	protected Queue<Object> results;
     	protected MappingInfo mappingInfo;
+		protected boolean terminated;
+		protected Throwable	exception;
+    	
+    	// to check time gap between last request from browser and current result
+    	// if gap>timeout -> abort future as probably no browser listening any more
+    	protected long	lastcheck;
     	
     	/**
     	 * 
     	 */
-		public ResultInfo(Object result, String callid, MappingInfo mappingInfo)
+		public RequestInfo(MappingInfo mappingInfo)
 		{
-			this.result = result;
-			this.callid = callid;
 			this.mappingInfo = mappingInfo;
+			this.lastcheck	= System.currentTimeMillis();
 		}
 		
-		/**
-		 *  Get the result. 
-		 *  @return The result
-		 */
-		public Object getResult()
+		public void setTerminated()
 		{
-			return result;
+			terminated	= true;
 		}
-		
-		/**
-		 *  Set the result.
-		 *  @param result The result to set
-		 */
-		public void setResult(Object result)
+
+		public boolean isTerminated()
 		{
-			this.result = result;
+			return terminated;
 		}
 
 		/**
-		 *  Get the callid. 
-		 *  @return The callid
+		 *  Check, if there is a result that is not yet consumed.
+		 *  Also increases the check timer to detect timeout when browser is disconnected.
+		 *  @return True if there is a result.
 		 */
-		public String getCallid()
+		public boolean checkForResult()
 		{
-			return callid;
+			this.lastcheck	= System.currentTimeMillis();
+			return results!=null && !results.isEmpty();
 		}
-
+		
 		/**
-		 *  Set the callid.
-		 *  @param callid The callid to set
+		 *  Add a result.
+		 *  @param result The result to add
 		 */
-		public void setCallid(String callid)
+		public void addResult(Object result)
 		{
-			this.callid = callid;
+			if(results==null)
+			{
+				results	= new ArrayDeque<>();
+			}
+			results.add(result);
 		}
 
 		/**
@@ -1893,14 +1986,39 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			return mappingInfo;
 		}
+		
+		/**
+		 *  Get the exception (if any).
+		 */
+		public Throwable	getException()
+		{
+			return exception;
+		}
+		
+		/**
+		 *  Set the exception.
+		 */
+		public void	setException(Throwable exception)
+		{
+			this.exception	= exception;
+		}
 
 		/**
-		 *  Set the mappingInfo.
-		 *  @param mappingInfo The mappingInfo to set
+		 *  Get the next result (FIFO order).
+		 *  @throws NullPointerException if there were never any results
+		 *  @throws NoSuchElementException if the last result was already consumed.
 		 */
-		public void setMappingInfo(MappingInfo mappingInfo)
+		public Object	getNextResult()
 		{
-			this.mappingInfo = mappingInfo;
+			return results.remove();
+		}
+
+		/**
+		 *  Get the timestamp of the last check (i.e. last request from browser).
+		 */
+		public long	getTimestamp()
+		{
+			return lastcheck;
 		}
     }
     
