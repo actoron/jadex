@@ -34,12 +34,13 @@ public class RSChartTest
 		System.setProperty("javax.net.debug", "all");	// Hack: workaround for java 8 problem with ECDH key exchange
 		new SReflectSub().setIsAndroid(true, true);
 
-		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+//		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+		IPlatformConfiguration config = jadex.base.test.util.STest.getDefaultTestConfig();
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
 		config.setLogging(true);
 		config.setValue("settings.readonly", Boolean.TRUE);	// Do not save settings (TODO: fix android settings?)
-		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
+//		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 //		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
 //		{
@@ -53,7 +54,8 @@ public class RSChartTest
 //				"-component", "jadex/webservice/examples/rs/chart/ChartProviderAgent.class"
 //		});
 
-		extAcc = fut.get();
+//		extAcc = fut.get();
+		extAcc = jadex.base.test.util.STest.createPlatform(config);
 	}
 	
 	@Test
