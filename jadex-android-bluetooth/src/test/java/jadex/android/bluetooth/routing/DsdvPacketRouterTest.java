@@ -1,6 +1,7 @@
 package jadex.android.bluetooth.routing;
 
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
