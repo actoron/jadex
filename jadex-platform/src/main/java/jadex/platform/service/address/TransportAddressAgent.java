@@ -33,6 +33,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
@@ -48,6 +49,9 @@ public class TransportAddressAgent implements ITransportAddressService
 {
 	/** Freshness limit for renewed searches. */
 	protected static final long CACHE_VALIDITY_DUR = 10*60*1000;
+	
+	/** Freshness limit for previously failed renewed searches. */
+	protected static final long CACHE_INVALIDITY_DUR = 5000;
 	
 	/** Maximum number of peers to ask for addresses. */
 	protected static final int ASK_ALL_LIMIT = 3;
@@ -73,6 +77,21 @@ public class TransportAddressAgent implements ITransportAddressService
 	
 	/** Subscription of local address changes. */
 	protected LinkedHashSet<SubscriptionIntermediateFuture<Tuple2<TransportAddress, Boolean>>> addresssubs;
+	
+	@AgentArgument
+	protected boolean superpeerlookup = true;
+	
+	@AgentArgument
+	protected boolean directlookup = true;
+	
+	@AgentArgument
+	protected boolean pawalookup = true;
+	
+	@AgentArgument
+	protected boolean awalookup = false;
+	
+	@AgentArgument
+	protected boolean askalllookup = false;
 	
 	/**
 	 *  Initializes the service.
@@ -184,7 +203,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			ret.setResult(addrs);
 			
 			if (freshness.get(platformid) == null ||
-				freshness.get(platformid) + CACHE_VALIDITY_DUR > System.currentTimeMillis())
+				freshness.get(platformid) > System.currentTimeMillis())
 			{
 				final Future<List<TransportAddress>> fret = new Future<List<TransportAddress>>();
 				
@@ -205,8 +224,12 @@ public class TransportAddressAgent implements ITransportAddressService
 							if (hasSuperPeer())
 								 ret = searchAddressesByAskSuperPeer(platformid);
 							
-							if (ret == null && !hasSuperPeer())
+							//if (ret == null && !hasSuperPeer())
+							if (ret == null)
 							{
+								ret = searchAddressesByAskPassiveAwareness(platformid);
+								
+								if (ret == null)
 								ret = searchAddressesByAskRemote(platformid);
 								
 								if (ret == null)
@@ -231,14 +254,19 @@ public class TransportAddressAgent implements ITransportAddressService
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						freshness.put(platformid, System.currentTimeMillis());
-						
 						resultAvailable(null);
 					}
 					
 					public void resultAvailable(List<TransportAddress> result)
 					{
-						freshness.put(platformid, System.currentTimeMillis());
+						if (result != null)
+							freshness.put(platformid, System.currentTimeMillis() + CACHE_VALIDITY_DUR );
+						else
+						{
+							freshness.put(platformid, System.currentTimeMillis() + CACHE_INVALIDITY_DUR );
+							System.err.println("FAIL FAIL Fail");
+							throw new Error("FAILED: " + platformid);
+						}
 						
 //						System.out.println("Resolved addresses for " + platformid + ": " + Arrays.toString(result.toArray()));
 						fret.setResult(filterAddresses(result, transporttype));
@@ -375,7 +403,11 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	protected List<TransportAddress> searchAddressesByAskSuperPeer(IComponentIdentifier platformid)
 	{
-		//TODO
+		if (superpeerlookup)
+		{
+			//TODO
+			return null;
+		}
 		return null;
 	}
 	
@@ -387,6 +419,9 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	protected List<TransportAddress> searchAddressesByAskRemote(IComponentIdentifier platformid)
 	{
+		if (!directlookup)
+			return null;
+		
 		List<TransportAddress> ret = null;
 		try
 		{
@@ -411,19 +446,12 @@ public class TransportAddressAgent implements ITransportAddressService
 	 *  @param platformid The platform ID.
 	 *  @return The addresses.
 	 */
-	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
+	protected List<TransportAddress> searchAddressesByAskPassiveAwareness(IComponentIdentifier platformid)
 	{
+		if (!pawalookup)
+			return null;
+		
 		List<TransportAddress> ret = new ArrayList<TransportAddress>();
-		try
-		{
-			IAwarenessManagementService awa = SServiceProvider.getLocalService(agent, IAwarenessManagementService.class);
-			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
-			if (info != null)
-				ret.addAll(info.getAddresses());
-		}
-		catch (Exception e)
-		{
-		}
 		
 		try
 		{
@@ -451,6 +479,34 @@ public class TransportAddressAgent implements ITransportAddressService
 	}
 	
 	/**
+	 *  Searches for addresses using super peer.
+	 * 
+	 *  @param platformid The platform ID.
+	 *  @return The addresses.
+	 */
+	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
+	{
+		if (!awalookup)
+			return null;
+		
+		List<TransportAddress> ret = null;
+		try
+		{
+			IAwarenessManagementService awa = SServiceProvider.getLocalService(agent, IAwarenessManagementService.class);
+			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
+			if (info != null)
+				ret = info.getAddresses();
+		}
+		catch (Exception e)
+		{
+		}
+		
+		addAddresses(ret);
+		
+		return ret;
+	}
+	
+	/**
 	 *  Randomly ask other platforms for addresses (search of last resort).
 	 *  
 	 *  @param platformid The platform ID.
@@ -458,6 +514,9 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	protected List<TransportAddress> searchAddressesByAskAll(final IComponentIdentifier platformid)
 	{
+		if (!askalllookup)
+			return null;
+		
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
 		final ITerminableIntermediateFuture<ITransportAddressService> fut = SServiceProvider.getServices(agent, ITransportAddressService.class, Binding.SCOPE_GLOBAL);
 		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
