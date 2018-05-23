@@ -146,6 +146,8 @@ public class ComponentTest extends TestCase
 	 */
 	public void runBare()
 	{
+		// Hack for testing.
+		timeout=timeout << 2;
 		if(suite!=null && suite.isAborted())
 		{
 			return;
