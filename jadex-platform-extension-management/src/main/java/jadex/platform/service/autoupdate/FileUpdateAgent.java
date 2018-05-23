@@ -332,13 +332,17 @@ public class FileUpdateAgent extends UpdateAgent
 							// search for jadex jar file
 							for(URL url: result)
 							{
-								File f = SUtil.getFile(url);
-								if(f.exists() && f.getName().endsWith(".jar") && f.getName().indexOf("jadex")!=-1)
+								System.out.println("URL " + url.toString());
+								if (url.getProtocol().equals("file"))
 								{
-									agent.getLogger().info(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
-									newestversion = f.lastModified();
-									ret.setResult(Long.valueOf(newestversion));
-									break;
+									File f = SUtil.getFile(url);
+									if(f.exists() && f.getName().endsWith(".jar") && f.getName().indexOf("jadex")!=-1)
+									{
+										agent.getLogger().info(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
+										newestversion = f.lastModified();
+										ret.setResult(Long.valueOf(newestversion));
+										break;
+									}
 								}
 							}
 							
