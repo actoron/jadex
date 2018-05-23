@@ -264,8 +264,7 @@ public class TransportAddressAgent implements ITransportAddressService
 						else
 						{
 							freshness.put(platformid, System.currentTimeMillis() + CACHE_INVALIDITY_DUR );
-							System.err.println("FAIL FAIL Fail");
-							throw new Error("FAILED: " + platformid);
+//							throw new Error(agent.getComponentIdentifier() + " FAILED: " + platformid);
 						}
 						
 //						System.out.println("Resolved addresses for " + platformid + ": " + Arrays.toString(result.toArray()));
