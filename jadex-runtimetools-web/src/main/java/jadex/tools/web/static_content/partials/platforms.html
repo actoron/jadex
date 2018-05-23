@@ -3,7 +3,7 @@
 	<p>
 		This page shows remote platforms connected to this Jadex platform.
 	</p>
-	<table ng-controller="ConnPlats">
+	<table ng-controller="ConnPlats" ng-class="{'down': serverDown}">
 		<tbody>
 			<tr>
 				<th>Name</th>

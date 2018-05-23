@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;

@@ -29,6 +29,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -117,27 +118,45 @@ public class StatusAgent implements IStatusService
 			@Override
 			public void terminated(Exception reason)
 			{
+				System.out.println("terminated: "+reason);
 				for(ISubscriptionIntermediateFuture<PlatformData> fut: futs)
 				{
 					fut.terminate();
 				}
 			}
 		});
-		for(ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
+		
+		// TODO: Use query for dynamically added platforms
+		for(final ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
 		{
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
-			fut.addResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
+			fut.addResultListener(new IIntermediateResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
+					System.out.println("status ex: "+exception);
 					// ignore
 				}
 								
 				@Override
 				public void finished()
 				{
+					System.out.println("status fini: "+tis);
 					//ignore
+				}
+				
+				@Override
+				public void intermediateResultAvailable(PlatformData result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				@Override
+				public void resultAvailable(Collection<PlatformData> result)
+				{
+					// Shouldn't be called
+					assert false;
 				}
 			});
 			futs.add(fut);

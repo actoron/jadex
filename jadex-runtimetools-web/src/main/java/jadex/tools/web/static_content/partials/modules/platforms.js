@@ -3,26 +3,36 @@
 var app = angular.module('acplatforms', []);
 app.controller('ConnPlats', [ '$scope', '$http',
 	function($scope, $http) {
-		getIntermediate($http, 'status/subscribeToConnections', function(response) {
-			updatePlatform($scope, response.data);
-		});
+		getIntermediate($http, 'status/subscribeToConnections',
+			function(response)
+			{
+				updatePlatform($scope, response.data);
+			},
+			function(response)
+			{
+				$scope.serverDown	= true;
+			});
 	}
 ]);
 
-function getIntermediate($http, path, handler) 
+function getIntermediate($http, path, handler, error) 
 {
 	var	func	= function(response)
 	{
-		handler(response);
+		//alert("response: "+JSON.stringify(response));
+		if(response.status!=202)	// ignore updatetimer commands
+		{
+			handler(response);
+		}
 		var callid = response.headers("x-jadex-callid");
 		//alert("callid: "+callid+", "+JSON.stringify(response.data))
 		if(callid!=null)
 		{
 			$http.get(path, {headers: {'x-jadex-callid': callid}})
-				.then(func);
+				.then(func, error);
 		}
 	};
-	$http.get(path).then(func);
+	$http.get(path).then(func, error);
 }
 
 function	updatePlatform($scope, platform)
