@@ -89,7 +89,6 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	public IFuture<Collection<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid)
 	{
 		Future<Collection<TransportAddress>> ret = new Future<Collection<TransportAddress>>();
-		
 		PassiveAwarenessIntraVMAgent remote = null;
 		disclock.readLock().lock();
 		remote = discoveries.get(platformid);
@@ -97,14 +96,14 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 		
 		if (remote != null)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(5000, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ret.setResultIfUndone(null);
 					return IFuture.DONE;
 				}
-			});
+			}, true);
 			remote.agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
