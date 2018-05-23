@@ -374,7 +374,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 
                     if(ret instanceof IIntermediateFuture)
                     {
-                    	final AsyncContext ctx = getAsyncContext(request);
+                    	AsyncContext ctx = getAsyncContext(request);
                     	final String fcallid = SUtil.createUniqueId(methodname);
                     	saveRequestContext(fcallid, ctx);
                     	final RequestInfo	rinfo	= new RequestInfo(mi);	
@@ -420,6 +420,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	     */
                     	    protected void handleResult(Object result, Throwable exception, Object command)
                     	    {
+                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command);
+                    	    	
                     	    	if(rinfo.isTerminated())
                     	    	{
                     	    		// nop -> ignore late results (i.e. when terminated due to browser offline).
@@ -927,6 +929,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     */
    protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin) 
    {
+	   System.out.println("writeResponse: "+result+", "+status+", "+callid);
 	   // Only write response on first exception
 	   if(isComplete(request, response))
 		   return;
