@@ -1,7 +1,6 @@
 package jadex.android.bluetooth.routing;
 
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
@@ -18,7 +17,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-@Ignore("Test does not fail but causes massive delays (minutes!) esp. on Jenkins")
 public class DsdvPacketRouterTest extends PacketRouterTest {
 
 	@Test

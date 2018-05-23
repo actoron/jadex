@@ -33,7 +33,6 @@ import android.bluetooth.BluetoothAdapter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-@Ignore("Test does not fail but causes massive delays (minutes!) esp. on Jenkins")
 @RunWith(CustomTestRunner.class)
 public abstract class PacketRouterTest {
 
