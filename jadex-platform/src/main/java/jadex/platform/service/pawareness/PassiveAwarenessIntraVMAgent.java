@@ -1,6 +1,5 @@
 package jadex.platform.service.pawareness;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,8 +149,10 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	{
 		IntermediateFuture<IComponentIdentifier> ret = new IntermediateFuture<IComponentIdentifier>();
 		disclock.readLock().lock();
-		ret.setResult(new ArrayList<IComponentIdentifier>(discoveries.keySet()));
+		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
 		disclock.readLock().unlock();
+		result.remove(agent.getComponentIdentifier().getRoot());
+		ret.setResult(result);
 		return ret;
 	}
 	
