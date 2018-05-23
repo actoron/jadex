@@ -332,7 +332,6 @@ public class FileUpdateAgent extends UpdateAgent
 							// search for jadex jar file
 							for(URL url: result)
 							{
-								System.out.println("URL " + url.toString());
 								if (url.getProtocol().equals("file"))
 								{
 									File f = SUtil.getFile(url);
