@@ -4,5 +4,5 @@ apply plugin: 'eclipse-wtp'
 
 dependencies 
 {
-	compile project(':jadex-servletfilter')
+	api project(':jadex-servletfilter')
 }

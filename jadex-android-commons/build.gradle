@@ -2,7 +2,7 @@ description 'Commonly used classes for jadex-android'
 
 dependencies
 {
-    //compile libraries.android_support
+    //api libraries.android_support
 	//compile(project(':jadex-bridge'))
 	api libraries.android_support
 	api(project(':jadex-bridge'))

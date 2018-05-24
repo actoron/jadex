@@ -2,13 +2,13 @@ description 'The Jadex BDI-BPMN kernel allows to use BPMN workflow descriptions 
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-xml')
-	compile project(':jadex-rules')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-base')
-	compile project(':jadex-kernel-bdi')
-	compile project(':jadex-kernel-bpmn')
+	api project(':jadex-commons')
+	api project(':jadex-xml')
+	api project(':jadex-rules')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
+	api project(':jadex-kernel-base')
+	api project(':jadex-kernel-bdi')
+	api project(':jadex-kernel-bpmn')
 }
 

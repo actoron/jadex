@@ -2,12 +2,12 @@ description 'The Jadex GPMN (goal oriented process modeling notation) kernel pro
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-xml')
-	compile project(':jadex-rules')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-bdi')
-	compile project(':jadex-kernel-bdibpmn')
+	api project(':jadex-commons')
+	api project(':jadex-xml')
+	api project(':jadex-rules')
+	api project(':jadex-bridge')
+	api project(':jadex-kernel-bdi')
+	api project(':jadex-kernel-bdibpmn')
 	
-	testCompile 'junit:junit:4.11'
+	testImplementation 'junit:junit:4.11'
 }

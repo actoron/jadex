@@ -3,19 +3,19 @@ description 'Jadex examples that can be deployed as web application.'
 apply plugin: 'war' 
 apply plugin: 'eclipse-wtp'
 
-dependencies 
+dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-xml')
-	compile project(':jadex-json')
-	compile project(':jadex-bridge')
-	compile project(':jadex-tools-base-swing')
-//	compile project(':jadex-kernel-bdi')
-	compile project(':jadex-kernel-bdiv3')
-	compile project(':jadex-kernel-micro')
-	compile project(':jadex-kernel-component')
-	compile project(':jadex-platform')
+	api project(':jadex-commons')
+	api project(':jadex-xml')
+	api project(':jadex-json')
+	api project(':jadex-bridge')
+	api project(':jadex-tools-base-swing')
+//	api project(':jadex-kernel-bdi')
+	api project(':jadex-kernel-bdiv3')
+	api project(':jadex-kernel-micro')
+	api project(':jadex-kernel-component')
+	api project(':jadex-platform')
 	
-	providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
-	compile 'javax.websocket:javax.websocket-api:1.1'
+	compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+	api 'javax.websocket:javax.websocket-api:1.1'
 }

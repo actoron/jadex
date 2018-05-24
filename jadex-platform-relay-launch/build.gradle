@@ -5,8 +5,8 @@ mainClassName = "jadex.relay.launch.Main"
 
 dependencies
 {
-	compile project(':jadex-distribution-minimal')
-	compile project(':jadex-platform-extension-relaytransport')
-	compile project(':jadex-platform-extension-websockettransport')
+	api project(':jadex-distribution-minimal')
+	api project(':jadex-platform-extension-relaytransport')
+	api project(':jadex-platform-extension-websockettransport')
 }
 

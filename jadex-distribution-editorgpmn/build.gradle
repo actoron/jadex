@@ -2,5 +2,5 @@ description 'Jadex GPMN editor.'
 
 dependencies
 {
-	compile project(':jadex-editor-gpmn')
+	api project(':jadex-editor-gpmn')
 }

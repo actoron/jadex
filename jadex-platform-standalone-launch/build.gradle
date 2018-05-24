@@ -36,7 +36,7 @@ dependencies
 	launcharts.retainAll(gradle.ext.includeartifacts)
 	
 	launcharts.each { art ->
-		compile project(art)
+		api project(art)
 	}
 	
 }

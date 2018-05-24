@@ -1,4 +1,4 @@
-description 'Gradle plugin for generating BDIV3 runtime code from agent annotations at compile time. Needed by Jadex-Android, because runtime code generation is not supported on Jadex-Android.'
+description 'Gradle plugin for generating BDIV3 runtime code from agent annotations at api time. Needed by Jadex-Android, because runtime code generation is not supported on Jadex-Android.'
 
 //ext.props = new Properties()
 //props.load(new FileReader(file("../gradle.properties")))
@@ -25,19 +25,19 @@ repositories {
 
 def androidToolsVersion = android_gradlePluginVersion;
 dependencies {
-    testCompile gradleTestKit()
+    testImplementation gradleTestKit()
 
-    compile gradleApi()
-    compile localGroovy()
+    api gradleApi()
+    api localGroovy()
 
-    compile project(':jadex-kernel-bdiv3')
-    compile "com.android.tools.build:gradle:$androidToolsVersion"
-    compile 'commons-io:commons-io:2.6'
+    api project(':jadex-kernel-bdiv3')
+    api "com.android.tools.build:gradle:$androidToolsVersion"
+    api 'commons-io:commons-io:2.6'
 
 
-    testCompile 'org.assertj:assertj-core:1.7.0'
-    testCompile "com.android.tools.build:gradle:$androidToolsVersion"
-    testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.7'
+    testImplementation 'org.assertj:assertj-core:1.7.0'
+    testImplementation "com.android.tools.build:gradle:$androidToolsVersion"
+    testImplementation 'com.neenbedankt.gradle.plugins:android-apt:1.7'
 }
 
 test.testLogging.showStandardStreams = true

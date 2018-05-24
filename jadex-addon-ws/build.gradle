@@ -2,9 +2,9 @@ description 'Jadex webservices publication addon.'
 
 dependencies
 {
-	compile project(':jadex-applications-webservice')
-	compile project(':jadex-platform-extension-webservice')
-	compile project(':jadex-platform-extension-webservice-desktop')
-	compile project(':jadex-platform-extension-webservice-desktop-grizzly')
-	compile project(':jadex-platform-extension-webservice-desktop-jetty')
+	api project(':jadex-applications-webservice')
+	api project(':jadex-platform-extension-webservice')
+	api project(':jadex-platform-extension-webservice-desktop')
+	api project(':jadex-platform-extension-webservice-desktop-grizzly')
+	api project(':jadex-platform-extension-webservice-desktop-jetty')
 }

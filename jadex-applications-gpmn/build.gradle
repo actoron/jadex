@@ -2,5 +2,5 @@ description 'The Jadex micro applications package contains several example appli
 
 dependencies
 {
-	compile project(':jadex-kernel-gpmn')
+	api project(':jadex-kernel-gpmn')
 }

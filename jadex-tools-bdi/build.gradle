@@ -2,12 +2,12 @@ description 'The Jadex tools bdi package contains JCC plugins for Jadex BDI agen
 
 dependencies
 {
-	compile project(':jadex-rules')
-	compile project(':jadex-xml')
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	//compile project(':jadex-kernel-bdi')
-	compile project(':jadex-runtimetools-swing')
-	compile project(':jadex-rules-tools')
-	compile project(':jadex-kernel-bdiv3')
+	api project(':jadex-rules')
+	api project(':jadex-xml')
+	api project(':jadex-commons')
+	api project(':jadex-bridge')
+	//api project(':jadex-kernel-bdi')
+	api project(':jadex-runtimetools-swing')
+	api project(':jadex-rules-tools')
+	api project(':jadex-kernel-bdiv3')
 }

@@ -4,20 +4,20 @@ sourceCompatibility	= 1.8
 
 dependencies
 {
-	compile project(':jadex-platform')
-	compile project(':jadex-kernel-component')
-	compile project(':jadex-platform-extension-webservice')
-	compile project(':jadex-json')
+	api project(':jadex-platform')
+	api project(':jadex-kernel-component')
+	api project(':jadex-platform-extension-webservice')
+	api project(':jadex-json')
 
-	compile 'javax.ws.rs:javax.ws.rs-api:2.0'
+	api 'javax.ws.rs:javax.ws.rs-api:2.0'
 
-	compile 'javassist:javassist:3.12.1.GA'
-	compile 'javax.servlet:javax.servlet-api:3.1.0'
-	//compile 'javax.websocket:javax.websocket-api:1.1'
+	api 'javassist:javassist:3.12.1.GA'
+	api 'javax.servlet:javax.servlet-api:3.1.0'
+	//api 'javax.websocket:javax.websocket-api:1.1'
 	
-	//compile 'org.ow2.asm:asm-all:5.0.3' // for getParameterNames() :-(
+	//api 'org.ow2.asm:asm-all:5.0.3' // for getParameterNames() :-(
 
-	testCompile 'org.glassfish.jersey.core:jersey-client:2.26'
-	testCompile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
+	testImplementation 'org.glassfish.jersey.core:jersey-client:2.26'
+	testImplementation 'org.glassfish.jersey.inject:jersey-hk2:2.26'
 
 }

@@ -2,7 +2,7 @@ description 'The Jadex android webservice platform extension package contains fu
 
 configurations
 {
-    // exclude android spring framework in testCompile, because we use the desktop variant for junit
+    // exclude android spring framework in testImplementation, because we use the desktop variant for junit
     testImplementation.exclude group: "org.springframework.android", module: "spring-android-rest-template"
     testImplementation.exclude group: "org.springframework.android", module: "spring-android-rest-core"
 }

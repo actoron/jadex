@@ -2,11 +2,11 @@ description 'The Jadex BPMN kernel provides a workflow kernel for the standardiz
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
-	compile project(':jadex-xml')
-	compile project(':jadex-kernel-base')
-	compile project(':jadex-model-bpmn')
+	api project(':jadex-commons')
+	api project(':jadex-commons:jadex-commons-gui')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
+	api project(':jadex-xml')
+	api project(':jadex-kernel-base')
+	api project(':jadex-model-bpmn')
 }

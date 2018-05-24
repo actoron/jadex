@@ -2,18 +2,18 @@ description 'BDIV3 Kernel that supports annotated POJOs and uses byte code manip
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-base')
-	compile project(':jadex-kernel-component')
-	compile project(':jadex-kernel-micro')
-	compile project(':jadex-rules-eca')
-	compile project(':jadex-xml')
-	compile project(':jadex-bytecode-tools')
+	api project(':jadex-commons')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
+	api project(':jadex-kernel-base')
+	api project(':jadex-kernel-component')
+	api project(':jadex-kernel-micro')
+	api project(':jadex-rules-eca')
+	api project(':jadex-xml')
+	api project(':jadex-bytecode-tools')
 	
-	compileNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
-//	compile 'org.ow2.asm:asm-all:6.0_ALPHA'
+	apiNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
+//	api 'org.ow2.asm:asm-all:6.0_ALPHA'
 }
 
 task mappings {
@@ -27,8 +27,3 @@ task mappings {
 		}
 	}
 }
-
-//configurations {
-//	compile.extendsFrom compileNoAndroidRuntime
-//	runtime.extendsFrom compileNoAndroidRuntime
-//}

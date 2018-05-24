@@ -5,15 +5,15 @@ description 'Jadex XML is an XML data binding framework for Java and also for ot
 
 dependencies 
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-traverser')
+	api project(':jadex-commons')
+	api project(':jadex-traverser')
 	
 	// Wrong way: (doesn't work for eclipse, depends on generated jar from gradle build)
-//	testCompile files(project(':jadex-traverser').sourceSets.test.output)
-//	testCompile files(project(':jadex-traverser').sourceSets.test.runtimeClasspath)
+//	testImplementation files(project(':jadex-traverser').sourceSets.test.output)
+//	testImplementation files(project(':jadex-traverser').sourceSets.test.runtimeClasspath)
 	
 	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
-	testCompile project(path: ':jadex-traverser', configuration: 'testOutput')
+	testImplementation project(path: ':jadex-traverser', configuration: 'testOutput')
 }
 //publishing
 //{

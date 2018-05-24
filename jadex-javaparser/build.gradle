@@ -2,5 +2,5 @@ description 'The Jadex Java parser allows arbitrary Java terms being parsed. The
 
 dependencies
 {
-	compile project(':jadex-commons')
+	api project(':jadex-commons')
 }

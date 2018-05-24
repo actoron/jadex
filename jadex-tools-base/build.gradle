@@ -2,6 +2,6 @@ description 'Reusable classes for starting Jadex, running test cases and buildin
 
 dependencies
 {
-	compile project(':jadex-bridge')
+	api project(':jadex-bridge')
 }
 

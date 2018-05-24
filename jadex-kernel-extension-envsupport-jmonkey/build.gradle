@@ -14,28 +14,28 @@ def jmonkeyversion = "3.0.0.20130125-SNAPSHOT"
 
 dependencies 
 {
-	compile project(":jadex-commons")
-	compile project(":jadex-javaparser")
-	compile project(":jadex-kernel-extension-envsupport")
+	api project(":jadex-commons")
+	api project(":jadex-javaparser")
+	api project(":jadex-kernel-extension-envsupport")
 
-	compile "net.sourceforge.jadex.jme3ext:jmonkeyengine3:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-core:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-terrain:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-lwjgl:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-lwjgl-natives:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-effects:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:lwjgl:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-blender:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-desktop:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-plugins:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-jogg:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:j-ogg-oggd:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:j-ogg-vorbisd:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:jME3-niftygui:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:nifty:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:nifty-default-controls:${jmonkeyversion}"
-	compile "net.sourceforge.jadex.jme3ext:nifty-style-black:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jmonkeyengine3:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-core:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-terrain:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-lwjgl:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-lwjgl-natives:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-effects:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:lwjgl:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-blender:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-desktop:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-plugins:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-jogg:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:j-ogg-oggd:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:j-ogg-vorbisd:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:jME3-niftygui:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:nifty:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:nifty-default-controls:${jmonkeyversion}"
+	api "net.sourceforge.jadex.jme3ext:nifty-style-black:${jmonkeyversion}"
 	
-	compile 'org.bushe:eventbus:1.3'
-	compile 'xpp3:xpp3:1.1.4c'
+	api 'org.bushe:eventbus:1.3'
+	api 'xpp3:xpp3:1.1.4c'
 }

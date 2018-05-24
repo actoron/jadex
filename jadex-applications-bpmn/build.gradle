@@ -2,9 +2,9 @@ description 'The Jadex bpmn applications package contains several example applic
 
 dependencies
 {
-	compile project(':jadex-kernel-bpmn')
+	api project(':jadex-kernel-bpmn')
 
-	testCompile project(':jadex-platform')
-	testCompile project(':jadex-platform-extension-websockettransport')
-	testCompile project(':jadex-platform-extension-relaytransport')
+	testImplementation project(':jadex-platform')
+	testImplementation project(':jadex-platform-extension-websockettransport')
+	testImplementation project(':jadex-platform-extension-relaytransport')
 }

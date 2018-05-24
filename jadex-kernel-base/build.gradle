@@ -2,7 +2,7 @@ description 'The Jadex base kernel provides basic support for all kinds of activ
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
+	api project(':jadex-commons')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
 }

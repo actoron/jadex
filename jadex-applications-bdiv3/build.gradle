@@ -2,22 +2,22 @@ description 'The Jadex BDI V3 applications package contains several example appl
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-bridge')
-	compile project(':jadex-tools-base-swing')
-	compile project(':jadex-kernel-bdiv3')
-	compile project(':jadex-kernel-extension-envsupport')
-	compile project(':jadex-xml')
-	compile project(':jadex-kernel-application')
+	api project(':jadex-commons')
+	api project(':jadex-commons:jadex-commons-gui')
+	api project(':jadex-bridge')
+	api project(':jadex-tools-base-swing')
+	api project(':jadex-kernel-bdiv3')
+	api project(':jadex-kernel-extension-envsupport')
+	api project(':jadex-xml')
+	api project(':jadex-kernel-application')
 	
-	testCompile project(':jadex-platform')
-	testCompile project(':jadex-platform-extension-websockettransport')
-	testCompile project(':jadex-platform-extension-relaytransport')
+	testImplementation project(':jadex-platform')
+	testImplementation project(':jadex-platform-extension-websockettransport')
+	testImplementation project(':jadex-platform-extension-relaytransport')
 
 	
-	compile 'com.toedter:jcalendar:1.3.2'
-	compile 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0'
+	api 'com.toedter:jcalendar:1.3.2'
+	api 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0'
 	
-	compile 'com.google.code.findbugs:annotations:3.0.0'	// For suppressing warnings for uninitialized fields
+	api 'com.google.code.findbugs:annotations:3.0.0'	// For suppressing warnings for uninitialized fields
 }

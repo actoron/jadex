@@ -2,7 +2,7 @@ description 'Business Process Model and Notation (BPMN) implementation.'
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge') // todo: remove, big problem IModelInfo 
-	compile project(':jadex-xml')
+	api project(':jadex-commons')
+	api project(':jadex-bridge') // todo: remove, big problem IModelInfo 
+	api project(':jadex-xml')
 }

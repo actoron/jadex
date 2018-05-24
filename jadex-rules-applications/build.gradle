@@ -2,9 +2,9 @@ description 'The Jadex rules applications package contains several example appli
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-rules')
-	compile project(':jadex-rules-tools')
+	api project(':jadex-commons')
+	api project(':jadex-rules')
+	api project(':jadex-rules-tools')
 	
-	compileNoAndroidRuntime 'org.antlr:antlr-runtime:3.1.3'
+	apiNoAndroidRuntime 'org.antlr:antlr-runtime:3.1.3'
 }

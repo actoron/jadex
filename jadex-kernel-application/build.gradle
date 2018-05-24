@@ -2,11 +2,11 @@ description 'The Jadex application kernel provides application support for activ
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
-	compile project(':jadex-xml')
-	compile project(':jadex-kernel-base')
-	compile project(':jadex-kernel-component')
+	api project(':jadex-commons')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
+	api project(':jadex-xml')
+	api project(':jadex-kernel-base')
+	api project(':jadex-kernel-component')
 }
 

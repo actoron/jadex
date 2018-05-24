@@ -131,14 +131,14 @@ subprojects
     ]
 
 	configurations {
-		// compileNoAndroidRuntime will exclude the artifact in Android APKs
+		// apiNoAndroidRuntime will exclude the artifact in Android APKs
 		runtimeAndroid.extendsFrom runtime
-		compileNoAndroidRuntime {
+		apiNoAndroidRuntime {
 			dependencies.all { dep ->
 				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
 			}
 		}
-		compile.extendsFrom compileNoAndroidRuntime
+		api.extendsFrom apiNoAndroidRuntime
 	}
 
     if(isAndroidProject(project))
@@ -240,7 +240,7 @@ subprojects
 		}
         dependencies
         {
-            testCompile junit
+            testImplementation junit
         }
 
 		configurations {
@@ -257,11 +257,17 @@ subprojects
     {
 		if (isWebApplicationProject(project)) {
 			apply plugin: 'war'
+			apply plugin: 'java-library'
 		} else {
-        	apply plugin: 'java'
+        	apply plugin: 'java-library'
 //			test {
 //				reports.html.enabled = false
 //			}
+		}
+		test {
+			testLogging {
+				 showStandardStreams = true
+			}
 		}
 
         compileJava.options.encoding = 'UTF-8'
@@ -273,7 +279,7 @@ subprojects
 
         dependencies
         {
-            testCompile junit
+            testImplementation junit
         }
 
         processResources {
