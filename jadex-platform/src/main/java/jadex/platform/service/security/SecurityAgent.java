@@ -555,6 +555,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	{
 		checkCleanup();
 		
+		if (content == null || content.length == 0)
+			return new Future<>(new IllegalArgumentException("Null messages and zero length messages cannot be decrypted."));
+		
 		String splat = sender.getRoot().toString();
 		ICryptoSuite cs = currentcryptosuites.get(splat);
 		if (cs != null && content.length > 0 && content[0] != -1)
