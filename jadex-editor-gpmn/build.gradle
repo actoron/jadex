@@ -2,14 +2,14 @@ description 'Editor for Goal-oriented Process Management Notation (GPMN) and gen
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-xml')
+	api project(':jadex-commons')
+	api project(':jadex-commons:jadex-commons-gui')
+	api project(':jadex-xml')
 	
-	compile 'org.tinyjee.jgraphx:jgraphx:1.10.1.3'
-	compile 'org.apache.xmlgraphics:xmlgraphics-commons:1.5'
-	compile 'org.apache.xmlgraphics:batik-rasterizer:1.7'
-	compile 'org.apache.xmlgraphics:batik-codec:1.7'
+	api 'org.tinyjee.jgraphx:jgraphx:1.10.1.3'
+	api 'org.apache.xmlgraphics:xmlgraphics-commons:1.5'
+	api 'org.apache.xmlgraphics:batik-rasterizer:1.7'
+	api 'org.apache.xmlgraphics:batik-codec:1.7'
 }
 
 jar 

@@ -2,9 +2,9 @@ description 'Dungeon Keeper with BDI Agents.'
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-micro')
-	compile project(':jadex-kernel-application')
-	compile project(':jadex-kernel-extension-envsupport')
+	api project(':jadex-commons')
+	api project(':jadex-bridge')
+	api project(':jadex-kernel-micro')
+	api project(':jadex-kernel-application')
+	api project(':jadex-kernel-extension-envsupport')
 }

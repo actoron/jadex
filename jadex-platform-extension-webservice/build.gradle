@@ -2,11 +2,11 @@ description 'The Jadex webservice platform extension package contains basic func
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-xml')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-micro')
+	api project(':jadex-commons')
+	api project(':jadex-xml')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
+	api project(':jadex-kernel-micro')
 	
-	compile 'javax.ws.rs:javax.ws.rs-api:2.0'
+	api 'javax.ws.rs:javax.ws.rs-api:2.0'
 }

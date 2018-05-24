@@ -2,6 +2,6 @@ description 'The Jadex rules tools package contains tools for the Jadex active c
 
 dependencies
 {
-	compile project(':jadex-tools-base-swing')
-	compile project(':jadex-platform')
+	api project(':jadex-tools-base-swing')
+	api project(':jadex-platform')
 }

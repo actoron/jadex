@@ -562,6 +562,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected ConnectionCandidate	createConnectionCandidate(final Con con, final boolean clientcon)
 	{
 		ConnectionCandidate cand;
+		boolean	created	= false;
 		synchronized(this)
 		{
 			if(candidates==null)
@@ -579,12 +580,16 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			{
 				cand = new ConnectionCandidate(con, clientcon);
 				candidates.put(con, cand);
+				created = true;
 			}
 		}
 
 		// Start handshake by sending id.
-		agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
-		impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+		if (created)
+		{
+			agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
+			impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+		}
 		
 		return cand;
 	}

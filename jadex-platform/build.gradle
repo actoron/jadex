@@ -2,21 +2,21 @@ description 'The Jadex platform package contains implementations of platform ser
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-commons:jadex-commons-security')
-	compile project(':jadex-binary')
-	compile project(':jadex-json')
-	compile project(':jadex-xml')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-base')
-	compile project(':jadex-kernel-micro')
-	compile project(':jadex-javaparser')
+	api project(path: ':jadex-commons')
+	api project(path: ':jadex-commons:jadex-commons-gui')
+	api project(path: ':jadex-commons:jadex-commons-security')
+	api project(path: ':jadex-binary')
+	api project(path: ':jadex-json')
+	api project(path: ':jadex-xml')
+	api project(path: ':jadex-bridge')
+	api project(path: ':jadex-kernel-base')
+	api project(path: ':jadex-kernel-micro')
+	api project(path: ':jadex-javaparser')
 	
-	compileNoAndroidRuntime 'javax.mail:mail:1.4.5'
-	compile group: 'org.tukaani', name: 'xz', version: '1.5'
-	compile group: 'net.jpountz.lz4', name: 'lz4', version: '1.3.0'
-	compile group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.2.6'
-	compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
+	apiNoAndroidRuntime 'javax.mail:mail:1.4.5'
+	api group: 'org.tukaani', name: 'xz', version: '1.5'
+	api group: 'net.jpountz.lz4', name: 'lz4', version: '1.3.0'
+	api group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.2.6'
+	api group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
 }
 

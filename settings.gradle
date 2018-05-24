@@ -240,7 +240,7 @@ def getProjectDeps(String projectid)
 				};
 			}
 			
-			if (name.equals('compile') || name.equals('api')) {
+			if (name.equals('compile') || name.equals('api') || name.equals('implementation')) {
 				if (args[0] instanceof GroovyInterceptable) {
 					def depname = args[0].getProperty('getprojname')
 					if (depname instanceof String)

@@ -2,5 +2,5 @@ description 'Gradle plugin for generating BDIV3 runtime code from agent annotati
 
 dependencies
 {
-	compile project(':jadex-gradle-plugin')
+	api project(':jadex-gradle-plugin')
 }

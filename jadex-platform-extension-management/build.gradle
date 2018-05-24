@@ -2,21 +2,21 @@ description 'Services that allow spawning new platforms and updating running pla
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	compile project(':jadex-xml')
-	compile project(':jadex-kernel-micro')
-	compile project(':jadex-kernel-bpmn')
-	compile project(':jadex-rules-eca')
-	compile project(':jadex-platform')
-	compile project(':jadex-tools-base-swing')
+	api project(':jadex-commons')
+	api project(':jadex-bridge')
+	api project(':jadex-xml')
+	api project(':jadex-kernel-micro')
+	api project(':jadex-kernel-bpmn')
+	api project(':jadex-rules-eca')
+	api project(':jadex-platform')
+	api project(':jadex-tools-base-swing')
 	
 	// Add transports, otherwise test fails due to consistency check.
-	testCompile project(':jadex-platform-extension-relaytransport')
-	testCompile project(':jadex-platform-extension-websockettransport')
+	testImplementation project(':jadex-platform-extension-relaytransport')
+	testImplementation project(':jadex-platform-extension-websockettransport')
 	// required for test suite (why?)
-	testCompile project(':jadex-kernel-component')
+	testImplementation project(':jadex-kernel-component')
 
-	compile 'commons-daemon:commons-daemon:1.0.10'
-	compileNoAndroidRuntime 'javassist:javassist:3.12.1.GA'
+	api 'commons-daemon:commons-daemon:1.0.10'
+	apiNoAndroidRuntime 'javassist:javassist:3.12.1.GA'
 }

@@ -2,13 +2,13 @@ description 'The Jadex rules tools package contains tools for the Jadex rule eng
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-rules')
+	api project(':jadex-commons')
+	api project(':jadex-commons:jadex-commons-gui')
+	api project(':jadex-rules')
 	
-	compile 'net.sourceforge.collections:collections-generic:4.01'
-	compile 'net.sf.jung:jung-api:2.0.1'
-	compile 'net.sf.jung:jung-graph-impl:2.0.1'
-	compile 'net.sf.jung:jung-visualization:2.0.1'
-	compile 'net.sf.jung:jung-algorithms:2.0.1'
+	api 'net.sourceforge.collections:collections-generic:4.01'
+	api 'net.sf.jung:jung-api:2.0.1'
+	api 'net.sf.jung:jung-graph-impl:2.0.1'
+	api 'net.sf.jung:jung-visualization:2.0.1'
+	api 'net.sf.jung:jung-algorithms:2.0.1'
 }

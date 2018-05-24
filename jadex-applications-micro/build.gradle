@@ -18,19 +18,19 @@ sourceSets
 
 dependencies 
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-xml')
-	compile project(':jadex-bridge')
-	compile project(':jadex-tools-base-swing')
-	compile project(':jadex-kernel-micro')
+	api project(':jadex-commons')
+	api project(':jadex-commons:jadex-commons-gui')
+	api project(':jadex-xml')
+	api project(':jadex-bridge')
+	api project(':jadex-tools-base-swing')
+	api project(':jadex-kernel-micro')
 	runtime project(':jadex-kernel-component') // Todo: move component tests in own project. -<scope>runtime</scope>
-	compile project(':jadex-kernel-application')
-	compile project(':jadex-kernel-extension-envsupport')
-	testCompile project(':jadex-platform')
-	testCompile project(':jadex-platform-extension-websockettransport')
-	testCompile project(':jadex-platform-extension-relaytransport')
+	api project(':jadex-kernel-application')
+	api project(':jadex-kernel-extension-envsupport')
+	testImplementation project(':jadex-platform')
+	testImplementation project(':jadex-platform-extension-websockettransport')
+	testImplementation project(':jadex-platform-extension-relaytransport')
 	
-	compile 'com.github.sarxos:webcam-capture:0.3.9'
-	compile 'org.jcodec:jcodec:0.1.5'
+	api 'com.github.sarxos:webcam-capture:0.3.9'
+	api 'org.jcodec:jcodec:0.1.5'
 }

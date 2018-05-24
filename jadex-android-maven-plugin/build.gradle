@@ -7,16 +7,16 @@ dependencies
 {
     ext.maven_api = "3.1.1"
 
-	compile 'org.activecomponents.jadex:jadex-bridge:' + props.jadex_build_version
-    compile 'org.activecomponents.jadex:jadex-platform:' + props.jadex_build_version
-    compile 'org.activecomponents.jadex:jadex-kernel-bdiv3:' + props.jadex_build_version
+	api 'org.activecomponents.jadex:jadex-bridge:' + props.jadex_build_version
+    api 'org.activecomponents.jadex:jadex-platform:' + props.jadex_build_version
+    api 'org.activecomponents.jadex:jadex-kernel-bdiv3:' + props.jadex_build_version
 
-    compile 'org.apache.maven:maven-artifact:' + maven_api
-    compile 'org.apache.maven:maven-model:' + maven_api
-    compile 'org.apache.maven:maven-core:' + maven_api
-    compile 'org.apache.maven:maven-plugin-api:' + maven_api
-    compile 'org.sonatype.plexus:plexus-build-api:0.0.7'
-    compile 'org.apache.commons:commons-io:1.3.2'
+    api 'org.apache.maven:maven-artifact:' + maven_api
+    api 'org.apache.maven:maven-model:' + maven_api
+    api 'org.apache.maven:maven-core:' + maven_api
+    api 'org.apache.maven:maven-plugin-api:' + maven_api
+    api 'org.sonatype.plexus:plexus-build-api:0.0.7'
+    api 'org.apache.commons:commons-io:1.3.2'
 }
 
 task pluginDescriptor( type: Exec ) {

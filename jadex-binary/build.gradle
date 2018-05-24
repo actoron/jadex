@@ -2,6 +2,6 @@ description 'Binary serialization support for Jadex.'
 
 dependencies 
 {
-	compile project(':jadex-traverser')
-	compile project(':jadex-commons')
+	api project(':jadex-traverser')
+	api project(':jadex-commons')
 }

@@ -13,7 +13,7 @@ dependencies
     api project(':jadex-kernel-bdiv3-android')
     api project(':jadex-kernel-bpmn')
 
-//    compile project(':jadex-platform-extension-webservice-android')
+//    api project(':jadex-platform-extension-webservice-android')
 
 //    releaseProvided project(':jadex-android-commons')
 //    releaseProvided project(':jadex-kernel-bpmn')

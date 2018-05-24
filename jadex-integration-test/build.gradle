@@ -35,9 +35,9 @@ dependencies
 	launcharts.retainAll(gradle.ext.includeartifacts)
 	
 	launcharts.each { art ->
-		compile project(art)
+		api project(art)
 	}
-	compile project(':jadex-applications-micro')
+	api project(':jadex-applications-micro')
 
 //	test {
 //		testLogging {

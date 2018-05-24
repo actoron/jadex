@@ -2,6 +2,6 @@ description 'Common GUI support classes.'
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-concurrent')
+	api project(':jadex-commons')
+	api project(':jadex-concurrent')
 }

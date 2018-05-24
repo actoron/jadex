@@ -2,17 +2,17 @@ description 'The Jadex tools comanalyzer package contains the ComAnalyzer JCC pl
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	compile project(':jadex-xml')
-	compile project(':jadex-tools-base-swing')
+	api project(':jadex-commons')
+	api project(':jadex-bridge')
+	api project(':jadex-xml')
+	api project(':jadex-tools-base-swing')
 	
-	compile 'jfree:jfreechart:1.0.12'
-	compile 'jfree:jcommon:1.0.15'
-	compile 'net.sf.jung:jung-visualization:2.0.1'
-	compile 'net.sf.jung:jung-graph-impl:2.0.1'
-	compile 'net.sf.jung:jung-algorithms:2.0.1'
-	compile 'net.sf.jung:jung-api:2.0.1'
-	compile 'colt:colt:1.2.0'
-	compile 'net.sourceforge.collections:collections-generic:4.01'
+	api 'jfree:jfreechart:1.0.12'
+	api 'jfree:jcommon:1.0.15'
+	api 'net.sf.jung:jung-visualization:2.0.1'
+	api 'net.sf.jung:jung-graph-impl:2.0.1'
+	api 'net.sf.jung:jung-algorithms:2.0.1'
+	api 'net.sf.jung:jung-api:2.0.1'
+	api 'colt:colt:1.2.0'
+	api 'net.sourceforge.collections:collections-generic:4.01'
 }

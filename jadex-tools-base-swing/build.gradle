@@ -2,9 +2,9 @@ description 'GUI-dependent classes for jadex-tools-base.'
 
 dependencies
 {
-	compile project(':jadex-bridge')
-	compile project(':jadex-commons:jadex-commons-gui')
-	compile project(':jadex-tools-base')
-	compile project(':jadex-xml')
+	api project(':jadex-bridge')
+	api project(':jadex-commons:jadex-commons-gui')
+	api project(':jadex-tools-base')
+	api project(':jadex-xml')
 }
 

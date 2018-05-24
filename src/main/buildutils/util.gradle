@@ -86,7 +86,7 @@ def getReleaseVariant(project) {
 }
 
 /**
- * Recursively check for dependencies with compileNoAndroidRuntime scope and exclude them from the project
+ * Recursively check for dependencies with apiNoAndroidRuntime scope and exclude them from the project
  * @param project
  * @param dep
  * @param alreadyChecked
@@ -110,9 +110,9 @@ def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alread
         }
 
 //        println "recursed to: $dep.name"
-//        println "android deps: $dep.dependencyProject.configurations.compileNoAndroidRuntime.dependencies"
+//        println "android deps: $dep.dependencyProject.configurations.apiNoAndroidRuntime.dependencies"
         // exclude direct children
-        dep.dependencyProject.configurations.compileNoAndroidRuntime.dependencies.all {
+        dep.dependencyProject.configurations.apiNoAndroidRuntime.dependencies.all {
             exDep ->
 //                println "excluding $exDep.group:$exDep.name"
                 project.configurations.all { conf ->

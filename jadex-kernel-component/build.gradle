@@ -2,10 +2,10 @@ description 'The Jadex component kernel provides basic support for active compon
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-bridge')
-	compile project(':jadex-xml')
-	compile project(':jadex-kernel-base')
+	api project(':jadex-commons')
+	api project(':jadex-javaparser')
+	api project(':jadex-bridge')
+	api project(':jadex-xml')
+	api project(':jadex-kernel-base')
 }
 

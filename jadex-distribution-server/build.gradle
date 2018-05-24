@@ -2,14 +2,14 @@ description 'The server distribution of the Jadex middleware includes useful mod
 
 dependencies
 {
-	compile project(':jadex-distribution-minimal')
-	compile project(':jadex-model-bpmn')
-	compile project(':jadex-kernel-bpmn')
-	compile project(':jadex-kernel-component')
-	compile project(':jadex-kernel-application')
-	compile project(':jadex-kernel-bdiv3')
-	compile project(':jadex-applib-bdi')
-	compile project(':jadex-platform')
-	compile project(':jadex-platform-extension-webservice')
-	compile project(':jadex-platform-extension-webservice-desktop')
+	api project(':jadex-distribution-minimal')
+	api project(':jadex-model-bpmn')
+	api project(':jadex-kernel-bpmn')
+	api project(':jadex-kernel-component')
+	api project(':jadex-kernel-application')
+	api project(':jadex-kernel-bdiv3')
+	api project(':jadex-applib-bdi')
+	api project(':jadex-platform')
+	api project(':jadex-platform-extension-webservice')
+	api project(':jadex-platform-extension-webservice-desktop')
 }

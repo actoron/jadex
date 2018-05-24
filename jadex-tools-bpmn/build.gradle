@@ -2,9 +2,9 @@ description 'The Jadex tools bpmn package contains JCC plugins for Jadex BPMN co
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	compile project(':jadex-kernel-bpmn')
-	compile project(':jadex-runtimetools-swing')
-	compile project(':jadex-editor-bpmn')
+	api project(':jadex-commons')
+	api project(':jadex-bridge')
+	api project(':jadex-kernel-bpmn')
+	api project(':jadex-runtimetools-swing')
+	api project(':jadex-editor-bpmn')
 }

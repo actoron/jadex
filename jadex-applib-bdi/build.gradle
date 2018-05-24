@@ -2,16 +2,16 @@ description 'The Jadex applib BDI package contains ready to use functionalities 
 
 dependencies
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-bridge')
-	compile project(':jadex-tools-base-swing')
-	compile project(':jadex-kernel-bdiv3')
-//	compile project(':jadex-kernel-bdibpmn')
-	compile project(':jadex-javaparser')
-	compile project(':jadex-xml')
-	compile project(':jadex-kernel-extension-envsupport')
+	api project(':jadex-commons')
+	api project(':jadex-bridge')
+	api project(':jadex-tools-base-swing')
+	api project(':jadex-kernel-bdiv3')
+//	api project(':jadex-kernel-bdibpmn')
+	api project(':jadex-javaparser')
+	api project(':jadex-xml')
+	api project(':jadex-kernel-extension-envsupport')
 
-	compileNoAndroidRuntime 'javax.mail:mail:1.4.5'
-	compile 'jivesoftware:smack:3.1.0' 
-	compile 'jivesoftware:smackx:3.1.0' 
+	apiNoAndroidRuntime 'javax.mail:mail:1.4.5'
+	api 'jivesoftware:smack:3.1.0' 
+	api 'jivesoftware:smackx:3.1.0' 
 }

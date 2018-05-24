@@ -2,6 +2,6 @@ description 'Future support for Jadex.'
 
 dependencies 
 {
-	compile project(':jadex-commons')
-	compile project(':jadex-binary')
+	api project(':jadex-commons')
+	api project(':jadex-binary')
 }

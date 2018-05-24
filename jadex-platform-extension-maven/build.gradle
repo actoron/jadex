@@ -5,23 +5,23 @@ def wagonversion = "2.2"
 
 configurations {
 	compile.exclude group: "asm", module: "asm"
-	testCompile.exclude group: "asm", module: "asm"
+	testImplementation.exclude group: "asm", module: "asm"
 }
 
 dependencies 
 {
-	compile project(":jadex-bridge")
-	compile project(":jadex-commons")
-	compile project(":jadex-tools-base-swing")
+	api project(":jadex-bridge")
+	api project(":jadex-commons")
+	api project(":jadex-tools-base-swing")
 	
-	compile "org.apache.maven.wagon:wagon-http-lightweight:${wagonversion}" 
-	compile "org.apache.maven.indexer:indexer-core:3.1.0" 
-	compile "org.apache.maven:maven-artifact:${mavenversion}"
-	compile "org.apache.maven:maven-model:${mavenversion}"
-	compile "org.apache.maven:maven-model-builder:${mavenversion}"
-	compile "org.apache.maven:maven-settings:${mavenversion}"
-	compile "org.apache.maven:maven-settings-builder:${mavenversion}"
-	compile "org.apache.maven:maven-aether-provider:${mavenversion}"
-	compile "org.sonatype.aether:aether-util:1.13.1"
-	compile "org.sonatype.aether:aether-connector-wagon:1.13"
+	api "org.apache.maven.wagon:wagon-http-lightweight:${wagonversion}" 
+	api "org.apache.maven.indexer:indexer-core:3.1.0" 
+	api "org.apache.maven:maven-artifact:${mavenversion}"
+	api "org.apache.maven:maven-model:${mavenversion}"
+	api "org.apache.maven:maven-model-builder:${mavenversion}"
+	api "org.apache.maven:maven-settings:${mavenversion}"
+	api "org.apache.maven:maven-settings-builder:${mavenversion}"
+	api "org.apache.maven:maven-aether-provider:${mavenversion}"
+	api "org.sonatype.aether:aether-util:1.13.1"
+	api "org.sonatype.aether:aether-connector-wagon:1.13"
 }
