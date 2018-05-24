@@ -23,6 +23,7 @@ public class ExecutionServiceTest
 		IPlatformConfiguration minimal = PlatformConfigurationHandler.getMinimal();
 		minimal.getExtendedPlatformConfiguration().setRelayTransport(false);
 		minimal.getExtendedPlatformConfiguration().setWsTransport(false);
+		minimal.setValue("settings.readonly", true);
 		IExternalAccess	platform	= Starter.createPlatform(minimal).get();
 		IExecutionService	exe	= SServiceProvider.getService(platform, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		

@@ -558,11 +558,6 @@ def createDistZip(distname, arts, isaddon)
 
 				if (isAndroidProject(sp)) {
 					
-					lintOptions {
-    					abortOnError false
-					}
-					
-					
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'

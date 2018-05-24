@@ -11,9 +11,12 @@ import java.util.Collection;
 import java.util.List;
 
 import jadex.binary.SBinarySerializer;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 
@@ -100,6 +103,18 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 			? new DatagramPacket(data, data.length, ((DatagramPacket)source).getAddress(), ((DatagramPacket)source).getPort())
 			: new DatagramPacket(data, data.length, new InetSocketAddress(multicastaddress, port));
 		sendsocket.send(p);
+	}
+	
+	/**
+	 *  Gets the address for a platform ID using the awareness mechanism.
+	 * 
+	 *  @param platformid The platform ID.
+	 *  @return The transport addresses or null if not available.
+	 */
+	public IFuture<Collection<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid)
+	{
+		// TODO: Implement
+		return new Future<Collection<TransportAddress>>(new UnsupportedOperationException("Unimplemented for multicast."));
 	}
 	
 	//-------- helper classes --------

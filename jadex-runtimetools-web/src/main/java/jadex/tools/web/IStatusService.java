@@ -1,6 +1,7 @@
 package jadex.tools.web;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
@@ -40,4 +41,10 @@ public interface IStatusService
 	// No intermediate for easier REST?
 	// TODO: subscription in registry to get notified about new services? -> please no polling!
 	public IFuture<Collection<IServiceIdentifier>>	getServices(String... scope);
+	
+	/**
+	 *  Get all memory stats. cf IMemstatService
+	 */
+	// No intermediate for easier REST?
+	public IFuture<Collection<Map<String, Object>>>	getMemInfo();
 }

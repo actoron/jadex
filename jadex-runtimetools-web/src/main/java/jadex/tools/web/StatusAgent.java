@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.base.IPlatformConfiguration;
@@ -19,6 +20,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
@@ -27,6 +29,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -35,6 +38,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -114,27 +118,45 @@ public class StatusAgent implements IStatusService
 			@Override
 			public void terminated(Exception reason)
 			{
+				System.out.println("terminated: "+reason);
 				for(ISubscriptionIntermediateFuture<PlatformData> fut: futs)
 				{
 					fut.terminate();
 				}
 			}
 		});
-		for(ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
+		
+		// TODO: Use query for dynamically added platforms
+		for(final ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
 		{
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
-			fut.addResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
+			fut.addResultListener(new IIntermediateResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
+					System.out.println("status ex: "+exception);
 					// ignore
 				}
 								
 				@Override
 				public void finished()
 				{
+					System.out.println("status fini: "+tis);
 					//ignore
+				}
+				
+				@Override
+				public void intermediateResultAvailable(PlatformData result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				@Override
+				public void resultAvailable(Collection<PlatformData> result)
+				{
+					// Shouldn't be called
+					assert false;
 				}
 			});
 			futs.add(fut);
@@ -186,6 +208,22 @@ public class StatusAgent implements IStatusService
 		ret.setFinished();
 
 		return ret;
+	}
+	
+	/**
+	 *  Get all memory stats. cf IMemstatService
+	 */
+	// No intermediate for easier REST?
+	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
+	{
+		Collection<IMemstatService>	stats	= SServiceProvider.getLocalServices(agent, IMemstatService.class, Binding.SCOPE_PLATFORM);
+		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
+		for(IMemstatService stat: stats)
+		{
+			fubar.addFuture(stat.getMemInfo());
+		}
+		
+		return fubar.waitForResultsIgnoreFailures(null);
 	}
 
 	

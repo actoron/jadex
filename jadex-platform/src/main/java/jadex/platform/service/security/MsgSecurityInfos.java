@@ -11,8 +11,8 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
  */
 public class MsgSecurityInfos implements IMsgSecurityInfos
 {
-	/** Flag if the platform ID could be authenticated. */
-	protected boolean auth;
+	/** Flag if the platform secret could be authenticated. */
+	protected boolean platformauth;
 	
 	/** Flag if the platform is trusted. */
 	protected boolean trustedplatform;
@@ -34,23 +34,33 @@ public class MsgSecurityInfos implements IMsgSecurityInfos
 	}
 	
 	/**
-	 *  Checks if the sender platform ID is authenticated.
+	 *  Checks if the sender platform is authenticated.
 	 *
 	 *  @return True if authenticated.
 	 */
 	public boolean isAuthenticated()
 	{
-		return auth;
+		return platformauth || (networks != null && networks.length > 0);
+	}
+	
+	/**
+	 *  Gets if the sender is authenticated.
+	 *
+	 *  @return True if authenticated.
+	 */
+	public boolean isPlatformAuthenticated()
+	{
+		return platformauth;
 	}
 	
 	/**
 	 *  Sets if the sender is authenticated.
 	 *
-	 *  @param authplatform True if authenticated.
+	 *  @param platformauth True if authenticated.
 	 */
-	public void setAuthenticated(boolean auth)
+	public void setPlatformAuthenticated(boolean platformauth)
 	{
-		this.auth = auth;
+		this.platformauth = platformauth;
 	}
 	
 	/**
@@ -138,6 +148,6 @@ public class MsgSecurityInfos implements IMsgSecurityInfos
 	 */
 	public String toString()
 	{
-		return "Authenticated: " + auth + ", Trusted: " + trustedplatform + ", Networks: " + Arrays.toString(networks); 
+		return "Authenticated: " + platformauth + ", Trusted: " + trustedplatform + ", Networks: " + Arrays.toString(networks); 
 	}
 }

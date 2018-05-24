@@ -1,6 +1,7 @@
 package jadex.platform.service.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -445,7 +446,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (savesettings)
 					saveSettings();
 				
-				agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
+				IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
+				msgfeat.addMessageHandler(new SecurityMessageHandler());
+				msgfeat.addMessageHandler(new ReencryptRequestHandler());
 				
 				ret.setResult(null);
 			}
@@ -621,7 +624,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									}
 									else
 									{
-										ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
+										cleartext = requestReencryption(splat, content);
+										if (cleartext != null)
+											ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
+										else
+											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
 									}
 								}
 								
@@ -633,7 +640,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						else
 						{
-							ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString()));
+							cleartext = requestReencryption(splat, content);
+							if (cleartext == null)
+								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString()));
+							else
+								cs = currentcryptosuites.get(splat);
 						}
 					}
 					
@@ -1349,7 +1360,33 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		return Boolean.TRUE.equals(header.getProperty(SECURITY_MESSAGE));
 	}
 	
-	//-------- Message Handler -------
+	/**
+	 *  Request reencryption by source.
+	 *  
+	 *  @param source Source of the content.
+	 *  @param content The encrypted content.
+	 *  @return Clear decrypted content.
+	 */
+	protected byte[] requestReencryption(String platformname, byte[] content)
+	{
+		ReencryptionRequest req = new ReencryptionRequest();
+		req.setContent(content);
+		
+		byte[] ret = null;
+		try
+		{
+			BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
+			ret = (byte[]) agent.getComponentFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	//-------- Message Handlers -------
 	
 	/**
 	 *  Security service message handler.
@@ -1523,7 +1560,52 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 	}
 	
-	//---- IInternalService bullshit
+	/**
+	 *  Handler dealing with remote reencryption requests.
+	 *
+	 */
+	protected class ReencryptRequestHandler implements IUntrustedMessageHandler
+	{
+		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		{
+			return msg instanceof ReencryptionRequest;
+		}
+		
+		public boolean isRemove()
+		{
+			return false;
+		}
+		
+		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		{
+			ReencryptionRequest req = (ReencryptionRequest) msg;
+			String senderpf = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot().toString();
+			
+			byte[] deccontent = null;
+			
+			Collection<Tuple2<ICryptoSuite, Long>> expsuites = expiringcryptosuites.get(senderpf);
+			if (expsuites != null)
+			{
+				for (Tuple2<ICryptoSuite, Long> expsuite : expsuites)
+				{
+					IMsgSecurityInfos suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
+					
+					if (!suiteinfos.isPlatformAuthenticated() || (suiteinfos.isPlatformAuthenticated() == secinfos.isPlatformAuthenticated()))
+					{
+						Set<String> msgnets = new HashSet<String>(Arrays.asList(secinfos.getNetworks()));
+						if (msgnets.containsAll(Arrays.asList(suiteinfos.getNetworks())))
+						{
+							deccontent = expsuite.getFirstEntity().decryptAndAuthLocal(req.getContent());
+						}
+					}
+				}
+			}
+			
+			agent.getComponentFeature(IMessageFeature.class).sendReply(header, deccontent);
+		}
+	}
+	
+	//---- IInternalService stuff 
 	
 	private IServiceIdentifier sid;
 	

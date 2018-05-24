@@ -1426,7 +1426,12 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
 //		System.out.println("Adding query: "+query);
-		return getRegistry().addQuery(query);
+		ISubscriptionIntermediateFuture<T>	ret	= getRegistry().addQuery(query);
+		
+		// As registry is plain object -> need to add no-timeout here. (hack???)
+		SFuture.avoidCallTimeouts((Future<?>)ret, getComponent());
+		
+		return ret;
 	}
 	
 	/**

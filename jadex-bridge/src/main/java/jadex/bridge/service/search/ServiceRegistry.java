@@ -204,7 +204,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	
 	/**
 	 *  Adapt the existing queries to a new superpeer.
-	 *  (Needs not to remove from old superpeer to to lease time cleanup).
+	 *  (Needs not to remove from old superpeer to lease time cleanup).
 	 */
 	protected void addQueriesToNewSuperpeer()
 	{
@@ -1426,13 +1426,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				@SuppressWarnings({"unchecked", "rawtypes"})
 				public void customResultAvailable(Boolean result) throws Exception
 				{
-					if(service.toString().indexOf("Time")!=-1)
-					{
-						System.out.println("checkQueries: "+service+", "+type+", "+result+", "+sqi.getQuery());
-					}
+//					if(service.toString().indexOf("Time")!=-1)
+//					{
+//						System.out.println("checkQueries: "+service+", "+type+", "+result+", "+sqi.getQuery());
+//					}
 					if(result.booleanValue())
 					{
-//						System.out.println("query: "+service);
+//						if(service.toString().indexOf("Time")!=-1)
+//						{
+//							System.out.println("query: "+service);
+//						}
 						((IntermediateFuture)sqi.getFuture()).addIntermediateResult(wrapServiceForQuery(sqi.getQuery(), service, type));
 					}
 					checkQueriesLoop(it, service, type).addResultListener(new DelegationResultListener<Void>(ret));

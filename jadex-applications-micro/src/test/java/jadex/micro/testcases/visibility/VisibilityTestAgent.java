@@ -41,9 +41,10 @@ public class VisibilityTestAgent extends JunitAgentTest
 	@AgentCreated
 	public IFuture<Void> test()
 	{
-		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();
-		Starter.createProxy(agent.getExternalAccess(), plat).get();
-		Starter.createProxy(plat, agent.getExternalAccess()).get();
+//		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();
+//		Starter.createProxy(agent.getExternalAccess(), plat).get();
+//		Starter.createProxy(plat, agent.getExternalAccess()).get();
+		final IExternalAccess plat = STest.createPlatform();
 		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();
 		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();
 		

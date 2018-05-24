@@ -195,6 +195,7 @@ def addSchemaTasks(Project project) {
             rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
         }
     }
+    project.processSchemas.dependsOn += project.schemadocs
     project.processResources.dependsOn += project.processSchemas
 }
 
@@ -316,6 +317,7 @@ def addJavaDocJarTask(Project p) {
         onAllVariants(p) {variant ->
             def javadocTask = p.tasks.create("generate${variant.name}Javadoc", Javadoc) {
                 description "Generates Javadoc for $variant.name."
+                dependsOn "compileReleaseSources"
                 source = variant.javaCompile.source
                 ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
                 doFirst { classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar) }

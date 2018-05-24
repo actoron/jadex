@@ -100,6 +100,18 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	}
 	
 	/**
+	 *  Decrypt and authenticates a locally encrypted message.
+	 *  
+	 *  @param content The content.
+	 *  @return Decrypted/authenticated message or null on invalid message.
+	 */
+	public byte[] decryptAndAuthLocal(byte[] content)
+	{
+		byte[] ret = chacha20Poly1305Dec(content, key, nonceprefix);
+		return ret;
+	}
+	
+	/**
 	 *  Gets the security infos related to the authentication state.
 	 *  
 	 *  @return The security infos for decrypted messages.

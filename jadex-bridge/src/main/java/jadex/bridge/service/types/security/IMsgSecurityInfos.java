@@ -16,6 +16,13 @@ public interface IMsgSecurityInfos
 	public boolean isAuthenticated();
 	
 	/**
+	 *  Gets if the platform is authenticated.
+	 *
+	 *  @return True if authenticated.
+	 */
+	public boolean isPlatformAuthenticated();
+	
+	/**
 	 *  Returns the authenticated platform name.
 	 *
 	 *  @return The authenticated platform name, null if not authenticated.

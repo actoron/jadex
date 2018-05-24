@@ -26,6 +26,7 @@ public class RSChartTest
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
+		config.setValue("settings.readonly", true);
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		extAcc = fut.get();
