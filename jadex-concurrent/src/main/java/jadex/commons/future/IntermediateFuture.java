@@ -85,11 +85,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	   	doAddIntermediateResult(result, false);
 
 	   	resumeIntermediate();
-		startScheduledNotifications();
 	}
+	
 	/**
      *  Set the result. 
-     *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      *  @return True if result was set.
      */
@@ -100,62 +99,72 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	if(ret)
     	{
     		resumeIntermediate();
-    		startScheduledNotifications();
     	}
     	
     	return ret;
     }
 	
     /**
-     *  Set the result without notifying listeners.
+     *  Set the result and schedule listener notifications.
+     *  @return true, when the result was added (finished and undone otherwise).
      */
-    protected synchronized boolean doAddIntermediateResult(final E result, boolean undone)
+    protected boolean doAddIntermediateResult(final E result, boolean undone)
     {
-    	if(undone)
+    	boolean	ret	= true;
+    	boolean	notify	= false;
+    	synchronized(this)
     	{
-    		this.undone = true;
-    	}
-
-    	// There is an exception when this is ok.
-    	// In BDI when belief value is a future.
-//    	if(result instanceof IFuture)
-//    	{
-//    		System.out.println("Internal error, future in future.");
-//    		setException(new RuntimeException("Future in future not allowed."));
-//    	}
-    	
-    	if(isDone())
-    	{
-    		if(undone)
-    		{
-    			return false;
-    		}
-    		else if(this.exception!=null)
-    		{
-        		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
-    		}
-    		else
-    		{
-        		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
-    		}
-    	}
-    	else
-    	{
-    		addResult(result);
-    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
-			{
-    			@Override
-    			public void execute(IResultListener<Collection<E>> listener)
-    			{
-	        		if(listener instanceof IIntermediateResultListener)
-	        		{
-	        			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
-	        		}
-    			}
-			});
+	    	if(undone)
+	    	{
+	    		this.undone = true;
+	    	}
+	
+	    	// There is an exception when this is ok.
+	    	// In BDI when belief value is a future.
+	//    	if(result instanceof IFuture)
+	//    	{
+	//    		System.out.println("Internal error, future in future.");
+	//    		setException(new RuntimeException("Future in future not allowed."));
+	//    	}
 	    	
-	    	return true;
+	    	if(isDone())
+	    	{
+	    		if(undone)
+	    		{
+	    			ret	= false;
+	    		}
+	    		else if(this.exception!=null)
+	    		{
+	        		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
+	    		}
+	    		else
+	    		{
+	        		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
+	    		}
+	    	}
+	    	else
+	    	{
+	    		addResult(result);
+	    		notify	= scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
+				{
+	    			@Override
+	    			public void execute(IResultListener<Collection<E>> listener)
+	    			{
+		        		if(listener instanceof IIntermediateResultListener)
+		        		{
+		        			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
+		        		}
+	    			}
+				});
+	    	}
     	}
+    	
+    	if(notify)
+    	{
+    		startScheduledNotifications();
+    	}
+    	
+    	return ret;
     }
 
     
@@ -270,8 +279,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    					notifyIntermediateResult(listener, result);
 	    				}
 					}); 
-	    			scheduleNotification(lis, c);
-	    			scheduled	= true;
+	    			scheduled	= scheduleNotification(lis, c) || scheduled;
 	    		}
     		}
     	}

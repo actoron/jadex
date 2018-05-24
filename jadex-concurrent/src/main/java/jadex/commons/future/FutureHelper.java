@@ -1,9 +1,9 @@
 package jadex.commons.future;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
-import jadex.commons.Tuple2;
+import jadex.commons.ICommand;
+import jadex.commons.Tuple3;
 
 /**
  *  Helper class to access future notification stack
@@ -14,55 +14,17 @@ public abstract class FutureHelper
 	 *  Process all collected listener notifications for the current thread.
 	 *  @return True, if at least one listener has been notified.
 	 */
-	public static boolean	notifyStackedListeners()
+	public static void	notifyStackedListeners()
 	{
-		boolean	notified	= false;
-		while(Future.STACK.get()!=null && !Future.STACK.get().isEmpty())
-		{
-			notified	= true;
-			Tuple2<Future<?>, IResultListener<?>>	tup	= Future.STACK.get().remove(0);
-			Future<?> fut	= tup.getFirstEntity();
-			IResultListener lis = tup.getSecondEntity();
-			if(fut.exception!=null)
-			{
-				if(fut.undone && lis instanceof IUndoneResultListener)
-				{
-					((IUndoneResultListener)lis).exceptionOccurredIfUndone(fut.exception);
-				}
-				else
-				{
-					lis.exceptionOccurred(fut.exception);
-				}
-			}
-			else
-			{
-				if(fut.undone && lis instanceof IUndoneResultListener)
-				{
-					((IUndoneResultListener)lis).resultAvailableIfUndone(fut.result);
-				}
-				else
-				{
-					lis.resultAvailable(fut.result); 
-				}
-			}
-		}
-		Future.STACK.remove();
-		return notified;
+		new Future<Void>().startScheduledNotifications();
 	}
 	
 	/**
 	 *  Remove all collected listener notifications for the current thread.
 	 */
-	public static List<Tuple2<Future<?>, IResultListener<?>>>	removeStackedListeners()
+	public static Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	removeStackedListeners()
 	{
-		List<Tuple2<Future<?>, IResultListener<?>>>	tmp	= Future.STACK.get();
-		List<Tuple2<Future<?>, IResultListener<?>>>	ret	= null;
-		if(tmp!=null)
-		{
-			ret	= new LinkedList<Tuple2<Future<?>,IResultListener<?>>>();
-			ret.addAll(tmp);
-			tmp.clear();
-		}
+		Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	ret	= Future.STACK.get();
 		Future.STACK.remove();
 		return ret;
 	}
@@ -70,14 +32,16 @@ public abstract class FutureHelper
 	/**
 	 *  Add listener notifications to the current thread.
 	 */
-	public static void	addStackedListeners(List<Tuple2<Future<?>, IResultListener<?>>> notifications)
+	public static void	addStackedListeners(Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>> notifications)
 	{
-		List<Tuple2<Future<?>, IResultListener<?>>>	list	= Future.STACK.get();
-		if(list==null)
+		Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	stack	= Future.STACK.get();
+		if(stack==null)
 		{
-    		list	= new LinkedList<Tuple2<Future<?>, IResultListener<?>>>();
-    		Future.STACK.set(list);
+    		Future.STACK.set(notifications);
 		}
-		list.addAll(notifications);
+		else
+		{
+			stack.addAll(notifications);
+		}
 	}
 }
