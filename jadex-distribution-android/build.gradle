@@ -3,7 +3,7 @@ description 'The android distribution of the Jadex middleware including all typi
 dependencies
 {
 	// Tests for this project are completely broken
-	//api project(path: ':jadex-android-bluetooth', configuration: 'default')
+	api project(path: ':jadex-android-bluetooth', configuration: 'default')
 
 	api project(path: ':jadex-android-antlr', configuration: 'default')
 	api project(path: ':jadex-android-commons', configuration: 'default')
