@@ -36,7 +36,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	 *  Send a foward command.
 	 */
 	@Override
-	public void scheduleForward(final ICommand<Void> command)
+	public <T> void scheduleForward(final ICommand<T> command, final T args)
 	{
 		if(!access.getComponentFeature(IExecutionFeature.class).isComponentThread())
 		{
@@ -44,7 +44,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					command.execute(null);
+					command.execute(args);
 					return IFuture.DONE;
 				}
 			}).addResultListener(new IResultListener<Void>()
@@ -65,7 +65,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 		}
 		else
 		{
-			command.execute(null);
+			command.execute(args);
 		}
 	};
 }

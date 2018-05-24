@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  *  Result listener that delegates calls to a future.
  */
-public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
+public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandResultListener<E>, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	

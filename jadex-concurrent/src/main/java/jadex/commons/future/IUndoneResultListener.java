@@ -3,7 +3,7 @@ package jadex.commons.future;
 /**
  * 
  */
-public interface IUndoneResultListener<E>
+public interface IUndoneResultListener<E>	extends IResultListener<E>
 {
 	/**
 	 *  Called when the result is available.

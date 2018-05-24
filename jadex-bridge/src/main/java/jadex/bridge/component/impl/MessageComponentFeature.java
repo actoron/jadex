@@ -554,6 +554,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 //		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
 //			throw new RuntimeException("wrooongMMMM");
+//		System.out.println("doSendMessage: "+header+", "+message);
 		
 		final Future<Void> ret = new Future<Void>();
 

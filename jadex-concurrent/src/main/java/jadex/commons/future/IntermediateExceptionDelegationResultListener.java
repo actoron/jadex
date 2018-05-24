@@ -8,7 +8,7 @@ import java.util.logging.Logger;
  *  Exception delegation listener for intermediate futures.
  */
 public class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, 
-	IFutureCommandListener, IUndoneIntermediateResultListener<E>
+IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	

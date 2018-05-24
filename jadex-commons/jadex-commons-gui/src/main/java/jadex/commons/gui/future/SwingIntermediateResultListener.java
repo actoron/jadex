@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
-import jadex.commons.future.IFutureCommandListener;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
@@ -299,9 +299,9 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		if(listener instanceof IFutureCommandListener)
+		if(listener instanceof IFutureCommandResultListener)
 		{
-			((IFutureCommandListener)listener).commandAvailable(command);
+			((IFutureCommandResultListener<?>)listener).commandAvailable(command);
 		}
 		else
 		{

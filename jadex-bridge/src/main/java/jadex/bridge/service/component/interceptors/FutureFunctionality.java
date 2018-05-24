@@ -1,10 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import jadex.bridge.ProxyFactory;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -103,9 +101,9 @@ public class FutureFunctionality
 	 *  i.e. from callee to caller,
 	 *  e.g. update timer to avoid timeouts.
 	 */
-	public void	scheduleForward(ICommand<Void> code)
+	public <T> void	scheduleForward(ICommand<T> code, T arg)
 	{
-		code.execute(null);
+		code.execute(arg);
 	}
 	
 	/**
@@ -423,35 +421,13 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 	}
 
 	/**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
+     *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	startScheduledNotifications()
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}
-		});
-	}
+    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 	
 	/**
 	 *  Pull an intermediate result.
@@ -595,35 +571,13 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	}
 
 	/**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
+     *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	startScheduledNotifications()
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingPullIntermediateDelegationFuture.super.startScheduledNotifications();
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}
-		});
-	}
+    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 	
 	
 	/**
@@ -768,35 +722,13 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	}
 
 	/**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
+     *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	startScheduledNotifications()
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}
-		});
-	}	
+    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 	
 	/**
 	 *  Terminate the future.
@@ -924,35 +856,13 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	}
 
 	/**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
+     *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	startScheduledNotifications()
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(info);
-			}
-		});
-	}
+    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 	
 	/**
 	 *  Terminate the future.
@@ -1041,34 +951,13 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	}
 	
 	/**
-	 *  Notify the listener.
-	 */
+     *  Execute a notification. Override for scheduling on other threads.
+     */
 	@Override
-	protected void notifyListener(final IResultListener<Object> listener)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingTerminableDelegationFuture.super.notifyListener(listener);
-			}
-		});
-	}
-
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
-			}
-		});
-	}	
+    protected void	executeNotification(IResultListener<Object> listener, ICommand<IResultListener<Object>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 	
 	/**
 	 *  Terminate the future.
@@ -1182,35 +1071,13 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	}
 
 	/**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
+     *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	startScheduledNotifications()
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingIntermediateFuture.super.startScheduledNotifications();
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingIntermediateFuture.super.sendForwardCommand(info);
-			}
-		});
-	}	
+    protected void	executeNotification(IResultListener<Collection<Object>> listener, ICommand<IResultListener<Collection<Object>>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 };
 
 /**
@@ -1259,34 +1126,13 @@ class DelegatingFuture extends Future<Object>
 	}
 	
 	/**
-	 *  Notify the listener.
-	 */
+     *  Execute a notification. Override for scheduling on other threads.
+     */
 	@Override
-	protected void notifyListener(final IResultListener<Object> listener)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingFuture.super.notifyListener(listener);
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingFuture.super.sendForwardCommand(info);
-			}
-		});
-	}
+    protected void	executeNotification(IResultListener<Object> listener, ICommand<IResultListener<Object>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 };
 
 /**
@@ -1377,34 +1223,12 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 	}
 
 	/**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
+     *  Execute a notification. Override for scheduling on other threads.
      */
 	@Override
-    protected void	startScheduledNotifications()
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingTupleFuture.super.startScheduledNotifications();
-			}
-		});
-	}
-	
-	/**
-	 *  Send a forward command.
-	 */
-	@Override
-	public void sendForwardCommand(final Object info)
-	{
-		func.scheduleForward(new ICommand<Void>()
-		{
-			public void execute(Void result)
-			{
-				DelegatingTupleFuture.super.sendForwardCommand(info);
-			}
-		});
-	}	
+    protected void	executeNotification(IResultListener<Collection<TupleResult>> listener, ICommand<IResultListener<Collection<TupleResult>>> command)
+    {
+		func.scheduleForward(command, listener);
+    }
 };
 

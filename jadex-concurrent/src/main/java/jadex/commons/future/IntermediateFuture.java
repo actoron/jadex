@@ -6,11 +6,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import jadex.commons.ICommand;
 import jadex.commons.functional.Function;
 
 /**
@@ -26,12 +25,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	/** Flag indicating that addIntermediateResult()has been called. */
 	protected boolean intermediate;
 	
-	/** The scheduled notifications. */
-	protected List	scheduled;
-	
-//	/** Flag if notifying. */
-//    protected boolean notifying;
-    
 	/** The blocked intermediate callers (caller->state). */
 	protected Map<ISuspendable, String> icallers;
     
@@ -116,7 +109,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     /**
      *  Set the result without notifying listeners.
      */
-    protected synchronized boolean doAddIntermediateResult(E result, boolean undone)
+    protected synchronized boolean doAddIntermediateResult(final E result, boolean undone)
     {
     	if(undone)
     	{
@@ -149,18 +142,17 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	else
     	{
     		addResult(result);
-			
-			if(listeners!=null)
+    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 			{
-				// Find intermediate listeners to be notified.
-				for(int i=0; i<listeners.size(); i++)
-				{
-					if(listeners.get(i) instanceof IIntermediateResultListener)
-					{
-						scheduleNotification(listeners.get(i), true, result);
-					}
-				}
-			}
+    			@Override
+    			public void execute(IResultListener<Collection<E>> listener)
+    			{
+	        		if(listener instanceof IIntermediateResultListener)
+	        		{
+	        			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
+	        		}
+    			}
+			});
 	    	
 	    	return true;
     	}
@@ -255,9 +247,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
-//    	if(getClass().getName().indexOf("Delegating")!=-1)
-//    		System.out.println("lis: "+listener.getClass()+" "+this);
-    	
     	if(listener==null)
     		throw new RuntimeException();
     	
@@ -268,39 +257,74 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		// If results==null its a subscription future and first results are already collected.
     		if(results!=null && intermediate && listener instanceof IIntermediateResultListener)
     		{
-    			Object[]	inter = results.toArray();
-	    		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
-	    		for(int i=0; i<inter.length; i++)
+	    		IIntermediateResultListener<E>	lis	= (IIntermediateResultListener<E>)listener;
+	    		for(final E result: results)
 	    		{
-	    			scheduleNotification(lis, true, inter[i]);
+	    			@SuppressWarnings("unchecked")
+					ICommand<IResultListener<Collection<E>>>	c	= (ICommand<IResultListener<Collection<E>>>) ((Object) new ICommand<IIntermediateResultListener<E>>()
+					{
+	    				@Override
+	    				public void execute(IIntermediateResultListener<E> listener)
+	    				{
+	    					// Use template method to allow overwriting (e.g. for tuple2future).
+	    					notifyIntermediateResult(listener, result);
+	    				}
+					}); 
+	    			scheduleNotification(lis, c);
 	    			scheduled	= true;
 	    		}
     		}
-    		
-	    	if(resultavailable)
-	    	{
-	    		scheduleNotification(listener, false, null);
-    			scheduled	= true;
-	    	}
-	    	else
-	    	{
-//	    		if(this.listener==null)
-//	    		{
-//	    			this.listener	= listener;
-//	    		}
-//	    		else
-	    		{
-		    		if(listeners==null)
-		    			listeners	= new ArrayList<IResultListener<Collection<E>>>();
-		    		listeners.add(listener);
-	    		}
-	    	}
     	}
 
     	if(scheduled)
     	{
     		startScheduledNotifications();
     	}
+    	
+    	super.addResultListener(listener);
+    }
+    
+    protected ICommand<IResultListener<Collection<E>>>	notcommand	= new ICommand<IResultListener<Collection<E>>>()
+	{
+		@Override
+		public void execute(IResultListener<Collection<E>> listener)
+		{
+	    	// Special handling only required for finished() instead of resultAvailable()
+			if(exception==null && listener instanceof IIntermediateResultListener)
+			{
+				// If non-intermediate future use -> send collection results as intermediate results
+				if(!intermediate && results!=null)
+				{
+		    		for(E result: results)
+		    		{
+		    			notifyIntermediateResult((IIntermediateResultListener<E>)listener, result);
+		    		}
+				}
+				
+    			if(undone && listener instanceof IUndoneIntermediateResultListener)
+				{
+					((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+				}
+				else
+				{
+					((IIntermediateResultListener<E>)listener).finished();
+				}
+			}
+				
+			// Use default handling for exception and non-intermediate listeners
+			else
+			{
+				IntermediateFuture.super.getNotificationCommand().execute(listener);
+			}
+		}
+	};
+	
+    /**
+     *  Get the notification command.
+     */
+    protected ICommand<IResultListener<Collection<E>>>	getNotificationCommand()
+    {
+    	return notcommand;
     }
     
 	/**
@@ -580,155 +604,73 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	}
     }
 
-    /**
-     *  Notify a result listener.
-     *  @param listener The listener.
-     */
-    protected void notifyListener(IResultListener<Collection<E>> listener)
-    {
-    	scheduleNotification(listener, false, null);
-    	startScheduledNotifications();
-    }
+//    /**
+//     *  Notify a result listener.
+//     *  @param listener The listener.
+//     */
+//    protected void doNotifyListener(IResultListener<Collection<E>> listener)
+//    {
+////    	try
+////    	{
+//			if(exception!=null)
+//			{
+//				if(undone && listener instanceof IUndoneResultListener)
+//				{
+//					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+//				}
+//				else
+//				{
+//					listener.exceptionOccurred(exception);
+//				}
+//			}
+//			else
+//			{
+//				if(listener instanceof IIntermediateResultListener)
+//				{
+//					IIntermediateResultListener lis = (IIntermediateResultListener)listener;
+//					Object[] inter = null;
+//					synchronized(this)
+//					{
+//						if(!intermediate && results!=null)
+//						{
+//							inter = results.toArray();
+//						}
+//					}
+//					if(inter!=null)
+//			    	{
+//			    		for(int i=0; i<inter.length; i++)
+//			    		{
+//			    			notifyIntermediateResult(lis, (E)inter[i]);
+//			    		}
+//			    	}
+//					if(undone && listener instanceof IUndoneIntermediateResultListener)
+//					{
+//						((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+//					}
+//					else
+//					{
+//						lis.finished();
+//					}
+//				}
+//				else
+//				{
+//					if(undone && listener instanceof IUndoneResultListener)
+//					{
+//						((IUndoneResultListener)listener).resultAvailableIfUndone(results);
+//					}
+//					else
+//					{
+//						listener.resultAvailable(results); 
+//					}
+//				}
+//			}
+////    	}
+////    	catch(Exception e)
+////    	{
+////    		e.printStackTrace();
+////    	}
+//    }
     
-    /**
-     *  Notify a result listener.
-     *  @param listener The listener.
-     */
-    protected void doNotifyListener(IResultListener<Collection<E>> listener)
-    {
-//    	try
-//    	{
-			if(exception!=null)
-			{
-				if(undone && listener instanceof IUndoneResultListener)
-				{
-					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
-				}
-				else
-				{
-					listener.exceptionOccurred(exception);
-				}
-			}
-			else
-			{
-				if(listener instanceof IIntermediateResultListener)
-				{
-					IIntermediateResultListener lis = (IIntermediateResultListener)listener;
-					Object[] inter = null;
-					synchronized(this)
-					{
-						if(!intermediate && results!=null)
-						{
-							inter = results.toArray();
-						}
-					}
-					if(inter!=null)
-			    	{
-			    		for(int i=0; i<inter.length; i++)
-			    		{
-			    			notifyIntermediateResult(lis, (E)inter[i]);
-			    		}
-			    	}
-					if(undone && listener instanceof IUndoneIntermediateResultListener)
-					{
-						((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
-					}
-					else
-					{
-						lis.finished();
-					}
-				}
-				else
-				{
-					if(undone && listener instanceof IUndoneResultListener)
-					{
-						((IUndoneResultListener)listener).resultAvailableIfUndone(results);
-					}
-					else
-					{
-						listener.resultAvailable(results); 
-					}
-				}
-			}
-//    	}
-//    	catch(Exception e)
-//    	{
-//    		e.printStackTrace();
-//    	}
-    }
-    
-    /**
-     *  Schedule a listener notification.
-     *  @param listener The listener to be notified.
-     *  @param intermediate	True for intermediate result, false for final results.
-     *  @param result	The intermediate result (if any).
-     */
-    protected void	scheduleNotification(IResultListener<Collection<E>> listener, boolean intermediate, Object result)
-    {
-    	synchronized(this)
-    	{
-    		if(scheduled==null)
-    		{
-    			scheduled	= new LinkedList();
-    		}
-    		scheduled.add(intermediate ? new Object[]{listener, result} : listener);
-    	}
-    }
-    
-    /**
-     *  Start scheduled listener notifications if not already running.
-     *  Must not be called from synchronized block.
-     */
-    protected void	startScheduledNotifications()
-    {
-//    	boolean	notify	= false;
-//    	synchronized(this)
-//    	{
-//    		if(!notifying && scheduled!=null)
-//    		{
-//    			notifying	= true;
-//    			notify	= true;
-//    		}
-//    	}
-    	
-    	boolean	notify	= true;
-    	while(notify)
-    	{
-    		Object	next	= null;
-        	synchronized(this)
-        	{
-        		if(scheduled==null || scheduled.isEmpty())
-        		{
-        			notify	= false;
-//        			notifying	= false;
-        			scheduled	= null;
-        		}
-        		else
-        		{
-        			next	=  scheduled.remove(0);
-            	}
-        	}
-        	
-//        	try
-//        	{
-	        	if(next!=null)
-	        	{
-	        		if(next instanceof IResultListener)
-	        		{
-	        			doNotifyListener((IResultListener<Collection<E>>)next);
-	        		}
-	        		else
-	        		{
-	        			notifyIntermediateResult((IIntermediateResultListener<E>)((Object[])next)[0], (E)((Object[])next)[1]);
-	        		}
-	        	}
-//        	}
-//        	catch(Exception e)
-//        	{
-//        		e.printStackTrace();
-//        	}
-    	}
-    }
 
     /**
      *  Resume also intermediate waiters.

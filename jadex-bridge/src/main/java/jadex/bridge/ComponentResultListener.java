@@ -7,7 +7,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IFutureCommandListener;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.future.SResultListener;
@@ -15,7 +15,7 @@ import jadex.commons.future.SResultListener;
 /**
  *  The result listener for executing listener invocations as a component step.
  */
-public class ComponentResultListener<E> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
+public class ComponentResultListener<E> implements IResultListener<E>, IFutureCommandResultListener<E>, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -361,9 +361,9 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	public void commandAvailable(Object command)
 	{
 		// Todo: should be scheduled on component thread?
-		if(listener instanceof IFutureCommandListener)
+		if(listener instanceof IFutureCommandResultListener<?>)
 		{
-			((IFutureCommandListener)listener).commandAvailable(command);
+			((IFutureCommandResultListener<?>)listener).commandAvailable(command);
 		}
 		else
 		{

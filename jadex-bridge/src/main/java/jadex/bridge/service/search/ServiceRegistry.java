@@ -2188,6 +2188,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 								{
 									public IFuture<Collection<T>> execute(IInternalAccess ia)
 									{
+//										System.out.println(cid + " searching remote platform2: "+platform+", "+query);
 										return ((IInternalRemoteExecutionFeature)ia.getComponentFeature(IRemoteExecutionFeature.class))
 											.executeRemoteSearch(platform, adaptQuery(query, platform));
 									}
@@ -2195,6 +2196,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 							}
 						});
 						
+//						System.out.println(cid + " searching remote platform3: "+platform+", "+query);
 						remotesearch.addResultListener(new IResultListener<Collection<T>>()
 						{
 							@SuppressWarnings("unchecked")
@@ -2258,6 +2260,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 
 							public void exceptionOccurred(Exception exception)
 							{
+								System.out.println(cid + " searched remote platform: "+platform+", "+exception);
 								doFinished();
 							}
 						});
