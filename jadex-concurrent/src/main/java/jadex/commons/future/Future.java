@@ -1,14 +1,14 @@
 package jadex.commons.future;
 
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Logger;
 
 import jadex.commons.DebugException;
@@ -19,6 +19,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
@@ -37,7 +38,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	//-------- constants --------
 	
 	/** Notification stack for unwinding call stack to topmost future. */
-	public static final ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
+	public static final ThreadLocal<Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>>	STACK	= new ThreadLocal<Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>>();
 	
 	/** A caller is queued for suspension. */
 	protected static final String	CALLER_QUEUED	= "queued";
@@ -54,7 +55,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean NO_STACK_COMPACTION = true;
+	public static boolean NO_STACK_COMPACTION = false;
 	
 	/** Constant for no timeout. */
 	public static final long NONE = -1;
@@ -102,8 +103,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	/** The undone flag. */
 	protected boolean undone;
 	
-	/** The list of commands. */
-	protected Map<ICommand<Object>, IFilter<Object>> fcommands;
+//	/** The list of commands. */
+//	protected Map<ICommand<Object>, IFilter<Object>> fcommands;
+	
+	/** The scheduled notifications. */
+	protected Queue<Tuple2<IResultListener<E>, ICommand<IResultListener<E>>>>	notifications;
 	
 	//-------- constructors --------
 	
@@ -478,19 +482,9 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 			}
 		}
 		
-		if(listener!=null)
-		{
-    		notifyListener(listener);			
-    		listener	= null; // avoid memory leaks
-		}
-		if(listeners!=null)
-		{
-	    	for(int i=0; i<listeners.size(); i++)
-	    	{
-	    		notifyListener(listeners.get(i));
-	    	}
-    		listeners	= null; // avoid memory leaks
-		}
+		notifyListener();
+		listener	= null; // avoid memory leaks
+		listeners	= null; // avoid memory leaks
 	}
 	
 	/**
@@ -522,7 +516,149 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 	}
 
+    /**
+     *  Schedule a listener notification.
+     *  @param filter Optional filter to select only specific listener (e.g. for forward commands). Otherwise uses all listeners.
+     *  @param command The notification command to execute for each selected listener.
+     *  @return Notify true, when notifications are not yet running (i.e. startScheduledNotifications() required).
+     */
+    protected boolean	scheduleNotification(IFilter<IResultListener<E>> filter, ICommand<IResultListener<E>> command)
+    {
+    	boolean	notify	= false;
+    	synchronized(this)
+    	{
+    		if(listener!=null)
+    		{
+    			if(filter==null || filter.filter(listener))
+    			{
+		    		notify	= scheduleNotification(listener, command) || notify;
+    			}
+    			
+    			if(listeners!=null)
+    			{
+    				for(IResultListener<E> listener: listeners)
+    				{
+    	    			if(filter==null || filter.filter(listener))
+    	    			{
+    			    		notify	= scheduleNotification(listener, command) || notify;
+    	    			}    					
+    				}
+    			}
+    		}
+    	}
+    	
+    	return notify;
+    }
+    
+    /**
+     *  Schedule a notification for all listeners.
+     *  @param command The notification command to execute for each currently registered listener.
+     *  @return Notify true, when notifications are not yet running (i.e. startScheduledNotifications() required).
+     */
+    protected boolean	scheduleNotification(ICommand<IResultListener<E>> command)
+    {
+    	return scheduleNotification((IFilter<IResultListener<E>>)null, command);
+    }
+    
+    /**
+     *  Schedule a listener notification for a specific listener.
+     *  @param listener The listener to notify.
+     *  @param command The notification command to execute for the listener.
+     *  @return Notify true, when notifications are not yet running (i.e. startScheduledNotifications() required).
+     */
+    protected boolean	scheduleNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
+    {
+    	boolean	notify	= false;
+    	if(NO_STACK_COMPACTION || SUtil.isGuiThread())
+    	{
+	    	synchronized(this)
+	    	{
+	    		assert notifications==null || !notifications.isEmpty();
+	    		if(notifications==null)
+	    		{
+	    			notifications	= new ArrayDeque<Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>>();
+	    			notify	= true;
+	    		}
+	    		notifications.add(new Tuple2<IResultListener<E>,ICommand<IResultListener<E>>>(listener, command));
+	    	}
+    	}
+    	else
+    	{
+    		if(STACK.get()==null)
+    		{
+    			STACK.set(new ArrayDeque<Tuple3<Future<?>, IResultListener<?>,ICommand<IResultListener<?>>>>());
+    			notify	= true;
+    		}
+    		
+    		// !%$$%* generics
+    		@SuppressWarnings({"unchecked", "rawtypes"})
+			Tuple3	tup = new Tuple3<Future<?>, IResultListener,ICommand<IResultListener>>(this, listener, (ICommand)command);
+    		@SuppressWarnings("unchecked")
+			Tuple3<Future<?>, IResultListener<?>,ICommand<IResultListener<?>>>	tup2	= tup;
+    		STACK.get().add(tup2);
+    	}
+    	return notify;
+    }
 	
+    /**
+     *  Start scheduled listener notifications.
+     *  Must not be called from synchronized block.
+     */
+    protected final void	startScheduledNotifications()
+    {
+    	if(NO_STACK_COMPACTION || SUtil.isGuiThread())
+    	{
+        	boolean	notify	= true;
+        	while(notify)
+        	{
+    			Tuple2<IResultListener<E>, ICommand<IResultListener<E>>>	next	= null;
+	        	synchronized(this)
+	        	{
+	        		if(notifications==null)
+	        		{
+	        			notify	= false;
+	        		}
+	        		else
+	        		{
+	        			next	= notifications.remove();
+	        			if(notifications.isEmpty())
+	        				notifications	= null;
+	            	}
+	        	}
+        	
+	        	if(next!=null)
+	        	{
+	        		executeNotification(next.getFirstEntity(), next.getSecondEntity());
+	        	}
+        	}
+    	}
+    	else
+    	{
+			if(STACK.get()!=null && STACK.get().isEmpty())	// Set to null on thread switch(?)
+				STACK.remove();
+    		while(STACK.get()!=null)
+        	{
+    			Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>	next	= STACK.get().remove();
+
+    			// Need to use corrent future for executeNotification, because might be overriden by e.g. delegation future for rescheduling on other thread
+        		@SuppressWarnings("rawtypes")
+				Future	fut	= next.getFirstEntity();
+        		fut.executeNotification(next.getSecondEntity(), next.getThirdEntity());
+
+    			if(STACK.get()!=null && STACK.get().isEmpty())	// Set to null on thread switch(?)
+    				STACK.remove();
+        	}
+    	}
+    }
+    
+    /**
+     *  Execute a notification. Override for scheduling on other threads.
+     */
+    protected void	executeNotification(IResultListener<E> listener, ICommand<IResultListener<E>> command)
+    {
+    	command.execute(listener);
+    }
+    
 	/**
 	 * Add an functional result listener, which is only called on success.
 	 * Exceptions will be handled by DefaultResultListener.
@@ -584,94 +720,156 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     }
     
     /**
-     *  Notify a result listener.
+     *  Notify all result listeners of the finished future (result or exception).
+     */
+    protected void notifyListener()
+    {
+		// cast to filter for notifying all listeners
+		if(scheduleNotification((IFilter<IResultListener<E>>)null, getNotificationCommand()))
+		{
+			startScheduledNotifications();
+		}
+    }
+    
+    /**
+     *  Notify a specific result listener of the finished future (result or exception).
      *  @param listener The listener.
      */
     protected void notifyListener(IResultListener<E> listener)
     {
-//		int stack	= Thread.currentThread().getStackTrace().length;
-//    	synchronized(Future.class)
-//		{
-//			stackcount++;
-//			avgstack	= (avgstack*(stackcount-1)+stack)/stackcount;
-//			if(stack>maxstack)
-//			{
-//				maxstack	= stack;
-//				System.out.println("max: "+maxstack+", avg: "+avgstack);
-////				Thread.dumpStack();
-//			}
-//		}
-    	
-    	if(NO_STACK_COMPACTION || STACK.get()==null || SUtil.isGuiThread())
-    	{
-    		List<Tuple2<Future<?>, IResultListener<?>>>	list	= new LinkedList<Tuple2<Future<?>, IResultListener<?>>>();
-    		STACK.set(list);
-    		try
+		if(scheduleNotification(listener, getNotificationCommand()))
+		{
+			startScheduledNotifications();
+		}
+    }
+    
+    protected ICommand<IResultListener<E>>	notcommand	= new ICommand<IResultListener<E>>()
+	{
+		@Override
+		public void execute(IResultListener<E> listener)
+		{
+    		if(exception!=null)
     		{
-	    		if(exception!=null)
-	    		{
-	    			if(undone && listener instanceof IUndoneResultListener)
-					{
-						((IUndoneResultListener)listener).exceptionOccurredIfUndone(exception);
-					}
-					else
-					{
-						listener.exceptionOccurred(exception);
-					}
-	    		}
-	    		else
-	    		{
-	    			if(undone && listener instanceof IUndoneResultListener)
-					{
-						((IUndoneResultListener)listener).resultAvailableIfUndone(result);
-					}
-					else
-					{
-						listener.resultAvailable(result);
-					}
-	    		}
-				while(!list.isEmpty())
+    			if(undone && listener instanceof IUndoneResultListener)
 				{
-					Tuple2<Future<?>, IResultListener<?>>	tup	= list.remove(0);
-					Future<?> fut	= tup.getFirstEntity();
-					IResultListener<Object> lis = (IResultListener<Object>)tup.getSecondEntity();
-					if(fut.exception!=null)
-					{
-						if(fut.undone && lis instanceof IUndoneResultListener)
-						{
-							((IUndoneResultListener)lis).exceptionOccurredIfUndone(fut.exception);
-						}
-						else
-						{
-							lis.exceptionOccurred(fut.exception);
-						}
-					}
-					else
-					{
-//						int	len	= list.size();
-						if(fut.undone && lis instanceof IUndoneResultListener)
-						{
-							((IUndoneResultListener)lis).resultAvailableIfUndone(fut.result);
-						}
-						else
-						{
-							lis.resultAvailable(fut.result);
-						}
-//						System.out.println(this+": "+tup+ (list.size()>=len ? " -> "+list.subList(len, list.size()) : ""));
-					}
+					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+				}
+				else
+				{
+					listener.exceptionOccurred(exception);
 				}
     		}
-    		finally
+    		else
     		{
-    			// Make sure that stack gets removed also when exception occurs -> else no notifications would happen any more.
-    			STACK.set(null);
+    			if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+				}
+				else
+				{
+					listener.resultAvailable(result);
+				}
     		}
-    	}
-    	else
-    	{
-    		STACK.get().add(new Tuple2<Future<?>, IResultListener<?>>(this, listener));
-    	}
+		}
+	};
+    
+    /**
+     *  Get the notification command.
+     */
+    protected ICommand<IResultListener<E>>	getNotificationCommand()
+    {
+    	return notcommand;
     }
+
+//    /**
+//     *  Notify a result listener.
+//     *  @param listener The listener.
+//     */
+//    protected void notifyListenerOld(IResultListener<E> listener)
+//    {
+////		int stack	= Thread.currentThread().getStackTrace().length;
+////    	synchronized(Future.class)
+////		{
+////			stackcount++;
+////			avgstack	= (avgstack*(stackcount-1)+stack)/stackcount;
+////			if(stack>maxstack)
+////			{
+////				maxstack	= stack;
+////				System.out.println("max: "+maxstack+", avg: "+avgstack);
+//////				Thread.dumpStack();
+////			}
+////		}
+//    	
+//    	if(NO_STACK_COMPACTION || STACK.get()==null || SUtil.isGuiThread())
+//    	{
+//    		List<Tuple2<Future<?>, IResultListener<?>>>	list	= new LinkedList<Tuple2<Future<?>, IResultListener<?>>>();
+//    		STACK.set(list);
+//    		try
+//    		{
+//	    		if(exception!=null)
+//	    		{
+//	    			if(undone && listener instanceof IUndoneResultListener)
+//					{
+//						((IUndoneResultListener)listener).exceptionOccurredIfUndone(exception);
+//					}
+//					else
+//					{
+//						listener.exceptionOccurred(exception);
+//					}
+//	    		}
+//	    		else
+//	    		{
+//	    			if(undone && listener instanceof IUndoneResultListener)
+//					{
+//						((IUndoneResultListener)listener).resultAvailableIfUndone(result);
+//					}
+//					else
+//					{
+//						listener.resultAvailable(result);
+//					}
+//	    		}
+//				while(!list.isEmpty())
+//				{
+//					Tuple2<Future<?>, IResultListener<?>>	tup	= list.remove(0);
+//					Future<?> fut	= tup.getFirstEntity();
+//					IResultListener<Object> lis = (IResultListener<Object>)tup.getSecondEntity();
+//					if(fut.exception!=null)
+//					{
+//						if(fut.undone && lis instanceof IUndoneResultListener)
+//						{
+//							((IUndoneResultListener)lis).exceptionOccurredIfUndone(fut.exception);
+//						}
+//						else
+//						{
+//							lis.exceptionOccurred(fut.exception);
+//						}
+//					}
+//					else
+//					{
+////						int	len	= list.size();
+//						if(fut.undone && lis instanceof IUndoneResultListener)
+//						{
+//							((IUndoneResultListener)lis).resultAvailableIfUndone(fut.result);
+//						}
+//						else
+//						{
+//							lis.resultAvailable(fut.result);
+//						}
+////						System.out.println(this+": "+tup+ (list.size()>=len ? " -> "+list.subList(len, list.size()) : ""));
+//					}
+//				}
+//    		}
+//    		finally
+//    		{
+//    			// Make sure that stack gets removed also when exception occurs -> else no notifications would happen any more.
+//    			STACK.set(null);
+//    		}
+//    	}
+//    	else
+//    	{
+//    		STACK.get().add(new Tuple2<Future<?>, IResultListener<?>>(this, listener));
+//    	}
+//    }
     
     /**
 	 *  Send a (forward) command to the listeners.
@@ -679,76 +877,80 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	 */
 	public void sendForwardCommand(Object command)
 	{
-		if(fcommands!=null)
-		{
-			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: fcommands.entrySet())
-			{
-				IFilter<Object> fil = entry.getValue();
-				if(fil==null || fil.filter(command))
-				{
-					ICommand<Object> com = entry.getKey();
-					com.execute(command);
-				}
-			}
-		}
+//		if(fcommands!=null)
+//		{
+//			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: fcommands.entrySet())
+//			{
+//				IFilter<Object> fil = entry.getValue();
+//				if(fil==null || fil.filter(command))
+//				{
+//					ICommand<Object> com = entry.getKey();
+//					com.execute(command);
+//				}
+//			}
+//		}
 		
-		if(listener!=null)
+		scheduleNotification(new IFilter<IResultListener<E>>()
 		{
-    		notifyListenerCommand(listener, command);			
-		}
-		if(listeners!=null)
+			@Override
+			public boolean filter(IResultListener<E> obj)
+			{
+				return listener instanceof IFutureCommandResultListener;
+			}
+		}, new ICommand<IResultListener<E>>()
 		{
-	    	for(int i=0; i<listeners.size(); i++)
-	    	{
-	    		notifyListenerCommand(listeners.get(i), command);
-	    	}
-		}
+			@Override
+			public void execute(IResultListener<E> listener)
+			{
+				((IFutureCommandResultListener<?>)listener).commandAvailable(command);
+			}
+		});
 	}
 	
-	/**
-	 *  Notify the command listeners.
-	 *  @param listener The listener.
-	 *  @param command The command.
-	 */
-	protected void notifyListenerCommand(IResultListener<E> listener, Object command)
-	{
-		if(listener instanceof IFutureCommandListener)
-		{
-			((IFutureCommandListener)listener).commandAvailable(command);
-		}
-		else
-		{
-//			System.out.println("Cannot forward command: "+listener+" "+command);
-			Logger.getLogger("future").fine("Cannot forward command: "+listener+" "+command);
-		}
-	}
+//	/**
+//	 *  Notify the command listeners.
+//	 *  @param listener The listener.
+//	 *  @param command The command.
+//	 */
+//	protected void notifyListenerCommand(IResultListener<E> listener, Object command)
+//	{
+//		if(listener instanceof IFutureCommandListener)
+//		{
+//			((IFutureCommandListener)listener).commandAvailable(command);
+//		}
+//		else
+//		{
+////			System.out.println("Cannot forward command: "+listener+" "+command);
+//			Logger.getLogger("future").fine("Cannot forward command: "+listener+" "+command);
+//		}
+//	}
 	
-	/**
-	 *  Add a forward command with a filter.
-	 *  Whenever the future receives an info it will check all
-	 *  registered filters.
-	 */
-	public void addForwardCommand(IFilter<Object> filter, ICommand<Object> command)
-	{
-		if(fcommands==null)
-		{
-			fcommands = new LinkedHashMap<ICommand<Object>, IFilter<Object>>();
-		}
-		fcommands.put(command, filter);
-	}
-	
-	/**
-	 *  Add a command with a filter.
-	 *  Whenever the future receives an info it will check all
-	 *  registered filters.
-	 */
-	public void removeForwardCommand(ICommand<Object> command)
-	{
-		if(fcommands!=null)
-		{
-			fcommands.remove(command);
-		}
-	}
+//	/**
+//	 *  Add a forward command with a filter.
+//	 *  Whenever the future receives an info it will check all
+//	 *  registered filters.
+//	 */
+//	public void addForwardCommand(IFilter<Object> filter, ICommand<Object> command)
+//	{
+//		if(fcommands==null)
+//		{
+//			fcommands = new LinkedHashMap<ICommand<Object>, IFilter<Object>>();
+//		}
+//		fcommands.put(command, filter);
+//	}
+//	
+//	/**
+//	 *  Add a command with a filter.
+//	 *  Whenever the future receives an info it will check all
+//	 *  registered filters.
+//	 */
+//	public void removeForwardCommand(ICommand<Object> command)
+//	{
+//		if(fcommands!=null)
+//		{
+//			fcommands.remove(command);
+//		}
+//	}
 	
 	/**
 	 *  Check, if the future has at least one listener.

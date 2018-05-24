@@ -177,7 +177,7 @@ public class CreateComponentTask implements ITask
 					
 					public void resultAvailable(Collection<Tuple2<String, Object>> result)
 					{
-						if(result!=null)
+						if(result!=null && resultmapping!=null)
 						{
 							Map<String, Object> results = Argument.convertArguments(result);
 							for(int i=0; i<resultmapping.length/2; i++)

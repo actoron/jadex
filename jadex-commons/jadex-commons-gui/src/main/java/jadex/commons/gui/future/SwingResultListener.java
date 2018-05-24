@@ -8,7 +8,6 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
-import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
@@ -189,9 +188,9 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		if(listener instanceof IFutureCommandListener)
+		if(listener instanceof IFutureCommandResultListener)
 		{
-			((IFutureCommandListener)listener).commandAvailable(command);
+			((IFutureCommandResultListener<?>)listener).commandAvailable(command);
 		}
 		else
 		{

@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -56,12 +57,13 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.DebugException;
+import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
-import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
@@ -112,7 +114,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	protected List<ITimer> timers = new ArrayList<ITimer>();
 	
 	/** Retained listener notifications when switching threads due to blocking. */
-	protected List<Tuple2<Future<?>, IResultListener<?>>>	notifications;
+	protected Queue<Tuple3<Future<?>, IResultListener<?>, ICommand<IResultListener<?>>>>	notifications;
 	
 	/** Flag for testing double execution. */
 	protected volatile boolean executing;

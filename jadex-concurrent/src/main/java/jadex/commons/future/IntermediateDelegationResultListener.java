@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  * Intermediate version of the delegation result listener.
  */
-public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IFutureCommandListener, IUndoneIntermediateResultListener<E>
+public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IFutureCommandResultListener<Collection<E>>, IUndoneIntermediateResultListener<E>
 {
 	// -------- attributes --------
 
@@ -305,9 +305,9 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void commandAvailable(Object command)
 	{
-		if(delegate instanceof IFutureCommandListener)
+		if(delegate instanceof IFutureCommandResultListener)
 		{
-			((IFutureCommandListener)delegate).commandAvailable(command);
+			((IFutureCommandResultListener<?>)delegate).commandAvailable(command);
 		}
 		if(future instanceof IForwardCommandFuture)
 		{

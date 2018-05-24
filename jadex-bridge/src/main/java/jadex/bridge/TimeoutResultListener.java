@@ -15,7 +15,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IFutureCommandListener;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
 
@@ -24,7 +24,7 @@ import jadex.commons.future.IUndoneResultListener;
  *  Listener that allows to automatically trigger a timeout when
  *  no result (or exception) was received after some timeout interval.
  */
-public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>, IFutureCommandListener
+public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>, IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -341,9 +341,9 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		if(IForwardCommandFuture.Type.UPDATETIMER.equals(command))
 			initTimer();
 		
-		if(listener instanceof IFutureCommandListener)
+		if(listener instanceof IFutureCommandResultListener)
 		{
-			((IFutureCommandListener)listener).commandAvailable(command);
+			((IFutureCommandResultListener<?>)listener).commandAvailable(command);
 		}
 		else
 		{

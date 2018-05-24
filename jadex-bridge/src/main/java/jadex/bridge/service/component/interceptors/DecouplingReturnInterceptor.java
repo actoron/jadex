@@ -1,6 +1,5 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.util.Collection;
 import java.util.logging.Logger;
 
 import jadex.bridge.ComponentTerminatedException;
@@ -64,19 +63,19 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 					FutureFunctionality func = new FutureFunctionality(caller!=null ? caller.getLogger() : (Logger)null)
 					{
 						@Override
-						public void scheduleForward(final ICommand<Void> com)
+						public <T> void scheduleForward(final ICommand<T> com, final T args)
 						{
 							// Don't reschedule if already on correct thread.
 							if(caller==null || caller.getComponentFeature(IExecutionFeature.class).isComponentThread())
 							{
-								com.execute(null);
+								com.execute(args);
 							}
 							else if (caller.getComponentDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
 									&& sic.getMethod().getName().equals("destroyComponent")
 									&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0))) 
 							{
 								// do not try to reschedule if component killed itself and is already terminated to allow passing results to the original caller.
-								com.execute(null);
+								com.execute(args);
 							}
 							else
 							{
@@ -86,7 +85,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											com.execute(null);
+											com.execute(args);
 											return IFuture.DONE;
 										}
 									}).addResultListener(new IResultListener<Void>()

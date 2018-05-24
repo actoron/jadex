@@ -1,9 +1,7 @@
 package jadex.micro.testcases.longcall;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
@@ -162,18 +160,18 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
-		final IntermediateFuture<TestReport> res = new IntermediateFuture<TestReport>();
-		
-		ret.addResultListener(new IntermediateDelegationResultListener<TestReport>(res)
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				TestReport tr = new TestReport("#"+testno, "Tests if a long running call works.");
-				tr.setFailed(exception);
-				List<TestReport> li = new ArrayList<TestReport>();
-				super.resultAvailable(li);
-			}
-		});
+//		final IntermediateFuture<TestReport> res = new IntermediateFuture<TestReport>();
+//		
+//		ret.addResultListener(new IntermediateDelegationResultListener<TestReport>(res)
+//		{
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				TestReport tr = new TestReport("#"+testno, "Tests if a long running call works.");
+//				tr.setFailed(exception);
+//				List<TestReport> li = new ArrayList<TestReport>();
+//				super.resultAvailable(li);
+//			}
+//		});
 		
 		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
 		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
@@ -184,7 +182,16 @@ public class LongcallTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				callServices(cid, testno, -1).addResultListener(new IntermediateDelegationResultListener<TestReport>(ret));
+				callServices(cid, testno, -1).addResultListener(new IntermediateDelegationResultListener<TestReport>(ret)
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						TestReport tr = new TestReport("#"+testno, "Tests if a long running call works.");
+						tr.setFailed(exception);
+						super.intermediateResultAvailable(tr);
+						super.finished();
+					}
+				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -194,7 +201,7 @@ public class LongcallTestAgent extends TestAgent
 			}
 		});
 		
-		return res;
+		return ret;
 	}
 	
 	/**

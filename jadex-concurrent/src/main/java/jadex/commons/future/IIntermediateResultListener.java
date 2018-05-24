@@ -7,7 +7,7 @@ import java.util.Collection;
  *  Result listener with additional notifications in case of intermediate results.
  */
 //@Reference
-public interface IIntermediateResultListener<E> extends IResultListener<Collection <E>>, IFunctionalIntermediateFinishedListener, IFunctionalIntermediateResultListener<E>
+public interface IIntermediateResultListener<E> extends IResultListener<Collection<E>>, IFunctionalIntermediateFinishedListener<E>, IFunctionalIntermediateResultListener<E>
 {
 	/**
 	 *  Called when the result is available.
