@@ -145,7 +145,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	else
 	    	{
 	    		addResult(result);
-	    		notify	= scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
+	    		notify	= true;
+	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 				{
 	    			@Override
 	    			public void execute(IResultListener<Collection<E>> listener)
@@ -264,8 +265,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	synchronized(this)
     	{
     		// If results==null its a subscription future and first results are already collected.
-    		if(results!=null && intermediate && listener instanceof IIntermediateResultListener)
+    		if(results!=null && !results.isEmpty() && intermediate && listener instanceof IIntermediateResultListener)
     		{
+    			scheduled	= true;
 	    		IIntermediateResultListener<E>	lis	= (IIntermediateResultListener<E>)listener;
 	    		for(final E result: results)
 	    		{
@@ -279,7 +281,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    					notifyIntermediateResult(listener, result);
 	    				}
 					}); 
-	    			scheduled	= scheduleNotification(lis, c) || scheduled;
+	    			scheduleNotification(lis, c);
 	    		}
     		}
     	}

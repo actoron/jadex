@@ -16,6 +16,7 @@ public abstract class FutureHelper
 	 */
 	public static void	notifyStackedListeners()
 	{
+		Future.NOTIFYING.remove();	// force new loop even when in outer notification loop
 		new Future<Void>().startScheduledNotifications();
 	}
 	
