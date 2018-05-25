@@ -52,7 +52,8 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	 */
 	public void suspend(Future<?> future, long timeout, boolean realtime)
 	{
-//		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
+//		if(agent.toString().indexOf("IntermediateBlockingTest@")!=-1)
+//			System.err.println("ComponentSuspendable.suspend "+agent);
 		
 		if(timeout==Timeout.UNSET)
 			timeout = getDefaultTimeout();
@@ -85,10 +86,8 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 //			}
 			finally
 			{
-//				if(agent.toString().indexOf("Leaker")!=-1)
-//				{
-//					System.out.println("ComponentSuspendable.unsuspend 3"+Thread.currentThread());
-//				}
+//				if(agent.toString().indexOf("IntermediateBlockingTest@")!=-1)
+//					System.err.println("ComponentSuspendable.unsuspend "+agent);
 				afterSwitch();
 				this.future	= null;
 			}

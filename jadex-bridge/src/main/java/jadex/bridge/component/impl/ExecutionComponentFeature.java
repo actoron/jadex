@@ -865,8 +865,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		else
 		{
 			// Retain listener notifications for new component thread.
-			assert notifications==null;
+			assert notifications==null : getComponent()+", "+IComponentIdentifier.LOCAL.get();
 			notifications	= FutureHelper.removeStackedListeners();
+//			if(notifications!=null && getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+//				System.err.println("setting notifications: "+getComponent());
 			
 			Executor	exe	= Executor.EXECUTOR.get();
 			if(exe==null)
@@ -952,6 +954,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				this.componentthread	= Thread.currentThread();
 				
 				afterBlock();
+				
+				// If no other thread for component in mean time, maybe there are notifications left -> readd
+				if(notifications!=null)
+				{
+//					if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+//						System.err.println("unsetting notifications2: "+getComponent());
+					FutureHelper.addStackedListeners(notifications);
+					notifications	= null;
+				}
 			}
 		}
 	}
@@ -1038,6 +1049,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			boolean notifexecuted	= false;
 			if(notifications!=null)
 			{
+//				if(getComponent().toString().indexOf("IntermediateBlockingTest@")!=-1)
+//					System.err.println("unsetting notifications: "+getComponent());
 				FutureHelper.addStackedListeners(notifications);
 				notifications	= null;
 				
