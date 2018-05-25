@@ -233,11 +233,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			ret = method.invoke(ser, args);
 		}
-//		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
-//		{
-//			System.out.println("hashcode on proxy: "+proxy);
-//			ret	= hashCode();
-//		}
+		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
+		{
+//			System.out.println("hashcode on proxy: "+getServiceIdentifier().toString());
+			ret	= hashCode();
+		}
+		else if((args==null || args.length==0) && "toString".equals(method.getName()))
+		{
+//			System.out.println("hashcode on proxy: "+getServiceIdentifier().toString());
+			ret	= toString();
+		}
 		else
 		{
 			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, getInterceptors(), 
