@@ -45,8 +45,10 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
@@ -64,6 +66,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.ILeaseTimeSet;
 import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
@@ -250,6 +253,29 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
+    	if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+    	{
+    		component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			{
+    			@Override
+    			public IFuture<Void> execute(IInternalAccess ia)
+    			{
+    				try
+    				{
+    					handleRequest(service, mappings, request, response, others);
+        				return IFuture.DONE;
+    				}
+    				catch(Exception e)
+    				{
+    					return new Future<Void>(e);
+    				}
+    			}
+			}).get();	// Hack??? should not be other component thread
+    		return;
+    	}
+    		
+//		System.out.println("handleRequest: "+Thread.currentThread());
+		
     	// In case the call comes from an internally started server async is not already set
     	// In case the call comes from an external web server it has to set the async in oder
     	// to let the call wait for async processing
@@ -315,7 +341,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         	}
         	
         	// Exception in mean time?
-        	if(rinfo.getException()!=null)
+        	else if(rinfo.getException()!=null)
         	{
 				Object	result = mapResult(rinfo.getMappingInfo().getMethod(), rinfo.getException());
         		writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true);
@@ -367,12 +393,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     {
                     	AsyncContext ctx = getAsyncContext(request);
                     	final String fcallid = SUtil.createUniqueId(methodname);
+//                		System.out.println("sav2");
                     	saveRequestContext(fcallid, ctx);
                     	final RequestInfo	rinfo	= new RequestInfo(mi);	
                     	requestinfos.put(fcallid, rinfo);
 //                    	System.out.println("added context: "+fcallid+" "+ctx);
                     	
-                    	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(new IIntermediateFutureCommandResultListener<Object>()
+                    	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(
+                    		component.getComponentFeature(IExecutionFeature.class).createResultListener(
+                    		new IIntermediateFutureCommandResultListener<Object>()
 						{
                     		public void resultAvailable(Collection<Object> result)
                     		{
@@ -411,7 +440,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	     */
                     	    protected void handleResult(Object result, Throwable exception, Object command)
                     	    {
-                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command);
+//                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command+", "+Thread.currentThread());
                     	    	
                     	    	if(rinfo.isTerminated())
                     	    	{
@@ -454,12 +483,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     				// Only check timeout when future not yet finished.
                     				if(!FINISHED.equals(result) && exception==null)
                     				{
-				        				System.out.println("checking "+result);
+//				        				System.out.println("checking "+result);
 				        				// if timeout -> cancel future.
 				        				// TODO: which timeout? (client vs server).
 				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getRemoteDefaultTimeout(component.getComponentIdentifier()))
 				        				{
-				        					System.out.println("terminating "+result);
+//				        					System.out.println("terminating "+result);
 				        					rinfo.setTerminated();
 				        					if(ret instanceof ITerminableFuture<?>)
 				        					{
@@ -487,8 +516,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     				
                     				//else nop (no need to store timer updates). what about other commands?
                     			}
+//    	        				System.out.println("handleResult exit");
                     	    }
-						});
+						}));
                     }
                     else if(ret instanceof IFuture)
                     {
@@ -496,10 +526,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	
                     	// todo: use timeout listener
                     	// TODO: allow also longcalls (requires intermediate command responses -> use only when requested by browser?)
-                    	((IFuture)ret).addResultListener(new IResultListener<Object>()
+                    	((IFuture)ret).addResultListener(
+                    		component.getComponentFeature(IExecutionFeature.class).createResultListener(
+                    		new IResultListener<Object>()
 						{
                     		public void resultAvailable(Object ret)
                     		{
+//        	                    System.out.println("one-shot call: "+method.getName()+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service+" "+Arrays.toString(params));
                     			ret = mapResult(method, ret);
                     			writeResponse(ret, null, mi, request, response, true);
 //                    			ctx.complete();
@@ -511,7 +544,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     			writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, mi, request, response, true);
 //                    			ctx.complete();
                     		}
-						});
+						}));
 //                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
                     }
                     else
@@ -525,6 +558,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 }
                 catch(Exception e)
                 {
+//                    System.out.println("call exception: "+e);
                 	writeResponse(e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), null, null, request, response, true);
                 }
             }
@@ -541,6 +575,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 complete(request, response);
             }
         }
+//		System.out.println("handleRequest exit");
     }    
     
     /**
@@ -920,7 +955,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     */
    protected void writeResponse(Object result, int status, String callid, MappingInfo mi, HttpServletRequest request, HttpServletResponse response, boolean fin) 
    {
-	   System.out.println("writeResponse: "+result+", "+status+", "+callid);
+//	   System.out.println("writeResponse: "+result+", "+status+", "+callid);
 	   // Only write response on first exception
 	   if(isComplete(request, response))
 		   return;
@@ -1135,6 +1170,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     protected void saveRequestContext(String callid, AsyncContext ctx)
     {
+//    	System.out.println("saveRequest: "+ctx);
   		requestspercall.add(callid, ctx);
 		
 		// Set individual time if is contained in request
