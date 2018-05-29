@@ -1,3 +1,5 @@
+/* -------- original styles from activecomponent.org -------- */
+
 body {
 	font-family: Open Sans;
   	font-size: 14px;
@@ -167,9 +169,30 @@ table {
 }
 
 
-/* -------- custom styles -------- */
+/* -------- custom styles for runtimetools-web -------- */
 
 /* grey out disconnected platforms. */
 .connecting {
 	color: graytext;
+}
+
+/* Display icon for broken connection. */
+.down {
+	position: relative;
+}
+.down::after {
+	/* grey out */
+	content: "";
+	position: absolute;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    height: 100%;
+	
+	/* https://www.iconfinder.com/icons/2124469/app_essential_global_network_ui_icon */
+	/* Changed SVG view box for smaller centered appearance and circle (x) to red. */
+	background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pjxzdmcgdmlld0JveD0iLTMyIC0zMiA5NiA5NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6bm9uZTtzdHJva2U6IzAwMDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLXdpZHRoOjJweDt9LnJlZHtzdHJva2U6I0ZGMDAwMH08L3N0eWxlPjwvZGVmcz48dGl0bGUvPjxnIGNsYXNzPSJjbHMtMSI+PHBhdGggZD0iTTE2LDMxQTE1LDE1LDAsMSwxLDMxLDE2Ii8+PGxpbmUgeDE9IjE2IiB4Mj0iMTYiIHkxPSIxIiB5Mj0iMTMiLz48bGluZSB4MT0iMjQiIHgyPSIyNCIgeTE9IjMiIHkyPSIxMiIvPjxsaW5lIHgxPSI4IiB4Mj0iOCIgeTE9IjMiIHkyPSIyOSIvPjxsaW5lIHgxPSIxIiB4Mj0iMTQiIHkxPSIxNiIgeTI9IjE2Ii8+PGxpbmUgeDE9IjMiIHgyPSIyOSIgeTE9IjkiIHkyPSI5Ii8+PGxpbmUgeDE9IjMiIHgyPSIxMiIgeTE9IjIzIiB5Mj0iMjMiLz48Y2lyY2xlIGNsYXNzPSJyZWQiIGN4PSIyMyIgY3k9IjIzIiByPSI4Ii8+PGxpbmUgY2xhc3M9InJlZCIgeDE9IjIwIiB4Mj0iMjYiIHkxPSIyMCIgeTI9IjI2Ii8+PGxpbmUgY2xhc3M9InJlZCIgeDE9IjI2IiB4Mj0iMjAiIHkxPSIyMCIgeTI9IjI2Ii8+PC9nPjwvc3ZnPg==');
+    background-size: 50%; 
+    background-repeat: no-repeat;
+    background-position: center;
+    bottom: 0px;
 }
