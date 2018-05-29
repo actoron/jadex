@@ -25,13 +25,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 26
     buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "org.activecomponents.jadex.android.example"
-        minSdkVersion 16
-        targetSdkVersion 16
+        minSdkVersion 21
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -61,8 +61,8 @@ def jadex_version = '${jadex_build_version}'
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api 'com.android.support:appcompat-v7:21.0.2'
-    api 'com.android.support:multidex:1.0.1' // For minSdkVersion 20 or lower, this is required for multidex
+    api 'com.android.support:appcompat-v7:26.1.0'
+//    api 'com.android.support:multidex:1.0.1' // For minSdkVersion 20 or lower, this is required for multidex
 
     api 'org.activecomponents.jadex:jadex-platform-android:' + jadex_version
     api 'org.activecomponents.jadex:jadex-kernel-bpmn:' + jadex_version
