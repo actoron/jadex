@@ -4,6 +4,7 @@ quicktest:
     - master
   variables:
     GIT_STRATEGY: fetch
+    GIT_DEPTH: "1"
   script:
     - gradlew -Pdist=publishdists clean build test -x javadoc --info --stacktrace --no-daemon
   tags:
