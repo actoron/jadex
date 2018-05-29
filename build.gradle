@@ -120,14 +120,16 @@ subprojects
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
 
     ext.libraries = [
-            android_support: "com.android.support:support-v4:23.1.0",
-            android_compat: "com.android.support:appcompat-v7:23.1.0",
-            android: 'com.google.android:android:2.2.1',
-            android_test: "com.google.android:android-test:2.2.1",
+            android_support: "com.android.support:support-v4:26.1.0",
+            android_compat: "com.android.support:appcompat-v7:26.1.0",
+			// this is only useful if android plugin is NOT used by a project (lib):
+            android: 'com.google.android:android:4.1.1.4',
+			android_test: "com.android.support.test:runner:1.0.2",
+//            android_test: "com.google.android:android-test:2.2.1",
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
-            robotium: 'com.jayway.android.robotium:robotium-solo:3.3',
-            robolectric: 'org.robolectric:robolectric:3.8'
+            robotium: 'com.jayway.android.robotium:robotium-solo:5.6.3',
+            robolectric: 'org.robolectric:robolectric:3.6.1'
     ]
 
 	configurations {
@@ -148,7 +150,7 @@ subprojects
 //				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
 //						version: "$project.version.major.$project.version.minor.+"
 				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-						version: "4.0.6"
+						version: "4.0.22"
 			}
 		}
 		
