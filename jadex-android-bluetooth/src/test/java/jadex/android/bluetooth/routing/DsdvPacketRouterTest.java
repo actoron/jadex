@@ -25,13 +25,18 @@ public class DsdvPacketRouterTest extends PacketRouterTest {
 		
 		connectPacketRouters(packetRouter1, packetRouter2);
 		connectPacketRouters(packetRouter2, packetRouter1);
-		
-		Thread.sleep(ConfigInfo.periodicRouteBroadcastIncremental*2);
+
+		packetRouter1.forceBroadcast();
+		packetRouter2.forceBroadcast();
+//		Thread.sleep(ConfigInfo.periodicRouteBroadcastIncremental*2);
 		
 		packetRouter1.setPacketSender(null);
 		packetRouter2.setPacketSender(null);
+
+		packetRouter1.forceDeleteStale();
+		packetRouter2.forceDeleteStale();
 		
-		Thread.sleep(ConfigInfo.deleteRouteStaleRoute + 1000);
+//		Thread.sleep(ConfigInfo.deleteRouteStaleRoute + 1000);
 		assertTrue(packetRouter2.getReachableDeviceAddresses().isEmpty());
 	}
 	

@@ -194,7 +194,7 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 	 * Sends the supplied routes to all neighbors, used to send incremental
 	 * updates as well as immediate changes
 	 * 
-	 * @param Vector
+	 * @param Vector<RoutingTableEntryWrapper> routes
 	 *            routes The vector of RoutingTableEntryWrapper objects to be
 	 *            sent
 	 */
@@ -534,6 +534,16 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 		Vector<String> neighbours = routeTable.getNeighborAddresses();
 		result.addAll(neighbours);
 		return result;
+	}
+
+	@Override
+	public void forceBroadcast() {
+		broadcaster.broadcastRoute();
+	}
+
+	@Override
+	public void forceDeleteStale() {
+		// no action?
 	}
 
 	@Override

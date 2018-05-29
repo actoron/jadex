@@ -191,6 +191,16 @@ public class FloodingPacketRouter extends AbstractPacketRouter implements IPacke
 	}
 
 	@Override
+	public void forceBroadcast() {
+		// no action required
+	}
+
+	@Override
+	public void forceDeleteStale() {
+		// no action required ??
+	}
+
+	@Override
 	public void start() {
 	}
 
