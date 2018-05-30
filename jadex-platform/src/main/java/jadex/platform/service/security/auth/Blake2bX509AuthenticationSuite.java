@@ -1,10 +1,6 @@
 package jadex.platform.service.security.auth;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.math.BigInteger;
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,25 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.agreement.jpake.JPAKERound1Payload;
 import org.bouncycastle.crypto.agreement.jpake.JPAKERound2Payload;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.Pack;
-import org.bouncycastle.util.io.pem.PemObject;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.SSecurity;
-import jadex.commons.security.random.ChaCha20Random;
 import jadex.platform.service.security.SecurityAgent;
-import net.i2p.crypto.eddsa.EdDSAEngine;
-import net.i2p.crypto.eddsa.KeyPairGenerator;
 
 /**
  *  Symmetric authentication based on Blake2b MACs.

@@ -10,7 +10,11 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Provider.Service;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -86,6 +90,7 @@ import org.bouncycastle.util.io.pem.PemReader;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.random.SecureThreadedRandom;
+import sun.security.jca.Providers;
 
 
 /**
@@ -124,6 +129,50 @@ public class SSecurity
 					else
 						SECURE_RANDOM = generateSecureRandom();
 				}
+				
+				if (Security.getProvider("Jadex") == null)
+				{
+					Security.insertProviderAt(new Provider("Jadex", 1.0, "")
+					{
+						{
+							putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.security.JadexSecureRandomSpi", null, null));
+						}
+						private static final long serialVersionUID = -3208767101511459503L;
+						
+					}, 1);
+				}
+				
+				// Attempt to overwrite UUID secure random.
+//				try
+//				{
+//					Class<?>[] cls = UUID.class.getDeclaredClasses();
+//					Class<?> holdercl = null;
+//					if (cls != null)
+//					{
+//						for (Class<?> cl : cls)
+//						{
+//							if ("java.util.UUID.Holder".equals(cl.getCanonicalName()))
+//							{
+//								holdercl = cl;
+//								break;
+//							}
+//						}
+//					}
+//					
+//					if (holdercl != null)
+//					{
+//						Field prngfield = holdercl.getDeclaredField("numberGenerator");
+//						VmHacks.get().setAccessible(prngfield, true);
+//						Field modifiersfield = Field.class.getDeclaredField("modifiers");
+//						VmHacks.get().setAccessible(modifiersfield, true);
+//						modifiersfield.setInt(prngfield, prngfield.getModifiers() & ~Modifier.FINAL);
+//						prngfield.set(null, SECURE_RANDOM);
+//					}
+//					
+//				}
+//				catch (Exception e)
+//				{
+//				}
 			}
 		}
 		return SECURE_RANDOM;
@@ -766,7 +815,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(new SecureRandom());
+		prngs.add(getDefaultSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
@@ -1106,6 +1155,34 @@ public class SSecurity
 			return obj.toASN1Primitive().getEncoded(ASN1Encoding.DER);
 		}
 		catch (IOException e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
+	 *  Creates default algorithm secure random.
+	 */
+	private static final SecureRandom getDefaultSecureRandom()
+	{
+		Provider p = Providers.getSunProvider();
+		String alg = "SHA1PRNG";
+		if (p != null)
+		{
+			for (Service serv : p.getServices())
+			{
+	            if (serv.getType().equals("SecureRandom"))
+	            {
+	                alg = serv.getAlgorithm();
+	                break;
+	            }
+	        }
+		}
+		try
+		{
+			return SecureRandom.getInstance(alg);
+		}
+		catch (NoSuchAlgorithmException e)
 		{
 			throw SUtil.throwUnchecked(e);
 		}
