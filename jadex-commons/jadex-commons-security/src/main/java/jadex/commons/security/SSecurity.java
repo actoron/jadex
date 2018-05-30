@@ -1165,8 +1165,8 @@ public class SSecurity
 	 */
 	private static final SecureRandom getDefaultSecureRandom()
 	{
-		Provider p = Providers.getSunProvider();
 		String alg = "SHA1PRNG";
+		Provider p = Security.getProvider("SUN");
 		if (p != null)
 		{
 			for (Service serv : p.getServices())
