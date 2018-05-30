@@ -1,13 +1,12 @@
 package jadex.bridge.service.types.pawareness;
 
-import java.util.Collection;
+import java.util.List;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Locate other platforms without polling.
@@ -27,11 +26,12 @@ public interface IPassiveAwarenessService
 	 *  @param platformid The platform ID.
 	 *  @return The transport addresses or null if not available.
 	 */
-	public IFuture<Collection<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid);
+	public IFuture<List<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid);
 	
-	/**
-	 *  Immediately return known platforms and continuously publish newly found platforms.
-	 *  Does no active searching.
-	 */
-	public ISubscriptionIntermediateFuture<IComponentIdentifier>	subscribeToNewPlatforms();
+//	/**
+//	 *  Immediately return known platforms and continuously publish newly found platforms.
+//	 *  Does no active searching.
+//	 */
+//	// currently unused.
+//	public ISubscriptionIntermediateFuture<IComponentIdentifier>	subscribeToNewPlatforms();
 }

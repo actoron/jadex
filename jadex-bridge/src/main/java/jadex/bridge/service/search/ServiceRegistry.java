@@ -2260,7 +2260,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println(cid + " searched remote platform: "+platform+", "+exception);
+//								System.out.println(cid + " searched remote platform: "+platform+", "+exception);
 								doFinished();
 							}
 						});

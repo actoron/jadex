@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -96,6 +97,7 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 	{
 		if(search == null)
 		{
+			System.out.println("New search");
 			search = new IntermediateFuture<IComponentIdentifier>();
 
 			// Add initial results
@@ -103,7 +105,6 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 			{
 				search.addIntermediateResult(platform);
 			}
-
 			// issue search request to trigger replies from platforms
 			sendInfo(null).addResultListener(new IResultListener<Void>()
 			{
@@ -111,7 +112,9 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 				public void resultAvailable(Void result)
 				{
 					// TODO: timeout from service call
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500, true).addResultListener(new IResultListener<Void>()
+					agent.getComponentFeature(IExecutionFeature.class)
+						.waitForDelay(Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier()), true)
+						.addResultListener(new IResultListener<Void>()
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
@@ -136,6 +139,10 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 					search = null;
 				}
 			});
+		}
+		else
+		{
+			System.out.println("old search");
 		}
 
 		return search;
@@ -169,9 +176,8 @@ public abstract class PassiveAwarenessBaseAgent implements IPassiveAwarenessServ
 	protected void discovered(final Collection<TransportAddress> addresses, final Object source)
 	{
 		// Ignore my own addresses.
-		// TODO: what if data source and platform(s) of addresses differ (e.g.
-		// no point-to-point awareness)
-		if(addresses != null && !addresses.isEmpty() && !agent.getComponentIdentifier().getRoot().equals(addresses.iterator().next().getPlatformId()))
+		// TODO: what if data source and platform(s) of addresses differ (e.g. no point-to-point awareness)
+		if(addresses!=null && !addresses.isEmpty() && !agent.getComponentIdentifier().getRoot().equals(addresses.iterator().next().getPlatformId()))
 		{
 			agent.getLogger().info("discovered: " + addresses);
 			agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()

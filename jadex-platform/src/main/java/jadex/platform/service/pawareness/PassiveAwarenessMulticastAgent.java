@@ -111,10 +111,10 @@ public class PassiveAwarenessMulticastAgent	extends PassiveAwarenessBaseAgent
 	 *  @param platformid The platform ID.
 	 *  @return The transport addresses or null if not available.
 	 */
-	public IFuture<Collection<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid)
+	public IFuture<List<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid)
 	{
 		// TODO: Implement
-		return new Future<Collection<TransportAddress>>(new UnsupportedOperationException("Unimplemented for multicast."));
+		return new Future<List<TransportAddress>>(new UnsupportedOperationException("Unimplemented for multicast."));
 	}
 	
 	//-------- helper classes --------

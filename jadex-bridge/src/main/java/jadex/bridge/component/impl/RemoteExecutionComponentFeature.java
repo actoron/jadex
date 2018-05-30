@@ -598,7 +598,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			
 			if(!trusted)
 			{
-				System.out.println("Untrusted command not executed: "+msg);
+				getComponent().getLogger().info("Untrusted command not executed: "+msg);
 			}
 //			else
 //			{
