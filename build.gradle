@@ -134,7 +134,7 @@ subprojects
 
 	configurations {
 		// apiNoAndroidRuntime will exclude the artifact in Android APKs
-		runtimeAndroid.extendsFrom runtime
+		runtimeAndroid.extendsFrom runtimeElements
 		apiNoAndroidRuntime {
 			dependencies.all { dep ->
 				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
