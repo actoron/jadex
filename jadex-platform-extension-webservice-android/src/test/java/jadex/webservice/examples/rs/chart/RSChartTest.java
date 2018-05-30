@@ -30,6 +30,8 @@ public class RSChartTest
 	@Before
 	public void setUp() throws Exception
 	{
+		System.setProperty("jadex_timeout", "120000");	// Slow response from google sometimes!?
+
 		System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_GCM_SHA256");	// Hack: workaround for java 8 problem with ECDH key exchange
 		System.setProperty("javax.net.debug", "all");	// Hack: workaround for java 8 problem with ECDH key exchange
 		new SReflectSub().setIsAndroid(true, true);
