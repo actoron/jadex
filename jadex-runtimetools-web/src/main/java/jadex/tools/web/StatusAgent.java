@@ -62,7 +62,13 @@ public class StatusAgent implements IStatusService
 	protected IFuture<Void>	setup()
 	{
 		IWebPublishService	wps	= SServiceProvider.getLocalService(agent, IWebPublishService.class);
-		return wps.publishResources("[http://localhost:8081/]", SReflect.getPackageName(getClass()).replace(".", "/")+"/static_content");
+		FutureBarrier<Void>	fubar	= new FutureBarrier<>();
+		fubar.addFuture(wps.publishResources("[http://localhost:8081/]", SReflect.getPackageName(getClass()).replace(".", "/")+"/static_content"));
+		
+		// Hack!!! Should be possible to publish all META-INF/resources at once (cf. servlet spec). 
+		fubar.addFuture(wps.publishResources("[http://localhost:8081/]", "META-INF/resources"));
+		
+		return fubar.waitFor();
 	}
 	
 	@Override

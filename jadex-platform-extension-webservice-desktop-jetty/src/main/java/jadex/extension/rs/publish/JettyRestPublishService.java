@@ -15,7 +15,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.resource.Resource;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
@@ -275,7 +274,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
 			            		super.doHandle(target, baseRequest, request, response);
 			            	}
 			            };
-			            ch.setBaseResource(Resource.newClassPathResource(rootpath));
+//			            ch.setBaseResource(Resource.newClassPathResource(rootpath));
+			            ch.setBaseResource(new UniversalClasspathResource(rootpath));
 			            ch.setHandler(rh);
 			            ch.setContextPath(uri.getPath());
 			            collhandler.addHandler(ch);
