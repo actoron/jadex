@@ -72,7 +72,7 @@ public class DuplicateRemovalIntermediateResultListener<E> extends IntermediateD
 	{
 		if(filter.add(objectToByteArray(result)))
 		{
-			System.out.println("addfil: "+result+" "+filter.hashCode());
+//			System.out.println("addfil: "+result+" "+filter.hashCode());
 			super.customIntermediateResultAvailable(result);
 		}
 //		else

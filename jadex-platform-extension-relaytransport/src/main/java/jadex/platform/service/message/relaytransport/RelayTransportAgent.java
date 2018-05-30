@@ -185,7 +185,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	{
 		this.cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
 		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
-		System.out.println("Started relay transport");
+		if (debug)
+			System.out.println("Started relay transport");
 		Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		
 		maxhops = SConfigParser.getIntValue(args.get(PROPERTY_MAX_HOPS), maxhops);
