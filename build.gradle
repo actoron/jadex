@@ -587,7 +587,7 @@ def createDistZip(distname, arts, isaddon)
 						zipfileset dir: spbdir + '/libs', prefix: foldername + '/lib/', includes: '*.jar', excludes: '*-sources.jar,*-javadoc.jar,jadex-distribution-*.jar,*-test.jar', erroronmissingdir: false
 
 						// copy all runtime deps:
-						def runtimeConfig = sp.configurations.runtime
+						def runtimeConfig = sp.configurations.runtimeElements	// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
 						if (distname.contains('android')) {
 							runtimeConfig = sp.configurations.runtimeAndroid
 						}
