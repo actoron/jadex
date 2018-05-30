@@ -196,10 +196,11 @@ public class SSecurity
 //						protected long bcount = 0;
 						
 						/** Input stream for POSIX-like systems. */
-						protected InputStream urandomis;
+						protected File urandom;
 						
 						{
-							File urandom = new File("/dev/urandom");
+							urandom = new File("/dev/urandom");
+							FileInputStream urandomis = null;
 							if (urandom.exists())
 							{
 								try
@@ -208,11 +209,24 @@ public class SSecurity
 								}
 								catch (Exception e)
 								{
-									SUtil.close(urandomis);
+									urandom = null;
+								}
+								finally
+								{
+									if (urandomis != null)
+									{
+										try
+										{
+											urandomis.close();
+										}
+										catch (Exception e)
+										{
+										}
+									}
 								}
 							}
 							
-							if (urandomis == null)
+							if (urandom == null)
 							{
 								urandom = new File("/dev/random");
 								if (urandom.exists())
@@ -223,7 +237,20 @@ public class SSecurity
 									}
 									catch (Exception e)
 									{
-										SUtil.close(urandomis);
+										urandom = null;
+									}
+									finally
+									{
+										if (urandomis != null)
+										{
+											try
+											{
+												urandomis.close();
+											}
+											catch (Exception e)
+											{
+											}
+										}
 									}
 								}
 							}
@@ -235,19 +262,39 @@ public class SSecurity
 //							System.out.println("Entropy bytes: " + bcount);
 							boolean noseed = true;
 							boolean urandomworked = false;
-							if (urandomis != null)
+							if (urandom != null)
 							{
+								FileInputStream urandomis = null;
 								try
 								{
-									SUtil.readStream(ret, urandomis);
+									urandomis = new FileInputStream(urandom);
+									int read = 0;
+									int off = 0;
+									while (read < ret.length)
+									{
+										read = urandomis.read(ret, off, ret.length - read);
+										off += read;
+									}
+									
 									noseed = false;
 									urandomworked = true;
 								}
 								catch (Exception e)
 								{
+									urandom = null;
+								}
+								finally
+								{
 									if (urandomis != null)
-										SUtil.close(urandomis);
-									urandomis = null;
+									{
+										try
+										{
+											urandomis.close();
+										}
+										catch (Exception e)
+										{
+										}
+									}
 								}
 							}
 							
@@ -296,12 +343,6 @@ public class SSecurity
 									xor(ret, addent);
 								}
 							}
-						}
-						
-						protected void finalize() throws Throwable
-						{
-							if (urandomis != null)
-								SUtil.close(urandomis);
 						}
 					};
 					
@@ -1193,5 +1234,7 @@ public class SSecurity
 	 */
 	public static void main(String[] args)
 	{
+		getSecureRandom();
+//		SecureRandom sec = new SecureRandom();
 	}
 }
