@@ -413,7 +413,8 @@ subprojects
 								}
 							}
 						}
-						root.children().last() + pomConfig
+						root.children().last() + pomConfig.common
+						root.children().last() + pomConfig.gpl
 					}
 				}
 			}

@@ -361,8 +361,8 @@ def addSourcesJarTask(Project p) {
     }
 }
 
-class Config {
-    static def pomConfig = {
+class PomConfig {
+    static def common = {
         scm {
             url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
         }
@@ -413,10 +413,23 @@ class Config {
                 organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
             }
         }
+
+    }
+
+    static def gpl = {
         licenses {
             license {
-                name "GPL-3.0"
-                url "https://gnu.org/licenses/gpl-3.0"
+                name 'GPL-3.0'
+                url 'https://gnu.org/licenses/gpl-3.0'
+                distribution 'repo'
+            }
+        }
+    }
+
+    static def commercial = {
+        licenses {
+            license {
+                name 'Actoron GmbH Commercial Licence'
             }
         }
     }
@@ -433,29 +446,11 @@ void configurePomMetadata(Task uploadTask) {
                 def root = asNode()
                 root.appendNode('name', uploadTask.project.name)
                 root.appendNode('description', uploadTask.project.description)
-                root.children().last() + Config.pomConfig
-            }
-        }
-    }
-    if (isCommercial(uploadTask.project)) {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.project {
-                licenses {
-                    license {
-                        name 'Actoron GmbH Commercial Licence'
-                    }
-                }
-            }
-        }
-    } else {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.project {
-                licenses {
-                    license {
-                        name 'GNU GENERAL PUBLIC LICENSE Version 3 or later'
-                        url 'http://www.activecomponents.org/bin/view/Download/License'
-                        distribution 'repo'
-                    }
+                root.children().last() + PomConfig.common
+                if (isCommercial(uploadTask.project)) {
+                    root.children().last() + PomConfig.commercial
+                } else {
+                    root.children().last() + PomConfig.gpl
                 }
             }
         }
@@ -550,6 +545,6 @@ ext {
     addSourcesJarTask = this.&addSourcesJarTask
     configurePomMetadata = this.&configurePomMetadata
     addEclipseWorkarounds = this.&addEclipseWorkarounds
-    pomConfig = Config.pomConfig
+    pomConfig = PomConfig
     getVar = this.&getVar
 }
