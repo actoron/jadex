@@ -413,6 +413,12 @@ class Config {
                 organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
             }
         }
+        licenses {
+            license {
+                name "GPL-3.0"
+                url "https://gnu.org/licenses/gpl-3.0"
+            }
+        }
     }
 }
 /**
