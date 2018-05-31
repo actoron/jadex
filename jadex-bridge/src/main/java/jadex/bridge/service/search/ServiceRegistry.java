@@ -797,6 +797,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		enhanceQuery(query);
 		
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				// TODO: unregister terminated query
+				System.out.println("TODO: unregister terminated query: "+query+", "+reason);
+			}
+		});
 		
 		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{

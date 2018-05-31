@@ -885,7 +885,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
+//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 		config.setAwareness(false);	// disable old awareness
 
