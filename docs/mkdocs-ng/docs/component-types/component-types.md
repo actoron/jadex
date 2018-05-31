@@ -1,3 +1,5 @@
+${SorryOutdatedv3}
+
 # Component Types
 While the most basic component type is a *Micro Agent*, Jadex supports much more advanced concepts. This is an overview of the supported component types and their [Features](../components/components/#component-features).
 

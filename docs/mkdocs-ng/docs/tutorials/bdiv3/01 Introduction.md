@@ -1,3 +1,5 @@
+${SorryOutdatedv3}
+
 # Introduction
 The Jadex BDI V3 kernel is a Belief-Desire-Intention reasoning engine for intelligent agents. 
 
