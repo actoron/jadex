@@ -545,6 +545,6 @@ ext {
     addSourcesJarTask = this.&addSourcesJarTask
     configurePomMetadata = this.&configurePomMetadata
     addEclipseWorkarounds = this.&addEclipseWorkarounds
-    PomConfig
+    pomConfig = PomConfig
     getVar = this.&getVar
 }
