@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 /**
@@ -156,11 +155,6 @@ public class BeanProperty
 		this.getter = getter;
 		try
 		{
-			if (Modifier.isStatic(getter.getModifiers()))
-			{
-				System.out.println("STATIC");
-				System.exit(0);
-			}
 			this.getterhandle = MethodHandles.lookup().unreflect(getter);
 		}
 		catch (Exception e)
@@ -194,11 +188,6 @@ public class BeanProperty
 		this.setter = setter;
 		try
 		{
-//			if (Modifier.isStatic(setter.getModifiers()))
-//			{
-//				sys
-//			}
-				//this.staticsetterhandle = MethodHandles.lookup().unreflect(setter);
 			this.setterhandle = MethodHandles.lookup().unreflect(setter);
 		}
 		catch (Exception e)
