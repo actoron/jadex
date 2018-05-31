@@ -1288,8 +1288,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						prop.setPropertyValue(object, arg);
 					}
-					else
-						prop.getField().set(object, arg);
+//					else
+//						prop.getField().set(object, arg);
 					set = true;
 				}
 				catch(Exception e)

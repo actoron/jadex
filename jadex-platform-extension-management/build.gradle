@@ -18,5 +18,5 @@ dependencies
 	testImplementation project(':jadex-kernel-component')
 
 	api 'commons-daemon:commons-daemon:1.0.10'
-	apiNoAndroidRuntime 'javassist:javassist:3.12.1.GA'
+	//apiNoAndroidRuntime 'javassist:javassist:3.12.1.GA'
 }

@@ -8,10 +8,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jadex.commons.SReflect;
-import jadex.commons.Tuple3;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.WeakObject;
 import jadex.commons.transformation.annotations.Exclude;
 import jadex.commons.transformation.annotations.Include;
 import jadex.commons.transformation.annotations.IncludeFields;
@@ -21,7 +24,7 @@ import jadex.commons.transformation.annotations.IncludeFields;
  * Introspector for Java beans. It uses the reflection to build up a map with
  * property infos (name, read/write method, etc.)
  */
-public class BeanReflectionIntrospector implements IBeanIntrospector
+public class DefaultBeanIntrospector implements IBeanIntrospector
 {
 	// -------- attributes --------
 	
@@ -32,24 +35,24 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 //	protected static final byte EXCLUDE_SETTER = 2;
 
 	/** The cache for saving time for multiple lookups. */
-	protected LRU<Tuple3<Class<?>, Boolean, Boolean>, Map<String, BeanProperty>>	beaninfos;
+	protected LRU<WeakObject<Class<?>>, Map<Tuple2<Boolean, Boolean>, Map<String, BeanProperty>>> beaninfos;
 
 	// -------- constructors --------
 
 	/**
 	 * Create a new introspector.
 	 */
-	public BeanReflectionIntrospector()
+	public DefaultBeanIntrospector()
 	{
-		this(200);
+		this(20000);
 	}
 
 	/**
 	 * Create a new introspector.
 	 */
-	public BeanReflectionIntrospector(int lrusize)
+	public DefaultBeanIntrospector(int lrusize)
 	{
-		this.beaninfos = new LRU<Tuple3<Class<?>, Boolean, Boolean>, Map<String, BeanProperty>>(lrusize);
+		this.beaninfos = new LRU<>(lrusize);
 	}
 
 	// -------- methods --------
@@ -60,12 +63,18 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	public Map<String, BeanProperty> getBeanProperties(Class<?> clazz, boolean includemethods, boolean includefields)
 	{
 		// includefields component of key is call based to avoid reflection calls during cache hits.
-		Tuple3<Class<?>, Boolean, Boolean> beaninfokey = new Tuple3<Class<?>, Boolean, Boolean>(clazz, includemethods, includefields);
+		WeakObject<Class<?>> classkey = new WeakObject<Class<?>>(clazz);
+		Tuple2<Boolean, Boolean> beaninfokey = new Tuple2<Boolean, Boolean>(includemethods, includefields);
 		Map<String, BeanProperty> ret = null;
 		
 		try
 		{
-			ret = beaninfos.get(beaninfokey);
+			synchronized(beaninfos)
+			{
+				Map<Tuple2<Boolean, Boolean>, Map<String, BeanProperty>> classmap = beaninfos.get(classkey);
+				if (classmap != null)
+					ret = classmap.get(beaninfokey);
+			}
 			
 			if(ret == null)
 			{
@@ -177,7 +186,17 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				}
 	
 				// Todo: find a way to make lru keys and contents weak.
-				beaninfos.put(beaninfokey, ret);
+				// Update: found one, at least partially
+				synchronized(beaninfos)
+				{
+					Map<Tuple2<Boolean, Boolean>, Map<String, BeanProperty>> classmap = beaninfos.get(classkey);
+					if (classmap == null)
+					{
+						classmap = new HashMap<>();
+						beaninfos.put(classkey, classmap);
+					}
+					classmap.put(beaninfokey, ret);
+				}
 			}
 		}
 		catch(Throwable t)
@@ -200,7 +219,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 */
 	protected BeanProperty createBeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, Type generictype)
 	{
-		return new BeanProperty(name, type, getter, setter, settertype, null, !getter.isAnnotationPresent(Exclude.class), !setter.isAnnotationPresent(Exclude.class), generictype);
+		return new BeanProperty(name, type, getter, setter, settertype, !getter.isAnnotationPresent(Exclude.class), !setter.isAnnotationPresent(Exclude.class), generictype);
 	}
 	
 	/**
@@ -212,6 +231,6 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 */
 	protected BeanProperty createBeanProperty(String name, Field field, boolean anonclass)
 	{
-		return new BeanProperty(name, field, null);
+		return new BeanProperty(name, field);
 	}
 }
