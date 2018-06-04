@@ -2,18 +2,6 @@ import groovy.lang.Closure
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.GroovyCompile;
 
-buildscript {
-    repositories
-    {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
-    }
-}
-
-
 def isApp(project) {
 	project.hasProperty('distasapp') && project.property('distasapp').toLowerCase().equals('true')
 }
@@ -41,6 +29,10 @@ def isAndroidLibraryProject(project) {
 
 def isWebApplicationProject(project) {
     project.hasProperty("webArchiveProject") && project.property("webArchiveProject") == 'true'
+}
+
+def isTestParallel(project) {
+    project.hasProperty("testParallel") && project.property("testParallel") == 'true'
 }
 
 def onVariant(Project project, String variantName, Closure c) {
@@ -101,11 +93,11 @@ def getReleaseVariant(project) {
  * @return
  */
 def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [], parentDep = null) {
-        if (parentDep == null) {
+    if (parentDep == null) {
             parentDep = project
         } else if (parentDep == project) {
             parentDep = dep
-        }
+    }
         if (dep instanceof DefaultProjectDependency && !alreadyChecked.contains(dep)) {
             DefaultProjectDependency pdep = dep
             alreadyChecked.add(pdep)
@@ -114,8 +106,8 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
                     if (innerDep instanceof DefaultProjectDependency)
                     {
                         excludeNonAndroidRuntime(project, innerDep, alreadyChecked, parentDep)
-                    }
-                }
+            }
+        }
             }
             pdep.dependencyProject.configurations.compileNoAndroidRuntime {
                 dependencies.all { innerDep ->
@@ -128,9 +120,11 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
                         ((DefaultProjectDependency)parentDep).exclude(group: innerDep.group, module: innerDep.name)
                     }
                 }
-            }
         }
+    }
+
 }
+
 
 /**
  * Add scope mapping for parent configurations of given configuration.
@@ -160,7 +154,7 @@ def addParentScopeMappings(Task task, Configuration configuration) {
  * @return
  */
 def addSchemaTasks(Project project) {
-    project.tasks.create('schemadocs') << {
+    project.tasks.create('schemadocs').doLast {
         ant.xslt(
                 basedir: "${project.projectDir}/src/main/schema/",
                 destdir: "${project.buildDir}/schemadocs/",
@@ -172,7 +166,7 @@ def addSchemaTasks(Project project) {
         )
     }
     project.assemble.dependsOn += project.schemadocs
-    project.tasks.create('processSchemas') << {
+    project.tasks.create('processSchemas').doLast {
         ant.copy todir: file("$project.buildDir/tmp/schemas"),
                 {
                     resources
@@ -198,6 +192,7 @@ def addSchemaTasks(Project project) {
             rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
         }
     }
+    project.processSchemas.dependsOn += project.schemadocs
     project.processResources.dependsOn += project.processSchemas
 }
 
@@ -320,9 +315,10 @@ def addJavaDocJarTask(Project p) {
         onAllVariants(p) {variant ->
             def javadocTask = p.tasks.create("generate${variant.name}Javadoc", Javadoc) {
                 description "Generates Javadoc for $variant.name."
+                dependsOn "compileReleaseSources"
                 source = variant.javaCompile.source
                 ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
-                classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+                doFirst { classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar) }
             }
             def javadocJar = p.tasks.create("javadoc${variant.name}Jar", Jar) {
                 classifier = 'javadoc'
@@ -363,92 +359,96 @@ def addSourcesJarTask(Project p) {
     }
 }
 
+class PomConfig {
+    static def common = {
+        scm {
+            url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
+        }
+
+        url 'https://www.activecomponents.org'
+
+        // beware: organization needs '=' assignment:
+        // https://issues.gradle.org/browse/GRADLE-2719
+        developers {
+            developer {
+                id 'alex'
+                name 'Alexander Pokahr'
+                email 'pokahr@gmx.net'
+    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/84'
+    //                organization 'University of Hamburg'
+    //                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                organization 'Actoron GmbH'
+                organizationUrl 'https://actoron.com/'
+            }
+            developer {
+                id 'lars'
+                name 'Lars Braubach'
+                email 'braubach@gmx.net'
+    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/80'
+    //                organization 'University of Hamburg'
+    //                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                organization 'Actoron GmbH'
+                organizationUrl 'https://actoron.com/'
+            }
+            developer {
+                id 'kai'
+                name 'Kai Jander'
+                email 'kai.jander@googlemail.com'
+    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
+    //                organization 'University of Hamburg'
+    //                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+                organization 'Actoron GmbH'
+                organizationUrl 'https://actoron.com/'
+            }
+            developer {
+                id 'julian'
+                name 'Julian Kalinowski'
+                email 'kalinowski@informatik.uni-hamburg.de'
+    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
+    //                organization 'Actoron GmbH'
+    //                organizationUrl 'https://actoron.com/'
+                organization 'University of Hamburg'
+                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
+            }
+        }
+
+    }
+
+    static def gpl = {
+        licenses {
+            license {
+                name 'GPL-3.0'
+                url 'https://gnu.org/licenses/gpl-3.0'
+                distribution 'repo'
+            }
+        }
+    }
+
+    static def commercial = {
+        licenses {
+            license {
+                name 'Actoron GmbH Commercial Licence'
+            }
+        }
+    }
+}
 /**
  * Adds maven pom metadata to an uploadTask.
  * @param uploadTask
  * @return
  */
-def configurePomMetadata(Task uploadTask) {
+void configurePomMetadata(Task uploadTask) {
     uploadTask.project.afterEvaluate {
         uploadTask.configure {
-            repositories.mavenDeployer.pom {
-                project {
-                    name uploadTask.project.name
-                    description uploadTask.project.description
-
-                    scm {
-                        url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
-                    }
-
-                    url 'https://www.activecomponents.org'
-
-                    // beware: organization needs '=' assignment:
-                    // https://issues.gradle.org/browse/GRADLE-2719
-                    developers {
-                        developer {
-                            id 'alex'
-                            name 'Alexander Pokahr'
-                            email 'pokahr@gmx.net'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/84'
-//                organization 'University of Hamburg'
-//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                            organization = 'Actoron GmbH'
-                            organizationUrl 'https://actoron.com/'
-                        }
-                        developer {
-                            id 'lars'
-                            name 'Lars Braubach'
-                            email 'braubach@gmx.net'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/80'
-//                organization 'University of Hamburg'
-//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                            organization = 'Actoron GmbH'
-                            organizationUrl 'https://actoron.com/'
-                        }
-                        developer {
-                            id 'kai'
-                            name 'Kai Jander'
-                            email 'kai.jander@googlemail.com'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
-//                organization 'University of Hamburg'
-//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                            organization = 'Actoron GmbH'
-                            organizationUrl 'https://actoron.com/'
-                        }
-                        developer {
-                            id 'julian'
-                            name 'Julian Kalinowski'
-                            email 'kalinowski@informatik.uni-hamburg.de'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
-//                organization = 'Actoron GmbH'
-//                organizationUrl 'https://actoron.com/'
-                            organization = 'University of Hamburg'
-                            organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (isCommercial(uploadTask.project)) {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.project {
-                licenses {
-                    license {
-                        name 'Actoron GmbH Commercial Licence'
-                    }
-                }
-            }
-        }
-    } else {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.project {
-                licenses {
-                    license {
-                        name 'GNU GENERAL PUBLIC LICENSE Version 3 or later'
-                        url 'http://www.activecomponents.org/bin/view/Download/License'
-                        distribution 'repo'
-                    }
+            repositories.mavenDeployer.pom.withXml {
+                def root = asNode()
+                root.appendNode('name', uploadTask.project.name)
+                root.appendNode('description', uploadTask.project.description)
+                root.children().last() + PomConfig.common
+                if (isCommercial(uploadTask.project)) {
+                    root.children().last() + PomConfig.commercial
+                } else {
+                    root.children().last() + PomConfig.gpl
                 }
             }
         }
@@ -507,6 +507,20 @@ def addEclipseWorkarounds(project) {
 //	}
 }
 
+
+def getVar(String key, Project p) {
+    String value = System.getenv(key)
+//    print "key: $key, value: $value \n"
+    if (!value || value.isEmpty()) {
+        if (project.hasProperty(key)) {
+            value = project[key]
+        } else {
+            value = null
+        }
+    }
+    return value
+}
+
 // make functions externally visible
 
 ext {
@@ -516,6 +530,7 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
+    isTestParallel = this.&isTestParallel
     androidSdkExists = this.&androidSdkExists
     onVariant = this.&onVariant
     onVariantOutput = this.&onVariantOutput
@@ -528,4 +543,6 @@ ext {
     addSourcesJarTask = this.&addSourcesJarTask
     configurePomMetadata = this.&configurePomMetadata
     addEclipseWorkarounds = this.&addEclipseWorkarounds
+    pomConfig = PomConfig
+    getVar = this.&getVar
 }

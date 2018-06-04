@@ -67,7 +67,7 @@ if (!isCommercial(project)) {
                         root.get('packaging').get(0).setValue('aar')
 //							root.appendNode('packaging', 'aar')
                         def dependenciesNode = asNode().appendNode('dependencies')
-                        project.configurations.implementation.allDependencies.each {
+                        project.configurations.compile.allDependencies.each {
                             // Ensure dependencies such as fileTree are not included.
                             if (it.name != 'unspecified') {
                                 def dependencyNode = dependenciesNode.appendNode('dependency')
