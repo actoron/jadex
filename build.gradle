@@ -31,7 +31,6 @@ project.subprojects.each { sp ->
 	addSubproject(sp)
 }
 
-project.ext.jadex_lastbuild_version=jadex_lastbuild_version
 project.ext.timestamp=timestamp
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
