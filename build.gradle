@@ -4,7 +4,8 @@ import org.gradle.api.artifacts.ProjectDependency
 
 //apply plugin: 'java-library-distribution'
 apply plugin: 'maven-publish' // publishToMavenLocal
-apply plugin: 'maven' // use gradle install to install in local .m2 
+apply plugin: 'maven' // use gradle install to install in local .m2
+
 //apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
 
@@ -37,20 +38,28 @@ def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 
 buildscript 
 {
-    apply from: "$rootDir/src/main/buildutils/util.gradle"
-
     repositories
     {
-        //mavenLocal()
+        mavenLocal()
         mavenCentral()
-        //jcenter()
+        jcenter()
+		maven
+		{
+			url "https://maven.google.com"
+		}
     }
-    
+
     dependencies
     {
         classpath 'com.android.tools.build:gradle:2.3.0'
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }
+
+    apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
+
+
 
 allprojects
 {
@@ -86,6 +95,10 @@ allprojects
 			{
 				url "http://nexus.actoron.com/content/repositories/oss-nightlies/"
 			}
+			maven
+			{
+				url "https://maven.google.com"
+			}
 	    }
 	}
 	
@@ -104,7 +117,6 @@ subprojects
     def allSource   = ''
 
 	apply plugin: 'signing'
-	apply plugin: 'maven'
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
 
@@ -140,6 +152,14 @@ subprojects
 //						version: "3.0-DEVELOPMENT"
 			}
 		}
+
+		// Disable Android lint nonsense.
+		tasks.whenTaskAdded {task ->
+		    if(task.name.contains("lint")) {
+		        task.enabled = false
+		    }
+		}
+
 	 	if (isAndroidLibraryProject(project))
         {
             apply plugin: 'com.android.library'
@@ -148,7 +168,7 @@ subprojects
         {
             apply plugin: 'com.android.application'
         }
-        
+
         if (ENABLE_ECLIPSE_ANDROID_WORKAROUNDS) addEclipseWorkarounds(project)
 
 		// strip "-debug" from .aar and .apks to include them in dist
@@ -171,8 +191,8 @@ subprojects
             sourceSets {
                 main {
                     manifest.srcFile 'src/main/AndroidManifest.xml'
-                    resources.srcDirs = ['src/main/java']
-                    aidl.srcDirs = ['src/main/java']
+                    resources.srcDirs = [mainSrcDir]
+                    aidl.srcDirs = [mainSrcDir]
                     res.srcDirs = ['src/main/res']
                 }
             }
@@ -196,8 +216,10 @@ subprojects
 
 			dexOptions {
 				jumboMode = true
+				javaMaxHeapSize "4g"
 			}
         }
+
 
         // include all resources that are placed inside src dirs
         android.sourceSets.main.resources.srcDirs mainSrcDir
@@ -263,6 +285,8 @@ subprojects
 //		}
 
     }
+	// needs to be applied after android + java plugins:
+	apply from: "$rootDir/src/main/buildutils/publishing.gradle"
 
 	// process schemas and generate schemadocs
 	if (project.projectDir.toPath().resolve('src/main/schema').toFile().exists()) {
@@ -280,43 +304,21 @@ subprojects
 
     sourceCompatibility = 1.6
     
-    uploadArchives {
-    	if (project.hasProperty('repouser')) {
-	        repositories {
-	        	if (isCommercial(project) && repo_commercial) // to commercial
-	        	{
-		            mavenDeployer {
-						beforeDeployment {
-							MavenDeployment deployment -> signing.signPom(deployment);
-						}
-		                repository(url: repo_commercial) {
-		                	authentication(userName: repouser, password: repopassword)
-		                }
-		                uniqueVersion=false
-		            }
-					configurePomMetadata(uploadArchives)
-		        }
-		        else if (!isCommercial(project) && repo_noncommercial) // to noncommercial. if repo is unset, do nothing!
-		        {
-		        	mavenDeployer {
-						beforeDeployment {
-							MavenDeployment deployment -> signing.signPom(deployment);
-						}
-						repository(url: repo_noncommercial) {
-		                	authentication(userName: repouser, password: repopassword)
-		                }
-		                uniqueVersion=false
-		            }
-					configurePomMetadata(uploadArchives)
-		        }
-	        }
-	    }
-    }
+    if(isTestParallel(project)) {
+		tasks.withType(Test) {
+ 			maxParallelForks = Runtime.runtime.availableProcessors()
+ 		}
+	}
 }
 
 // Hack, helper to generate dep-tree
 task genDepList << {
 
+
+    subprojects
+    {
+		task allDeps(type: DependencyReportTask) {}
+	}
 	def out = new PrintStream(project.projectDir.getCanonicalPath() + '/src/main/buildutils/dependencies.conf', 'UTF-8')
 	project.ext.subprojectmap.entrySet().each { entry ->
 		def sp = entry.getValue()
@@ -401,69 +403,81 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	outputs.upToDateWhen {false}
 }
 
-task exampleZips << {
-	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
-	def preprocessdir = preprocessdirfile.getCanonicalPath()
+task exampleZips {
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
-    String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
-	gradle.ext.maindistartifacts.each { artname ->
-		Project sp = project.ext.subprojectmap.get(artname)
-		File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
-		if (exdir.exists() && exdir.isDirectory()) {
-			exdir.listFiles().each { ex ->
-				preprocessdirfile.mkdirs()
-				def ant = new groovy.util.AntBuilder()
-				ant.sequential {
-					ant.copy todir: preprocessdir + '/' + ex.getName(),
-					{
-						resources
+	outputs.dir outputdir
+	doLast {
+		def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
+		def preprocessdir = preprocessdirfile.getCanonicalPath()
+		//String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
+		String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
+		gradle.ext.maindistartifacts.each { artname ->
+			Project sp = project.ext.subprojectmap.get(artname)
+			File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
+			if (exdir.exists() && exdir.isDirectory()) {
+				exdir.listFiles().each { ex ->
+					preprocessdirfile.mkdirs()
+					def ant = new groovy.util.AntBuilder()
+					ant.sequential {
+						ant.copy todir: preprocessdir + '/' + ex.getName(),
 						{
-							fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
-						}
+							resources
+							{
+								fileset dir: ex.getCanonicalPath(), includes: project.ext.filterfiles, erroronmissingdir: false
+							}
 
-						filterset begintoken: '${', endtoken: '}',
-						{
-							filter token: 'jadex_build_version', value: jadex_build_version
+							filterset begintoken: '${', endtoken: '}',
+							{
+								filter token: 'jadex_build_version', value: jadex_build_version
+							}
 						}
-					}
-					ant.copy todir: preprocessdir + '/' + ex.getName(),
-					{
-						resources
+						ant.copy todir: preprocessdir + '/' + ex.getName(),
 						{
-							fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
+							resources
+							{
+								fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
+							}
 						}
+						ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
+						ant.delete dir: preprocessdir
 					}
-					ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
-					ant.delete dir: preprocessdir
 				}
 			}
 		}
 	}
 }
 
-task srcZip(dependsOn: createVersionInfo) << {
-	createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+task srcZip(dependsOn: createVersionInfo) {
+	doLast {
+		createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	}
 }
 
-task srcZips(dependsOn: createVersionInfo) << {
-	gradle.ext.selecteddists.each { selecteddist ->
-		def arts = gradle.ext.distartmap.get(selecteddist)
-		createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
+task srcZips(dependsOn: createVersionInfo) {
+	doLast {
+		gradle.ext.selecteddists.each { selecteddist ->
+			def arts = gradle.ext.distartmap.get(selecteddist)
+			createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
+		}
 	}
 }
 
 task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
 	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-} << {
-	createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	
+	doLast {
+		createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	}
 }
 
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-} << {
-	gradle.ext.selecteddists.each { selecteddist ->
-		def arts = gradle.ext.distartmap.get(selecteddist)
-		createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
+	
+	doLast {
+		gradle.ext.selecteddists.each { selecteddist ->
+			def arts = gradle.ext.distartmap.get(selecteddist)
+			createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
+		}
 	}
 }
 

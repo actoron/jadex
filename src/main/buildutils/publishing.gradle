@@ -1,0 +1,116 @@
+apply plugin: 'maven-publish' // needed for building poms in each subproject
+
+if(isAndroidProject(project)) {
+    // needed for pom-generation. maven plugin is not compatible with android plugin -_-
+    apply plugin: 'com.github.dcendents.android-maven'
+} else {
+    apply plugin: 'maven'
+}
+
+// needs to be applied after android and java plugins:
+apply plugin: 'com.jfrog.bintray' // publish to bintray
+
+
+// -------------------------------------
+// ------------ PUBLISH ----------------
+// -------------------------------------
+uploadArchives {
+    if (project.hasProperty('repouser')) {
+        repositories {
+            if (isCommercial(project) && repo_commercial) // to commercial
+            {
+                mavenDeployer {
+                    beforeDeployment {
+                        MavenDeployment deployment -> signing.signPom(deployment);
+                    }
+                    repository(url: repo_commercial) {
+                        authentication(userName: repouser, password: repopassword)
+                    }
+                    uniqueVersion=false
+                }
+                configurePomMetadata(uploadArchives)
+            }
+            else if (!isCommercial(project) && repo_noncommercial) // to noncommercial. if repo is unset, do nothing!
+            {
+                mavenDeployer {
+                    beforeDeployment {
+                        MavenDeployment deployment -> signing.signPom(deployment);
+                    }
+                    repository(url: repo_noncommercial) {
+                        authentication(userName: repouser, password: repopassword)
+                    }
+                    uniqueVersion=false
+                }
+                configurePomMetadata(uploadArchives)
+            }
+        }
+    }
+}
+
+if (!isCommercial(project)) {
+    publishing {
+        publications {
+
+            MyPublication(MavenPublication) {
+                if (!isAndroidProject(project)) {
+                    from components.java
+                }
+
+                groupId group
+                artifactId project.name
+                version project.version
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('description', project.description)
+                    root.appendNode('name', project.name)
+                    if (isAndroidProject(project)) {
+                        root.get('packaging').get(0).setValue('aar')
+//							root.appendNode('packaging', 'aar')
+                        def dependenciesNode = asNode().appendNode('dependencies')
+                        project.configurations.implementation.allDependencies.each {
+                            // Ensure dependencies such as fileTree are not included.
+                            if (it.name != 'unspecified') {
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', it.group)
+                                dependencyNode.appendNode('artifactId', it.name)
+                                dependencyNode.appendNode('version', it.version)
+                            }
+                        }
+                    }
+                    root.children().last() + pomConfig.common
+                    root.children().last() + pomConfig.gpl
+                }
+            }
+        }
+    }
+
+    bintray {
+        user = getVar('BINTRAY_USER', project)
+        key = getVar('BINTRAY_KEY', project)
+        configurations = ['archives']
+        publish = false
+        publications = ['MyPublication']
+        pkg {
+            repo = 'jadex'
+            name = 'jadex'
+            licenses = ['GPL-3.0']
+            vcsUrl = 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
+            websiteUrl = 'https://www.activecomponents.org'
+            desc = 'Jadex Active Components Platform'
+            version {
+                name = jadex_build_version
+                released = new Date()
+                vcsTag = jadex_build_version
+                if (getVar('centraluser', project) != null) {
+                    mavenCentralSync {
+                        sync = false //[Default: true] Determines whether to sync the version to Maven Central.
+                        user = getVar('centraluser', project) //OSS user token: mandatory
+                        password = getVar('centralpassword', project) //OSS user password: mandatory
+                        close = '0' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+                    }
+                }
+            }
+        }
+    }
+
+}
