@@ -359,102 +359,6 @@ def addSourcesJarTask(Project p) {
     }
 }
 
-class PomConfig {
-    static def common = {
-        scm {
-            url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
-        }
-
-        url 'https://www.activecomponents.org'
-
-        // beware: organization needs '=' assignment:
-        // https://issues.gradle.org/browse/GRADLE-2719
-        developers {
-            developer {
-                id 'alex'
-                name 'Alexander Pokahr'
-                email 'pokahr@gmx.net'
-    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/84'
-    //                organization 'University of Hamburg'
-    //                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                organization 'Actoron GmbH'
-                organizationUrl 'https://actoron.com/'
-            }
-            developer {
-                id 'lars'
-                name 'Lars Braubach'
-                email 'braubach@gmx.net'
-    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/80'
-    //                organization 'University of Hamburg'
-    //                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                organization 'Actoron GmbH'
-                organizationUrl 'https://actoron.com/'
-            }
-            developer {
-                id 'kai'
-                name 'Kai Jander'
-                email 'kai.jander@googlemail.com'
-    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
-    //                organization 'University of Hamburg'
-    //                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                organization 'Actoron GmbH'
-                organizationUrl 'https://actoron.com/'
-            }
-            developer {
-                id 'julian'
-                name 'Julian Kalinowski'
-                email 'kalinowski@informatik.uni-hamburg.de'
-    //                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
-    //                organization 'Actoron GmbH'
-    //                organizationUrl 'https://actoron.com/'
-                organization 'University of Hamburg'
-                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-            }
-        }
-
-    }
-
-    static def gpl = {
-        licenses {
-            license {
-                name 'GPL-3.0'
-                url 'https://gnu.org/licenses/gpl-3.0'
-                distribution 'repo'
-            }
-        }
-    }
-
-    static def commercial = {
-        licenses {
-            license {
-                name 'Actoron GmbH Commercial Licence'
-            }
-        }
-    }
-}
-/**
- * Adds maven pom metadata to an uploadTask.
- * @param uploadTask
- * @return
- */
-void configurePomMetadata(Task uploadTask) {
-    uploadTask.project.afterEvaluate {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.withXml {
-                def root = asNode()
-                root.appendNode('name', uploadTask.project.name)
-                root.appendNode('description', uploadTask.project.description)
-                root.children().last() + PomConfig.common
-                if (isCommercial(uploadTask.project)) {
-                    root.children().last() + PomConfig.commercial
-                } else {
-                    root.children().last() + PomConfig.gpl
-                }
-            }
-        }
-    }
-}
-
 def addEclipseWorkarounds(project) {
 	// detached configuration, so this workaround config does not get added to default build process
 	def conf = project.configurations.detachedConfiguration()
@@ -541,8 +445,6 @@ ext {
     getDetachedConfiguration = this.&getDetachedConfiguration
     addJavaDocJarTask = this.&addJavaDocJarTask
     addSourcesJarTask = this.&addSourcesJarTask
-    configurePomMetadata = this.&configurePomMetadata
     addEclipseWorkarounds = this.&addEclipseWorkarounds
-    pomConfig = PomConfig
     getVar = this.&getVar
 }
