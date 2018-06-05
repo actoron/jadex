@@ -85,6 +85,8 @@ class PomConfig {
 // ------------ PUBLISH ----------------
 // -------------------------------------
 
+def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
+
 if (project.hasProperty('signing.secretKeyRingFile')) {
     signing {
         sign configurations.archives
@@ -104,8 +106,10 @@ if (project.hasProperty('signing.secretKeyRingFile')) {
         tasks.publishMyPublicationPublicationToMavenLocal {
             dependsOn project.tasks.signArchives
         }
-        tasks.publishMyPublicationPublicationToMavenRepository {
-            dependsOn project.tasks.signArchives
+        if (canPublishToNexus) {
+            tasks.publishMyPublicationPublicationToMavenRepository {
+                dependsOn project.tasks.signArchives
+            }
         }
         tasks.bintrayUpload {
             dependsOn project.tasks.signArchives
@@ -128,9 +132,10 @@ if (project.hasProperty('signing.secretKeyRingFile')) {
     }
 }
 
-if (!isCommercial(project)) {
-    publishing {
-        if (project.hasProperty('repouser')) {
+
+publishing {
+    if (project.hasProperty('repouser')) {
+        if (canPublishToNexus) {
             repositories {
                 def repo
 
@@ -148,51 +153,53 @@ if (!isCommercial(project)) {
                 }
             }
         }
+    }
 
-        publications {
-            MyPublication(MavenPublication) {
-                if (!isAndroidProject(project)) {
-//                    from components.java
-                }
+    publications {
+        MyPublication(MavenPublication) {
+            if (!isAndroidProject(project)) {
+                    from components.java
+            }
 
-                groupId group
-                artifactId project.name
-                version project.version
-                pom.withXml {
-                    def root = asNode()
-                    root.appendNode('description', project.description)
-                    root.appendNode('name', project.name)
-                    if (isAndroidProject(project)) {
-                        root.get('packaging').get(0).setValue('aar')
+            groupId group
+            artifactId project.name
+            version project.version
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', project.description)
+                root.appendNode('name', project.name)
+                if (isAndroidProject(project)) {
+                    root.get('packaging').get(0).setValue('aar')
 //							root.appendNode('packaging', 'aar')
-                        def dependenciesNode = asNode().appendNode('dependencies')
-                        project.configurations.compile.allDependencies.each {
-                            // Ensure dependencies such as fileTree are not included.
-                            if (it.name != 'unspecified') {
-                                def dependencyNode = dependenciesNode.appendNode('dependency')
-                                dependencyNode.appendNode('groupId', it.group)
-                                dependencyNode.appendNode('artifactId', it.name)
-                                dependencyNode.appendNode('version', it.version)
-                            }
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    project.configurations.compile.allDependencies.each {
+                        // Ensure dependencies such as fileTree are not included.
+                        if (it.name != 'unspecified') {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
                         }
                     }
-                    root.children().last() + PomConfig.common
-                    root.children().last() + PomConfig.gpl
+                }
+                root.children().last() + PomConfig.common
+                root.children().last() + PomConfig.gpl
 
-                    // remove once on gradle 4.8:
-                    // signing workaround for gradle 4.7:
-                    def pomFile = file("${project.buildDir}/generated-pom.xml")
-                    writeTo(pomFile)
-                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                    artifact(pomAscFile) {
-                        classifier = null
-                        extension = 'pom.asc'
-                    }
+                // remove once on gradle 4.8:
+                // signing workaround for gradle 4.7:
+                def pomFile = file("${project.buildDir}/generated-pom.xml")
+                writeTo(pomFile)
+                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                artifact(pomAscFile) {
+                    classifier = null
+                    extension = 'pom.asc'
                 }
             }
         }
     }
+}
 
+if (!isCommercial(project)) {
     bintray {
         user = getVar('BINTRAY_USER', project)
         key = getVar('BINTRAY_KEY', project)
@@ -215,7 +222,8 @@ if (!isCommercial(project)) {
                         sync = false //[Default: true] Determines whether to sync the version to Maven Central.
                         user = getVar('centraluser', project) //OSS user token: mandatory
                         password = getVar('centralpassword', project) //OSS user password: mandatory
-                        close = '0' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+                        close = '0'
+                        //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
                     }
                 }
             }
