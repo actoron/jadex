@@ -134,17 +134,17 @@ def excludeNonAndroidRuntime(Project project, Dependency dep, alreadyChecked = [
  * @param configuration
  * @return
  */
-def addParentScopeMappings(Task task, Configuration configuration) {
-    def repos = task.repositories.asList()
-    if (!repos.empty) {
-        def scopeMappings = repos[0].pom.scopeMappings
-        def scope = scopeMappings.getMapping([configuration]).scope
-        configuration.extendsFrom.each {parentConfiguration ->
-//            println "add mapping for $parentConfiguration"
-            scopeMappings.addMapping(300, parentConfiguration, scope)
-        }
-    }
-}
+//def addParentScopeMappings(Task task, Configuration configuration) {
+//    def repos = task.repositories.asList()
+//    if (!repos.empty) {
+//        def scopeMappings = repos[0].pom.scopeMappings
+//        def scope = scopeMappings.getMapping([configuration]).scope
+//        configuration.extendsFrom.each {parentConfiguration ->
+////            println "add mapping for $parentConfiguration"
+//            scopeMappings.addMapping(300, parentConfiguration, scope)
+//        }
+//    }
+//}
 
 /**
  * Adds schema processing tasks:
@@ -441,7 +441,7 @@ ext {
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntime = this.&excludeNonAndroidRuntime
-    addParentScopeMappings = this.&addParentScopeMappings
+//    addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
     addJavaDocJarTask = this.&addJavaDocJarTask
     addSourcesJarTask = this.&addSourcesJarTask

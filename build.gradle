@@ -3,8 +3,9 @@ import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
 //apply plugin: 'java-library-distribution'
-apply plugin: 'maven-publish' // publishToMavenLocal
-apply plugin: 'maven' // use gradle install to install in local .m2
+apply plugin: 'java' // needed for distsDir on root project level
+//apply plugin: 'maven-publish' // publishToMavenLocal
+//apply plugin: 'maven' // use gradle install to install in local .m2
 
 //apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
@@ -116,7 +117,6 @@ subprojects
     def junit       = 'junit:junit:4.11'
     def allSource   = ''
 
-	apply plugin: 'signing'
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
 
@@ -272,9 +272,9 @@ subprojects
         	// Set correct bootclasspath for each project, depending on sourceCompatibility
             setBootClassPath(project)
 			// add scope mappings to include parent configurations in deployed pom.xml
-			[install, uploadArchives].each { task ->
-				addParentScopeMappings(task, configurations.compile)
-			}
+//			[install, uploadArchives].each { task ->
+//				addParentScopeMappings(task, configurations.compile)
+//			}
         }
 
 //		test {
@@ -296,11 +296,11 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-	if (project.hasProperty('signing.secretKeyRingFile')) {
-		signing {
-			sign configurations.archives
-		}
-	}
+//	if (project.hasProperty('signing.secretKeyRingFile')) {
+//		signing {
+//			sign configurations.archives
+//		}
+//	}
 
     sourceCompatibility = 1.6
     
@@ -529,6 +529,7 @@ def createDistZip(distname, arts, isaddon)
 				def spbdir = sp.buildDir.getCanonicalPath()
 
 				if (isAndroidProject(sp)) {
+
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'
