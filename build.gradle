@@ -3,8 +3,9 @@ import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
 //apply plugin: 'java-library-distribution'
-apply plugin: 'maven-publish' // publishToMavenLocal
-apply plugin: 'maven' // use gradle install to install in local .m2
+apply plugin: 'java-library' // needed for distsDir on root project level
+//apply plugin: 'maven-publish' // publishToMavenLocal
+//apply plugin: 'maven' // use gradle install to install in local .m2
 
 //apply plugin: 'net.researchgate.release'
 // gradle install -x test -i    for fast local install without tests (-x test i program args)
@@ -118,7 +119,6 @@ subprojects
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
 
-	apply plugin: 'signing'
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
 
@@ -303,9 +303,9 @@ subprojects
         	// Set correct bootclasspath for each project, depending on sourceCompatibility
             setBootClassPath(project)
 			// add scope mappings to include parent configurations in deployed pom.xml
-			[install, uploadArchives].each { task ->
-				addParentScopeMappings(task, configurations.compile)
-			}
+//			[install, uploadArchives].each { task ->
+//				addParentScopeMappings(task, configurations.compile)
+//			}
         }
 
 //		test {
@@ -328,22 +328,22 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-	if (project.hasProperty('signing.secretKeyRingFile')) {
-		signing {
-			sign configurations.archives
-		}
-	}
+//	if (project.hasProperty('signing.secretKeyRingFile')) {
+//		signing {
+//			sign configurations.archives
+//		}
+//	}
 
     sourceCompatibility = 1.8
     
     if(isTestParallel(project)) {
 		tasks.withType(Test) {
  			maxParallelForks = Runtime.runtime.availableProcessors()
- 		} 
+ 		}
 	}
 
 
-    
+
     subprojects
     {
 		task allDeps(type: DependencyReportTask) {}
@@ -361,12 +361,12 @@ task copyJavaDocSources(type: Copy) {
 		}
 	}
 	def comment = false
-	
+
 	/* Filter to fix some HTML-entity/Javadoc nonsense */
 	filter { line ->
 		if (line.trim().startsWith('/**'))
 			comment = true
-		
+
 		if (comment) {
 			line = line.replaceAll('(?<!code)>','&gt;')
 			if (line.contains('*/'))
@@ -389,12 +389,12 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
 	source(sourcedir)
 	destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
-	
+
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
 	options.charSet 'UTF-8'
 	options.quiet()
-	
+
 	options.docTitle("Jadex Active Component Platform ${project.version} API")
 	options.windowTitle("Jadex Active Component Platform ${project.version} API")
 	options.group('Core Packages','jadex.commons*:jadex.bridge*')
@@ -404,7 +404,7 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	options.group('Web Service Extension Packages','jadex.extension.ws*:jadex.extension.rs*')
 	options.group('2D/3D Environment Extension Packages','')
 	options.group('Agent-Group-Role (AGR) Extension Packages','jadex.extension.agr*')
-	
+
 	doLast {
 		def ant = new groovy.util.AntBuilder()
 		ant.sequential {
@@ -479,7 +479,7 @@ task srcZips(dependsOn: createVersionInfo) {
 
 task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
 	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-	
+
 	doLast {
 		createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 	}
@@ -487,7 +487,7 @@ task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
 
 task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-	
+
 	doLast {
 		gradle.ext.selecteddists.each { selecteddist ->
 			def arts = gradle.ext.distartmap.get(selecteddist)
@@ -503,7 +503,7 @@ def createDistZip(distname, arts, isaddon)
 		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
 	}
 	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
-		
+
 	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filtereddistfiles')
 	preprocessdirfile.mkdirs()
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
@@ -512,7 +512,7 @@ def createDistZip(distname, arts, isaddon)
 	def distdir = project.distsDir.getCanonicalPath()
 	def ant = new groovy.util.AntBuilder()
 	def extdists = new HashSet()
-	
+
 	ant.sequential {
 		ant.copy todir: preprocessdir,
 		{
@@ -523,7 +523,7 @@ def createDistZip(distname, arts, isaddon)
 					fileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', includes: project.ext.filterfiles, erroronmissingdir: false
 				}
 			}
-			
+
 			filterset begintoken: '${', endtoken: '}',
 			{
 				filter token: 'jadex_build_version', value: jadex_build_version
@@ -544,7 +544,7 @@ def createDistZip(distname, arts, isaddon)
 				def spbdir = sp.buildDir.getCanonicalPath()
 
 				if (isAndroidProject(sp)) {
-					
+
 					def targetFolder = '/apps/'
 					if (isAndroidLibraryProject(sp)) {
 						targetFolder = '/lib/'
@@ -570,7 +570,7 @@ def createDistZip(distname, arts, isaddon)
 						if (distname.contains('android')) {
 							runtimeConfig = sp.configurations.runtimeAndroid
 						}
-						
+
 						def detached = getDetachedConfiguration(sp, runtimeConfig)
 						detached.each { file ->
 							if (!extdists.contains(file)) {
@@ -580,9 +580,9 @@ def createDistZip(distname, arts, isaddon)
 						}
 					}
 				}
-				
+
 				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist/files', prefix: foldername + '/', excludes: project.ext.filterfiles, erroronmissingdir: false
-				
+
 				def exdir = new File(sp.projectDir.getCanonicalPath() + File.separator + 'dist/exampleprojects')
 				if (exdir.exists() && exdir.isDirectory()) {
 					exdir.listFiles().each { ex ->
@@ -590,7 +590,7 @@ def createDistZip(distname, arts, isaddon)
 					}
 				}
 			}
-			
+
 			zipfileset dir: preprocessdir, prefix: foldername + '/', excludes: project.ext.execfiles, erroronmissingdir: false
 			zipfileset dir: preprocessdir, prefix: foldername + '/', includes: project.ext.execfiles, filemode: 755, erroronmissingdir: false
 		}

@@ -1,14 +1,11 @@
-apply plugin: 'maven-publish' // needed for building poms in each subproject
+apply plugin: 'maven-publish'
 
-if(isAndroidProject(project)) {
-    // needed for pom-generation. maven plugin is not compatible with android plugin -_-
-    apply plugin: 'com.github.dcendents.android-maven'
-} else {
-    apply plugin: 'maven'
-}
+apply plugin: 'signing'
 
 // needs to be applied after android and java plugins:
 apply plugin: 'com.jfrog.bintray' // publish to bintray
+
+
 
 class PomConfig {
     static def common = {
@@ -87,34 +84,45 @@ class PomConfig {
 // -------------------------------------
 // ------------ PUBLISH ----------------
 // -------------------------------------
-uploadArchives {
-    if (project.hasProperty('repouser')) {
-        repositories {
-            if (isCommercial(project) && repo_commercial) // to commercial
-            {
-                mavenDeployer {
-                    beforeDeployment {
-                        MavenDeployment deployment -> signing.signPom(deployment);
-                    }
-                    repository(url: repo_commercial) {
-                        authentication(userName: repouser, password: repopassword)
-                    }
-                    uniqueVersion=false
+
+if (project.hasProperty('signing.secretKeyRingFile')) {
+    signing {
+        sign configurations.archives
+// uncomment with gradle 4.8
+// signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
+//            sign publishing.publications.MyPublication
+    }
+
+
+    // remove once on gradle 4.8:
+    // generate pom so it can be signed with gradle < 4.8
+    // see https://medium.com/@nmauti/sign-and-publish-on-maven-central-a-project-with-the-new-maven-publish-gradle-plugin-22a72a4bfd4b
+    model {
+        tasks.generatePomFileForMyPublicationPublication {
+            destination = file("$buildDir/generated-pom.xml")
+        }
+        tasks.publishMyPublicationPublicationToMavenLocal {
+            dependsOn project.tasks.signArchives
+        }
+        tasks.publishMyPublicationPublicationToMavenRepository {
+            dependsOn project.tasks.signArchives
+        }
+        tasks.bintrayUpload {
+            dependsOn project.tasks.signArchives
+        }
+    }
+
+    // remove once on gradle 4.8:
+    project.tasks.signArchives.signatureFiles.each {
+        if (it instanceof Artifact) {
+            artifact(it) {
+                def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
+                if (matcher.find()) {
+                    classifier = matcher.group(1)
+                } else {
+                    classifier = null
                 }
-                configurePomMetadata(uploadArchives)
-            }
-            else if (!isCommercial(project) && repo_noncommercial) // to noncommercial. if repo is unset, do nothing!
-            {
-                mavenDeployer {
-                    beforeDeployment {
-                        MavenDeployment deployment -> signing.signPom(deployment);
-                    }
-                    repository(url: repo_noncommercial) {
-                        authentication(userName: repouser, password: repopassword)
-                    }
-                    uniqueVersion=false
-                }
-                configurePomMetadata(uploadArchives)
+                extension = 'jar.asc'
             }
         }
     }
@@ -122,11 +130,29 @@ uploadArchives {
 
 if (!isCommercial(project)) {
     publishing {
-        publications {
+        if (project.hasProperty('repouser')) {
+            repositories {
+                def repo
 
+                if (isCommercial(project) && repo_commercial) {
+                    repo = repo_commercial
+                } else if (!isCommercial(project) && repo_noncommercial) {
+                    repo = repo_noncommercial
+                }
+                maven {
+                    url repo
+                    credentials {
+                        username repouser
+                        password repopassword
+                    }
+                }
+            }
+        }
+
+        publications {
             MyPublication(MavenPublication) {
                 if (!isAndroidProject(project)) {
-                    from components.java
+//                    from components.java
                 }
 
                 groupId group
@@ -152,6 +178,16 @@ if (!isCommercial(project)) {
                     }
                     root.children().last() + PomConfig.common
                     root.children().last() + PomConfig.gpl
+
+                    // remove once on gradle 4.8:
+                    // signing workaround for gradle 4.7:
+                    def pomFile = file("${project.buildDir}/generated-pom.xml")
+                    writeTo(pomFile)
+                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                    artifact(pomAscFile) {
+                        classifier = null
+                        extension = 'pom.asc'
+                    }
                 }
             }
         }
@@ -181,30 +217,6 @@ if (!isCommercial(project)) {
                         password = getVar('centralpassword', project) //OSS user password: mandatory
                         close = '0' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
                     }
-                }
-            }
-        }
-    }
-
-}
-
-/**
- * Adds maven pom metadata to an uploadTask.
- * @param uploadTask
- * @return
- */
-void configurePomMetadata(Task uploadTask) {
-    uploadTask.project.afterEvaluate {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.withXml {
-                def root = asNode()
-                root.appendNode('name', uploadTask.project.name)
-                root.appendNode('description', uploadTask.project.description)
-                root.children().last() + PomConfig.common
-                if (isCommercial(uploadTask.project)) {
-                    root.children().last() + PomConfig.commercial
-                } else {
-                    root.children().last() + PomConfig.gpl
                 }
             }
         }
