@@ -2,13 +2,7 @@ import java.nio.file.Paths
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
-//apply plugin: 'java-library-distribution'
 apply plugin: 'java-library' // needed for distsDir on root project level
-//apply plugin: 'maven-publish' // publishToMavenLocal
-//apply plugin: 'maven' // use gradle install to install in local .m2
-
-//apply plugin: 'net.researchgate.release'
-// gradle install -x test -i    for fast local install without tests (-x test i program args)
 
 apply from: "$rootDir/src/main/buildutils/versioning.gradle"
 
@@ -83,10 +77,6 @@ allprojects
 			name 'sonatype public'
 			url 'https://oss.sonatype.org/content/groups/public/'
 		}
-//		maven
-//		{
-//			url "https://maven.google.com"
-//		}
     }
     
     buildscript 
@@ -327,12 +317,6 @@ subprojects
 
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
-
-//	if (project.hasProperty('signing.secretKeyRingFile')) {
-//		signing {
-//			sign configurations.archives
-//		}
-//	}
 
     sourceCompatibility = 1.8
     
