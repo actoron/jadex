@@ -132,7 +132,6 @@ if (project.hasProperty('signing.secretKeyRingFile')) {
     }
 }
 
-
 publishing {
     if (project.hasProperty('repouser')) {
         if (canPublishToNexus) {
@@ -157,8 +156,10 @@ publishing {
 
     publications {
         MyPublication(MavenPublication) {
-            if (!isAndroidProject(project)) {
-                    from components.java
+            if (isWebApplicationProject(project)) {
+                from components.web
+            } else if (!isAndroidProject(project)) {
+                from components.java
             }
 
             groupId group
@@ -170,7 +171,6 @@ publishing {
                 root.appendNode('name', project.name)
                 if (isAndroidProject(project)) {
                     root.get('packaging').get(0).setValue('aar')
-//							root.appendNode('packaging', 'aar')
                     def dependenciesNode = asNode().appendNode('dependencies')
                     project.configurations.compile.allDependencies.each {
                         // Ensure dependencies such as fileTree are not included.

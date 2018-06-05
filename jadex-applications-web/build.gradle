@@ -1,9 +1,6 @@
 description 'Jadex examples that can be deployed as web application.'
 
-apply plugin: 'war' 
-apply plugin: 'eclipse-wtp'
-
-dependencies 
+dependencies
 {
 	compile project(':jadex-commons')
 	compile project(':jadex-xml')

@@ -235,10 +235,21 @@ subprojects
     }
     else
     {
+		apply plugin: 'java'
 		if (isWebApplicationProject(project)) {
 			apply plugin: 'war'
-		} else {
-        	apply plugin: 'java'
+			artifacts {
+				archives jar
+			}
+		}
+//			test {
+//				reports.html.enabled = false
+//			}
+//		}
+		test {
+			testLogging {
+				 showStandardStreams = true
+			}
 		}
 
         compileJava.options.encoding = 'UTF-8'
