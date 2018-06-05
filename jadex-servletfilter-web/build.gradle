@@ -1,8 +1,6 @@
 description 'Servletfilter Web-App.'
 
-apply plugin: 'eclipse-wtp'
-
-dependencies 
+dependencies
 {
 	api project(':jadex-servletfilter')
 }

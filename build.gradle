@@ -254,15 +254,17 @@ subprojects
     }
     else
     {
+		apply plugin: 'java-library'
 		if (isWebApplicationProject(project)) {
 			apply plugin: 'war'
-			apply plugin: 'java-library'
-		} else {
-        	apply plugin: 'java-library'
+			artifacts {
+				archives jar
+			}
+		}
 //			test {
 //				reports.html.enabled = false
 //			}
-		}
+//		}
 		test {
 			testLogging {
 				 showStandardStreams = true
