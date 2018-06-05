@@ -204,7 +204,7 @@ if (!isCommercial(project)) {
         user = getVar('BINTRAY_USER', project)
         key = getVar('BINTRAY_KEY', project)
         configurations = ['archives']
-        publish = false
+        publish = true
         publications = ['MyPublication']
         pkg {
             repo = 'jadex'
@@ -219,10 +219,10 @@ if (!isCommercial(project)) {
                 vcsTag = jadex_build_version
                 if (getVar('centraluser', project) != null) {
                     mavenCentralSync {
-                        sync = false //[Default: true] Determines whether to sync the version to Maven Central.
+                        sync = true //[Default: true] Determines whether to sync the version to Maven Central.
                         user = getVar('centraluser', project) //OSS user token: mandatory
                         password = getVar('centralpassword', project) //OSS user password: mandatory
-                        close = '0'
+                        close = '1'
                         //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
                     }
                 }
