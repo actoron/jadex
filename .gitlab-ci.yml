@@ -30,7 +30,7 @@ preBuild:
     - mkdir -p /tmp/
     - df -h /tmp/
     - dd if=/dev/urandom of=/tmp/randomPreBuild bs=1M count=10
-    - ./gradlew -Pdist=addongradleplugin clean build test install -x javadoc $GRADLE_ARGS
+    - ./gradlew -Pdist=addongradleplugin clean build test publishToMavenLocal -x javadoc $GRADLE_ARGS
 
 build:
   stage: build
