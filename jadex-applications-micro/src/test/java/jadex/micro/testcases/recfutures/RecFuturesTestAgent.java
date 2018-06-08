@@ -61,7 +61,7 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
 @ComponentTypes(@ComponentType(name="aagent", clazz=AAgent.class))
 @RequiredServices(@RequiredService(name="aser", type=IAService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_NONE, create=true, creationinfo=@CreationInfo(type="aagent"))))
-//@Ignore
+@Ignore
 public class RecFuturesTestAgent extends RemoteTestBaseAgent
 {
 	@Agent
