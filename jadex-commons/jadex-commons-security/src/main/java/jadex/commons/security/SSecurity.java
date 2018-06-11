@@ -259,7 +259,6 @@ public class SSecurity
 						{
 //							bcount += ret.length;
 //							System.out.println("Entropy bytes: " + bcount);
-							boolean noseed = true;
 							boolean urandomworked = false;
 							if (urandom != null)
 							{
@@ -275,7 +274,6 @@ public class SSecurity
 										off += read;
 									}
 									
-									noseed = false;
 									urandomworked = true;
 								}
 								catch (Exception e)
@@ -297,7 +295,8 @@ public class SSecurity
 								}
 							}
 							
-							if (noseed)
+							// TODO: Check thoroughly before re-enabling.
+							if (!urandomworked)
 							{
 								// For Windows, use Windows API to gather entropy data
 								String osname = System.getProperty("os.name");
@@ -314,14 +313,7 @@ public class SSecurity
 										Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
 										Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
 										byte[]	tmpret = (byte[]) getrandomfromwindows.invoke(null, ret.length);
-										if(tmpret == null || ret.length != tmpret.length)
-										{
-											noseed	= true;
-										}
-										else
-										{
-											ret	= tmpret;
-										}
+										System.arraycopy(tmpret, 0, ret, 0, tmpret.length);
 									}
 									catch(Throwable e)
 									{
@@ -329,18 +321,10 @@ public class SSecurity
 								}
 							}
 							
-							if (noseed)
+							if (!urandomworked)
 							{
-								// Fallback to Java if nothing works.
-								ret = SecureRandom.getSeed(ret.length);
-							}
-							else
-							{
-								if (!urandomworked)
-								{
-									byte[] addent = SecureRandom.getSeed(ret.length);
-									xor(ret, addent);
-								}
+								byte[] addent = SecureRandom.getSeed(ret.length);
+								xor(ret, addent);
 							}
 						}
 					};
@@ -1233,7 +1217,7 @@ public class SSecurity
 	 */
 	public static void main(String[] args)
 	{
-		getSecureRandom();
+		System.out.println(getSecureRandom().nextInt());
 //		SecureRandom sec = new SecureRandom();
 	}
 }
