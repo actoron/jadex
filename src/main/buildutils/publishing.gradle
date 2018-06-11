@@ -194,6 +194,13 @@ publishing {
                     classifier = null
                     extension = 'pom.asc'
                 }
+
+                // workaround for compile-time scope in POMs: (remove with gradle 4.7 or something)
+                asNode().dependencies.'*'.findAll() {
+                    it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+                        dep.name == it.artifactId.text()
+                    }
+                }.each { it.scope*.value = 'compile'}
             }
         }
     }
