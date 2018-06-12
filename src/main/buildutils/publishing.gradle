@@ -5,7 +5,16 @@ apply plugin: 'signing'
 // needs to be applied after android and java plugins:
 apply plugin: 'com.jfrog.bintray' // publish to bintray
 
+project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
 
+project.rootProject.afterEvaluate {
+    nexusStaging {
+        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
+        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
+        username = getVar('centraluser', project)
+        password = getVar('centralpassword', project)
+    }
+}
 
 class PomConfig {
     static def common = {
@@ -226,7 +235,7 @@ if (!isCommercial(project)) {
                 vcsTag = jadex_build_version
                 if (getVar('centraluser', project) != null) {
                     mavenCentralSync {
-                        sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+                        sync = false //[Default: true] Determines whether to sync the version to Maven Central.
                         user = getVar('centraluser', project) //OSS user token: mandatory
                         password = getVar('centralpassword', project) //OSS user password: mandatory
                         close = '1'
