@@ -317,6 +317,7 @@ def addJavaDocJarTask(Project p) {
         def javadocsTask = p.tasks.create ('androidjavadocs', Javadoc) {
             source = p.android.sourceSets.main.java.srcDirs
             classpath += p.files(p.android.getBootClasspath().join(File.pathSeparator))
+            include( "**/*.java" )
         }
 
         p.tasks.create('androidjavadocsJar', Jar) {
