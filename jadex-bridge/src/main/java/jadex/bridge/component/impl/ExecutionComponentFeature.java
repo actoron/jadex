@@ -29,6 +29,7 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.SFuture;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
@@ -66,6 +67,7 @@ import jadex.commons.TimeoutException;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.functional.Consumer;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -1353,11 +1355,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				try
 				{
-					if(step.getFuture() instanceof IntermediateFuture)
+					// Use generic connection method to avoid issues with different future types.
+					FutureFunctionality.connectDelegationFuture(step.getFuture(), stepfut);
+					
+					// Monitoring only when active after step started (outer check) and step completed (inner check).
+					if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
+						getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 					{
-						stepfut.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)step.getFuture())
+						stepfut.thenAccept(new Consumer<Object>()
 						{
-							public void customResultAvailable(Collection result)
+							@Override
+							public void accept(Object t)
 							{
 								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
 									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
@@ -1367,27 +1375,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 									// null was step.getCause()
 								}
-								
-								super.customResultAvailable(result);
-							}
-						});
-					}
-					else
-					{
-						stepfut.addResultListener(new DelegationResultListener(step.getFuture())
-						{
-							public void customResultAvailable(Object result)
-							{
-								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
-									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-								{
-									getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
-										getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
-									// null was step.getCause()
-								}
-								
-								super.customResultAvailable(result);
 							}
 						});
 					}
