@@ -43,6 +43,7 @@ A minimal complete build.gradle could look like this:
 apply plugin: 'java'
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -55,7 +56,6 @@ If you want to use our nightly builds, you need add another repository:
 
 ```groovy
 repositories {
-    mavenCentral()
     maven
     {
         name 'jadexsnapshots'
@@ -66,6 +66,13 @@ repositories {
   
 #### Apache Maven Project:
 ```xml
+<repositories>
+    <repository>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
+    </repository>
+</repositories>
+
 <dependency>
     <groupId>org.activecomponents.jadex</groupId>
     <artifactId>jadex-distribution-minimal</artifactId>

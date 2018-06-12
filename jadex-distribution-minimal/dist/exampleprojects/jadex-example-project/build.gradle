@@ -10,6 +10,7 @@ dependencies {
 }
 
 repositories {
+	jcenter()
 	mavenCentral()
 	// Additional repositories (only required when using nightlies and/or pro version of Jadex).
 	maven {
