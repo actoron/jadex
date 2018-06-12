@@ -171,6 +171,17 @@ publishing {
                 from components.java
             }
 
+            // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
+            project.tasks.withType(Jar) {
+                def matcher = (it.name =~ /.*(javadoc|sources).*/)
+                if (matcher.matches()) {
+                println "adding artifact: $it , classifier: ${matcher[0][1]}"
+                    artifact(it) {
+                        classifier matcher[0][1]
+                    }
+                }
+            }
+
             groupId group
             artifactId project.name
             version project.version
