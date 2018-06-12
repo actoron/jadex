@@ -314,20 +314,17 @@ def androidSdkExists() {
  */
 def addJavaDocJarTask(Project p) {
     if (isAndroidProject(p)) {
-        onAllVariants(p) {variant ->
-            def javadocTask = p.tasks.create("generate${variant.name}Javadoc", Javadoc) {
-                description "Generates Javadoc for $variant.name."
-                dependsOn "compileReleaseSources"
-                source = variant.javaCompile.source
-                ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
-                doFirst { classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar) }
-            }
-            def javadocJar = p.tasks.create("javadoc${variant.name}Jar", Jar) {
-                classifier = 'javadoc'
-                from javadocTask
-            }
-            p.artifacts {archives javadocJar}
+        def javadocsTask = p.tasks.create ('androidjavadocs', Javadoc) {
+            source = p.android.sourceSets.main.java.srcDirs
+            classpath += p.files(p.android.getBootClasspath().join(File.pathSeparator))
         }
+
+        p.tasks.create('androidjavadocsJar', Jar) {
+            classifier = 'javadoc'
+            dependsOn javadocsTask
+            from javadocsTask.destinationDir
+        }
+
     } else {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
             classifier = 'javadoc'
@@ -345,13 +342,11 @@ def addJavaDocJarTask(Project p) {
  */
 def addSourcesJarTask(Project p) {
     if (isAndroidProject(p)) {
-        onAllVariants(p) { variant ->
-            def sourcesJar = p.tasks.create("build${variant.name}SourcesJar", Jar) {
-                classifier = 'sources'
-                from p.android.sourceSets.main.java.srcDirs
-            }
-            p.artifacts {archives sourcesJar}
+        p.tasks.create('androidsourcesJar', Jar) {
+            classifier = 'sources'
+            from p.android.sourceSets.main.java.srcDirs
         }
+
     } else {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
             classifier = 'sources'
