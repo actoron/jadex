@@ -63,12 +63,12 @@ import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ILeaseTimeSet;
 import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
@@ -79,7 +79,6 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
@@ -88,7 +87,6 @@ import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -208,7 +206,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         			public void execute(AsyncContext ctx)
         			{
         				// Client timeout (nearly) occurred for the request
-        				System.out.println("sending timeout to client "+tup.getFirstEntity().getRequest());
+        				System.out.println("sending timeout to client "+ctx.getRequest());
         				writeResponse(null, Response.Status.REQUEST_TIMEOUT.getStatusCode(), callid, null, 
         					(HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 //        				ctx.complete();
@@ -256,7 +254,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /**
      *  Handle a web request.
      */
-    public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
+    public void handleRequest(final IService service, final MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, final Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
     	if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
     	{
@@ -2008,7 +2006,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			if(results==null)
 			{
-				results	= new ArrayDeque<>();
+				results	= new ArrayDeque<Object>();
 			}
 			results.add(result);
 		}
