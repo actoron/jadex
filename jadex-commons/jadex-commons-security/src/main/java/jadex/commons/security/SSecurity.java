@@ -16,6 +16,7 @@ import java.security.Provider.Service;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -111,6 +112,12 @@ public class SSecurity
 	/** Entropy source for seeding CSPRNGS. */
 	protected static volatile IEntropySource ENTROPY_SOURCE;
 	
+	/** Flag if the fallback warning has been issued before. */
+	protected static boolean ENTROPY_FALLBACK_WARNING_DONE = false;
+	
+	/** Enable this to test the seeding fallback, do not change, used by tests only. */
+	protected static boolean TEST_ENTROPY_FALLBACK = false;
+	
 	/**
 	 *  Gets access to the common secure PRNG.
 	 *  @return Common secure PRNG.
@@ -195,7 +202,7 @@ public class SSecurity
 //						protected long bcount = 0;
 						
 						/** Input stream for POSIX-like systems. */
-						protected File urandom;
+						protected File urandom = null;
 						
 						{
 							urandom = new File("/dev/urandom");
@@ -255,14 +262,17 @@ public class SSecurity
 							}
 						}
 						
-						public synchronized void getEntropy(byte[] ret)
+						public synchronized void getEntropy(byte[] output)
 						{
 //							bcount += ret.length;
 //							System.out.println("Entropy bytes: " + bcount);
-							boolean urandomworked = false;
+//							boolean urandomworked = false;
+							byte[] empty = new byte[output.length];
+							byte[] ret = null;
 							if (urandom != null)
 							{
 								FileInputStream urandomis = null;
+								ret = new byte[output.length];
 								try
 								{
 									urandomis = new FileInputStream(urandom);
@@ -273,12 +283,10 @@ public class SSecurity
 										read = urandomis.read(ret, off, ret.length - read);
 										off += read;
 									}
-									
-									urandomworked = true;
 								}
 								catch (Exception e)
 								{
-									urandom = null;
+									ret = null;
 								}
 								finally
 								{
@@ -295,37 +303,39 @@ public class SSecurity
 								}
 							}
 							
-							// TODO: Check thoroughly before re-enabling.
-							if (!urandomworked)
+							if (ret == null || Arrays.equals(ret, empty))
 							{
 								// For Windows, use Windows API to gather entropy data
-								String osname = System.getProperty("os.name");
-								String osversion = System.getProperty("os.version");
-								int minmajwinversion = 6;
-								if (osname != null &&
-									osname.startsWith("Windows") &&
-									osversion != null &&
-									osversion.contains(".") &&
-									Integer.parseInt(osversion.substring(0, osversion.indexOf('.'))) >= minmajwinversion)
+								try
 								{
-									try
-									{
-										Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
-										Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
-										byte[]	tmpret = (byte[]) getrandomfromwindows.invoke(null, ret.length);
-										System.arraycopy(tmpret, 0, ret, 0, tmpret.length);
-									}
-									catch(Throwable e)
-									{
-									}
+									Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
+									Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
+									ret = (byte[]) getrandomfromwindows.invoke(null, output.length);
+								}
+								catch(Throwable e)
+								{
+									ret = null;
 								}
 							}
 							
-							if (!urandomworked)
+							if (TEST_ENTROPY_FALLBACK)
+								ret = null;
+							
+							// Fallback
+							while (ret == null || Arrays.equals(ret, empty))
 							{
-								byte[] addent = SecureRandom.getSeed(ret.length);
-								xor(ret, addent);
+								if (!ENTROPY_FALLBACK_WARNING_DONE)
+								{
+									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
+									ENTROPY_FALLBACK_WARNING_DONE = true;
+								}
+								ret = SecureRandom.getSeed(output.length);
 							}
+							
+							System.arraycopy(ret, 0, output, 0, output.length);
+							
+							if (output == null || Arrays.equals(output, empty))
+								throw new SecurityException("Entropy gathering failed.");
 						}
 					};
 					
