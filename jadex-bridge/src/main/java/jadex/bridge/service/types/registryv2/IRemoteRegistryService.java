@@ -1,7 +1,8 @@
-package jadex.bridge.service.search;
+package jadex.bridge.service.types.registryv2;
 
 import java.util.Collection;
 
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -25,20 +26,4 @@ public interface IRemoteRegistryService
 	 *  @return The matching services or exception if none are found.
 	 */
 	public <T> IFuture<Collection<T>> searchServices(ServiceQuery<T> query);
-	
-	/**
-	 *  Add a service query to the registry.
-	 *  
-	 *  @param query The service query.
-	 *  @return Subscription to matching services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
-	
-	/**
-	 *  Removes a service query from the registry.
-	 *  
-	 *  @param query The service query.
-	 *  @return Null, when done.
-	 */
-	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query);
 }
