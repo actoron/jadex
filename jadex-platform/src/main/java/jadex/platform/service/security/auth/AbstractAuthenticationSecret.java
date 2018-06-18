@@ -36,6 +36,25 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 	}
 	
 	/**
+	 *  Check if equal (String representation matches).
+	 */
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof AbstractAuthenticationSecret && toString().equals(obj.toString()))
+			return true;
+		
+		return super.equals(obj);
+	}
+	
+	/**
+	 *  Hashcode is string representation hash code.
+	 */
+	public int hashCode()
+	{
+		return toString().hashCode();
+	}
+	
+	/**
 	 *  Decodes a secret from a string.
 	 *  
 	 *  @param secret The secret as string.

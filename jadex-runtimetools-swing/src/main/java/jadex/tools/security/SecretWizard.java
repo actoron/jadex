@@ -42,6 +42,9 @@ public class SecretWizard extends JWizard
 {
 //	protected ButtonGroup secrettypes;
 	
+	/** ID */
+	private static final long serialVersionUID = 5314846699201632703L;
+
 	/** SCrypt work factor / hardness for password strengthening. */
 	protected static final int SCRYPT_N = 131072;
 	
@@ -50,6 +53,9 @@ public class SecretWizard extends JWizard
 	
 	/** SCrypt parallelization. */
 	protected static final int SCRYPT_P = 4;
+	
+	/** Entity type which is the secret owner. */
+	protected String entitytype;
 	
 	/** Entity which is the secret owner. */
 	protected String entity;
@@ -101,13 +107,65 @@ public class SecretWizard extends JWizard
 		return result;
 	}
 	
-	/**
-	 *  Sets the entity of the secret.
-	 *  @param entity The entity.
-	 */
-	public void setEntity(String entity)
+	public String getEntity()
 	{
-		this.entity = entity;
+		return entity;
+	}
+	
+	/**
+	 *  Sets the entity type of the secret.
+	 *  @param entitytype The entity type.
+	 */
+	public void setEntityType(String entitytype)
+	{
+		this.entitytype = entitytype;
+		if (entitytype != null && entitytype.length() != 0)
+		{
+			WizardNode choice = start;
+			start = createEntityNode();
+			start.addChild(choice);
+			reset();
+			next();
+		}
+	}
+	
+	/**
+	 *  Creates the entity node.
+	 *  
+	 *  @return The entity node.
+	 */
+	protected WizardNode createEntityNode()
+	{
+		final JPlaceholderTextField entityfield = new JPlaceholderTextField();
+		entityfield.setMinimumSize(new Dimension(400, entityfield.getMinimumSize().height));
+		entityfield.setPreferredSize(entityfield.getMinimumSize());
+		
+		final JPanel inner = new JPanel();
+		inner.setBorder(BorderFactory.createTitledBorder("Please enter " + entitytype + ":"));
+		SGUI.createVerticalGroupLayout(inner, new JComponent[] { entityfield }, true);
+		
+		final WizardNode node = new WizardNode()
+		{
+			protected void onNext()
+			{
+				entity = entityfield.getText();
+				
+				if (entity == null || entity.length() == 0)
+				{
+					entityfield.showInvalid();
+					throw new IllegalArgumentException();
+				}
+			}
+			
+			public void onShow()
+			{
+				entityfield.requestFocus();
+			}
+		};
+		node.setLayout(new BorderLayout());
+		node.add(inner);
+		
+		return node;
 	}
 	
 	/**
@@ -232,6 +290,9 @@ public class SecretWizard extends JWizard
 		
 		final WizardNode node = new WizardNode()
 		{
+			/** Flag if first shown. */
+			protected boolean firstshow = true;
+			
 			protected void onNext()
 			{
 				KeySecret keysecret = null;
@@ -255,6 +316,12 @@ public class SecretWizard extends JWizard
 			
 			public void onShow()
 			{
+				if (firstshow)
+				{
+					String key = SUtil.toUTF8(Base64.encodeNoPadding(KeySecret.createRandom().getKey()));
+					keyfield.setNonPlaceholderText(key);
+					firstshow = false;
+				}
 				randbutton.requestFocus();
 			}
 		};

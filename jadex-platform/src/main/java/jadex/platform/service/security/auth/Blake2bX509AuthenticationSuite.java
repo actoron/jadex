@@ -3,6 +3,7 @@ package jadex.platform.service.security.auth;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -106,16 +107,22 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		List<byte[]> networks = new ArrayList<byte[]>();
 		if (agent.getInternalNetworks() != null && agent.getInternalNetworks().size() > 0)
 		{
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getInternalNetworks().entrySet())
+			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : agent.getInternalNetworks().entrySet())
 			{
-				if (entry.getValue() instanceof PasswordSecret)
+				if (entry.getValue() != null)
 				{
-					JadexJPakeParticipant jpake = createJPakeParticipant(pid,((PasswordSecret) entry.getValue()).getPassword());
-					pakestate.put((PasswordSecret) entry.getValue(), jpake);
-					JPAKERound1Payload r1pl = jpake.createRound1PayloadToSend();
-					
-					networks.add(createSaltedId(entry.getKey(), idsalt));
-					networks.add(round1ToBytes(r1pl));
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+					{
+						if (secret instanceof PasswordSecret)
+						{
+							JadexJPakeParticipant jpake = createJPakeParticipant(pid,((PasswordSecret) secret).getPassword());
+							pakestate.put((PasswordSecret) secret, jpake);
+							JPAKERound1Payload r1pl = jpake.createRound1PayloadToSend();
+							
+							networks.add(createSaltedId(entry.getKey(), idsalt));
+							networks.add(round1ToBytes(r1pl));
+						}
+					}
 				}
 			}
 		}
@@ -201,10 +208,16 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{ 
 			Map<ByteArrayWrapper, PasswordSecret> reversemap = new HashMap<ByteArrayWrapper, PasswordSecret>();
 			
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getInternalNetworks().entrySet())
+			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : agent.getInternalNetworks().entrySet())
 			{
-				if (entry.getValue() instanceof PasswordSecret)
-					reversemap.put(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), (PasswordSecret) entry.getValue());
+				if (entry.getValue() != null)
+				{
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+					{
+						if (secret instanceof PasswordSecret)
+							reversemap.put(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), (PasswordSecret) secret);
+					}
+				}
 			}
 			
 			List<byte[]> nwloads = SUtil.splitData(r1list.get(4));
@@ -301,13 +314,19 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		{ 
 			Map<ByteArrayWrapper, JadexJPakeParticipant> reversemap = new HashMap<ByteArrayWrapper, JadexJPakeParticipant>();
 			
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : agent.getInternalNetworks().entrySet())
+			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : agent.getInternalNetworks().entrySet())
 			{
-				if (entry.getValue() instanceof PasswordSecret)
+				if (entry.getValue() != null)
 				{
-					JadexJPakeParticipant p = pakestate.get(entry.getValue());
-					if (p != null)
-						reversemap.put(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), p);
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+					{
+						if (entry.getValue() instanceof PasswordSecret)
+						{
+							JadexJPakeParticipant p = pakestate.get(secret);
+							if (p != null)
+								reversemap.put(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), p);
+						}
+					}
 				}
 			}
 			
