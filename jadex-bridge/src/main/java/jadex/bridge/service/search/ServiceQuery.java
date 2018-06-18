@@ -719,7 +719,7 @@ public class ServiceQuery<T>
 	 *  Set the networknames.
 	 *  @param networknames The networknames to set
 	 */
-	public void setNetworkNames(String[] networknames)
+	public void setNetworkNames(String... networknames)
 	{
 		this.networknames = networknames;
 	}

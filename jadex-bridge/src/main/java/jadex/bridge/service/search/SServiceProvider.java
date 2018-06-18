@@ -234,9 +234,20 @@ public class SServiceProvider
 	 */
 	public static <T> T getLocalService(final IInternalAccess component, final Class<T> type, final String scope, final IFilter<T> filter, boolean proxy)
 	{
-		checkThreadAccess(component, proxy);
-		
 		ServiceQuery<T> query = new ServiceQuery<T>(type, scope, null, component.getComponentIdentifier(), filter);
+		return getLocalService(component, query, proxy);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  (Returns required service proxy).
+	 *  @param component The internal access.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static <T> T getLocalService(final IInternalAccess component, ServiceQuery<T> query, boolean proxy)
+	{
+		checkThreadAccess(component, proxy);
 		
 		T ret = ServiceRegistry.getRegistry(component).searchServiceSync(query);
 		if(ret==null)
@@ -245,9 +256,9 @@ public class SServiceProvider
 //			{
 //				System.out.println("ogesjyph");
 //			}
-			throw new ServiceNotFoundException("Service not found: "+type.getName());
+			throw new ServiceNotFoundException("Service not found: "+query.getServiceType());
 		}
-		return proxy? createRequiredProxy(component, ret, type): ret;
+		return proxy? createRequiredProxy(component, ret, query.getServiceType()): ret;
 	}
 	
 	/**

@@ -12,11 +12,15 @@ public interface ISuperpeerService extends IRemoteRegistryService
 {
 	/**
 	 *  Initiates the client registration procedure
-	 *  (superpeer will perform a subscription callback)
+	 *  (super peer will perform a subscription callback).
+	 *  
+	 *  @param networkname	Network name for callback. 
+	 *  @param client	Subscription service for callback. 
 	 *  
 	 *  @return Null, when registration is complete.
 	 */
-	public IFuture<Void> registerClient();
+	// TODO: replace ping pong with Channel (i.e. bidirectional subscription future)
+	public IFuture<Void> registerClient(String networkname, ISuperpeerClientService client);
 	
 	/**
 	 *  Add a service query to the registry.

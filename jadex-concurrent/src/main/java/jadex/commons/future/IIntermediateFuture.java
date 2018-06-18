@@ -71,6 +71,8 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 * Add a result listener.
 	 * 
 	 * @param intermediateListener The intermediate listener.
+	 * 
+	 * @deprecated Use addResultListener()
 	 */
 	public void addIntermediateResultListener(IIntermediateResultListener<E> intermediateListener);
     
