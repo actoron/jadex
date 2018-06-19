@@ -16,7 +16,7 @@ public interface IRemoteRegistryService
 	 *  Search remote registry for a single service.
 	 *  
 	 *  @param query The search query.
-	 *  @return The first matching service or exception if not found.
+	 *  @return The first matching service or null if not found.
 	 */
 	public <T> IFuture<T> searchService(ServiceQuery<T> query);
 	
@@ -24,7 +24,7 @@ public interface IRemoteRegistryService
 	 *  Search remote registry for services.
 	 *  
 	 *  @param query The search query.
-	 *  @return The matching services or exception if none are found.
+	 *  @return The matching services or empty set if none are found.
 	 */
 	public <T> IFuture<Set<T>> searchServices(ServiceQuery<T> query);
 }

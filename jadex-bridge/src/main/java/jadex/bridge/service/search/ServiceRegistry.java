@@ -1484,7 +1484,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param scope The scope.
 	 *  @return The services that fit to the scope.
 	 */
-	protected <T> boolean checkScope(final T ser, final IComponentIdentifier cid, final String scope)
+	public <T> boolean checkScope(final T ser, final IComponentIdentifier cid, final String scope)
 	{
 		return checkSearchScope(cid, (IService)ser, scope, false) && checkPublicationScope(cid, (IService)ser);
 	}
@@ -1722,6 +1722,17 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			rwlock.readLock().unlock();
 		}
+	}
+	
+	/**
+	 *  Get services per query. Uses not the full query spec and
+	 *  does not check scope and filter, indexer checks only.
+	 *  @param query The query.
+	 *  @return First matching service or null.
+	 */
+	public Set<IService> getServicesFromIndexer(final ServiceQuery<?> query)
+	{
+		return getServices(query);
 	}
 	
 	/**

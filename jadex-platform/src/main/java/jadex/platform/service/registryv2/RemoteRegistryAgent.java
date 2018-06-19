@@ -1,10 +1,13 @@
 package jadex.platform.service.registryv2;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
@@ -23,7 +26,9 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	protected IInternalAccess ia;
 	
 	/** The local service registry. */
-	protected IServiceRegistry serviceregistry;
+	protected ServiceRegistry serviceregistry;
+	
+	protected IComponentIdentifier platformid;
 	
 	/**
 	 *  Service initialization.
@@ -33,7 +38,8 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
-		serviceregistry = ServiceRegistry.getRegistry(ia);
+		serviceregistry = (ServiceRegistry) ServiceRegistry.getRegistry(ia);
+		platformid = ia.getComponentIdentifier().getRoot();
 		return IFuture.DONE;
 	}
 	
@@ -41,21 +47,66 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 *  Search remote registry for a single service.
 	 *  
 	 *  @param query The search query.
-	 *  @return The first matching service or exception if not found.
+	 *  @return The first matching service or null if not found.
 	 */
 	public <T> IFuture<T> searchService(ServiceQuery<T> query)
 	{
-		return new Future<T>(serviceregistry.searchServiceSync(query));
+		T ret = null;
+		boolean localowner = query.getOwner().getRoot().equals(platformid);
+		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
+		{
+			@SuppressWarnings("unchecked")
+			Set<T> indexerresults = (Set<T>) serviceregistry.getServicesFromIndexer(query);
+			if (localowner)
+			{
+				for (T ser : indexerresults)
+				{
+					if (serviceregistry.checkScope(ser, query.getOwner(), query.getScope()))
+					{
+						ret = ser;
+						break;
+					}
+				}
+				
+			}
+			else if (indexerresults.size() > 0)
+			{
+				ret = indexerresults.iterator().next();
+			}
+		}
+		
+		return new Future<>(ret);
 	}
 	
 	/**
 	 *  Search remote registry for services.
 	 *  
 	 *  @param query The search query.
-	 *  @return The matching services or exception if none are found.
+	 *  @return The matching services or empty set if none are found.
 	 */
 	public <T> IFuture<Set<T>> searchServices(ServiceQuery<T> query)
 	{
-		return new Future<Set<T>>(serviceregistry.searchServicesSync(query));
+		Set<T> ret = Collections.emptySet();
+		
+		boolean localowner = query.getOwner().getRoot().equals(platformid);
+		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
+		{
+			@SuppressWarnings("unchecked")
+			Set<T> indexerresults = (Set<T>) serviceregistry.getServicesFromIndexer(query);
+			if (localowner)
+			{
+				ret = new HashSet<>();
+				for (T ser : indexerresults)
+				{
+					if (serviceregistry.checkScope(ser, query.getOwner(), query.getScope()))
+						ret.add(ser);
+				}
+			}
+			else
+			{
+				ret = indexerresults;
+			}
+		}
+		return new Future<Set<T>>(ret);
 	}
 }
