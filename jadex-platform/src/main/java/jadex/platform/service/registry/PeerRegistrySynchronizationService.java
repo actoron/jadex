@@ -3,7 +3,6 @@ package jadex.platform.service.registry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +36,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.micro.annotation.Binding;
 
 /**
  *  Service for normal peers to send local changes to a selected superpeer.
@@ -374,7 +374,10 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						throw new RuntimeException("wrooong4");
 //					spcid = new ComponentIdentifier("registrysuperpeer@"+spcid.getPlatformName());
 //					System.out.println("Found superpeer: "+spcid);
-					SServiceProvider.getService(component, spcid, ISuperpeerRegistrySynchronizationService.class).addResultListener(
+					ServiceQuery<ISuperpeerRegistrySynchronizationService>	query
+						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, spcid, component.getComponentIdentifier(), null);
+					query.setUnrestricted(true);
+					SServiceProvider.getService(component, query).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
 					{
 						public void customResultAvailable(final ISuperpeerRegistrySynchronizationService spser)
