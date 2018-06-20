@@ -12,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -38,6 +39,7 @@ import jadex.micro.annotation.Binding;
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
 @Agent(autoprovide=Boolean3.TRUE)
+@Service
 public class SuperpeerClientAgent	implements ISuperpeerClientService
 {
 	//-------- attributes --------
@@ -235,9 +237,10 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
 		config.setGui(true);
+//		config.setLogging(true);
 		config.addComponent(SuperpeerClientAgent.class);
-//		config.setNetworkNames("test");
-//		config.setNetworkSecrets("test");
+		config.setNetworkNames("test");
+		config.setNetworkSecrets("test");
 		Starter.createPlatform(config, args).get();
 	}
 }
