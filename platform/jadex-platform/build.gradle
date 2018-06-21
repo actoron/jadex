@@ -3,8 +3,8 @@ description 'The Jadex platform package contains implementations of platform ser
 dependencies
 {
 	api project(path: ':util:jadex-commons')
-	api project(path: ':util:jadex-commons:jadex-commons-gui')
-	api project(path: ':util:jadex-commons:jadex-commons-security')
+	api project(path: ':util:jadex-commons-gui')
+	api project(path: ':util:jadex-commons-security')
 	api project(path: ':serialization:jadex-binary')
 	api project(path: ':serialization:jadex-json')
 	api project(path: ':serialization:jadex-xml')

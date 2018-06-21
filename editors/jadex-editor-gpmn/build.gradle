@@ -3,7 +3,7 @@ description 'Editor for Goal-oriented Process Management Notation (GPMN) and gen
 dependencies
 {
 	api project(':util:jadex-commons')
-	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons-gui')
 	api project(':serialization:jadex-xml')
 	
 	api 'org.tinyjee.jgraphx:jgraphx:1.10.1.3'

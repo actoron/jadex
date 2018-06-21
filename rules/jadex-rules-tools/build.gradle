@@ -3,7 +3,7 @@ description 'The Jadex rules tools package contains tools for the Jadex rule eng
 dependencies
 {
 	api project(':util:jadex-commons')
-	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons-gui')
 	api project(':rules:jadex-rules')
 	
 	api 'net.sourceforge.collections:collections-generic:4.01'

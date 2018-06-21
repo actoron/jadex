@@ -19,7 +19,7 @@ sourceSets
 dependencies 
 {
 	api project(':util:jadex-commons')
-	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons-gui')
 	api project(':serialization:jadex-xml')
 	api project(':platform:jadex-bridge')
 	api project(':tools:jadex-tools-base-swing')
