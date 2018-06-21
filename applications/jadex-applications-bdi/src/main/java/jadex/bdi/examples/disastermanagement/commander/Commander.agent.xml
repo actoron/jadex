@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Commander</H3>
+
+	Coordinates entities to efficiently handle disasters.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Commander"
+	package="jadex.bdi.examples.disastermanagement.commander">
+
+	<imports>
+		<import>jadex.commons.future.*</import>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdi.examples.disastermanagement.*</import>
+		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment imported inherited from move capability. -->
+		<belief name="environment" class="ContinuousSpace2D">
+ 			<fact class="ContinuousSpace2D">jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
+		</belief>
+		
+		<!-- Required to have disasters in OAV state. -->
+ 		<beliefset name="disasters" class="ISpaceObject" updaterate="1000">
+			<facts>$beliefbase.environment.getSpaceObjectsByType("disaster")</facts>
+		</beliefset>
+		
+		<beliefset name="busy_entities" class="Object"/>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="handle_disaster">
+			<parameter name="disaster" class="ISpaceObject">
+				<bindingoptions>
+				    select ISpaceObject $disaster from $beliefbase.disasters
+				    where $disaster.getType().equals("disaster") &amp;&amp;	($disaster.fire!=0 || $disaster.victims!=0 || $disaster.chemicals!=0)
+				</bindingoptions>
+			</parameter>
+			<unique/>
+			<!-- Create one goal for each known disaster. -->
+			<creationcondition beliefs="disasters">
+				true
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="handle_disaster">
+					$goal.disaster.severe &amp;&amp; $ref.disaster.severe==false
+				</inhibits>
+			</deliberation>
+			<targetcondition>
+				$goal.disaster.fire==0 &amp;&amp; $goal.disaster.victims==0 &amp;&amp; $goal.disaster.chemicals==0
+			</targetcondition>
+		</achievegoal>
+		
+		<achievegoal name="clear_chemicals" exclude="never">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<parameterset name="units" class="Object" direction="inout"/>
+			<deliberation>
+				<inhibits ref="treat_victims">
+					$goal.disaster==$ref.disaster
+				</inhibits>
+			</deliberation>
+			<targetcondition>$goal.disaster.getProperty("chemicals")==0</targetcondition>
+		</achievegoal>
+		
+		<achievegoal name="extinguish_fires" exclude="never">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<parameterset name="units" class="Object" direction="inout"/>
+			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
+		</achievegoal>
+		
+		<achievegoal name="treat_victims" exclude="never">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<parameterset name="units" class="Object" direction="inout"/>
+			<targetcondition>$goal.disaster.getProperty("victims")==0</targetcondition>
+		</achievegoal>
+		
+		<achievegoal name="send_rescueforce">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<parameter name="rescueforce" class="IService"/>
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<!-- Plan for assigning units to a disaster. -->
+		<plan name="handle_disaster_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="handle_disaster.disaster"/>
+			</parameter>
+			<body class="HandleDisasterPlan"/>
+			<trigger>
+				<goal ref="handle_disaster"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plans for handling chemicals, fires and victims -->
+		
+		<plan name="clear_chemicals_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="clear_chemicals.disaster"/>
+			</parameter>
+			<parameterset name="units" class="IService" direction="inout">
+				<goalmapping ref="clear_chemicals.units"/>
+			</parameterset>
+			<body class="HandleFireBrigadesClearChemicalsPlan"/>
+			<trigger>
+				<goal ref="clear_chemicals"/>
+			</trigger>
+		</plan>
+		
+		<plan name="extinguish_fire_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="extinguish_fires.disaster"/>
+			</parameter>
+			<parameterset name="units" class="IService" direction="inout">
+				<goalmapping ref="extinguish_fires.units"/>
+			</parameterset>
+			<body class="HandleFireBrigadesExtinguishFiresPlan"/>
+			<trigger>
+				<goal ref="extinguish_fires"/>
+			</trigger>
+		</plan>
+		
+		<plan name="treat_victims_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="treat_victims.disaster"/>
+			</parameter>
+			<parameterset name="units" class="IService" direction="inout">
+				<goalmapping ref="treat_victims.units"/>
+			</parameterset>
+			<body class="HandleAmbulancesPlan"/>
+			<trigger>
+				<goal ref="treat_victims"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plans for sending a rescue force -->
+		
+		<plan name="send_firebrigade_clear_chemicals_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="send_rescueforce.disaster"/>
+			</parameter>
+			<parameter name="rescueforce" class="IService">
+				<goalmapping ref="send_rescueforce.rescueforce"/>
+			</parameter>
+			<body class="ClearChemicalsPlan"/>
+			<trigger>
+				<goal ref="send_rescueforce"/>
+			</trigger>
+			<precondition>$goal.rescueforce instanceof IClearChemicalsService</precondition>
+		</plan>
+		
+		<plan name="send_firebrigade_extinguish_fire_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="send_rescueforce.disaster"/>
+			</parameter>
+			<parameter name="rescueforce" class="IService">
+				<goalmapping ref="send_rescueforce.rescueforce"/>
+			</parameter>
+			<body class="ExtinguishFirePlan"/>
+			<trigger>
+				<goal ref="send_rescueforce"/>
+			</trigger>
+			<precondition>$goal.rescueforce instanceof IExtinguishFireService</precondition>
+		</plan>
+		
+		<plan name="send_ambulance_treat_victims_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="send_rescueforce.disaster"/>
+			</parameter>
+			<parameter name="rescueforce" class="IService">
+				<goalmapping ref="send_rescueforce.rescueforce"/>
+			</parameter>
+			<body class="TreatVictimsPlan"/>
+			<trigger>
+				<goal ref="send_rescueforce"/>
+			</trigger>
+			<precondition>$goal.rescueforce instanceof ITreatVictimsService</precondition>
+		</plan>
+		
+	</plans>
+	
+	<services>
+		<requiredservice name="treatvictimservices" class="ITreatVictimsService" multiple="true"/>
+		<requiredservice name="extinguishfireservices" class="IExtinguishFireService" multiple="true"/>
+		<requiredservice name="clearchemicalsservices" class="IClearChemicalsService" multiple="true"/>
+	</services>
+</agent>

@@ -1,0 +1,9 @@
+description 'The jadex-platform-android package contains extensions needed to run a jadex platform on an android device.'
+
+dependencies
+{
+    api(project(':jadex-platform'))
+    api project(':jadex-android-commons')
+    testImplementation libraries.robotium
+    testImplementation libraries.robolectric
+}

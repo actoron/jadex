@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_1aHQ0TKSEd-MwJoRTfcdNQ" iD="_1aHQ0DKSEd-MwJoRTfcdNQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-FH5IDKSEd-MwJoRTfcdNQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-FH5ITKSEd-MwJoRTfcdNQ" key="Description" value="&lt;h1>Sequence of Tasks&lt;/h1> An example with tasks being executed one after another.&lt;br/> Also useful for trying out the debugger."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-FH5IjKSEd-MwJoRTfcdNQ" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFxQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_1aHQ1zKSEd-MwJoRTfcdNQ" iD="_1aHQ1jKSEd-MwJoRTfcdNQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_1aHQ2TKSEd-MwJoRTfcdNQ" iD="_1aHQ2DKSEd-MwJoRTfcdNQ" outgoingEdges="_MXDtsTKTEd-MwJoRTfcdNQ" name="Task 1" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IVv0YDKTEd-MwJoRTfcdNQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IVv0YTKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sTYFsARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFsQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFsgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFswRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFtARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFtQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFtgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;The first task has been executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_KjvV8TKTEd-MwJoRTfcdNQ" iD="_KjvV8DKTEd-MwJoRTfcdNQ" outgoingEdges="_y9_-QTKTEd-MwJoRTfcdNQ" incomingEdges="_MXDtsTKTEd-MwJoRTfcdNQ" name="Task 2" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Kke80DKTEd-MwJoRTfcdNQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Kke80TKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sTYFtwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFuARPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFuQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFugRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFuwRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFvARPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFvQRPEeCnwcpWvxOwkg" key="0:3" value="&quot;The second task has been executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_yqfMYTKTEd-MwJoRTfcdNQ" iD="_yqfMYDKTEd-MwJoRTfcdNQ" incomingEdges="_y9_-QTKTEd-MwJoRTfcdNQ" name="Task 3">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zKErYDKTEd-MwJoRTfcdNQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zKErYTKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sTYFvgRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFvwRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFwARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFwQRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFwgRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFwwRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sTYFxARPEeCnwcpWvxOwkg" key="0:3" value="&quot;The third task has been executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_MXDtsTKTEd-MwJoRTfcdNQ" iD="_MXDtsDKTEd-MwJoRTfcdNQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_y9_-QTKTEd-MwJoRTfcdNQ" iD="_y9_-QDKTEd-MwJoRTfcdNQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

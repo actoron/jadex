@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:results>
+      <jadex:result name="running" type="boolean">
+        <jadex:description>Set while the process is running.</jadex:description>
+        <jadex:value>false</jadex:value>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="DEufUuni4nNNmUlB">
+    <semantic:startEvent id="fghXEVbXRQwY0QZk">
+      <semantic:outgoing>QJVfuNZ0HjVVxGde</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Set Running" id="88QofHgdRDKSxoBF">
+      <semantic:incoming>QJVfuNZ0HjVVxGde</semantic:incoming>
+      <semantic:outgoing>T8cMMZDcFsguddot</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="java.lang.String">&quot;running&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="java.lang.Object">true</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:intermediateCatchEvent id="FIi/Z1TjDftrE4jb">
+      <semantic:incoming>T8cMMZDcFsguddot</semantic:incoming>
+      <semantic:outgoing>1piSWGRUW5kzhj4r</semantic:outgoing>
+      <semantic:messageEventDefinition/>
+    </semantic:intermediateCatchEvent>
+    <semantic:task name="Print" id="ijg34GNvu23vAkCs">
+      <semantic:incoming>1piSWGRUW5kzhj4r</semantic:incoming>
+      <semantic:outgoing>LhLc2cXpmnXhrVPE</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Still running: &quot;+$component</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="Zl6dkQPfqGW0lWbp">
+      <semantic:incoming>LhLc2cXpmnXhrVPE</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="fghXEVbXRQwY0QZk" targetRef="88QofHgdRDKSxoBF" id="QJVfuNZ0HjVVxGde">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="88QofHgdRDKSxoBF" targetRef="FIi/Z1TjDftrE4jb" id="T8cMMZDcFsguddot">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="FIi/Z1TjDftrE4jb" targetRef="ijg34GNvu23vAkCs" id="1piSWGRUW5kzhj4r">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="ijg34GNvu23vAkCs" targetRef="Zl6dkQPfqGW0lWbp" id="LhLc2cXpmnXhrVPE">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="DEufUuni4nNNmUlB">
+        <dc:Bounds height="600.0" width="3000.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="fghXEVbXRQwY0QZk">
+        <dc:Bounds height="40.0" width="40.0" x="70.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="88QofHgdRDKSxoBF">
+        <dc:Bounds height="100.0" width="160.0" x="190.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="FIi/Z1TjDftrE4jb">
+        <dc:Bounds height="40.0" width="40.0" x="410.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ijg34GNvu23vAkCs">
+        <dc:Bounds height="100.0" width="160.0" x="520.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Zl6dkQPfqGW0lWbp">
+        <dc:Bounds height="40.0" width="40.0" x="730.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="QJVfuNZ0HjVVxGde">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="T8cMMZDcFsguddot">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="1piSWGRUW5kzhj4r">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="LhLc2cXpmnXhrVPE">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -1,0 +1,1 @@
+Required for build to proceed, see com.xtremelabs.robolectric.RobolectricTestRunner.createResourceLoader(...)

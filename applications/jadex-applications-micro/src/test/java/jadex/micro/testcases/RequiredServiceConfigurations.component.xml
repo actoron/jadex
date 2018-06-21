@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Service configurations.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="RequiredServiceConfigurations" package="jadex.micro.testcases">
+	
+	<imports>
+		<import>jadex.bridge.service*</import>
+	</imports>
+	
+	<services>
+		<requiredservice name="as" class="IAService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+	
+	<configurations>
+		<configuration name="a"/>
+		<configuration name="b">
+			<services>
+				<requiredservice name="as">
+					<binding scope="local"/>
+				</requiredservice>
+			</services>
+		</configuration>
+	</configurations>
+	
+</componenttype>

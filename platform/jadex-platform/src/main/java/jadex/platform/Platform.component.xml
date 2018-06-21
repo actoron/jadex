@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The platform provides the basic services for running components.
+  In addition, the platform exposes several configuration options as arguments.
+  Further platform start parameters, e.g. for custom initial components, are defined in the 
+  <a href="https://download.actoron.com/docs/latest/javadoc/index.html?jadex/base/Starter.html">jadex.base.Starter class</a>.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Platform" package="jadex.platform">
+		
+	<arguments>
+	
+		<!-- ======== Arguments used by starter unless supplied from command line. ======== -->
+	
+		<!-- The name of the platform component (null for auto generation). To use a custom prefix name 
+		     and an auto generated postfix the name should end with _* (3 digits) or with _ and an arbitrary number of +, e.g. _++++.  -->	
+		<argument name="platformname" class="String">"jadex"</argument>
+		<!-- The configuration to use. -->	
+		<argument name="configname" class="String">"auto"</argument>
+		<!-- Automatically shut down the platform when no user agents are running anymore. -->	
+		<argument name="autoshutdown" class="boolean">false</argument>
+		<!-- Tell the starter to use the default platform component implementation (usually no need to change). -->	
+		<argument name="platformcomponent" class="Class">jadex.platform.service.cms.PlatformComponent.class</argument>
+		<!-- Tell starter to print welcome message. -->
+		<argument name="welcome" class="boolean">true</argument>
+		<!-- The saved program arguments. -->
+		<argument name="programarguments" class="String[]"/>
+		
+		<!-- ======== Arguments used by platform components. ======== -->
+		
+		<!-- Start the JCC agent to open the platform GUI? -->
+		<argument name="gui" class="boolean">true</argument>
+		<!-- Start the platform with command line interface (cli) activated?  (requires Jadex Pro add-on) -->
+		<argument name="cli" class="boolean">true</argument>
+		<!-- Start cli with console in or not -->
+		<argument name="cliconsole" class="boolean">true</argument>
+		<!-- Save platform settings on shutdown? -->
+		<argument name="saveonexit" class="boolean">true</argument>
+		<!-- Open JCC for specific remote platforms. -->
+		<argument name="jccplatforms" class="String">null</argument>
+		<!-- Enable verbose logging (shortcut for setting logging_level to info). -->
+		<argument name="logging" class="boolean">false</argument>
+		<!-- Logging level for platform. -->
+		<argument name="logging_level" class="java.util.logging.Level">java.util.logging.Level.SEVERE</argument>
+		<!-- Use simulation execution mode? -->
+		<argument name="simulation" class="Boolean"/>
+		<!-- Use asynchronous execution mode? -->
+		<argument name="asyncexecution" class="Boolean"/>
+		<!-- Flag if CIDs may be reused (true for not). -->
+		<argument name="uniqueids" class="boolean">true</argument>
+		<!-- Flag for deferring thread creation/deletion in thread pool -->
+		<argument name="threadpooldefer" class="boolean">true</argument>
+		
+		
+		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
+		<argument name="libpath" class="String"></argument>
+		<!-- The base classloader. -->
+		<argument name="baseclassloader" class="ClassLoader"></argument>
+				
+		<!-- Start the chat agent for instant messaging and file transfer with user Jadex users. -->
+		<argument name="chat" class="boolean">true</argument>
+		
+		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
+		<argument name="awareness" class="boolean">true</argument>
+		<!-- Specify the awareness agent discovery mechanisms (comma separated). -->
+		<argument name="awamechanisms" class="String">"Broadcast, Multicast, Message, Relay, Local"</argument>
+		<!-- The awareness delay in milliseconds -->
+		<argument name="awadelay" class="long">20000</argument>
+		<!-- The fast awareness flag, i.e. try to connect during init. -->
+		<argument name="awafast" class="boolean">false</argument>
+		<!-- Include entries for awareness agent. -->
+		<argument name="awaincludes" class="String">""</argument>
+		<!-- Exclude entries for awareness agent. -->
+		<argument name="awaexcludes" class="String">""</argument>
+		
+		<!-- Use a compact binary message format instead of XML by default. -->
+		<argument name="binarymessages" class="boolean">true</argument>
+		
+		<!-- Fail on recoverable message decoding errors instead of ignoring. -->
+		<argument name="strictcom" class="boolean">false</argument>
+				
+		<!-- Flag if the platform should be protected with password.
+		     If a value is provided this value overrides the settings value. -->
+		<argument name="usepass" class="Boolean"/>
+		<!-- Flag if the platform password should be printed to the console. -->
+		<argument name="printpass" class="boolean">true</argument>
+		<!-- Flag if trusted lan should be used. -->
+		<argument name="trustedlan" class="Boolean"/>
+		<!-- Network name. -->
+		<argument name="networkname" class="String"/>
+		<!-- Network pass. -->
+		<argument name="networkpass" class="String"/>
+		<!-- Virtual names that are used for authentication -->
+		<argument name="virtualnames" class="java.util.Map"/>
+		<!-- The message validity duration (in minutes) -->
+		<argument name="validityduration" class="long"></argument>
+		
+		<!-- Flag if local transport is enabled. -->
+		<argument name="localtransport" class="boolean">true</argument>
+		<!-- Flag if tcp transport is enabled. -->
+		<argument name="tcptransport" class="boolean">false</argument>
+		<!-- Port for TCP transport. -->
+		<argument name="tcpport" class="int">9876</argument>
+		<!-- Flag if niotcp transport is enabled. -->
+		<argument name="niotcptransport" class="boolean">true</argument>
+		<!-- Port for NIOTCP transport. -->
+		<argument name="niotcpport" class="int">8765</argument>
+		<!-- Flag if relay transport is enabled. -->
+		<argument name="relaytransport" class="boolean">true</argument>
+		<!-- Address(es) for relay transport (one or more addresses separated by commas). -->
+		<argument name="relayaddress" class="String">jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
+		<!-- Flag if relay should use HTTPS for receiving messages. -->
+		<argument name="relaysecurity" class="boolean">$args.relayaddress.indexOf("https://")==-1 ? false : true</argument>
+		<!-- Flag if relay should only be used for awareness and not for messages. -->
+		<argument name="relayawaonly" class="boolean">false</argument>
+		<!-- Flag if ssltcp transport should enabled (requires Jadex Pro add-on). -->
+		<argument name="ssltcptransport" class="boolean">false</argument>
+		<!-- Port for SSL TCP transport. -->
+		<argument name="ssltcpport" class="int">44334</argument>
+		
+		<!-- Flag if web service publishing is enabled. -->
+		<argument name="wspublish" class="boolean">false</argument>
+		
+		<!-- Flag if rest service publishing is enabled. -->
+		<argument name="rspublish" class="boolean">false</argument>
+		
+		<!-- Rest publish implementation. -->
+		<argument name="rspublishcomponent" class="String">jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)</argument>
+		
+		<!-- The name(s) of kernel(s) to load (separated by comma).
+		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
+		     Alternatively, the 'multi' can be used to start any available kernels on demand.
+		     Specifying 'all' will start all available kernels directly. -->
+		<argument name="kernels" class="String">"multi"</argument>
+		
+		<!-- <argument name="platform_shutdown_time">1000</argument> -->
+		
+		<!-- Flag to enable the Maven dependency service (requires Jadex Pro add-on). -->
+		<argument name="maven_dependencies" class="boolean">false</argument>
+		
+		<!-- Flag if global monitoring is turned on.  -->
+		<argument name="monitoringcomp" class="boolean">true</argument>
+		
+		<!-- Flag if sensors are turned on.  -->
+		<argument name="sensors" class="boolean">false</argument>
+
+		<!-- Optionally provide alternative thread pool implementation.  -->
+		<argument name="threadpoolclass" class="String">null</argument>
+		
+		<!-- Optionally provide alternative context service implementation.  -->
+		<argument name="contextserviceclass" class="String">null</argument>
+		
+		
+		<!-- Flag if df component and service should be started.  -->
+		<argument name="df" class="boolean">true</argument>
+		<!-- Flag if clock component and service should be started.  -->
+		<argument name="clock" class="boolean">true</argument>
+		<!-- Flag if message component and service should be started.  -->
+		<argument name="message" class="boolean">true</argument>
+		<!-- Flag if simulation component and service should be started.  -->
+		<argument name="simul" class="boolean">true</argument>
+		<!-- Flag if filetransfer component and service should be started.  -->
+		<argument name="filetransfer" class="boolean">true</argument>
+		<!-- Flag if marshal component and service should be started.  -->
+		<argument name="marshal" class="boolean">true</argument>
+		<!-- Flag if security component and service should be started.  -->
+		<argument name="security" class="boolean">true</argument>
+		<!-- Flag if library component and service should be started.  -->
+		<argument name="library" class="boolean">true</argument>
+		<!-- Flag if settings component and service should be started.  -->
+		<argument name="settings" class="boolean">true</argument>
+		<!-- Flag if context component and service should be started.  -->
+		<argument name="context" class="boolean">true</argument>
+		<!-- Flag if address component and service should be started.  -->
+		<argument name="address" class="boolean">true</argument>
+		<!-- Flag if registry synchronization should be used. -->
+		<argument name="registrysync" class="boolean">false</argument>
+	</arguments>
+	
+	<componenttypes>
+		<componenttype filename="jadex/platform/System.component.xml" name="system"/>
+		
+		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
+		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
+		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
+		<componenttype filename="jadex/bdiv3x/KernelBDIX.component.xml" name="kernel_bdi"/>
+		<componenttype filename="jadex/bdiv3/KernelBDIV3.component.xml" name="kernel_bdiv3"/>
+		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.component.xml" name="kernel_bdibpmn"/>
+		<componenttype filename="jadex/bpmn/KernelBPMN.component.xml" name="kernel_bpmn"/>
+		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
+		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
+		<componenttype filename="jadex/platform/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
+		
+		<componenttype filename="jadex/platform/service/chat/Chat.component.xml" name="chat"/>
+		<componenttype filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
+		<componenttype filename="jadex/extension/rs/publish/RSPublishAgent.class" name="rspublish"/>
+		<componenttype filename="jadex/extension/ws/publish/WSPublishAgent.class" name="wspublish"/>
+		<componenttype filename="jadex/platform/service/cli/CliAgent.class" name="cli"/>
+		<componenttype filename="jadex/platform/service/monitoring/Monitoring.component.xml" name="monitor"/>
+		<componenttype filename="jadex/platform/sensor/SensorHolder.component.xml" name="sensor"/>
+		
+		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
+		
+		<componenttype filename="jadex/platform/service/df/DirectoryFacilitatorAgent.class" name="df"/>
+		<componenttype filename="jadex/platform/service/clock/ClockAgent.class" name="clock"/>
+		<componenttype filename="jadex/platform/service/message/MessageAgent.class" name="message"/>
+		<componenttype filename="jadex/platform/service/simulation/SimulationAgent.class" name="simulation"/>
+		<componenttype filename="jadex/platform/service/filetransfer/FileTransferAgent.class" name="filetransfer"/>
+		<componenttype filename="jadex/platform/service/security/SecurityAgent.class" name="security"/>
+		<componenttype filename="jadex/platform/service/library/Library.component.xml" name="library"/>
+		<componenttype filename="jadex/platform/service/settings/Settings.component.xml" name="settings"/>
+		<componenttype filename="jadex/platform/service/context/Context.component.xml" name="context"/>
+		<componenttype filename="jadex/platform/service/address/TransportAddressAgent.class" name="address"/>
+		
+		<componenttype filename="jadex/platform/service/registry/RegistrySynchronizationAgent.class" name="registrysync"/>
+	</componenttypes>
+	
+	<services>
+		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
+			<implementation proxytype="raw">
+				new jadex.platform.service.threadpool.ThreadPoolService(
+					$args.threadpoolclass!=null
+						? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
+						: new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)),
+					$component.getComponentIdentifier())
+			</implementation>
+		</providedservice>
+		<providedservice class="jadex.bridge.service.types.threadpool.IDaemonThreadPoolService">
+			<implementation proxytype="raw">
+				new jadex.platform.service.threadpool.ThreadPoolService(
+					$args.threadpoolclass!=null
+						? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance()
+						: new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)),
+					$component.getComponentIdentifier())
+			</implementation>
+		</providedservice>
+	    <providedservice class="jadex.bridge.service.types.marshal.IMarshalService">
+			<implementation proxytype="raw">
+				new jadex.platform.service.marshal.MarshalService($component)
+			</implementation>
+		</providedservice>
+		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
+			<implementation proxytype="raw">
+				//new jadex.platform.service.execution.AsyncExecutionService($component)
+				($args.asyncexecution!=null &amp;&amp; !$args.asyncexecution.booleanValue()) || 
+				($args.asyncexecution==null &amp;&amp; $args.simulation!=null &amp;&amp; $args.simulation.booleanValue())
+				? new jadex.platform.service.execution.SyncExecutionService($component)
+				: new jadex.platform.service.execution.AsyncExecutionService($component)
+			</implementation>
+		 </providedservice>
+		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService" name="cms">
+			<implementation>
+				new jadex.platform.service.cms.ComponentManagementService($args.platformaccess, $args.bootstrapfactory, $args.uniqueids)
+			</implementation>
+		</providedservice>
+		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+
+	<properties>
+		<property name="componentviewer.viewerclass">
+		    // Todo: baseclassloader? but evaluated without args?
+		    jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
+		    	jadex.platform.service.library.LibraryService.class.getClassLoader())
+		</property>
+		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
+		<property name="logging.level">$args.logging ? java.util.logging.Level.INFO : $args.logging_level</property>
+	</properties>
+	
+	<configurations>
+		<!-- Autoassigned name and port. Dynamically loads kernels as required. -->
+		<configuration name="auto">
+			<arguments>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
+				<argument name="ssltcpport">0</argument>
+				<argument name="platformname">null</argument>
+			</arguments>
+			
+			<components>
+				<component name="library" type="library" daemon="true" number="Boolean.TRUE.equals($args.library)? 1: 0">
+					<arguments>
+						<argument name="libpath">$args.libpath</argument>
+						<argument name="baseclassloader">$args.baseclassloader</argument>
+						<argument name="maven_dependencies">$args.maven_dependencies</argument>
+					</arguments>
+				</component>
+				<component name="context" type="context" daemon="true" number="Boolean.TRUE.equals($args.context)? 1: 0">
+					<arguments>
+						<argument name="contextserviceclass">$args.contextserviceclass</argument>
+					</arguments>
+				</component>
+				<component name="settings" type="settings" daemon="true" number="Boolean.TRUE.equals($args.settings)? 1: 0"/>
+				
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
+				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_micro" type="kernel_micro" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;micro&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;v3&quot;)!=-1 ? 1 : 0"/>
+				<component name="kernel_bdi" type="kernel_bdi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1 &amp;&amp; $args.get(&quot;kernels&quot;).indexOf(&quot;bdibpmn&quot;)==-1? 1 : 0"/>
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<!-- <component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdiv3&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/> -->
+				
+				<component name="address" type="address" daemon="true" number="Boolean.TRUE.equals($args.address)? 1: 0"/>
+				<component name="clock" type="clock" daemon="true" number="Boolean.TRUE.equals($args.clock)? 1: 0">
+					<arguments>
+						<argument name="simulation">$args.simulation</argument>
+					</arguments>
+				</component>
+				<component name="security" type="security" daemon="true" number="Boolean.TRUE.equals($args.security)? 1: 0">
+					<arguments>
+						<argument name="usepass">$args.usepass</argument>
+						<argument name="printpass">$args.printpass</argument>
+						<argument name="trustedlan">$args.trustedlan</argument>
+						<argument name="networkname">$args.networkname</argument>
+						<argument name="networkpass">$args.networkpass</argument>
+						<argument name="virtualnames">$args.virtualnames</argument>
+						<argument name="validityduration">$args.validityduration</argument>
+					</arguments>
+				</component>
+				<component name="message" type="message" daemon="true" number="Boolean.TRUE.equals($args.message)? 1: 0">
+					<arguments>
+						<argument name="localtransport">$args.localtransport</argument>
+						<argument name="tcptransport">$args.tcptransport</argument>
+						<argument name="niotcptransport">$args.niotcptransport</argument>
+						<argument name="ssltcptransport">$args.ssltcptransport</argument>
+						<argument name="relaytransport">$args.relaytransport</argument>
+						<argument name="tcpport">$args.tcpport</argument>
+						<argument name="niotcpport">$args.niotcpport</argument>
+						<argument name="ssltcpport">$args.ssltcpport</argument>
+						<argument name="relayaddress">$args.relayaddress</argument>
+						<argument name="relaysecurity">$args.relaysecurity</argument>
+						<argument name="relayawaonly">$args.relayawaonly</argument>
+						<argument name="binarymessages">$args.binarymessages</argument>
+						<argument name="strictcom">$args.strictcom</argument>
+					</arguments>
+				</component>
+				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
+				<component name="filetransfer" type="filetransfer" daemon="true" number="Boolean.TRUE.equals($args.filetransfer)? 1: 0"/>
+				
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
+						<argument name="delay">$args.awadelay</argument>
+						<argument name="fast">$args.awafast</argument>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
+				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
+					<arguments>
+						<argument name="saveonexit">$args.saveonexit</argument>
+						<argument name="platforms">$args.jccplatforms</argument>
+					</arguments>
+				</component>
+				<component name="rspub" type="rspublish" daemon="true" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
+				<component name="wspub" type="wspublish" daemon="true" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
+				<component name="cli" type="cli" daemon="true" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
+					<arguments>
+						<argument name="console">$args.cliconsole</argument>
+					</arguments>
+				</component>
+				<component name="registrysync" type="registrysync" daemon="true" number="Boolean.TRUE.equals($args.registrysync)? 1: 0"/>
+			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
+			</components>
+		</configuration>
+		
+		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
+		<configuration name="fixed">
+			<components>
+				<component name="library" type="library" daemon="true" number="Boolean.TRUE.equals($args.library)? 1: 0">
+					<arguments>
+						<argument name="libpath">$args.libpath</argument>
+						<argument name="baseclassloader">$args.baseclassloader</argument>
+						<argument name="maven_dependencies">$args.maven_dependencies</argument>
+					</arguments>
+				</component>
+				<component name="context" type="context" daemon="true" number="Boolean.TRUE.equals($args.context)? 1: 0">
+					<arguments>
+						<argument name="contextserviceclass">$args.contextserviceclass</argument>
+					</arguments>
+				</component>
+				<component name="settings" type="settings" daemon="true" number="Boolean.TRUE.equals($args.settings)? 1: 0"/>
+				
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
+			  	<component name="system" type="system" daemon="true"/>
+				<component name="kernels" type="kernel_multi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;multi&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_micro" type="kernel_micro" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;micro&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;v3&quot;)!=-1 ? 1 : 0"/>
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				
+				<component name="address" type="address" daemon="true" number="Boolean.TRUE.equals($args.address)? 1: 0"/>
+				<component name="clock" type="clock" daemon="true" number="Boolean.TRUE.equals($args.clock)? 1: 0">
+					<arguments>
+						<argument name="simulation">$args.simulation</argument>
+					</arguments>
+				</component>
+				<component name="security" type="security" daemon="true" number="Boolean.TRUE.equals($args.security)? 1: 0">
+					<arguments>
+						<argument name="usepass">$args.usepass</argument>
+						<argument name="printpass">$args.printpass</argument>
+						<argument name="trustedlan">$args.trustedlan</argument>
+						<argument name="networkname">$args.networkname</argument>
+						<argument name="networkpass">$args.networkpass</argument>
+						<argument name="virtualnames">$args.virtualnames</argument>
+						<argument name="validityduration">$args.validityduration</argument>
+					</arguments>
+				</component>
+				<component name="message" type="message" daemon="true" number="Boolean.TRUE.equals($args.message)? 1: 0">
+					<arguments>
+						<argument name="localtransport">$args.localtransport</argument>
+						<argument name="tcptransport">$args.tcptransport</argument>
+						<argument name="niotcptransport">$args.niotcptransport</argument>
+						<argument name="ssltcptransport">$args.ssltcptransport</argument>
+						<argument name="relaytransport">$args.relaytransport</argument>
+						<argument name="tcpport">$args.tcpport</argument>
+						<argument name="niotcpport">$args.niotcpport</argument>
+						<argument name="ssltcpport">$args.ssltcpport</argument>
+						<argument name="relayaddress">$args.relayaddress</argument>
+						<argument name="relaysecurity">$args.relaysecurity</argument>
+						<argument name="relayawaonly">$args.relayawaonly</argument>
+						<argument name="binarymessages">$args.binarymessages</argument>
+						<argument name="strictcom">$args.strictcom</argument>
+					</arguments>
+				</component>
+				<component name="simulation" type="simulation" daemon="true" number="Boolean.TRUE.equals($args.simul)? 1: 0"/>
+				<component name="filetransfer" type="filetransfer" daemon="true" number="Boolean.TRUE.equals($args.filetransfer)? 1: 0"/>
+				
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
+				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
+					<arguments>
+						<argument name="saveonexit">$args.saveonexit</argument>
+						<argument name="platforms">$args.jccplatforms</argument>
+					</arguments>
+				</component>
+				<component name="rspub" type="rspublish" daemon="true" number="Boolean.TRUE.equals($args.rspublish)? 1: 0"/>
+				<component name="wspub" type="wspublish" daemon="true" number="Boolean.TRUE.equals($args.wspublish)? 1: 0"/>
+				<component name="cli" type="cli" daemon="true" number="jadex.commons.SReflect.classForName0(&quot;jadex.platform.service.cli.CliAgent&quot;, jadex.platform.service.library.LibraryService.class.getClassLoader())!=null &amp;&amp; Boolean.TRUE.equals($args.cli)? 1: 0" >
+					<arguments>
+						<argument name="console">$args.cliconsole</argument>
+					</arguments>
+				</component>
+				<component name="registrysync" type="registrysync" daemon="true" number="Boolean.TRUE.equals($args.registrysync)? 1: 0"/>
+			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
+			</components>
+		</configuration>
+		
+	</configurations>
+</componenttype>

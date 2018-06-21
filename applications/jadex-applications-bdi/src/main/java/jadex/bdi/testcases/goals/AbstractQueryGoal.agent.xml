@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test abstract query goal dispatched by inner capability.</H3>
+
+	The agent defines a query goal which is assigned to the abstract goal
+	from a capability. The capability posts the abstract goal, which succeeds
+	due to out parameter settings in the concrete goal.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AbstractQueryGoal"
+	package="jadex.bdi.testcases.goals">
+	
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+	
+	<capabilities>
+		<capability name="capA" file="jadex/bdi/testcases/goals/AbstractQueryGoal"/>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports">
+			<assignto ref="capA.reports"/>
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<querygoal name="qgoal">
+			<assignto ref="capA.testgoal"/>
+			<parameterset name="params" class="String"/>
+			<parameter name="result" class="String" direction="out" evaluationmode="push">
+				<value>
+					$goal.params.length>0 ? $goal.params[0] : null
+				</value>
+			</parameter>
+		</querygoal>
+	</goals>
+		
+</agent>

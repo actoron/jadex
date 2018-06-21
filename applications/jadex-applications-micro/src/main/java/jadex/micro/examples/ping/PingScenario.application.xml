@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3> The Ping Scenario </H3>
+	
+	Starts pinging agents and agents to be ping'd. 
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application
+						http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
+	name="PingScenario" package="jadex.micro.examples.ping">
+	
+	<componenttypes>
+		<componenttype name="Ping" filename="jadex/micro/examples/ping/PingAgent.class" master="true"/>
+		<componenttype name="Pinging" filename="jadex/micro/examples/ping/PingingAgent.class" master="true"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Simple Pinging">
+			<components>
+				<component type="Ping" name="Ping" />
+				<component type="Pinging" name="Pinging" />
+			</components>
+		</configuration>
+
+		<configuration name="Multi Pinging">
+			<components>
+				<component type="Ping" name="Ping"/>
+				<component type="Pinging" number="2"/>
+			</components>
+		</configuration>
+
+		<configuration name="Fast Pinging">
+			<components>
+				<component type="Ping" name="Ping"/>
+				<component type="Pinging" name="FastPinging">
+					<arguments>
+						<argument name="ping_delay">
+							500
+						</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+	</configurations>
+	
+</applicationtype>

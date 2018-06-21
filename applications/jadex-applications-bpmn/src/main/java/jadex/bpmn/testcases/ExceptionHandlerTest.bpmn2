@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>ExceptionHandlerTest</jadex:modelname>
+    <jadex:results>
+      <jadex:result name="testresults" type="jadex.base.test.Testcase">
+        <jadex:description>The test results.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="OgR1WrueGvWKmuLX">
+    <semantic:startEvent id="LbALhauqc5ETNk83">
+      <semantic:outgoing>tUzqgLS/ka3L1KUm</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Exception Test 1" id="f1PrXq47cuD9/Kk2">
+      <semantic:incoming>tUzqgLS/ka3L1KUm</semantic:incoming>
+      <semantic:outgoing>Ai7VZil9Ut/AdlvB</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.ExceptionTask</jadex:class>
+        <jadex:parameter direction="in" name="exceptionclass" type="java.lang.Class">RuntimeException.class</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:boundaryEvent id="nSiswbBiZ/j0Yut5" attachedToRef="f1PrXq47cuD9/Kk2">
+      <semantic:outgoing>yZmSLtICaXZc936X</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:task name="Exception Test 2" id="VN5FhPSxhG2r9mE8">
+      <semantic:incoming>yZmSLtICaXZc936X</semantic:incoming>
+      <semantic:outgoing>3lYeR1fMM+ojRkRu</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.ExceptionTask</jadex:class>
+        <jadex:parameter direction="in" name="exceptionclass" type="java.lang.Class">IllegalArgumentException.class</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:boundaryEvent id="Y7F7p9O+H4KeAwP0" attachedToRef="VN5FhPSxhG2r9mE8">
+      <semantic:outgoing>Kyv1RCA04zi3ZjtV</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:class>java.lang.ClassCastException</jadex:class>
+      </semantic:extensionElements>
+    </semantic:boundaryEvent>
+    <semantic:boundaryEvent id="nItYKWYpNZ+kGzFp" attachedToRef="VN5FhPSxhG2r9mE8">
+      <semantic:outgoing>4md1gXzFG5kgpWFa</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:task name="Write\nSuccessful Test\nReport" id="h5kKU0WayHteVOGx">
+      <semantic:incoming>Olmugl4+Qep80pF7</semantic:incoming>
+      <semantic:outgoing>uEMmMQvmEs3dwUi7</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.TestCaseReportTask</jadex:class>
+        <jadex:parameter direction="in" name="success" type="java.lang.Boolean">Boolean.TRUE</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Write\nWrong Handler\nReport" id="6awHrcyjHr2iElWP">
+      <semantic:incoming>Kyv1RCA04zi3ZjtV</semantic:incoming>
+      <semantic:incoming>ff8lWGpc6LSqfYUu</semantic:incoming>
+      <semantic:incoming>hRqLbC/i1/4162L+</semantic:incoming>
+      <semantic:outgoing>WH+iRZQ6Ulj7o3of</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.TestCaseReportTask</jadex:class>
+        <jadex:parameter direction="in" name="description" type="java.lang.String">null</jadex:parameter>
+        <jadex:parameter direction="in" name="success" type="java.lang.Boolean">Boolean.FALSE</jadex:parameter>
+        <jadex:parameter direction="in" name="reason" type="java.lang.String">&quot;Flow control picked wrong exception handler.&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Write\nIgnored Exception\nReport" id="eBYKdAJ3ZFpTqcmb">
+      <semantic:incoming>Ai7VZil9Ut/AdlvB</semantic:incoming>
+      <semantic:incoming>3lYeR1fMM+ojRkRu</semantic:incoming>
+      <semantic:incoming>HonC9cAwhDRu3Jue</semantic:incoming>
+      <semantic:outgoing>QGmUvPQgSbN1tUjF</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.TestCaseReportTask</jadex:class>
+        <jadex:parameter direction="in" name="success" type="java.lang.Boolean">Boolean.FALSE</jadex:parameter>
+        <jadex:parameter direction="in" name="reason" type="java.lang.String">&quot;Interpreter ignored exception.&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Exception Test 3" id="kqJ2/9YG7nIjQtLl">
+      <semantic:incoming>4md1gXzFG5kgpWFa</semantic:incoming>
+      <semantic:outgoing>HonC9cAwhDRu3Jue</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.testcases.ExceptionTask</jadex:class>
+        <jadex:parameter direction="in" name="exceptionclass" type="java.lang.Class">IllegalArgumentException.class</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:boundaryEvent id="w38+Oa3RHeLyo6+b" attachedToRef="kqJ2/9YG7nIjQtLl">
+      <semantic:outgoing>hRqLbC/i1/4162L+</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:class>java.lang.ClassCastException</jadex:class>
+      </semantic:extensionElements>
+    </semantic:boundaryEvent>
+    <semantic:boundaryEvent id="jtDgz/bDerLYy4SR" attachedToRef="kqJ2/9YG7nIjQtLl">
+      <semantic:outgoing>Olmugl4+Qep80pF7</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:class>java.lang.RuntimeException</jadex:class>
+      </semantic:extensionElements>
+    </semantic:boundaryEvent>
+    <semantic:boundaryEvent id="mfmsATIQPnTL6QZH" attachedToRef="kqJ2/9YG7nIjQtLl">
+      <semantic:outgoing>ff8lWGpc6LSqfYUu</semantic:outgoing>
+      <semantic:errorEventDefinition/>
+    </semantic:boundaryEvent>
+    <semantic:endEvent id="mg8UX8NVwR66dDHT">
+      <semantic:incoming>uEMmMQvmEs3dwUi7</semantic:incoming>
+      <semantic:incoming>QGmUvPQgSbN1tUjF</semantic:incoming>
+      <semantic:incoming>WH+iRZQ6Ulj7o3of</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="LbALhauqc5ETNk83" targetRef="f1PrXq47cuD9/Kk2" id="tUzqgLS/ka3L1KUm">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="f1PrXq47cuD9/Kk2" targetRef="eBYKdAJ3ZFpTqcmb" id="Ai7VZil9Ut/AdlvB">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="nSiswbBiZ/j0Yut5" targetRef="VN5FhPSxhG2r9mE8" id="yZmSLtICaXZc936X">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="VN5FhPSxhG2r9mE8" targetRef="eBYKdAJ3ZFpTqcmb" id="3lYeR1fMM+ojRkRu">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="Y7F7p9O+H4KeAwP0" targetRef="6awHrcyjHr2iElWP" id="Kyv1RCA04zi3ZjtV">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="nItYKWYpNZ+kGzFp" targetRef="kqJ2/9YG7nIjQtLl" id="4md1gXzFG5kgpWFa">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="h5kKU0WayHteVOGx" targetRef="mg8UX8NVwR66dDHT" id="uEMmMQvmEs3dwUi7">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="6awHrcyjHr2iElWP" targetRef="mg8UX8NVwR66dDHT" id="WH+iRZQ6Ulj7o3of">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="eBYKdAJ3ZFpTqcmb" targetRef="mg8UX8NVwR66dDHT" id="QGmUvPQgSbN1tUjF">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="kqJ2/9YG7nIjQtLl" targetRef="eBYKdAJ3ZFpTqcmb" id="HonC9cAwhDRu3Jue">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="w38+Oa3RHeLyo6+b" targetRef="6awHrcyjHr2iElWP" id="hRqLbC/i1/4162L+">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="jtDgz/bDerLYy4SR" targetRef="h5kKU0WayHteVOGx" id="Olmugl4+Qep80pF7">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="mfmsATIQPnTL6QZH" targetRef="6awHrcyjHr2iElWP" id="ff8lWGpc6LSqfYUu">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="OgR1WrueGvWKmuLX">
+        <dc:Bounds height="770.0" width="1320.0" x="155.0192740205541" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LbALhauqc5ETNk83">
+        <dc:Bounds height="40.0" width="40.0" x="90.0" y="70.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="f1PrXq47cuD9/Kk2">
+        <dc:Bounds height="100.0" width="160.0" x="240.0" y="40.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>exceptionclass</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="nSiswbBiZ/j0Yut5">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="VN5FhPSxhG2r9mE8">
+        <dc:Bounds height="100.0" width="160.0" x="305.0" y="200.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>exceptionclass</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Y7F7p9O+H4KeAwP0">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="nItYKWYpNZ+kGzFp">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="h5kKU0WayHteVOGx">
+        <dc:Bounds height="100.0" width="160.0" x="835.0" y="600.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>success</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="6awHrcyjHr2iElWP">
+        <dc:Bounds height="100.0" width="160.0" x="835.0" y="480.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>reason</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>description</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>success</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eBYKdAJ3ZFpTqcmb">
+        <dc:Bounds height="100.0" width="160.0" x="835.0" y="350.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>reason</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>success</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="kqJ2/9YG7nIjQtLl">
+        <dc:Bounds height="100.0" width="160.0" x="425.0" y="350.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>exceptionclass</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="w38+Oa3RHeLyo6+b">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="jtDgz/bDerLYy4SR">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mfmsATIQPnTL6QZH">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mg8UX8NVwR66dDHT">
+        <dc:Bounds height="40.0" width="40.0" x="1155.0" y="510.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="Ai7VZil9Ut/AdlvB">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="3lYeR1fMM+ojRkRu">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="HonC9cAwhDRu3Jue">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="tUzqgLS/ka3L1KUm">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="uEMmMQvmEs3dwUi7">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="yZmSLtICaXZc936X">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="QGmUvPQgSbN1tUjF">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="WH+iRZQ6Ulj7o3of">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Kyv1RCA04zi3ZjtV">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="4md1gXzFG5kgpWFa">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ff8lWGpc6LSqfYUu">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="hRqLbC/i1/4162L+">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Olmugl4+Qep80pF7">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

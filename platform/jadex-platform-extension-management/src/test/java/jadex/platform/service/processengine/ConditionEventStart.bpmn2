@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>ConditionEventStart</jadex:modelname>
+    <jadex:package>jadex.platform.service.processengine</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:results>
+      <jadex:result name="result" type="String">
+        <jadex:description>&quot;The result&quot;</jadex:description>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_BlPWQScvEeKSvNRxWcVdjQ">
+    <semantic:task name="B1" id="_9UeqoSf9EeKVjbAWuDmuDw">
+      <semantic:incoming>_9Ul_YSf9EeKVjbAWuDmuDw</semantic:incoming>
+      <semantic:outgoing>_Gh4vMSgbEeK-VrV1qXeZuQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started B1: &quot;+$event+&quot; &quot;+$component.getComponentIdentifier()</jadex:parameter>
+        <jadex:parameter direction="out" name="act" type="String">&quot;b1&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="B2" id="_NoymoSf-EeKVjbAWuDmuDw">
+      <semantic:incoming>_No57YSf-EeKVjbAWuDmuDw</semantic:incoming>
+      <semantic:outgoing>_G1uRMSgbEeK-VrV1qXeZuQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started B2: &quot;+$event+&quot; &quot;+$component.getComponentIdentifier()</jadex:parameter>
+        <jadex:parameter direction="out" name="act" type="String">&quot;b2&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="A1" id="_BlP9UScvEeKSvNRxWcVdjQ">
+      <semantic:incoming>_FPokYScvEeKSvNRxWcVdjQ</semantic:incoming>
+      <semantic:outgoing>_MEdcYSgaEeKVjbAWuDmuDw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started A1: &quot;+$event+&quot; &quot;+$component.getComponentIdentifier()</jadex:parameter>
+        <jadex:parameter direction="out" name="act" type="String">&quot;a1&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="A2" id="_XRD1wSdsEeKVjbAWuDmuDw">
+      <semantic:incoming>_XRLxkSdsEeKVjbAWuDmuDw</semantic:incoming>
+      <semantic:outgoing>_GI4ZUCgbEeK-VrV1qXeZuQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started A2: &quot;+$event+&quot; &quot;+$component.getComponentIdentifier()</jadex:parameter>
+        <jadex:parameter direction="out" name="act" type="String">&quot;a2&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:startEvent id="_EnQ80ScvEeKSvNRxWcVdjQ">
+      <semantic:outgoing>_FPokYScvEeKSvNRxWcVdjQ</semantic:outgoing>
+      <semantic:conditionalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="notifier">&quot;file_added; $event.getContent()&quot;</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_added&quot;}</jadex:property>
+        <jadex:property name="condition">$event.getContent()</jadex:property>
+      </semantic:extensionElements>
+    </semantic:startEvent>
+    <semantic:startEvent id="_VBdxsSdsEeKVjbAWuDmuDw">
+      <semantic:outgoing>_XRLxkSdsEeKVjbAWuDmuDw</semantic:outgoing>
+      <semantic:conditionalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="notifier">&quot;file_added; !$event.getContent()&quot;</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_added&quot;}</jadex:property>
+        <jadex:property name="condition">!$event.getContent()</jadex:property>
+      </semantic:extensionElements>
+    </semantic:startEvent>
+    <semantic:startEvent id="_7aMIMSf9EeKVjbAWuDmuDw">
+      <semantic:outgoing>_9Ul_YSf9EeKVjbAWuDmuDw</semantic:outgoing>
+      <semantic:conditionalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="notifier">&quot;file_removed; $event.getContent()&quot;</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_removed&quot;}</jadex:property>
+        <jadex:property name="condition">$event.getContent()</jadex:property>
+      </semantic:extensionElements>
+    </semantic:startEvent>
+    <semantic:startEvent id="_NOFnoCf-EeKVjbAWuDmuDw">
+      <semantic:outgoing>_No57YSf-EeKVjbAWuDmuDw</semantic:outgoing>
+      <semantic:conditionalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="notifier">&quot;file_removed; !$event.getContent()&quot;</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;file_removed&quot;}</jadex:property>
+        <jadex:property name="condition">!$event.getContent()</jadex:property>
+      </semantic:extensionElements>
+    </semantic:startEvent>
+    <semantic:endEvent id="_GFQk0ScvEeKSvNRxWcVdjQ">
+      <semantic:incoming>_lRaCgSdVEeKVjbAWuDmuDw</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:task name="Write" id="_KNFEASgaEeKVjbAWuDmuDw">
+      <semantic:incoming>_MEdcYSgaEeKVjbAWuDmuDw</semantic:incoming>
+      <semantic:incoming>_GI4ZUCgbEeK-VrV1qXeZuQ</semantic:incoming>
+      <semantic:incoming>_Gh4vMSgbEeK-VrV1qXeZuQ</semantic:incoming>
+      <semantic:incoming>_G1uRMSgbEeK-VrV1qXeZuQ</semantic:incoming>
+      <semantic:outgoing>_lRaCgSdVEeKVjbAWuDmuDw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;result&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="String">act</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="_9UeqoSf9EeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_Gh4vMSgbEeK-VrV1qXeZuQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_NoymoSf-EeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_G1uRMSgbEeK-VrV1qXeZuQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_BlP9UScvEeKSvNRxWcVdjQ" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_MEdcYSgaEeKVjbAWuDmuDw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_XRD1wSdsEeKVjbAWuDmuDw" targetRef="_KNFEASgaEeKVjbAWuDmuDw" id="_GI4ZUCgbEeK-VrV1qXeZuQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_EnQ80ScvEeKSvNRxWcVdjQ" targetRef="_BlP9UScvEeKSvNRxWcVdjQ" id="_FPokYScvEeKSvNRxWcVdjQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_VBdxsSdsEeKVjbAWuDmuDw" targetRef="_XRD1wSdsEeKVjbAWuDmuDw" id="_XRLxkSdsEeKVjbAWuDmuDw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_7aMIMSf9EeKVjbAWuDmuDw" targetRef="_9UeqoSf9EeKVjbAWuDmuDw" id="_9Ul_YSf9EeKVjbAWuDmuDw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_NOFnoCf-EeKVjbAWuDmuDw" targetRef="_NoymoSf-EeKVjbAWuDmuDw" id="_No57YSf-EeKVjbAWuDmuDw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_KNFEASgaEeKVjbAWuDmuDw" targetRef="_GFQk0ScvEeKSvNRxWcVdjQ" id="_lRaCgSdVEeKVjbAWuDmuDw">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_BlPWQScvEeKSvNRxWcVdjQ">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_9UeqoSf9EeKVjbAWuDmuDw">
+        <dc:Bounds height="100.0" width="160.0" x="250.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_NoymoSf-EeKVjbAWuDmuDw">
+        <dc:Bounds height="100.0" width="160.0" x="250.0" y="380.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_BlP9UScvEeKSvNRxWcVdjQ">
+        <dc:Bounds height="100.0" width="160.0" x="250.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_XRD1wSdsEeKVjbAWuDmuDw">
+        <dc:Bounds height="100.0" width="160.0" x="250.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_EnQ80ScvEeKSvNRxWcVdjQ">
+        <dc:Bounds height="40.0" width="40.0" x="120.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_VBdxsSdsEeKVjbAWuDmuDw">
+        <dc:Bounds height="40.0" width="40.0" x="120.0" y="180.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_7aMIMSf9EeKVjbAWuDmuDw">
+        <dc:Bounds height="40.0" width="40.0" x="120.0" y="300.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_NOFnoCf-EeKVjbAWuDmuDw">
+        <dc:Bounds height="40.0" width="40.0" x="120.0" y="410.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_GFQk0ScvEeKSvNRxWcVdjQ">
+        <dc:Bounds height="40.0" width="40.0" x="910.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_KNFEASgaEeKVjbAWuDmuDw">
+        <dc:Bounds height="100.0" width="160.0" x="640.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_MEdcYSgaEeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_MEdcYSgaEeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_FPokYScvEeKSvNRxWcVdjQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_FPokYScvEeKSvNRxWcVdjQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_XRLxkSdsEeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_XRLxkSdsEeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_GI4ZUCgbEeK-VrV1qXeZuQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_GI4ZUCgbEeK-VrV1qXeZuQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_9Ul_YSf9EeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_9Ul_YSf9EeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Gh4vMSgbEeK-VrV1qXeZuQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Gh4vMSgbEeK-VrV1qXeZuQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_No57YSf-EeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_No57YSf-EeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_G1uRMSgbEeK-VrV1qXeZuQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_G1uRMSgbEeK-VrV1qXeZuQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_lRaCgSdVEeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_lRaCgSdVEeKVjbAWuDmuDw">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>S1_ProvidedServices</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="h+5zbIZCq1kqcVgt">
+    <semantic:subProcess name="Service B" id="PDiITEFBW/u0FejX" triggeredByEvent="true">
+      <semantic:startEvent id="AWoEEebCXTss6X2s">
+        <semantic:outgoing>B8NvyQ3DpJBHbika</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="out" name="param0" type="int"/>
+          <jadex:parameter direction="out" name="param1" type="int"/>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;IFuture&lt;Integer&gt; add(int, int)&quot;</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Method 1" id="EIIUyDRP37T+GbVt">
+        <semantic:incoming>B8NvyQ3DpJBHbika</semantic:incoming>
+        <semantic:outgoing>dK03HWtXwwUegxHB</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="inout" name="param0" type="java.lang.Integer"/>
+          <jadex:parameter direction="inout" name="param1" type="java.lang.Integer"/>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 1: &quot;+param0+&quot; &quot;+param1</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:task name="Method 2" id="SZYm7jv3Bit8uZxc">
+        <semantic:incoming>gkpmA0Jeo+713iXM</semantic:incoming>
+        <semantic:outgoing>hCmn6earoHTmDtA6</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Service B - method 2: &quot;+param0+&quot; &quot;+param1</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:startEvent id="8t+uPx2Ybl6pQUAV">
+        <semantic:outgoing>gkpmA0Jeo+713iXM</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="out" name="param0" type="int"/>
+          <jadex:parameter direction="out" name="param1" type="int"/>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="method">&quot;IFuture&lt;Integer&gt; sub(int, int)&quot;</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:endEvent id="dXojUkOKANVBrm25">
+        <semantic:incoming>dK03HWtXwwUegxHB</semantic:incoming>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:endEvent>
+      <semantic:endEvent id="LxP3XYiJRbz8g0MS">
+        <semantic:incoming>hCmn6earoHTmDtA6</semantic:incoming>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
+          <jadex:property name="returnparam">param0-param1</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:endEvent>
+      <semantic:startEvent id="sZlEH92/9t0EQDRU">
+        <semantic:outgoing>RSKdQT8P+R46kId0</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="iface">jadex.bpmn.tutorial.IBService.class</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+          <jadex:property name="method">&quot;IIntermediateFuture&lt;Integer&gt; count()&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Method 3" id="/09zsgGkEnkWC1wR">
+        <semantic:incoming>RSKdQT8P+R46kId0</semantic:incoming>
+        <semantic:incoming>MgwEUOGUo3I7MySH</semantic:incoming>
+        <semantic:outgoing>DEvMaqZuasVEhiJO</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="inout" name="cnt" type="int">0</jadex:parameter>
+          <jadex:parameter direction="in" name="text1" type="java.lang.String">&quot;Service C - method 3: &quot;+cnt</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:intermediateThrowEvent id="CM2YXVq9jNbjX/vx">
+        <semantic:incoming>DEvMaqZuasVEhiJO</semantic:incoming>
+        <semantic:outgoing>UUUVMs4gePDwbEFg</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:intermediateThrowEvent>
+      <semantic:exclusiveGateway id="uTFFqJRT/Vrj2AjE">
+        <semantic:incoming>UUUVMs4gePDwbEFg</semantic:incoming>
+        <semantic:outgoing>FlWhRnxfsvQYwbjo</semantic:outgoing>
+        <semantic:outgoing>MgwEUOGUo3I7MySH</semantic:outgoing>
+      </semantic:exclusiveGateway>
+      <semantic:endEvent id="vAjLBNSzcVQPU9W8">
+        <semantic:incoming>FlWhRnxfsvQYwbjo</semantic:incoming>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:endEvent>
+    </semantic:subProcess>
+    <semantic:subProcess name="Service A" id="BLhKFbd+HLIvEnKU" triggeredByEvent="true">
+      <semantic:startEvent id="M0ETx6cYjmHk/hoH">
+        <semantic:outgoing>4DdtrGFKVof6uS49</semantic:outgoing>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="method">&quot;IFuture&lt;String&gt; test()&quot;</jadex:property>
+          <jadex:property name="iface">jadex.bpmn.testcases.IAService.class</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Method 1" id="HSjAxDflhY3JYSiV">
+        <semantic:incoming>4DdtrGFKVof6uS49</semantic:incoming>
+        <semantic:outgoing>uFWlOF7UPObuF9uy</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="inout" name="text" type="java.lang.String">&quot;Service A - method 1&quot;</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:endEvent id="m5vdqhI00xqP2LF7">
+        <semantic:incoming>uFWlOF7UPObuF9uy</semantic:incoming>
+        <semantic:messageEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:parameter direction="inout" name="returnparam" type="java.lang.Object"/>
+          <jadex:property name="returnparam">text</jadex:property>
+          <jadex:property name="isService">&quot;true&quot;</jadex:property>
+        </semantic:extensionElements>
+      </semantic:endEvent>
+    </semantic:subProcess>
+    <semantic:sequenceFlow sourceRef="AWoEEebCXTss6X2s" targetRef="EIIUyDRP37T+GbVt" id="B8NvyQ3DpJBHbika">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="EIIUyDRP37T+GbVt" targetRef="dXojUkOKANVBrm25" id="dK03HWtXwwUegxHB">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="SZYm7jv3Bit8uZxc" targetRef="LxP3XYiJRbz8g0MS" id="hCmn6earoHTmDtA6">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="8t+uPx2Ybl6pQUAV" targetRef="SZYm7jv3Bit8uZxc" id="gkpmA0Jeo+713iXM">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="sZlEH92/9t0EQDRU" targetRef="/09zsgGkEnkWC1wR" id="RSKdQT8P+R46kId0">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="/09zsgGkEnkWC1wR" targetRef="CM2YXVq9jNbjX/vx" id="DEvMaqZuasVEhiJO">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="CM2YXVq9jNbjX/vx" targetRef="uTFFqJRT/Vrj2AjE" id="UUUVMs4gePDwbEFg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="uTFFqJRT/Vrj2AjE" targetRef="vAjLBNSzcVQPU9W8" id="FlWhRnxfsvQYwbjo">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="uTFFqJRT/Vrj2AjE" targetRef="/09zsgGkEnkWC1wR" id="MgwEUOGUo3I7MySH">
+      <semantic:conditionExpression>cnt&lt;2\n</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="M0ETx6cYjmHk/hoH" targetRef="HSjAxDflhY3JYSiV" id="4DdtrGFKVof6uS49">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="HSjAxDflhY3JYSiV" targetRef="m5vdqhI00xqP2LF7" id="uFWlOF7UPObuF9uy">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+      <jadex:dataFlow id="ubRYMDACim4brswJ" sourceRef="AWoEEebCXTss6X2s" sourceParam="param0" targetRef="EIIUyDRP37T+GbVt" targetParam="param0"/>
+      <jadex:dataFlow id="HUa2iQ6m39wAe1jb" sourceRef="AWoEEebCXTss6X2s" sourceParam="param1" targetRef="EIIUyDRP37T+GbVt" targetParam="param1"/>
+      <jadex:dataFlow id="CD5FbioCR+Q1fJXy" sourceRef="EIIUyDRP37T+GbVt" sourceParam="param0" targetRef="dXojUkOKANVBrm25" targetParam="returnparam">
+        <jadex:dataFlowValueMapping>param0+param1</jadex:dataFlowValueMapping>
+      </jadex:dataFlow>
+      <jadex:dataFlow id="kbJosNYbUy5svUwk" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="CM2YXVq9jNbjX/vx" targetParam="returnparam"/>
+      <jadex:dataFlow id="yFWtiNqxE549bNnW" sourceRef="/09zsgGkEnkWC1wR" sourceParam="cnt" targetRef="/09zsgGkEnkWC1wR" targetParam="cnt">
+        <jadex:dataFlowValueMapping>cnt+1</jadex:dataFlowValueMapping>
+      </jadex:dataFlow>
+      <jadex:dataFlow id="ccNv2FkqQgUnxFfC" sourceRef="HSjAxDflhY3JYSiV" sourceParam="text" targetRef="m5vdqhI00xqP2LF7" targetParam="returnparam"/>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="h+5zbIZCq1kqcVgt">
+        <dc:Bounds height="750.0" width="1200.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="PDiITEFBW/u0FejX" isExpanded="true">
+        <dc:Bounds height="460.0" width="650.0" x="140.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="AWoEEebCXTss6X2s">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EIIUyDRP37T+GbVt">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="20.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SZYm7jv3Bit8uZxc">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="8t+uPx2Ybl6pQUAV">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="dXojUkOKANVBrm25">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LxP3XYiJRbz8g0MS">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="190.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sZlEH92/9t0EQDRU">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="340.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="/09zsgGkEnkWC1wR">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="310.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CM2YXVq9jNbjX/vx">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="340.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="uTFFqJRT/Vrj2AjE">
+        <dc:Bounds height="60.0" width="60.0" x="460.0" y="330.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="vAjLBNSzcVQPU9W8">
+        <dc:Bounds height="40.0" width="40.0" x="560.0" y="340.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="BLhKFbd+HLIvEnKU" isExpanded="true">
+        <dc:Bounds height="200.0" width="480.0" x="140.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="M0ETx6cYjmHk/hoH">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="HSjAxDflhY3JYSiV">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="m5vdqhI00xqP2LF7">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="B8NvyQ3DpJBHbika">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="gkpmA0Jeo+713iXM">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="dK03HWtXwwUegxHB">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="hCmn6earoHTmDtA6">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="ubRYMDACim4brswJ">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="HUa2iQ6m39wAe1jb">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="CD5FbioCR+Q1fJXy">
+      </di:Edge>
+      <bpmndi:BPMNEdge bpmnElement="RSKdQT8P+R46kId0">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="DEvMaqZuasVEhiJO">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="UUUVMs4gePDwbEFg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="FlWhRnxfsvQYwbjo">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="MgwEUOGUo3I7MySH">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="kbJosNYbUy5svUwk">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="yFWtiNqxE549bNnW">
+      </di:Edge>
+      <bpmndi:BPMNEdge bpmnElement="4DdtrGFKVof6uS49">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="uFWlOF7UPObuF9uy">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="ccNv2FkqQgUnxFfC">
+      </di:Edge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

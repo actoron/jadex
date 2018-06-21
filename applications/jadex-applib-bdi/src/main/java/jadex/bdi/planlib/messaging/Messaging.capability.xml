@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The messaging capability can be used to send/receive im/email/(sms).
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	package="jadex.bdi.planlib.messaging" name="Messaging">
+	
+	<imports>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+	
+	<beliefs>
+		<belief name="emailaccount" class="EmailAccount" exported="true" />
+	
+		<belief name="icqaccount" class="IMAccount" exported="true" />
+		
+		<belief name="xmppaccount" class="IMAccount" exported="true" />
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="send_sms" exported="true">
+			<parameter name="content" class="String"></parameter>
+			<parameterset name="receivers" class="String"></parameterset>
+		</achievegoal>
+	
+		<achievegoal name="send_icq" exported="true">
+			<parameter name="account" class="IMAccount">
+				<value>$beliefbase.icqaccount</value>
+			</parameter>
+			<parameter name="content" class="String"></parameter>
+			<parameterset name="receivers" class="String"></parameterset>
+		</achievegoal>
+		
+		<achievegoal name="send_xmpp" exported="true">
+			<parameter name="account" class="IMAccount">
+				<value>$beliefbase.xmppaccount</value>
+			</parameter>
+			<parameter name="content" class="String"></parameter>
+			<parameterset name="receivers" class="String"></parameterset>
+		</achievegoal>
+		
+		<achievegoal name="send_email" exported="true">
+			<parameter name="account" class="EmailAccount">
+				<value>$beliefbase.emailaccount</value>
+			</parameter>
+			<parameter name="content" class="String" optional="true" />
+			<parameter name="subject" class="String" optional="true" />
+			<parameterset name="receivers" class="String" />
+			<parameterset name="ccs" class="String" optional="true" />
+			<parameterset name="bccs" class="String" optional="true" />
+			<parameterset name="attachments" class="Object"
+				optional="true" />
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="send_email_plan">
+			<parameter name="account" class="EmailAccount">
+				<goalmapping ref="send_email.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_email.content" />
+			</parameter>
+			<parameter name="subject" class="String">
+				<goalmapping ref="send_email.subject" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_email.receivers" />
+			</parameterset>
+			<parameterset name="ccs" class="String">
+				<goalmapping ref="send_email.ccs" />
+			</parameterset>
+			<parameterset name="bccs" class="String">
+				<goalmapping ref="send_email.bccs" />
+			</parameterset>
+			<parameterset name="attachments" class="Object">
+				<goalmapping ref="send_email.attachments" />
+			</parameterset>
+			<body class="SendEmailPlan" />
+			<trigger>
+				<goal ref="send_email" />
+			</trigger>
+		</plan>
+		
+		<plan name="send_icq_plan">
+			<parameter name="account" class="IMAccount">
+				<goalmapping ref="send_icq.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_icq.content" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_icq.receivers" />
+			</parameterset>
+			<body class="SendICQPlan" />
+			<trigger>
+				<goal ref="send_icq" />
+			</trigger>
+		</plan>
+		
+		<plan name="send_xmpp_plan">
+			<parameter name="account" class="IMAccount">
+				<goalmapping ref="send_xmpp.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_xmpp.content" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_xmpp.receivers" />
+			</parameterset>
+			<body class="SendXMPPPlan" />
+			<trigger>
+				<goal ref="send_xmpp" />
+			</trigger>
+		</plan>
+		
+	</plans>
+	
+</capability>

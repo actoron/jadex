@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The buyer agent that purchases books for its user.</H3>
+
+	The buyer agent comes with a user interface in which the
+	human user can enter its purchase book orders consisting of
+	a title, start price, price limit and a deadline. The agent
+	subsequently tries to buy the book and changes the price
+	according to the deadline.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	   name="Buyer" package="jadex.bdi.examples.booktrading.serviceimpl.buyer">
+
+	<imports>
+		<import>jadex.bdi.examples.booktrading.common.*</import>
+		<import>jadex.bdi.examples.booktrading.serviceimpl.*</import>
+		<import>java.util.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
+	</imports>
+
+	<beliefs>
+		<beliefset name="orders" class="Order" evaluationmode="push">
+			<facts>
+			    select $g.order from IGoal $g in $goalbase.getGoals("purchase_book")
+			</facts>
+		</beliefset>
+		
+		<belief name="time" class="long" updaterate="1000">
+			<fact>$scope.getTime()</fact>
+		</belief>
+		
+		<beliefset name="initial_orders" class="Order" exported="true"/>
+		
+		<beliefset name="negotiation_reports" class="NegotiationReport"/>
+		
+		<belief name="gui" class="jadex.commons.gui.GuiCreator"/>
+	</beliefs>
+
+	<goals>
+		<!--  Initiate negotiation rounds every 10 secs. -->
+		<achievegoal name="purchase_book" recur="true" recurdelay="10000">
+			<parameter name="order" class="Order">
+			    <bindingoptions>
+			        select Order $order from $beliefbase.initial_orders where $order.getState()==Order.OPEN
+			    </bindingoptions>
+			</parameter>
+			<unique/>
+			<creationcondition beliefs="initial_orders">
+				true
+			</creationcondition>
+			<dropcondition>
+				$goal.order.getState().equals(Order.FAILED)
+			</dropcondition>
+			<targetcondition>
+				Order.DONE.equals($goal.order.getState())
+			</targetcondition>
+		</achievegoal>
+		
+	</goals>
+
+	<plans>
+		<plan name="purchase_book_plan">
+			<parameter name="order" class="Order">
+				<goalmapping ref="purchase_book.order"/>
+			</parameter>
+			<body class="PurchaseBookPlan" />
+			<trigger>
+				<goal ref="purchase_book"/>
+			</trigger>
+		</plan>		
+	</plans>
+	
+	<expressions>
+		<expression name="search_reports">
+			select NegotiationReport $nr from $beliefbase.negotiation_reports
+			where $nr.getOrder().equals($order)
+			order by $nr.getTime()
+			<!-- <parameter name="$order" class="Order"/> -->
+		</expression>
+	</expressions>
+
+	<services>
+		<requiredservice name="buyservice" class="IBuyBookService" multiple="true">
+			<binding scope="global"/>
+		</requiredservice>
+	</services>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+		<property name="debugging">false</property>
+		<property name="componentviewer.viewerclass">"jadex.bdi.examples.booktrading.common.GuiViewerPanel"</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			 <beliefs>
+				 <initialbelief ref="gui">
+					<fact>
+						new jadex.commons.gui.GuiCreator(Gui.class, 
+							new Class[]{jadex.bridge.IExternalAccess.class}, 
+							new Object[]{$scope.getExternalAccess()})
+					</fact>
+				</initialbelief> 
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>

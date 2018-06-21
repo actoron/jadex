@@ -1,0 +1,1343 @@
+
+//-------- JavaCC and JJTree options --------
+
+options
+{
+	// Create nonstatic parser for thread-safeness.
+	static	= false;
+
+	// Allow unicode tokens
+	java_unicode_escape	= true;
+
+	// Allow subtypes of SimpleNode.
+	multi	= true;
+
+	// Don't use node prefix (all nodes are manually named XyzNode).
+	node_prefix	= "";
+
+	// Do not create .java files for nodes (done by hand).
+	build_node_files	= false;
+
+	// Pass reference to parser object in node constructor (for getting imports).
+	node_uses_parser	= true;
+}
+
+
+//-------- Predefined parser code --------
+
+PARSER_BEGIN(ParserImpl)
+
+package jadex.javaparser.javaccimpl;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import java.util.Map;
+import java.util.ArrayList;
+
+
+/**
+ *  The jadex parser parses all types of expressions in ADF and queries.
+ */
+class ParserImpl
+{
+	//-------- constants --------
+
+	/** The class not found identifier. */
+	protected static Object	NOTFOUND	= new Object(); 
+
+	//-------- attributes --------
+
+	/** The imports. */
+	protected String[]	imports;
+
+	/** The local parameters (name->type). */
+	protected Map	params;
+	
+	/** The class loader. */
+	protected ClassLoader classloader;
+
+	//-------- attribute accessors --------
+
+	/**
+	 *  Set the imports (comma separated packages).
+	 *  @param imports	The imports.
+	 */
+	protected void	setImports(String[] imports)
+	{
+		this.imports	= imports;
+	}
+
+	/**
+	 *  Get the imports (comma separated packages).
+	 *  @return	The imports.
+	 */
+	protected String[]	getImports()
+	{
+		return this.imports;
+	}
+
+	/**
+	 *  Set the parameters.
+	 */
+	protected void	setParameters(Map params)
+	{
+		this.params	= params;
+	}
+	
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader.
+	 */
+	protected void	setClassLoader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
+	}
+	
+	/**
+	 *  Get the classloader.
+	 *  @return	The classloader.
+	 */
+	protected ClassLoader getClassLoader()
+	{
+		return this.classloader;
+	}
+
+	//-------- helper methods --------
+
+	/**
+	 *  Find a class using imports.
+	 *  @param name	The class name.
+	 *  @return The class, or null if not found.
+	 */
+	protected Class	findClass0(String name)
+	{
+		return SReflect.findClass0(name, imports, classloader);
+	}
+
+	/**
+	 *  Find a class using imports.
+	 *  @param name	The class name.
+	 *  @return The class.
+	 *  @throws ClassNotFoundException when the class is not found in the imports.
+	 */
+	protected Class	findClass(String name) throws ClassNotFoundException
+	{
+		return SReflect.findClass(name, imports, classloader);
+	}
+
+	/**
+	 *  Check if an inner class exists.
+	 *  @param outer	The outer class.
+	 *  @param inner	The name of the inner class.
+	 *  @return The inner class, or null if not found.
+	 */
+	protected Class	getInnerClass(Class outer, String inner)
+	{
+		return SReflect.classForName0(outer.getName()+"$"+inner, classloader);
+	}
+
+	/**
+	 *  Check if a token is an identifier.
+	 *  Needed, because the extension keywords
+	 *  (like SELECT, ALL etc.) may occur as identifier
+	 *  (e.g. java.util.logging.Level.ALL).
+	 */
+	protected boolean	isIdentifier(Token token)
+	{
+		return token.kind==IDENTIFIER
+			|| token.kind==SELECT
+			|| token.kind==ALL
+			|| token.kind==ANY
+			|| token.kind==ONE
+			|| token.kind==IOTA
+			|| token.kind==FROM
+			|| token.kind==IN
+			|| token.kind==WHERE
+			|| token.kind==ORDER
+			|| token.kind==BY
+			|| token.kind==ASC
+			|| token.kind==DESC;
+ 	}
+
+	/**
+	 *  Unescape a string.
+	 */
+   	protected String        unescape(String str)
+    {
+    	StringBuffer	buf	= new StringBuffer(str);
+    	int	idx	= buf.indexOf("\\");
+    	while(idx!=-1 && buf.length()>idx+1)
+    	{
+    		if(buf.charAt(idx+1)=='b')
+    			buf.replace(idx, idx+2, "\b");
+    		else if(buf.charAt(idx+1)=='t')
+    			buf.replace(idx, idx+2, "\t");
+    		else if(buf.charAt(idx+1)=='n')
+    			buf.replace(idx, idx+2, "\n");
+    		else if(buf.charAt(idx+1)=='f')
+    			buf.replace(idx, idx+2, "\f");
+    		else if(buf.charAt(idx+1)=='r')
+    			buf.replace(idx, idx+2, "\r");
+    		else if(buf.charAt(idx+1)=='"')
+    			buf.replace(idx, idx+2, "\"");
+    		else if(buf.charAt(idx+1)=='\'')
+    			buf.replace(idx, idx+2, "'");
+    		else if(buf.charAt(idx+1)=='\\')
+    			buf.replace(idx, idx+2, "\\");
+    		
+        	idx	= buf.indexOf("\\", idx+1);
+    	}
+
+       // Todo: escape octal codes.
+       return buf.toString();
+    }
+}
+PARSER_END(ParserImpl)
+
+
+//******** Grammar starts here ********
+
+
+//-------- Tokens --------
+
+// Whitespaces
+SKIP:
+{
+	" "
+|	"\t"
+|	"\n"
+|	"\r"
+|	"\f"
+}
+
+// Comments.
+SPECIAL_TOKEN:
+{
+	// "//" followed by arbitrary characters (except \n, \r) and then \r or \n.
+	<SINGLE_LINE_COMMENT:	"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+
+	// ???
+|	<MULTI_LINE_COMMENT:	"/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+// Reserved Words
+TOKEN:
+{
+	<NEW:	"new">
+|	<INSTANCEOF:	"instanceof">
+}
+
+// Case insensitive tokens.
+TOKEN[IGNORE_CASE]:
+{
+	< SELECT: "select" >
+|	< ALL: "all" >
+|	< ANY: "any" >
+|	< ONE: "one" >
+|	< IOTA: "iota" >
+|	< FROM: "from" >
+|	< IN: "in" >
+|	< WHERE: "where" >
+|	< ORDER: "order" >
+|	< BY: "by" >
+|	< ASC: "asc" >
+|	< DESC: "desc" >
+}
+
+// Basic types
+TOKEN:
+{
+	<BOOLEAN:	"boolean">
+|	<DOUBLE:	"double">
+|	<FLOAT:	"float">
+|	<LONG:	"long">
+|	<INT:	"int">
+|	<SHORT:	"short">
+|	<BYTE:	"byte">
+|	<CHAR:	"char">
+}
+
+// Predefined literals
+TOKEN:
+{
+	<TRUE:	"true">
+|	<FALSE:	"false">
+|	<NULL:	"null">
+}
+
+// Literals
+TOKEN:
+{
+	// Integer may be decimal, hex, or octal.
+	<INTEGER_LITERAL:
+		<DECIMAL_LITERAL> (["l","L"])?
+		| <HEX_LITERAL> (["l","L"])?
+		| <OCTAL_LITERAL> (["l","L"])?
+	>
+|	<#DECIMAL_LITERAL: ("0") | (["1"-"9"] (["0"-"9"])*) >
+|	<#HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|	<#OCTAL_LITERAL: "0" (["1"-"9"]) (["0"-"7"])* >
+
+	// Float (may have exponent).
+|	<FLOATING_POINT_LITERAL:
+		(["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+		| "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+		| (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+		| (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+	>
+|	<#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+
+	// Character (contained in single quotes).
+|	<CHARACTER_LITERAL:
+		"'"
+		(
+			// Everything except quote, backslash, linefeed, or return.
+			(~["'","\\","\n","\r"])
+			// Escaped characters are also allowed.
+			| ("\\"
+				( ["n","t","b","r","f","\\","'","\""]
+/*				| ["0"-"7"] ( ["0"-"7"] )?
+				| ["0"-"3"] ["0"-"7"] ["0"-"7"]
+*/				)
+			)
+		)
+		"'"
+	>
+
+	// String (contained in double quotes).
+|	<STRING_LITERAL:
+		"\""
+		(
+			// Everything except double quote, backslash, linefeed, or return.
+			(~["\"","\\","\n","\r"])
+			// Escaped characters are also allowed.
+			| ("\\"
+				( ["n","t","b","r","f","\\","'","\""]
+/*				| ["0"-"7"] ( ["0"-"7"] )?
+				| ["0"-"3"] ["0"-"7"] ["0"-"7"]
+*/				)
+			)
+		)*
+		"\""
+	>
+}
+
+// "?" used in conditional and for clips variable identifiers
+TOKEN:
+{
+	<QUESTIONMARK:	"?">
+}
+
+
+// Identifiers (have to start with letter).
+TOKEN:
+{
+	<IDENTIFIER:	(<QUESTIONMARK>)? <LETTER> (<LETTER>|<DIGIT>)* >
+
+	// Allowed characters for LETTER.
+|	<#LETTER:[
+		"\u0024",
+		"\u0041"-"\u005a",
+		"\u005f",
+		"\u0061"-"\u007a",
+		"\u00c0"-"\u00d6",
+		"\u00d8"-"\u00f6",
+		"\u00f8"-"\u00ff",
+		"\u0100"-"\u1fff",
+		"\u3040"-"\u318f",
+		"\u3300"-"\u337f",
+		"\u3400"-"\u3d2d",
+		"\u4e00"-"\u9fff",
+		"\uf900"-"\ufaff"
+	]>
+
+/*	<IDENTIFIER:	<LETTERNOTDOLLAR> (<LETTER>|<DIGIT>)* >
+
+	// Allowed characters for LETTER without "$".
+|	<#LETTERNOTDOLLAR:[
+//		"\u0024",	// $
+		"\u0041"-"\u005a",
+		"\u005f",
+		"\u0061"-"\u007a",
+		"\u00c0"-"\u00d6",
+		"\u00d8"-"\u00f6",
+		"\u00f8"-"\u00ff",
+		"\u0100"-"\u1fff",
+		"\u3040"-"\u318f",
+		"\u3300"-"\u337f",
+		"\u3400"-"\u3d2d",
+		"\u4e00"-"\u9fff",
+		"\uf900"-"\ufaff"
+	]>
+*/
+
+	// Allowed characters for DIGIT.
+|	<#DIGIT:[
+		"\u0030"-"\u0039",
+		"\u0660"-"\u0669",
+		"\u06f0"-"\u06f9",
+		"\u0966"-"\u096f",
+		"\u09e6"-"\u09ef",
+		"\u0a66"-"\u0a6f",
+		"\u0ae6"-"\u0aef",
+		"\u0b66"-"\u0b6f",
+		"\u0be7"-"\u0bef",
+		"\u0c66"-"\u0c6f",
+		"\u0ce6"-"\u0cef",
+		"\u0d66"-"\u0d6f",
+		"\u0e50"-"\u0e59",
+		"\u0ed0"-"\u0ed9",
+		"\u1040"-"\u1049"
+	]>
+}
+
+
+// Separators.
+TOKEN:
+{
+	< LPAREN: "(" >
+|	< RPAREN: ")" >
+|	< LBRACE: "{" >
+|	< RBRACE: "}" >
+|	< LBRACKET: "[" >
+|	< RBRACKET: "]" >
+|	< SEMICOLON: ";" >
+|	< COMMA: "," >
+|	< DOT: "." >
+}
+
+/*
+TOKEN : /* OPERATORS * /
+{
+  < GT: ">" >
+| < LT: "<" >
+| < BANG: "!" >
+| < TILDE: "~" >
+| < HOOK: "?" >
+| < COLON: ":" >
+| < EQ: "==" >
+| < LE: "<=" >
+| < GE: ">=" >
+| < NE: "!=" >
+| < SC_OR: "||" >
+| < SC_AND: "&&" >
+| < INCR: "++" >
+| < DECR: "--" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < STAR: "*" >
+| < SLASH: "/" >
+| < BIT_AND: "&" >
+| < BIT_OR: "|" >
+| < XOR: "^" >
+| < REM: "%" >
+| < LSHIFT: "<<" >
+| < RSIGNEDSHIFT: ">>" >
+| < RUNSIGNEDSHIFT: ">>>" >
+}
+*/
+
+//-------- Grammer rules --------
+
+/**
+ *  Parse the supplied expression.
+ *  @return The root node of the generated tree.
+ */
+ExpressionNode parseExpression() #void :
+{}
+{
+	// Expect a single expression, without trailing characters.
+	Expression() <EOF>
+	{
+		// Return the root of the generated tree.
+		return (ExpressionNode)jjtree.rootNode();
+	}
+}
+
+/**
+ *  Parse the supplied type expression.
+ *  @return The class given by the type expression.
+ */
+Class parseType() #void :
+{}
+{
+	// Expect a single type expression, without trailing characters.
+	Type() <EOF>
+	{
+		// Return the value of the type expression.
+		return (Class)((TypeNode)jjtree.rootNode()).getValue(null);
+	}
+}
+
+/**
+ *  The start rule.
+ *  All other rules are invoked by this rule,
+ *  and may recursively reinvoke this rule.
+ */
+void Expression() #void :
+{}
+{
+	// Start with the expression with the least precedence.
+	// This is done to create an expression tree conforming
+	// to operator precedence:
+	// Rules with higher precedence will create subnodes
+	// of nodes create by rules with lower precedence.
+
+	// For select tokens, we have to check, if its a select-statement,
+	// or just a class or package name (e.g. Select.func(x,y)).
+	LOOKAHEAD(<SELECT>, {getToken(2).kind != DOT})
+	SelectExpression()
+
+|	ConditionalExpression()
+}
+
+/**
+ *  The conditional expression (bool ? exp1 : exp2).
+ *  Creates ConditionalNode if present (not yet implemented).
+ */
+void SelectExpression() #void :
+{
+	// Declare local variables.
+	Token	t1	= null;
+	String	t2	= null;
+	ArrayList	vars	= new ArrayList();
+	Token	t3	= null;
+	Token	t4	= null;
+	Token	t5	= null;
+}
+{
+	(	<SELECT>
+		[
+			  LOOKAHEAD(<ALL>, {getToken(2).kind != DOT})	t1=<ALL>
+			| LOOKAHEAD(<ANY>, {getToken(2).kind != DOT})	t1=<ANY>
+			| LOOKAHEAD(<ONE>, {getToken(2).kind != DOT})	t1=<ONE>
+			| LOOKAHEAD(<IOTA>, {getToken(2).kind != DOT})	t1=<IOTA> 
+		]
+		(LOOKAHEAD(ConditionalExpression() <FROM> [Type()] t2=Identifier() <IN>)
+		(ConditionalExpression()
+			<FROM>
+				(LOOKAHEAD(Type() Identifier())	(Type() t2=Identifier()) | t2=Identifier())
+				<IN> ConditionalExpression()
+			{vars.add(t2);}
+			(
+				LOOKAHEAD("," [Type()] Identifier() <IN>)
+				("," [Type()] t2=Identifier() <IN> ConditionalExpression())
+				{vars.add(t2);}
+			)*
+		)
+		// Shortcut "SELECT <var> FROM <collection>".
+		|(((LOOKAHEAD(Type() Identifier())	(Type() t2=Identifier()) | t2=Identifier()) #ParameterNode()
+			{
+				((ExpressionNode)jjtree.peekNode()).setText(t2);
+				vars.add(t2);
+			}
+			<FROM> ConditionalExpression())
+		))
+		[ t3=<WHERE>	ConditionalExpression() ]
+		[ t4=<ORDER> <BY>	ConditionalExpression() [ t5=<ASC> | t5=<DESC> ] ]
+	) #SelectNode(>1)
+	{
+		// Set node properties.
+		if(t1!=null)	((SelectNode)jjtree.peekNode()).setText(t1.kind==ONE ? "any" : t1.image);
+		((SelectNode)jjtree.peekNode()).setVariables((String[])vars.toArray(new String[vars.size()]));
+		if(t3!=null)	((SelectNode)jjtree.peekNode()).setWhere(true);
+		if(t4!=null)	((SelectNode)jjtree.peekNode()).setOrderBy(true);
+		if(t5!=null)	((SelectNode)jjtree.peekNode()).setOrder(t5.image);
+	}
+}
+
+/**
+ *  The conditional expression (bool ? exp1 : exp2).
+ *  Creates ConditionalNode if present (not yet implemented).
+ */
+void ConditionalExpression() #void :
+{}
+{
+	( ConditionalOrExpression() [ <QUESTIONMARK> ConditionalExpression() ":" ConditionalExpression() ]
+	) #ConditionalNode(>1)
+}
+
+/**
+ *  Or expression.
+ *  If present, creates BooleanNode with arbitrary number of subnodes.
+ */
+void ConditionalOrExpression() #void :
+{	Token t	= null; }	// Declare local variable.
+{
+	( ConditionalAndExpression() ( t="||" ConditionalAndExpression() )*
+	) #BooleanNode(>1)
+	{
+		// When token is set, node was created.
+		// Set node text to specify boolean operation.
+		if(t!=null)	((ExpressionNode)jjtree.peekNode()).setText("||");
+	}
+}
+
+/**
+ *  And expression.
+ *  If present, creates BooleanNode with arbitrary number of subnodes.
+ */
+void ConditionalAndExpression() #void :
+{	Token t	= null; }	// Declare local variable.
+{
+	( InclusiveOrExpression() ( t="&&" InclusiveOrExpression() )*
+	) #BooleanNode(>1)
+	{
+		// When token is set, node was created.
+		// Set node text to specify boolean operation.
+		if(t!=null)	((ExpressionNode)jjtree.peekNode()).setText("&&");
+	}
+}
+
+/**
+ *  Bitwise Or expression (|).
+ *  If present, creates MathNode(s) with two subnodes.
+ */
+void InclusiveOrExpression() #void :
+{}
+{
+	ExclusiveOrExpression()
+	(
+		( ( "|" ExclusiveOrExpression() )
+		) #MathNode(2)
+		{
+			// Set node text to specify math operation.
+			((ExpressionNode)jjtree.peekNode()).setText("|");
+		}
+	)*
+}
+
+/**
+ *  Bitwise XOr expression (^).
+ *  If present, creates MathNode(s) with two subnodes.
+ */
+void ExclusiveOrExpression() #void :
+{}
+{
+	AndExpression()
+	(
+		( ( "^" AndExpression() )
+		) #MathNode(2)
+		{
+			// Set node text to specify math operation.
+			((ExpressionNode)jjtree.peekNode()).setText("^");
+		}
+	)*
+}
+
+/**
+ *  Bitwise And expression (&).
+ *  If present, creates MathNode(s) with two subnodes.
+ */
+void AndExpression() #void :
+{}
+{
+	EqualityExpression()
+	(
+		( ( "&" EqualityExpression() )
+		) #MathNode(2)
+		{
+			// Set node text to specify math operation.
+			((ExpressionNode)jjtree.peekNode()).setText("&");
+		}
+	)*
+}
+
+/**
+ *  Test for (un)equality.
+ *  If present, creates CompareNode(s) with two subnodes.
+ */
+void EqualityExpression() #void :
+{	Token	t; }	// Declare local variable.
+{
+	InstanceOfExpression()
+	(
+		( ( t="==" | t="!=" ) InstanceOfExpression()
+		) #CompareNode(2)
+		{
+			// Set node text to specify compare operation.
+			((ExpressionNode)jjtree.peekNode()).setText(t.image);
+		}
+	)*
+}
+
+/**
+ *  Instance of operator.
+ *  If present, creates CompareNode with two subnodes.
+ */
+void InstanceOfExpression() #void :
+{}
+{
+	RelationalExpression()
+	(
+		( "instanceof" Type()
+		) #CompareNode(2)
+		{
+			// Set node text to specify compare operation.
+			((ExpressionNode)jjtree.peekNode()).setText("instanceof");
+		}
+	)?
+}
+
+/**
+ *  Comparison expression
+ *  If present, creates CompareNode(s) with two subnodes.
+ */
+void RelationalExpression() #void :
+{	Token	t; }	// Declare local variable.
+{
+	ShiftExpression()
+	(
+		( ( t="<" | t=">" | t="<=" | t=">=" ) ShiftExpression()
+		) #CompareNode(2)
+		{
+			// Set node text to specify compare operation.
+			((ExpressionNode)jjtree.peekNode()).setText(t.image);
+		}
+	)*
+}
+
+/**
+ *  Shift operation.
+ *  If present, creates MathNode(s) with two subnodes.
+ */
+void ShiftExpression() #void :
+{	String	exp; }	// Declare local variable.
+{
+	AdditiveExpression()
+	(
+		LOOKAHEAD(2) 
+		( ( "<<" {exp="<<";} | LOOKAHEAD(3) RUNSIGNEDSHIFT() {exp=">>>";} | RSIGNEDSHIFT() {exp=">>";} ) AdditiveExpression()
+		) #MathNode(2)
+		{
+			// Set node text to specify math operation.
+			((ExpressionNode)jjtree.peekNode()).setText(exp);
+		}
+	)*
+}
+
+/* We use productions to match >>>, >> and > so that we can keep the
+* type declaration syntax with generics clean
+*/
+void RUNSIGNEDSHIFT() #void:
+{}
+{
+	( ">" ">" ">" )
+}
+void RSIGNEDSHIFT() #void:
+{}
+{
+	( ">" ">" )
+}
+
+/**
+ *  Additive operation.
+ *  If present, creates MathNode(s) with two subnodes.
+ */
+void AdditiveExpression() #void :
+{	Token	t; }	// Declare local variable.
+{
+	MultiplicativeExpression()
+	(
+		( ( t="+" | t="-" ) MultiplicativeExpression()
+		) #MathNode(2)
+		{
+			// Set node text to specify math operation.
+			((ExpressionNode)jjtree.peekNode()).setText(t.image);
+		}
+	)*
+}
+
+/**
+ *  Multiplicative operation.
+ *  If present, creates MathNode(s) with two subnodes.
+ */
+void MultiplicativeExpression() #void :
+{	Token	t; }	// Declare local variable.
+{
+	UnaryExpression()
+	(
+		( ( t="*" | t="/" | t="%" ) UnaryExpression()
+		) #MathNode(2)
+		{
+			// Set node text to specify math operation.
+			((ExpressionNode)jjtree.peekNode()).setText(t.image);
+		}
+	)*
+}
+
+/**
+ *  Unary math operation.
+ *  If present, creates MathNode with single subnode.
+ */
+void UnaryExpression() #void :
+{	Token	t; }	// Declare local variable.
+{
+	( ( t="+" | t="-" ) UnaryExpression()
+	) #MathNode(1)
+	{
+		// Set node text to specify compare operation.
+		((ExpressionNode)jjtree.peekNode()).setText(t.image);
+	}
+|	UnaryExpressionNotPlusMinus()
+}
+
+/**
+ *  Logical or bitwise Not operator.
+ *  If present, creates BooleanNode or MathNode with single subnode.
+ *  Otherwise goes on with cast or primary expression.
+ */
+void UnaryExpressionNotPlusMinus() #void :
+{}
+{
+	( ( "!" ) UnaryExpression()
+	) #BooleanNode(1)
+	{
+		// Set node text to specify boolean operation.
+		((ExpressionNode)jjtree.peekNode()).setText("!");
+	}
+|	( ( "~" ) UnaryExpression()
+	) #MathNode(1)
+	{
+		// Set node text to specify matz operation.
+		((ExpressionNode)jjtree.peekNode()).setText("~");
+	}
+
+	// Use lookahead to distinguish "(" type ")" vs. "(" expression ")".
+|	LOOKAHEAD( "(" Type() ")" )
+	CastExpression()
+
+|	PrimaryExpression()
+}
+
+/**
+ *  A cast node changes the static type of an unary expression,
+ *  but does not affect the value.
+ *  Creates a cast node having as child the type node and the unary expression.
+ */
+void CastExpression() #CastNode :
+{}
+{
+	"(" Type() ")" UnaryExpression()
+}
+
+/**
+ *  The basic form of an object expression.
+ *  Consists of statement for initial object value (primary prefix)
+ *  e.g., a constructor invocation.
+ *  The prefix may be followed by an arbitrary number
+ *  of subsequent operations (primary suffix)
+ *  e.g., a method invocation or field access.
+ */
+void PrimaryExpression() #void :
+{}
+{
+	PrimaryPrefix()	( PrimarySuffix() )*
+}
+
+/**
+ *  The expression for initial values i.e.,
+ *  the leaves of every expression.
+ *  Creates a single node representing the value,
+ *  which may be a literal, parameter, constructor or static method invocation,
+ *  field access, or array creation.
+ *  For parsing braces, expressions like "(" expression ")" are also
+ *  represented as primary prefix.
+ */
+void PrimaryPrefix() #void :
+{ String t=null; Token lit=null; }
+{
+	Literal()
+|	"(" Expression() ")"
+
+	// Context method
+//|	LOOKAHEAD("@" Identifier() "(")
+//	( "@" t=Identifier() Arguments()
+//	) #ReflectNode(1)
+//	{
+//		((ReflectNode)jjtree.peekNode()).setText(t);
+//		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.CONTEXT_METHOD);
+//	}
+
+	// Context field
+//|	( "@" t=Identifier()
+//	) #ReflectNode(0)
+//	{
+//		((ReflectNode)jjtree.peekNode()).setText(t);
+//		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.CONTEXT_FIELD);
+//	}
+	// Constructor.
+|	LOOKAHEAD("new" Name() [ TypeArguments() ] "(")
+	( "new" Name() [ TypeArguments() ] Arguments()
+	) #ReflectNode(2)
+	{ ((ReflectNode)jjtree.peekNode()).setType(ReflectNode.CONSTRUCTOR); }
+
+|	ArrayExpression()
+
+	// Static method (have to use semantic lookahead, hack???)
+|	LOOKAHEAD({lookaheadStaticMethod()})
+	( Name() "." t=Identifier() Arguments()
+	) #ReflectNode(2)
+	{
+		((ReflectNode)jjtree.peekNode()).setText(t);
+		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.STATIC_METHOD);
+	}
+
+	// Static field (allow primitive or array for .class "field")
+|	LOOKAHEAD( Type() )
+	( ( Type() ) "." t=Identifier()
+	) #ReflectNode(1)
+	{
+		((ReflectNode)jjtree.peekNode()).setText(t);
+		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.STATIC_FIELD);
+	}
+	
+	// Parameter[-x] for preconditions.
+	| LOOKAHEAD(4)
+	( t=Identifier() "[" "-" lit=<INTEGER_LITERAL> "]"
+	) #ParameterNode()
+	{ ((ExpressionNode)jjtree.peekNode()).setText(t+"[-"+lit+"]");}
+	
+	// Parameter.
+|	//LOOKAHEAD({params!=null && params.containsKey(getToken(1).image)})
+	( t=Identifier()
+	) #ParameterNode()
+	{ ((ExpressionNode)jjtree.peekNode()).setText(t);}
+
+}
+
+/**
+ *  Method to lookahead for a class name.
+ */
+boolean	classname() #void :
+{}
+{{
+	// Starts with name.
+	String	name;
+	int	next	= 1;
+	boolean	havename	= false;
+
+	if(isIdentifier(getToken(next)))
+	{
+		name	= getToken(next).image;
+		havename	= findClass0(name)!=null;
+		next++;
+	}
+	else
+	{
+		return false;
+	}
+
+	// Append "." <IDENTIFIER> while available and class not found.
+	while(!havename && getToken(next).kind==DOT && isIdentifier(getToken(next+1)))
+	{
+		name	+= "." + getToken(next+1).image;
+		havename	= findClass0(name)!=null;
+		next	+= 2;
+	}
+
+	return havename;
+}}
+
+/**
+ *  Method to lookahead for static methods.
+ *  Expects Name() "." Identifier() "(".
+ *  Syntactic lookahead doesn't work correctly in this case
+ *  (don't ask me why).
+ */
+boolean	lookaheadStaticMethod() #void :
+{}
+{{
+	// Starts with name.
+	String	name;
+	int	next	= 1;
+	boolean	havename	= false;
+
+	if(isIdentifier(getToken(next)))
+	{
+		name	= getToken(next).image;
+		havename	= findClass0(name)!=null;
+		next++;
+	}
+	else
+	{
+		return false;
+	}
+
+	// Append "." <IDENTIFIER> while available and class not found.
+	while(!havename && getToken(next).kind==DOT && isIdentifier(getToken(next+1)))
+	{
+		name	+= "." + getToken(next+1).image;
+		havename	= findClass0(name)!=null;
+		next	+= 2;
+	}
+
+	if(!havename)
+	{
+		return false;
+	}
+
+	// Found name, now search for "." <IDENTIFIER> "(".
+	return getToken(next).kind==DOT && isIdentifier(getToken(next+1))
+		&& getToken(next+2).kind==LPAREN;
+}}
+
+/**
+ *  Subsequent operations to perform on an initial value.
+ *  Creates nodes for selection from array, method invocation, field access,
+ *  or filling in of collection values.
+ */
+void PrimarySuffix() #void :
+{	String	identifier;}	// Declare local variable.
+{
+	// Selection from Array.
+	( "[" Expression() "]"
+	) #SelectionNode(2)
+
+	// Nonstatic method.
+|	LOOKAHEAD("." Identifier() "(")
+	( "." identifier=Identifier() Arguments()
+	) #ReflectNode(2)
+	{
+		((ReflectNode)jjtree.peekNode()).setText(identifier);
+		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.METHOD);
+	}
+
+	// Nonstatic field.
+|	( "." identifier=Identifier()
+	) #ReflectNode(1)
+	{
+		((ReflectNode)jjtree.peekNode()).setText(identifier);
+		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.FIELD);
+	}
+
+|	// Collection content (<set>{val1, ...}, <map>{key1=val1, ...})
+	( CollectionContent()
+	) #CollectionNode(2)
+}
+
+/**
+ *  A literal value.
+ *  Creates a constant node, with the value filled in.
+ */
+// Todo: Support long, float, hex, exponents, escapes in characters, strings...
+void Literal() #ConstantNode :
+{ Token t=null; }
+{
+	( t=<INTEGER_LITERAL> )
+	{
+		String	string	= t.image;
+		boolean	l	= false;
+		int	radix	= 10;
+
+		if(string.endsWith("l") || string.endsWith("L"))
+		{
+			l	= true;
+			string	= string.substring(0, string.length()-1);
+		}
+
+		if(string.startsWith("0x"))
+		{
+			radix	= 16;
+			string	= string.substring(2);
+		}
+		else if(string.length()>1 && string.startsWith("0"))
+		{
+			radix	= 8;
+			string	= string.substring(1);
+		}
+
+		if(l)	
+			jjtThis.setValue(Long.valueOf(string, radix));
+		else
+			jjtThis.setValue(Integer.valueOf(string, radix));
+	}
+
+|	( t=<FLOATING_POINT_LITERAL> )
+	{
+		if(t.image.endsWith("f") || t.image.endsWith("F"))
+			jjtThis.setValue(Float.valueOf(t.image.substring(0, t.image.length()-1)));
+		else if(t.image.endsWith("d") || t.image.endsWith("D"))
+			jjtThis.setValue(Double.valueOf(t.image.substring(0, t.image.length()-1)));
+		else
+			jjtThis.setValue(Double.valueOf(t.image));
+	}
+
+|	( t=<CHARACTER_LITERAL> )
+	{
+		// Get unescaped character between ''.
+		jjtThis.setValue(Character.valueOf(unescape(
+			t.image.substring(1, t.image.length()-1)).charAt(0)));
+	}
+
+|	( t=<STRING_LITERAL> )
+	{
+		// Get string between "".
+		jjtThis.setValue(unescape(t.image.substring(1, t.image.length()-1)));
+	}
+
+|	"true"
+	{ jjtThis.setValue(Boolean.TRUE); }
+
+|	"false"
+	{ jjtThis.setValue(Boolean.FALSE); }
+
+|	"null"
+	// { jjtThis.setValue(null); }	// ;-)
+}
+
+/**
+ *  Arguments of a method call or constructor invocation.
+ *  Creates a single arguments node, which contains subnodes for
+ *  all argument expressions.
+ */
+void Arguments() #ArgumentsNode :
+{}
+{
+	"("
+		[ Expression() ( "," Expression() )* ]
+	")"
+}
+
+/**
+ *  For creating arrays with or without content.
+ *  Creates an array node, with two subnodes
+ *  for array type and arguments.
+ */
+void ArrayExpression() #ArrayNode :
+{}
+{
+	// Array with content (new MyClass[]{val1, val2,...})
+	LOOKAHEAD("new" ( Name() | PrimitiveType() ) [ TypeArguments() ] "[" "]")
+	( "new" Type() ArrayContent()
+	)
+	{ jjtThis.setType(ArrayNode.ARRAY); }
+
+|	// Array with dimensions (new MyClass[5][2])
+	LOOKAHEAD("new" ( Name() | PrimitiveType() ) [ TypeArguments() ] "[")
+	( "new" ( Name() | PrimitiveType() )  [ TypeArguments() ] ArrayDimensions()
+	)
+	{ jjtThis.setType(ArrayNode.ARRAY_DIMENSION); }
+}
+
+/**
+ *  Inline content specification of an array.
+ *  Creates a single arguments node, which contains subnodes for
+ *  all content values.
+ */
+void ArrayContent() #ArgumentsNode :
+{}
+{
+	"{" [ Expression() ( "," Expression() )* ] "}"
+}
+
+/**
+ *  Array size specification.
+ *  Creates a single arguments node, which contains subnodes for
+ *  all dimension values.
+ */
+void ArrayDimensions() #ArgumentsNode :
+{ int i=0; }	// Local variable to compute offset to type node.
+{
+	// Brackets with values represent dimension specifications.
+	(
+		LOOKAHEAD(2)
+		"[" Expression() "]"
+		{
+			i++;
+			// Append array dimension to type node.
+			// System.out.println("node is: "+jjtree.peekNode(i));
+			((TypeNode)jjtree.peekNode(i)).appendText("[]");
+		}
+	)+
+
+	// Subsequent brackets without values
+	// just change the underlying component type.
+	// Use lookahead to handle [2][][1] with primary suffix.
+	(
+		LOOKAHEAD(2) "[" "]"
+		{
+			// Append array dimension to type node.
+			// System.out.println("und hier: "+jjtree.peekNode(i));
+			((TypeNode)jjtree.peekNode(i)).appendText("[]");
+		}
+	)*
+}
+
+/**
+ *  Inline content specification of a collection.
+ *  Creates a single arguments node, which contains subnodes for
+ *  all content values. Map content values are represented in
+ *  turn by an arguments node with two subnodes for key and value.
+ */
+void CollectionContent() #ArgumentsNode :
+{}
+{
+	"{"
+		// First content value
+		( [Expression() [ "=" Expression() ] ]
+		) #ArgumentsNode(>1)	// create arguments node, only for key=value
+
+		// Subsequent content values are preceeded by ",".
+		(
+			( "," Expression() [ "=" Expression() ]
+			) #ArgumentsNode(>1)	// create arguments node, only for key=value
+		)*
+	"}"
+}
+
+/**
+ *  Parse Java type (class or basic type,
+ *  with or without array brackets).
+ *  Creates TypeNode.
+ */
+void Type() #void :
+{}
+{	
+	( PrimitiveType() | Name() ) [ TypeArguments() ]
+	(
+		( "[" "]" )
+		{
+			((ExpressionNode)jjtree.peekNode()).appendText("[]");
+		}
+	)*
+}
+
+/**
+ *  Parse primitive type.
+ *  Creates type node.
+ */
+void PrimitiveType() #TypeNode :
+{}
+{
+	// Already set constant value to speed up precompilation.
+
+	"boolean"
+	{
+		jjtThis.setText("boolean");
+		jjtThis.setConstantValue(boolean.class);
+	}
+|	"char"
+	{
+		jjtThis.setText("char");
+		jjtThis.setConstantValue(char.class);
+	}
+|	"byte"
+	{
+		jjtThis.setText("byte");
+		jjtThis.setConstantValue(byte.class);
+	}
+|	"short"
+	{
+		jjtThis.setText("short");
+		jjtThis.setConstantValue(short.class);
+	}
+|	"int"
+	{
+		jjtThis.setText("int");
+		jjtThis.setConstantValue(int.class);
+	}
+|	"long"
+	{
+		jjtThis.setText("long");
+		jjtThis.setConstantValue(long.class);
+	}
+|	"float"
+	{
+		jjtThis.setText("float");
+		jjtThis.setConstantValue(float.class);
+	}
+|	"double"
+	{
+		jjtThis.setText("double");
+		jjtThis.setConstantValue(double.class);
+	}
+}
+
+/**
+ *  Parse class name (with package) into given type node.
+ *  Use SReflect.findClass, to assure that class exists.
+ */
+void Name() #TypeNode :
+{	String	identifier;	Class	type;}	// Declare local variables.
+{
+
+	LOOKAHEAD({classname()})
+	identifier	= Identifier()
+	{
+		// Set node text to identifier using token image.
+		jjtThis.setText(identifier);
+		// Set type.
+		type	= findClass0(jjtThis.getText());
+	}
+
+	(
+		// Continue expansion, while class not found.
+		LOOKAHEAD(".", {type==null
+			|| getInnerClass(type, getToken(2).image)!=null})
+		"." identifier	= Identifier()
+		{
+			if(type==null)
+			{
+				// Append identifier to node text using token image.
+				jjtThis.appendText(".");
+				jjtThis.appendText(identifier);
+				// Set type.
+				type	= findClass0(jjtThis.getText());
+			}
+			else
+			{
+				// Append identifier to node text using token image.
+				jjtThis.appendText("$");
+				jjtThis.appendText(identifier);
+				// Set type.
+				type	= getInnerClass(type, identifier);
+			}
+		}
+	)*
+}
+
+/**
+ *  Parse identifier and return token string.
+ */
+String Identifier() #void :
+{	Token t; }	// Declare local variable.
+{
+	(
+		  t=<IDENTIFIER>
+		| t=<SELECT>
+		| t=<ALL>
+		| t=<ANY>
+		| t=<IOTA>
+		| t=<FROM>
+		| t=<IN>
+		| t=<WHERE>
+		| t=<ORDER>
+		| t=<BY>
+		| t=<ASC>
+		| t=<DESC>
+	)
+
+	{ return t.image; }
+}
+
+/**
+ * Generic type arguments.
+ * https://github.com/pmd/pmd/blob/master/pmd/etc/grammar/Java.jjt
+ */
+void TypeArguments() #void:
+{}
+{
+	LOOKAHEAD(2) "<" TypeArgument() ( "," TypeArgument() )* ">"
+	| "<" ">"
+}
+
+/**
+ * A generic type argument.
+ */
+void TypeArgument() #void:
+{}
+{
+	Type()
+	{ jjtree.popNode(); /* hack!!! */}
+}

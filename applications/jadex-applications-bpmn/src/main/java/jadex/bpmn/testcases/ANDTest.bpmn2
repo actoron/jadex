@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>ANDTest</jadex:modelname>
+    <jadex:description>Test and split and joing using parameters</jadex:description>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
+    <jadex:imports>
+      <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
+      <jadex:import>jadex.base.test.*</jadex:import>
+    </jadex:imports>
+    <jadex:results>
+      <jadex:result name="testresults" type="Testcase">
+        <jadex:description>The test results.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+    <jadex:configurations>
+      <jadex:configuration name="Pool">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_ZfOVASbmEd-LGeDmwCGsJg">
+    <semantic:startEvent id="_bLQZASbmEd-LGeDmwCGsJg">
+      <semantic:outgoing>_0zT72CbnEd-LGeDmwCGsJg</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="A" id="_0zKK0SbnEd-LGeDmwCGsJg">
+      <semantic:incoming>_0zT72CbnEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_2FtX0SbnEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="a" type="int">1</jadex:parameter>
+        <jadex:parameter direction="inout" name="b" type="int">1</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Activity A: a=&quot;+a+&quot;, b=&quot;+b</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:parallelGateway id="_c34S4SbmEd-LGeDmwCGsJg">
+      <semantic:incoming>_2FtX0SbnEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_eJ1qASbmEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:outgoing>_eyEusSbmEd-LGeDmwCGsJg</semantic:outgoing>
+    </semantic:parallelGateway>
+    <semantic:task name="C" id="_ex69sSbmEd-LGeDmwCGsJg">
+      <semantic:incoming>_eyEusSbmEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_gtJ7USbmEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="b" type="int">b+1</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Activity C: b=&quot;+b</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="B" id="_ZfOVAybmEd-LGeDmwCGsJg">
+      <semantic:incoming>_eJ1qASbmEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_hVixASbmEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="a" type="int">a+1</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Activity B: a=&quot;+a</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:parallelGateway id="_gtAxYSbmEd-LGeDmwCGsJg">
+      <semantic:incoming>_hVixASbmEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:incoming>_gtJ7USbmEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_h3zwkSbmEd-LGeDmwCGsJg</semantic:outgoing>
+    </semantic:parallelGateway>
+    <semantic:task name="D" id="_h3qmoSbmEd-LGeDmwCGsJg">
+      <semantic:incoming>_h3zwkSbmEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_dzwIUShyEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="a" type="int">a</jadex:parameter>
+        <jadex:parameter direction="inout" name="b" type="int">b</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Activity D: a=&quot;+a+&quot;, b=&quot;+b</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:exclusiveGateway id="_akev8ShyEd-LGeDmwCGsJg" default="_qrUGEShxEd-LGeDmwCGsJg">
+      <semantic:incoming>_dzwIUShyEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_0rhuQibmEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:outgoing>_qrUGEShxEd-LGeDmwCGsJg</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:endEvent id="_0rX9QSbmEd-LGeDmwCGsJg">
+      <semantic:incoming>_s7QIYShxEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:incoming>_tZ82kShxEd-LGeDmwCGsJg</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:task name="Failure" id="_qrKVEShxEd-LGeDmwCGsJg">
+      <semantic:incoming>_qrUGEShxEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_tZ82kShxEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;AND test.&quot;, false, &quot;Wrong parameter values after join.&quot;)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Success" id="_l1EI0ShxEd-LGeDmwCGsJg">
+      <semantic:incoming>_0rhuQibmEd-LGeDmwCGsJg</semantic:incoming>
+      <semantic:outgoing>_s7QIYShxEd-LGeDmwCGsJg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;AND test for parameter values after join.&quot;, true, null)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="_bLQZASbmEd-LGeDmwCGsJg" targetRef="_0zKK0SbnEd-LGeDmwCGsJg" id="_0zT72CbnEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_0zKK0SbnEd-LGeDmwCGsJg" targetRef="_c34S4SbmEd-LGeDmwCGsJg" id="_2FtX0SbnEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_c34S4SbmEd-LGeDmwCGsJg" targetRef="_ZfOVAybmEd-LGeDmwCGsJg" id="_eJ1qASbmEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_c34S4SbmEd-LGeDmwCGsJg" targetRef="_ex69sSbmEd-LGeDmwCGsJg" id="_eyEusSbmEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_ex69sSbmEd-LGeDmwCGsJg" targetRef="_gtAxYSbmEd-LGeDmwCGsJg" id="_gtJ7USbmEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_ZfOVAybmEd-LGeDmwCGsJg" targetRef="_gtAxYSbmEd-LGeDmwCGsJg" id="_hVixASbmEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_gtAxYSbmEd-LGeDmwCGsJg" targetRef="_h3qmoSbmEd-LGeDmwCGsJg" id="_h3zwkSbmEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_h3qmoSbmEd-LGeDmwCGsJg" targetRef="_akev8ShyEd-LGeDmwCGsJg" id="_dzwIUShyEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_akev8ShyEd-LGeDmwCGsJg" targetRef="_l1EI0ShxEd-LGeDmwCGsJg" id="_0rhuQibmEd-LGeDmwCGsJg">
+      <semantic:conditionExpression>a==2 &amp;&amp; b==2</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_akev8ShyEd-LGeDmwCGsJg" targetRef="_qrKVEShxEd-LGeDmwCGsJg" id="_qrUGEShxEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_qrKVEShxEd-LGeDmwCGsJg" targetRef="_0rX9QSbmEd-LGeDmwCGsJg" id="_tZ82kShxEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_l1EI0ShxEd-LGeDmwCGsJg" targetRef="_0rX9QSbmEd-LGeDmwCGsJg" id="_s7QIYShxEd-LGeDmwCGsJg">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+      <jadex:dataFlow id="G1dJDc8Fs1ikWCq7" sourceRef="_0zKK0SbnEd-LGeDmwCGsJg" sourceParam="a" targetRef="_ZfOVAybmEd-LGeDmwCGsJg" targetParam="a">
+        <jadex:dataFlowValueMapping>$value+1</jadex:dataFlowValueMapping>
+      </jadex:dataFlow>
+      <jadex:dataFlow id="Ua5IIOw7Ya/wL3JP" sourceRef="_0zKK0SbnEd-LGeDmwCGsJg" sourceParam="b" targetRef="_ex69sSbmEd-LGeDmwCGsJg" targetParam="b">
+        <jadex:dataFlowValueMapping>$value+1</jadex:dataFlowValueMapping>
+      </jadex:dataFlow>
+      <jadex:dataFlow id="eaqFHt8dlfob35Gy" sourceRef="_ex69sSbmEd-LGeDmwCGsJg" sourceParam="b" targetRef="_h3qmoSbmEd-LGeDmwCGsJg" targetParam="b"/>
+      <jadex:dataFlow id="TN0KZdXzM4RLzoM6" sourceRef="_ZfOVAybmEd-LGeDmwCGsJg" sourceParam="a" targetRef="_h3qmoSbmEd-LGeDmwCGsJg" targetParam="a"/>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_ZfOVASbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="600.0" width="3000.0" x="116.0" y="46.66666666666668"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_bLQZASbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="40.0" width="40.0" x="74.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_0zKK0SbnEd-LGeDmwCGsJg">
+        <dc:Bounds height="100.0" width="160.0" x="194.0" y="240.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>b</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>a</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_c34S4SbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="60.0" width="60.0" x="414.0" y="260.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_ex69sSbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="100.0" width="160.0" x="534.0" y="370.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_ZfOVAybmEd-LGeDmwCGsJg">
+        <dc:Bounds height="100.0" width="160.0" x="534.0" y="120.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_gtAxYSbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="60.0" width="60.0" x="824.0" y="263.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_h3qmoSbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="100.0" width="160.0" x="934.0" y="243.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_akev8ShyEd-LGeDmwCGsJg">
+        <dc:Bounds height="60.0" width="60.0" x="1154.0" y="263.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_0rX9QSbmEd-LGeDmwCGsJg">
+        <dc:Bounds height="40.0" width="40.0" x="1554.0" y="273.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_qrKVEShxEd-LGeDmwCGsJg">
+        <dc:Bounds height="100.0" width="160.0" x="1274.0" y="363.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_l1EI0ShxEd-LGeDmwCGsJg">
+        <dc:Bounds height="100.0" width="160.0" x="1274.0" y="123.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_hVixASbmEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_0zT72CbnEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_eJ1qASbmEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_eyEusSbmEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_gtJ7USbmEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_h3zwkSbmEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_dzwIUShyEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_2FtX0SbnEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_s7QIYShxEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_tZ82kShxEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_0rhuQibmEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_qrUGEShxEd-LGeDmwCGsJg">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="G1dJDc8Fs1ikWCq7">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="Ua5IIOw7Ya/wL3JP">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="TN0KZdXzM4RLzoM6">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="eaqFHt8dlfob35Gy">
+      </di:Edge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -1,0 +1,23 @@
+<!--
+	<H3>The chart provider</H3>
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+	                    http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="ChartProvider" package="jadex.android.applications.demos.rest">
+	
+	<imports>
+		<import>jadex.extension.rs.invoke.*</import>
+		<import>jadex.android.applications.demos.rest.*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IChartService">
+			<implementation>SRest.createServiceImplementation($component, 
+				IChartService.class, IRSChartService.class)</implementation>
+		</providedservice>
+	</services>
+	
+</componenttype>

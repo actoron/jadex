@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The Cleaner Agent.</H3>
+
+	The agent mainly has 3 top-level goals:<br>
+	- Searching for waste (perform lookforwaste).<br>
+	- Cleaning up waste (achieve cleanup).<br>
+	- Keep the battery loaded (maintain battery loaded).<br><br>
+
+	To achieve this goals it uses various
+	subgoals for decomposition of the overall
+	tasks.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Cleaner"
+	package="jadex.bdi.examples.cleanerworld.cleaner">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
+ 		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.bdi.examples.cleanerworld.*</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="environment" class="ContinuousSpace2D">
+ 			<fact class="ContinuousSpace2D">jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
+ 		</belief>
+ 		
+ 		<belief name="myself" class="ISpaceObject" exported="true">
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+
+		<beliefset name="wastes" class="ISpaceObject" />
+
+		<beliefset name="wastebins"  class="ISpaceObject" />
+
+		<beliefset name="chargingstations" class="ISpaceObject" />
+
+		<beliefset name="cleaners" class="ISpaceObject" />
+
+		<beliefset name="raster" class="Integer">
+			<fact>10</fact>
+			<fact>10</fact>
+		</beliefset>
+		
+		<beliefset name="visited_positions" class="MapPoint">
+			<facts>
+ 				MapPoint.getMapPointRaster($beliefbase.raster[0].intValue(), $beliefbase.raster[1].intValue(),
+ 					$beliefbase.environment.getAreaSize().getXAsDouble(), $beliefbase.environment.getAreaSize().getYAsDouble())
+			</facts>
+		</beliefset>
+
+		<!-- <belief name="daytime" class="boolean" evaluationmode="push">
+			<fact >$beliefbase.environment.daytime</fact>
+		</belief> //does not work because environment does not throw change event for time :-( ? -->
+		
+		<belief name="daytime" class="boolean" evaluationmode="pull" updaterate="1000">
+			<fact>$beliefbase.environment.getProperty("daytime")</fact>
+		</belief>
+
+		<belief name="my_location" class="IVector2" evaluationmode="push">
+			<fact >$beliefbase.myself.position</fact>
+ 		</belief>
+ 		
+ 		<belief name="my_speed" class="double" evaluationmode="push">
+			<fact >$beliefbase.myself.speed</fact>
+ 		</belief>
+ 		
+ 		<belief name="my_vision" class="double" evaluationmode="push">
+			<fact >$beliefbase.myself.vision_range</fact>
+ 		</belief>
+ 		
+ 		<belief name="my_chargestate" class="double" evaluationmode="push">
+			<fact >$beliefbase.myself.chargestate</fact>
+ 		</belief>
+
+		<beliefset name="patrolpoints" class="IVector2">
+			<fact>new Vector2Double(0.1, 0.1)</fact>
+			<fact>new Vector2Double(0.1, 0.9)</fact>
+			<fact>new Vector2Double(0.3, 0.9)</fact>
+			<fact>new Vector2Double(0.3, 0.1)</fact>
+			<fact>new Vector2Double(0.5, 0.1)</fact>
+			<fact>new Vector2Double(0.5, 0.9)</fact>
+			<fact>new Vector2Double(0.7, 0.9)</fact>
+			<fact>new Vector2Double(0.7, 0.1)</fact>
+			<fact>new Vector2Double(0.9, 0.1)</fact>
+			<fact>new Vector2Double(0.9, 0.9)</fact>
+		</beliefset>
+		
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(CleanerGui.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<!-- Top-level goals -->
+
+		<!-- Observe the battery state. -->
+		<maintaingoal name="maintainbatteryloaded">
+			<deliberation>
+				<inhibits ref="performlookforwaste"/>
+				<inhibits ref="achievecleanup"/>
+				<inhibits ref="performpatrol"/>
+			</deliberation>
+ 			<maintaincondition >
+ 				$beliefbase.my_chargestate > 0.2 &amp;&amp; $beliefbase.my_chargestate!=0
+ 			</maintaincondition>
+			<targetcondition >
+ 				$beliefbase.my_chargestate >= 1.0
+ 			</targetcondition>
+		</maintaingoal>
+
+		<!-- Clean up some waste. -->
+		<achievegoal name="achievecleanup" retry="true" exclude="never">
+			<parameter name="waste" class="ISpaceObject">
+				<bindingoptions>$beliefbase.wastes</bindingoptions>
+			</parameter>
+			<unique/>
+			<creationcondition beliefs="wastes">
+				true
+			</creationcondition>
+			<contextcondition>
+				$beliefbase.daytime
+ 			</contextcondition>
+			<dropcondition >
+				$beliefbase.myself.waste==null &amp;&amp;
+					!$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
+ 			</dropcondition>
+			<!-- <deliberation cardinality="1"> -->
+			<deliberation cardinalityone="true">
+				<inhibits ref="performlookforwaste"/>
+				<inhibits ref="achievecleanup" >
+					$goal.waste.equals($beliefbase.myself.waste) || $goal.waste.position==null || 
+					(!$ref.waste.equals($beliefbase.myself.waste) &amp;&amp; !($ref.waste.position==null) &amp;&amp;
+					$beliefbase.my_location.getDistance($goal.waste.position).getAsDouble()
+					&lt; $beliefbase.my_location.getDistance($ref.waste.position).getAsDouble())
+				</inhibits>
+			</deliberation>
+			<targetcondition>
+				(select one ISpaceObject $wastebin from $beliefbase.wastebins
+				where $wastebin.wasteids.contains($goal.waste.getId()))!=null
+			</targetcondition>
+		</achievegoal>
+
+		<!-- Look out for waste when nothing better to do, what means that
+			the agent is not cleaning, not loading and it is daytime. -->
+		<performgoal name="performlookforwaste" retry="true" exclude="never">
+			<contextcondition >
+				$beliefbase.daytime
+ 			</contextcondition>
+ 		</performgoal>
+
+		<!-- Perform patrols at night when the agent is not loading. -->
+		<performgoal name="performpatrol" retry="true" exclude="never">
+			<contextcondition >
+				!$beliefbase.daytime
+ 			</contextcondition>
+ 		</performgoal>
+
+		<!-- Sub-level goals -->
+
+		<!-- Pick up a piece of waste. -->
+		<achievegoal name="achievepickupwaste" retry="false">
+			<parameter name="waste" class="ISpaceObject"/>
+		</achievegoal>
+
+		<!-- Drop a piece of waste into a wastebin. -->
+		<achievegoal name="achievedropwaste" retry="true" exclude="never">
+			<parameter name="wastebin" class="ISpaceObject"/>
+			<parameter name="waste" class="ISpaceObject"/>
+			
+			<!-- The goal has failed when the aimed wastebin is full. -->
+			<dropcondition >
+				$goal.wastebin.wastes &gt;= $goal.wastebin.capacity 
+			</dropcondition>
+		</achievegoal>
+
+		<!-- Try to move to the specified location. -->
+		<achievegoal name="achievemoveto">
+			<parameter name="location" class="IVector2"/>
+			<!-- The goal has been reached when the agent's location is
+				near the target position as specified in the parameter. - ->
+			<targetcondition>
+ 				$beliefbase.my_location.isNear($goal.location)
+			</targetcondition> -->
+		</achievegoal>
+
+		<!-- Try to find a not full waste bin that
+			is as near as possible to the agent. -->
+		<querygoal name="querywastebin" exclude="never">
+			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
+				<value >
+					select one ISpaceObject $wastebin
+					from $beliefbase.wastebins
+					where !$wastebin.full
+					order by $beliefbase.my_location.getDistance($wastebin.position).getAsDouble()
+				</value>
+			</parameter>
+		</querygoal>
+
+		<!-- Find the nearest charging station. -->
+		<querygoal name="querychargingstation" exclude="never">
+			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
+				<value >
+					select one ISpaceObject $station
+					from $beliefbase.chargingstations
+					order by $beliefbase.my_location.getDistance($station.position).getAsDouble()
+				</value>
+			</parameter>
+		</querygoal>
+		
+		<!-- Basic environment actions modelled as goals to handle failures. -->
+
+		<!-- Pick up a piece of waste. -->
+		<achievegoal name="pickup_waste_action">
+			<parameter name="waste" class="ISpaceObject"/>
+		</achievegoal>
+
+		<!-- Drop a piece of waste. -->
+		<achievegoal name="drop_waste_action">
+			<parameter name="waste" class="ISpaceObject"/>
+			<parameter name="wastebin" class="ISpaceObject"/>
+		</achievegoal>
+
+		<!-- Memorize the already visited positions in a raster. -->
+		<performgoal name="performmemorizepositions"/>
+		
+		<!-- Drop a piece of waste. -->
+		<achievegoal name="helpbatteryempty">
+			<unique/>
+			<creationcondition>
+				$beliefbase.my_chargestate==0
+ 			</creationcondition>
+		</achievegoal>
+ 	</goals>
+
+	<plans>
+		<!-- Walk to the least seen positions.
+ 			Position just visited have value 1. The longer the position
+ 			was not visted the lower the value. Good for seeking movable targets. -->
+		<plan name="leastseenwalk">
+			<body class="LeastSeenWalkPlan"/>
+			<trigger>
+				<goal ref="performlookforwaste"/>
+			</trigger>
+		</plan>
+		
+		<!-- Walk to random positions. -->
+		<plan name="randomwalk" priority="-1">
+			<body class="RandomWalkPlan"/>
+			<trigger>
+				<goal ref="performlookforwaste"/>
+				<goal ref="querywastebin"/>
+				<goal ref="querychargingstation"/>
+			</trigger>
+		</plan>
+
+		<!-- This plan explores the map by walking to unknown positions.
+ 			Uses the absolute quantity of visits at the map points.
+ 			Good for seeking firm targets.-->
+		<plan name="exploremap">
+			<body class="ExploreMapPlan"/>
+			<trigger>
+				<goal ref="querywastebin"/>
+				<goal ref="querychargingstation"/>
+			</trigger>
+		</plan>
+
+		<!-- Perform patrols. -->
+		<plan name="patrol">
+			<body class="PatrolPlan"/>
+			<trigger>
+				<goal ref="performpatrol"/>
+			</trigger>
+		</plan>
+
+		<!-- Clean up waste by picking it up
+			and carrying it to a waste bin. -->
+		<plan name="cleanup">
+			<parameter name="waste" class="ISpaceObject">
+ 				<goalmapping ref="achievecleanup.waste"/>
+			</parameter>
+			<body class="CleanUpWastePlan"/>
+			<trigger>
+				<goal ref="achievecleanup"/>
+			</trigger>
+		</plan>
+
+		<!-- Pick up a waste. -->
+		<plan name="pickupwaste">
+			<parameter name="waste" class="ISpaceObject">
+ 				<goalmapping ref="achievepickupwaste.waste"/>
+			</parameter>
+			<body class="PickUpWastePlan" />
+			<trigger>
+				<goal ref="achievepickupwaste"/>
+			</trigger>
+		</plan>
+
+		<!-- Drop a waste into a waste bin. -->
+		<plan name="dropwaste">
+			<parameter name="wastebin" class="ISpaceObject">
+ 				<goalmapping ref="achievedropwaste.wastebin"/>
+			</parameter>
+			<parameter name="waste" class="ISpaceObject">
+ 				<goalmapping ref="achievedropwaste.waste"/>
+			</parameter>
+			<body class="DropWastePlan"/>
+			<trigger>
+				<goal ref="achievedropwaste"/>
+			</trigger>
+		</plan>
+
+		<!-- Load the battery. -->
+		<plan name="loadbattery">
+			<body class="LoadBatteryPlan"/>
+			<trigger>
+				<goal ref="maintainbatteryloaded"/>
+			</trigger>
+		</plan>
+
+		<!-- Move to a location. -->
+		<plan name="moveto">
+			<parameter name="location" class="IVector2">
+				<goalmapping ref="achievemoveto.location"/>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="achievemoveto"/>
+			</trigger>
+			<!-- <contextcondition>$beliefbase.my_chargestate &gt; 0</contextcondition>-->
+		</plan>
+
+		<!-- This plan memorizes the positions. -->
+		<plan name="memorizepositions">
+			<body class="MemorizePositionsPlan"/>
+			<trigger>
+				<goal ref="performmemorizepositions"/>
+			</trigger>
+		</plan>
+		
+		<plan name="searchhelpplan">
+			<body class="SearchHelpPlan"/>
+			<trigger>
+				<goal ref="helpbatteryempty"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<expressions>
+		<!-- Query the max quantity map point. -->
+		<expression name="query_max_quantity">
+			select one MapPoint $mp
+			from $beliefbase.getBeliefSet("visited_positions").getFacts()
+			order by $mp.getQuantity() desc
+		</expression>
+
+		<!-- Query the map points ordered by their quantity
+ 			(least ones first). -->
+		<expression name="query_min_quantity">
+			select MapPoint $mp
+			from $beliefbase.getBeliefSet("visited_positions").getFacts()
+			order by $mp.getQuantity()
+		</expression>
+
+		<!-- Query the map points ordered by their seen value
+ 			(least ones first). -->
+		<expression name="query_min_seen">
+			select MapPoint $mp
+			from $beliefbase.getBeliefSet("visited_positions").getFacts()
+			order by $mp.getSeen()
+		</expression>
+	</expressions>
+
+	<properties>
+		<!--<property name="logging.level">Level.FINE</property>-->
+		<!-- <property name="debugging">true</property>  -->
+		<property name="componentviewer.viewerclass">"jadex.bdi.examples.cleanerworld.cleaner.CleanerViewerPanel"</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="performlookforwaste"/>
+  				<initialgoal ref="performpatrol"/>
+		  		<initialgoal ref="maintainbatteryloaded"/>
+				<initialgoal ref="performmemorizepositions"/>
+			</goals>
+		</configuration>
+	</configurations>
+</agent>
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Chat component.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Chat" package="jadex.platform.service.chat">
+	
+    <imports>
+    	<import>jadex.bridge.service.types.chat.*</import>    
+    </imports>
+    
+	<services>
+		<providedservice name="chat" class="IChatService">
+			<implementation class="ChatService"/>
+		</providedservice>
+		<providedservice class="IChatGuiService">
+			<implementation>
+				$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("chat")
+			</implementation>
+		</providedservice>
+		<requiredservice name="chatservices" class="IChatService" multiple="true">
+			<binding dynamic="true" scope="global"/>
+		</requiredservice>
+	</services>
+	
+	<properties>
+		<property name="system" class="boolean">true</property>
+	</properties>
+</componenttype>

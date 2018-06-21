@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>BlackJack application descriptor</H3>
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
+	name="BlackJack" package="jadex.bdi.examples.blackjack">
+	
+	<componenttypes>
+		<componenttype name="Manager" filename="jadex/bdi/examples/blackjack/manager/Manager.agent.xml"/>
+		<componenttype name="Dealer" filename="jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"/>
+		<componenttype name="Player" filename="jadex/bdi/examples/blackjack/player/Player.agent.xml"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Only Manager">
+			<components>
+				<component type="Manager" master="true"/>
+			</components>
+		</configuration>
+	</configurations>
+	
+</applicationtype>

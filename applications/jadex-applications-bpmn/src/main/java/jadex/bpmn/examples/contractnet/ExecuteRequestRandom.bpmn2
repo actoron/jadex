@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>ExecuteRequestRandom</jadex:modelname>
+    <jadex:description>&lt;h1&gt;Execute a Request&lt;/h1&gt; This process randomly produces a result or fails.</jadex:description>
+    <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:arguments>
+      <jadex:argument name="proposal" type="Object">
+        <jadex:description>The proposal.</jadex:description>
+      </jadex:argument>
+    </jadex:arguments>
+    <jadex:results>
+      <jadex:result name="result" type="Object">
+        <jadex:description>The result of the execution</jadex:description>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_eyJZMVrFEd-ircvS5nprxA">
+    <semantic:endEvent id="_iX7NEVrFEd-ircvS5nprxA">
+      <semantic:incoming>_iYEXCFrFEd-ircvS5nprxA</semantic:incoming>
+      <semantic:errorEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="exception">new RuntimeException(&quot;Failed to execute: &quot;+proposal)</jadex:property>
+      </semantic:extensionElements>
+    </semantic:endEvent>
+    <semantic:startEvent id="_hVT5gVrFEd-ircvS5nprxA">
+      <semantic:outgoing>_hVdqgVrFEd-ircvS5nprxA</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:exclusiveGateway id="_gYN_IVrFEd-ircvS5nprxA" default="_iYEXCFrFEd-ircvS5nprxA">
+      <semantic:incoming>_hVdqgVrFEd-ircvS5nprxA</semantic:incoming>
+      <semantic:outgoing>_iYEXCFrFEd-ircvS5nprxA</semantic:outgoing>
+      <semantic:outgoing>_9JVMumJdEd-Q9q1HfsZXQw</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:task name="Store Result" id="_9JVMsWJdEd-Q9q1HfsZXQw">
+      <semantic:incoming>_9JVMumJdEd-Q9q1HfsZXQw</semantic:incoming>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="_hVT5gVrFEd-ircvS5nprxA" targetRef="_gYN_IVrFEd-ircvS5nprxA" id="_hVdqgVrFEd-ircvS5nprxA">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_gYN_IVrFEd-ircvS5nprxA" targetRef="_iX7NEVrFEd-ircvS5nprxA" id="_iYEXCFrFEd-ircvS5nprxA">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_gYN_IVrFEd-ircvS5nprxA" targetRef="_9JVMsWJdEd-Q9q1HfsZXQw" id="_9JVMumJdEd-Q9q1HfsZXQw">
+      <semantic:conditionExpression>Math.random()&lt;0.5</semantic:conditionExpression>
+      <semantic:extensionElements>
+        <jadex:parametermapping name="result">&quot;Executed: &quot;+proposal</jadex:parametermapping>
+      </semantic:extensionElements>
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_eyJZMVrFEd-ircvS5nprxA">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_iX7NEVrFEd-ircvS5nprxA">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="320.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_hVT5gVrFEd-ircvS5nprxA">
+        <dc:Bounds height="40.0" width="40.0" x="90.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_gYN_IVrFEd-ircvS5nprxA">
+        <dc:Bounds height="60.0" width="60.0" x="240.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_9JVMsWJdEd-Q9q1HfsZXQw">
+        <dc:Bounds height="100.0" width="160.0" x="420.0" y="120.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_iYEXCFrFEd-ircvS5nprxA">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_9JVMumJdEd-Q9q1HfsZXQw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_hVdqgVrFEd-ircvS5nprxA">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

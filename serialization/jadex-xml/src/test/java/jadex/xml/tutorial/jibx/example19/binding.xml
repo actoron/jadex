@@ -1,0 +1,24 @@
+<binding>
+  <mapping name="order" class="example19.Order"
+      factory="example19.Order.orderFactory" pre-get="preget">
+    <structure field="customer"/>
+    <value name="total" field="total" usage="optional"/>
+    <collection field="items" item-type="example19.Item"/>
+  </mapping>
+  <mapping name="customer" class="example19.Customer">
+    <structure name="person" field="person" pre-set="preset">
+      <value name="cust-num" style="attribute" field="customerNumber"/>
+      <value name="first-name" field="firstName"/>
+      <value name="last-name" field="lastName"/>
+    </structure>
+    <value name="street" field="street"/>
+    <value name="city" field="city"/>
+    <value name="state" field="state"/>
+    <value name="zip" field="zip"/>
+    <value name="phone" style="attribute" field="phone"/>
+  </mapping>
+  <mapping name="item" class="example19.Item" post-set="postset">
+    <value name="id" style="attribute" field="itemId"/>
+    <value style="text" field="count"/>
+  </mapping>
+</binding>

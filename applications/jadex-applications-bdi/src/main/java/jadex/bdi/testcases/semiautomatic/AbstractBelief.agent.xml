@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test for abstract beliefs</H3>
+	An agent that has a capability with an abstract belief.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AbstractBelief"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<capabilities>
+		<capability name="cap" file="jadex/bdi/testcases/semiautomatic/AbstractBelief.capability.xml"/>
+	</capabilities>
+	
+	<beliefs>
+		<belief name="outer" class="String">
+			<assignto ref="cap.inner"/>
+			<fact>"Hello"</fact>
+		</belief>
+	</beliefs>
+
+</agent>

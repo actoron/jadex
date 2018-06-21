@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test abstract goal dispatched from outer capability.</H3>
+
+	Creates a goal which is assigned to the abstract goal
+	from a capability.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="OuterAbstractGoal"
+	package="jadex.bdi.testcases.goals">
+
+	<capabilities>
+		<capability name="abs" file="jadex/bdi/testcases/goals/OuterAbstractGoal"/>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+	
+	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="testgoal">
+			<assignto ref="abs.agoal"/>
+			<parameter name="param" class="String" direction="in"/>
+			<parameter name="result" class="String" direction="out"/>
+		 </achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="testplan">
+			<body class="GenerateGoalPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="testplan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

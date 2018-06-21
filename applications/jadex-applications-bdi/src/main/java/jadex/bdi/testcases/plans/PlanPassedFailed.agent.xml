@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the plans passed() and failed() methods.</H3>
+	
+	Test, if the plan methods passed() and failed() are
+	called properly, according to the plan behaviour.<br><br>
+
+	The agent create 4 goals in sequence and always
+	uses the PassedFailedPlan to execute a further
+	testcase. The belief cnt captures the testcase no.
+
+	aborted() method is tested in PlanAbort.agent (abort on failure)
+	and PlanContext.agent (abort on success)
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="PlanPassedFailed"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="cnt" class="int">
+			<fact>0</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="init" retry="true" exclude="never">	<!-- Hack!!! goal triggers only once, because condition uses only temporary variables -->
+			<creationcondition>
+				$beliefbase.cnt&lt;4
+			</creationcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+        <plan name="passfail">
+			<body class="PassedFailedPlan"/>
+			<trigger>
+				<goal ref="init"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.OFF</property>
+        <!-- Todo: Reduce level from severe to warning, as exception is part of the test. -->
+        <!-- <property name="logging.level.exceptions">java.util.logging.Level.WARNING</property> -->
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>4</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</agent>
+

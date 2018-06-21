@@ -1,0 +1,10 @@
+description 'Dungeon Keeper with BDI Agents.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':platform:jadex-bridge')
+	api project(':kernels:jadex-kernel-micro')
+	api project(':kernels:jadex-kernel-application')
+	api project(':environments:jadex-kernel-extension-envsupport')
+}

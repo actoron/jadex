@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Shop agent that sells goods.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Shop"
+	package="jadex.bdi.examples.shop">
+
+	<capabilities>
+		<capability name="shopcap" file="jadex.bdi.examples.shop.Shop"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="money" class="double" argument="true">
+			<assignto ref="shopcap.money"/>
+			<fact>100</fact>
+		</belief>
+
+		<beliefref name="shopname" argument="true">
+			<concrete ref="shopcap.shopname"/>
+		</beliefref>
+		
+		<beliefsetref name="catalog" argument="true">
+			<concrete ref="shopcap.catalog"/>
+		</beliefsetref>
+	</beliefs>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+
+</agent>

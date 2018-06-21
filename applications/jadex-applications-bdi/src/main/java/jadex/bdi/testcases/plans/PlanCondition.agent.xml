@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test an activation condition of a plan.</H3>
+
+	This agent has a "plan_a" plan which reacts on
+	a condition. This condition is triggered when
+	the belief count is 1.
+
+	This agent has a "plan_b" plan which reacts on
+	a condition. This condition is triggered when
+	the belief count is 2.
+	Because two bindings are possible, two instances
+	of the plan are executed (one for each binding).
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="PlanCondition"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="count" class="int"/>
+		<belief name="a" class="int"/>
+	</beliefs>
+
+	<plans>
+        <plan name="plan_a">
+			<parameter name="beliefname" class="String">
+				<value>"a"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<condition>
+					$beliefbase.count==1
+				</condition>
+			</trigger>
+		</plan>
+		
+		<plan name="plan_b">
+			<parameter name="var" class="String">
+	        	<bindingoptions>new String[]{"var1", "var2"}</bindingoptions>
+			</parameter>
+			<parameter name="beliefname" class="String">
+				<value>"a"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+ 				<condition>
+ 					$beliefbase.count==2
+ 				</condition>
+			</trigger>
+		</plan>
+		
+		<plan name="tester">
+			<body class="PlanConditionTesterPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+        <!--<property name="debugging">true</property>-->
+        <!--<property name="logging.level">java.util.logging.Level.INFO</property>-->
+        <property name="logging.useParentHandlers">true</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

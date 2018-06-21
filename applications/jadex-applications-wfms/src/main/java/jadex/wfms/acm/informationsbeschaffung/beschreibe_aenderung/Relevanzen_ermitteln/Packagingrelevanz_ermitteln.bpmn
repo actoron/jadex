@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_t484AWpiEd-hCvoq5nCi-Q" iD="_t484AGpiEd-hCvoq5nCi-Q">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uSOToGpiEd-hCvoq5nCi-Q" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uSO6sGpiEd-hCvoq5nCi-Q" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uSQI0GpiEd-hCvoq5nCi-Q" key="Package" value="jadex.wfms.acm.informationsbeschaffung.beschreibe_aenderung.Relevanzen_ermitteln"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_t49fFWpiEd-hCvoq5nCi-Q" iD="_t49fFGpiEd-hCvoq5nCi-Q" name="body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_t4_7UWpiEd-hCvoq5nCi-Q" iD="_t4_7UGpiEd-hCvoq5nCi-Q" outgoingEdges="_ES2SMWpjEd-hCvoq5nCi-Q" incomingEdges="_xuXDUGpiEd-hCvoq5nCi-Q" name="Query_Packagin_Relevance" lanes="_u_zyYWpiEd-hCvoq5nCi-Q" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_udJxQGpiEd-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_udJxQWpiEd-hCvoq5nCi-Q" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7F6BgGpiEd-hCvoq5nCi-Q" key="parameters" value="out␋Packaging_Computation_required␋boolean␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xiOr0GpiEd-hCvoq5nCi-Q" iD="_xiOEwGpiEd-hCvoq5nCi-Q" outgoingEdges="_xuXDUGpiEd-hCvoq5nCi-Q" lanes="_u_zyYWpiEd-hCvoq5nCi-Q" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Dt7AMWpjEd-hCvoq5nCi-Q" iD="_Dt7AMGpjEd-hCvoq5nCi-Q" outgoingEdges="_Ze4LEWpjEd-hCvoq5nCi-Q _aHr3gWpjEd-hCvoq5nCi-Q" incomingEdges="_ES2SMWpjEd-hCvoq5nCi-Q" lanes="_u_zyYWpiEd-hCvoq5nCi-Q" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_GqISoWpjEd-hCvoq5nCi-Q" iD="_GqISoGpjEd-hCvoq5nCi-Q" outgoingEdges="_abwDAWpjEd-hCvoq5nCi-Q" incomingEdges="_aHr3gWpjEd-hCvoq5nCi-Q" name="Write_Evaluation_State" lanes="_u_zyYWpiEd-hCvoq5nCi-Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KILG0GpjEd-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KILG0WpjEd-hCvoq5nCi-Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nCp5IGpjEd-hCvoq5nCi-Q" key="parameters" value="in␋beliefname␋java.lang.String␋&quot;BewertungPackagingFertig&quot;␟in␋value␋java.lang.Object␋false"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_G2abIWpjEd-hCvoq5nCi-Q" iD="_G2abIGpjEd-hCvoq5nCi-Q" outgoingEdges="_qrBuAWpjEd-hCvoq5nCi-Q" incomingEdges="_Ze4LEWpjEd-hCvoq5nCi-Q _abwDAWpjEd-hCvoq5nCi-Q" name="Write_Packaging" lanes="_u_zyYWpiEd-hCvoq5nCi-Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OuBQkGpjEd-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OuBQkWpjEd-hCvoq5nCi-Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fpvK0GpjEd-hCvoq5nCi-Q" key="parameters" value="in␋beliefname␋java.lang.String␋&quot;Relevanz_Packaging&quot;␟in␋value␋java.lang.Object␋Packaging_Computation_required"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_qTrlAWpjEd-hCvoq5nCi-Q" iD="_qTrlAGpjEd-hCvoq5nCi-Q" incomingEdges="_qrBuAWpjEd-hCvoq5nCi-Q" lanes="_u_zyYWpiEd-hCvoq5nCi-Q" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xuXDUGpiEd-hCvoq5nCi-Q" iD="_xuWcQGpiEd-hCvoq5nCi-Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ES2SMWpjEd-hCvoq5nCi-Q" iD="_ES2SMGpjEd-hCvoq5nCi-Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Ze4LEWpjEd-hCvoq5nCi-Q" iD="_Ze4LEGpjEd-hCvoq5nCi-Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dp9EYGpjEd-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dp9EYWpjEd-hCvoq5nCi-Q" key="condition" value="!Packaging_Computation_required"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_aHr3gWpjEd-hCvoq5nCi-Q" iD="_aHr3gGpjEd-hCvoq5nCi-Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dMEOgGpjEd-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dMEOgWpjEd-hCvoq5nCi-Q" key="condition" value="Packaging_Computation_required"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_abwDAWpjEd-hCvoq5nCi-Q" iD="_abwDAGpjEd-hCvoq5nCi-Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_qrBuAWpjEd-hCvoq5nCi-Q" iD="_qrBuAGpjEd-hCvoq5nCi-Q"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_u_zyYWpiEd-hCvoq5nCi-Q" iD="_u_zyYGpiEd-hCvoq5nCi-Q" name="AnsprechpartnerPackaging" activities="_t4_7UWpiEd-hCvoq5nCi-Q _xiOr0GpiEd-hCvoq5nCi-Q _Dt7AMWpjEd-hCvoq5nCi-Q _GqISoWpjEd-hCvoq5nCi-Q _G2abIWpjEd-hCvoq5nCi-Q _qTrlAWpjEd-hCvoq5nCi-Q"/>
+  </pools>
+</bpmn:BpmnDiagram>

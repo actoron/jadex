@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson F2.</H3>
+	Understanding message event matching.
+	<H4>Explanation</H4>
+	The agent has declared two message event
+	types. Whenever the agent receives a message it
+	has to decide to which message event this message
+	can be mapped. If more than one mapping are valid
+	for a received message the specificity of the
+	declared message events (more specific -> better).
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationF2"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>jadex.bdi.planlib.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>java.util.logging.*</import>
+	</imports>
+
+	<plans>
+		<!-- A translation plan, from which a new instance is created
+			whenever a translation request is received. -->
+		<plan name="egtrans">
+			<body class="EnglishGermanTranslationPlanF2"/>
+			<trigger>
+				<messageevent ref="request_translation"/>
+			</trigger>
+		</plan>
+		<!-- Reacts on all messages that can not be handled by the
+ 			the translation plan. -->
+		<plan name="notunderstood">
+			<body class="NotUnderstoodPlan"/>
+			<trigger>
+				<messageevent ref="any_message"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Specifies a translation request being all
+			messages with performative request. -->
+		<messageevent name="request_translation" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+		</messageevent>
+		<!-- All messages can be also mapped to a any_message,
+ 			when no more specific mapping can be found. -->
+		<messageevent name="any_message" direction="receive" type="fipa">
+			<!-- As no required parameters are specified this event matches any message. -->
+		</messageevent>
+
+		<!-- The answer message after success. -->
+		<messageevent name="inform" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+		<!-- The answer message after some error occurred. -->
+		<messageevent name="failure" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.FAILURE</value>
+			</parameter>
+		</messageevent>
+		<!-- The answer message after success. -->
+		<messageevent name="not_understood" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.NOT_UNDERSTOOD</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+       <!-- <property name="logging.level">Level.INFO</property> -->
+ 		<!-- The default parent handler prints out log messages on the console. -->
+       <property name="logging.useParentHandlers">true</property>
+        <!--<property name="debugging">true</property>-->
+    </properties>
+
+</agent>
+

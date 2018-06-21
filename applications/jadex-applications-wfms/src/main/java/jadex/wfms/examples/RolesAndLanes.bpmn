@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_nprHIRolEd-ylKS_uyVCzg" iD="_nprHIBolEd-ylKS_uyVCzg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oSYF4BolEd-ylKS_uyVCzg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oSYF4RolEd-ylKS_uyVCzg" key="imports" value="jadex.wfms.parametertypes.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oSYF4holEd-ylKS_uyVCzg" key="Package" value="jadex.wfms.examples"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_npruMRolEd-ylKS_uyVCzg" iD="_npruMBolEd-ylKS_uyVCzg" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_npruMxolEd-ylKS_uyVCzg" iD="_npruMholEd-ylKS_uyVCzg" outgoingEdges="_LCVd0RomEd-ylKS_uyVCzg" incomingEdges="_zHaVwRolEd-ylKS_uyVCzg" name="First_Role_enters_value" lanes="_qQjp0RolEd-ylKS_uyVCzg" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xH5VEBolEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xH58IBolEd-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_23q7UBolEd-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h3>The First Role enters a value which will be passed to the Second Role.&lt;/h3>&lt;/center>&lt;/html>&quot;)␟out␋Value␋long␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_yqcs8RolEd-ylKS_uyVCzg" iD="_yqcs8BolEd-ylKS_uyVCzg" outgoingEdges="_zHaVwRolEd-ylKS_uyVCzg" lanes="_qQjp0RolEd-ylKS_uyVCzg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JeEOsRomEd-ylKS_uyVCzg" iD="_JeEOsBomEd-ylKS_uyVCzg" outgoingEdges="_k6HUIRomEd-ylKS_uyVCzg" incomingEdges="_LCVd0RomEd-ylKS_uyVCzg" name="Second_Role_enters_string" lanes="_qdhu0RolEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JkuQUBomEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JkuQURomEd-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S3omIBomEd-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h3>The Second Role receives the value, can modify it and adds a String value.&lt;/h3>&lt;/center>&lt;/html>&quot;)␟inout␋First_Role_Value␋long␋Value␟out␋String_Value␋String␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_kOsYkRomEd-ylKS_uyVCzg" iD="_kOsYkBomEd-ylKS_uyVCzg" outgoingEdges="_Cjqy8RonEd-ylKS_uyVCzg" incomingEdges="_k6HUIRomEd-ylKS_uyVCzg" name="Third_Role_Confirms" lanes="_qrRP4RolEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_kU_N0BomEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kU_N0RomEd-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qJtlgBomEd-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h3>The Third Role receives all entered information, corrects and confirms it.&lt;/h3>&lt;/center>&lt;/html>&quot;)␟inout␋First_Role_Value␋long␋First_Role_Value␟inout␋Second_Role_String␋String␋String_Value␟out␋Confirmation␋boolean␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_B0sNERonEd-ylKS_uyVCzg" iD="_B0sNEBonEd-ylKS_uyVCzg" outgoingEdges="_Tm64kRonEd-ylKS_uyVCzg" incomingEdges="_Cjqy8RonEd-ylKS_uyVCzg" name="Review_final_results_with_role_override" lanes="_qrRP4RolEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_B6aakBonEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_B6bBoBonEd-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EsW9wBonEd-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h3>This workitem is on the lane for the third role but the workitem role is overridden with the META_role parameter. The entered information can now be reviewed by that role.&lt;/h3>&lt;/center>&lt;/html>&quot;)␟in␋First_Role_Value␋long␋First_Role_Value␟in␋Second_Role_String␋String␋Second_Role_String␟in␋Third_Role_Confirmation␋boolean␋Confirmation␟in␋META_role␋String␋&quot;OverriddenRole&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TL1fERonEd-ylKS_uyVCzg" iD="_TL1fEBonEd-ylKS_uyVCzg" incomingEdges="_Tm64kRonEd-ylKS_uyVCzg" lanes="_qrRP4RolEd-ylKS_uyVCzg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_zHaVwRolEd-ylKS_uyVCzg" iD="_zHaVwBolEd-ylKS_uyVCzg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LCVd0RomEd-ylKS_uyVCzg" iD="_LCVd0BomEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LDOOoBomEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDO1sBomEd-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDO1sRomEd-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OioUwBomEd-ylKS_uyVCzg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OioUwRomEd-ylKS_uyVCzg" key="mappings" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_k6HUIRomEd-ylKS_uyVCzg" iD="_k6HUIBomEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_k7AE8BomEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_k7AE8RomEd-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_k7AE8homEd-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Cjqy8RonEd-ylKS_uyVCzg" iD="_Cjqy8BonEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Cki8sBonEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Cki8sRonEd-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Cki8shonEd-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Tm64kRonEd-ylKS_uyVCzg" iD="_Tm64kBonEd-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Tn5wABonEd-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Tn5wARonEd-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Tn6XEBonEd-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_qQjp0RolEd-ylKS_uyVCzg" iD="_qQjp0BolEd-ylKS_uyVCzg" name="First_Role" activities="_npruMxolEd-ylKS_uyVCzg _yqcs8RolEd-ylKS_uyVCzg"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_qdhu0RolEd-ylKS_uyVCzg" iD="_qdhu0BolEd-ylKS_uyVCzg" name="Second_Role" activities="_JeEOsRomEd-ylKS_uyVCzg"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_qrRP4RolEd-ylKS_uyVCzg" iD="_qrRP4BolEd-ylKS_uyVCzg" name="Third_Role" activities="_kOsYkRomEd-ylKS_uyVCzg _B0sNERonEd-ylKS_uyVCzg _TL1fERonEd-ylKS_uyVCzg"/>
+  </pools>
+</bpmn:BpmnDiagram>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>LoopingSubtask</jadex:modelname>
+    <jadex:description>&lt;H1&gt;Looping Subtask&lt;/H1&gt; Test if looping subtasks work. Should print A, B, C with 2 seconds delay in between.</jadex:description>
+    <jadex:package>jadex.bpmn.examples.execute</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_7GnScUdBEeG8rbYlagcQXQ">
+    <semantic:subProcess name="Loop" id="_BaPMoUdCEeG8rbYlagcQXQ">
+      <semantic:multiInstanceLoopCharacteristics isSequential="true">
+      </semantic:multiInstanceLoopCharacteristics> 
+      <semantic:incoming>_Bar4kUdCEeG8rbYlagcQXQ</semantic:incoming>
+      <semantic:outgoing>_1irTWEdCEeG8rbYlagcQXQ</semantic:outgoing>
+      <semantic:task name="Print" id="_Jexq0UdCEeG8rbYlagcQXQ">
+        <semantic:incoming>_KGWoMUdCEeG8rbYlagcQXQ</semantic:incoming>
+        <semantic:outgoing>_T8_9MUdCEeG8rbYlagcQXQ</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Executing &quot;+item</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:startEvent id="_HwPFYUdCEeG8rbYlagcQXQ">
+        <semantic:outgoing>_KGWoMUdCEeG8rbYlagcQXQ</semantic:outgoing>
+      </semantic:startEvent>
+      <semantic:intermediateCatchEvent id="_T82zQUdCEeG8rbYlagcQXQ">
+        <semantic:incoming>_T8_9MUdCEeG8rbYlagcQXQ</semantic:incoming>
+        <semantic:outgoing>_XrV3MUdCEeG8rbYlagcQXQ</semantic:outgoing>
+        <semantic:timerEventDefinition>
+          <semantic:timeDuration>2000</semantic:timeDuration>
+        </semantic:timerEventDefinition>
+        <semantic:extensionElements>
+          <jadex:property name="duration">2000</jadex:property>
+        </semantic:extensionElements>
+      </semantic:intermediateCatchEvent>
+      <semantic:endEvent id="_XrMGMUdCEeG8rbYlagcQXQ">
+        <semantic:incoming>_XrV3MUdCEeG8rbYlagcQXQ</semantic:incoming>
+      </semantic:endEvent>
+      <semantic:extensionElements>
+        <jadex:property name="items">new String[]{&quot;A&quot;, &quot;B&quot;, &quot;C&quot;}</jadex:property>
+      </semantic:extensionElements>
+    </semantic:subProcess>
+    <semantic:startEvent id="__Drk8UdBEeG8rbYlagcQXQ">
+      <semantic:outgoing>_Bar4kUdCEeG8rbYlagcQXQ</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:endEvent id="_1iiJYUdCEeG8rbYlagcQXQ">
+      <semantic:incoming>_1irTWEdCEeG8rbYlagcQXQ</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="_BaPMoUdCEeG8rbYlagcQXQ" targetRef="_1iiJYUdCEeG8rbYlagcQXQ" id="_1irTWEdCEeG8rbYlagcQXQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_Jexq0UdCEeG8rbYlagcQXQ" targetRef="_T82zQUdCEeG8rbYlagcQXQ" id="_T8_9MUdCEeG8rbYlagcQXQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_HwPFYUdCEeG8rbYlagcQXQ" targetRef="_Jexq0UdCEeG8rbYlagcQXQ" id="_KGWoMUdCEeG8rbYlagcQXQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_T82zQUdCEeG8rbYlagcQXQ" targetRef="_XrMGMUdCEeG8rbYlagcQXQ" id="_XrV3MUdCEeG8rbYlagcQXQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="__Drk8UdBEeG8rbYlagcQXQ" targetRef="_BaPMoUdCEeG8rbYlagcQXQ" id="_Bar4kUdCEeG8rbYlagcQXQ">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_7GnScUdBEeG8rbYlagcQXQ">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_BaPMoUdCEeG8rbYlagcQXQ" isExpanded="true">
+        <dc:Bounds height="240.0" width="640.0" x="460.0" y="130.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_Jexq0UdCEeG8rbYlagcQXQ">
+        <dc:Bounds height="100.0" width="160.0" x="150.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_HwPFYUdCEeG8rbYlagcQXQ">
+        <dc:Bounds height="40.0" width="40.0" x="30.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_T82zQUdCEeG8rbYlagcQXQ">
+        <dc:Bounds height="40.0" width="40.0" x="380.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_XrMGMUdCEeG8rbYlagcQXQ">
+        <dc:Bounds height="40.0" width="40.0" x="520.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="__Drk8UdBEeG8rbYlagcQXQ">
+        <dc:Bounds height="40.0" width="40.0" x="240.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_1iiJYUdCEeG8rbYlagcQXQ">
+        <dc:Bounds height="40.0" width="40.0" x="1250.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_Bar4kUdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Bar4kUdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_1irTWEdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_1irTWEdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_KGWoMUdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_T8_9MUdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_XrV3MUdCEeG8rbYlagcQXQ">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

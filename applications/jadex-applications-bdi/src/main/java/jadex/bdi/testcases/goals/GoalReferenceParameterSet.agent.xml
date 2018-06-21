@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test if goal references can have paraemter sets.</H3>
+
+	Test correct operation of parameter sets when using goal
+	references.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="GoalReferenceParameterSet"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.ResultPlan</import>
+	</imports>
+
+	<capabilities>
+		<capability name="cap" file="jadex.bdi.testcases.goals.GoalReferenceParameterSet"/>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+	
+	<goals>
+ 		<achievegoalref name="testgoal">
+			<concrete ref="cap.testgoal"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<plan name="testplan">
+			<body class="GenerateGoalPlan"/>
+		</plan>
+		
+		<plan name="grps_plan">
+			<parameterset name="paramset" class="String"  direction="inout">
+				<goalmapping ref="cap.testgoal.paramset"/>
+			</parameterset>
+			<body class="GoalReferenceParameterSetPlan"/>
+			<trigger>
+				<goal cref="cap.testgoal"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="testplan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

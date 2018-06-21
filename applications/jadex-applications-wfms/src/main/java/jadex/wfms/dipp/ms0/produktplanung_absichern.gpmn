@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" version="2.0">
+  <context/>
+  <goal id="_315FoL_-Ed-Dc7YUB4bIuQ" name="Produktplanung_absichern" goalType="AchieveGoal"/>
+  <goal id="_4KpNoL_-Ed-Dc7YUB4bIuQ" name="Kollisionsfreiheit_Spannvorrichtungen" goalType="AchieveGoal"/>
+  <goal id="_4Yh4oL_-Ed-Dc7YUB4bIuQ" name="Toleranzen_einhalten" goalType="AchieveGoal"/>
+  <plan xsi:type="gpmn:ActivationPlan" id="_5dCCkL_-Ed-Dc7YUB4bIuQ"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_GrwtsL__Ed-Dc7YUB4bIuQ" name="Kollisionsfreiheit Spannvorrichtungen Absichern"/>
+  <plan xsi:type="gpmn:BpmnPlan" id="_HBRqsL__Ed-Dc7YUB4bIuQ" name="Einhaltung_Toleranzen_Absichern"/>
+  <activationEdge id="_5dFF4L_-Ed-Dc7YUB4bIuQ" source="_5dCCkL_-Ed-Dc7YUB4bIuQ" target="_4KpNoL_-Ed-Dc7YUB4bIuQ" order="1"/>
+  <activationEdge id="_8iy5oL_-Ed-Dc7YUB4bIuQ" source="_5dCCkL_-Ed-Dc7YUB4bIuQ" target="_4Yh4oL_-Ed-Dc7YUB4bIuQ" order="2"/>
+  <planEdge id="_5dD3wL_-Ed-Dc7YUB4bIuQ" source="_315FoL_-Ed-Dc7YUB4bIuQ" target="_5dCCkL_-Ed-Dc7YUB4bIuQ"/>
+  <planEdge id="_JviAsL__Ed-Dc7YUB4bIuQ" source="_4KpNoL_-Ed-Dc7YUB4bIuQ" target="_GrwtsL__Ed-Dc7YUB4bIuQ"/>
+  <planEdge id="_KKYJoL__Ed-Dc7YUB4bIuQ" source="_4Yh4oL_-Ed-Dc7YUB4bIuQ" target="_HBRqsL__Ed-Dc7YUB4bIuQ"/>
+</gpmn:GpmnDiagram>

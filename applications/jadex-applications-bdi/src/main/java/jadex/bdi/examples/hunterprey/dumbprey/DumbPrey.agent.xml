@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The dumb prey.</H3>
+
+	Exhibits very basic behavior for searching and
+	eating food. Does not flee explicitly from hunters.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="DumbPrey"
+	package="jadex.bdi.examples.hunterprey.dumbprey">
+
+	<imports>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.base.contextservice.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.bridge.IContextService</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="env" class="Grid2D">
+ 			<fact>jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject">
+ 			<fact>$beliefbase.env.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+
+ 		<!-- The nearest known food. -->
+ 		<belief name="nearest_food" class="ISpaceObject"/>
+	</beliefs>
+	
+	<plans>
+		<plan name="dumbprey_plan">
+			<body class="DumbPreyPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- The environment may throw exceptions when executing property listeners
+			and these listeners are not valid any longer. This leads to normal plan
+			failure and can therefore be ignored. -->
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">false</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="dumbprey_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

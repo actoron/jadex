@@ -1,0 +1,23 @@
+description 'The Jadex BDI V3 applications package contains several example applications, benchmarks and testcases using BDI V3 agents.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':platform:jadex-bridge')
+	api project(':tools:jadex-tools-base-swing')
+	api project(':kernels:jadex-kernel-bdiv3')
+	api project(':environments:jadex-kernel-extension-envsupport')
+	api project(':serialization:jadex-xml')
+	api project(':kernels:jadex-kernel-application')
+	
+	testImplementation project(':platform:jadex-platform')
+	testImplementation project(':transports:jadex-platform-extension-websockettransport')
+	testImplementation project(':transports:jadex-platform-extension-relaytransport')
+}
+	
+	api 'com.toedter:jcalendar:1.3.2'
+	api 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0'
+	
+	api 'com.google.code.findbugs:annotations:3.0.0'	// For suppressing warnings for uninitialized fields
+}

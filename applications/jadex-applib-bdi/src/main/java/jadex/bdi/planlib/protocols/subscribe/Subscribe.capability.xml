@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The request capability enables an easy goal-driven usage of
+	the FIPA subscribe protocol.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	package="jadex.bdi.planlib.protocols.subscribe"
+	name="Subscribe">
+
+	<imports>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>java.util.*</import>
+		<import>jadex.commons.IFilter</import>
+	</imports>
+	
+	<capabilities>
+	</capabilities>
+
+	<beliefs>
+	</beliefs>
+
+	<goals>
+	
+		<!-- FIPA subscribe protocol. -->
+
+		<!-- (Initiator side) Initiate a conversation using the fipa-subscribe protocol. -->
+		<achievegoal name="sp_initiate" exported="true">
+			<!-- The receiver of the request. -->
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier"/>
+			<!-- The targeted subscription. -->
+			<parameter name="subscription" class="Object" optional="true"/>
+			<!-- Optional ontology for marshalling. -->
+			<parameter name="ontology" class="String" optional="true"/>
+			<!-- Optional language for marshalling. -->
+			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
+			<!-- The subscription id. -->
+			<parameter name="subscription_id" class="Object" direction="out"/>
+		</achievegoal>
+		
+		<!-- (Initiator side) Handle a subscription update. -->
+		<achievegoal name="sp_handle_update" exported="true">
+			<!-- The update. -->
+			<parameter name="update" class="Object"/>
+			<!-- The subscription id. -->
+			<parameter name="subscription_id" class="Object"/>
+		</achievegoal>
+		
+		<!-- (Participant side) Start a subscription. -->
+		<achievegoal name="sp_start_subscription" exported="true">
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
+			<!-- The requesting agent. -->
+			<parameter name="subscription_id" class="Object"/>
+			<!-- The targeted subscription. -->
+			<parameter name="subscription" class="Object"/>
+		</achievegoal>
+		
+		<!-- (Participant side) Submit a subscription update. -->
+		<achievegoal name="sp_submit_update" exported="true">
+			<!-- The update. -->
+			<parameter name="update" class="Object"/>
+			<!-- The requesting agent. -->
+			<parameter name="subscription_id" class="Object"/>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- FIPA Request Protocol Plans -->
+	
+		<plan name="sp_initiation_plan">
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="sp_initiate.receiver"/>
+			</parameter>
+			<parameter name="subscription" class="Object">
+				<goalmapping ref="sp_initiate.subscription"/>
+			</parameter>
+			<parameter name="ontology" class="String">
+				<goalmapping ref="sp_initiate.ontology"/>
+			</parameter>
+			<parameter name="language" class="String">
+				<goalmapping ref="sp_initiate.language"/>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="sp_initiate.conversation_id"/>
+			</parameter>
+			<parameter name="protocol" class="String">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="subscription_id" class="Object" direction="out">
+				<goalmapping ref="sp_initiate.subscription_id"/>
+			</parameter>
+			<body class="SPInitiationPlan" />
+			<trigger>
+				<goal ref="sp_initiate"/>
+			</trigger>
+		</plan>
+		
+		<plan name="sp_reception_plan">
+			<body class="SPReceptionPlan"/>
+			<trigger>
+				<messageevent ref="sp_subscribe"/>
+			</trigger>
+		</plan>
+		
+		<plan name="sp_submit_update_plan">
+			<parameter name="update" class="Object">
+				<goalmapping ref="sp_submit_update.update"/>
+			</parameter>
+			<parameter name="message" class="Object">
+				<goalmapping ref="sp_submit_update.subscription_id"/>
+			</parameter>
+			<body class="SPSubmitUpdatePlan"/>
+			<trigger>
+				<goal ref="sp_submit_update"/>
+			</trigger>	
+		</plan>
+		
+		<plan name="sp_handle_update_plan">
+			<body class="SPHandleUpdatePlan"/>
+			<trigger>
+				<messageevent ref="sp_inform"/>
+			</trigger>
+		</plan>
+		
+	</plans>
+
+	<events>
+		<messageevent name="sp_subscribe" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.SUBSCRIBE</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+			</parameter>
+		</messageevent>
+
+		<messageevent name="sp_agree" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.AGREE</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="sp_refuse" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REFUSE</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="sp_failure" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.FAILURE</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="sp_not_understood" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.NOT_UNDERSTOOD</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="sp_inform" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+	</events>
+	
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+	</properties>
+
+</capability>

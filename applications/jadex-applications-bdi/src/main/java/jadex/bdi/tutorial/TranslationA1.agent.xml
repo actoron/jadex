@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson A1.</H3>
+	Creating an agent definition file (adf).
+	<H4>Explanation</H4>
+	This agent does not exhibit any functionality. This example
+	shows how to set-up and run a new Jadex agent.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationA1"
+	package="jadex.bdi.tutorial">
+</agent>

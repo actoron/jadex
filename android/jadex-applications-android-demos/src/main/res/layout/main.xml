@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/infoTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hello" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/main_launchBPMNDemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.86"
+            android:text="@string/main_launchBPMNDemo" />
+        
+        <Button
+            android:id="@+id/main_launchBDIDemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.86"
+            android:text="@string/main_launchBDIDemo" />
+        
+        <Button
+            android:id="@+id/main_launchBDIV3DemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.86"
+            android:text="@string/main_launchBDIV3Demo" />
+        
+        <Button
+            android:id="@+id/main_launchBenchmarkDemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_launchBenchmarkDemo" />
+        
+        <Button
+            android:id="@+id/main_launchEventDemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_launchEventDemo" />
+        <Button
+            android:id="@+id/main_launchRestDemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_launchRestDemo" />
+        
+        <Button
+            android:id="@+id/main_launchControlCenterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_launchControlCenterDemo" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Receive a message event and forward it to another agent.</H3>
+
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="MessageForward"
+	package="jadex.bdi.testcases.events">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bridge.fipa.SFipa</import>
+		<import>java.util.logging.Level</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="messageforward">
+			<body class="MessageForwardPlan"/>
+			<trigger>
+				<messageevent ref="just_born"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="just_born" type="fipa" direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String">
+				<value>"Born message"</value>
+				<!--<bindingoptions>new String[]{"hello_1", "hello_2", "hello_3"}</bindingoptions>-->
+			</parameter>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier" direction="inout">
+				<value>$scope.getComponentIdentifier()</value>
+			</parameterset>
+		</messageevent>
+
+		<!--<messageevent name="just_born_receive" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>-->
+	</events>
+
+	<properties>
+		<!--<property name="debugging">true</property>-->
+		<property name="logging.level">Level.WARNING</property>
+	</properties>
+
+	<configurations>
+		<configuration name="sender">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>1</fact>
+				</initialbelief>
+			</beliefs>
+			<events>
+				<initialmessageevent ref="just_born" />
+			</events>
+		</configuration>
+		<configuration name="receiver">
+			<capabilities>
+				<initialcapability ref="testcap" configuration="off"/>
+			</capabilities>
+		</configuration>
+	</configurations>
+
+</agent>
+

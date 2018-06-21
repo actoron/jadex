@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_OnKFUJaHEeCrd4zl1z0lzA" iD="_OnJeQJaHEeCrd4zl1z0lzA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_U7Tj8JaHEeCrd4zl1z0lzA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_U7WAMJaHEeCrd4zl1z0lzA" key="package" value="jadex.micro"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XSqc4JaHEeCrd4zl1z0lzA" key="description" value="Micro kernel."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eSsxIJaHEeCrd4zl1z0lzA" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Mse9kJwHEeCTM9TB44euIw" key="keep alive" value="true"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XTbR4JaHEeCrd4zl1z0lzA" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFcP4tEeCPEIwlbR2FIA" key="dimension" value="2:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFcf4tEeCPEIwlbR2FIA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFcv4tEeCPEIwlbR2FIA" key="complexColumns" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFc_4tEeCPEIwlbR2FIA" key="0:0" value="jadex.commons.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFdP4tEeCPEIwlbR2FIA" key="1:0" value="jadex.bridge.service.types.factory.*"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_azL9UJaHEeCrd4zl1z0lzA" source="jadex_providedservices_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUEJaJEeCj2rAtY6yqkw" key="dimension" value="1:4"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUEZaJEeCj2rAtY6yqkw" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUEpaJEeCj2rAtY6yqkw" key="0:0" value="name"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUE5aJEeCj2rAtY6yqkw" key="0:1" value="IComponentFactory"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUFZaJEeCj2rAtY6yqkw" key="0:2" value="decoupled"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUFJaJEeCj2rAtY6yqkw" key="0:3" value="new MicroAgentFactory($component, SUtil.createHashMap(new String[]{&quot;debugger.panels&quot;},new Object[]{&quot;jadex.tools.debugger.micro.MicroDebuggerPanel&quot;}))"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZOVdYJadEeCaQoJ0zk4t6Q" source="jadex_properties_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_buLj8JadEeCaQoJ0zk4t6Q" key="dimension" value="1:2"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_buLj8ZadEeCaQoJ0zk4t6Q" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_buLj8padEeCaQoJ0zk4t6Q" key="0:0" value="kernel.types"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_buLj85adEeCaQoJ0zk4t6Q" key="0:1" value="new String[]{&quot;Agent.class&quot;}"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_OnZ88ZaHEeCrd4zl1z0lzA" iD="_OnZ88JaHEeCrd4zl1z0lzA" name="Pool"/>
+</bpmn:BpmnDiagram>

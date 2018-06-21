@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the English Auction Protocol.</H3>
+	Protocol Test Agent.
+	Tests the english auction protocol.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="EAInitiator"
+	package="jadex.bdi.testcases.planlib">
+
+	<imports>
+		<import>java.util.logging.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+		<capability name="eacap" file="jadex.bdi.planlib.protocols.englishauction.EnglishAuction"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="acceptplan_invoked" class="Integer">
+			<fact>0</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="test">
+			<body class="EATestPlan"/>
+		</plan>
+		
+		<plan name="decide_iteration_plan">
+			<parameter name="cfp" class="Object" direction="out">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object" direction="inout">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp_info"/>
+			</parameter>
+			<parameterset name="history" class="Object">
+				<goalmapping ref="eacap.ea_decide_iteration.history"/>
+			</parameterset>
+			<body class="EADecideIterationPlan"/>
+			<trigger>
+				<goal cref="eacap.ea_decide_iteration"/>
+			</trigger>
+			<precondition>$goal.getParameter("cfp_info").getValue()==null</precondition>
+			<!-- <precondition>$plan.cfp_info==null</precondition> -->
+		</plan>
+		
+		<plan name="decide_iteration_gen_plan">
+			<parameter name="cfp" class="Object" direction="out">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object" direction="inout">
+				<goalmapping ref="eacap.ea_decide_iteration.cfp_info"/>
+			</parameter>
+			<parameterset name="history" class="Object">
+				<goalmapping ref="eacap.ea_decide_iteration.history"/>
+			</parameterset>
+			<body class="EADecideIterationGenPlan"/>
+			<trigger>
+				<goal cref="eacap.ea_decide_iteration"/>
+			</trigger>
+			<precondition>$goal.getParameter("cfp_info").getValue()!=null</precondition>
+			<!-- <precondition>$plan.cfp_info!=null</precondition> -->
+		</plan>
+		
+		<plan name="decide_acceptance_plan">
+			<parameter name="auction_description" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.auction_description"/>
+			</parameter>
+			<parameter name="cfp" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.cfp_info"/>
+			</parameter>
+			<parameter name="winner" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="eacap.ea_decide_acceptance.winner"/>
+			</parameter>
+			<parameter name="accept" class="Boolean" direction="out">
+				<goalmapping ref="eacap.ea_decide_acceptance.accept"/>
+			</parameter>
+			<parameterset name="history" class="Object">
+				<goalmapping ref="eacap.ea_decide_acceptance.history"/>
+			</parameterset>
+			<body class="EADecideAcceptancePlan"/>
+			<trigger>
+				<goal cref="eacap.ea_decide_acceptance"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- Suppress event not handled warning for late not understood messages. -->
+ 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+ 		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="timeout">
+					<fact>jadex.base.Starter.getScaledLocalDefaultTimeout($scope.getComponentIdentifier(), 3)</fact>
+				</initialbelief>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

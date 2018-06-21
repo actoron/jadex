@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The movement capability supplies the agents with basic
+	goals, plans and beliefs for moving around.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Movement"
+	package="jadex.bdi.examples.marsworld.movement">
+
+	<imports>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="environment" class="ContinuousSpace2D">
+ 			<fact>jadex.application.EnvironmentService.getSpace($component, "my2dspace").get()</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject" exported="true">
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+
+		<!-- Is the mission finished? -->
+		<belief name="missionend" class="boolean" updaterate="1000" evaluationmode="pull" exported="true">
+			<fact>
+ 				$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("missiontime")&lt;=$scope.getTime()
+ 			</fact>
+		</belief>
+
+		<!-- The seen targets. -->
+		<beliefset name="my_targets" class="ISpaceObject" exported="true" />
+	</beliefs>
+
+	<goals>
+		<!-- Move to a certain location. -->
+		<achievegoal name="move_dest" exported="true">
+			<parameter name="destination" class="IVector2"/>
+		</achievegoal>
+
+		<!-- Walk around without target when nothing else to do. -->
+		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
+			<dropcondition>
+				$beliefbase.missionend
+			</dropcondition>
+  		</performgoal>
+
+		<!-- Move home when missionend. -->
+		<achievegoal name="missionend">
+			<parameter name="destination" class="IVector2">
+				<value>$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position")</value>
+			</parameter>
+			<unique/>
+			<creationcondition>
+				$beliefbase.missionend
+				  &amp;&amp; !$beliefbase.myself.position.equals(
+				  $beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position"))
+			</creationcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Go to a destination. -->
+		<plan name="go_destination">
+			<parameter name="destination" class="IVector2">
+ 				<goalmapping ref="move_dest.destination"/>
+  				<goalmapping ref="missionend.destination"/>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="move_dest"/>
+ 				<goal ref="missionend"/>
+			</trigger>
+		</plan>
+
+		<!-- Walk around randomly. -->
+		<plan name="randomwalk">
+			<body class="RandomWalkPlan"/>
+			<trigger>
+				<goal ref="walk_around"/>
+			</trigger>
+		</plan>
+	</plans>
+</capability>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_NElFAXFGEd63xqPyP8ks8A" iD="_NElFAHFGEd63xqPyP8ks8A">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="__VnvwXFHEd63xqPyP8ks8A" iD="__VnvwHFHEd63xqPyP8ks8A" name="package jadex.bdibpmn.examples.puzzle;&#xD;&#xA;import jadex.bpmn.runtime.task.*;&#xD;&#xA;import jadex.bdibpmn.task.*;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import java.util.Map;&#xD;&#xA;&#xD;&#xA;long start = $scope.getTime();&#xD;&#xA;long startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();">
+    <associations xmi:type="bpmn:Association" xmi:id="__VnvyXFHEd63xqPyP8ks8A"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_NFK64XFGEd63xqPyP8ks8A" iD="_NFK64HFGEd63xqPyP8ks8A" associations="__VnvyXFHEd63xqPyP8ks8A" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_NFK643FGEd63xqPyP8ks8A" iD="_NFK64nFGEd63xqPyP8ks8A" outgoingEdges="_fRs8wXFGEd63xqPyP8ks8A" name="Start&#xD;&#xA;class = PrintTask&#xD;&#xA;in String text = &quot;Now puzzling:&quot;" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7M4e8BcuEd-xT7_lMByXRg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7M4e8RcuEd-xT7_lMByXRg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_fRjLwXFGEd63xqPyP8ks8A" iD="_fRjLwHFGEd63xqPyP8ks8A" outgoingEdges="_9KkC6nFGEd63xqPyP8ks8A" incomingEdges="_fRs8wXFGEd63xqPyP8ks8A" activityType="SubProcess">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_fRjLw3FGEd63xqPyP8ks8A" iD="_fRjLwnFGEd63xqPyP8ks8A" name="Play&#xD;&#xA;class = DispatchGoalTask&#xD;&#xA;in String type = &quot;makemove&quot;&#xD;&#xA;in Map parameters = SUtil.createHashMap(new String[]{&quot;depth&quot;}, new Object[]{new Integer(0)})">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5qPAcBcuEd-xT7_lMByXRg" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5qPAcRcuEd-xT7_lMByXRg" key="class" value=""/>
+        </eAnnotations>
+      </vertices>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_te0iynFGEd63xqPyP8ks8A" iD="_te0iyXFGEd63xqPyP8ks8A"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_sy20oXFGEd63xqPyP8ks8A" iD="_sy20oHFGEd63xqPyP8ks8A" outgoingEdges="_te0iynFGEd63xqPyP8ks8A" activityType="EventIntermediateError"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_te0iwXFGEd63xqPyP8ks8A" iD="_te0iwHFGEd63xqPyP8ks8A" outgoingEdges="_ByyyQXFHEd63xqPyP8ks8A" incomingEdges="_te0iynFGEd63xqPyP8ks8A" name="No Solution&#xD;&#xA;class = PrintTask&#xD;&#xA;in String text = &quot;No solution found :-( &quot;" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_44wgMBcuEd-xT7_lMByXRg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_44wgMRcuEd-xT7_lMByXRg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_9KkC4XFGEd63xqPyP8ks8A" iD="_9KkC4HFGEd63xqPyP8ks8A" outgoingEdges="_XqrWUXU-Ed6U1PeYnSFQ0g" incomingEdges="_9KkC6nFGEd63xqPyP8ks8A _ByyyQXFHEd63xqPyP8ks8A" name="End&#xD;&#xA;class = PrintTask&#xD;&#xA;in String text = &quot;Needed: &quot;+($scope.getTime()-start)+&quot; millis.&quot;" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5YDrUBcuEd-xT7_lMByXRg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5YDrURcuEd-xT7_lMByXRg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_igQuAXFHEd63xqPyP8ks8A" iD="_igQuAHFHEd63xqPyP8ks8A" incomingEdges="_igQuCnFHEd63xqPyP8ks8A" name="Kill&#xD;&#xA;class = DestroyComponentTask&#xD;&#xA;in Object componentid = $scope.getComponentIdentifier()" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bEN5YBcuEd-xT7_lMByXRg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bEN5YRcuEd-xT7_lMByXRg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XqhlUXU-Ed6U1PeYnSFQ0g" iD="_XqhlUHU-Ed6U1PeYnSFQ0g" outgoingEdges="_igQuCnFHEd63xqPyP8ks8A" incomingEdges="_XqrWUXU-Ed6U1PeYnSFQ0g" name="Benchmark&#xD;&#xA;class = BenchmarkMemoryTask&#xD;&#xA;in long startmem = startmem&#xD;&#xA;in boolean print = true" activityType="Task"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fRs8wXFGEd63xqPyP8ks8A" iD="_fRs8wHFGEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9KkC6nFGEd63xqPyP8ks8A" iD="_9KkC6XFGEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ByyyQXFHEd63xqPyP8ks8A" iD="_ByyyQHFHEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_igQuCnFHEd63xqPyP8ks8A" iD="_igQuCXFHEd63xqPyP8ks8A"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XqrWUXU-Ed6U1PeYnSFQ0g" iD="_XqrWUHU-Ed6U1PeYnSFQ0g"/>
+  </pools>
+</bpmn:BpmnDiagram>

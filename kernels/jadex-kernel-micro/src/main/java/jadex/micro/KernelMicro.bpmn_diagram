@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_OnPk4JaHEeCrd4zl1z0lzA" type="Bpmn" name="KernelMicro.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_OnfcgJaHEeCrd4zl1z0lzA" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_OngqoJaHEeCrd4zl1z0lzA" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_OnhRsJaHEeCrd4zl1z0lzA" type="5001">
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_OnhRsZaHEeCrd4zl1z0lzA"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_OnhRspaHEeCrd4zl1z0lzA"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_OnhRs5aHEeCrd4zl1z0lzA"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_OnfcgZaHEeCrd4zl1z0lzA" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_OnfcgpaHEeCrd4zl1z0lzA"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_Onfcg5aHEeCrd4zl1z0lzA" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_OnfchJaHEeCrd4zl1z0lzA" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="KernelMicro.bpmn#_OnZ88ZaHEeCrd4zl1z0lzA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Onh4wJaHEeCrd4zl1z0lzA" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_OnPk4ZaHEeCrd4zl1z0lzA"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_OnPk4paHEeCrd4zl1z0lzA"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_OnPk45aHEeCrd4zl1z0lzA"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="KernelMicro.bpmn#_OnKFUJaHEeCrd4zl1z0lzA"/>
+</notation:Diagram>

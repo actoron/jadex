@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>B4_Choice</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="yT7Z17sIj8orYBB4">
+    <semantic:startEvent id="Bayb7QE3Dv2flSRh">
+      <semantic:outgoing>s/UXEynA+oolM9QY</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:exclusiveGateway id="3PDgF1nV6g5bqpFr" default="x9ERLGKTSfsDNML5">
+      <semantic:incoming>s/UXEynA+oolM9QY</semantic:incoming>
+      <semantic:outgoing>ZOeZT0lv2fehmgIu</semantic:outgoing>
+      <semantic:outgoing>x9ERLGKTSfsDNML5</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:task name="Head\n" id="0/IPKPEiXj4830Cr">
+      <semantic:incoming>ZOeZT0lv2fehmgIu</semantic:incoming>
+      <semantic:outgoing>7MDZSXSSrPl1cbBy</semantic:outgoing>
+    </semantic:task>
+    <semantic:task name="Tail" id="e6ri5a+yVsIRdEpx">
+      <semantic:incoming>x9ERLGKTSfsDNML5</semantic:incoming>
+      <semantic:outgoing>AAp3EN8bfMh4vlEX</semantic:outgoing>
+    </semantic:task>
+    <semantic:endEvent id="i+Qc1NVz98+2Ek3v">
+      <semantic:incoming>7MDZSXSSrPl1cbBy</semantic:incoming>
+      <semantic:incoming>AAp3EN8bfMh4vlEX</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="Bayb7QE3Dv2flSRh" targetRef="3PDgF1nV6g5bqpFr" id="s/UXEynA+oolM9QY">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="3PDgF1nV6g5bqpFr" targetRef="0/IPKPEiXj4830Cr" id="ZOeZT0lv2fehmgIu">
+      <semantic:conditionExpression>Math.random()&gt;0.5\n</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="3PDgF1nV6g5bqpFr" targetRef="e6ri5a+yVsIRdEpx" id="x9ERLGKTSfsDNML5">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="0/IPKPEiXj4830Cr" targetRef="i+Qc1NVz98+2Ek3v" id="7MDZSXSSrPl1cbBy">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="e6ri5a+yVsIRdEpx" targetRef="i+Qc1NVz98+2Ek3v" id="AAp3EN8bfMh4vlEX">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="yT7Z17sIj8orYBB4">
+        <dc:Bounds height="360.0" width="700.0" x="50.0" y="210.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Bayb7QE3Dv2flSRh">
+        <dc:Bounds height="40.0" width="40.0" x="100.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="3PDgF1nV6g5bqpFr">
+        <dc:Bounds height="60.0" width="60.0" x="210.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="0/IPKPEiXj4830Cr">
+        <dc:Bounds height="100.0" width="160.0" x="320.0" y="40.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="e6ri5a+yVsIRdEpx">
+        <dc:Bounds height="100.0" width="160.0" x="320.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="i+Qc1NVz98+2Ek3v">
+        <dc:Bounds height="40.0" width="40.0" x="610.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="s/UXEynA+oolM9QY">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ZOeZT0lv2fehmgIu">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="x9ERLGKTSfsDNML5">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="7MDZSXSSrPl1cbBy">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="AAp3EN8bfMh4vlEX">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

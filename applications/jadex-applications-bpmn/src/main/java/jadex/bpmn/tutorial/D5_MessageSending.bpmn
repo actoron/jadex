@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_-KFNcUYhEd-3iKqz0F2Flw" iD="_-KFNcEYhEd-3iKqz0F2Flw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KkF3EEYiEd-3iKqz0F2Flw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KkF3EUYiEd-3iKqz0F2Flw" key="Description" value="&lt;h1>Message Sending Process&lt;/h1> This process sends a message as expected by process D3."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KkF3EkYiEd-3iKqz0F2Flw" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyyQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_-KYIYUYhEd-3iKqz0F2Flw" iD="_-KYIYEYhEd-3iKqz0F2Flw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_p4OoYUYiEd-3iKqz0F2Flw" iD="_p4OoYEYiEd-3iKqz0F2Flw" outgoingEdges="_q6FG-kYiEd-3iKqz0F2Flw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_q6FG8UYiEd-3iKqz0F2Flw" iD="_q6FG8EYiEd-3iKqz0F2Flw" incomingEdges="_q6FG-kYiEd-3iKqz0F2Flw" name="Send Order" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rVMVoEYiEd-3iKqz0F2Flw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVoUYiEd-3iKqz0F2Flw" key="mode" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVpEYiEd-3iKqz0F2Flw" key="filter" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Jxev0Fa0Ed-1RJ7RXx1qjA" source="isThrowing">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jxev0Va0Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wqnywARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlcOCGEeCe5uLOC0nxFQ" key="dimension" value="2:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlceCGEeCe5uLOC0nxFQ" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlcuCGEeCe5uLOC0nxFQ" key="complexColumns" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlc-CGEeCe5uLOC0nxFQ" key="0:0" value="message"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRldOCGEeCe5uLOC0nxFQ" key="0:1" value="new jadex.bridge.fipa.FipaMessage(jadex.bridge.fipa.FipaMessage.Performative.REQUEST, &quot;Order sent by D5&quot;, null)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRlc-CGEaCe5uLOC0nxFQ" key="1:0" value="receiver"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GLRldOCGEaCe5uLOC0nxFQ" key="1:1" value="&quot;D3_MessageReceival&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q6FG-kYiEd-3iKqz0F2Flw" iD="_q6FG-UYiEd-3iKqz0F2Flw"/>
+  </pools>
+</bpmn:BpmnDiagram>

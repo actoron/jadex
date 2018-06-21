@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_e1024Wo9Ed-hCvoq5nCi-Q" iD="_e1024Go9Ed-hCvoq5nCi-Q">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gHodAGo9Ed-hCvoq5nCi-Q" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gHpEEGo9Ed-hCvoq5nCi-Q" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gHsHYGo9Ed-hCvoq5nCi-Q" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yqRRwGo9Ed-hCvoq5nCi-Q" key="imports" value="jadex.wfms.parametertypes.*"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_e2BEIGo9Ed-hCvoq5nCi-Q" iD="_e2AdEGo9Ed-hCvoq5nCi-Q" name="body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_e2EugWo9Ed-hCvoq5nCi-Q" iD="_e2EugGo9Ed-hCvoq5nCi-Q" outgoingEdges="_rTajgWo-Ed-hCvoq5nCi-Q" incomingEdges="_oVLGMWo9Ed-hCvoq5nCi-Q" name="Choose_Development_Experts_for_Statement" lanes="_nAP6oWo9Ed-hCvoq5nCi-Q" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gRrJ0Go9Ed-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gRrJ0Wo9Ed-hCvoq5nCi-Q" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tSNn8Go9Ed-hCvoq5nCi-Q" key="parameters" value="in␋Text␋Text␋new Text(&quot;Please choose areas from development that have to give a statement for the CR.&quot;)␟inout␋ExpertenEntwicklung␋ListChoice␋new ListChoice(new String[] {&quot;Cockpit&quot;, &quot;Doors&quot;, &quot;Tires&quot;, &quot;Engine&quot;, &quot;Wind-shield&quot;})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_oDsUoWo9Ed-hCvoq5nCi-Q" iD="_oDsUoGo9Ed-hCvoq5nCi-Q" outgoingEdges="_oVLGMWo9Ed-hCvoq5nCi-Q" lanes="_nAP6oWo9Ed-hCvoq5nCi-Q" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_mpz7IWo-Ed-hCvoq5nCi-Q" iD="_mpz7IGo-Ed-hCvoq5nCi-Q" outgoingEdges="_4L8VIWo-Ed-hCvoq5nCi-Q" incomingEdges="_rTajgWo-Ed-hCvoq5nCi-Q" name="Write_Context_Acknowledge" lanes="_nAP6oWo9Ed-hCvoq5nCi-Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mu8SwGo-Ed-hCvoq5nCi-Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mu8SwWo-Ed-hCvoq5nCi-Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sgKDcGo-Ed-hCvoq5nCi-Q" key="parameters" value="in␋beliefname0␋java.lang.String␋&quot;ExpertenEntwicklung&quot;␟in␋value0␋java.lang.Object␋ExpertenEntwicklung.getSelection()␟in␋beliefname1␋java.lang.String␋&quot;ExpertenEntwicklungFestgelegt&quot;␟in␋value1␋java.lang.Object␋true"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_3oitIWo-Ed-hCvoq5nCi-Q" iD="_3oitIGo-Ed-hCvoq5nCi-Q" incomingEdges="_4L8VIWo-Ed-hCvoq5nCi-Q" lanes="_nAP6oWo9Ed-hCvoq5nCi-Q" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_oVLGMWo9Ed-hCvoq5nCi-Q" iD="_oVLGMGo9Ed-hCvoq5nCi-Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_rTajgWo-Ed-hCvoq5nCi-Q" iD="_rTajgGo-Ed-hCvoq5nCi-Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_4L8VIWo-Ed-hCvoq5nCi-Q" iD="_4L8VIGo-Ed-hCvoq5nCi-Q"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_nAP6oWo9Ed-hCvoq5nCi-Q" iD="_nAP6oGo9Ed-hCvoq5nCi-Q" name="FuehrenderEntwickler" activities="_e2EugWo9Ed-hCvoq5nCi-Q _oDsUoWo9Ed-hCvoq5nCi-Q _mpz7IWo-Ed-hCvoq5nCi-Q _3oitIWo-Ed-hCvoq5nCi-Q"/>
+  </pools>
+</bpmn:BpmnDiagram>

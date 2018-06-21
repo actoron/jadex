@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson F1.</H3>
+	Using internal events to broadcast information.
+	<H4>Explanation</H4>
+	The agent creates a gui and visualizes issued
+	translation requests.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationF1"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.commons.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- This beliefset contains the english-german dictionary as facts. -->
+		<beliefset name="egwords" class="Tuple">
+			<fact>new Tuple("milk", "Milch")</fact>
+			<fact>new Tuple("cow", "Kuh")</fact>
+			<fact>new Tuple("cat", "Katze")</fact>
+			<fact>new Tuple("dog", "Hund")</fact>
+		</beliefset>
+	</beliefs>
+
+	<plans>
+		<!-- Passive plan for translating words, when a request
+			translation message is received. -->
+		<plan name="egtrans">
+			<body class="EnglishGermanTranslationPlanF1"/>
+			<trigger>
+				<messageevent ref="request_translation"/>
+			</trigger>
+		</plan>
+		<!-- Initial plan for creating and updating the gui. -->
+		<plan name="gui">
+			<body class="GUIPlanF1"/>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Specifies an internal event for updating the gui.-->
+		<internalevent name="gui_update">
+			<parameter name="content" class="String[]"/>
+		</internalevent>
+		<!-- Specifies a translation request being all messages with performative
+			request and start with a specific string "translate english_german". -->
+		<messageevent name="request_translation" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("translate english_german")</match>
+		</messageevent>
+	</events>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+		<property name="logging.level">Level.INFO</property>
+ 		<!-- The default parent handler prints out log messages on the console. -->
+		<property name="logging.useParentHandlers">true</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="gui"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

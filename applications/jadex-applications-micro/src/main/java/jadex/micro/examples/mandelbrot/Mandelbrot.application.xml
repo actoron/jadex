@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Mandelbrot Application</H3>
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
+	name="Mandelbrot" package="jadex.micro.examples.mandelbrot" autoshutdown="true">
+	
+	<imports>
+		<import>jadex.bridge.serviceclock.IClockService</import>
+		<import>jadex.bridge.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
+		<import>jadex.bridge.service.types.appstore.*</import>
+	</imports>
+	
+	<arguments>
+		<argument name="delay" class="long">5000L</argument>
+	</arguments>
+	
+	<componenttypes>
+		<componenttype name="Generator" filename="jadex/micro/examples/mandelbrot/GenerateAgent.class"/>
+		<componenttype name="Calculator" filename="jadex/micro/examples/mandelbrot/CalculateAgent.class"/>
+		<componenttype name="Display" filename="jadex/micro/examples/mandelbrot/DisplayAgent.class"/>
+	</componenttypes>
+	
+	<services>
+		<providedservice class="IGenerateService">
+			<implementation>
+				<binding create="true">
+					<creationinfo type="Generator"/>
+				</binding>
+			</implementation>
+		</providedservice>
+		<!-- <providedservice class="ICalculateService">
+			<binding componenttype="Calculator"/>
+		</providedservice> -->
+		<providedservice class="IDisplayService">
+			<implementation>
+				<binding create="true">
+					<creationinfo type="Display"/>
+				</binding>
+			</implementation>
+		</providedservice>
+		
+		<providedservice class="IMandelbrotService">
+			<implementation class="MandelbrotService"/>
+		</providedservice>
+		<providedservice class="IAppProviderService">
+			<implementation class="AppProviderService"/>
+		</providedservice>
+	</services>
+	
+	<configurations>
+		<configuration name="All Components">
+			<components>
+				<component type="Generator">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
+				<component type="Calculator"/>
+				<component type="Display"/>
+			</components>
+		</configuration>
+		<configuration name="Only Generator">
+			<components>
+				<component type="Generator">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+		<configuration name="Only Calculators">
+			<components>
+				<component type="Calculator" number="10">
+					<arguments>
+						<argument name="delay">0L</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+		<!-- <configuration name="Test Config 1">
+			<arguments>
+				<argument name="delay">1000L</argument>
+			</arguments>
+			<components>
+				<component type="Generator">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
+				<component type="Display"/>
+			</components>
+		</configuration>
+		<configuration name="Test Config 2" autoshutdown="false">
+			<components>
+				<component type="Generator" master="true">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
+				<component type="Display"/>
+			</components>
+		</configuration> -->
+	</configurations>
+	
+</applicationtype>

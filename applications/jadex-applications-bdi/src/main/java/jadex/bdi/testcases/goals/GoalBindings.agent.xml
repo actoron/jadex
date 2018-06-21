@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the creation of goals with binding parameters.</H3>
+
+	An initial goal is specified in the configuration.
+	Due to several binding options, three instances of the goal
+	are created and dispatched.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="GoalBindings"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="create" class="boolean"/>
+	</beliefs>
+
+	<goals>
+		<performgoal name="test">
+			<parameter name="num" class="int">
+				<bindingoptions>new int[]{1,2,3}</bindingoptions>
+			</parameter>
+			<creationcondition>
+ 				$beliefbase.create
+ 			</creationcondition>
+		</performgoal>
+	</goals>
+
+	<plans>
+		<plan name="printer">
+			<parameter name="num" class="int">
+				<goalmapping ref="test.num"/>
+			</parameter>
+			<parameter name="report" class="TestReport">
+				<value>new TestReport("goal_binding", "Initial goal with binding "+$plan.num, true, null)</value>
+			</parameter>
+			<body class="StoreReportPlan"/>
+			<trigger>
+				<goal ref="test"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!-- <property name="debugging">false</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="test">
+ 					<!-- <parameter ref="num">
+						 <value>33</value>
+ 					</parameter> -->
+				</initialgoal>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>

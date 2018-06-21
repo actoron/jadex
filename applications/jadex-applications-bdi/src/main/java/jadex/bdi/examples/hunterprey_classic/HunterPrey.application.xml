@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The hunter prey application descriptor</H3>
+
+	The hunterprey scenario is run in a time-stepped simulation
+	which is controlled by the environment agent. This means that
+	the environment increases the simulation time in fixed (adjustable)
+	real-time intervals. The environment is represented by a grid-world
+	with different kinds of objects. Basically there are positions with
+	obstacles (trees) which cannot be entered by creatues. Additionally
+	the environment creates vegetarian food (salads) randomly at aarbitrary
+	positions. Two different kinds of creatues inhabit the environment.
+	Preys (sheeps) are creatures that search for salads and gain one point
+	for eating a piece of salad. Hunters (wolfs) search for preys and
+	try to eat them. They gain five points if they manage to eat a
+	prey. Consequently preys should try to flee from hunters if they
+	see them. Every creature can see all objects and creatues in a
+	certain range around them.
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
+	name="HunterPrey" package="jadex.bdi.examples.hunterprey_classic">
+	
+	<componenttypes>
+		<componenttype name="Environment" filename="jadex/bdi/examples/hunterprey_classic/environment/Environment.agent.xml" master="true"/>
+		
+		<componenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
+		<componenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/dumbprey/DumbPrey.agent.xml"/>
+		<componenttype name="LazyPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/lazyprey/LazyPrey.agent.xml"/>
+		<componenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/cleverprey/CleverPrey.agent.xml"/>
+		
+		<componenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/dumbhunter/DumbHunter.agent.xml"/>
+		<componenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/ldahunter/LAHunter.agent.xml"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Some hunters and preys">
+			<components>
+				<component type="Environment" />
+				<component type="DumbPrey" number="2"/>
+				<component type="CleverPrey" number="2" />
+				<component type="DumbHunter" number="2" />
+				<component type="CleverHunter" number="1" />
+			</components>
+		</configuration>
+		<configuration name="Willy">
+			<components>
+				<component type="Environment" />
+				<component type="CleverHunter" number="1" />
+			</components>
+		</configuration>
+		<configuration name="Dumbo">
+			<components>
+				<component type="Environment" />
+				<component type="DumbHunter" number="1" />
+			</components>
+		</configuration>
+		<configuration name="Dumpo">
+			<components>
+				<component type="Environment" />
+				<component type="DumbPrey" number="1" />
+			</components>
+		</configuration>
+	</configurations>
+
+</applicationtype>

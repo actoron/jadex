@@ -1,0 +1,28 @@
+apply plugin: 'com.android.application'
+apply plugin: jadex.gradle.BDIPlugin
+
+description 'Jadex-Android BDIV3 puzzle sample application'
+
+dependencies
+{
+    api project(':jadex-platform-android')
+    api project(':jadex-android-commons')
+    api project(':jadex-android-xmlpull')
+    api project(':jadex-android-antlr')
+    api project(':jadex-runtimetools-android')
+    api project(':jadex-kernel-bdiv3-android')
+    api project(':jadex-kernel-bpmn')
+
+//    api project(':jadex-platform-extension-webservice-android')
+
+//    releaseProvided project(':jadex-android-commons')
+//    releaseProvided project(':jadex-kernel-bpmn')
+//    releaseProvided project(':jadex-kernel-bdiv3-android')
+//    releaseProvided project(':jadex-kernel-bdiv3')
+//    releaseProvided project(':jadex-runtimetools-android')
+//    releaseProvided project(':jadex-platform-extension-webservice-android')
+}
+
+jadexBdi {
+    incremental = false
+}

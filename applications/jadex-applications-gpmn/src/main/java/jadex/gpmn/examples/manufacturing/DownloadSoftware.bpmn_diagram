@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_EUqo4HLvEd-2b-xkrl-imA" type="Bpmn" name="DownloadSoftware.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_EU-K4nLvEd-2b-xkrl-imA" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_EU-K6HLvEd-2b-xkrl-imA" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_EU-K6XLvEd-2b-xkrl-imA" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_EVHU0HLvEd-2b-xkrl-imA" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_EVHU1nLvEd-2b-xkrl-imA" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_EVHU0XLvEd-2b-xkrl-imA" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_EVHU0nLvEd-2b-xkrl-imA"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_EVHU03LvEd-2b-xkrl-imA"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_EVHU1HLvEd-2b-xkrl-imA" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DownloadSoftware.bpmn#_EU-K4XLvEd-2b-xkrl-imA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EVHU13LvEd-2b-xkrl-imA" x="55" y="70" width="111" height="61"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_EU-K6nLvEd-2b-xkrl-imA"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_EU-K63LvEd-2b-xkrl-imA"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_EU-K7HLvEd-2b-xkrl-imA"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_EU-K43LvEd-2b-xkrl-imA" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_EU-K5HLvEd-2b-xkrl-imA"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_EU-K5XLvEd-2b-xkrl-imA" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_EU-K5nLvEd-2b-xkrl-imA" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="DownloadSoftware.bpmn#_EU0Z4XLvEd-2b-xkrl-imA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EU-K7XLvEd-2b-xkrl-imA" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_EUqo4XLvEd-2b-xkrl-imA"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_EUqo4nLvEd-2b-xkrl-imA"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_EUqo43LvEd-2b-xkrl-imA"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="DownloadSoftware.bpmn#_EUhe8XLvEd-2b-xkrl-imA"/>
+</notation:Diagram>

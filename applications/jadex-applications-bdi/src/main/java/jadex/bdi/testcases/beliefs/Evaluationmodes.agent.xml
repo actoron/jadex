@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the evaluation modes of expressions.</H3>
+
+	Test evaluation modes.<br>
+	date1: evaluate static.<br>
+	date2: evaluate pull (evaluated on demand).
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Evaluationmodes"
+	package="jadex.bdi.testcases.beliefs">
+
+	<imports>
+		<import>java.util.Date</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="date1" class="Date">
+			<fact>
+				new Date($scope.getTime())
+			</fact>
+		</belief>
+		<belief name="date2" class="Date" evaluationmode="pull">
+			<fact>
+				new Date($scope.getTime())
+			</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="tester">
+			<body class="EvaluationmodesPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+        <property name="debugging">false</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

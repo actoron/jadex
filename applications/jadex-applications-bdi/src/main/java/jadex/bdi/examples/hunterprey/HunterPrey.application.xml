@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The hunter prey application descriptor</H3>
+
+	Two kinds of creatures live on a grid world.
+	Hunters try to catch the prey, while prey
+	moves around looking for food.
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="HunterPrey" package="jadex.bdi.examples.hunterprey">
+	
+	<imports>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.bdi.examples.hunterprey.dumbprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.cleverprey.*</import>
+		<import>jadex.bdi.examples.hunterprey.dumbhunter.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+	</imports>
+	
+	<extensiontypes>
+		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
+			<env:objecttypes>
+				<env:objecttype name="hunter">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="prey">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="obstacle" />
+				<env:objecttype name="food" >
+				    <env:property name="clock" />
+				    <env:property name="creation_age" />
+				    <env:property name="size" dynamic="true">
+						new Vector2Double
+						(
+							Math.min(1, ($object.clock.getTick()-
+							$object.creation_age.doubleValue())/32.0),
+							Math.min(0.8, ($object.clock.getTick()-
+							$object.creation_age.doubleValue())/40.0)
+						)
+					</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+			
+			<env:processtypes>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="tickrate">5</env:property>
+					<env:property name="type">"food"</env:property>
+					<env:property name="properties" dynamic="true">
+						jadex.commons.SUtil.createHashMap(
+							new String[]{Space2D.PROPERTY_POSITION, "creation_age", "clock"},
+							new Object[]{((Grid2D)$space).getEmptyGridPosition(), new Double($clock.getTick()), $clock})
+					</env:property>
+					<env:property name="condition" dynamic="true">
+						((Grid2D)$space).getEmptyGridPosition()!=null
+					</env:property>
+				</env:processtype>
+			</env:processtypes>
+			
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
+				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="CleverPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
+				<env:avatarmapping componenttype="LAHunter" objecttype="hunter"/>
+			</env:avatarmappings>
+			
+			<env:percepttypes>
+				<env:percepttype name="food_seen" objecttype="food">
+					<env:componenttypes>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_out_of_sight" objecttype="food">
+					<env:componenttypes>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_eaten" objecttype="food">
+					<env:componenttypes>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_moved" objecttype="prey">
+					<env:componenttypes>
+						<!-- Todo: Use avatar types for mapping? -->
+						<env:componenttype name="CleverPrey"/>
+						<env:componenttype name="DumbHunter"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_seen" objecttype="prey">
+					<env:componenttypes>
+						<env:componenttype name="DumbHunter"/>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="prey_gone" objecttype="prey">
+					<env:componenttypes>
+						<env:componenttype name="DumbHunter"/>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="obstacle_seen" objecttype="obstacle">
+					<env:componenttypes>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="obstacle_gone" objecttype="obstacle">
+					<env:componenttypes>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="hunter_seen" objecttype="hunter">
+					<env:componenttypes>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="hunter_gone" objecttype="hunter">
+					<env:componenttypes>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+					
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
+					<env:property name="range">new Vector1Int(2)</env:property>
+					<!-- percept types are declared with associated action types: 
+						percepttype, actiontype1, actiontype2, ... -->
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "appeared", "created"}, 
+							new String[]{"food_out_of_sight", "disappeared"}, 
+							new String[]{"food_eaten", "destroyed"},
+							new String[]{"prey_moved", "moved"},
+							new String[]{"prey_seen", "appeared", "created"}, 
+							new String[]{"prey_gone", "disappeared", "destroyed"},
+							new String[]{"hunter_seen", "appeared", "created"}, 
+							new String[]{"hunter_gone", "disappeared", "destroyed"},
+							new String[]{"obstacle_seen", "appeared", "created"}, 
+							new String[]{"obstacle_gone", "disappeared", "destroyed"}
+						}
+					</env:property>
+				</env:perceptgenerator>
+				
+				<env:perceptprocessor componenttype="CleverPrey" class="DefaultBDIVisionProcessor">
+					<env:property name="range">new Vector1Int(2)</env:property>
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "add", "seen_food"},
+							new String[]{"food_seen", "add", "known_food"},
+							new String[]{"food_eaten", "remove", "seen_food"},
+							new String[]{"food_eaten", "remove", "known_food"},
+							new String[]{"food_out_of_sight", "remove", "seen_food"},
+							new String[]{"hunter_seen", "add", "seen_hunters"},
+							new String[]{"hunter_gone", "remove", "seen_hunters"},
+							new String[]{"prey_moved", "remove_outdated", "known_food"}
+						}
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor componenttype="DumbPrey" class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "set", "nearest_food", "isNearer"},
+							new String[]{"food_eaten", "unset", "nearest_food", "isFact"},
+							new String[]{"food_out_of_sight", "unset", "nearest_food", "isFact"}
+						}
+					</env:property>
+					<env:property name="isNearer" dynamic="true">
+						$fact==null
+						|| $space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$fact).getProperty(Space2D.PROPERTY_POSITION))
+							.greater($space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$percept).getProperty(Space2D.PROPERTY_POSITION)))
+					</env:property>
+					<env:property name="isFact" dynamic="true">
+						$percept.equals($fact)
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor componenttype="DumbHunter" class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"prey_seen", "set", "nearest_prey", "isNearer"},
+							new String[]{"prey_moved", "set", "nearest_prey", "isNearer"},
+							new String[]{"prey_gone", "unset", "nearest_prey", "isFact"}
+						}
+					</env:property>
+					<env:property name="isNearer" dynamic="true">
+						$fact==null
+						|| $space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$fact).getProperty(Space2D.PROPERTY_POSITION))
+							.greater($space.getDistance((IVector2)$avatar.getProperty(Space2D.PROPERTY_POSITION),
+								(IVector2)((ISpaceObject)$percept).getProperty(Space2D.PROPERTY_POSITION)))
+					</env:property>
+					<env:property name="isFact" dynamic="true">
+						$percept.equals($fact)
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor componenttype="LAHunter" class="DefaultBDIVisionProcessor">
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"prey_seen", "add", "vision"}, 
+							new String[]{"prey_gone", "remove", "vision"},
+							new String[]{"obstacle_seen", "add", "vision"}, 
+							new String[]{"obstacle_gone", "remove", "vision"}
+						}
+					</env:property>
+				</env:perceptprocessor>
+			</env:percepttypes>
+			
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction" />
+				<env:actiontype name="eat" class="EatAction" />
+			</env:actiontypes>
+			
+			<env:perspectives>
+				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="food" width="1.0" height="1.0">
+						<env:texturedrectangle layer="0" size="size" imagepath="jadex/bdi/examples/hunterprey/images/food.png" />
+					</env:drawable>
+					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey/images/obstacle.png" />
+					</env:drawable>
+					<env:drawable objecttype="prey" width="1.0" height="1.0">
+						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey/images/prey.png" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ffff007f" />
+					</env:drawable>
+					<env:drawable objecttype="hunter" width="1.0" height="1.0">
+						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/bdi/examples/hunterprey/images/hunter.png" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ff00007f" />
+					</env:drawable>
+					<env:prelayers>
+						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/bdi/examples/hunterprey/images/background.png" />
+					</env:prelayers>
+					<env:postlayers>
+						<env:gridlayer width="1.0" height="1.0" color="black" />
+					</env:postlayers>
+				</env:perspective>
+
+				<env:perspective name="abstract" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="food" width="1.0" height="1.0">
+						<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
+					</env:drawable>
+					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+						<env:triangle layer="0" width="0.9" height="0.9" rotatez="3.14159" color="#996600" />
+					</env:drawable>
+					<env:drawable objecttype="prey" width="1.0" height="1.0">
+						<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="5" color="#CCCCCC" />
+					</env:drawable>
+					<env:drawable objecttype="hunter" width="1.0" height="1.0">
+						<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="8" color="#3366FF" />
+					</env:drawable>
+					<env:prelayers>
+						<!-- <env:tiledlayer width="17.5" height="17.5" color="white" /> -->
+						<env:gridlayer width="1.0" height="1.0" color="white" />
+					</env:prelayers>
+					<env:postlayers>
+					</env:postlayers>
+				</env:perspective>
+			</env:perspectives>
+			
+			<!-- executor -->
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="comparator">new CreatureActionComparator($space)</env:property>
+				<env:property name="mode">"lastaction"</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+		<componenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/dumbprey/DumbPrey.agent.xml"/>
+		<componenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey/cleverprey/CleverPrey.agent.xml"/>
+		<componenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/dumbhunter/DumbHunter.agent.xml"/>
+		<componenttype name="LAHunter" filename="jadex/bdi/examples/hunterprey/ldahunter/LAHunter.agent.xml"/>
+	</componenttypes>
+
+	<configurations>
+		<configuration name="Classic">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+					
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+ 			<components>
+				<component type="DumbPrey" name="Dumbo"/>
+				<!-- <component type="DumbPrey" name="Duffy"/> -->
+				<component type="CleverPrey" name="Heinz" configuration="Lazy"/>
+				<!-- <component type="CleverPrey" name="Harald" configuration="Lazy"/> -->
+				<component type="CleverPrey" name="Otto" configuration="Opportunistic"/>
+				<component type="CleverPrey" name="Clever" configuration="Clever"/>
+				<!-- <component type="CleverPrey" name="Charlton" configuration="Clever"/> -->
+				<component type="DumbHunter" name="Lenny"/>
+				<component type="DumbHunter" name="Louis"/>
+				<component type="LAHunter" name="Willy"/>
+				<!-- <component type="LAHunter" name="Wolfram"/> -->
+			</components>
+ 		</configuration>
+
+		<configuration name="Land of Peace">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+					
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="DumbPrey" number="50"/>
+				<component type="CleverPrey" number="40" configuration="Clever"/>
+				<component type="CleverPrey" number="10" configuration="Opportunistic"/>
+			</components>
+ 		</configuration>
+ 		
+		<configuration name="Lupo's Paradise">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+					
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="DumbPrey" number="80"/>
+				<component type="CleverPrey" number="10" configuration="Clever"/>
+				<component type="CleverPrey" number="5" configuration="Opportunistic"/>
+				<component type="CleverPrey" number="5" configuration="Lazy"/>
+				<component name="Lupo" type="DumbHunter"/>
+			</components>
+ 		</configuration>
+
+		<configuration name="Battlefield">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+	
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">1</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" killonexit="true"/>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="DumbPrey" number="100"/>
+				<component type="CleverPrey" number="50" configuration="Clever"/>
+				<component type="CleverPrey" number="25" configuration="Opportunistic"/>
+				<component type="CleverPrey" number="25" configuration="Lazy"/>
+				<component type="DumbHunter" number="25"/>
+				<component type="LAHunter" number="5"/>
+			</components>
+ 		</configuration>
+
+		<configuration name="Empty (no creatures)">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+	
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">10</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+ 		</configuration>
+	</configurations>
+</applicationtype>

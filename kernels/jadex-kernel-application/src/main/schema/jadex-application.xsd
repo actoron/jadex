@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.activecomponents.org/jadex-application" xmlns="http://www.activecomponents.org/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:redefine schemaLocation="http://www.activecomponents.org/jadex-component-base-${jadex_build_version}.xsd">
+	</xs:redefine>
+
+	<xs:element name="applicationtype">
+		<xs:annotation>
+			<xs:documentation>An application type specifies the structure and content of an active component application.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="startabletype">
+					<xs:all>
+						<xs:element name="imports" type="imports" minOccurs="0"/>
+						<xs:element name="arguments" type="arguments" minOccurs="0"/>
+						<xs:element name="componenttypes" type="componenttypes" minOccurs="0"/>
+						<xs:element name="services" type="services" minOccurs="0"/>
+						<xs:element name="properties" type="properties" minOccurs="0"/>
+						<xs:element name="nfproperties" type="nfproperties" minOccurs="0"/>
+						<xs:element name="configurations" type="appconfigurations" minOccurs="0"/>
+						<xs:element name="extensiontypes" type="extensiontypes" minOccurs="0"/>
+					</xs:all>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="package" type="xs:string" use="optional"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<!-- constraints copied from jadex-component.xsd, prefixed names with 'app_' as duplicates are not allowed. -->
+		<!-- keys on type level -->
+		<xs:key name="app_argument_name">
+			<xs:selector xpath="arguments/argument"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="app_component_name">
+			<xs:selector xpath="componenttypes/componenttype"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="app_providedservice_key">
+			<xs:selector xpath="services/providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:key>
+		<xs:unique name="app_providedservice_name">
+			<xs:selector xpath="services/providedservice"/>
+			<xs:field xpath="@name"/>
+		</xs:unique>
+		<xs:key name="app_requiredservice_name">
+			<xs:selector xpath="services/requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:key name="app_property_name">
+			<xs:selector xpath="properties/property"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<!-- key references in configurations -->
+		<xs:keyref name="app_argument_reference" refer="app_argument_name">
+			<xs:selector xpath="configurations/configuration/arguments/argument"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+		<xs:keyref name="app_component_reference" refer="app_component_name">
+			<xs:selector xpath="configurations/configuration/components/component"/>
+			<xs:field xpath="@type"/>
+		</xs:keyref>
+		<xs:keyref name="app_providedservice_reference" refer="app_providedservice_key">
+			<xs:selector xpath="configurations/configuration/services/providedservice"/>
+			<xs:field xpath="@name|@class"/>
+		</xs:keyref>
+		<xs:keyref name="app_requiredservice_reference" refer="app_requiredservice_name">
+			<xs:selector xpath="configurations/configuration/services/requiredservice"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+	</xs:element>
+	
+	<xs:complexType name="extensiontypes">
+		<xs:annotation>
+			<xs:documentation>
+In this section, specifications for extensions as required
+ by some specific factory component extension service (e.g.
+ EnvSupport) can be placed.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="appconfigurations">
+		<xs:annotation>
+			<xs:documentation>
+In the configurations section, predefined
+ component configurations (i.e. component
+				instances) can be defined.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="configuration" type="appconfiguration" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						A predefined component
+						configuration.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:key name="config_argument_name2">
+					<xs:selector xpath="arguments/argument"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
+				<xs:key name="config_providedservice_key2">
+					<xs:selector xpath="services/providedservice"/>
+					<xs:field xpath="@name|@class"/>
+				</xs:key>
+				<xs:unique name="config_providedservice_name2">
+					<xs:selector xpath="services/providedservice"/>
+					<xs:field xpath="@name"/>
+				</xs:unique>
+				<xs:key name="config_requiredservice_name2">
+					<xs:selector xpath="services/requiredservice"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
+				<!-- Configuration unique constraints defined here, because elements need only be unique inside one config. -->
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="appconfiguration">
+		<xs:annotation>
+			<xs:documentation>A predefined application configuration.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="startabletype">
+				<xs:all>
+					<xs:element name="arguments" type="configarguments" minOccurs="0"/>
+					<xs:element name="components" type="configcomponents" minOccurs="0"/>
+					<xs:element name="services" type="configservices" minOccurs="0"/>
+					<xs:element name="extensions" type="extensions" minOccurs="0"/>
+					<xs:element name="steps" type="configsteps" minOccurs="0"/>
+				</xs:all>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="extensions">
+		<xs:annotation>
+			<xs:documentation>
+In this section, specifications for extensions as required
+ by some specific factory component extension service (e.g.
+				EnvSupport) can be placed.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

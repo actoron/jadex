@@ -1,0 +1,289 @@
+<!--
+	<H3>The hunter prey application descriptor</H3>
+
+	Two kinds of creatures live on a grid world.
+	Hunters try to catch the prey, while prey
+	moves around looking for food.
+-->
+
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="HunterPrey" package="jadex.micro.examples.hunterprey">
+	
+	<imports>
+		<import>jadex.extension.envsupport.environment.*</import>
+				<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.bridge.IClockService</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.micro.examples.hunterprey.service.*</import>
+		<import>jadex.micro.examples.hunterprey.service.impl.*</import>
+				<import>jadex.extension.envsupport.observer.perspective.*</import>
+	</imports>
+	
+	<extensiontypes>
+		<env:envspacetype name="2dspace" class="Grid2D" width="30" height="30">
+			<env:objecttypes>
+				<env:objecttype name="hunter">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="prey">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="obstacle">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="food" >
+					<env:property name="size" dynamic="true">
+						new Vector2Double(
+							Math.min(1, ($object.getProperty("clock").getTick()-
+							$object.getProperty("creation_age").doubleValue())/32.0),
+							Math.min(0.8, ($object.getProperty("clock").getTick()-
+							$object.getProperty("creation_age").doubleValue())/40.0)
+						)
+					</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+
+			<env:processtypes>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="tickrate">5</env:property>
+					<env:property name="type">"food"</env:property>
+					<env:property name="properties" dynamic="true">
+						jadex.commons.SUtil.createHashMap(
+							new String[]{Space2D.PROPERTY_POSITION, "creation_age", "clock"},
+							new Object[]{((Grid2D)$space).getEmptyGridPosition(), new Double($clock.getTick()), $clock})
+					</env:property>
+					<env:property name="condition" dynamic="true">
+						((Grid2D)$space).getEmptyGridPosition()!=null
+					</env:property>
+				</env:processtype>
+			</env:processtypes>
+
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
+				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="MicroPrey" objecttype="prey"/>
+			</env:avatarmappings>
+			
+			<env:percepttypes>
+				<env:percepttype name="food_seen" objecttype="food">
+					<env:componenttypes>
+						<env:componenttype name="MicroPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_out_of_sight" objecttype="food">
+					<env:componenttypes>
+						<env:componenttype name="MicroPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+				<env:percepttype name="food_eaten" objecttype="food">
+					<env:componenttypes>
+						<env:componenttype name="MicroPrey"/>
+					</env:componenttypes>
+				</env:percepttype>
+					
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
+					<env:property name="range">new Vector1Int(2)</env:property>
+					<!-- percept types are declared with associated action types: 
+						percepttype, actiontype1, actiontype2, ... -->
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"food_seen", "appeared", "created"}, 
+							new String[]{"food_out_of_sight", "disappeared"}, 
+							new String[]{"food_eaten", "destroyed"}
+						}
+					</env:property>
+				</env:perceptgenerator>
+				
+				<env:perceptprocessor componenttype="MicroPrey" class="MicroPreyVisionProcessor"/>
+				<env:perceptprocessor class="ServiceVisionProcessor"/>
+				
+			</env:percepttypes>
+			
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction" />
+				<env:actiontype name="eat" class="EatAction" />
+			</env:actiontypes>
+
+			<env:perspectives>
+				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="food" width="1.0" height="1.0">
+						<env:texturedrectangle layer="0" size="size" imagepath="jadex/micro/examples/hunterprey/images/food.png" />
+					</env:drawable>
+					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+						<env:texturedrectangle layer="0" width="0.9" height="0.9" imagepath="jadex/micro/examples/hunterprey/images/obstacle.png" />
+					</env:drawable>
+					<env:drawable objecttype="prey" width="1.0" height="1.0">
+						<env:texturedrectangle layer="1" width="0.9" height="0.9" imagepath="jadex/micro/examples/hunterprey/images/prey.png" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ffff007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ffff007f" />
+					</env:drawable>
+					<env:drawable objecttype="hunter" width="1.0" height="1.0">
+						<env:texturedrectangle layer="2" width="0.9" height="0.9" imagepath="jadex/micro/examples/hunterprey/images/hunter.png" />
+						<env:rectangle layer="-1" width="3" height="3" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="-2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="2" y="0" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="-2" color="#ff00007f" />
+						<env:rectangle layer="-1" width="1" height="1" x="0" y="2" color="#ff00007f" />
+					</env:drawable>
+					<env:prelayers>
+						<env:tiledlayer width="0.4" height="0.4" imagepath="jadex/micro/examples/hunterprey/images/background.png" />
+					</env:prelayers>
+					<env:postlayers>
+						<env:gridlayer width="1.0" height="1.0" color="black" />
+					</env:postlayers>
+				</env:perspective>
+
+				<env:perspective name="abstract" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="food" width="1.0" height="1.0">
+						<env:rectangle layer="0" width="0.3" height="0.3" color="green" />
+					</env:drawable>
+					<env:drawable objecttype="obstacle" width="1.0" height="1.0">
+						<env:triangle layer="0" width="0.9" height="0.9" rotatez="3.14159" color="#996600" />
+					</env:drawable>
+					<env:drawable objecttype="prey" width="1.0" height="1.0">
+						<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="5" color="#CCCCCC" />
+					</env:drawable>
+					<env:drawable objecttype="hunter" width="1.0" height="1.0">
+						<env:regularpolygon layer="2" width="0.9" height="0.9" vertices="8" color="#3366FF" />
+					</env:drawable>
+					<env:prelayers>
+						<!-- <env:tiledlayer width="17.5" height="17.5" color="white" /> -->
+						<env:gridlayer width="1.0" height="1.0" color="white" />
+					</env:prelayers>
+					<env:postlayers>
+					</env:postlayers>
+				</env:perspective>
+			</env:perspectives>
+						
+			<!-- executor -->
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="comparator">new CreatureActionComparator($space)</env:property>
+				<env:property name="mode">"lastaction"</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+		<componenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="One Micro Prey">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+		
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+		
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+				</env:envspace>
+			</extensions>
+ 			
+ 			<components>
+				<component name="Mickey" type="MicroPrey"/>
+			</components>			
+ 		</configuration>
+
+		<configuration name="Empty">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<env:object type="obstacle" number="125"/>
+					</env:objects>
+	
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>	
+ 		</configuration>
+
+		<configuration name="Semi">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace" width="50" height="50">
+					<env:objects>
+						<env:object type="obstacle" number="250"/>
+					</env:objects>
+	
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">0.5</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+
+			<components>
+				<component type="MicroPrey" number="100"/>
+			</components>
+ 		</configuration>
+ 		
+		<configuration name="Multi">
+			<extensions>
+				<env:envspace name="my2dspace" type="2dspace" width="75" height="75">
+					<env:objects>
+						<env:object type="obstacle" number="750"/>
+					</env:objects>
+	
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">0.2</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+
+			<components>
+				<component type="MicroPrey" number="200"/>
+			</components>
+ 		</configuration>
+ 		
+	</configurations>
+
+</applicationtype>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	<H3>Check naming of referenced config elements</H3>
+	Part of ConfigElementRef test.
+ -->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+						http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="ConfigElementRefWorker"
+	package="jadex.bdi.testcases.misc">
+	
+	<imports>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+	
+	<goals>
+		<achievegoal name="testgoal" exported="true"/>
+	</goals>
+		
+	<events>
+		<internalevent name="testevent" exported="true" />
+		<messageevent name="testmsg" type="fipa" direction="send_receive" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String" direction="fixed">
+				<value>"capability test message event"</value>
+			</parameter>
+			<parameter name="conversation_id" class="String" direction="fixed">
+				<value>"capability test conversation"</value>
+			</parameter>
+			<parameterset name="receivers" class="IComponentIdentifier">
+				<value>$scope.getComponentIdentifier()</value>
+			</parameterset>
+		</messageevent>
+	</events>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>	
+	
+</capability>

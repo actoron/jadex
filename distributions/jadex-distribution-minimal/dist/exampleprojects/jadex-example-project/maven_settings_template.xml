@@ -1,0 +1,18 @@
+<!-- Maven settings template for access to Jadex Pro artifacts.
+     Enter you credentials below and use this file as maven settings.
+     E.g. in Eclipse: Window->Preferences and then Maven->User settings
+-->
+<settings>
+	<servers>
+		<server>
+			<id>jadex-pro-snapshots</id>
+			<username>Wikiuser</username>
+			<password>wikipass</password>
+		</server>
+		<server>
+			<id>jadex-pro-releases</id>
+			<username>Wikiuser</username>
+			<password>wikipass</password>
+		</server>
+	</servers>
+</settings> 

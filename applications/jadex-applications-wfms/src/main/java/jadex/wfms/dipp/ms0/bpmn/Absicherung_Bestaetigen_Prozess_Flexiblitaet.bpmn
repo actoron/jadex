@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_dASbQcClEd-jKppMsEcWIw" iD="_dASbQMClEd-jKppMsEcWIw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_87qPUNFGEd-OeJnOjY27qg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_87qPUdFGEd-OeJnOjY27qg" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_87srkNFGEd-OeJnOjY27qg" key="Package" value=""/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NnI3sNFTEd-OeJnOjY27qg" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLW_ENFTEd-OeJnOjY27qg" key="dimension" value="1:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLW_EdFTEd-OeJnOjY27qg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLW_EtFTEd-OeJnOjY27qg" key="0:0" value="jadex.wfms.parametertypes.*"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_dASbR8ClEd-jKppMsEcWIw" iD="_dASbRsClEd-jKppMsEcWIw" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_dATCUcClEd-jKppMsEcWIw" iD="_dATCUMClEd-jKppMsEcWIw" outgoingEdges="_NHuOQdFHEd-OeJnOjY27qg" incomingEdges="_B-a-kdFHEd-OeJnOjY27qg" name="Bestaetigung_Datensatz_geladen" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AZK4ANFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AZK4AdFHEd-OeJnOjY27qg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Glug4NFHEd-OeJnOjY27qg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Wh4bkNFHEd-OeJnOjY27qg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Wh4bkdFHEd-OeJnOjY27qg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Wh4bktFHEd-OeJnOjY27qg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Wh4bk9FHEd-OeJnOjY27qg" key="0:1" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Wh4blNFHEd-OeJnOjY27qg" key="0:2" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Wh4bldFHEd-OeJnOjY27qg" key="0:3" value="new Text(&quot;Der Datensatz fuer die gewaehlte Absicherung wurde erfolgreich geladen. &lt;br>&lt;br> Bitte bestaetigen&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_BkjtEdFHEd-OeJnOjY27qg" iD="_BkjtENFHEd-OeJnOjY27qg" outgoingEdges="_B-a-kdFHEd-OeJnOjY27qg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_MH360dFHEd-OeJnOjY27qg" iD="_MH360NFHEd-OeJnOjY27qg" outgoingEdges="_snfn0dFHEd-OeJnOjY27qg" incomingEdges="_NHuOQdFHEd-OeJnOjY27qg" name="Anzeige_des_Datensatzes">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MOHFsNFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MOHFsdFHEd-OeJnOjY27qg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SBhOwNFHEd-OeJnOjY27qg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KBQNIBEd-DzrFLWicweA" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KBQdIBEd-DzrFLWicweA" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KBQtIBEd-DzrFLWicweA" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KBQ9IBEd-DzrFLWicweA" key="0:1" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KBRNIBEd-DzrFLWicweA" key="0:2" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KoUNIBEd-DzrFLWicweA" key="0:3" value="new Text(&quot;&lt;html>:&lt;br>&lt;br>Bitte dokumentieren Sie ob die Absicherung erfolgreich war&lt;br> &lt;&lt;br> &lt;/html>&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KoUdIBEd-DzrFLWicweA" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KoUtIBEd-DzrFLWicweA" key="1:1" value="Bitte auswaehlen"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KoU9IBEd-DzrFLWicweA" key="1:2" value="ListChoice"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m1KoVNIBEd-DzrFLWicweA" key="1:3" value="new ListChoice(new String[] {&quot;Absicherung erfolgreich&quot;, &quot;Absicherung war nicht erfolgreich&quot;})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rmy_0dFHEd-OeJnOjY27qg" iD="_rmy_0NFHEd-OeJnOjY27qg" outgoingEdges="_u8jasdFHEd-OeJnOjY27qg _w4rwMdFHEd-OeJnOjY27qg" incomingEdges="_snfn0dFHEd-OeJnOjY27qg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_t30nQdFHEd-OeJnOjY27qg" iD="_t30nQNFHEd-OeJnOjY27qg" outgoingEdges="_vQxXMdFHEd-OeJnOjY27qg" incomingEdges="_u8jasdFHEd-OeJnOjY27qg" name="Erneuten_Prueftermin_festlegen">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uoAuENFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uoBVINFHEd-OeJnOjY27qg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5QAAcNFHEd-OeJnOjY27qg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_99xXINFHEd-OeJnOjY27qg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_99x-MNFHEd-OeJnOjY27qg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_99x-MdFHEd-OeJnOjY27qg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_99x-MtFHEd-OeJnOjY27qg" key="0:1" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_99x-M9FHEd-OeJnOjY27qg" key="0:2" value="Text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_99x-NNFHEd-OeJnOjY27qg" key="0:3" value="new Text(&quot;Bitte erarbeiten Sie eine Problemloesung &lt;br> &lt;br> Legen Sie dann fuer einen weiteren Prueftermin die verantwortlichen Personen fest &lt;br>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_v6bYMdFHEd-OeJnOjY27qg" iD="_v6bYMNFHEd-OeJnOjY27qg" incomingEdges="_w4rwMdFHEd-OeJnOjY27qg" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_tvzSsdFSEd-OeJnOjY27qg" iD="_tvzSsNFSEd-OeJnOjY27qg" incomingEdges="_vQxXMdFHEd-OeJnOjY27qg" activityType="EventEndError">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uwxAcNFSEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uwxAcdFSEd-OeJnOjY27qg" key="exception" value=""/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_B-a-kdFHEd-OeJnOjY27qg" iD="_B-a-kNFHEd-OeJnOjY27qg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NHuOQdFHEd-OeJnOjY27qg" iD="_NHuOQNFHEd-OeJnOjY27qg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NIQZwNFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NIQZwdFHEd-OeJnOjY27qg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_snfn0dFHEd-OeJnOjY27qg" iD="_snfn0NFHEd-OeJnOjY27qg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sn_-INFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sn_-IdFHEd-OeJnOjY27qg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_u8jasdFHEd-OeJnOjY27qg" iD="_u8jasNFHEd-OeJnOjY27qg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_u9DxANFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u9DxAdFHEd-OeJnOjY27qg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vQxXMdFHEd-OeJnOjY27qg" iD="_vQxXMNFHEd-OeJnOjY27qg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vRAAsNFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vRAnwNFHEd-OeJnOjY27qg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_w4rwMdFHEd-OeJnOjY27qg" iD="_w4rwMNFHEd-OeJnOjY27qg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w5SNINFHEd-OeJnOjY27qg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w5S0MNFHEd-OeJnOjY27qg" key="condition" value="&quot;Absicherung erfolgreich&quot;.equals(Bitte_auswaehlen.getSelection())"/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

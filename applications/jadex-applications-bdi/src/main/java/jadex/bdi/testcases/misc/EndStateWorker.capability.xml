@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	<H3>Check usage of end elements in capabilities</H3>
+	Part of EndState test.
+ -->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+						http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="EndStateWorker"
+	package="jadex.bdi.testcases.misc">
+	
+	<imports>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+	
+	<goals>
+		<achievegoal name="endgoal" exported="true">
+			<parameter name="content" class="String">
+				<value>"capability end goal"</value>
+			</parameter>
+		</achievegoal>
+	</goals>
+		
+	<events>
+		<internalevent name="endevent" exported="true">
+			<parameter name="content" class="String">
+				<value>"capability end internal event"</value>
+			</parameter>
+		</internalevent>
+		<messageevent name="endmsg" type="fipa" direction="send_receive" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String" direction="fixed">
+				<value>"capability end message event"</value>
+			</parameter>
+			<parameterset name="receivers" class="IComponentIdentifier">
+				<value>$scope.getComponentIdentifier()</value>
+			</parameterset>
+		</messageevent>
+	</events>
+	
+</capability>

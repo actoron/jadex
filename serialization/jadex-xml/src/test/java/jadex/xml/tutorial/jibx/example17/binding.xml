@@ -1,0 +1,26 @@
+<binding>
+  <mapping name="customer" class="example17.Customer">
+    <structure field="identity"/>
+    <value name="street" field="street" usage="optional"/>
+    <value name="city" field="city" usage="optional"/>
+    <value name="state" field="state" usage="optional"/>
+    <value name="zip" field="zip" usage="optional"/>
+    <value name="phone" field="phone" usage="optional"/>
+  </mapping>
+  <mapping class="example17.Identity" abstract="true" type-name="ident">
+    <value name="cust-num" field="customerNumber"/>
+  </mapping>
+  <mapping name="base-ident" class="example17.Identity">
+    <structure map-as="ident"/>
+  </mapping>
+  <mapping name="person" class="example17.Person" extends="example17.Identity">
+    <structure map-as="ident"/>
+    <value name="first-name" field="firstName"/>
+    <value name="last-name" field="lastName"/>
+  </mapping>
+  <mapping name="company" class="example17.Company" extends="example17.Identity">
+    <value name="name" field="name"/>
+    <value name="tax-id" field="taxId"/>
+    <structure map-as="ident"/>
+  </mapping>
+</binding>

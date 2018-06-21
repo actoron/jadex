@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson C1.</H3>
+	Using the beliefbase with a belief.
+	<H4>Explanation</H4>
+	The agent stores its dictionary in a single-valued
+	belief that can be accessed from a translation as well
+	as from a add new word plan.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationC1"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>java.util.*</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- This belief contains the english-german dictionary as a map. -->
+		<belief name="egwords" class="Map">
+			<fact>EnglishGermanTranslationPlanC1.getDictionary()</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<!-- Passive plan for adding words, when a
+			request word message is received. -->
+		<plan name="addword">
+			<body class="EnglishGermanAddWordPlanC1"/>
+			<trigger>
+				<messageevent ref="request_addword"/>
+			</trigger>
+		</plan>
+		<!-- Passive plan for translating words, when a request
+			translation message is received. -->
+		<plan name="egtrans">
+			<body class="EnglishGermanTranslationPlanC1"/>
+			<trigger>
+				<messageevent ref="request_translation"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Specifies a add word request being all messages with performative
+			request and start with a specific string "add english_german". -->
+		<messageevent name="request_addword" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("add english_german")</match>
+		</messageevent>
+		<!-- Specifies a translation request being all messages with performative
+			request and start with a specific string "translate english_german". -->
+		<messageevent name="request_translation" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("translate english_german")</match>
+		</messageevent>
+	</events>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+		<property name="logging.level">Level.INFO</property>
+ 		<!-- The default parent handler prints out log messages on the console. -->
+		<property name="logging.useParentHandlers">true</property>
+		<!-- <property name="debugging">true</property>-->
+    </properties>
+
+</agent>
+

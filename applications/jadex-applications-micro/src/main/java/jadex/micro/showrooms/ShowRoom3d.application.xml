@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <H3>The Show Room for random 3D Spaceobjects</H3> 3D Showroom of Spaceobjects 
+	created by us or licensed under Creative Commons Attribution 3.0 <br><br> 
+	Shortkeys: <br> F8 - Grid On/OFF<br> F3 - Chase Cam ON/OFF<br> F4 - Follow 
+	Cam ON/OFF<br> F5 - Informations ON/OFF<br> -->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:agr="http://www.activecomponents.org/jadex-agrspace" xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-agrspace 
+	                    http://www.activecomponents.org/jadex-agrspace-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="ShowRoom3d" package="jadex.micro.showrooms">
+
+	<imports>
+		<import>jadex.extension.envsupport.environment.space3d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>java.text.SimpleDateFormat</import>
+		<import>java.util.Date</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.micro.rotation.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+	</imports>
+
+	<arguments>
+		<argument name="types" class="String[]">
+			new String[]{"jadex3d/models/vehicles/digger/digger.j3o",
+			"jadex3d/models/space/misc/rock01.j3o",
+			"jadex3d/models/space/carrier/spaceship.j3o",
+			"jadex3d/models/space/spacefrigate/spacefrigate.j3o",
+			"jadex3d/models/vehicles/forklift/forklift.j3o",
+			"jadex3d/models/vehicles/tank/sentrytank.j3o",
+			"jadex3d/models/space/smallship/ship.j3o",
+			"jadex3d/models/space/misc/box/ammo.j3o",
+			"jadex3d/models/space/misc/station/konostationobj.j3o",
+			"jadex3d/models/vehicles/tank/apc.j3o",
+			"jadex3d/models/vehicles/disaster/hospital.j3o",
+			"jadex3d/models/vehicles/tractor/tractor.j3o"}
+		</argument>
+
+		<argument name="size" class="Vector3Double[]">
+			new Vector3Double[]{new
+			Vector3Double(0.3),
+			new Vector3Double(0.5),
+			new Vector3Double(0.075),
+			new Vector3Double(0.075),
+			new Vector3Double(2.9),
+			new Vector3Double(2.9),
+			new Vector3Double(0.5),
+			new Vector3Double(0.01),
+			new Vector3Double(0.005),
+			new Vector3Double(2),
+			new Vector3Double(1),
+			new Vector3Double(0.4)}
+		</argument>
+		<argument name="posloc" class="Vector3Double[]">
+			new Vector3Double[]{new
+			Vector3Double(0.0,0.16,0.0),
+			new Vector3Double(0.0,0.5,0.0),
+			new Vector3Double(0.0,0.1,0.0),
+			new Vector3Double(0.0,0.3,0.0),
+			new Vector3Double(0.0,0.0,0.0),
+			new Vector3Double(0.0,0.0,0.0),
+			new Vector3Double(0.0,0.2,0.0),
+			new Vector3Double(0.0,0.0,0.0),
+			new Vector3Double(0.0,0.6,0.0),
+			new Vector3Double(0.0,0.0,0.0),
+			new Vector3Double(0.0,0.0,0.0),
+			new Vector3Double(0.0,0.0,0.0)}
+		</argument>
+	</arguments>
+
+	<extensiontypes>
+		<env:envspacetype name="3dspace" class="ContinuousSpace3D"
+			width="1" height="1" depth="1">
+			<env:objecttypes>
+				<env:objecttype name="rotationplattform">
+					<env:property name="tick360" class="int" dynamic="true">$properties.clock.getTick()%360
+					</env:property>
+					<env:property name="type" class="String">"jadex3d/models/space/misc/rock01.j3o"
+					</env:property>
+					<env:property name="size" class="Vector3Double">new
+						Vector3Double(0.1,0.1,0.1)</env:property>
+					<env:property name="posloc" class="Vector3Double">new
+						Vector3Double(0.0,0.0,0.0)</env:property>
+					<env:property name="rota" class="IVector3" dynamic="true">$object.getProperty("rotation")
+					</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+
+			<env:tasktypes>
+				<env:tasktype name="rotation" class="RotationTask" />
+			</env:tasktypes>
+
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView3D" />
+			</env:dataviews>
+
+			<env:perspectives>
+				<env:perspective3d name="Complex3D" class="Perspective3D">
+					<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+						<env:sky skypath="jadex3d/textures/sky/space/nebula02/"
+							west="right.jpg" east="left.jpg" north="back.jpg" south="front.jpg"
+							up="top.jpg" down="bottom.jpg" isSphere="false" />
+						<!-- <env:rndterrain width="1" height="0.2" depth="1" tiles="512" iterations="1000" 
+							minradius="25" maxradius="100" seed="4" terrapath="jadex3d/textures/terrain/terrain01/" 
+							alphamap="alphamap.png" texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" 
+							tex02val="32" texture03="road.jpg" tex03val="128" /> -->
+					</env:drawable3d>
+
+					<env:drawable3d objecttype="rotationplattform" width="0.2" height="0.2" depth="0.2" rotation3d="false">
+						<env:sphere width="1" height="0.01" depth="1" rotation="rota" x="0.0" y="0.0" z="0.0" color="#FFFFFFFF" texturepath="jadex3d/textures/solid/red.jpg" />
+						<env:object3d size="size" position="posloc" modelpath="type" hasLightMaterials="true">
+						</env:object3d>
+					</env:drawable3d>
+				</env:perspective3d>
+			</env:perspectives>
+
+			<!-- executor -->
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($component,
+			IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		</property>
+	</properties>
+
+	<configurations>
+		<configuration name="Default">
+			<extensions>
+				<env:envspace name="my3dspace" type="3dspace">
+					<env:objects>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[0]</env:property>
+							<env:property name="posloc">$args.posloc[0]</env:property>
+							<env:property name="size">$args.size[0]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[1]</env:property>
+							<env:property name="posloc">$args.posloc[1]</env:property>
+							<env:property name="size">$args.size[1]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[2]</env:property>
+							<env:property name="posloc">$args.posloc[2]</env:property>
+							<env:property name="size">$args.size[2]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[3]</env:property>
+							<env:property name="posloc">$args.posloc[3]</env:property>
+							<env:property name="size">$args.size[3]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[4]</env:property>
+							<env:property name="posloc">$args.posloc[4]</env:property>
+							<env:property name="size">$args.size[4]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[5]</env:property>
+							<env:property name="posloc">$args.posloc[5]</env:property>
+							<env:property name="size">$args.size[5]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[6]</env:property>
+							<env:property name="posloc">$args.posloc[6]</env:property>
+							<env:property name="size">$args.size[6]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[7]</env:property>
+							<env:property name="posloc">$args.posloc[7]</env:property>
+							<env:property name="size">$args.size[7]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[8]</env:property>
+							<env:property name="posloc">$args.posloc[8]</env:property>
+							<env:property name="size">$args.size[8]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[9]</env:property>
+							<env:property name="posloc">$args.posloc[9]</env:property>
+							<env:property name="size">$args.size[9]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[10]</env:property>
+							<env:property name="posloc">$args.posloc[10]</env:property>
+							<env:property name="size">$args.size[10]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+						<env:object type="rotationplattform">
+							<env:property name="type">$args.types[11]</env:property>
+							<env:property name="posloc">$args.posloc[11]</env:property>
+							<env:property name="size">$args.size[11]</env:property>
+							<env:task type="rotation" />
+						</env:object>
+					</env:objects>
+
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all"
+							perspective="Complex3D">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+	</configurations>
+</applicationtype>

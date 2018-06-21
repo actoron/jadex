@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_rEMp0E4FEd-h4K8oRzpwEg" type="Bpmn" name="E2_CustomTask.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_rEfkxE4FEd-h4K8oRzpwEg" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_rEpVwE4FEd-h4K8oRzpwEg" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_rEpVwU4FEd-h4K8oRzpwEg" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_rEpVxk4FEd-h4K8oRzpwEg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_rEpVzE4FEd-h4K8oRzpwEg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_rEpVx04FEd-h4K8oRzpwEg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_rEpVyE4FEd-h4K8oRzpwEg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_rEpVyU4FEd-h4K8oRzpwEg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_rEpVyk4FEd-h4K8oRzpwEg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="E2_CustomTask.bpmn#_rEfkw04FEd-h4K8oRzpwEg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rEpVzU4FEd-h4K8oRzpwEg" x="53" y="8" width="111" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_G106sk4nEd-h4K8oRzpwEg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_G106uE4nEd-h4K8oRzpwEg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_G106s04nEd-h4K8oRzpwEg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_G106tE4nEd-h4K8oRzpwEg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_G106tU4nEd-h4K8oRzpwEg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_G106tk4nEd-h4K8oRzpwEg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="E2_CustomTask.bpmn#_G106sU4nEd-h4K8oRzpwEg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_G106t04nEd-h4K8oRzpwEg" x="178" y="8"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_Xr9KUk4nEd-h4K8oRzpwEg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_Xr9KWE4nEd-h4K8oRzpwEg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_Xr9KU04nEd-h4K8oRzpwEg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_Xr9KVE4nEd-h4K8oRzpwEg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_Xr9KVU4nEd-h4K8oRzpwEg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_Xr9KVk4nEd-h4K8oRzpwEg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="E2_CustomTask.bpmn#_Xr9KUU4nEd-h4K8oRzpwEg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Xr9KV04nEd-h4K8oRzpwEg" x="305" y="8"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_rEpVwk4FEd-h4K8oRzpwEg"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_rEpVw04FEd-h4K8oRzpwEg"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_rEpVxE4FEd-h4K8oRzpwEg"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_rEfkxU4FEd-h4K8oRzpwEg" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_rEfkxk4FEd-h4K8oRzpwEg"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_rEfkx04FEd-h4K8oRzpwEg" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_rEfkyE4FEd-h4K8oRzpwEg" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="E2_CustomTask.bpmn#_rEfkwU4FEd-h4K8oRzpwEg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rEpVxU4FEd-h4K8oRzpwEg" x="16" y="16" width="754" height="81"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_rEMp0U4FEd-h4K8oRzpwEg"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_rEMp0k4FEd-h4K8oRzpwEg"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_rEMp004FEd-h4K8oRzpwEg"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="E2_CustomTask.bpmn#_rEC40U4FEd-h4K8oRzpwEg"/>
+</notation:Diagram>

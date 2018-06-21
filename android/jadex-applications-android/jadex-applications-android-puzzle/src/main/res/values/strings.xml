@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_label">Status: </string>
+    <string name="app_title">Jadex Puzzle</string>
+    <string name="app_sendtitle">Send Activity</string>
+    <string name="status_loading">Loading Platform...</string>
+    <string name="status_started">Platform started!</string>
+    <string name="start_bdi">Start BDI</string>
+    <string name="start_bdiv3">Start BDIV3</string>
+    <string name="start_bdi_bench">Start BDI Benchmark</string>
+    <string name="start_bdiv3_bench">Start BDIV3 Benchmark</string>
+</resources>

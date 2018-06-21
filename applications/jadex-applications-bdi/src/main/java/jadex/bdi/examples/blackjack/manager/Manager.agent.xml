@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The blackjack Manager helps with starting agents.</H3>
+
+	Provides a GUI to start/stop agents, and close the complete BlackJack application.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	   name="Manager"
+	   package="jadex.bdi.examples.blackjack.manager">
+
+	<imports>
+		<import>jadex.bdi.examples.blackjack.Player</import>
+		<import>jadex.bdi.examples.blackjack.player.strategies.*</import>
+		<import>java.awt.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
+	</imports>
+	
+	<beliefs>
+
+		<!-- The player objects with initial values. -->
+		<beliefset name="players" class="Player">
+			<fact>new Player("Heinz", 100, new Color(255,192,192), AbstractStrategy.CONSTANT_VERY_CAREFUL)</fact>
+			<fact>new Player("Erna",  100, new Color(255,224,192), AbstractStrategy.CONSTANT_CAREFUL)</fact>
+			<fact>new Player("Fritz", 100, new Color(255,255,192), AbstractStrategy.CONSTANT_RISKY)</fact>
+			<fact>new Player("Lotte", 100, new Color(224,255,192), AbstractStrategy.CONSTANT_VERY_RISKY) </fact>
+			<fact>new Player("Karl",  100, new Color(192,255,224), AbstractStrategy.STOCHASTIC_TABLE)</fact>
+			<fact>new Player("Marie", 100, new Color(192,255,255), AbstractStrategy.HUMAN_PLAYER)</fact>
+<!--			<fact> new Player("Hubert", 100, new Color(192,224,255), new StochasticTable()) </fact>
+			<fact> new Player("Rosi", 100, new Color(192,192,255), new StochasticTable()) </fact>			
+-->		</beliefset>
+		
+		<!-- The id of a manually started local dealer. -->
+		<belief name="localDealerAID"  class="jadex.bridge.IComponentIdentifier" />
+		
+		<!-- The gui object. -->
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(ManagerFrame.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact>
+		</belief>
+		
+	</beliefs>
+
+	<plans>
+		<!-- Plan to register, when dealer belief changes. -->
+		<plan name="dealerRegister">
+			<body class="ManagerDealerRegisterPlan" />
+			<trigger>
+				<factchanged ref="localDealerAID"/>
+			</trigger>
+		</plan>
+		<!-- Plan to update the GUI, when informed by dealer changes. -->
+		<plan name="guiManager">
+			<body class="ManagerGuiUpdatePlan"/>
+			<trigger>
+				<messageevent ref="inform_playerplaying"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Message to be sent to shutdown the dealer. -->
+		<messageevent name="dealer_shutdown" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String" direction="fixed">
+				<value>"manager:shutDown"</value>
+			</parameter>
+		</messageevent>
+		<!-- Message to be sent to register at the dealer. -->
+		<messageevent name="dealer_register" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.QUERY_REF</value>
+			</parameter>
+			<parameter name="content" class="String" direction="fixed">
+				<value>"manager:registerAsTracker"</value>
+			</parameter>
+		</messageevent>
+		<!-- Message sent by dealer to inform the manager about the status of a player. -->
+		<messageevent name="inform_playerplaying" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("playerPlaying")</match>
+		</messageevent>
+	</events>
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+	
+	<!-- 
+	     logging-properties, needed to debug the application.
+	     Start the Jadex-Logging-Agent to see whats going on behind
+	     the scenes
+	 -->
+	<properties>
+		<property name="logging.level">Level.WARNING</property>
+<!--		<property name="debugging">true</property>-->
+	</properties>
+
+	<!--  <configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="gui">
+					<fact>new ManagerFrame($scope.getExternalAccess())</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>-->
+
+</agent>
+

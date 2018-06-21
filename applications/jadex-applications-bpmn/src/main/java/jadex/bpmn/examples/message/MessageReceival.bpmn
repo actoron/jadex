@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Q4lTQc-aEd6NWbZHdUI2WQ" iD="_Q4lTQM-aEd6NWbZHdUI2WQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hjfBkBYrEd-yC473XtaJZQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hjfBkhYrEd-yC473XtaJZQ" key="Package" value="jadex.bpmn.examples.message"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hpToMBaYEd-YccbjZenQqQ" key="Description" value="&lt;h3>Message receival process&lt;/h3>The Message Receival process waits for a predefined number of messages and then terminates."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj-wRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lu8vYARPEeCnwcpWvxOwkg" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vYQRPEeCnwcpWvxOwkg" key="dimension" value="2:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vYgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vYwRPEeCnwcpWvxOwkg" key="0:0" value="jadex.bpmn.examples.execute"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vZARPEeCnwcpWvxOwkg" key="1:0" value="jadex.commons.*"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lu8vZQRPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vZgRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vZwRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vaARPEeCnwcpWvxOwkg" key="0:0" value="message_number"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vaQRPEeCnwcpWvxOwkg" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vagRPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vawRPEeCnwcpWvxOwkg" key="0:3" value="The number of messages to receive."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vbARPEeCnwcpWvxOwkg" key="0:4" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lu8vbQRPEeCnwcpWvxOwkg" key="0:5" value="10"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_Q5erIc-aEd6NWbZHdUI2WQ" iD="_Q5erIM-aEd6NWbZHdUI2WQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Q5erI8-aEd6NWbZHdUI2WQ" iD="_Q5erIs-aEd6NWbZHdUI2WQ" outgoingEdges="_bjpHwc-aEd6NWbZHdUI2WQ" incomingEdges="_6WZS8dBNEd6NWbZHdUI2WQ _b0-_QdByEd6NWbZHdUI2WQ" name="PreMessage" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_l4Lj4ARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj4QRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj4gRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj4wRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj5ARPEeCnwcpWvxOwkg" key="0:1" value="i"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj5QRPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj5gRPEeCnwcpWvxOwkg" key="0:3" value="0"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_bjf90c-aEd6NWbZHdUI2WQ" iD="_bjf90M-aEd6NWbZHdUI2WQ" outgoingEdges="_ZD05kc-eEd6NWbZHdUI2WQ" incomingEdges="_bjpHwc-aEd6NWbZHdUI2WQ" name="Wait for Message" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_m6N1sBYrEd-yC473XtaJZQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m6N1sRYrEd-yC473XtaJZQ" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m6N1shYrEd-yC473XtaJZQ" key="filter" value="IFilter.ALWAYS"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qRFq4BYrEd-yC473XtaJZQ" key="mode" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qRO00BYrEd-yC473XtaJZQ" key="msgtype" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eSwVwGKMEd-Q9q1HfsZXQw" key="match expression" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZDrIkc-eEd6NWbZHdUI2WQ" iD="_ZDrIkM-eEd6NWbZHdUI2WQ" outgoingEdges="_whyoYRY1Ed-yC473XtaJZQ" incomingEdges="_ZD05kc-eEd6NWbZHdUI2WQ" name="MessageReceived" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lXlZwBY1Ed-yC473XtaJZQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uk6sABY1Ed-yC473XtaJZQ" key="class" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_l4Lj5wRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj6ARPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj6QRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj6gRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj6wRPEeCnwcpWvxOwkg" key="0:1" value="i"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj7ARPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj7QRPEeCnwcpWvxOwkg" key="0:3" value="i"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_5_vtgdBNEd6NWbZHdUI2WQ" iD="_5_vtgNBNEd6NWbZHdUI2WQ" outgoingEdges="_6WZS8dBNEd6NWbZHdUI2WQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_vk2fARY1Ed-yC473XtaJZQ" iD="_vk2fABY1Ed-yC473XtaJZQ" outgoingEdges="_b0-_QdByEd6NWbZHdUI2WQ _SMJwkRY-Ed-yC473XtaJZQ" incomingEdges="_whyoYRY1Ed-yC473XtaJZQ" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_yNYAcRY1Ed-yC473XtaJZQ" iD="_yNYAcBY1Ed-yC473XtaJZQ" incomingEdges="_yNhxcRY1Ed-yC473XtaJZQ" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_SL21oRY-Ed-yC473XtaJZQ" iD="_SL21oBY-Ed-yC473XtaJZQ" outgoingEdges="_yNhxcRY1Ed-yC473XtaJZQ" incomingEdges="_SMJwkRY-Ed-yC473XtaJZQ" name="Print results" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YKhMcBY-Ed-yC473XtaJZQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fy-yoBY-Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_l4Lj7gRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj7wRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8ARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8QRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8gRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8wRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj9ARPEeCnwcpWvxOwkg" key="0:3" value="$component.getComponentIdentifier().getLocalName()+&quot; received &quot;+message_number+&quot; messages.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_bjpHwc-aEd6NWbZHdUI2WQ" iD="_bjpHwM-aEd6NWbZHdUI2WQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZD05kc-eEd6NWbZHdUI2WQ" iD="_ZD05kM-eEd6NWbZHdUI2WQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6WZS8dBNEd6NWbZHdUI2WQ" iD="_6WZS8NBNEd6NWbZHdUI2WQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_b0-_QdByEd6NWbZHdUI2WQ" iD="_b0-_QNByEd6NWbZHdUI2WQ" name="For the expected number of messages to receive">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mrB-oBY1Ed-yC473XtaJZQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrB-ohY1Ed-yC473XtaJZQ" key="condition" value="i+1 &lt; message_number"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_l4Lj9gRPEeCnwcpWvxOwkg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj9wRPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj-ARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj-QRPEeCnwcpWvxOwkg" key="0:0" value="i"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj-gRPEeCnwcpWvxOwkg" key="0:1" value="i+1"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_whyoYRY1Ed-yC473XtaJZQ" iD="_whyoYBY1Ed-yC473XtaJZQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_yNhxcRY1Ed-yC473XtaJZQ" iD="_yNhxcBY1Ed-yC473XtaJZQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_SMJwkRY-Ed-yC473XtaJZQ" iD="_SMJwkBY-Ed-yC473XtaJZQ" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5kiGsDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5kiGsTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

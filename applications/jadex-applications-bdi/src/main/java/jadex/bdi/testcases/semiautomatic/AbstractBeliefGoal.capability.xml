@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test for abstract beliefs</H3>
+	An agent that has a capability with an abstract belief.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AbstractBeliefGoal"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<beliefs>
+		<beliefref name="myabstractbelief">
+			<abstract />
+		</beliefref>
+	</beliefs>
+	<goals>
+		<achievegoal name="abChanged">
+			<creationcondition> $beliefbase.myabstractbelief == true
+			</creationcondition>
+		</achievegoal>
+	</goals>
+	<!-- <plans>
+		<plan name="abTellChange">
+			<body class="CapsPlan" />
+			<trigger>
+				<goal ref="abChanged" />
+			</trigger>
+		</plan>
+	</plans> -->
+</capability>

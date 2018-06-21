@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test agent creation performance.</H3>
+
+	Creates a number of peers and prints out the time/memory it takes.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AgentCreation"
+	package="jadex.bdi.benchmarks"
+	synchronous="false">
+
+	<imports>
+		<import>jadex.bridge.service.types.cms.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- <belief name="delay" class="int">
+			<fact>0</fact>
+		</belief> -->
+		<!-- Parallel execution gains only performance advantages if platform executes
+			agents also in parallel (standalone -> async platform executor) -->
+		<belief name="parallel" class="boolean" exported="true">
+			<fact>false</fact>
+		</belief>
+		<belief name="max" class="Integer" exported="true">
+			<fact>new Integer(10000)</fact>
+		</belief>
+		<belief name="num" class="int" exported="true">
+			<fact>new Integer(1)</fact>
+		</belief>
+		<belief name="counter" class="Counter" exported="true">
+			<fact>new Counter()</fact>
+		</belief>
+		<belief name="starttime" class="Long" exported="true">
+			<fact>new Long($scope.getTime())</fact>
+		</belief>
+		<belief name="startmem" class="Long" exported="true">
+			<fact>new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="start_peer">
+			<body class="StartPeerPlan" />
+		</plan>
+	</plans>
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+	
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="start_peer"/>
+			</plans>
+		</configuration>
+		<configuration name="def2"/>
+		<configuration name="max=10000">
+			<beliefs>
+				<initialbelief ref="max">
+					<fact>10000</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="start_peer"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

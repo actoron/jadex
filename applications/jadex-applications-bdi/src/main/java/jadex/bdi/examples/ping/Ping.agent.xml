@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Ping Agent for answering ping requests.</H3>
+
+	Reacts on "ping" query-ref and sends back inform "alive".
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Ping"
+	package="jadex.bdi.examples.ping">
+
+	<capabilities>
+		<capability name="ping" file="jadex.bdi.planlib.ping.Ping"/>
+	</capabilities>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+
+</agent>

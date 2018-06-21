@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>TestEventprocessStartEvent</jadex:modelname>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="VkKri5cBRYKjzY3x">
+    <semantic:subProcess id="BN6NQnDCfnsKNShG" triggeredByEvent="true">
+      <semantic:outgoing>PFxnDrRViXQFrwHT</semantic:outgoing>
+      <semantic:startEvent id="z1vDx6pJQvutYhmN">
+        <semantic:outgoing>9fWLp0w2NJONsh42</semantic:outgoing>
+        <semantic:conditionalEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="eventtypes">new java.lang.String[]{&quot;EventSubprocessStart&quot;}</jadex:property>
+          <jadex:property name="condition">$event.value==7</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Task" id="9dQ2QrH6z7TdyX1R">
+        <semantic:incoming>9fWLp0w2NJONsh42</semantic:incoming>
+        <semantic:outgoing>qwHGugR/tHq5msQF</semantic:outgoing>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getComponentIdentifier()+&quot; after event: &quot;+$event</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:endEvent id="BW619SMSOFSI8dGf">
+        <semantic:incoming>qwHGugR/tHq5msQF</semantic:incoming>
+      </semantic:endEvent>
+    </semantic:subProcess>
+    <semantic:endEvent id="oCu/rKaa0Hg/pllB">
+      <semantic:incoming>PFxnDrRViXQFrwHT</semantic:incoming>
+      <semantic:terminateEventDefinition/>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="BN6NQnDCfnsKNShG" targetRef="oCu/rKaa0Hg/pllB" id="PFxnDrRViXQFrwHT">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="z1vDx6pJQvutYhmN" targetRef="9dQ2QrH6z7TdyX1R" id="9fWLp0w2NJONsh42">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="9dQ2QrH6z7TdyX1R" targetRef="BW619SMSOFSI8dGf" id="qwHGugR/tHq5msQF">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="VkKri5cBRYKjzY3x">
+        <dc:Bounds height="300.0" width="680.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="BN6NQnDCfnsKNShG" isExpanded="true">
+        <dc:Bounds height="180.0" width="420.0" x="100.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="z1vDx6pJQvutYhmN">
+        <dc:Bounds height="40.0" width="40.0" x="40.0" y="70.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="9dQ2QrH6z7TdyX1R">
+        <dc:Bounds height="100.0" width="160.0" x="140.0" y="40.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="BW619SMSOFSI8dGf">
+        <dc:Bounds height="40.0" width="40.0" x="350.0" y="70.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="oCu/rKaa0Hg/pllB">
+        <dc:Bounds height="40.0" width="40.0" x="610.0" y="120.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="9fWLp0w2NJONsh42">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="qwHGugR/tHq5msQF">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="PFxnDrRViXQFrwHT">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -1,0 +1,24 @@
+description 'Message transport protocols supporting websockets.'
+
+dependencies
+{
+	api project(':platform:jadex-platform')
+	//api 'org.eclipse.jetty.websocket:websocket-client:9.4.4.v20170414'
+	
+	// NanoHTTPd server
+	api 'org.nanohttpd:nanohttpd-websocket:2.3.1'
+	
+	// NV client
+	api 'com.neovisionaries:nv-websocket-client:2.3'
+	
+	// Tyrus client
+	//api 'org.glassfish.tyrus:tyrus-client:1.13.1'
+	//api 'org.glassfish.tyrus:tyrus-container-grizzly-client:1.13.1'
+	
+	// Java-WebSocket
+	api 'org.java-websocket:Java-WebSocket:1.3.5'
+	
+	// Tyrus server
+	//api 'org.glassfish.tyrus:tyrus-server:1.13.1'
+	//api 'org.glassfish.tyrus:tyrus-container-grizzly-server:1.13.1'
+}

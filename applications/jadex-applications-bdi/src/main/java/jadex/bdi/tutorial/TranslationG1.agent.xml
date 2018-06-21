@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson G1.</H3>
+	Using a separate thread to accept http connections.
+	<H4>Explanation</H4>
+	The agent opens a server connection at port 9099 and waits
+	for translation requests.<br>
+	Direct your browser to e.g.
+	<a href="http://localhost:9099/dog">http://localhost:9099/dog</a>
+	to perform a translation.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationG1"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>jadex.commons.Tuple</import>
+		<import>java.net.Socket</import>
+		<import>java.util.logging.Level</import>
+	</imports>
+
+	<beliefs>
+		<!-- This beliefset contains the english-german dictionary as facts. -->
+		<beliefset name="egwords" class="Tuple">
+			<fact>new Tuple("milk", "Milch")</fact>
+			<fact>new Tuple("cow", "Kuh")</fact>
+			<fact>new Tuple("cat", "Katze")</fact>
+			<fact>new Tuple("dog", "Hund")</fact>
+		</beliefset>
+	</beliefs>
+
+	<goals>
+		<!-- Translation goal containing the socket for client communication. -->
+		<achievegoal name="translate">
+			<parameter name="client" class="Socket"/>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Passive plan for translating a word from English to German.
+ 			Reacts on changes made to the belief set clients. -->
+		<plan name="egtrans">
+			<parameter name="client" class="Socket">
+				<goalmapping ref="translate.client"/>
+			</parameter>
+			<body class="EnglishGermanTranslationPlanG1"/>
+			<trigger>
+				<goal ref="translate"/>
+			</trigger>
+		</plan>
+		<!-- Initial plan for starting a server thread waiting for client connections.
+ 			Adds new sockets with the new connection to the client belief set. -->
+		<plan name="server">
+			<parameter name="port" class="int">
+				<value>9099</value>
+			</parameter>
+			<body class="ServerPlanG1"/>
+		</plan>
+	</plans>
+
+	<expressions>
+		<!-- This query selects the first matching entry from the English - German
+			dictionary, whereby the parameter $eword is compared to the first
+			element of a belief set tuple. -->
+		<expression name="query_egword">
+			select one $wordpair.get(1)
+			from Tuple $wordpair in $beliefbase.getBeliefSet("egwords").getFacts()
+			where $wordpair.get(0).equals($eword)
+			<!-- <parameter name="$eword" class="String"/> -->
+		</expression>
+	</expressions>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+		<property name="logging.level">Level.INFO</property>
+ 		<!-- The default parent handler prints out log messages on the console.-->
+       <property name="logging.useParentHandlers">true</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="server"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

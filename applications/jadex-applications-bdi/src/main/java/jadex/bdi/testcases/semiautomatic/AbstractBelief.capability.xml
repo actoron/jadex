@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test for abstract beliefs</H3>
+	A capability with an abstract belief.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AbstractBelief"
+	package="jadex.bdi.testcases.semiautomatic">
+	
+	<imports>
+		<import>jadex.bdi.testcases.PrintResultPlan</import>
+		<import>java.util.logging.Level</import>
+	</imports>
+
+	<beliefs>
+		<beliefref name="inner">
+			<abstract/>
+		</beliefref>
+	</beliefs>
+	
+	<plans>
+		<plan name="printer">
+			<parameter name="result" class="String">
+				<value>$beliefbase.inner</value>
+			</parameter>
+			<body class="PrintResultPlan"/>
+		</plan>
+	</plans>
+	
+	<properties>
+		<property name="logging.level">Level.INFO</property>
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="printer"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</capability>

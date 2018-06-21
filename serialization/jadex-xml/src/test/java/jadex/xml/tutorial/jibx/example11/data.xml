@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timetable>
+  <carriers>
+    <carrier code="NL" rating="4">
+      <url>http://www.northleft.com</url>
+      <name>Northleft Airlines</name>
+    </carrier>
+    <carrier code="CL" rating="9">
+      <url>http://www.classyskylines.com</url>
+      <name>Classy Skylines</name>
+    </carrier>
+  </carriers>
+  <airports>
+    <airport code="BOS">
+      <location>Boston, MA</location>
+      <name>Logan International Airport</name>
+    </airport>
+    <airport code="SEA">
+      <location>Seattle, WA</location>
+      <name>Seattle-Tacoma International Airport</name>
+    </airport>
+    <airport code="LAX">
+      <location>Los Angeles, CA</location>
+      <name>Los Angeles International Airport</name>
+    </airport>
+  </airports>
+  <routes>
+    <route from="BOS" to="SEA">
+      <flight carrier="CL" number="796" depart="4:12a" arrive="1:26a"/>
+      <flight carrier="NL" number="328" depart="2:54a" arrive="1:29a"/>
+      <flight carrier="CL" number="401" depart="4:12a" arrive="1:25a"/>
+    </route>
+    <route from="SEA" to="BOS">
+      <flight carrier="CL" number="634" depart="7:43a" arrive="9:13a"/>
+      <flight carrier="NL" number="508" depart="4:38p" arrive="6:12p"/>
+      <flight carrier="CL" number="687" depart="1:38p" arrive="3:08p"/>
+    </route>
+  </routes>
+</timetable>

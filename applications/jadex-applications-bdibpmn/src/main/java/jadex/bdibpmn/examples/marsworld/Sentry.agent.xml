@@ -1,0 +1,148 @@
+<!--
+	<H3>Sentry agent for finding ore..</H3>
+
+	This agent move to positons to check for minerals.
+	Then calls the Production Agent to produce the ore.
+	After all locations have been visited the Agent moves home.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Sentry"
+	package="jadex.bdibpmn.examples.marsworld">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.bdi.examples.marsworld.*</import>
+		<import>jadex.bdi.examples.marsworld.sentry.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.extension.agr.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the move capability as move for basic movement. -->
+		<capability name="move" file="Movement" />
+	</capabilities>
+
+	<beliefs>
+		<!-- The agent's avatar  in the environment. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
+
+		<!-- The seen targets. -->
+		<beliefsetref name="my_targets">
+			<concrete ref="move.my_targets"/>
+		</beliefsetref>
+
+		<!-- Missionend belief is used in drop condition of analyze target goal. -->
+		<beliefref name="missionend">
+			<concrete ref="move.missionend"/>
+		</beliefref>
+
+		<!-- Environment belief is used in AddTargetPlan. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		
+		<belief name="agrspace" class="AGRSpace">
+			<fact class="IFuture">$scope.getParentAccess().getExtension("myagrspace")</fact>
+		</belief>
+	</beliefs>
+
+  	<goals>
+		<!-- Analyze a target.-->
+		<achievegoal name="analyze_target" retry="false">
+			<!-- The parameter target is bound to one
+				of the facts in the belief my_targets. -->
+			<parameter name="target" class="ISpaceObject">
+				<value>
+					$target
+				</value>
+			</parameter>
+			<unique/>
+			<!-- Create a new goal when a target was added
+				and the mission is going on. -->
+			<creationcondition language="jcl">
+				ISpaceObject $target &amp;&amp;
+				Arrays.asList($beliefbase.my_targets).contains($target) &amp;&amp;
+				$target.state==AnalyzeTargetTask.STATE_UNKNOWN
+			</creationcondition>
+			<!-- Suspend the goal when some other target is nearer to the agent. -->
+			<contextcondition language="jcl">
+				// Hack!!! $t2 must occur first. Todo: support reordering to allow arbitrary constraints in NOT. 
+				!(ISpaceObject $t2 &amp;&amp; $t2.getType().equals("target") &amp;&amp; $t2.state==AnalyzeTargetTask.STATE_UNKNOWN &amp;&amp;
+					((IVector2)$t2.position).getDistance((IVector2)$beliefbase.myself.position).getAsDouble()
+					&lt; ((IVector2)$goal.target.position).getDistance((IVector2)$beliefbase.myself.position).getAsDouble())
+			</contextcondition>
+			<!-- Drop the goal on mission end. -->
+			<dropcondition language="jcl">
+				$beliefbase.missionend
+			</dropcondition>
+
+			<deliberation cardinalityone="true">
+				<inhibits cref="move.walk_around"/>
+			</deliberation>
+			<!-- The goal is reached when the target is analysed. - ->
+			<!- - Target condition prevents producers from being called by sentry, because plan is aborted. - ->  
+			<targetcondition language="jcl">
+				$goal.target.state==AnalyzeTargetTask.STATE_ANALYZED
+ 			</targetcondition> -->
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Analyse a target. -->
+		<plan name="do_analyze">
+			<parameter name="target" class="ISpaceObject">
+				<goalmapping ref="analyze_target.target"/>
+			</parameter>
+			<body type="bpmn" impl="AnalyzeTargetPlan"/>
+			<trigger>
+				<goal ref="analyze_target"/>
+			</trigger>
+		</plan>
+
+		<!-- Add a new target when new info available. -->
+		<plan name="add_target">
+			<body type="bpmn" impl="AddTargetPlan"/>
+			<trigger>
+				<messageevent ref="target_inform"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Other agents inform the sentries about discovered
+			potential ore resources. -->
+		<messageevent name="target_inform" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<match>((ISpaceObject)$content).getType().equals("target")</match>
+		</messageevent>
+
+		<messageevent name="request_producer" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+		</messageevent>
+	</events>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<!-- Create a goal for walking around. -->
+				<initialgoal cref="move.walk_around"/>
+			</goals>
+		</configuration>
+	</configurations>
+</agent>

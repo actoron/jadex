@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The GoodbyeWorld agent.</H3>
+
+	It has the task to print out a goodbye 
+	message when the agent is terminated.
+	The agent terminates itself after it has lived 2 seconds.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="GoodbyeWorld"
+	package="jadex.bdi.examples.helloworld">
+	
+	<plans>
+		<!-- Plan for terminating the agent. -->
+		<plan name="terminate">
+			<body class="TerminateAgentPlan"/>
+		</plan>
+		<!-- Plan which prints out a message. -->
+		<plan name="goodbye">
+			<body class="GoodbyeWorldPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<!-- Auto-terminate the agent in 2 secs. -->
+				<initialplan ref="terminate"/>
+				<!-- Start goodbye plan when agent is terminated. -->
+				<endplan ref="goodbye"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

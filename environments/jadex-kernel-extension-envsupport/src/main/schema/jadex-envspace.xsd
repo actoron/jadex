@@ -1,0 +1,1120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.activecomponents.org/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.activecomponents.org/jadex-envspace" elementFormDefault="qualified">
+	<xs:complexType name="actiontype">
+		<xs:annotation>
+			<xs:documentation>An action type defines how a component can act in the environment. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="animation">
+		<xs:annotation>
+			<xs:documentation>A animation ONLY for an complex object3d</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="animationcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string"/>
+				<xs:attribute name="channel" type="xs:string"/>
+				<xs:attribute name="loop" type="xs:string"/>
+				<xs:attribute name="speed" type="xs:double"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="arrow">
+		<xs:annotation>
+			<xs:documentation>A simple arrow</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="avatarmapping">
+		<xs:annotation>
+			<xs:documentation>The avatarmapping represents the connection between components and space objects. The mapping allows to define different creation and deletion semantics, e.g. kill also the avatar when the agent dies.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="componenttype" type="xs:string" use="required"/>
+		<xs:attribute name="objecttype" type="xs:string" use="required"/>
+		<xs:attribute name="createavatar" type="xs:boolean" default="true"/>
+		<xs:attribute name="createcomponent" type="xs:boolean" default="false"/>
+		<xs:attribute name="killavatar" type="xs:boolean" default="true"/>
+		<xs:attribute name="killcomponent" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:complexType name="box">
+		<xs:annotation>
+			<xs:documentation>A threedimensional box or cube</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="colorlayer">
+		<xs:annotation>
+			<xs:documentation>A color layer colors the complete screen, often used with alpha colors.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="color" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="componenttype">
+		<xs:annotation>
+			<xs:documentation>Name of a component type for percepts.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="cylinder">
+		<xs:annotation>
+			<xs:documentation>A threedimensional cylinder</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="radius" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="data" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Definition of a data element that should be collected by a data provider.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="dataconsumer">
+		<xs:annotation>
+			<xs:documentation>A data consumer is used for evaluation purposes. They come in very different flavors, e.g. a chart display or a file writer. Takes input data from a data provider and processes it somehow.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="dataconsumers">
+		<xs:annotation>
+			<xs:documentation>Container for data consumer definitions.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dataconsumer" type="dataconsumer" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="dataprovider">
+		<xs:annotation>
+			<xs:documentation>A data provider is used for evaluation purposes. It can be configured to collect specifc data about the execution run.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="source" type="source" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Definition of a data source for data providers.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="data" type="data" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Definition of a data element that should be collected by a data provider.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="dataproviders">
+		<xs:annotation>
+			<xs:documentation>Container for data provider definitions.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dataprovider" type="dataprovider" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A data provider is used for evaluation purposes. It can be configured to collect specifc data about the execution run.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="dataview">
+		<xs:annotation>
+			<xs:documentation>A view is a defineable cutout of the space. It allows to restrict the perception of the envspace e.g. for displaying local views of avatars in an observer. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="objecttype" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="dome">
+		<xs:annotation>
+			<xs:documentation>A threedimensional dome</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="radius" type="xs:string"/>
+				<xs:attribute name="planes" type="xs:string"/>
+				<xs:attribute name="samples" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="drawable">
+		<xs:annotation>
+			<xs:documentation>Container element for the definition of how a space object should look like.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="triangle" type="drawableelement" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Triangle display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="rectangle" type="drawableelement" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Rectangle display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ellipse" type="drawableelement" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Ellipse display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="regularpolygon" type="regularpolygon" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>A regular polygon for displaying simple polygons.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="texturedrectangle" type="texturedrectangle" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>A textured rectangle can be used display images.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="text" type="text" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:attribute name="objecttype" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string" use="required"/>
+				<xs:attribute name="height" type="xs:string" use="required"/>
+				<xs:attribute name="rotation" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="drawable3d">
+		<xs:annotation>
+			<xs:documentation>Container element for the definition of how a 3d space object should look like.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="sphere" type="sphere" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Sphere display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="box" type="box" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Box display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="cylinder" type="cylinder" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Cylinder display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="dome" type="dome" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Dome display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="torus" type="torus" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Torus display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="object3d" type="object3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>3D object display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="arrow" type="arrow" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>3D arrow (vector) display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="text3d" type="text3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sky" type="sky" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Skymap. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="terrain" type="terrain" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Terrain, heightmap </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="rndterrain" type="rndterrain" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Randon generated Heightmap. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sound3d" type="sound3d" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Skymap. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="effect" type="effect" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:choice>
+				<xs:attribute name="objecttype" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string" use="required"/>
+				<xs:attribute name="height" type="xs:string" use="required"/>
+				<xs:attribute name="depth" type="xs:string" use="required"/>
+				<xs:attribute name="rotation3d" type="xs:string"/>
+				<xs:attribute name="hasSpaceobject" type="xs:boolean"/>
+				<xs:attribute name="autoRotation" type="xs:boolean" use="optional" default="true"/>
+				<xs:attribute name="isDynamic" type="xs:boolean" use="optional" default="true"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="drawableelement">
+		<xs:annotation>
+			<xs:documentation>Abstract base type for all kinds of concrete drawable elements.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This condition is used, for deciding if the element should be displayed or not.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="layer" type="xs:int" default="0"/>
+		<xs:attribute name="x" type="xs:string"/>
+		<xs:attribute name="y" type="xs:string"/>
+		<xs:attribute name="width" type="xs:double"/>
+		<xs:attribute name="height" type="xs:string"/>
+		<xs:attribute name="rotatex" type="xs:string"/>
+		<xs:attribute name="rotatey" type="xs:string"/>
+		<xs:attribute name="rotatez" type="xs:string"/>
+		<xs:attribute name="position" type="xs:string"/>
+		<xs:attribute name="rotation" type="xs:string"/>
+		<xs:attribute name="size" type="xs:string"/>
+		<xs:attribute name="abspos" type="xs:string"/>
+		<xs:attribute name="abssize" type="xs:string"/>
+		<xs:attribute name="absrot" type="xs:string"/>
+		<xs:attribute name="color" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="drawableelement3d">
+		<xs:annotation>
+			<xs:documentation>Abstract base type for all kinds of concrete 3d drawable elements.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="x" type="xs:string"/>
+		<xs:attribute name="y" type="xs:string"/>
+		<xs:attribute name="z" type="xs:string"/>
+		<xs:attribute name="width" type="xs:double"/>
+		<xs:attribute name="height" type="xs:string"/>
+		<xs:attribute name="depth"/>
+		<xs:attribute name="rotatex" type="xs:string"/>
+		<xs:attribute name="rotatey" type="xs:string"/>
+		<xs:attribute name="rotatez" type="xs:string"/>
+		<xs:attribute name="position" type="xs:string"/>
+		<xs:attribute name="rotation" type="xs:string"/>
+		<xs:attribute name="size" type="xs:string"/>
+		<xs:attribute name="color" type="xs:string"/>
+		<xs:attribute name="shadowtype" type="xs:string"/>
+		<xs:attribute name="texturepath" type="xs:string"/>
+		<xs:attribute name="materialpath" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="effect">
+		<xs:annotation>
+			<xs:documentation>A animation ONLY for an complex object3d</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="predefinedid" type="xs:string" use="optional"/>
+				<xs:attribute name="startsize" type="xs:double" use="required"/>
+				<xs:attribute name="endsize" type="xs:double" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="envspace" type="envspace">
+		<xs:annotation>
+			<xs:documentation>Instance element for a declared space type.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="envspace">
+		<xs:annotation>
+			<xs:documentation>Instance element for a declared space type.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="objects" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for object instances.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="object" type="object" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Instance of a specific object type.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="processes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for process instances.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="process" type="process" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Instance of a process type.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="dataproviders" type="dataproviders" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for data provider definitions.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="dataconsumers" type="dataconsumers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for data consumer definitions.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="observers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for observers.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="observer" type="observer" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>An observer is an entity that watches the space via a gui. The gui can be extended using custom plugins.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="type" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="depth" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="envspacetype" type="envspacetype">
+		<xs:annotation>
+			<xs:documentation>Declaration of an environment space. The concrete type of the space can be defined using the class.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="envspacetype">
+		<xs:annotation>
+			<xs:documentation>Declaration of an environment space. The concrete type of the space can be defined using the class.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="objecttypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for object types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="objecttype" type="objecttype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>An objecttype is used to define the kind of object in an environment including available properties. Is like a struct definition.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="tasktypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for task types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="tasktype" type="tasktype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A task is a piece of behaviour that can be attached to a space object. It will then be executed until it decides to be finished.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="processtypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for process types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="processtype" type="processtype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A process type can be used for representing environmental processes continually happening in the environment space.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="dataviews" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for views.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="dataview" type="dataview" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A view is a defineable cutout of the space. It allows to restrict the perception of the envspace e.g. for displaying local views of avatars in an observer. </xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="avatarmappings" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for avatar mappings.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="avatarmapping" type="avatarmapping" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>The avatarmapping represents the connection between components and space objects. The mapping allows to define different creation and deletion semantics, e.g. kill also the avatar when the agent dies.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="percepttypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for percept types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="percepttype" type="percepttype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A percept type is a special domain-level form of event that is propagated from the environment space to components.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="perceptgenerator" type="perceptgenerator" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A percept generators can be used to create percepts based on e.g. simple events occurring in the space.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="perceptprocessor" type="perceptprocessor" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A percept processor has the task to bring a percept into the knowlegde of a component.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="actiontypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for action types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="actiontype" type="actiontype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>An action type defines how a component can act in the environment. </xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="perspectives" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for perspectives.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="perspective" type="perspective" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A perspective is used to define the visual representation of space objects.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="perspective3d" type="perspective3d" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="spaceexecutor" type="spaceexecutor" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The space executor determines th execution logic of the space.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="depth" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="gridlayer">
+		<xs:annotation>
+			<xs:documentation>A grid layer can be used to display a defineable grid view.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="color" type="xs:string"/>
+		<xs:attribute name="width" type="xs:string"/>
+		<xs:attribute name="height" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="layers">
+		<xs:annotation>
+			<xs:documentation>Container for different kind of layers.</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="gridlayer" type="gridlayer" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A grid layer can be used to display a defineable grid view.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tiledlayer" type="tiledlayer" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A tiled layer uses an image that is repeatably printed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="colorlayer" type="colorlayer" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A color layer colors the complete screen, often used with alpha colors.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="materialfile">
+		<xs:annotation>
+			<xs:documentation>Materialfiles can be played here</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="soundcondition" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="path" type="xs:string" use="required"/>
+		<xs:attribute name="part" type="xs:string" use="required"/>
+		<xs:attribute name="useAlpha" type="xs:boolean" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="object">
+		<xs:annotation>
+			<xs:documentation>Instance of a specific object type.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="task" type="task" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="number" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="object3d">
+		<xs:annotation>
+			<xs:documentation>A threedimensional complex object</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="animation" type="animation" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="materialfile" type="materialfile" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="modelpath" type="xs:string"/>
+				<xs:attribute name="hasLightMaterials" type="xs:string"/>
+				<xs:attribute name="rigDebug" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="objecttype">
+		<xs:annotation>
+			<xs:documentation>An objecttype is used to define the kind of object in an environment including available properties. Is like a struct definition.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="kdtree" type="xs:boolean" use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="observer">
+		<xs:annotation>
+			<xs:documentation>An observer is an entity that watches the space via a gui. The gui can be extended using custom plugins.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="plugin" type="plugin" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Extension mechanism for the observer gui.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="dataview" type="xs:string" use="required"/>
+		<xs:attribute name="perspective" type="xs:string" use="required"/>
+		<xs:attribute name="killonexit" type="xs:boolean" default="true"/>
+		<xs:attribute name="class" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="perceptgenerator">
+		<xs:annotation>
+			<xs:documentation>A percept generators can be used to create percepts based on e.g. simple events occurring in the space.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="perceptprocessor">
+		<xs:annotation>
+			<xs:documentation>A percept processor has the task to bring a percept into the knowlegde of a component.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="componenttype" type="xs:string"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="percepttype">
+		<xs:annotation>
+			<xs:documentation>A percept type is a special domain-level form of event that is propagated from the environment space to components.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="componenttypes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Container for component types for which this percept type is relevant.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="componenttype" type="componenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Name of the component type for which this percept is relevant.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="objecttypes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Container for object types for which this percept type is relevant.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="objecttype" type="componenttype" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="objecttype" type="xs:string" use="required"/>
+		<xs:attribute name="componenttype" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="perspective">
+		<xs:annotation>
+			<xs:documentation>A perspective is used to define the visual representation of space objects.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="drawable" type="drawable" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="prelayers" type="layers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Layers that are shown behind the space objects (drawn before). </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="postlayers" type="layers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Layers that are shown before the space objects (drawn after). </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="opengl" type="xs:boolean" default="true"/>
+				<xs:attribute name="objectplacement" type="xs:string" default="border"/>
+				<xs:attribute name="invertxaxis" type="xs:boolean"/>
+				<xs:attribute name="invertyaxis" type="xs:boolean"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="perspective3d">
+		<xs:annotation>
+			<xs:documentation>A perspective3d is used to define the visual representation of space objects.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="drawable3d" type="drawable3d" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="camera" type="xs:string" use="optional"/>
+				<xs:attribute name="ambientOcclusion" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="guiCreatorPath" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="plugin">
+		<xs:annotation>
+			<xs:documentation>User interface plugin. Can be used for extending the plugins shown in the observer.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="process">
+		<xs:annotation>
+			<xs:documentation>Instance of a process type.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="processtype">
+		<xs:annotation>
+			<xs:documentation>A process type can be used for representing environmental processes continually happening in the environment space.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="property" mixed="true">
+		<xs:annotation>
+			<xs:documentation>A property represents a static or dynamically evaluated attribute of an object.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+		<xs:attribute name="event" type="xs:boolean" default="false"/>
+		<xs:attribute name="class" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="propertyobject">
+		<xs:annotation>
+			<xs:documentation>Base class for objects with properties.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="regularpolygon">
+		<xs:annotation>
+			<xs:documentation>A regular polygon for displaying simple polygons.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement">
+				<xs:attribute name="vertices" type="xs:int" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="rndterrain">
+		<xs:annotation>
+			<xs:documentation>The terrain object for generating complex terrain</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="tiles" type="xs:string"/>
+				<xs:attribute name="terrapath" type="xs:string"/>
+				<xs:attribute name="alphamap" type="xs:string"/>
+				<xs:attribute name="interations" type="xs:string"/>
+				<xs:attribute name="minradius" type="xs:string"/>
+				<xs:attribute name="maxradius" type="xs:string"/>
+				<xs:attribute name="seed" type="xs:string"/>
+				<xs:attribute name="texture01" type="xs:string"/>
+				<xs:attribute name="texture02" type="xs:string"/>
+				<xs:attribute name="texture03" type="xs:string"/>
+				<xs:attribute name="texture04" type="xs:string"/>
+				<xs:attribute name="texture05" type="xs:string"/>
+				<xs:attribute name="tex01val" type="xs:string"/>
+				<xs:attribute name="tex02val" type="xs:string"/>
+				<xs:attribute name="tex03val" type="xs:string"/>
+				<xs:attribute name="tex04val" type="xs:string"/>
+				<xs:attribute name="tex05val" type="xs:string"/>
+				<xs:attribute name="iterations"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sky">
+		<xs:annotation>
+			<xs:documentation>The Sky object, only one per perspective3d</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="skyfile" type="xs:string"/>
+		<xs:attribute name="skypath" type="xs:string"/>
+		<xs:attribute name="west" type="xs:string"/>
+		<xs:attribute name="east" type="xs:string"/>
+		<xs:attribute name="north" type="xs:string"/>
+		<xs:attribute name="south" type="xs:string"/>
+		<xs:attribute name="up" type="xs:string"/>
+		<xs:attribute name="down" type="xs:string"/>
+		<xs:attribute name="isSphere" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="sound3d">
+		<xs:annotation>
+			<xs:documentation>Soundfiles can be played here</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="soundcondition" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="soundfile" type="xs:string"/>
+		<xs:attribute name="loop" type="xs:string"/>
+		<xs:attribute name="continuosly" type="xs:string"/>
+		<xs:attribute name="positional" type="xs:string"/>
+		<xs:attribute name="volume" type="xs:string"/>
+		<xs:attribute name="numRndFiles" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="source" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Definition of a data source for data providers.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="includecondition" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Allows to include only elements from the source for which the condition is true. $object allows to reference the current object that is considered.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="objecttype" type="xs:string"/>
+		<xs:attribute name="aggregate" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="spaceexecutor">
+		<xs:annotation>
+			<xs:documentation>The space executor is the central control entity of an envspace. It controls the way the space advances its internal state by executing actions and distributing percepts.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sphere">
+		<xs:annotation>
+			<xs:documentation>A threedimensional Sphere</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="task">
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tasktype">
+		<xs:annotation>
+			<xs:documentation>A task is a piece of behaviour that can be attached to a space object. It will then be executed until it decides to be finished.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="terrain">
+		<xs:annotation>
+			<xs:documentation>The terrain object for loading complex terrain</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="terrapath" type="xs:string"/>
+				<xs:attribute name="alphamap" type="xs:string"/>
+				<xs:attribute name="heightmap" type="xs:string"/>
+				<xs:attribute name="texture01" type="xs:string"/>
+				<xs:attribute name="texture02" type="xs:string"/>
+				<xs:attribute name="texture03" type="xs:string"/>
+				<xs:attribute name="texture04" type="xs:string"/>
+				<xs:attribute name="texture05" type="xs:string"/>
+				<xs:attribute name="tex01val" type="xs:string"/>
+				<xs:attribute name="tex02val" type="xs:string"/>
+				<xs:attribute name="tex03val" type="xs:string"/>
+				<xs:attribute name="tex04val" type="xs:string"/>
+				<xs:attribute name="tex05val" type="xs:string"/>
+				<xs:attribute name="patchsize" type="xs:string"/>
+				<xs:attribute name="picsize" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="text">
+		<xs:annotation>
+			<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement">
+				<xs:attribute name="font" type="xs:string"/>
+				<xs:attribute name="style" type="xs:string"/>
+				<xs:attribute name="text" type="xs:string" use="required"/>
+				<xs:attribute name="halign" default="left">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="left"/>
+							<xs:enumeration value="right"/>
+							<xs:enumeration value="center"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="valign" default="top">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="top"/>
+							<xs:enumeration value="middle"/>
+							<xs:enumeration value="bottom"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="text3d">
+		<xs:annotation>
+			<xs:documentation>Text3d for displaying textual information about the object. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="text" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="texturedrectangle">
+		<xs:annotation>
+			<xs:documentation>A textured rectangle can be used display images.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement">
+				<xs:attribute name="imagepath" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tiledlayer">
+		<xs:annotation>
+			<xs:documentation>A tiled layer uses an image that is repeatably printed.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="color" type="xs:string"/>
+		<xs:attribute name="width" type="xs:string"/>
+		<xs:attribute name="height" type="xs:string"/>
+		<xs:attribute name="imagepath" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="torus">
+		<xs:annotation>
+			<xs:documentation>A threedimensional torus</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="drawableelement3d">
+				<xs:sequence>
+					<xs:element name="drawcondition" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This condition is used for deciding if the element should be displayed or not.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="innerRadius" type="xs:string" use="required"/>
+				<xs:attribute name="outerRadius" type="xs:string" use="required"/>
+				<xs:attribute name="circleSamples" type="xs:string" use="required"/>
+				<xs:attribute name="radialSamples" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

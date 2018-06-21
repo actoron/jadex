@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_TC66EaasEd6kg8fxk-W9OA" iD="_TC66EKasEd6kg8fxk-W9OA">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_fNKCUaasEd6kg8fxk-W9OA" iD="_fNKCUKasEd6kg8fxk-W9OA" name="import jadex.wfms.client.task.WorkitemTask;"/>
+  <pools xmi:type="bpmn:Pool" xmi:id="_TC7hIaasEd6kg8fxk-W9OA" iD="_TC7hIKasEd6kg8fxk-W9OA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TC8IMaasEd6kg8fxk-W9OA" iD="_TC8IMKasEd6kg8fxk-W9OA" outgoingEdges="_ZoqfAaasEd6kg8fxk-W9OA" incomingEdges="_HBA8gaauEd6kg8fxk-W9OA" name="ProduceEngine&#xA;class = WorkitemTask" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XsnCAaasEd6kg8fxk-W9OA" iD="_XsnCAKasEd6kg8fxk-W9OA" outgoingEdges="_ZLCH0aasEd6kg8fxk-W9OA" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_YtWtUaasEd6kg8fxk-W9OA" iD="_YtWtUKasEd6kg8fxk-W9OA" incomingEdges="_ZoqfAaasEd6kg8fxk-W9OA" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_EY3OgaauEd6kg8fxk-W9OA" iD="_EY3OgKauEd6kg8fxk-W9OA" outgoingEdges="_HBA8gaauEd6kg8fxk-W9OA" incomingEdges="_ZLCH0aasEd6kg8fxk-W9OA" name="PickEngineDisplacement&#xA;class = WorkitemTask&#xA;out short displacement"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZLCH0aasEd6kg8fxk-W9OA" iD="_ZLCH0KasEd6kg8fxk-W9OA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZoqfAaasEd6kg8fxk-W9OA" iD="_ZoqfAKasEd6kg8fxk-W9OA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_HBA8gaauEd6kg8fxk-W9OA" iD="_HBA8gKauEd6kg8fxk-W9OA"/>
+  </pools>
+</bpmn:BpmnDiagram>

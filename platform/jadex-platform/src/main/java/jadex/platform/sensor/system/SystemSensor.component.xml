@@ -1,0 +1,26 @@
+<!--
+	<H3>System sensor component that captures platform sensors</H3>
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component 
+	                    http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="SystemSensor" package="jadex.platform.sensor.system">
+	
+	<properties>
+		<property name="system" class="boolean">true</property>
+	</properties>
+	
+	<nfproperties>
+		<nfproperty class="jadex.bridge.sensor.mac.MacAddressProperty"/>
+		<nfproperty class="jadex.bridge.sensor.cpu.CPULoadProperty"/>
+		<nfproperty class="jadex.bridge.sensor.cpu.CoreNumberProperty"/>
+		<nfproperty class="jadex.bridge.sensor.memory.MaxMemoryProperty"/>
+		<nfproperty class="jadex.bridge.sensor.memory.UsedMemoryProperty"/>
+		<nfproperty class="jadex.bridge.sensor.memory.MaxPermGenMemoryProperty"/>
+		<nfproperty class="jadex.bridge.sensor.memory.UsedPermGenMemoryProperty"/>
+		<nfproperty class="jadex.bridge.sensor.memory.LoadedClassesProperty"/>
+		<nfproperty class="jadex.bridge.sensor.time.ComponentUptimeProperty"/>
+	</nfproperties>
+</componenttype>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The ping capability helps integrating ping behaviour for agents.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Ping">
+
+	<imports>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bdi.planlib.ping.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
+		<import>jadex.commons.IFilter</import>
+	</imports>
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.query.Query" />
+	</capabilities>
+
+	<beliefs>
+		<belief name="ping_timeout" class="Long" exported="true">
+			<fact>1000</fact>
+		</belief>
+		<belief name="ping_delay" class="long" exported="true">
+			<fact>1000</fact>
+		</belief>
+		<belief name="ping_content" class="String" exported="true">
+			<fact>"ping"</fact>
+		</belief>
+		<belief name="ping_answer" class="String" exported="true">
+			<fact>"alive"</fact>
+		</belief>
+		
+		<beliefref name="qp_filter">
+			<concrete ref="procap.qp_filter"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="pinging" exported="true" exclude="never">
+			<parameter name="timeout" class="Long">
+				<value>$beliefbase.ping_timeout</value>
+			</parameter>
+			<parameter name="content" class="String">
+				<value>$beliefbase.ping_content</value>
+			</parameter>
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier" />
+			<parameter name="ping_delay" class="long">
+				<value>$beliefbase.ping_delay</value>
+			</parameter>
+			<parameter name="missed_cnt" class="int" direction="inout" />
+			<parameter name="missed_max" class="int">
+				<value>3</value>
+			</parameter>
+			<dropcondition language="jcl">
+				// Finished if pinged agent misses max pings.
+				$goal.missed_cnt > $goal.missed_max
+			</dropcondition>
+			<targetcondition language="jcl">
+				false // (i.e. never finished)
+			</targetcondition>
+		</achievegoal>
+	
+		<achievegoal name="ping" exported="true">
+			<parameter name="timeout" class="Long">
+				<value>$beliefbase.ping_timeout</value>
+			</parameter>
+			<parameter name="content" class="String">
+				<value>$beliefbase.ping_content</value>
+			</parameter>
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier" />
+		</achievegoal>
+		
+		<achievegoalref name="qp_execute_request">
+			<concrete ref="procap.qp_execute_request"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<!-- This plan initiates a ping request. -->
+		<plan name="do_ping">
+			<parameter name="content" class="String">
+				<goalmapping ref="ping.content"/>
+			</parameter>
+			<parameter name="timeout" class="long">
+				<goalmapping ref="ping.timeout"/>
+			</parameter>
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="ping.receiver"/>
+			</parameter>
+			<body class="DoPingPlan" />
+			<trigger>
+				<goal ref="ping"/>
+			</trigger>
+		</plan>
+
+		<!-- Initial plan that continually send ping
+			messages to another agent. -->
+		<plan name="do_pinging">
+			<parameter name="content" class="String">
+				<goalmapping ref="pinging.content"/>
+			</parameter>
+			<parameter name="timeout" class="long">
+				<goalmapping ref="pinging.timeout"/>
+			</parameter>
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="pinging.receiver"/>
+			</parameter>
+			<parameter name="ping_delay" class="long">
+				<goalmapping ref="pinging.ping_delay"/>
+			</parameter>
+			<parameter name="missed_cnt" class="int" direction="inout">
+				<goalmapping ref="pinging.missed_cnt"/>
+			</parameter>
+			<body class="PingingPlan" />
+			<trigger>
+				<goal ref="pinging"/>
+			</trigger>
+		</plan>
+		
+		<!-- This plan sends back an alive on a ping request. -->
+		<plan name="answer_ping">
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="qp_execute_request.result"/>
+			</parameter>
+			<body class="AnswerPingPlan" />
+			<trigger>
+				<goal ref="qp_execute_request"/>
+			</trigger>
+		</plan>
+	</plans>	
+
+	<configurations>
+		<configuration name="send_receive">
+			<beliefs>
+				<initialbelief ref="qp_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+		<configuration name="send" />
+	</configurations>
+
+</capability>

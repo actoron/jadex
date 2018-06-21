@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_VqUXEUZCEd-3iKqz0F2Flw" iD="_VqUXEEZCEd-3iKqz0F2Flw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WLiNwEZCEd-3iKqz0F2Flw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WLiNwUZCEd-3iKqz0F2Flw" key="Description" value="&lt;h1>Inventory Process&lt;/h1> The process counts items. The item type is supplied as arguments. The item count is provided as return value."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WLr-wEZCEd-3iKqz0F2Flw" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSJwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ugRbEARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbEQRPEeCnwcpWvxOwkg" key="dimension" value="2:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbEgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbEwRPEeCnwcpWvxOwkg" key="0:0" value="item_type"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbFARPEeCnwcpWvxOwkg" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbFQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbFgRPEeCnwcpWvxOwkg" key="0:3" value="The type of items to be counted."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbFwRPEeCnwcpWvxOwkg" key="0:4" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbGARPEeCnwcpWvxOwkg" key="0:5" value="&quot;all&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbGQRPEeCnwcpWvxOwkg" key="1:0" value="item_count"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbGgRPEeCnwcpWvxOwkg" key="1:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbGwRPEeCnwcpWvxOwkg" key="1:2" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbHARPEeCnwcpWvxOwkg" key="1:3" value="The number of items."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbHQRPEeCnwcpWvxOwkg" key="1:4" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugRbHgRPEeCnwcpWvxOwkg" key="1:5" value=""/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_VqUXF0ZCEd-3iKqz0F2Flw" iD="_VqUXFkZCEd-3iKqz0F2Flw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_VqUXGUZCEd-3iKqz0F2Flw" iD="_VqUXGEZCEd-3iKqz0F2Flw" outgoingEdges="_6-8OckbiEd-qm5VDdIP35A" name="Count Items" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5k9kAEZDEd-3iKqz0F2Flw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5k9kAUZDEd-3iKqz0F2Flw" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_umOSEARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSEQRPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSEgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSEwRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSFARPEeCnwcpWvxOwkg" key="0:1" value="count"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSFQRPEeCnwcpWvxOwkg" key="0:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSFgRPEeCnwcpWvxOwkg" key="0:3" value="(int)(Math.random()*100)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSFwRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSGARPEeCnwcpWvxOwkg" key="1:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSGQRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSGgRPEeCnwcpWvxOwkg" key="1:3" value="&quot;Counting &quot;+item_type+&quot;: &quot;+count"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6-oscUbiEd-qm5VDdIP35A" iD="_6-oscEbiEd-qm5VDdIP35A" incomingEdges="_6-8OckbiEd-qm5VDdIP35A" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_kZxCoFhMEd-F7Z1jfVSjng" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kZxCoVhMEd-F7Z1jfVSjng" key="class" value="jadex.bpmn.runtime.task.WriteContextTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_umOSGwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSHARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSHQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSHgRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSHwRPEeCnwcpWvxOwkg" key="0:1" value="name"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSIARPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSIQRPEeCnwcpWvxOwkg" key="0:3" value="&quot;item_count&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSIgRPEeCnwcpWvxOwkg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSIwRPEeCnwcpWvxOwkg" key="1:1" value="value"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSJARPEeCnwcpWvxOwkg" key="1:2" value="Object"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_umOSJQRPEeCnwcpWvxOwkg" key="1:3" value="count"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6-8OckbiEd-qm5VDdIP35A" iD="_6-8OcUbiEd-qm5VDdIP35A">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_79qggEbiEd-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_79qggUbiEd-qm5VDdIP35A" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

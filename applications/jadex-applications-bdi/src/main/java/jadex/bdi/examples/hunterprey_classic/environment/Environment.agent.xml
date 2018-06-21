@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Environment Agent for managing the environment object.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Environment"
+	package="jadex.bdi.examples.hunterprey_classic.environment">
+
+	<imports>
+		<import>jadex.bdi.examples.hunterprey_classic.*</import>
+		<import>jadex.commons.IFilter</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.protocols.request.Request"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="environment" class="Environment">
+			<!-- <fact>Environment.getInstance()</fact> -->
+			<fact>new Environment()</fact>
+		</belief>
+		<belief name="roundtime" class="long">
+			<fact>1000</fact>
+		</belief>
+		<beliefset name="observers" class="Observer" />
+
+		<!-- The filter for deciding which request messages are handled in this capability. -->
+		<beliefref name="rp_filter">
+			<concrete ref="procap.rp_filter"/>
+		</beliefref>
+		
+		<belief name="gui" class="EnvironmentGui">
+			<fact>new EnvironmentGui($scope.getExternalAccess())</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<querygoalref name="rp_decide_request">
+			<concrete ref="procap.rp_decide_request"/>
+		</querygoalref>
+		<achievegoalref name="rp_execute_request">
+			<concrete ref="procap.rp_execute_request"/>
+		</achievegoalref>
+		
+		<!-- Destroy the Environment Agent. -->
+		<achievegoal name="end_agent">
+			<!-- The agent to destroy. -->
+			<!-- <parameter name="componentidentifier" class="jadex.bridge.IComponentIdentifier"/> -->
+		</achievegoal>
+	</goals>
+
+	<plans>
+
+		<!-- Dispatch the actual vision to a requester. -->
+		<plan name="dispatchvision">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="DispatchVisionPlan"/>
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestVision</match>
+				</goal>
+				<!--<messageevent ref="request_vision"/>-->
+			</trigger>
+		</plan>
+
+		<!-- Dispatch the world size to a requester. -->
+		<plan name="dispatchworldsize">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="DispatchWorldSizePlan"/>
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestWorldSize</match>
+				</goal>
+				<!--<messageevent ref="request_worldsize"/>-->
+			</trigger>
+		</plan>
+
+		<!-- Inform the requester if a pickup action succeeds. -->
+		<plan name="moverequest">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="MovePlan"/>
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestMove</match>
+				</goal>
+				<!--<messageevent ref="request_move"/>-->
+			</trigger>
+		</plan>
+
+		<!-- Inform the requester if a drop action succeeds. -->
+		<plan name="eatrequest">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="EatPlan"/>
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestEat</match>
+				</goal>
+				<!--<messageevent ref="request_eat"/>-->
+			</trigger>
+		</plan>
+
+		<!-- Simulation plan. -->
+		<plan name="simticker">
+			<body class="SimulationTickerPlan"/>
+		</plan>
+		
+		<!-- Simulation plan. -->
+		<plan name="simend">
+			<body class="SimulationEndPlan"/>
+			<trigger>
+				<goal ref="end_agent" />
+				<!--
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestEnd</match>
+				</goal>
+				-->
+			</trigger>
+		</plan>
+		
+	    <plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
+	</plans>
+
+	<events>
+<!--		<messageevent name="request_vision" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"HunterPreyOntology"</value>
+ 			</parameter>
+			<parameter name="content-class" class="Class" direction="fixed">
+				<value>RequestVision.class</value>
+			</parameter>
+		</messageevent>
+
+		<messageevent name="request_worldsize" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"HunterPreyOntology"</value>
+ 			</parameter>
+			<parameter name="content-class" class="Class" direction="fixed">
+				<value>RequestWorldSize.class</value>
+			</parameter>
+		</messageevent>
+
+		<messageevent name="request_move" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"HunterPreyOntology"</value>
+ 			</parameter>
+			<parameter name="content-class" class="Class" direction="fixed">
+				<value>RequestMove.class</value>
+			</parameter>
+		</messageevent>
+
+		<messageevent name="request_eat" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"HunterPreyOntology"</value>
+ 			</parameter>
+			<parameter name="content-class" class="Class" direction="fixed">
+				<value>RequestEat.class</value>
+			</parameter>
+		</messageevent>
+
+		<messageevent name="inform_done" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"HunterPreyOntology"</value>
+ 			</parameter>
+			<parameter name="content-class" class="Class" direction="fixed">
+				<value>Done.class</value>
+			</parameter>
+		</messageevent>
+
+		<messageevent name="failure" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.FAILURE</value>
+			</parameter>
+			<parameter name="language" class="String">
+<!- -				<value>"plain-text"</value>- ->
+			</parameter>
+			<parameter name="content-class" class="Class" direction="fixed">
+				<value>ContentElementList.class</value>
+			</parameter>
+		</messageevent>
+-->
+		<messageevent name="inform_vision" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"HunterPreyOntology"</value>
+			</parameter>
+			<parameter name="content" class="CurrentVision"/>
+		</messageevent>
+	</events>
+	
+	<expressions>
+		<condition name="notasks">
+			$beliefbase.environment.getTaskSize()==0
+		</condition>
+	</expressions>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="rp_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="simticker"/>
+				<initialplan ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
+										new String[]{"JADEX_XML"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null),
+								20000)
+ 						</value>
+					</parameter>
+				</initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

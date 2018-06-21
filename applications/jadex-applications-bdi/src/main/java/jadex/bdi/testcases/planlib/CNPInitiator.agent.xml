@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the contract net protocol.</H3>
+	This agent imports the protocols capability and tests the cnp protocol.
+	Represents the initiator in cnp protocol.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="CNPInitiator"
+	package="jadex.bdi.testcases.planlib">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+		<capability name="cnpcap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="test">
+			<body class="CNPTestPlan"/>
+		</plan>
+		
+		<plan name="cnp_evaluator">
+			<parameter name="cfp" class="Object">
+				<goalmapping ref="cnpcap.cnp_evaluate_proposals.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object" optional="true" direction="inout">
+				<goalmapping ref="cnpcap.cnp_evaluate_proposals.cfp_info"/>
+			</parameter>
+			<parameterset name="proposals" class="ParticipantProposal">
+				<goalmapping ref="cnpcap.cnp_evaluate_proposals.proposals"/>
+			</parameterset>
+			<parameterset name="history" class="NegotiationRecord" optional="true">
+				<goalmapping ref="cnpcap.cnp_evaluate_proposals.history"/>
+			</parameterset>
+			<parameterset name="acceptables" class="ParticipantProposal" direction="out">
+				<goalmapping ref="cnpcap.cnp_evaluate_proposals.acceptables"/>
+			</parameterset>
+			<body class="CNPEvaluatorPlan"/>
+			<trigger>
+				<goal cref="cnpcap.cnp_evaluate_proposals"/>
+			</trigger>
+			<precondition>!($goal.cfp_info instanceof IProposalEvaluator)</precondition>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="debugging">true</property>-->
+		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+		<!-- <property name="logging.useParentHandlers">true</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>4</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

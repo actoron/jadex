@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Agent for testing a custom codec.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Codec"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  argument="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="tester">
+			<body class="CodecTestPlan"/>
+			<trigger>
+				<messageevent ref="inform"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+	  <messageevent name="inform" type="fipa" direction="send_receive">
+	    <parameter name="performative" class="String" direction="fixed">
+	      <value>SFipa.INFORM</value>
+	    </parameter>
+	    <parameter name="language" class="String" direction="fixed">
+	      <value>"test-language"</value>
+	    </parameter>
+	  </messageevent>
+	</events>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="debugging">false</property>
+		<property name="contentcodec.custom">new TestCodec()</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<events>
+				<initialmessageevent ref="inform">
+					<parameter ref="content">
+						<value>new Integer(99)</value>
+					</parameter>
+					<parameterset ref="receivers">
+						<value>$scope.getComponentIdentifier()</value>
+					</parameterset>
+				</initialmessageevent>
+			</events>
+		</configuration>
+	</configurations>
+
+</agent>
+

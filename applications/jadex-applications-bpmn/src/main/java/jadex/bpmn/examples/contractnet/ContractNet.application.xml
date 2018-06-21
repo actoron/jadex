@@ -1,0 +1,82 @@
+<!--
+	<H3>The contract net application</H3>
+
+	It can be started to launch a contract net scenario.
+-->
+
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="ContractNet" package="jadex.bpmn.examples.contractnet" autoshutdown="true">
+	
+	<componenttypes>
+		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn2"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="One Initiator and Five Participants">
+			<components>
+				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_2"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_3"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_4"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_5"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Initiator" type="CNPProtocol" configuration="Initiator">
+					<arguments>
+						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3", "Participant_4", "Participant_5"}</argument>
+						<argument name="cfp">"Hello?"</argument>
+						<argument name="epp">"EvaluateProposalsRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+		
+		<configuration name="One Initiator and One Participant">
+			<components>
+				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn2"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+				<component name="Initiator" type="CNPProtocol" configuration="Initiator">
+					<arguments>
+						<argument name="participants">new String[]{"Participant_1"}</argument>
+						<argument name="cfp">"Hello?"</argument>
+						<argument name="epp">"EvaluateProposalsRandom.bpmn2"</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+	</configurations>
+
+</applicationtype>

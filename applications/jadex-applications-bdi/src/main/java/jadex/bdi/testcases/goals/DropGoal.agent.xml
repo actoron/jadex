@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test waiting for a dropped goal.</H3>
+	The test dispatches a goal, then drops it and
+	checks if it finishes afterwards.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="DropGoal"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="testgoal"/>
+	</goals>
+
+	<plans>
+		<plan name="test">
+			<body class="DropGoalPlan"/>
+		</plan>
+		
+		<!-- Dummy plan to handle the testgoal (just waits for a long time). -->
+		<plan name="result_plan">
+			<parameter name="wait" class="long">
+				<value>10000L</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="testgoal"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property>-->
+		<property name="debugging">false</property>
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="test"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

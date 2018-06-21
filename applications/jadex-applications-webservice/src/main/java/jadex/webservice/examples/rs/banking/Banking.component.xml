@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Banking agent that offers a banking service.</H3>
+
+    This example shows how a Jadex service can be automatically published
+    as web service with a synchronous interfaces.
+    
+    The @Publish annotation requires the publishing type (e.g. web service),
+    the id (e.g. a web service url) and the service type, i.e. interface to
+    be specified.<br/><br/>
+    
+    The service is published at:<br/>
+	<a href="http://localhost:8080/wanking1/">http://localhost:8080/wanking1/</a>
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Banking" package="jadex.webservice.examples.rs.banking">
+	
+	<imports>
+		<import>jadex.bridge.service.types.publish.*</import>
+	</imports>
+	
+	<services>
+		<!-- a) Generate everything (no own implementation) -->
+		<providedservice name="banking1" class="IBankingService">
+			<implementation class="BankingService"/>
+			<publish publishtype="rs" publishid="http://localhost:8080/wanking1">
+				<property name="formats">new String[]{"application/json"}</property>
+			</publish>
+		</providedservice>
+		<!--  <providedservice name="banking1" class="IBankingService">
+			<implementation class="BankingService"/>
+			<publish publishtype="rs" publishid="http://localhost:8080/" mapping="RSBankingService.class"/>
+		</providedservice>-->
+	</services>
+</componenttype>	

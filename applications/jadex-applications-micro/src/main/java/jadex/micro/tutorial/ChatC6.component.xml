@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Chat component using a required service.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="ChatC6" package="jadex.micro.tutorial">
+	
+	<imports>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+	</imports>
+	
+	<services>
+		<requiredservice name="clockservice" class="IClockService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+	
+	<configurations>
+		<configuration name="first">
+			<steps>
+				<initialstep class="PrintTimeStep"/>
+			</steps>
+		</configuration>
+	</configurations>
+</componenttype>

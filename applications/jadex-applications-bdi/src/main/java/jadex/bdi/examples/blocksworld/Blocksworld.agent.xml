@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The blocksword agent.</H3>
+
+	Creates a blocks-world and moves blocks based on goals.
+	Its objective is to establish a given stack model.
+
+	<H4>Blocksword benchmark (use "benchmark" configuration).</H4>
+
+	Uses the blocksworld scenario to measure Jadex performance.
+
+<pre>
+<font face="Arial, Helvetica, sans-serif">
+Benchmarks (grouped by system, newest benchmark first):
+
+P4 3 GHz (HyperThreading), JADE 3.2, Java 1.4.2_01
+
+	Jadex 0.94beta (jibx+janino)
+	Benchmark: 10 runs with 10 goals each.
+		Avg. time per run (millis): 100
+		Standard deviation of runs (millis): 8
+	Benchmark: 10 runs with 50 goals each.
+		Avg. time per run (millis): 460
+		Standard deviation of runs (millis): 47
+
+	Jadex 0.94beta (jibx+javacc)
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 132
+	Standard deviation of runs (millis): 8
+
+	Jadex 0.94beta (enter jibx)
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 143
+	Standard deviation of runs (millis): 15
+
+	Jadex 0.93 (release):
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 156
+	Standard deviation of runs (millis): 0
+
+	Jadex 0.93beta (deliberation):
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 204
+	Standard deviation of runs (millis): 5
+
+	Jadex 0.93beta (pre_deliberation):
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 290
+	Standard deviation of runs (millis): 8
+
+	Jadex 0.93beta (clean_membrane):
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 196
+	Standard deviation of runs (millis): 8
+
+	Jadex-0.93beta (JBind patch):
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 331
+	Standard deviation of runs (millis): 5
+
+	Jadex-0.93beta (JBind):
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 342
+	Standard deviation of runs (millis): 5
+
+	Jadex-0.921:
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 267
+	Standard deviation of runs (millis): 5
+
+
+P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
+
+	Jadex 0.94beta (jibx+janino)
+	Benchmark: 10 runs with 10 goals each.
+		Avg. time per run (millis): 70
+		Standard deviation of runs (millis): 18
+	Benchmark: 10 runs with 50 goals each.
+		Avg. time per run (millis): 338
+		Standard deviation of runs (millis): 24
+
+	Jadex 0.94beta (enter jibx)
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 110
+	Standard deviation of runs (millis): 19
+
+	Jadex 0.93beta (deliberation_jan)
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 143
+	Standard deviation of runs (millis): 5
+
+	Jadex 0.93beta (JBind)
+	Benchmark: 10 runs with 10 goals each.
+	Avg. time per run (millis): 287
+	Standard deviation of runs (millis): 5
+</font>
+</pre>
+
+-->
+
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Blocksworld"
+	package="jadex.bdi.examples.blocksworld">
+
+	<imports>
+		<import>java.awt.Color</import>
+		<import>java.util.*</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- The stack mode, can be normal, step or slow. -->
+		<belief name="mode" class="String">
+			<fact>StackBlocksPlan.MODE_NORMAL</fact>
+		</belief>
+		<!-- The flag for turning on/off output. -->
+		<belief name="quiet" class="boolean" />
+		<!-- The table for the blocks.-->
+		<belief name="table" class="Table">
+			<fact>new Table()</fact>
+		</belief>
+		<!-- The bucket for currently unused blocks. -->
+		<belief name="bucket" class="Table">
+			<fact>new Table("Bucket", Color.lightGray)</fact>
+		</belief>
+		<!-- The currently existing blocks. -->
+		<beliefset name="blocks" class="Block">
+			<fact>new Block(new Color(240, 16, 16), (Table)$beliefbase.getBelief("table").getFact())</fact>
+			<fact>new Block(new Color(16, 16, 240), (Table)$beliefbase.getBelief("table").getFact())</fact>
+			<fact>new Block(new Color(240, 240, 16), ((Table)$beliefbase.getBelief("table").getFact()).getAllBlocks()[0])</fact>
+			<fact>new Block(new Color(16, 240, 16), ((Table)$beliefbase.getBelief("table").getFact()).getAllBlocks()[2])</fact>
+			<fact>new Block(new Color(240, 16, 240), (Table)$beliefbase.getBelief("bucket").getFact())</fact>
+			<fact>new Block(new Color(16, 240, 240), (Table)$beliefbase.getBelief("bucket").getFact())</fact>
+			<fact>new Block(new Color(240, 240, 240), (Table)$beliefbase.getBelief("bucket").getFact())</fact>
+<!-- 			<fact>new Block(new Color(240, 16, 16), (Table)$beliefbase.table)</fact>
+			<fact>new Block(new Color(16, 16, 240), (Table)$beliefbase.table)</fact>
+			<fact>new Block(new Color(240, 240, 16), ((Table)$beliefbase.table).getAllBlocks()[0])</fact>
+			<fact>new Block(new Color(16, 240, 16), ((Table)$beliefbase.table).getAllBlocks()[2])</fact>
+			<fact>new Block(new Color(240, 16, 240), (Table)$beliefbase.bucket)</fact>
+			<fact>new Block(new Color(16, 240, 240), (Table)$beliefbase.bucket)</fact>
+			<fact>new Block(new Color(240, 240, 240), (Table)$beliefbase.bucket)</fact>
+ -->
+		</beliefset>
+		
+		<!-- The gui (if any). -->
+		<belief name="gui" class="jadex.commons.gui.GuiCreator"/>
+	</beliefs>
+
+	<goals>
+		<!-- Clear one block. -->
+		<achievegoal name="clear">
+			<parameter name="block" class="Block" />
+			<targetcondition>
+				$goal.block.isClear()
+			</targetcondition>
+		</achievegoal>
+		
+		<!-- Achieve that one block is on a some target block or the table. -->
+		<achievegoal name="stack">
+			<parameter name="block" class="Block" />
+			<parameter name="target" class="Block" />
+			<targetcondition>
+				$goal.block.getLower()==$goal.target
+			</targetcondition>
+		</achievegoal>
+		
+		<!-- Achieve a certain configuration of blocks. -->
+		<achievegoal name="configure">
+			<parameter name="configuration" class="Table" />
+ 			<parameterset name="blocks" class="Block"/>
+			<targetcondition beliefs="blocks">
+				$beliefbase.table.configurationEquals($goal.configuration)
+ 			</targetcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Plan to clear a block, by moving to the table whats on top of it. -->
+		<plan name="clear">
+			<parameter name="block" class="Block">
+				<value>
+					select one Block $block from $beliefbase.blocks
+					where $block.getLower()==$goal.block
+				</value>
+			</parameter>
+			<parameter name="target" class="Block">
+				<value>$beliefbase.table</value>
+			</parameter>
+			<body class="StackBlocksPlan"/>
+			<trigger>
+				<goal ref="clear"/>
+			</trigger>
+			<precondition>
+				(select one Block $block from $beliefbase.blocks
+				where $block.getLower()==$goal.block)!=null
+			</precondition>
+		</plan>
+		
+		<!-- Stack one block on another one. -->
+		<plan name="stack">
+			<parameter name="block" class="Block">
+				<goalmapping ref="stack.block"/>
+			</parameter>
+			<parameter name="target" class="Block">
+				<goalmapping ref="stack.target"/>
+			</parameter>
+			<body class="StackBlocksPlan"/>
+			<trigger>
+				<goal ref="stack"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plan for stacking towards a certain configuration. -->
+		<plan name="configure">
+			<parameter name="configuration" class="Table">
+				<goalmapping ref="configure.configuration"/>
+			</parameter>
+			<body class="ConfigureBlocksPlan" />
+			<trigger>
+				<goal ref="configure"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plan for running test benchmarks. -->
+		<plan name="benchmark">
+			<parameter name="runs" class="int">
+				<value>10</value>
+			</parameter>
+			<parameter name="goals" class="int">
+				<value>10</value>
+			</parameter>
+			<body class="BenchmarkPlan" />
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Event that indicates an execution step can be done. -->
+		<internalevent name="step"/>
+	</events>
+	
+	<properties>
+		<property name="debugging">false</property>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+
+	<configurations>
+		<!-- GUI configuration. Uses gui plan to show frame, and verbose stack plans. -->
+		<configuration name="gui">
+			<beliefs>
+				<initialbelief ref="quiet">
+					<fact>false</fact>
+				</initialbelief>
+				<initialbelief ref="gui">
+					<fact>new jadex.commons.gui.GuiCreator(BlocksworldGui.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
+						new Object[]{$scope.getExternalAccess()})</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+
+		<!-- Benchmark configuration. Uses benchmark plan to perform runs, and quiet stack plans. -->
+		<configuration name="benchmark(runs=10/goals=10)">
+			<beliefs>
+				<initialbelief ref="quiet">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="benchmark" />
+			</plans>
+		</configuration>
+
+		<!-- Benchmark configuration. Uses benchmark plan to perform runs, and quiet stack plans. -->
+		<configuration name="benchmark(runs=10/goals=50)">
+			<beliefs>
+				<initialbelief ref="quiet">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="benchmark">
+ 					<parameter ref="goals">
+						 <value>50</value>
+ 					</parameter>
+				</initialplan>
+			</plans>
+		</configuration>
+
+		<!-- Benchmark configuration. Uses benchmark plan to perform runs, and quiet stack plans. -->
+		<configuration name="benchmark(runs=10/goals=500)">
+			<beliefs>
+				<initialbelief ref="quiet">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="benchmark">
+ 					<parameter ref="goals">
+						 <value>500</value>
+ 					</parameter>
+				</initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

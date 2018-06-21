@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The cleaner world application descriptor</H3>
+
+	It can be started to launch a cleaner world scenario.
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
+	name="CleanerWorld" package="jadex.bdi.examples.cleanerworld_classic">
+	
+	<componenttypes>
+		<componenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld_classic/environment/EnvironmentLocal.agent.xml"/>
+		<componenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/CleanerLocal.agent.xml"/>
+		<componenttype name="EnvironmentRemote" filename="jadex/bdi/examples/cleanerworld_classic/environment/Environment.agent.xml"/>
+		<componenttype name="CleanerRemote" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/Cleaner.agent.xml"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Two cleaners local">
+			<components>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal" number="2"/>
+			</components>
+		</configuration>
+		<configuration name="One cleaner local">
+			<components>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal"/>
+			</components>
+		</configuration>
+		<configuration name="Two cleaners remote">
+			<components>
+				<component type="EnvironmentRemote" master="true"/>
+				<component type="CleanerRemote" number="2"/>
+			</components>
+		</configuration>
+		<configuration name="One cleaner remote">
+			<components>
+				<component type="EnvironmentRemote" master="true"/>
+				<component type="CleanerRemote"/>
+			</components>
+		</configuration>
+	</configurations>
+
+</applicationtype>

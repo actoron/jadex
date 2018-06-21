@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson B6.</H3>
+	Using log outputs.
+	<H4>Explanation</H4>
+	The agent definition includes logging proprties that
+	allow the agent to be observed from logging handlers
+	such as the console or from the logger tool.
+-->
+<!-- todo: support logger agent for standalone platform. -->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationB6"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<plans>
+		<!-- A translation plan, from which a new instance is created
+			whenever a translation request is received. -->
+		<plan name="egtrans">
+			<body class="EnglishGermanTranslationPlanB6"/>
+			<trigger>
+				<messageevent ref="request_translation"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Specifies a translation request being all
+			messages with performative request. -->
+		<messageevent name="request_translation" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+       <property name="logging.level">Level.INFO</property>
+ 		<!-- The default parent handler prints out log messages on the console. -->
+       <property name="logging.useParentHandlers">true</property>
+    </properties>
+
+</agent>
+

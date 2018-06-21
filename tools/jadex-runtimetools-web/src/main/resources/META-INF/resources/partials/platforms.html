@@ -1,0 +1,21 @@
+<div class="actwtable section">
+	<h3 id="HConnectedPlatforms">Connected Platforms</h3>
+	<p>
+		This page shows remote platforms connected to this Jadex platform.
+	</p>
+	<table ng-controller="ConnPlats" ng-class="{'down': serverDown}">
+		<tbody>
+			<tr>
+				<th>Name</th>
+				<th>Connected?</th>
+				<th>Protocol</th>
+			</tr>
+			<tr ng-repeat="x in platforms | orderBy: 'connected' : reverse | orderBy: 'platform.name' | orderBy: 'protocol'"
+				ng-class="{'connecting': !x.connected}">
+				<td>{{x.platform.name}}</td>
+				<td>{{x.connected}}</td>
+				<td>{{x.protocol}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

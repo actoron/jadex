@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions">
+  <semantic:extension>
+    <jadex:modelname>Flow1</jadex:modelname>
+    <jadex:arguments>
+      <jadex:argument name="a" type="java.lang.Integer">
+        <jadex:value>12</jadex:value>
+      </jadex:argument>
+      <jadex:argument name="b" type="java.lang.Integer">
+        <jadex:value>11</jadex:value>
+      </jadex:argument>
+    </jadex:arguments>
+  </semantic:extension>
+  <semantic:process name="Pool" id="K3nFIuOK+YpMMVVn">
+    <semantic:startEvent id="EKuSv0suF++YVmMD">
+      <semantic:outgoing>ttTOjueYeXuMaLGQ</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="A" id="2fQU660/vHV3AksA">
+      <semantic:incoming>ttTOjueYeXuMaLGQ</semantic:incoming>
+      <semantic:outgoing>buL7iCrSo1gcunPg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:taskclass>jadex.bpmn.examples.dataflow.A</jadex:taskclass>
+        <jadex:parameter direction="in" name="a" type="int">null</jadex:parameter>
+        <jadex:parameter direction="in" name="b" type="int">null</jadex:parameter>
+        <jadex:parameter direction="out" name="c" type="int">null</jadex:parameter>
+        <jadex:parameter direction="out" name="d" type="java.lang.String">null</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="B " id="LHEmvR3ToYirPJk2">
+      <semantic:incoming>buL7iCrSo1gcunPg</semantic:incoming>
+      <semantic:outgoing>Fh0pUC/2RXEUtMeH</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:taskclass>jadex.bpmn.examples.dataflow.B</jadex:taskclass>
+        <jadex:parameter direction="in" name="a" type="java.lang.String">null</jadex:parameter>
+        <jadex:parameter direction="out" name="b" type="java.lang.String">null</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="ys2KHcoP3v0jlpo0">
+      <semantic:incoming>Fh0pUC/2RXEUtMeH</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="EKuSv0suF++YVmMD" targetRef="2fQU660/vHV3AksA" id="ttTOjueYeXuMaLGQ">
+      <semantic:extensionElements>
+        <jadex:parametermapping name="b">$args.b</jadex:parametermapping>
+        <jadex:parametermapping name="a">$args.a</jadex:parametermapping>
+      </semantic:extensionElements>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="2fQU660/vHV3AksA" targetRef="LHEmvR3ToYirPJk2" id="buL7iCrSo1gcunPg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="LHEmvR3ToYirPJk2" targetRef="ys2KHcoP3v0jlpo0" id="Fh0pUC/2RXEUtMeH">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+      <jadex:dataFlow id="ttTOjueYeXuaabb" sourceRef="2fQU660/vHV3AksA" sourceParam="c" targetRef="LHEmvR3ToYirPJk2" targetParam="a"/>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="K3nFIuOK+YpMMVVn">
+        <dc:Bounds height="600.0" width="3000.0" x="20.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EKuSv0suF++YVmMD">
+        <dc:Bounds height="40.0" width="40.0" x="110.0" y="110.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="2fQU660/vHV3AksA">
+        <dc:Bounds height="100.0" width="160.0" x="210.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LHEmvR3ToYirPJk2">
+        <dc:Bounds height="100.0" width="160.0" x="450.0" y="80.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ys2KHcoP3v0jlpo0">
+        <dc:Bounds height="40.0" width="40.0" x="680.0" y="110.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="ttTOjueYeXuMaLGQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="buL7iCrSo1gcunPg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Fh0pUC/2RXEUtMeH">
+      </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="ttTOjueYeXuaabb">
+      </di:Edge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

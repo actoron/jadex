@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The dumb prey.</H3>
+
+	Exhibits very basic behaviour for searching and
+	eating food. Does not flee explicitly from hunters.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="DumbPrey"
+	package="jadex.bdi.examples.hunterprey_classic.creature.preys.dumbprey">
+
+	<imports>
+		<import>jadex.bdi.examples.hunterprey_classic.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey_classic.creature.actsense.Creature"/>
+	</capabilities>
+
+	<beliefs>
+
+		<!-- The creature -->
+		<beliefref name="my_self">
+			<concrete ref="actsensecap.my_self"/>
+		</beliefref>
+
+		<!-- The current vision. -->
+		<beliefref name="vision">
+			<concrete ref="actsensecap.vision"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoalref name="move">
+			<concrete ref="actsensecap.move"/>
+		</achievegoalref>
+		
+		<achievegoalref name="eat">
+			<concrete ref="actsensecap.eat"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<!-- Dumb move plan. -->
+		<plan name="dumbmove">
+			<body class="DumbPreyPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="my_self">
+					<fact>new Prey($scope.getAgentName(), $scope.getComponentIdentifier(), new Location(10,10))</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="dumbmove"/>
+ 			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

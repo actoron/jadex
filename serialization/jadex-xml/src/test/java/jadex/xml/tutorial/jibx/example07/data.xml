@@ -1,0 +1,13 @@
+<customer>
+  <street>12345 Happy Lane</street>
+  <city>Plunk</city>
+  <state>WA</state>
+  <zip>98059</zip>
+  <instructions>
+    <!-- content skipped when unmarshalled -->
+    <p>Leave package behind bushes to <b>left</b>
+      of door</p>
+    <!-- always marshalled as empty -->
+  </instructions>
+  <phone>888.555.1234</phone>
+</customer>

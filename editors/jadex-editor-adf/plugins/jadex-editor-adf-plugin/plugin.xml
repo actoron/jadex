@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="adfChecker"
+         name="Jadex ADF Checker"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="jadex.editor.adf.checker.ADFChecker">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="jadexNature"
+         name="Jadex Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="jadex.editor.adf.checker.JadexNature">
+         </run>
+      </runtime>
+      <builder
+            id="jadex.editor.adf.plugin.adfChecker">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            objectClass="org.eclipse.core.resources.IProject"
+            nameFilter="*"
+            id="jadex.editor.adf.plugin.contribution1">
+         <menu
+            id="net.sourceforge.jadexMenu" 
+            path="additions" 
+            label="Jadex"
+            icon="jadex_icon.png">
+            <separator name="group1"/> 
+         </menu> 
+         <action
+               label="Enable ADF Checking on Selected Project(s)"
+               class="jadex.editor.adf.checker.ToggleNatureAction"
+               menubarPath="net.sourceforge.jadexMenu/group1"
+               enablesFor="+"
+               id="jadex.editor.adf.plugin.addRemoveNatureAction"
+               icon="adf_check.png"
+               style="toggle">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         id="jadexproblem"
+         name="Jadex ADF Checker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+</plugin>

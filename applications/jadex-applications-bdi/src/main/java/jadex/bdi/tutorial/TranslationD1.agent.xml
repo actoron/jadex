@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>TranslationAgent: Lesson D1.</H3>
+	Creating a capability.
+	<H4>Explanation</H4>
+	The agent uses a capability which encapsulates the
+	translation functionality.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationD1"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>java.util.logging.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the translation capability under the name transcap. -->
+		<capability name="transcap" file="TranslationD1"/>
+	</capabilities>
+
+	<properties>
+ 		<!-- Only log outputs >= level are printed. -->
+       <!-- <property name="logging.level">Level.INFO</property> -->
+ 		<!-- The default parent handler prints out log messages on the console. -->
+       <property name="logging.useParentHandlers">true</property>
+        <!--<property name="debugging">true</property>-->
+    </properties>
+
+</agent>
+

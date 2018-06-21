@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jadex Editor Commons
+Bundle-SymbolicName: jadex.editor.commons.plugin
+Bundle-Version: 2.0.0.qualifier
+Bundle-Activator: jadex.editor.common.internal.CommonsActivator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;bundle-version="2.5.0",
+ org.eclipse.emf.ecore.xmi;bundle-version="2.5.0",
+ org.eclipse.gmf.runtime.common.core;bundle-version="1.2.0",
+ org.eclipse.gmf.runtime.common.ui;bundle-version="1.2.0",
+ org.eclipse.gmf.runtime.diagram.core;bundle-version="1.3.0",
+ org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.3.0",
+ org.eclipse.gmf.runtime.diagram.ui.properties;bundle-version="1.3.0",
+ org.eclipse.gmf.runtime.diagram.ui.providers;bundle-version="1.3.0",
+ org.eclipse.gmf.runtime.diagram.ui.resources.editor;bundle-version="1.3.0",
+ org.eclipse.gmf.runtime.diagram.ui.resources.editor.ide;bundle-version="1.2.0",
+ org.eclipse.gmf.runtime.emf.commands.core;bundle-version="1.2.0",
+ org.eclipse.gmf.runtime.emf.core;bundle-version="1.2.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+DynamicImport-Package: *
+Export-Package: jadex.editor.common.eclipse.ui,
+ jadex.editor.common.model.properties,
+ jadex.editor.common.model.properties.table

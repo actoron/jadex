@@ -1,0 +1,17 @@
+public classes:
+
+base.Starter
+base.SComponentFactory
+base.contentcodecs?
+base.gui.ComponentSelectorDialog
+base.gui.componentviewer
+base.gui.plugin
+base.test
+
+
+private classes:
+
+bdi.impl
+bdi.interpreter)
+
+bdibpmn.handler

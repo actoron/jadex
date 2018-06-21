@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" id="_kFppMCqsEd-Tm-pQQN-8pw">
+  <artifacts xsi:type="gpmn:Context" id="_zE2MYCqsEd-Tm-pQQN-8pw"/>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_zb6BgCqsEd-Tm-pQQN-8pw" name="SequentialGoal" sequential="true">
+    <outgoingEdges>_EDLVwCqtEd-Tm-pQQN-8pw</outgoingEdges>
+    <outgoingEdges>_DnjJsCqtEd-Tm-pQQN-8pw</outgoingEdges>
+    <outgoingEdges>_DRFKcCqtEd-Tm-pQQN-8pw</outgoingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_2oQBsCqsEd-Tm-pQQN-8pw" name="SequentialSubgoal1">
+    <outgoingEdges>_WxWkwCqwEd-Tm-pQQN-8pw</outgoingEdges>
+    <incomingEdges>_DRFKcCqtEd-Tm-pQQN-8pw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_29l_kCqsEd-Tm-pQQN-8pw" name="SequentialSubgoal2">
+    <outgoingEdges>_BpCfcCt6Ed-cIrzPTxeRYA</outgoingEdges>
+    <incomingEdges>_DnjJsCqtEd-Tm-pQQN-8pw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_3OJkECqsEd-Tm-pQQN-8pw" name="SequentialSubgoal3">
+    <outgoingEdges>_L5BhgCt6Ed-cIrzPTxeRYA</outgoingEdges>
+    <incomingEdges>_EDLVwCqtEd-Tm-pQQN-8pw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_Am7RUCqtEd-Tm-pQQN-8pw" name="CreateGoalNameWorkitems1" bpmnPlan="/jadex/wfms/examples/patterns/GoalWorkitemProcess.bpmn">
+    <incomingEdges>_WxWkwCqwEd-Tm-pQQN-8pw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_-zG0ICt5Ed-cIrzPTxeRYA" name="CreateGoalNameWorkitems2" bpmnPlan="/jadex/wfms/examples/patterns/GoalWorkitemProcess.bpmn">
+    <incomingEdges>_BpCfcCt6Ed-cIrzPTxeRYA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_E3bHACt6Ed-cIrzPTxeRYA" name="CreateGoalNameWorkitems3" bpmnPlan="/jadex/wfms/examples/patterns/GoalWorkitemProcess.bpmn">
+    <incomingEdges>_L5BhgCt6Ed-cIrzPTxeRYA</incomingEdges>
+  </vertices>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_DRFKcCqtEd-Tm-pQQN-8pw" sequentialOrder="1"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_DnjJsCqtEd-Tm-pQQN-8pw" sequentialOrder="2"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_EDLVwCqtEd-Tm-pQQN-8pw" sequentialOrder="3"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_WxWkwCqwEd-Tm-pQQN-8pw"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_BpCfcCt6Ed-cIrzPTxeRYA"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_L5BhgCt6Ed-cIrzPTxeRYA"/>
+</gpmn:GpmnDiagram>

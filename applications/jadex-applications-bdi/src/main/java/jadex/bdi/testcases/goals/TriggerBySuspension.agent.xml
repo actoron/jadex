@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test if goal suspension can trigger a plan.</H3>
+
+	The suspension of the initial goal triggers the test plan.
+	<br>The initial goal is an achieve goal associated with
+	an increment plan that increments
+	every second the belief count. The achieve
+	goal succeeds when it has count till 10.
+	It will be suspended when it is 5.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TriggerBySuspension"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.base.test.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="count"  class="int">
+			<fact>0</fact>
+		</belief>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="cnt" retry="true" exclude="never">
+			<contextcondition>
+				$beliefbase.count!=5
+			</contextcondition>
+			<targetcondition>
+ 				$beliefbase.count==10
+ 			</targetcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+        <plan name="increment">
+			<parameter name="beliefname" class="String">
+				<value>"count"</value>
+			</parameter>
+			<parameter name="rate" class="int">
+				<value>100</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<goal ref="cnt"/>
+			</trigger>
+		</plan>
+		
+		<plan name="test">
+			<parameter name="$g" class="IGoal">
+				<bindingoptions>
+					select IGoal $g from $goalbase.getGoals("cnt")
+					where IGoal.GoalLifecycleState.SUSPENDED==$g.getLifecycleState()
+				</bindingoptions>
+			</parameter>
+			<parameter name="report" class="TestReport">
+				<value>new TestReport("test_trigger", "Test if goal suspension can trigger a plan.", true, null)</value>
+			</parameter>
+			<body class="StoreReportPlan"/>
+			<trigger>
+				<condition rawevents="goalsuspended.cnt"> <!-- goals="cnt" -->
+					true
+				</condition>
+			</trigger>
+			<!-- Hack!!! Triggers more than once. -->
+			<precondition>
+				$beliefbase.reports.length &lt; 1
+			</precondition>
+			<!-- todo: check context condition initially? -->
+			<!--  <contextcondition>
+				$beliefbase.reports.length &lt; 1
+			</contextcondition>-->
+		</plan>
+	</plans>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.INFO</property>
+		<property name="debugging">false</property>
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="cnt"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

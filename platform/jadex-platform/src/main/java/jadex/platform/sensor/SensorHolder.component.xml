@@ -1,0 +1,26 @@
+<!--
+	<H3>Sensor holder component that captures platform sensors</H3>
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component 
+	                    http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="SensorHolder" package="jadex.platform.sensor">
+	
+	<componenttypes>
+		<componenttype filename="jadex/platform/sensor/system/SystemSensor.component.xml" name="cpusensor"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="def">
+			<components>
+				<component type="cpusensor"/>
+			</components>
+		</configuration>
+	</configurations>
+	
+	<properties>
+		<property name="system" class="boolean">true</property>
+	</properties>
+</componenttype>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>SimpleTest</jadex:modelname>
+    <jadex:description>Test if a testcase works in principle.</jadex:description>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
+    <jadex:imports>
+      <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
+      <jadex:import>jadex.base.test.*</jadex:import>
+      <jadex:import>jadex.bridge.*</jadex:import>
+    </jadex:imports>
+    <jadex:results>
+      <jadex:result name="testresults" type="Testcase">
+        <jadex:description>The test results.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+    <jadex:configurations>
+      <jadex:configuration name="Pool">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_Kp6EQfxtEd6BS97d4w8Gew">
+    <semantic:task name="Save results" id="_aZp6qfxtEd6BS97d4w8Gew">
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Object"> new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Simple BPMN testcase.&quot;, true, null)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_Kp6EQfxtEd6BS97d4w8Gew">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_aZp6qfxtEd6BS97d4w8Gew">
+        <dc:Bounds height="100.0" width="160.0" x="420.0" y="240.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -1,0 +1,412 @@
+<class-diagram version="1.0.4" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="true" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.BTServer.AcceptThread" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/BTServer.java" binary="false">    
+    <position x="1308" y="578" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.AConnection.ConnectedThread" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/AConnection.java" binary="false">    
+    <position x="295" y="642" width="151" height="46"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.AConnection" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/AConnection.java" binary="false">    
+    <position x="358" y="336" width="151" height="62"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.ClientConnection.ConnectThread" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/ClientConnection.java" 
+    binary="false">    
+    <position x="102" y="556" width="151" height="46"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="5" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.IConnectionListener" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/IConnectionListener.java" 
+    binary="false">    
+    <position x="398" y="470" width="151" height="46"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.ClientConnection" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/ClientConnection.java" 
+    binary="false">    
+    <position x="123" y="470" width="151" height="46"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.BluetoothStateListenerAdapter" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/BluetoothStateListenerAdapter.java" 
+    binary="false">    
+    <position x="1337" y="109" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="8" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.BTP2PConnector.ProximityDeviceChangedListener" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/BTP2PConnector.java" binary="false">    
+    <position x="739" y="48" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.BTP2PConnector" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/BTP2PConnector.java" binary="false">    
+    <position x="782" y="170" width="263" height="126"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="10" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.ConnectionManager.ConnectionsListener" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/ConnectionManager.java" 
+    binary="false">    
+    <position x="510" y="591" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="11" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.BTServer.ConnectionEstablishedListener" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/BTServer.java" binary="false">    
+    <position x="937" y="400" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.ServerConnection" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/ServerConnection.java" 
+    binary="false">    
+    <position x="952" y="556" width="151" height="46"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="13" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.ConnectionManager" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/ConnectionManager.java" 
+    binary="false">    
+    <position x="677" y="427" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="14" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.MessageListener" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/MessageListener.java" binary="false">    
+    <position x="472" y="43" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="15" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.BTServer" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/BTServer.java" binary="false">    
+    <position x="1324" y="431" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="16" corner="BOTTOM_RIGHT" language="java" name="jadex.android.bluetooth.connection.IConnection" 
+    project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/IConnection.java" binary="false">    
+    <position x="761" y="556" width="151" height="46"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="17" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.IBluetoothStateInformer" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/IBluetoothStateInformer.java" 
+    binary="false">    
+    <position x="1069" y="34" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="18" corner="BOTTOM_RIGHT" language="java" 
+    name="jadex.android.bluetooth.connection.IBluetoothStateListener" project="jadex-android-bluetooth" 
+    file="/jadex-android-bluetooth/src/main/java/jadex/android/bluetooth/connection/IBluetoothStateListener.java" 
+    binary="false">    
+    <position x="1553" y="110" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <dependency>    
+    <end type="SOURCE" nodeId="11"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </dependency>  
+  <generalization>    
+    <bendpoint x="367" y="470"/>    
+    <end type="SOURCE" nodeId="12"/>    
+    <end type="TARGET" nodeId="3"/>  
+  </generalization>  
+  <association>    
+    <bendpoint x="558" y="336"/>    
+    <end type="SOURCE" nodeId="9" navigable="false">      
+      <attribute name="defaultConnectionListener"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization>    
+    <end type="SOURCE" nodeId="7"/>    
+    <end type="TARGET" nodeId="18"/>  
+  </realization>  
+  <realization>    
+    <bendpoint x="1723" y="336"/>    
+    <bendpoint x="1723" y="470"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="18"/>  
+  </realization>  
+  <association>    
+    <end type="SOURCE" nodeId="15" navigable="false">      
+      <attribute name="estListener"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <end type="SOURCE" nodeId="3" navigable="false">      
+      <attribute name="listeners"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" nodeId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <end type="SOURCE" nodeId="5"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="1285" y="336"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="7"/>  
+  </dependency>  
+  <nesting>    
+    <end type="SOURCE" nodeId="15"/>    
+    <end type="TARGET" nodeId="11"/>  
+  </nesting>  
+  <nesting>    
+    <end type="SOURCE" nodeId="6"/>    
+    <end type="TARGET" nodeId="4"/>  
+  </nesting>  
+  <association>    
+    <bendpoint x="304" y="470"/>    
+    <bendpoint x="304" y="556"/>    
+    <end type="SOURCE" nodeId="3" navigable="false">      
+      <attribute name="connectedThread"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <bendpoint x="1052" y="470"/>    
+    <end type="SOURCE" nodeId="15"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </dependency>  
+  <association>    
+    <end type="SOURCE" nodeId="13" navigable="false">      
+      <attribute name="listeners"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" nodeId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <end type="SOURCE" nodeId="15" navigable="false">      
+      <attribute name="stateInformer"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="17" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="14"/>  
+  </dependency>  
+  <nesting>    
+    <bendpoint x="325" y="470"/>    
+    <bendpoint x="325" y="556"/>    
+    <end type="SOURCE" nodeId="3"/>    
+    <end type="TARGET" nodeId="2"/>  
+  </nesting>  
+  <association>    
+    <bendpoint x="1264" y="336"/>    
+    <end type="SOURCE" nodeId="9" navigable="false">      
+      <attribute name="stateInformer"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="17" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <end type="SOURCE" nodeId="6" navigable="false">      
+      <attribute name="connectThread"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <end type="SOURCE" nodeId="12"/>    
+    <end type="TARGET" nodeId="2"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="791" y="336"/>    
+    <bendpoint x="791" y="470"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </dependency>  
+  <nesting>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </nesting>  
+  <generalization>    
+    <end type="SOURCE" nodeId="6"/>    
+    <end type="TARGET" nodeId="3"/>  
+  </generalization>  
+  <dependency>    
+    <end type="SOURCE" nodeId="1"/>    
+    <end type="TARGET" nodeId="12"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="15"/>    
+    <end type="TARGET" nodeId="7"/>  
+  </dependency>  
+  <association>    
+    <end type="SOURCE" nodeId="9" navigable="false">      
+      <attribute name="listener"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <end type="SOURCE" nodeId="15" navigable="false">      
+      <attribute name="listenThreads"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" nodeId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting>    
+    <end type="SOURCE" nodeId="13"/>    
+    <end type="TARGET" nodeId="10"/>  
+  </nesting>  
+  <dependency>    
+    <bendpoint x="812" y="336"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="11"/>  
+  </dependency>  
+  <association>    
+    <bendpoint x="1264" y="470"/>    
+    <end type="SOURCE" nodeId="15" navigable="false">      
+      <attribute name="connectedThreads"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" nodeId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <end type="SOURCE" nodeId="9" navigable="false">      
+      <attribute name="btServer"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <end type="SOURCE" nodeId="17"/>    
+    <end type="TARGET" nodeId="18"/>  
+  </dependency>  
+  <association>    
+    <end type="SOURCE" nodeId="9" navigable="false">      
+      <attribute name="connections"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <bendpoint x="579" y="336"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="10"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="770" y="470"/>    
+    <end type="SOURCE" nodeId="13"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </dependency>  
+  <nesting>    
+    <end type="SOURCE" nodeId="15"/>    
+    <end type="TARGET" nodeId="1"/>  
+  </nesting>  
+  <dependency>    
+    <end type="SOURCE" nodeId="10"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="283" y="556"/>    
+    <end type="SOURCE" nodeId="6"/>    
+    <end type="TARGET" nodeId="2"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="327" y="336"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="6"/>  
+  </dependency>  
+  <realization>    
+    <bendpoint x="346" y="470"/>    
+    <end type="SOURCE" nodeId="3"/>    
+    <end type="TARGET" nodeId="16"/>  
+  </realization>  
+  <classifier-display autosize="true" package="true" initial-value="false" signature="true" visibility="true">    
+    <attributes public="true" package="false" protected="false" private="false"/>    
+    <operations public="false" package="false" protected="false" private="false"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

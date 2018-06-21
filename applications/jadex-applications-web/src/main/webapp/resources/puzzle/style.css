@@ -1,0 +1,229 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0pt;
+	background-color: #F7F8FD;
+	text-align: center;
+}
+
+a:link
+{
+	color: #0D297C;
+}
+
+a:active
+{
+	color: #D8DFF2;
+}
+
+a:visited
+{
+	color: #0D297C;
+}
+
+a:hover
+{
+	color: #D8DFF2;
+	text-decoration: none;
+}
+
+/* Bar separating title from rest of page. */
+.horbar {
+	background-color: #EAD085;
+	background-attachment: fixed;
+	background-image: url(shadebar.png);
+	background-repeat: repeat-y;
+	background-position: left top;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D3AF41;
+	font-size: 1px;
+	padding: 0pt;
+}
+
+/* Bar for footer. */
+.horbar2 {
+	background-color: #EAD085;
+	background-attachment: fixed;
+	background-image: url(shadebar.png);
+	background-repeat: repeat-y;
+	background-position: left top;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #D3AF41;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D3AF41;
+	font-size: smaller;
+	padding: 0pt;
+}
+
+/* Classes for navbar. */
+.menublock_top {
+	padding: 10pt;
+/*	padding-top: 10pt;
+	padding-right: 10pt;
+	padding-bottom: 10pt;
+*/	background-color: #D8DFF2;
+/*}
+
+.menublock_bottom {
+	background-color: #D8DFF2;
+*/	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D3AF41;
+}
+
+
+/* Class for content area. */
+.textblock {
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #D3AF41;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D3AF41;
+	background-color: #FFF2CC;
+	padding: 10pt;
+	padding-left: 40pt;
+	padding-right: 40pt;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	text-align: justify;
+}
+
+/* Class for news area. */
+.news {
+/*	float: right;
+	padding: 0pt;
+	padding-left: 10pt;
+	padding-bottom: 10pt;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #D3AF41;
+	border-color: #0D297C;
+*/	border-bottom: 1px solid #D8DFF2;
+	border-top: 1px solid #D8DFF2;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	text-align: left;
+	padding: 5pt;
+	background-color: #F7F8FD;
+}
+
+h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: medium;
+	height: auto;
+	width: auto;
+	border-bottom: 1px solid #EAD085;
+	/*color: #d3af41;
+	color: #d3af41;	
+	color: #0D297C;*/
+	color: #000000;
+}
+
+h1.newsheader {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	height: auto;
+	width: auto;
+	text-align: center;
+	border-bottom: none;
+/*	border-bottom: 1px solid #0D297C;
+	border-top: 1px solid #0D297C;
+*/	color: #0D297C;
+	padding: 0pt;
+}
+h1center {
+	border: 1px none #9CAECE;
+	font-style: italic;
+	text-align: center;
+	padding: 10pt;
+}
+h2 {
+/*	border-bottom: 1px solid #d3af41;
+	color: #d3af41;	
+	color: #0D297C;*/
+	color: #000000;
+	font-size: small;
+}
+
+h3 {
+/*	border-bottom: 1px solid #d3af41;
+	color: #d3af41;	
+	color: #0D297C;*/
+	color: #000000;
+	font-size: x-small;
+}
+
+.white {
+	width: 1.5%;
+}
+th {
+	text-align: left;
+	font-size: medium;
+	padding-top: 10pt;
+}
+.plain {
+	font-size: small;
+}
+
+p, dl, ul, ol {
+	text-align: justify;
+	padding: 0pt;
+	padding-bottom: 15pt;
+	border: 1px none #EAD085;
+	border-bottom-style: solid;
+	font-size: 10pt;
+}
+
+/* TDs of class="references" tables.
+ * Doesn't work in mozilla/netscape6 ? :-(
+ */
+.references
+{
+	td
+	{
+		schrott: blurps;	/* do no remove, as first style is ignored !? */
+		text-align: justify;
+		padding: 1pt;
+		font-size: 10pt;
+	}
+}
+
+.noborder {
+	border:	none;
+	padding: 0pt;
+}
+
+.cite {
+	border:	none;
+	padding-left: 25pt;
+	padding-right: 25pt;
+	padding-top: 0pt;	
+	font-style: italic;
+	padding-bottom: 0pt;	
+}
+
+.menu {
+	text-decoration: none;
+	list-style-type: disc;
+	font-weight: bold;
+	font-variant: normal;
+	padding-top: 5pt;
+	padding-bottom: 5pt;
+	padding-right: 5pt;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.h0 {
+	font-size: large;
+	font-weight: bold;
+}
+td {
+/*	color: #d3af41;*/
+}
+
+.boardlabel {
+	font-size: large;
+}
+

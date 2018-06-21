@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WfMS Workitem Management Component.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="WorkitemManagement" package="jadex.wfms.components">
+	
+	<imports>
+		<import>jadex.wfms.service.IWorkitemHandlerService</import>
+		<import>jadex.wfms.service.IAAAService</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IWorkitemHandlerService">
+			<implementation>
+				new jadex.wfms.service.impl.WorkitemHandlerService()
+			</implementation>
+		</providedservice>
+		
+		<requiredservice name="aaa_service" class="IAAAService">
+			<binding recover="true" scope="global" />
+		</requiredservice>
+	</services>
+	
+</componenttype>

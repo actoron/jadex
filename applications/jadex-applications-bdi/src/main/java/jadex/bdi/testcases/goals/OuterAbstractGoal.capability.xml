@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test abstract goal dispatched from outer capability.</H3>
+
+	Defines an abstract goal and a plan to react on it.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi 
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	package="jadex.bdi.testcases.goals"
+	name="OuterAbstractGoal">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+
+	<goals>
+		<achievegoalref name="agoal" exported="true">
+			<abstract/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<plan name="testplan">
+			<parameter name="value" class="Object">
+				<goalmapping ref="agoal.param"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="agoal.result"/>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="agoal"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+</capability>

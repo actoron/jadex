@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>Result</jadex:modelname>
+    <jadex:description>Simple process that fowards an argument as its result.</jadex:description>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
+    <jadex:imports>
+      <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
+      <jadex:import>jadex.bpmn.model.*</jadex:import>
+      <jadex:import>jadex.bridge.*</jadex:import>
+      <jadex:import>jadex.bridge.modelinfo.*</jadex:import>
+    </jadex:imports>
+    <jadex:arguments>
+      <jadex:argument name="in" type="String">
+        <jadex:description>Argument value.</jadex:description>
+        <jadex:value>&quot;default value&quot;</jadex:value>
+      </jadex:argument>
+    </jadex:arguments>
+    <jadex:results>
+      <jadex:result name="out" type="String">
+        <jadex:description>Result value.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+    <jadex:configurations>
+      <jadex:configuration name="Pool">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_QZvnoRcWEd-OSKK6OfNWqA">
+    <semantic:startEvent id="_jUWbARcXEd-OSKK6OfNWqA">
+      <semantic:outgoing>_kPgbsRcXEd-OSKK6OfNWqA</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Save the result" id="_QZvnoxcWEd-OSKK6OfNWqA">
+      <semantic:incoming>_kPgbsRcXEd-OSKK6OfNWqA</semantic:incoming>
+      <semantic:outgoing>_lAOuChcXEd-OSKK6OfNWqA</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;out&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Object">in</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="_lAOuARcXEd-OSKK6OfNWqA">
+      <semantic:incoming>_lAOuChcXEd-OSKK6OfNWqA</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="_jUWbARcXEd-OSKK6OfNWqA" targetRef="_QZvnoxcWEd-OSKK6OfNWqA" id="_kPgbsRcXEd-OSKK6OfNWqA">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_QZvnoxcWEd-OSKK6OfNWqA" targetRef="_lAOuARcXEd-OSKK6OfNWqA" id="_lAOuChcXEd-OSKK6OfNWqA">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_QZvnoRcWEd-OSKK6OfNWqA">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_jUWbARcXEd-OSKK6OfNWqA">
+        <dc:Bounds height="40.0" width="40.0" x="360.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_QZvnoxcWEd-OSKK6OfNWqA">
+        <dc:Bounds height="100.0" width="160.0" x="520.0" y="210.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_lAOuARcXEd-OSKK6OfNWqA">
+        <dc:Bounds height="40.0" width="40.0" x="830.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_lAOuChcXEd-OSKK6OfNWqA">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_lAOuChcXEd-OSKK6OfNWqA">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_kPgbsRcXEd-OSKK6OfNWqA">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_kPgbsRcXEd-OSKK6OfNWqA">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

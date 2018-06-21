@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Bidder for Dutch Auction Protocol.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="DAReceiver" package="jadex.bdi.testcases.planlib">
+
+	<imports>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.commons.IFilter</import>
+	</imports>
+
+	<capabilities>
+		<capability name="dacap" file="jadex.bdi.planlib.protocols.dutchauction.DutchAuction"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="max_price" class="double" exported="true" />
+		<belief name="participate" class="Boolean" exported="true">
+			<fact>true</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="decide_participation_plan">
+			<parameter name="initiator" class="IComponentIdentifier">
+				<goalmapping ref="dacap.da_decide_participation.initiator" />
+			</parameter>
+			<parameter name="participate" class="Boolean" direction="out">
+				<goalmapping ref="dacap.da_decide_participation.participate" />
+			</parameter>
+			<parameter name="auction_description" class="AuctionDescription">
+				<goalmapping ref="dacap.da_decide_participation.auction_description" />
+			</parameter>
+			<parameter name="auction_info" class="Object">
+				<goalmapping ref="dacap.da_decide_participation.auction_info" />
+			</parameter>
+			<body class="DADecideParticipationPlan"/>
+			<trigger>
+				<goal cref="dacap.da_decide_participation"></goal>
+			</trigger>
+		</plan>
+		
+		<plan name="make_proposal_plan">
+			<parameter name="accept" class="Boolean" direction="out" optional="true">
+				<goalmapping ref="dacap.da_make_proposal.accept" />
+			</parameter>
+			<parameter name="leave" class="Boolean" direction="out" optional="true">
+				<goalmapping ref="dacap.da_make_proposal.leave" />
+			</parameter>
+			<parameter name="cfp" class="Object">
+				<goalmapping ref="dacap.da_make_proposal.cfp" />
+			</parameter>
+			<parameter name="auction_description" class="AuctionDescription">
+				<goalmapping ref="dacap.da_make_proposal.auction_description" />
+			</parameter>
+			<parameter name="auction_info" class="Object">
+				<goalmapping ref="dacap.da_make_proposal.auction_info" />
+			</parameter>
+			<parameterset name="history" class="Comparable" optional="true">
+				<goalmapping ref="dacap.da_make_proposal.history" />
+			</parameterset>
+			<body class="DAMakeProposalPlan"/>
+			<trigger>
+				<goal cref="dacap.da_make_proposal"/>
+			</trigger>
+		</plan>
+		
+		<plan name="negotiation_finished_plan">
+			<parameter name="interaction_state" class="InteractionState">
+				<!-- todo: goalfinished mapping. -->
+				<!-- <goalmapping ref="da_receiver_interaction.interaction_state"/> -->
+				<value>new InteractionState()</value>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<!-- todo: goalfinished mapping. -->
+				<!-- <goalmapping ref="da_receiver_interaction.result"/> -->
+				<value>"test"</value>
+			</parameter>
+			<body class="PrintResultPlan"/>
+			<trigger>
+				<goalfinished cref="dacap.da_receiver_interaction"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>	
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="dacap.da_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+</agent>
+

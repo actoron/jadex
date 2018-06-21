@@ -1,0 +1,17 @@
+<order>
+  <customer phone="888.555.1234">
+    <person cust-num="123456789">
+      <first-name>John</first-name>
+      <last-name>Smith</last-name>
+    </person>
+    <street>12345 Happy Lane</street>
+    <city>Plunk</city>
+    <state>WA</state>
+    <zip>98059</zip>
+  </customer>
+  <total>6.0</total>
+  <item id="4832">5</item>
+  <item id="1222">1</item>
+  <item id="8311">3</item>
+  <item id="83111">2</item>
+</order>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test initial events (internal and message).</H3>
+
+	Defines an initial message event that is sent to itself.
+	Defines an initial internal event on which a plan reacts.
+
+	Uses binding for the initial events.
+	Initial values for parameter with binding options override the bindings
+	and cause the value to be fixed.
+	The agent should send 3 messages as there are 3 possible bindings.
+	The agent should dispatch 2 internal events as there are 2 possible bindings
+	(the 'param' parameter has an initial value)
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="InitialEvent"
+	package="jadex.bdi.testcases.events">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>java.util.logging.Level</import>		
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="eventhandler">
+			<body class="EventHandlerPlan"/>
+			<waitqueue>
+				<internalevent ref="ievent"/>
+			</waitqueue>
+		</plan>
+		<plan name="messagereceiver">
+			<body class="MessageReceiverPlan"/>
+			<waitqueue>
+				<messageevent ref="just_born_receive"/>
+			</waitqueue>
+		</plan>
+	</plans>
+
+	<events>
+		<internalevent name="ievent">
+			<parameter name="param" class="String">
+				<value>"default value"</value>
+			</parameter>
+		</internalevent>
+
+		<messageevent name="just_born_send" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String">
+				<value>"default value"</value>
+			</parameter>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
+				<value>$scope.getComponentIdentifier()</value>
+			</parameterset>
+		</messageevent>
+
+		<messageevent name="just_born_receive" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<properties>
+		<property name="debugging">false</property>	
+		<!-- <property name="logging.level">Level.WARNING</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="test">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="eventhandler"/>
+				<initialplan ref="messagereceiver"/>
+			</plans>
+			<events>
+				<initialinternalevent ref="ievent">
+					<parameter ref="param">
+						<value>"initial value"</value>
+					</parameter>
+				</initialinternalevent>
+				<initialmessageevent ref="just_born_send" >
+					<parameter ref="content">
+						<value>"initial value"</value>
+					</parameter>
+				</initialmessageevent>
+			</events>
+		</configuration>
+	</configurations>
+
+</agent>
+

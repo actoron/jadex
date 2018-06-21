@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_qYXzoTZhEd-86tAf5dPynA" iD="_qYXzoDZhEd-86tAf5dPynA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_q01GIDZhEd-86tAf5dPynA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q01GITZhEd-86tAf5dPynA" key="Description" value="&lt;h1>Global Parameter&lt;/h1> This process prints out a customized welcome message based on the global parameter 'customer'."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q01GIjZhEd-86tAf5dPynA" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEIwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tnOTMARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTMQRPEeCnwcpWvxOwkg" key="dimension" value="2:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTMgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTMwRPEeCnwcpWvxOwkg" key="0:0" value="customer"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTNARPEeCnwcpWvxOwkg" key="0:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTNQRPEeCnwcpWvxOwkg" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTNgRPEeCnwcpWvxOwkg" key="0:3" value="The customer."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTNwRPEeCnwcpWvxOwkg" key="0:4" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTOARPEeCnwcpWvxOwkg" key="0:5" value="&quot;Carl Customer&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTOQRPEeCnwcpWvxOwkg" key="1:0" value="logins"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTOgRPEeCnwcpWvxOwkg" key="1:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTOwRPEeCnwcpWvxOwkg" key="1:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTPARPEeCnwcpWvxOwkg" key="1:3" value="The number of logins"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTPQRPEeCnwcpWvxOwkg" key="1:4" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tnOTPgRPEeCnwcpWvxOwkg" key="1:5" value="0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_qY9pgTZhEd-86tAf5dPynA" iD="_qY9pgDZhEd-86tAf5dPynA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_qY9pgzZhEd-86tAf5dPynA" iD="_qY9pgjZhEd-86tAf5dPynA" outgoingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Welcome" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JKmKsDZiEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JKmKsTZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tuYEEARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEEQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEEgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEEwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEFARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEFQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEFgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Welcome &quot;+customer+&quot;!&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_s1m1oTZiEd-86tAf5dPynA" iD="_s1m1oDZiEd-86tAf5dPynA" incomingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Status" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ul9Y8DZiEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ul9Y8TZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tuYEFwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEGARPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEGQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEGgRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEGwRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEHARPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEHQRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Customer &quot;+customer+&quot; has logged in &quot;+logins+&quot; times.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_s1v_kTZiEd-86tAf5dPynA" iD="_s1v_kDZiEd-86tAf5dPynA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RzdogDZjEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzdogTZjEd-86tAf5dPynA" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tuYEHgRPEeCnwcpWvxOwkg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEHwRPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEIARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEIQRPEeCnwcpWvxOwkg" key="0:0" value="logins"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tuYEIgRPEeCnwcpWvxOwkg" key="0:1" value="logins + 1"/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

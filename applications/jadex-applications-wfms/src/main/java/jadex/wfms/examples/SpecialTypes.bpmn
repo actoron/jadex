@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_pyOxQBo0Ed-ylKS_uyVCzg" iD="_pyOKMBo0Ed-ylKS_uyVCzg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_q0k_EBo0Ed-ylKS_uyVCzg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q0k_ERo0Ed-ylKS_uyVCzg" key="imports" value="jadex.wfms.parametertypes.*␟java.util.Arrays"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q0k_Eho0Ed-ylKS_uyVCzg" key="Package" value="jadex.wfms.examples"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_pyPYURo0Ed-ylKS_uyVCzg" iD="_pyPYUBo0Ed-ylKS_uyVCzg" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_pyPYUxo0Ed-ylKS_uyVCzg" iD="_pyPYUho0Ed-ylKS_uyVCzg" outgoingEdges="_e-DDsRo5Ed-ylKS_uyVCzg" incomingEdges="_v5KTQRo0Ed-ylKS_uyVCzg" name="Special_Types_Demo" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rE8WUBo0Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rE89YBo0Ed-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4bI0ABo3Ed-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h2>Type Demo&lt;/h2>&lt;/center>&lt;p>This workitem demostrates the special workitem parameter types in jadex.wfms.parametertypes.*. This parameter is a read-only Text parameter, which supports HTML&lt;p>&lt;/html>&quot;)␟inout␋Writable_Text_Area␋Text␋new Text(&quot;This paramter is of the read/write text type.\n It lacks HTML-support but supports entering long texts in a multiline text area.\nUnlike the read-only version, this parameter is automatically surrounded by a border. The border can be enabled and disabled at will even for the read-only version using meta-properties (see appropriate example for a demonstration).&quot;)␟in␋ListChoice_Information␋Text␋new Text(&quot;The following parameter will demonstrate the ListChoice types which allows the user to pick one item out of a list of many items.&quot;)␟inout␋ListChoice_Parameter␋ListChoice␋new ListChoice(new Object[] {&quot;Choice 1&quot;, &quot;Choice 2&quot;, &quot;Choice 3&quot;})␟in␋MultiChoice_Information␋Text␋new Text(&quot;The following parameter will demonstrate the MultiListChoice types which allows the user to pick multiple items out of a list of many items.&quot;)␟inout␋MultiChoice_Parameter␋MultiListChoice␋new MultiListChoice(new Object[] {&quot;MultiChoice 1&quot;, &quot;MultiChoice 2&quot;, &quot;MultiChoice 3&quot;})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_urzvURo0Ed-ylKS_uyVCzg" iD="_urzvUBo0Ed-ylKS_uyVCzg" outgoingEdges="_v5KTQRo0Ed-ylKS_uyVCzg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_cVFdYRo5Ed-ylKS_uyVCzg" iD="_cVFdYBo5Ed-ylKS_uyVCzg" outgoingEdges="_6BhboRo6Ed-ylKS_uyVCzg" incomingEdges="_e-DDsRo5Ed-ylKS_uyVCzg" name="Extracted_Parameters">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_cZYukBo5Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cZZVoBo5Ed-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mtNSUBo6Ed-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;p>This workitem will show the results extracted from the previous workitem&lt;/p>&lt;/html>&quot;)␟in␋TextResult␋String␋␟in␋ListChoiceResult␋String␋␟in␋MultiChoiceResult␋String␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_45e1gRo6Ed-ylKS_uyVCzg" iD="_45e1gBo6Ed-ylKS_uyVCzg" outgoingEdges="_c9l88Ro7Ed-ylKS_uyVCzg" incomingEdges="_6BhboRo6Ed-ylKS_uyVCzg" name="Show_Document_Demo">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_49-7ABo6Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_49-7ARo6Ed-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__r_rIBo6Ed-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h2>Document Attachment Demo&lt;/h2>&lt;/center>&lt;p>The last demonstration will show how to use the Document type to attach files to a workitem and download, modify and reattach them. If the attached file is an image, a preview feature will be enabled.&lt;/p>&lt;/html&quot;)␟out␋Perform_Document_Demonstration␋boolean␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_cSd8URo7Ed-ylKS_uyVCzg" iD="_cSd8UBo7Ed-ylKS_uyVCzg" outgoingEdges="_fUsXMRo7Ed-ylKS_uyVCzg _hX5lERo7Ed-ylKS_uyVCzg" incomingEdges="_c9l88Ro7Ed-ylKS_uyVCzg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eWRAERo7Ed-ylKS_uyVCzg" iD="_eWRAEBo7Ed-ylKS_uyVCzg" outgoingEdges="_VDy5sRo8Ed-ylKS_uyVCzg" incomingEdges="_fUsXMRo7Ed-ylKS_uyVCzg" name="Attachment_Demo">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ebv9ABo7Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ebwkEBo7Ed-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lqeNgBo7Ed-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h2>Attachment Demo&lt;/h2>&lt;/center>&lt;p>This workitem shows how to use the Document type to attach files to a workitem.&lt;/p>&lt;/html>&quot;)␟out␋Attach_a_file␋Document␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_f7Qn8Ro7Ed-ylKS_uyVCzg" iD="_f7Qn8Bo7Ed-ylKS_uyVCzg" incomingEdges="_hX5lERo7Ed-ylKS_uyVCzg _P8M4URo9Ed-ylKS_uyVCzg" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_8yAJwRo7Ed-ylKS_uyVCzg" iD="_8yAJwBo7Ed-ylKS_uyVCzg" outgoingEdges="_uNqhIRo8Ed-ylKS_uyVCzg" incomingEdges="_VDy5sRo8Ed-ylKS_uyVCzg" name="Save_and_Reattach_Demo">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_824pwBo7Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_824pwRo7Ed-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-KUnkBo7Ed-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h2>Save and Reattach Demo&lt;/h2>&lt;/center>&lt;p>This workitem demonstrates how a previously uploaded file can be made available for saving it locally and reattaching it after modification.&lt;/p>&lt;/html>&quot;)␟inout␋Modify_this_file␋Document␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rTM7IRo8Ed-ylKS_uyVCzg" iD="_rTM7IBo8Ed-ylKS_uyVCzg" outgoingEdges="_P8M4URo9Ed-ylKS_uyVCzg" incomingEdges="_uNqhIRo8Ed-ylKS_uyVCzg" name="Save_Demo">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rZRt8Bo8Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rZRt8Ro8Ed-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_u9qasBo8Ed-ylKS_uyVCzg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;center>&lt;h2>Save Demo&lt;/h2>&lt;/center>&lt;p>This workitem demonstrates how a previously attached file can be made available simply for saving only.&lt;/p>&lt;/html>&quot;)␟in␋Save_this_file␋Document␋"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_v5KTQRo0Ed-ylKS_uyVCzg" iD="_v5KTQBo0Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_v6CdABo0Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_v6DEEBo0Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_v6DEERo0Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_e-DDsRo5Ed-ylKS_uyVCzg" iD="_e-DDsBo5Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_e-70gBo5Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e-70gRo5Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e-70gho5Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ybf64Bo5Ed-ylKS_uyVCzg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ybf64Ro5Ed-ylKS_uyVCzg" key="mappings" value="TextResult␋Writable_Text_Area.getText()␟ListChoiceResult␋ListChoice_Parameter.getSelection()␟MultiChoiceResult␋Arrays.toString(MultiChoice_Parameter.getSelections())"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6BhboRo6Ed-ylKS_uyVCzg" iD="_6BhboBo6Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6CwxwBo6Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6CwxwRo6Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6CxY0Bo6Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_c9l88Ro7Ed-ylKS_uyVCzg" iD="_c9l88Bo7Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c-bDYBo7Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c-bDYRo7Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c-bDYho7Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fUsXMRo7Ed-ylKS_uyVCzg" iD="_fUsXMBo7Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fVmWIBo7Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fVmWIRo7Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fVm9MBo7Ed-ylKS_uyVCzg" key="condition" value="Perform_Document_Demonstration"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hX5lERo7Ed-ylKS_uyVCzg" iD="_hX5lEBo7Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hYVC4Bo7Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hYVC4Ro7Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hYVp8Bo7Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_VDy5sRo8Ed-ylKS_uyVCzg" iD="_VDy5sBo8Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VExKEBo8Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VExKERo8Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VExxIBo8Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pTrTYBo8Ed-ylKS_uyVCzg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pTrTYRo8Ed-ylKS_uyVCzg" key="mappings" value="Modify_this_file␋Attach_a_file"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_uNqhIRo8Ed-ylKS_uyVCzg" iD="_uNqhIBo8Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uOoKcBo8Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uOoxgBo8Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uOoxgRo8Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OEGuQBo9Ed-ylKS_uyVCzg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OEGuQRo9Ed-ylKS_uyVCzg" key="mappings" value="Save_this_file␋Modify_this_file"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_P8M4URo9Ed-ylKS_uyVCzg" iD="_P8M4UBo9Ed-ylKS_uyVCzg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_P9Wu4Bo9Ed-ylKS_uyVCzg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_P9Wu4Ro9Ed-ylKS_uyVCzg" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_P9Wu4ho9Ed-ylKS_uyVCzg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test abstract goal dispatched by inner capability.</H3>
+
+	Creates a goal which is assigned to the abstract goal
+	from a capability.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="InnerAbstractGoal"
+	package="jadex.bdi.testcases.goals">
+	
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+	
+	<capabilities>
+		<capability name="capA" file="jadex/bdi/testcases/goals/InnerAbstractGoal"/>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+	
+	<beliefs>
+		<beliefsetref name="reports">
+			<assignto ref="capA.reports"/>
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="agoal" exported="true">
+			<assignto ref="capA.testgoal"/>
+			<parameter name="oparam" class="String"/>
+			<parameter name="oresult" class="String" direction="out"/>
+		</achievegoal> 
+	</goals>
+	
+	<plans>
+		<plan name="testplan">
+			<parameter name="value" class="Object">
+				<goalmapping ref="agoal.oparam"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="agoal.oresult"/>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="agoal"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+</agent>

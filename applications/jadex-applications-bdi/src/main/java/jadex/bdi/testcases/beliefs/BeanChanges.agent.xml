@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test bean property changes.</H3>
+
+	Propagate Changes Agent.
+	This agent tests if bean changes are propagated
+	to belief changes. (todo: test parameter changes).
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="BeanChanges"
+	package="jadex.bdi.testcases.beliefs">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults" result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="one" class="TestBean">
+			<fact>new TestBean("Alois")</fact>
+		</belief>
+		<belief name="invocations" class="int" />
+		<beliefset name="some" class="TestBean">
+			<fact>new TestBean("Albert")</fact>
+			<fact>new TestBean("Berta")</fact>
+		</beliefset>
+	</beliefs>
+
+	<plans>
+		<plan name="invocation_counter">
+			<parameter name="beliefname" class="String">
+				<value>"invocations"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<factadded ref="some"/>
+				<factremoved ref="some"/>
+				<factchanged ref="some"/>
+				<factchanged ref="one"/>
+			</trigger>
+		</plan>
+		<plan name="bean_modifier">
+			<body class="BeanModifierPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+        <property name="debugging">false</property>
+        <!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>10</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="bean_modifier"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

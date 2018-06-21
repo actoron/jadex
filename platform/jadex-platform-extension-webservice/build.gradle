@@ -1,0 +1,12 @@
+description 'The Jadex webservice platform extension package contains basic functionality for WSDL web services and REST web services.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':serialization:jadex-xml')
+	api project(':util:jadex-javaparser')
+	api project(':platform:jadex-bridge')
+	api project(':kernels:jadex-kernel-micro')
+	
+	api 'javax.ws.rs:javax.ws.rs-api:2.0'
+}

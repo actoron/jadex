@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	TranslationCapability Lesson: D1.
+	Creating a capability.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="TranslationD1"
+	package="jadex.bdi.tutorial">
+
+	<imports>
+		<import>jadex.commons.*</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- This beliefset contains the english-german dictionary as facts. -->
+		<beliefset name="egwords" class="Tuple">
+			<fact>new Tuple("milk", "Milch")</fact>
+			<fact>new Tuple("cow", "Kuh")</fact>
+			<fact>new Tuple("cat", "Katze")</fact>
+			<fact>new Tuple("dog", "Hund")</fact>
+		</beliefset>
+	</beliefs>
+	
+	<plans>
+		<!-- Passive plan for adding words, when a
+			request word message is received. -->
+		<plan name="addword">
+			<body class="EnglishGermanAddWordPlanD1"/>
+			<trigger>
+				<messageevent ref="request_addword"/>
+			</trigger>
+		</plan>
+		<!-- Passive plan for translating words, when a request
+			translation message is received. -->
+		<plan name="egtrans">
+			<body class="EnglishGermanTranslationPlanD1"/>
+			<trigger>
+				<messageevent ref="request_translation"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Specifies a add word request being all messages with performative
+			request and start with a specific string "add english_german". -->
+		<messageevent name="request_addword" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("add english_german")</match>
+		</messageevent>
+		<!-- Specifies a translation request being all messages with performative
+			request and start with a specific string "translate english_german". -->
+		<messageevent name="request_translation" direction="receive" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("translate english_german")</match>
+		</messageevent>
+		<!-- The answer message after success. -->
+		<messageevent name="inform" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+		<!-- The answer message after some error occurred. -->
+		<messageevent name="failure" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.FAILURE</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<expressions>
+		<!-- This query selects the first matching entry from the dictionary,
+			whereby the parameter $eword is compared to the first element of
+			a belief set tuple. -->
+		<expression name="query_egword" exported="true">
+			select one $wordpair.get(1)
+			from Tuple $wordpair in $beliefbase.getBeliefSet("egwords").getFacts()
+			where $wordpair.get(0).equals($eword)
+			<!-- <parameter name="$eword" class="String"/> -->
+		</expression>
+	</expressions>
+
+</capability>

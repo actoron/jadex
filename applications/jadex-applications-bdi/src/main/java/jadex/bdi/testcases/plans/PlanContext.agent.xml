@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Tests a plan with a context condition.</H3>
+
+	The context condition has to be valid during plan execution.
+	Otherwise the plan is aborted.
+
+	Has two initial plans.
+	The activity plan is executed (the context is ok).
+	It waits for some time.
+	The remover plan waits for a shorter time
+	and modifies the context, so that the
+	first plans context condition is no longer
+	satisfied (abort on failure).
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="PlanContext"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports" >
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="context"  class="boolean">
+			<fact>true</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="activity">
+			<body class="TestContextPlan"/>
+			<contextcondition>
+				$beliefbase.context
+			</contextcondition>
+		</plan>
+		
+		<plan name="remover">
+			<parameter name="wait" class="long">
+				<value>20L</value>
+			</parameter>
+			<parameter name="value" class="Object">
+				<value>new Boolean(false)</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"context"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+		</plan>
+	</plans>
+
+	<expressions>
+		<condition name="plan_context">
+			!$beliefbase.context
+		</condition>
+	</expressions>
+	
+	<properties>
+        <property name="debugging">false</property>
+        <!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+    </properties>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="activity"/>
+				<initialplan ref="remover"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

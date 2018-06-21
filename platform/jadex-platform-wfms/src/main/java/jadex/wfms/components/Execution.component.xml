@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WfMS Execution Component.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Execution" package="jadex.wfms.components">
+	
+	<imports>
+		<import>jadex.wfms.service.IExecutionService</import>
+		<import>jadex.wfms.service.IModelRepositoryService</import>
+		<import>jadex.wfms.service.IAAAService</import>
+		<import>jadex.bridge.service.types.library.ILibraryService</import>
+		<import>jadex.bridge.service.types.cms.IComponentManagementService</import>
+	</imports>
+	
+	<services>
+		<providedservice name="execution_service" class="IExecutionService">
+			<implementation>
+				new jadex.wfms.service.impl.ExecutionService()
+			</implementation>
+		</providedservice>
+		<providedservice name="repository_service" class="IModelRepositoryService">
+			<implementation>
+				new jadex.wfms.service.impl.LinkedModelRepositoryService()
+			</implementation>
+		</providedservice>
+		
+		<requiredservice name="aaa_service" class="IAAAService">
+			<binding recover="true" scope="global" />
+		</requiredservice>
+		<requiredservice name="execution_services" class="IExecutionService" multiple="true">
+			<binding scope="global" dynamic="true" />
+		</requiredservice>
+		
+		<requiredservice name="libservice" class="ILibraryService">
+			<binding scope="platform" />
+		</requiredservice>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform" />
+		</requiredservice>
+	</services>
+	
+</componenttype>

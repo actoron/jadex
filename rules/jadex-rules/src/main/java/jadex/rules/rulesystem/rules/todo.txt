@@ -1,0 +1,85 @@
+ExistsCondition
+ForAllCondition
+
+
+//--------------------------------------------
+
+package jadex.microkernel.rulesystem.rules;
+
+import jadex.microkernel.rulesystem.ICondition;
+
+import java.util.List;
+
+/**
+ *  Condition for testing the existence of at least one match.
+ */
+public class ExistsCondition extends ComplexCondition
+{
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new exists condition.
+	 */
+	public ExistsCondition()
+	{
+		super();
+	}
+	
+	/**
+	 *  Create a new exists condition.
+	 */
+	public ExistsCondition(List conditions)
+	{
+		super(conditions);
+	}
+	
+	/**
+	 *  Create a new exists condition.
+	 */
+	public ExistsCondition(ICondition[] conditions)
+	{
+		super(conditions);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		StringBuffer ret = new StringBuffer("(exists\n");
+		for(int i=0; i<conditions.size(); i++)
+			ret.append(conditions.get(i).toString()+"\n");
+		ret.append(")");
+		return ret.toString();
+	}
+}
+
+//--------------------------------------------
+
+package jadex.microkernel.rulesystem.rules;
+
+/**
+ *  Needs at least two contained conditions.
+ *  Is fullfilled when for all matches of the
+ *  first pattern all further pattern also match.
+ */
+public class ForAllCondition extends ComplexCondition
+{
+	//-------- methods --------
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		StringBuffer ret = new StringBuffer("(forall\n");
+		for(int i=0; i<conditions.size(); i++)
+			ret.append(conditions.get(i).toString()+"\n");
+		ret.append(")");
+		return ret.toString();
+	}
+}

@@ -1,0 +1,6 @@
+description 'Jadex 3d support for environments.'
+
+dependencies
+{
+	api project(':environments:jadex-kernel-extension-envsupport-jmonkey')
+}

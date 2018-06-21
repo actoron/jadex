@@ -1,0 +1,6 @@
+description 'Gradle plugin for generating BDIV3 runtime code from agent annotations at compile time. Needed by Jadex-Android, because runtime code generation is not supported on Jadex-Android.'
+
+dependencies
+{
+	api project(':android:jadex-gradle-plugin')
+}

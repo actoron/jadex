@@ -1,0 +1,104 @@
+<!--
+	The movement capability supplies the agents with basic
+	goals, plans and beliefs for moving around.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Movement"
+	package="jadex.bdibpmn.examples.marsworld">
+
+	<imports>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="environment" class="ContinuousSpace2D">
+ 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject" exported="true">
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+
+		<!-- Is the mission finished? -->
+		<belief name="missionend" class="boolean" updaterate="1000" evaluationmode="pull" exported="true">
+			<fact>
+ 				$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("missiontime")&lt;=$scope.getTime()
+ 			</fact>
+		</belief>
+
+		<!-- The seen targets. -->
+		<beliefset name="my_targets" class="ISpaceObject" exported="true" />
+	</beliefs>
+
+	<goals>
+		<!-- Move to a certain location. -->
+		<achievegoal name="move_dest" exported="true">
+			<parameter name="destination" class="IVector2"/>
+		</achievegoal>
+
+		<!-- Walk around without target when nothing else to do. -->
+		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
+			<dropcondition language="jcl">
+				$beliefbase.missionend
+				
+				// (belief (element_has_model ?mbel) (belief_has_fact true))
+				// ?mbel	= (mbelief (melement_has_name "missionend"))
+			</dropcondition>
+  		</performgoal>
+
+		<!-- Move home when missionend. -->
+		<achievegoal name="missionend">
+			<parameter name="destination" class="IVector2">
+				<value>$beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position")</value>
+			</parameter>
+			<unique/>
+			<creationcondition language="jcl">
+				$beliefbase.missionend
+				  &amp;&amp; !$beliefbase.myself.position.equals(
+				  $beliefbase.environment.getSpaceObjectsByType("homebase")[0].getProperty("position"))
+				 
+				// (belief (element_has_model ?mbel_missionend) (belief_has_fact true))
+				// ?mbel_missionend = (mbelief (melement_has_name "missionend"))
+				// 
+				// (belief (element_has_model ?mbel_myhome) (belief_has_fact ?myhome))
+				// ?mbel_myhome = (mbelief (melement_has_name "my_home"))
+				// 
+				// (belief (element_has_model ?mbel_mylocation) (belief_has_fact ?mylocation))
+				// ?mbel_mylocation = (mbelief (melement_has_name "my_location"))
+				// 
+				// ?mylocation	= (Location (isNear(?myhome) false))
+			</creationcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Go to a destination. -->
+		<plan name="go_destination">
+			<parameter name="destination" class="IVector2">
+ 				<goalmapping ref="move_dest.destination"/>
+  				<goalmapping ref="missionend.destination"/>
+			</parameter>
+			<body type="bpmn" impl="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="move_dest"/>
+ 				<goal ref="missionend"/>
+			</trigger>
+		</plan>
+
+		<!-- Walk around randomly. -->
+		<plan name="randomwalk">
+			<body type="bpmn" impl="RandomWalkPlan"/>
+			<trigger>
+				<goal ref="walk_around"/>
+			</trigger>
+		</plan>
+	</plans>
+</capability>

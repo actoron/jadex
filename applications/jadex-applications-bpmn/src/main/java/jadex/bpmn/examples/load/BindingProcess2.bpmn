@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_G63n0UvEEeCk5oxudy8pew" iD="_G63n0EvEEeCk5oxudy8pew">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w0RusEvEEeCk5oxudy8pew" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w0RusUvEEeCk5oxudy8pew" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_G7ddsUvEEeCk5oxudy8pew" iD="_G7ddsEvEEeCk5oxudy8pew" name="Service Binding Process">
+    <artifacts xmi:type="bpmn:DataObject" xmi:id="_lRixsUvMEeCXurNjCey__Q" iD="_lRixsEvMEeCXurNjCey__Q" name="Service&#xD;&#xA;Binding">
+      <associations xmi:type="bpmn:Association" xmi:id="_lR1soEvMEeCXurNjCey__Q"/>
+      <associations xmi:type="bpmn:Association" xmi:id="_w5r5gEvMEeCXurNjCey__Q"/>
+    </artifacts>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JsPjQUvEEeCk5oxudy8pew" iD="_JsPjQEvEEeCk5oxudy8pew" outgoingEdges="_LWe3ikvEEeCk5oxudy8pew" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_LWe3gUvEEeCk5oxudy8pew" iD="_LWe3gEvEEeCk5oxudy8pew" associations="_lR1soEvMEeCXurNjCey__Q" outgoingEdges="_Pim5ukvEEeCk5oxudy8pew _TNP_ekvEEeCk5oxudy8pew" incomingEdges="_LWe3ikvEEeCk5oxudy8pew" name="Service&#xD;&#xA;already&#xD;&#xA;bound?" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Pim5sUvEEeCk5oxudy8pew" iD="_Pim5sEvEEeCk5oxudy8pew" incomingEdges="_Pim5ukvEEeCk5oxudy8pew _q7WMcUvEEeCk5oxudy8pew _rnlnYUvEEeCk5oxudy8pew" name="Binding&#xD;&#xA;available" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TNP_cUvEEeCk5oxudy8pew" iD="_TNP_cEvEEeCk5oxudy8pew" outgoingEdges="_UtJr-kvEEeCk5oxudy8pew" incomingEdges="_TNP_ekvEEeCk5oxudy8pew" name="Search Service" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_UtJr8UvEEeCk5oxudy8pew" iD="_UtJr8EvEEeCk5oxudy8pew" outgoingEdges="_kSwqsUvLEeCXurNjCey__Q _lCRcEUvLEeCXurNjCey__Q" incomingEdges="_UtJr-kvEEeCk5oxudy8pew" name="Found&#xD;&#xA;service?" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XP25QUvEEeCk5oxudy8pew" iD="_XP25QEvEEeCk5oxudy8pew" outgoingEdges="_q7WMcUvEEeCk5oxudy8pew _mKqngUvLEeCXurNjCey__Q" incomingEdges="_u4dlcUvIEeCXurNjCey__Q" name="Dynamic&#xD;&#xA;binding?" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_pzyugUvEEeCk5oxudy8pew" iD="_pzyugEvEEeCk5oxudy8pew" associations="_w5r5gEvMEeCXurNjCey__Q" outgoingEdges="_rnlnYUvEEeCk5oxudy8pew" incomingEdges="_mKqngUvLEeCXurNjCey__Q" name="Store Binding" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_RhAqoUvFEeCk5oxudy8pew" iD="_RhAqoEvFEeCk5oxudy8pew" outgoingEdges="_hubUcUvFEeCk5oxudy8pew _kxeOsUvFEeCk5oxudy8pew" incomingEdges="_lCRcEUvLEeCXurNjCey__Q" name="Creation&#xD;&#xA;allowed?" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XsTvQUvFEeCk5oxudy8pew" iD="_XsTvQEvFEeCk5oxudy8pew" incomingEdges="_kxeOsUvFEeCk5oxudy8pew" name="Service&#xD;&#xA;not found" activityType="EventEndError"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_c0ETQUvFEeCk5oxudy8pew" iD="_c0ETQEvFEeCk5oxudy8pew" outgoingEdges="_vlmYQUvIEeCXurNjCey__Q" incomingEdges="_hubUcUvFEeCk5oxudy8pew" name="Create Component">
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1KXIukvFEeCk5oxudy8pew" iD="_1KXIuUvFEeCk5oxudy8pew"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_eH-LIUvFEeCk5oxudy8pew" iD="_eH-LIEvFEeCk5oxudy8pew" outgoingEdges="_1KXIukvFEeCk5oxudy8pew" activityType="EventIntermediateError"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_1KXIsUvFEeCk5oxudy8pew" iD="_1KXIsEvFEeCk5oxudy8pew" incomingEdges="_1KXIukvFEeCk5oxudy8pew" name="Component&#xD;&#xA;creation failed" activityType="EventEndError"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_uT-YUUvIEeCXurNjCey__Q" iD="_uT-YUEvIEeCXurNjCey__Q" outgoingEdges="_u4dlcUvIEeCXurNjCey__Q" incomingEdges="_vlmYQUvIEeCXurNjCey__Q _kSwqsUvLEeCXurNjCey__Q" activityType="GatewayDataBasedExclusive"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LWe3ikvEEeCk5oxudy8pew" iD="_LWe3iUvEEeCk5oxudy8pew"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Pim5ukvEEeCk5oxudy8pew" iD="_Pim5uUvEEeCk5oxudy8pew" name="yes"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TNP_ekvEEeCk5oxudy8pew" iD="_TNP_eUvEEeCk5oxudy8pew" name="no" conditionType="Default" isDefault="true"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_UtJr-kvEEeCk5oxudy8pew" iD="_UtJr-UvEEeCk5oxudy8pew"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q7WMcUvEEeCk5oxudy8pew" iD="_q7WMcEvEEeCk5oxudy8pew" name="yes" conditionType="None" isDefault="false"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_rnlnYUvEEeCk5oxudy8pew" iD="_rnlnYEvEEeCk5oxudy8pew"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hubUcUvFEeCk5oxudy8pew" iD="_hubUcEvFEeCk5oxudy8pew" name="yes"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kxeOsUvFEeCk5oxudy8pew" iD="_kxeOsEvFEeCk5oxudy8pew" name="no" conditionType="Default" isDefault="true"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_u4dlcUvIEeCXurNjCey__Q" iD="_u4dlcEvIEeCXurNjCey__Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vlmYQUvIEeCXurNjCey__Q" iD="_vlmYQEvIEeCXurNjCey__Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kSwqsUvLEeCXurNjCey__Q" iD="_kSwqsEvLEeCXurNjCey__Q" name="yes"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_lCRcEUvLEeCXurNjCey__Q" iD="_lCRcEEvLEeCXurNjCey__Q" name="no" conditionType="Default" isDefault="true"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mKqngUvLEeCXurNjCey__Q" iD="_mKqngEvLEeCXurNjCey__Q" name="no" conditionType="Default" isDefault="true"/>
+  </pools>
+</bpmn:BpmnDiagram>

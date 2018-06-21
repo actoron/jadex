@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  <H3>Puzzling agent.</H3>
+  
+  This agent that plays a board game for one player.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Sokrates"
+	package="jadex.web.examples.puzzle.agent">
+
+	<imports>
+		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.web.examples.puzzle.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- The meta-level strategy for choosing moves
+ 			(none=choose the first applicable, long=prefer jump moves,
+			same_long=prefer long moves of same color, alter_long=prefer
+			long move of alternate color. -->
+		<belief name="ml" class="String" exported="true">
+			<fact>"same_long"</fact>
+		</belief>
+		<belief name="time" class="long" updaterate="1000">
+			<fact>$scope.getTime()</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<!-- The goal to make a move on the board that is the solution. -->
+		<achievegoal name="makemove" recalculate="false">
+			<parameter name="board" class="Board"/>
+			<parameter name="deadline" class="long"/>
+			<dropcondition>
+				$beliefbase.time > $goal.deadline &amp;&amp; $goal.deadline > 0
+			</dropcondition>
+			<targetcondition>
+				$goal.board.isSolution()
+			</targetcondition>
+ 		</achievegoal>
+
+		<!-- The meta-level goal for choosing between plans for the makemove goal. -->
+		<metagoal name="choosemove" recalculate="false">
+			<parameterset name="applicables" class="ICandidateInfo"/>
+			<parameterset name="result" class="ICandidateInfo" direction="out"/>
+			<trigger>
+				<goal ref="makemove"/>
+			</trigger>
+		</metagoal>
+	</goals>
+
+	<plans>
+		<!-- Make a move on the board and create a subgoal for the next move. -->
+		<plan name="move_plan">
+			<parameter name="board" class="Board">
+				<goalmapping ref="makemove.board"/>
+			</parameter>
+			<parameter name="deadline" class="long">
+				<goalmapping ref="makemove.deadline"/>
+			</parameter>
+			<parameter name="move" class="Move">
+				<bindingoptions>$goal.board.getPossibleMoves()</bindingoptions>
+			</parameter>
+			<body class="MovePlan"/>
+			<trigger>
+				<goal ref="makemove"/>
+			</trigger>
+		</plan>
+
+		<!-- Meta-level plan used to choose among the possible move plans. -->
+		<plan name="choose_move_plan">
+			<parameterset name="applicables" class="ICandidateInfo">
+				<goalmapping ref="choosemove.applicables"/>
+			</parameterset>
+			<parameterset name="result" class="ICandidateInfo" direction="out">
+				<goalmapping ref="choosemove.result"/>
+			</parameterset>
+			<body class="ChooseMovePlan"/>
+			<trigger>
+				<goal ref="choosemove"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<services>
+		<providedservice class="IPuzzleService">
+			<implementation class="PuzzleService"/>
+		</providedservice>
+	</services>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+
+</agent>

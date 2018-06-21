@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The mars world application descriptor</H3>
+
+	Can be used to launch the mars world example.<br>
+
+	It consists of three different kinds of agents:<br>
+	- <b>Sentry agents</b> are responsible for examining ore locations<br>
+		A ore capacity is shown on the map when an ore location was examined.<br>
+	- <b>Production agents</b> produce ore at available ore location.<br>
+	- <b>Carry agents</b> are able to carry ore to the base.<br><br>
+
+	Objective is to carry as much ore as possible to the<br>
+	home base in a predefined mission time.<br>
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:agr="http://www.activecomponents.org/jadex-agrspace"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-agrspace 
+	                    http://www.activecomponents.org/jadex-agrspace-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="SpaceWorld3d" package="jadex.bdi.examples.spaceworld3d">
+	
+	<imports>
+		<import>jadex.extension.envsupport.environment.space3d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>java.text.SimpleDateFormat</import>
+		<import>java.util.Date</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.examples.spaceworld3d.carry.*</import>
+		<import>jadex.bdi.examples.spaceworld3d.producer.*</import>
+		<import>jadex.bdi.examples.spaceworld3d.sentry.*</import>
+		<import>jadex.bdi.examples.spaceworld3d.movement.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+	</imports>
+	
+	<extensiontypes>
+		<agr:agrspacetype name="marsagrspace">
+			<agr:grouptype name="marsteam">
+				<agr:roles>
+					<agr:role name="sentry" min="1" max="1" />
+					<agr:role name="producer" min="1" />
+					<agr:role name="carrier" min="1" max="-1" />
+				</agr:roles>
+			</agr:grouptype>
+		</agr:agrspacetype>
+
+		<env:envspacetype name="3dspace" class="ContinuousSpace3D" width="1" height="1" depth="1">
+			<env:objecttypes>
+				<env:objecttype name="target">
+					<env:property name="tick360" class="double" dynamic="true">((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick()%360
+					</env:property>	
+					<env:property name="abbau" class="boolean" dynamic="true">								
+						$object.getProperty("state").equals("analyzed")
+						&amp;&amp; ($object.getProperty("ore")!=0 &amp;&amp; $object.getProperty("capacity")!=0)
+					</env:property>
+					<env:property name="ore" class="int">0</env:property>
+					<env:property name="capacity" class="int">0</env:property>
+					<env:property name="state" class="String">"unknown"</env:property>
+					<env:property name="position" class="IVector3"/>
+				</env:objecttype>
+				<env:objecttype name="sentry">
+				<env:property name="tick360" class="double" dynamic="true">((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick()%360
+					</env:property>	
+					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.2*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10),0.2*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10),0.2*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10))
+					</env:property>	
+					<env:property name="vision" class="double">0.2</env:property>
+					<env:property name="speed" class="double">0.05</env:property>
+					<env:property name="position" class="IVector3" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="producer">
+					<env:property name="vision" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.1</env:property>
+					<env:property name="position" class="IVector3" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="carry">
+					<env:property name="vision" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.15</env:property>
+					<env:property name="ore" class="int">0</env:property>
+					<env:property name="capacity" class="int">20</env:property>
+					<env:property name="position" class="IVector3" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="homebase">
+					<env:property name="ore" class="int">0</env:property>
+					<env:property name="text" class="String" dynamic="true">
+						"Collected ore: "+$object.getProperty("ore")+" \n"+
+						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
+							- ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())))
+					</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+						
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
+				<env:tasktype name="produce" class="ProduceOreTask" />
+				<env:tasktype name="load" class="LoadOreTask" />
+			</env:tasktypes>			
+						
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView3D" />
+			</env:dataviews>
+						
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Sentry" objecttype="sentry"/>
+				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
+				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
+			</env:avatarmappings>
+			
+			
+			
+			<env:perspectives>
+			<env:perspective3d name="Complex3D" class="Perspective3D">
+
+				
+				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+
+					<env:sky skypath="jadex3d/textures/sky/space/nebula02/" west="right.jpg" east="left.jpg" north="back.jpg" south="front.jpg" up="top.jpg" down="bottom.jpg" isSphere="false" />  
+					<!--  
+					<env:rndterrain width="1" height="0.2" depth="1"  
+		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
+					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
+					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" />
+					-->
+				</env:drawable3d>
+				
+				<!-- H O M E B A S E -->
+				<env:drawable3d objecttype="homebase" width="0.2" height="0.2" depth="0.2" rotation3d="false">
+					<env:property name="oresize" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/300.0))</env:property>
+					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
+					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					<env:property name="rotate45" dynamic="false">new Vector3Double(0, (Math.PI/180)*45, 0)</env:property>
+					
+					<env:text3d  width="2" height="2" depth="1"  rotation="rotate45" x="0.2" y="0.2" z="0.2" text="$textda$" color="#FFFFFFFF"></env:text3d>
+				
+					<env:sphere width="0.01" height="0.01" depth="0.01" x="0" y="0" z="0"  color="#FFFF00FF"/>
+		  
+					<env:object3d width="0.03" height="0.03" depth="0.03" x="-1.5" y="-2.2" z="0.5" modelpath="jadex3d/models/space/misc/station/konostationobj.j3o" hasLightMaterials="true"/> 
+
+					<env:sphere width="2" height="0.002" depth="2" x="1" y="-3" z="1"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/yellowblack.jpg">
+					</env:sphere>
+
+					<env:dome radius="1" size="oresize" samples="30" depth="2" x="1" y="-3" z="1"  color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/oretex.jpg">
+					</env:dome>
+			
+				</env:drawable3d>
+				
+				<!--ERZVORKOMMEN  -->
+				<env:drawable3d objecttype="target" width="0.2" height="0.2" depth="0.2">
+				  	<env:property name="oresize" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/600.0))</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/600.0))</env:property>
+					<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					<env:property name="rotated" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8, 0, 0)</env:property>
+
+						<!-- Nullpunkt  -->
+						<env:object3d width="0.1" height="0.1" depth="0.1" x="0" y="-0.2" z="0" modelpath="jadex3d/models/space/misc/rock01.j3o" hasLightMaterials="true"> 
+							<env:drawcondition>
+								$object.getProperty("ore")==0
+							</env:drawcondition>
+						</env:object3d>
+						<env:object3d size="oresize" x="0" y="-0.4" z="0" modelpath="jadex3d/models/space/misc/rock01_ore.j3o" hasLightMaterials="true"> 
+							<env:drawcondition>
+								($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:object3d>
+						
+						<!--Abgebautes erz  -->
+						<env:sphere size="capa"  x="0" y="-0.2" z="0" color="#FFFFFFFF" texturepath="jadex3d/textures/solid/oretex.jpg">
+							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
+						</env:sphere>
+						
+						<!-- Markierung  -->
+						<env:cylinder height="0.25" radius="0.025" rotation="rotate90" x="0" y="0.125" z="0" color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/iron01.jpg">
+							<env:drawcondition>
+								$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:cylinder>
+						<env:dome radius="0.1" samples="30" x="0" y="0.25" z="0" color="#FFFFFFFF"  texturepath="jadex3d/textures/solid/yellowblack.jpg">
+							<env:drawcondition>
+								$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:dome>
+				   	
+			</env:drawable3d>
+				
+
+				<env:drawable3d objecttype="sentry" width="0.1" height="0.1" depth="0.1">
+				<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
+				<env:property name="rotate" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
+				<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
+					
+						<env:object3d width="0.05" height="0.05" depth="0.05" x="0" y="0.0" z="0.0" rotation="rotate" modelpath="jadex3d/models/space/spacefrigate/spacefrigate.j3o" hasLightMaterials="true"/> 
+						
+						
+						<!--  Sonstiges -->
+						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F10" />
+				</env:drawable3d>
+				
+					
+				<env:drawable3d objecttype="carry" width="0.1" height="0.1" depth="0.1">
+					<env:property name="turn180" dynamic="false">new Vector3Double(0, Math.PI/2, 0)</env:property>	
+					<env:property name="rotation90" dynamic="false">new Vector3Double(0, Math.PI/188*90, 0)</env:property>	
+						
+	
+	
+					<env:object3d width="0.06" height="0.06" depth="0.06" rotation="rotation90" x="0" y="0.0" z="-0.2" modelpath="jadex3d/models/space/carrier/spaceship.j3o" hasLightMaterials="true" /> 
+	
+		
+					
+					<env:object3d width="0.01" height="0.01" depth="0.01" x="0" y="-0.2" z="0.0" modelpath="jadex3d/models/space/misc/box/ammo.j3o" hasLightMaterials="true"> 
+							   <env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition> 
+						</env:object3d>
+						
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="producer" width="0.1" height="0.1" depth="0.1">
+					<env:property name="rotation" dynamic="false">new Vector3Double(0, (Math.PI/180)*180, 0)</env:property>
+						  
+						<env:object3d width="0.3" height="0.3" depth="0.3" rotation="rotation" x="0" y="0.0" z="0.0"  modelpath="jadex3d/models/space/smallship/ship.j3o" hasLightMaterials="true"/> 
+						
+					</env:drawable3d>
+					
+				</env:perspective3d>	
+				
+				
+				
+			</env:perspectives>
+				
+
+			<!-- executor -->
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+		<componenttype name="Sentry" filename="jadex/bdi/examples/spaceworld3d/sentry/Sentry.agent.xml"/>
+		<componenttype name="Producer" filename="jadex/bdi/examples/spaceworld3d/producer/Producer.agent.xml"/>
+		<componenttype name="Carry" filename="jadex/bdi/examples/spaceworld3d/carry/Carry.agent.xml"/>
+	</componenttypes>
+	
+	<configurations>
+ 		
+ 		<configuration name="1 Sentry / 2 Producers / 3 Carries">
+			<extensions>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>
+	
+				<env:envspace name="my3dspace" type="3dspace">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector3Double(0.3,0.3, 0.3)</env:property>
+							<env:property name="space">$space</env:property><!-- hack!!! -->
+							<env:property name="missiontime">
+								900000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+							</env:property>
+						</env:object>
+						
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.1, 0.15, 0.2)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.05,0.2 ,0.7)</env:property>
+							<env:property name="ore">200</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.5,0.5 ,0.6)</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.8,0.0 ,0.1)</env:property>
+							<env:property name="ore">50</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.7,0.45 ,0.4)</env:property>
+							<env:property name="ore">100</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.0,0.5 ,0.5)</env:property>
+							<env:property name="ore">100</env:property>
+						</env:object>
+						
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.0,1 ,1)</env:property>
+							<env:property name="ore">100</env:property>
+						</env:object>
+
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.0,0.0,0.0)</env:property>
+							<env:property name="ore">75</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.9,0.9,0.9)</env:property>
+							<env:property name="ore">75</env:property>
+						</env:object>
+						
+						<env:object type="target">
+							<env:property name="position">new Vector3Double(0.9,0.0,0.9)</env:property>
+							<env:property name="ore">75</env:property>
+						</env:object>
+					</env:objects>
+					
+					<env:dataproviders>
+						<env:dataprovider name="homebase_ore">
+							<env:source name="$homebase" objecttype="homebase">
+							</env:source>
+							<env:data name="time">$time</env:data>
+							<env:data name="ore_amount">$homebase.ore</env:data>
+						</env:dataprovider>
+					</env:dataproviders>
+			
+					<env:dataconsumers>
+						<env:dataconsumer name="ore_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"homebase_ore"</env:property>
+							<env:property name="title">"Ore in homebase"</env:property>
+							<env:property name="labelx">"Time"</env:property>
+							<env:property name="labely">"Ore"</env:property>
+							<env:property name="maxitemcount">500</env:property>
+							<env:property name="legend">false</env:property>
+							
+							<!-- Defines a normal series. -->
+							<env:property name="seriesname">"Ore"</env:property>
+							<env:property name="valuex">"time"</env:property>
+							<env:property name="valuey">"ore_amount"</env:property>
+						</env:dataconsumer>
+					</env:dataconsumers>
+					
+					<env:observers>
+						<env:observer name="SpaceWorld" dataview="view_all" perspective="icons">
+							<env:plugin name="evaluation" class="EvaluationPlugin">
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("ore_chart")).getChartPanel()</env:property>
+							</env:plugin>
+						</env:observer>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="1"/>
+  				<component type="Producer" number="2"/>
+				<component type="Carry" number="3"/>
+			</components>
+ 		</configuration>
+ 		
+ 		
+ 		<configuration name="Multi">
+			<extensions>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>
+	
+				<env:envspace name="my3dspace" type="3dspace" width="2" height ="2" depth ="2">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="space">$space</env:property>
+							<env:property name="position">new Vector3Double(0.0,0.0, 0.0)</env:property>
+							<env:property name="missiontime">
+								3000000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+							</env:property>
+						</env:object>
+						<env:object type="target" number="80">
+							<env:property name="ore">Math.random()>0.2 ? (Integer)(5+Math.random()*35)*5 : 0</env:property>
+						</env:object>
+					</env:objects>
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all" perspective="icons"/>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="1"/> 
+  				<component type="Producer" number="5"/>
+				<component type="Carry" number="10"/>
+			</components>
+ 		</configuration>
+
+	</configurations>
+
+</applicationtype>

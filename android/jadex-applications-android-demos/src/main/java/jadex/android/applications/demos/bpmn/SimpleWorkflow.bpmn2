@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>SimpleWorkflow</jadex:modelname>
+    <jadex:description>Simple Workflow Test</jadex:description>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:requiredservices>
+      <jadex:requiredservice name="androidcontext" interface="jadex.bridge.service.types.context.IContextService" scope="platform" dynamic="false" create="false"/>
+    </jadex:requiredservices>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_ryEFAU29EeGhL9ZmcZLCEw">
+    <semantic:task name="How are you ?" id="_ryEsEU29EeGhL9ZmcZLCEw">
+      <semantic:outgoing>_0tnqEFYpEeGXrobMFNo4qg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.android.applications.demos.bpmn.tasks.ShowActivityWithResultTask</jadex:class>
+        <jadex:parameter direction="in" name="activityClass" type="java.lang.Class">jadex.android.applications.demos.bpmn.QuestionActivity.class</jadex:parameter>
+        <jadex:parameter direction="inout" name="attributes" type="java.util.HashMap">jadex.commons.SUtil.createHashMap(new Object[] {&quot;question&quot;, &quot;choices&quot;}, new Object[] {&quot;How are you doing ?&quot;, new String[] {&quot;Fine&quot;, &quot;Worried&quot;}})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Worried" id="_wEBuKFY8EeGyHKgzTbb6-g">
+      <semantic:incoming>_84TR4VY8EeGyHKgzTbb6-g</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.android.applications.demos.bpmn.tasks.ShowActivityTask</jadex:class>
+        <jadex:parameter direction="in" name="activityClass" type="java.lang.Class">jadex.android.applications.demos.bpmn.AnswerActivity.class</jadex:parameter>
+        <jadex:parameter direction="in" name="attributes" type="java.util.HashMap">jadex.commons.SUtil.createHashMap(new Object[] {&quot;answer&quot;}, new Object[] {&quot;Sorry to hear that.&quot;})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:exclusiveGateway id="_tjAi4FY8EeGyHKgzTbb6-g" default="_84TR4VY8EeGyHKgzTbb6-g">
+      <semantic:incoming>_0tnqEFYpEeGXrobMFNo4qg</semantic:incoming>
+      <semantic:outgoing>_8iuDcVY8EeGyHKgzTbb6-g</semantic:outgoing>
+      <semantic:outgoing>_84TR4VY8EeGyHKgzTbb6-g</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:task name="Fine" id="_tKgd-FYpEeGXrobMFNo4qg">
+      <semantic:incoming>_8iuDcVY8EeGyHKgzTbb6-g</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.android.applications.demos.bpmn.tasks.ShowActivityTask</jadex:class>
+        <jadex:parameter direction="in" name="activityClass" type="java.lang.Class">jadex.android.applications.demos.bpmn.AnswerActivity.class</jadex:parameter>
+        <jadex:parameter direction="in" name="attributes" type="java.util.HashMap">jadex.commons.SUtil.createHashMap(new Object[] {&quot;answer&quot;}, new Object[] {&quot;Glad to hear that.&quot;})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="_ryEsEU29EeGhL9ZmcZLCEw" targetRef="_tjAi4FY8EeGyHKgzTbb6-g" id="_0tnqEFYpEeGXrobMFNo4qg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_tjAi4FY8EeGyHKgzTbb6-g" targetRef="_tKgd-FYpEeGXrobMFNo4qg" id="_8iuDcVY8EeGyHKgzTbb6-g">
+      <semantic:conditionExpression>attributes.get(&quot;answer&quot;).equals(&quot;Fine&quot;)</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_tjAi4FY8EeGyHKgzTbb6-g" targetRef="_wEBuKFY8EeGyHKgzTbb6-g" id="_84TR4VY8EeGyHKgzTbb6-g">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_ryEFAU29EeGhL9ZmcZLCEw">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_ryEsEU29EeGhL9ZmcZLCEw">
+        <dc:Bounds height="100.0" width="160.0" x="70.0" y="220.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_wEBuKFY8EeGyHKgzTbb6-g">
+        <dc:Bounds height="100.0" width="160.0" x="500.0" y="300.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_tjAi4FY8EeGyHKgzTbb6-g">
+        <dc:Bounds height="60.0" width="60.0" x="320.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_tKgd-FYpEeGXrobMFNo4qg">
+        <dc:Bounds height="100.0" width="160.0" x="500.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_0tnqEFYpEeGXrobMFNo4qg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_0tnqEFYpEeGXrobMFNo4qg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_8iuDcVY8EeGyHKgzTbb6-g">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_84TR4VY8EeGyHKgzTbb6-g">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_8iuDcVY8EeGyHKgzTbb6-g">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_84TR4VY8EeGyHKgzTbb6-g">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

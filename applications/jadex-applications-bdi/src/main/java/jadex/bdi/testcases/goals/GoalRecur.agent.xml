@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test a goal recur.</H3>
+
+	Tests if the recur continues to process goals even if there are no plans.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="GoalRecur"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.ResultPlan</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="context" class="boolean" />
+	</beliefs>
+
+	<goals>
+		<performgoal name="perf" recur="true" recurdelay="200"/>
+		<achievegoal name="achi" recur="true" recurdelay="200"/>
+		<querygoal name="quer" recur="true" recurdelay="200">
+			<parameter name="result" class="String" direction="out"/>
+		</querygoal>
+		<performgoal name="perf2" recur="true">
+			<recurcondition>
+				$beliefbase.context
+			</recurcondition>
+		</performgoal>	
+	</goals>
+
+	<plans>
+		<plan name="result_plan">
+			<parameter name="value" class="Object">
+				<value>"dummy"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="perf"/>
+				<goal ref="perf2"/>
+				<goal ref="achi"/>
+			</trigger>
+			<precondition>$beliefbase.context</precondition>
+		</plan>
+		
+		<plan name="result_plan2">
+			<parameter name="result" class="String" direction="out">
+				<goalmapping ref="quer.result"/>
+			</parameter>
+			<parameter name="value" class="Object">
+				<value>"dummy"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="quer"/>
+			</trigger>
+			<precondition>$beliefbase.context</precondition>
+		</plan>
+ 		
+ 		<plan name="testplan">
+ 			<body class="RecurTestPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>8</fact>
+				</initialbelief>
+			</beliefs>
+			<!-- <goals>
+				<initialgoal ref="perf"/>
+				<initialgoal ref="achi"/>
+				<initialgoal ref="quer"/>
+			</goals> -->
+ 			<plans>
+				<initialplan ref="testplan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

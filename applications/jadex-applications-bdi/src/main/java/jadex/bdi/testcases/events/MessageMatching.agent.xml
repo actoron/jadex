@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the message matching.</H3>
+
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="MessageMatching"
+	package="jadex.bdi.testcases.events">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>java.util.logging.Level</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<beliefset name="results" class="String"/>
+	</beliefs>
+
+	<plans>
+		<plan name="messagereceiver_one">
+			<parameter name="value" class="Object">
+				<value>"one"</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"results"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<messageevent ref="inform_one"/>
+			</trigger>
+		</plan>
+		<plan name="messagereceiver_two">
+			<parameter name="value" class="Object">
+				<value>"two"</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"results"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<messageevent ref="inform_two"/>
+			</trigger>
+		</plan>
+		<plan name="test">
+			<body class="MessageMatchingPlan"/>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="inform_one" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String"/>
+			<match>"one".equals($content)</match>
+		</messageevent>
+
+		<messageevent name="inform_two" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String"/>
+			<match>"two".equals($content) &amp;&amp; "conv-id".equals($conversation_id)</match>
+		</messageevent>
+
+		<messageevent name="inform" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<properties>
+		<property name="debugging">false</property>
+		<!-- Logging turned off, as SEVERE message gets logged for non-matched message. -->
+		<property name="logging.level">Level.OFF</property>
+	</properties>
+
+	<configurations>
+		<configuration name="test">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>4</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

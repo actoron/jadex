@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WfMS Workitem Management Component.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="Monitoring" package="jadex.wfms.components">
+	
+	<imports>
+		<import>jadex.wfms.service.ILogService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.types.cms.IComponentManagementService</import>
+	</imports>
+	
+	<services>
+		<providedservice class="ILogService">
+			<implementation>
+				new jadex.wfms.service.impl.LogService()
+			</implementation>
+		</providedservice>
+		<requiredservice name="clock_service" class="IClockService">
+			<binding scope="platform" />
+		</requiredservice>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform" />
+		</requiredservice>
+	</services>
+	
+</componenttype>

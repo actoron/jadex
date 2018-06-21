@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.activecomponents.org/jadex-component" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="http://www.activecomponents.org/jadex-component-base-${jadex_build_version}.xsd"></xs:include>
+</xs:schema>

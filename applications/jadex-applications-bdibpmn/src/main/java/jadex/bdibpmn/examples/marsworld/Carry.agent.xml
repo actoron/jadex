@@ -1,0 +1,123 @@
+<!--
+	<H3>Carry agent for carrying ore.</H3>
+
+	This Agent is called by the Production
+	Agent to carry the produced ore. 
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Carry"
+	package="jadex.bdibpmn.examples.marsworld">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import> 
+		<import>jadex.extension.envsupport.environment.*</import> 
+		<import>jadex.commons.future.*</import>
+		<import>jadex.extension.agr.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the move capability as move for basic movement. -->
+		<capability name="move" file="Movement" />
+	</capabilities>
+
+	<beliefs>
+		<!-- Missionend belief is used in drop condition of carry ore goal. -->
+		<beliefref name="missionend">
+			<concrete ref="move.missionend"/>
+		</beliefref>
+		<!-- Environment belief is used CarryPlan. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		<!-- Self belief is used CarryOrePlan. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
+		<belief name="agrspace" class="AGRSpace">
+			<fact class="IFuture">$scope.getParentAccess().getExtension("myagrspace")</fact>
+		</belief>
+	</beliefs>
+
+  	<goals>
+		<!-- Carry ore to the homebase. -->
+		<achievegoal name="carry_ore">
+			<parameter name="target" class="ISpaceObject"/>
+ 			<dropcondition language="jcl">
+				$beliefbase.missionend
+				// (belief (element_has_model.melement_has_name "missionend") (belief_has_fact true))
+			</dropcondition>
+			<deliberation>
+				<inhibits cref="move.walk_around"/>
+			</deliberation>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- The main plan handling action requests. -->
+		<plan name="carry_plan">
+			<body type="bpmn" impl="CarryPlan"/>
+			<waitqueue>
+				<messageevent ref="request_carry"/>
+			</waitqueue>
+		</plan>
+
+		<!-- Carry ore to the homebase. -->
+		<plan name="carry_ore_plan">
+			<parameter name="target" class="ISpaceObject">
+				<goalmapping ref="carry_ore.target"/>
+			</parameter>
+			<body type="bpmn" impl="CarryOrePlan"/>
+			<trigger>
+				<goal ref="carry_ore"/>
+			</trigger>
+		</plan>
+
+		<!-- Inform sentries about new targets. -->
+		<plan name="informer">
+			<body type="bpmn" impl="InformNewTargetPlan"/>
+			<!-- Inform whenever a new fact is added to the belief set my_targets. -->
+			<trigger>
+				<factadded cref="move.my_targets"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Message event for carry ore task allocation. -->
+		<messageevent name="request_carry" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<match>$content instanceof RequestCarry</match>
+		</messageevent>
+
+		<!-- Message event for informing sentries about new targets. -->
+		<messageevent name="inform_target" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+		</messageevent>
+	</events>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<!-- Create a goal for walking around. -->
+				<initialgoal cref="move.walk_around"/>
+			</goals>
+			<plans>
+				<initialplan ref="carry_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

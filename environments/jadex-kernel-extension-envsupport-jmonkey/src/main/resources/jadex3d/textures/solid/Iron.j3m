@@ -1,0 +1,15 @@
+Material Iron : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : jadex3d/textures/solid/metalfloor.jpg
+        NormalMap: jadex3d/textures/solid/metalfloor_normal3.jpg
+       	Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 1.0 1.0
+        GlowColor : 1.0 1.0 1.0 1.0
+        VertexLighting : false
+        UseMaterialColors : false
+     }
+     AdditionalRenderState {
+      FaceCull Back
+    }
+}

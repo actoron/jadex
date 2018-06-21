@@ -1,0 +1,22 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Flip Repeat jadex3d/models/space/misc/station/base_texture1.jpg
+        Specular : 0.0 0.0 0.0 1.0
+        Diffuse : 0.5882 0.5882 0.5882 1.0
+        UseMaterialColors : true
+        ParallaxHeight : 0.05
+        Ambient : 0.5882 0.5882 0.5882 1.0
+        Shininess : 10.0
+    }
+    AdditionalRenderState {
+        FaceCull Back
+        Wireframe Off
+        DepthWrite On
+        PolyOffset 0.0 0.0
+        AlphaTestFalloff 0.0
+        Blend Off
+        PointSprite Off
+        ColorWrite On
+        DepthTest On
+    }
+}

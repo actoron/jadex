@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The cancel meta capability is used by other protocol
+	capabilities to handle protocol abortion according
+	to the FIPA cancel meta protocol.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	package="jadex.bdi.planlib.protocols.cancelmeta"
+	name="CancelMeta">
+
+	<imports>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>java.util.*</import>
+		<import>jadex.commons.IFilter</import>
+		<import>jadex.base.Starter</import>
+	</imports>
+
+	<beliefs>
+		<!-- Timeout for messages. -->
+		<belief name="timeout" class="Long" exported="true">
+			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
+		</belief>
+
+		<!-- Filters are only relevant for the participants protocol side. - ->
+
+		<!- - The filter for deciding which cancel messages are handled in this capability. not needed as matching uses converstion id - ->
+		<belief name="cm_filter" class="IFilter" exported="true">
+			<fact>IFilter.NEVER</fact>
+		</belief>
+		-->
+	</beliefs>
+
+	<goals>
+	
+		<!-- FIPA-Cancel-Meta-Protocol goals. -->
+
+		<!-- (Initiator side) Cancel a running interaction according to FIPA cancel meta protocol. -->
+		<achievegoal name="cm_initiate" exported="true">
+			<!-- The initial message of the to-be-cancelled interaction. -->
+			<parameter name="message" class="IMessageEvent"/>
+			<!-- The timeout from the original interaction. -->
+			<parameter name="timeout" class="long"/>
+			<!-- The interaction state. -->
+			<parameter name="interaction_state" class="InteractionState"/>
+		</achievegoal>
+
+		<!-- (Participant side) Handle cancel requests. -->
+		<performgoal name="cm_handler" exported="true">
+			<!-- The interaction goal. -->
+			<parameter name="interaction_goal" class="IGoal"/>
+		</performgoal>
+		
+		<!-- (Participant side) Optional goal to approve a cancel request (default=true). -->
+		<querygoal name="cm_approve_cancel" exported="true">
+			<!-- The interaction to be cancelled. -->
+			<parameter name="conversation_id" class="String"/>
+			<!-- The protocol of the interaction to be cancelled. -->
+			<parameter name="protocol" class="String"/>
+			<!-- The initiator agent for the cancel request. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
+			<!-- True, if the cancellation is ok. -->
+			<parameter name="result" class="Boolean" direction="out"/>
+			<!-- A failure reason when cancellation is not ok. -->
+			<parameter name="failure_reason" class="Object" direction="out" optional="true"/>
+		</querygoal>
+
+	</goals>
+
+	<plans>
+	
+		<!-- Plan for cancelling an interaction (initiator side of FIPA-Cancel-Meta-Protocol). -->
+		<plan name="cm_initiator_plan">
+			<parameter name="message" class="IMessageEvent">
+				<goalmapping ref="cm_initiate.message"/>
+			</parameter>
+			<parameter name="timeout" class="long">
+				<goalmapping ref="cm_initiate.timeout"/>
+			</parameter>
+			<parameter name="interaction_state" class="InteractionState">
+				<goalmapping ref="cm_initiate.interaction_state"/>
+			</parameter>
+			<body class="CMInitiatorPlan" />
+			<trigger>
+				<goal ref="cm_initiate"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plan for cancelling an interaction (receiver side of FIPA-Cancel-Meta-Protocol). -->
+		<plan name="cm_handler_plan">
+			<parameter name="interaction_goal" class="IGoal">
+				<goalmapping ref="cm_handler.interaction_goal"/>
+			</parameter>
+			<body class="CMHandlerPlan" />
+			<trigger>
+				<goal ref="cm_handler"/>
+			</trigger>
+		</plan>
+		
+		<!-- Default plan for deciding about cancellation. -->
+		<plan name="cm_approve_cancel_plan" priority="-1">
+			<parameter name="result" class="boolean" direction="out">
+				<goalmapping ref="cm_approve_cancel.result"/>
+			</parameter>
+			<body class="CMApproveCancelPlan" />
+			<trigger>
+				<goal ref="cm_approve_cancel"/>
+			</trigger>
+		</plan>
+		
+	</plans>
+
+	<events>
+
+		<!-- Cancel message sent by initiator side to terminate an ongoing interaction.
+			 Part of the generic FIPA-Cancel-Meta-Protocol (CM). -->
+		<messageevent name="cm_cancel" type="fipa" direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.CANCEL</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_CANCEL_META</value>
+			</parameter>
+  			<match>/*$beliefbase.cm_filter.filter($messagemap) &amp;&amp;*/ $conversation_id!=null</match>
+		</messageevent>	
+
+		<!-- Inform message sent by receiver side describing successful termination of an ongoing interaction.
+			 Part of the generic FIPA-Cancel-Meta-Protocol (CM). -->
+		<messageevent name="cm_inform" type="fipa"  direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_CANCEL_META</value>
+			</parameter>
+			<match>$conversation_id!=null</match>
+		</messageevent>	
+
+		<!-- Failure message sent by receiver side describing failed termination of an ongoing interaction.
+			 Part of the generic FIPA-Cancel-Meta-Protocol (CM). -->
+		<messageevent name="cm_failure" type="fipa"  direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.FAILURE</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_CANCEL_META</value>
+			</parameter>
+			<match>$conversation_id!=null</match>
+		</messageevent>	
+		
+		<!-- Not-understood message sent by receiver side describing the wish to abort the interaction. -->
+		<messageevent name="cm_not_understood" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.NOT_UNDERSTOOD</value>
+			</parameter>
+			<match>$conversation_id!=null</match>
+		</messageevent>	
+		
+	</events>
+	
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+	</properties>
+
+</capability>

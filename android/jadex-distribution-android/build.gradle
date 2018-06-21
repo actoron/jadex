@@ -1,0 +1,52 @@
+description 'The android distribution of the Jadex middleware including all typical modules that can be used on Android.'
+
+dependencies
+{
+	// Tests for this project are completely broken
+	api project(':jadex-android-bluetooth')
+
+	api project(':android:jadex-android-antlr')
+	api project(':android::jadex-android-commons')
+	api project(':android::jadex-android-xmlpull')
+	api project(':platform:jadex-bridge')
+	api project(':util:jadex-commons')
+	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons:jadex-commons-security')
+	api project(':util:jadex-bytecode-tools')
+	api project(':util:jadex-javaparser')
+	api project(':serialization:jadex-json')
+	api project(':kernels:jadex-kernel-base')
+	api project(':kernels:jadex-kernel-bdiv3')
+	api project(':android:jadex-kernel-bdiv3-android')
+	api project(':kernels:jadex-kernel-bpmn')
+	api project(':kernels:jadex-kernel-component')
+	api project(':kernels:jadex-kernel-micro')
+	api project(':kernels:jadex-kernel-microservice')
+	api project(':kernels:jadex-model-bpmn')
+	api project(':platform:jadex-platform')
+	api project(':platform:jadex-platform-android')
+	api project(':transports:jadex-platform-extension-relaytransport')
+	api project(':transports:jadex-platform-extension-websockettransport')
+	api project(':platform:jadex-platform-extension-webservice')
+	api project(':platform:jadex-platform-extension-webservice-android')
+	api project(':rules:jadex-rules')
+	api project(':rules:jadex-rules-eca')
+	api project(':android:jadex-runtimetools-android')
+	api project(':tools:jadex-tools-base')
+	api project(':serialization:jadex-xml')
+	
+	
+	// Below this was the old stuff, all artifacts were already commented, so this packages had none?
+	
+    // do not use distribution-minimal, because we do not need platform-standalone-launch
+//    api project(':jadex-distribution-minimal')
+
+//    api project(':jadex-platform-android')
+//    api project(':jadex-android-xmlpull')
+//    api project(':jadex-android-bluetooth')
+//    api project(':jadex-kernel-bdiv3-android')
+//    api project(':jadex-kernel-bpmn')
+//    api project(':jadex-kernel-component')
+//    api project(':jadex-platform-extension-webservice-android')
+//    api project(':jadex-runtimetools-android')
+}

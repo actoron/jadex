@@ -1,0 +1,49 @@
+<!--
+	<H3>The message application</H3>
+
+	It can be started to launch a message scenario.
+-->
+
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="Message" package="jadex.bpmn.examples.message" autoshutdown="true">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+	</imports>
+	
+	<arguments>
+		<!-- The number of messages to send by the sender. -->
+		<argument name="message_number" class="Integer">1000</argument>
+	</arguments>
+	
+	<componenttypes>
+		<componenttype name="Sender" filename="jadex/bpmn/examples/message/MessageSending.bpmn"/>
+		<componenttype name="Receiver" filename="jadex/bpmn/examples/message/MessageReceival.bpmn"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="One sender and one receiver">
+			<components>
+				<!-- <component type="Receiver" name="Receiver" master="true">-->
+				<component type="Receiver" name="Receiver">
+					<arguments>
+						<argument name="message_number">$args.message_number</argument>
+					</arguments>
+				</component>
+				<component type="Sender" name="Sender">
+					<arguments>
+						<argument name="message_number">$args.message_number</argument>
+						<argument name="receivers">new String[]{"Receiver"}</argument>
+					</arguments>
+				</component>
+			</components>
+		</configuration>
+	</configurations>
+
+</applicationtype>

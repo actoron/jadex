@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<invoice xmlns="http://jadex.sourceforge.net/ns1">
+	<name>Jadex agent software suite.</name>
+	<description>Special update offer.</description>
+	<price>999.98</price>
+	<ns2:product ns2:name="Jadex" 
+		xmlns:ns2="http://jadex.sourceforge.net/ns2">
+		<ns2:type>"Software"</ns2:type>
+		<ns2:date>11.01.2010</ns2:date>		
+	</ns2:product>
+	<quantity>1</quantity>
+</invoice>

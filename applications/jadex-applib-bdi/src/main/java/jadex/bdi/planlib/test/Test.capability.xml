@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The Test capability is responsible for tracking
+  test results and publishes results either to a
+  test center or on console.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	package="jadex.bdi.planlib.test"
+	name="Test">
+
+	<imports>
+		<import>jadex.base.test.*</import>
+		<import>jadex.base.Starter</import>
+	</imports>
+
+	<beliefs>
+		<!-- The number of testcases. -->
+		<belief name="testcase_cnt" class="int" exported="true">
+			<fact>1</fact>
+		</belief>
+
+		<!-- Default timeout platform timeout, e.g. 30 seconds. -->
+		<belief name="timeout" class="long" exported="true">
+			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
+		</belief>
+
+		<!-- The testcase reports. -->
+		<beliefset name="reports" class="TestReport" exported="true"/>
+		
+		<!-- The results have to be published by the agent. -->
+		<belief name="testresults" class="Testcase" exported="true" evaluationmode="pull">
+			<fact>new Testcase($beliefbase.testcase_cnt, $beliefbase.reports)</fact>
+		</belief>
+
+		<!-- The off flag. -->
+		<belief name="off" class="boolean">
+			<fact>false</fact>
+		</belief>
+
+		<!-- The start time. -->
+		<belief name="starttime" class="long">
+			<fact>$scope.getTime()</fact>
+		</belief>
+
+		<!-- The indicator for a timeout (when no time left and reports incomplete). -->
+		<belief name="timeout_failure" class="boolean" updaterate="$beliefbase.timeout">
+			<fact>((Number)$beliefbase.getBelief("timeout").getFact()).longValue()>0 
+				&amp;&amp; ((Number)$beliefbase.getBelief("starttime").getFact()).longValue()
+					+((Number)$beliefbase.getBelief("timeout").getFact()).longValue() &lt;= $scope.getTime()
+				&amp;&amp; ((Number)$beliefbase.getBelief("testcase_cnt").getFact()).intValue()
+					!=$beliefbase.getBeliefSet("reports").getFacts().length</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="tests_finished">
+			<creationcondition>
+				$beliefbase.testcase_cnt==$beliefbase.reports.length
+			</creationcondition>		
+		</achievegoal>
+		<achievegoal name="test_timeout">
+			<creationcondition>
+				!$beliefbase.off &amp;&amp; $beliefbase.timeout_failure
+			</creationcondition>		
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Stop the test agent. -->
+		<plan name="finished_plan">
+			<body class="FinishedPlan" />
+			<trigger>
+				<goal ref="tests_finished"/>
+				<goal ref="test_timeout"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default" />
+		<configuration name="off">
+			<beliefs>
+				<initialbelief ref="off">
+					<fact>true</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+
+</capability>

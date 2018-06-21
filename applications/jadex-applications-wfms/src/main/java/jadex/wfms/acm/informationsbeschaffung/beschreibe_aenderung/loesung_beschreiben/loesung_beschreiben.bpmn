@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_XRFIkWl4Ed-bhvVt-Y1Mlg" iD="_XRFIkGl4Ed-bhvVt-Y1Mlg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_eQACgGl4Ed-bhvVt-Y1Mlg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eQApkGl4Ed-bhvVt-Y1Mlg" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eQB3sGl4Ed-bhvVt-Y1Mlg" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xzWGUGl4Ed-bhvVt-Y1Mlg" key="imports" value="jadex.wfms.parametertypes.*"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_XRFIl2l4Ed-bhvVt-Y1Mlg" iD="_XRFIlml4Ed-bhvVt-Y1Mlg" name="body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XRFvoWl4Ed-bhvVt-Y1Mlg" iD="_XRFvoGl4Ed-bhvVt-Y1Mlg" outgoingEdges="_S2ewEWl5Ed-bhvVt-Y1Mlg" incomingEdges="_gIHasWl4Ed-bhvVt-Y1Mlg" name="Loesungsbeschreibung_eingeben" lanes="_i72GkWl4Ed-bhvVt-Y1Mlg" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fNFV0Gl4Ed-bhvVt-Y1Mlg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fNFV0Wl4Ed-bhvVt-Y1Mlg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nm0A4Gl4Ed-bhvVt-Y1Mlg" key="parameters" value="inout␋Loesungsbeschreibung␋Text␋new Text()␟inout␋LoesungExtPath␋String␋&quot;&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fHpcMWl4Ed-bhvVt-Y1Mlg" iD="_fHpcMGl4Ed-bhvVt-Y1Mlg" outgoingEdges="_gIHasWl4Ed-bhvVt-Y1Mlg" lanes="_i72GkWl4Ed-bhvVt-Y1Mlg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_OqkJQWl5Ed-bhvVt-Y1Mlg" iD="_OqkJQGl5Ed-bhvVt-Y1Mlg" outgoingEdges="_0qyYEWl5Ed-bhvVt-Y1Mlg" incomingEdges="_S2ewEWl5Ed-bhvVt-Y1Mlg" name="Write_Context" lanes="_i72GkWl4Ed-bhvVt-Y1Mlg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QQ-GYGl5Ed-bhvVt-Y1Mlg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QQ-tcGl5Ed-bhvVt-Y1Mlg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T4PIAGl5Ed-bhvVt-Y1Mlg" key="parameters" value="in␋beliefname0␋java.lang.String␋&quot;Loesungsbeschreibung&quot;␟in␋value0␋java.lang.Object␋Loesungsbeschreibung.getText()␟inout␋beliefname1␋java.lang.String␋&quot;LoesungExtPath&quot;␟inout␋value1␋java.lang.Object␋LoesungExtPath"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_0Ps-kWl5Ed-bhvVt-Y1Mlg" iD="_0Ps-kGl5Ed-bhvVt-Y1Mlg" incomingEdges="_0qyYEWl5Ed-bhvVt-Y1Mlg" lanes="_i72GkWl4Ed-bhvVt-Y1Mlg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gIHasWl4Ed-bhvVt-Y1Mlg" iD="_gIHasGl4Ed-bhvVt-Y1Mlg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_S2ewEWl5Ed-bhvVt-Y1Mlg" iD="_S2ewEGl5Ed-bhvVt-Y1Mlg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_0qyYEWl5Ed-bhvVt-Y1Mlg" iD="_0qyYEGl5Ed-bhvVt-Y1Mlg"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_i72GkWl4Ed-bhvVt-Y1Mlg" iD="_i72GkGl4Ed-bhvVt-Y1Mlg" name="FuehrenderEntwickler" activities="_XRFvoWl4Ed-bhvVt-Y1Mlg _fHpcMWl4Ed-bhvVt-Y1Mlg _OqkJQWl5Ed-bhvVt-Y1Mlg _0Ps-kWl5Ed-bhvVt-Y1Mlg"/>
+  </pools>
+</bpmn:BpmnDiagram>

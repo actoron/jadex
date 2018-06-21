@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test abstract query goal dispatched by inner capability.</H3>
+
+	Dispatches an abstract query goal.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AbstractQueryGoal"
+	package="jadex.bdi.testcases.goals">
+	
+	<beliefs>
+		<beliefsetref name="reports">
+			<abstract/>
+		</beliefsetref>
+	</beliefs>
+
+	<goals>
+		<querygoalref name="testgoal" exported="true">
+			<abstract/>
+		</querygoalref>
+	</goals>
+	
+	<plans>
+		<plan name="generate_goal_plan">
+			<body class="GenerateGoalPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="generate_goal_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</capability>
+

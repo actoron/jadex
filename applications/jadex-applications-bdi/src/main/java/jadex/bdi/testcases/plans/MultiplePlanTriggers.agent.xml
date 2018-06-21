@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test multiple plan triggers</H3>
+
+	In this test scenario a plan has more than one plan trigger,
+	e.g. a beliefchange and a condition.
+	<p>
+	<b>This testcases fails.
+	Problem: condition, beliefchange, beliefsetchanges create
+	their own conditions that are activated independently. Hence
+	a plan is activated more than once for the same event.</b>
+	Is there a better solution?
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="MultiplePlanTriggers"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports" >
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="bel_a" class="int"/>
+		<belief name="plan_cnt" class="int"/>
+	</beliefs>
+
+	<plans>
+		<plan name="a_changed">
+			<parameter name="beliefname" class="String">
+				<value>"plan_cnt"</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<condition>
+					$beliefbase.bel_a>0
+				</condition>
+				<factchanged ref="bel_a"/>
+			</trigger>
+		</plan>
+		<plan name="tester">
+			<body class="MultipleTesterPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+        <!--<property name="debugging">true</property>-->
+        <!--<property name="logging.level">java.util.logging.Level.INFO</property>-->
+        <property name="logging.useParentHandlers">true</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

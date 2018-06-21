@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <ListView 
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:id="@+id/chat_listView">
+    </ListView>
+<!--     <ScrollView -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_weight="1" > -->
+
+<!--         <TextView -->
+<!--             android:id="@+id/agntTextView" -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="fill_parent" /> -->
+<!--     </ScrollView> -->
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Chat Msg" />
+	
+	        <EditText
+	            android:id="@+id/chatmsg"
+	            android:layout_width="0dip"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"/>
+	
+	        <Button
+	            android:id="@+id/send"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Send" />
+		</TableRow>
+    </TableLayout>
+
+</LinearLayout>

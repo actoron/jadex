@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>D1_TimeEvent</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="1XZevpplvUwWTLBf">
+    <semantic:startEvent id="Ei+PAXOetNQp+HTJ">
+      <semantic:outgoing>9EPEmL+0vT29i0Eu</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Send 1st \nReminder" id="rjunBFW4QaV+kfpW">
+      <semantic:incoming>9EPEmL+0vT29i0Eu</semantic:incoming>
+      <semantic:outgoing>dD5jIIK3Z+uR7P2M</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Sending 1st reminder&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Send 2nd\nReminder" id="QLtzb+djnXORbRmS">
+      <semantic:incoming>v9FwjtXjtAkB44MG</semantic:incoming>
+      <semantic:outgoing>muoGzl7Lf6DgVb0U</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Sending 2nd reminder&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:intermediateCatchEvent id="ozp52KYsH5xPPly4">
+      <semantic:incoming>dD5jIIK3Z+uR7P2M</semantic:incoming>
+      <semantic:outgoing>v9FwjtXjtAkB44MG</semantic:outgoing>
+      <semantic:timerEventDefinition>
+        <semantic:timeDuration>3000</semantic:timeDuration>
+      </semantic:timerEventDefinition>
+      <semantic:extensionElements>
+        <jadex:property name="duration">3000</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:endEvent id="QAn+b0Y4inZ1Uwfw">
+      <semantic:incoming>muoGzl7Lf6DgVb0U</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="Ei+PAXOetNQp+HTJ" targetRef="rjunBFW4QaV+kfpW" id="9EPEmL+0vT29i0Eu">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="rjunBFW4QaV+kfpW" targetRef="ozp52KYsH5xPPly4" id="dD5jIIK3Z+uR7P2M">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="QLtzb+djnXORbRmS" targetRef="QAn+b0Y4inZ1Uwfw" id="muoGzl7Lf6DgVb0U">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="ozp52KYsH5xPPly4" targetRef="QLtzb+djnXORbRmS" id="v9FwjtXjtAkB44MG">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="1XZevpplvUwWTLBf">
+        <dc:Bounds height="360.0" width="980.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Ei+PAXOetNQp+HTJ">
+        <dc:Bounds height="40.0" width="40.0" x="90.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rjunBFW4QaV+kfpW">
+        <dc:Bounds height="100.0" width="160.0" x="210.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="QLtzb+djnXORbRmS">
+        <dc:Bounds height="100.0" width="160.0" x="560.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ozp52KYsH5xPPly4">
+        <dc:Bounds height="40.0" width="40.0" x="440.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="QAn+b0Y4inZ1Uwfw">
+        <dc:Bounds height="40.0" width="40.0" x="800.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="9EPEmL+0vT29i0Eu">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="dD5jIIK3Z+uR7P2M">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="v9FwjtXjtAkB44MG">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="muoGzl7Lf6DgVb0U">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

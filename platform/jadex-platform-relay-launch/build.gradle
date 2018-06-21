@@ -1,0 +1,12 @@
+
+apply plugin: 'application'
+mainClassName = "jadex.relay.launch.Main"
+
+
+dependencies
+{
+	api project(':distributions:jadex-distribution-minimal')
+	api project(':transports:jadex-platform-extension-relaytransport')
+	api project(':transports:jadex-platform-extension-websockettransport')
+}
+

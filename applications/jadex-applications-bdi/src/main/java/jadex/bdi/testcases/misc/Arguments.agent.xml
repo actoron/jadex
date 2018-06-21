@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Agent for testing agent arguments.</H3>
+	Command-line starting and argument passing can be done in this style:
+	a1:jadex.bdi.testcases.misc.Arguments(default,arg1=\"juppi\",testcase_cnt=1)
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Arguments"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="arg1" class="String" exported="true">
+			<fact>"default"</fact>
+		</belief>
+		<belief name="arg2" class="Object" exported="true"/>
+		<belief name="arg3" class="Integer" exported ="true">
+			<fact>new Integer(3)</fact>
+		</belief>
+		<belief name="arg4" class="boolean" exported="true"/>
+	
+		<beliefref name="testcase_cnt"  exported="true">
+			<concrete ref="testcap.testcase_cnt"/>
+		</beliefref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+	
+	<plans>
+		<plan name="arguments_plan">
+			<body class="ArgumentsPlan"/>
+			<waitqueue>
+				<messageevent ref="inform_created"/>
+			</waitqueue>
+		</plan>
+	</plans>
+	
+	<events>
+		<messageevent name="inform_created" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String" direction="fixed">
+				<value>"worker"</value>
+			</parameter>
+		</messageevent>
+	</events>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!--<property name="debugging">false</property> -->
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="arg1">
+					<fact>"initial"</fact>
+				</initialbelief>
+				<initialbelief ref="testcase_cnt">
+					<fact>1</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="arguments_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="alternaltive1">
+			<beliefs>
+				<initialbelief ref="arg1">
+					<fact>"initial_alter"</fact>
+				</initialbelief>
+				<initialbelief ref="testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="arguments_plan"/>
+			</plans>
+		</configuration>
+		<!--<configuration name="alternaltive2">
+			<capabilities>
+				<initialcapability ref="testcap" configuration="test"/>
+			</capabilities>
+			<plans>
+				<initialplan ref="arguments_plan"/>
+			</plans>
+		</configuration>-->
+	</configurations>
+</agent>
+

@@ -1,0 +1,33 @@
+Objective:
+
+- Use an xml with mixed element tags, i.e.
+
+-> start object1
+-> start object2 - end object2
+-> end object1
+
+todo: This is basically supported, but currently no specific 
+mappings can be defined for an xml inner object that is not 
+explicitly mapped to a Java object but to its parent.
+(As firstname and lastname of person in this example).
+
+
+Original Jibx config and result:
+
+<binding>
+  <mapping name="customer" class="example12.Customer">
+    <structure name="person" value-style="attribute">
+      <value name="cust-num" field="customerNumber"/>
+      <value name="first-name" field="firstName"/>
+      <value style="text" field="lastName"/>
+    </structure>
+    <structure field="address"/>
+    <value name="phone" field="phone"/>
+  </mapping>
+  <mapping name="address" class="example12.Address">
+    <value name="street" field="street"/>
+    <value name="city" field="city"/>
+    <value name="state" field="state"/>
+    <value name="zip" style="attribute" field="zip"/>
+  </mapping>
+</binding>>

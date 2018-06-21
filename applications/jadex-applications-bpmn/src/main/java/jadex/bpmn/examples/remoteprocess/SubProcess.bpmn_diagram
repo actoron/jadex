@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_k1hdoAr2EeGP-Kw9N9E5Mw" type="Bpmn" name="SubProcess.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_k1irwAr2EeGP-Kw9N9E5Mw" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_k1jS0Ar2EeGP-Kw9N9E5Mw" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_k1jS0Qr2EeGP-Kw9N9E5Mw" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_k1j54Ar2EeGP-Kw9N9E5Mw" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_k1kg8Ar2EeGP-Kw9N9E5Mw" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_k1j54Qr2EeGP-Kw9N9E5Mw" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_k1j54gr2EeGP-Kw9N9E5Mw"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_k1j54wr2EeGP-Kw9N9E5Mw"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_k1j55Ar2EeGP-Kw9N9E5Mw" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="SubProcess.bpmn#_k1iEsQr2EeGP-Kw9N9E5Mw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_k1lIAAr2EeGP-Kw9N9E5Mw" x="55" y="70" width="111" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_9SYOEAr2EeGP-Kw9N9E5Mw" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_9SZcMAr2EeGP-Kw9N9E5Mw" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_9SYOEQr2EeGP-Kw9N9E5Mw" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_9SYOEgr2EeGP-Kw9N9E5Mw"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_9SYOEwr2EeGP-Kw9N9E5Mw"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_9SYOFAr2EeGP-Kw9N9E5Mw" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="SubProcess.bpmn#_9SXnAQr2EeGP-Kw9N9E5Mw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9SYOFQr2EeGP-Kw9N9E5Mw" x="204" y="68"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_k1jS0gr2EeGP-Kw9N9E5Mw"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_k1jS0wr2EeGP-Kw9N9E5Mw"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_k1jS1Ar2EeGP-Kw9N9E5Mw"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_k1irwQr2EeGP-Kw9N9E5Mw" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_k1irwgr2EeGP-Kw9N9E5Mw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_k1irwwr2EeGP-Kw9N9E5Mw" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_k1irxAr2EeGP-Kw9N9E5Mw" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="SubProcess.bpmn#_k1hdpQr2EeGP-Kw9N9E5Mw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_k1jS1Qr2EeGP-Kw9N9E5Mw" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_k1hdoQr2EeGP-Kw9N9E5Mw"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_k1hdogr2EeGP-Kw9N9E5Mw"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_k1hdowr2EeGP-Kw9N9E5Mw"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="SubProcess.bpmn#_k1g2kQr2EeGP-Kw9N9E5Mw"/>
+  <edges xmi:type="notation:Edge" xmi:id="_9ShYAAr2EeGP-Kw9N9E5Mw" type="3001" source="_k1j54Ar2EeGP-Kw9N9E5Mw" target="_9SYOEAr2EeGP-Kw9N9E5Mw">
+    <children xmi:type="notation:Node" xmi:id="_9Sh_EAr2EeGP-Kw9N9E5Mw" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_9Sh_EQr2EeGP-Kw9N9E5Mw" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_9Sh_Egr2EeGP-Kw9N9E5Mw" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_9Sh_Ewr2EeGP-Kw9N9E5Mw" y="40"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_9ShYAQr2EeGP-Kw9N9E5Mw" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_9ShYAgr2EeGP-Kw9N9E5Mw" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_9ShYAwr2EeGP-Kw9N9E5Mw" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="SubProcess.bpmn#_9Sgw8Ar2EeGP-Kw9N9E5Mw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_9ShYBAr2EeGP-Kw9N9E5Mw" points="[-31, -28, 79, 72]$[-108, -98, 2, 2]"/>
+  </edges>
+</notation:Diagram>

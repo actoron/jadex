@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test subgoal handling in standard plans.</H3>
+	
+	The agent tests correct handling of three cases:
+	<ol>
+		<li>The subgoal succeeds and the plan continues.</li>
+		<li>The subgoal fails an a GoalFailureException is thrown.</li>
+		<li>The subgoal times out a TimeoutException is thrown.</li>
+	</ol>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="SubgoalHandling"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="success_goal"/>
+		<achievegoal name="failure_goal"/>
+		<achievegoal name="timeout_goal"/>
+	</goals>
+
+	<plans>
+        <plan name="test_plan">
+        	<body class="SubgoalHandlingPlan"/>
+		</plan>
+		<plan name="success_plan">
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="success_goal"/>
+			</trigger>
+		</plan>
+		<plan name="failure_plan">
+			<parameter name="success" class="boolean">
+				<value>false</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="failure_goal"/>
+			</trigger>
+		</plan>
+		<plan name="timeout_plan">
+			<parameter name="wait" class="long">
+				<value>10000L</value>
+			</parameter>
+			<parameter name="success" class="boolean">
+				<value>false</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<goal ref="timeout_goal"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

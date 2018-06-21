@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test the atomic execution of the start agent action.</H3>
+	
+	If the start agent action is executed as transaction
+	evaluating the initial fact of the belief should trigger the plan
+	printing the belief value ("Hello World!").
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="InitialTransaction"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="text"  class="String">
+			<fact>"Hello World!"</fact>
+		</belief>
+		<belief name="result" class="String">
+			<fact>"sth"</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+        <plan name="print">
+			<parameter name="value" class="Object">
+				<value>$beliefbase.text</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"result"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+			<trigger>
+				<condition>
+					$beliefbase.text!=null
+				</condition>
+			</trigger>
+		</plan>
+		<plan name="tester">
+			<body class="InitialTransactionPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<!--<property name="debugging">true</property>-->
+		<!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
+		<property name="logging.useParentHandlers">true</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="tester"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+
+</agent>
+

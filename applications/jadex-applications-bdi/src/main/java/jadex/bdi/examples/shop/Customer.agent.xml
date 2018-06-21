@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Customer agent that buys items.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Customer"
+	package="jadex.bdi.examples.shop">
+
+	<capabilities>
+		<capability name="customercap" file="jadex.bdi.examples.shop.Customer"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="money" class="double" argument="true">
+			<assignto ref="customercap.money"/>
+			<fact>100</fact>
+		</belief>
+		<beliefsetref name="inventory">
+			<concrete ref="customercap.inventory"/>
+		</beliefsetref>
+	</beliefs>
+	
+	<properties>
+		<property name="componentviewer.viewerclass">"jadex.bdi.planlib.DefaultBDIViewerPanel"</property>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+</agent>

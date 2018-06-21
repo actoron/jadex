@@ -1,0 +1,18 @@
+description 'Jadex examples that can be deployed as web application.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':serialization:jadex-xml')
+	api project(':serialization:jadex-json')
+	api project(':platform:jadex-bridge')
+	api project(':tools:jadex-tools-base-swing')
+//	api project(':kernels:jadex-kernel-bdi')
+	api project(':kernels:jadex-kernel-bdiv3')
+	api project(':kernels:jadex-kernel-micro')
+	api project(':kernels:jadex-kernel-component')
+	api project(':platform:jadex-platform')
+	
+	compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+	api 'javax.websocket:javax.websocket-api:1.1'
+}

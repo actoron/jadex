@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Represents the participant in ping protocol.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="PingReceiver"
+	package="jadex.bdi.testcases.planlib">
+
+	<capabilities>
+		<capability name="procap" file="jadex.bdi.planlib.ping.Ping"/>
+	</capabilities>
+
+	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>	
+
+</agent>
+

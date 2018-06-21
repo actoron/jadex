@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Carry agent for carrying ore.</H3>
+
+	This Agent is called by the Production
+	Agent to carry the produced ore. Therefore it is registering
+	it's carry-servivce at the DF.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Carry"
+	package="jadex.bdi.examples.marsworld_classic.carrier">
+
+	<imports>
+		<import>jadex.bdi.examples.marsworld_classic.*</import>
+		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.commons.future.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the move capability as move for basic movement. -->
+		<capability name="move" file="jadex.bdi.examples.marsworld_classic.movement.Movement"/>
+	</capabilities>
+
+	<beliefs>
+
+		<!-- The ore capacity it can carry. -->
+		<belief name="my_capacity" class="int">
+			<fact>20</fact>
+		</belief>
+
+		<!-- The carried ore amount. -->
+		<belief name="ore" class="int">
+			<fact>0</fact>
+		</belief>
+
+		<!-- The targets sent to the sentries. -->
+		<beliefset name="finished_targets" class="Target"/>
+		
+		<beliefref name="missionend">
+			<concrete ref="move.missionend"/>
+		</beliefref>
+		<beliefref name="my_type">
+			<concrete ref="move.my_type"/>
+		</beliefref>
+		<beliefref name="my_speed">
+			<concrete ref="move.my_speed"/>
+		</beliefref>
+		<beliefref name="my_vision">
+			<concrete ref="move.my_vision"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<!-- Carry ore home from a target. -->
+		<achievegoal name="carry_ore">
+			<parameter name="destination" class="Location"/>
+			<dropcondition>
+				$beliefbase.missionend
+			</dropcondition>
+			<deliberation>
+				<inhibits cref="move.walk_around"/>
+			</deliberation>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- Main service plan that handles action requests. -->
+		<plan name="carry">
+			<body class="CarryPlan"/>
+			<!--<trigger>
+				<messageevent ref="request_carry"/>
+			</trigger>-->
+			<waitqueue>
+				<messageevent ref="request_carry"/>
+			</waitqueue>
+		</plan>
+
+		<!-- Carry home ore. -->
+		<plan name="carry_ore">
+			<parameter name="destination" class="Location">
+				<goalmapping ref="carry_ore.destination"/>
+ 			</parameter>
+ 			<body class="CarryOrePlan"/>
+			<trigger>
+				<goal ref="carry_ore"/>
+			</trigger>
+		</plan>
+
+		<!-- Inform sentries about a new target.-->
+		<plan name="informer">
+			<body class="InformNewTargetPlan"/>
+			<trigger>
+				<factadded cref="move.my_targets"/>
+			</trigger>
+		</plan>
+		
+		<plan name="df_keep_registered">
+	        <parameter name="description" class="IDFComponentDescription"/>
+	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
+	    </plan>
+		
+	</plans>
+
+	<events>
+		<messageevent name="request_carry" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REQUEST</value>
+			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>MarsOntology.ONTOLOGY_NAME</value>
+			</parameter>
+			<match>$content instanceof RequestCarry</match>
+		</messageevent>
+
+		<messageevent name="inform_target" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>MarsOntology.ONTOLOGY_NAME</value>
+			</parameter>
+		</messageevent>
+	</events>
+	
+	<properties>
+   		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="my_type">
+					<fact>Environment.CARRY_AGENT</fact>
+				</initialbelief>
+				<initialbelief ref="my_speed">
+					<fact>15.0</fact>
+				</initialbelief>
+				<initialbelief ref="my_vision">
+					<fact>0.05</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<!-- Create a goal for walking around. -->
+				<initialgoal cref="move.walk_around"/>
+				<!-- Create a goal for watching for targets. -->
+				<initialgoal cref="move.watch_targets"/>
+			</goals>
+			<plans>
+				<initialplan ref="carry"/>
+				<initialplan ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
+								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								.createDFServiceDescription("service_carry", "service_carry", "University of Hamburg"),
+								20000)
+ 						</value>
+					</parameter>
+				</initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

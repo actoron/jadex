@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_VEGsYU4pEd-h4K8oRzpwEg" iD="_VEGsYE4pEd-h4K8oRzpwEg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WQF-YE4pEd-h4K8oRzpwEg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WQF-YU4pEd-h4K8oRzpwEg" key="Description" value="&lt;h1>Asynchronous checklist process&lt;/h1> The process shows some parallel information requesters.&lt;br/> The process terminates after all requesters have been closed."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WQF-Yk4pEd-h4K8oRzpwEg" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flCQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_VEGsZ04pEd-h4K8oRzpwEg" iD="_VEGsZk4pEd-h4K8oRzpwEg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_VEGsaU4pEd-h4K8oRzpwEg" iD="_VEGsaE4pEd-h4K8oRzpwEg" name="Drinks" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XHXkoE4pEd-h4K8oRzpwEg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XHXkoU4pEd-h4K8oRzpwEg" key="class" value="AsynchronousOKTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_x0fk4ARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk4QRPEeCnwcpWvxOwkg" key="dimension" value="3:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk4gRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk4wRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk5ARPEeCnwcpWvxOwkg" key="0:1" value="message"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk5QRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk5gRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Remember to get drinks for your party.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk5wRPEeCnwcpWvxOwkg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk6ARPEeCnwcpWvxOwkg" key="1:1" value="title"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk6QRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk6gRPEeCnwcpWvxOwkg" key="1:3" value="&quot;Party Planner&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk6wRPEeCnwcpWvxOwkg" key="2:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk7ARPEeCnwcpWvxOwkg" key="2:1" value="y_offset"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk7QRPEeCnwcpWvxOwkg" key="2:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk7gRPEeCnwcpWvxOwkg" key="2:3" value="-200"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XpCuUU4pEd-h4K8oRzpwEg" iD="_XpCuUE4pEd-h4K8oRzpwEg" name="Music">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YA4mkE4pEd-h4K8oRzpwEg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YA4mkU4pEd-h4K8oRzpwEg" key="class" value="AsynchronousOKTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_x0fk7wRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk8ARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk8QRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk8gRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk8wRPEeCnwcpWvxOwkg" key="0:1" value="message"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk9ARPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk9QRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Remember to have some good music at your party.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk9gRPEeCnwcpWvxOwkg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk9wRPEeCnwcpWvxOwkg" key="1:1" value="title"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk-ARPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk-QRPEeCnwcpWvxOwkg" key="1:3" value="&quot;Party Planner&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_X53_oU4pEd-h4K8oRzpwEg" iD="_X53_oE4pEd-h4K8oRzpwEg" name="People">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YNGdoE4pEd-h4K8oRzpwEg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YNGdoU4pEd-h4K8oRzpwEg" key="class" value="AsynchronousOKTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_x0fk-gRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk-wRPEeCnwcpWvxOwkg" key="dimension" value="3:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk_ARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk_QRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk_gRPEeCnwcpWvxOwkg" key="0:1" value="message"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0fk_wRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flAARPEeCnwcpWvxOwkg" key="0:3" value="&quot;Remember to invite nice people to your party.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flAQRPEeCnwcpWvxOwkg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flAgRPEeCnwcpWvxOwkg" key="1:1" value="title"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flAwRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flBARPEeCnwcpWvxOwkg" key="1:3" value="&quot;Party Planner&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flBQRPEeCnwcpWvxOwkg" key="2:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flBgRPEeCnwcpWvxOwkg" key="2:1" value="y_offset"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flBwRPEeCnwcpWvxOwkg" key="2:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x0flCARPEeCnwcpWvxOwkg" key="2:3" value="200"/>
+      </eAnnotations>
+    </vertices>
+  </pools>
+</bpmn:BpmnDiagram>

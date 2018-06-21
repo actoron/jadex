@@ -1,0 +1,163 @@
+<!--
+  <H3>Puzzling agent.</H3>
+  
+  This agent that plays a board game for one player.
+  This example is a Jadex adaption of the original JACK(TM)
+  puzzle example and was used for performance comparisons
+  between both platforms (cf. readme.txt).
+  This version shows how the puzzle works
+  with a graphical board and uses a delay
+  between the moves. Measurements were done
+  with the Benchmark.agent in this package.
+-->
+
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Sokrates"
+	package="jadex.bdibpmn.examples.puzzle">
+
+	<imports>
+		<import>jadex.bdi.runtime.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- The game board offers possibilities to make moves,
+			take back moves and keep track of the game history. -->
+		<belief name="board" class="IBoard"/>
+
+		<!-- The gui of the game board. -->
+		<belief name="board_gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(BoardGui.class, new Class[]{jadex.bridge.IExternalAccess.class, IBoard.class}, 
+				new Object[]{$scope.getExternalAccess(), $beliefbase.board})</fact>
+		</belief>
+		<!-- The number of moves already tried. -->
+		<belief name="triescnt" class="int">
+			<fact>0</fact>
+		</belief>
+		<!-- The delay in milliseconds between two moves. -->
+		<belief name="move_delay" class="long">
+			<fact>500L</fact>
+		</belief>
+		<!-- The meta-level strategy for choosing moves
+ 			(none=choose the first applicable, long=prefer jump moves,
+			same_long=prefer long moves of same color, alter_long=prefer
+			long move of alternate color. -->
+		<belief name="ml" class="String" exported="true">
+			<fact>"same_long"</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<!-- The goal to make a move on the board that is the solution. -->
+		<achievegoal name="makemove" recalculate="false">
+			<parameter name="depth" class="int"/>
+			<targetcondition language="jcl">
+				$beliefbase.board.isSolution()
+			</targetcondition>
+ 		</achievegoal>
+
+		<!-- The meta-level goal for choosing between plans for the makemove goal. -->
+		<metagoal name="choosemove" recalculate="false">
+			<parameterset name="applicables" class="ICandidateInfo"/>
+			<parameterset name="result" class="ICandidateInfo" direction="out"/>
+			<trigger>
+				<goal ref="makemove"/>
+			</trigger>
+		</metagoal>
+	</goals>
+
+	<plans>
+		<!-- Start puzzling on the board and measure the needed time. -->
+		<plan name="play_game_plan">
+			<body type="bpmn" impl="jadex/bdibpmn/examples/puzzle/PlayGamePlan.bpmn"/>
+		</plan>
+
+		<!-- Make a move on the board and create a subgoal for the next move. -->
+		<plan name="move_plan">
+			<parameter name="move" class="Move">
+				<bindingoptions>$beliefbase.board.getPossibleMoves()</bindingoptions>
+			</parameter>
+			<parameter name="depth" class="int">
+				<goalmapping ref="makemove.depth"/>
+			</parameter>
+			<body type="bpmn" impl="jadex/bdibpmn/examples/puzzle/MovePlan.bpmn"/>
+			<trigger>
+				<goal ref="makemove"/>
+			</trigger>
+		</plan>
+
+		<!-- Meta-level plan used to choose among the possible move plans. -->
+		<plan name="choose_move_plan">
+			<parameterset name="applicables" class="ICandidateInfo">
+				<goalmapping ref="choosemove.applicables"/>
+			</parameterset>
+			<parameterset name="result" class="ICandidateInfo" direction="out">
+				<goalmapping ref="choosemove.result"/>
+			</parameterset>
+			<body type="bpmn" impl="jadex/bdibpmn/examples/puzzle/ChooseMovePlan.bpmn"/>
+			<trigger>
+				<goal ref="choosemove"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+ 		<property name="logging.level">java.util.logging.Level.SEVERE</property> 
+		<property name="debugging">false</property>
+    </properties>
+
+	<configurations>
+		<configuration name="5x5 board (standard)" >
+			<beliefs>
+				<initialbelief ref="board">
+ 					<fact>new Board(5)</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan name="start_playing" ref="play_game_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="3x3 board (no solution)">
+			<beliefs>
+				<initialbelief ref="board">
+ 					<fact>new Board(3)</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan name="start_playing" ref="play_game_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="7x7 board (takes quite long)">
+			<beliefs>
+				<initialbelief ref="board">
+ 					<fact>new Board(7)</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan name="start_playing" ref="play_game_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="9x9 board (takes very long)">
+			<beliefs>
+				<initialbelief ref="board">
+ 					<fact>new Board(9)</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan name="start_playing" ref="play_game_plan"/>
+			</plans>
+		</configuration>
+		<!-- <configuration name="jack-5x5">
+			<beliefs>
+				<initialbelief ref="board">
+ 					<fact>new JackBoard()</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan name="start_playing" ref="play_game_plan"/>
+			</plans>
+		</configuration> -->
+	</configurations>
+</agent>

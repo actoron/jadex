@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>B1_simple</jadex:modelname>
+    <jadex:package>jadex.bpmn.tutorial</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:configurations>
+      <jadex:configuration name="name">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="tDCmz3ohVjhMuuJR">
+    <semantic:task name="Print Message" id="iOjLbKVRDuni5lO+">
+      <semantic:incoming>2NxQ+lTl16lIU0bi</semantic:incoming>
+      <semantic:outgoing>q02LbhVtOE60Tm8o</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;The task has been executed&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="7/Aam5FPKdQIjnli">
+      <semantic:incoming>q02LbhVtOE60Tm8o</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:startEvent id="R9JhsYF5P/06y2ND">
+      <semantic:outgoing>2NxQ+lTl16lIU0bi</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:sequenceFlow sourceRef="iOjLbKVRDuni5lO+" targetRef="7/Aam5FPKdQIjnli" id="q02LbhVtOE60Tm8o">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="R9JhsYF5P/06y2ND" targetRef="iOjLbKVRDuni5lO+" id="2NxQ+lTl16lIU0bi">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="tDCmz3ohVjhMuuJR">
+        <dc:Bounds height="600.0" width="3000.0" x="50.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="iOjLbKVRDuni5lO+">
+        <dc:Bounds height="100.0" width="160.0" x="220.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="7/Aam5FPKdQIjnli">
+        <dc:Bounds height="40.0" width="40.0" x="460.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="R9JhsYF5P/06y2ND">
+        <dc:Bounds height="40.0" width="40.0" x="100.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="2NxQ+lTl16lIU0bi">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="q02LbhVtOE60Tm8o">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

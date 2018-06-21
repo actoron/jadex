@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The dutch auction capability enables an easy goal-driven usage of
+	the FIPA dutch auction protocol.
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	package="jadex.bdi.planlib.protocols.dutchauction"
+	name="DutchAuction">
+
+	<imports>
+		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bdiv3.runtime.*</import>
+		<import>jadex.bdiv3x.runtime.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>java.util.*</import>
+		<import>jadex.commons.IFilter</import>
+		<import>jadex.base.Starter</import>
+	</imports>
+	
+	<capabilities>
+		<capability name="cmcap" file="jadex.bdi.planlib.protocols.cancelmeta.CancelMeta"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- Timeout for messages. -->
+		<belief name="timeout" class="Long" exported="true">
+			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
+		</belief>
+
+		<!-- Filters are only relevant for the participants protocol side. -->
+
+		<!-- The filter for deciding which initial request messages are handled in this capability. -->
+		<belief name="da_filter" class="IFilter" exported="true">
+			<fact>IFilter.NEVER</fact>
+		</belief>
+
+	</beliefs>
+
+	<goals>
+	
+		<!-- FIPA dutch auction protocol. -->
+
+		<!-- (Initiator side) Initiate the dutch auction protocol. -->
+		<achievegoal name="da_initiate" exported="true">
+			<!-- The auction description containing necessary information about the auction:
+				a) the auction topic, b) the round timeout, c) the starttime (optional) -->
+			<parameter name="auction_description" class="AuctionDescription"/>
+			<!-- The current offer made by the auctioneer. -->
+			<parameter name="cfp" class="Object"/>
+			<!-- The call-for-proposals info (local information). -->
+			<parameter name="cfp_info" class="Object" optional="true" direction="in"/>
+			<!-- Optional ontology for marshalling. -->
+			<parameter name="ontology" class="String" optional="true"/>
+			<!-- Optional language for marshalling. -->
+			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
+			<!-- The result of the protocol execution. -->
+			<parameter name="result" class="Object" optional="true" direction="out"/>
+			<!-- The interaction state. -->
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
+				<value>new InteractionState()</value>
+			</parameter>
+			<!-- The initially participating bidder agents. -->
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier"/>
+		</achievegoal>
+		
+		<!-- (Initiator side) Decide if the next round should be executed and with which cfp. -->
+		<querygoal name="da_decide_iteration" exported="true">
+			<!-- Decide about the cfp for the next round. -->
+			<parameter name="cfp" class="Object" direction="out"/>
+			<!-- Decide about the (new) cfp info. -->
+			<parameter name="cfp_info" class="Object" optional="true" direction="inout"/>
+			<!-- The history of cfps. -->
+			<parameterset name="history" class="Object"/>
+		</querygoal>
+				
+		<!-- (Participant side) Dutch auction protocol interaction goal (top-level goal of all receiver-side interactions). -->
+		<performgoal name="da_receiver_interaction" retry="false" exported="true">
+			<!-- The message that initiated the protocol. -->
+			<parameter name="message" class="IMessageEvent"/>
+			<!-- The interaction description (content of first message). -->
+			<parameter name="interaction_description" class="Object" direction="out"/>
+			<!-- The interaction state. -->
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
+				<value>new InteractionState()</value>
+			</parameter>
+			<!-- The interaction result. -->
+			<parameter name="result" class="Object" direction="out"/>
+		</performgoal>
+		
+		<!-- (Participant side) Optional goal that offers a possibility to decide a participation. -->		
+		<achievegoal name="da_decide_participation" exported="true">
+			<!-- The initiator of the interaction. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
+			<!-- The auction description. -->
+			<parameter name="auction_description" class="AuctionDescription" direction="in"/>
+			<!-- Local auction info. -->
+			<parameter name="auction_info" class="Object" optional="true" direction="out"/>
+			<!-- False for not participating in the auction. -->
+			<parameter name="participate" class="Boolean" direction="out"/>
+		</achievegoal>		
+								
+		<!-- (Participant side) Accept a proposal in a dutch auction. -->
+		<querygoal name="da_make_proposal" exported="true">
+			<!-- The current offer made by the auctioneer. -->
+			<parameter name="cfp" class="Object"/>
+			<!-- The auction description. -->
+			<parameter name="auction_description" class="AuctionDescription"/>
+			<!-- Local auction info. -->
+			<parameter name="auction_info" class="Object" optional="true" direction="inout"/>
+			<!-- True, for accepting the offer. -->
+			<parameter name="accept" class="Boolean" direction="out"/>
+			<!-- True, for immediately leaving the current auction. -->
+			<parameter name="leave" class="Boolean" direction="out" optional="true"/>
+			<!-- The history of all offers in the auction. -->
+			<parameterset name="history" class="Object" optional="true"/>
+		</querygoal>
+
+		<!-- Generic goals. -->
+
+		<!-- A subgoal that can be posted to trigger  to protocol specific
+			 interaction handling. Should be used when implementing custom
+			 plan for receiver interaction goal. -->
+		<performgoal name="perform_interaction" retry="false" exported="true">
+			<!-- The message should be assign from the superordinated goal. -->
+			<parameter name="message" class="IMessageEvent"/>
+			<!-- The interaction description (content of first message). -->
+			<parameter name="interaction_description" class="Object" direction="out"/>
+			<!-- The interaction state should be assign from the superordinated goal. -->
+			<parameter name="interaction_state" class="InteractionState" direction="inout"/>
+			<!-- The result should be passed back to the superordinated goal. -->
+			<parameter name="result" class="Object" direction="out"/>
+		</performgoal>
+
+	</goals>
+
+	<plans>
+		<plan name="da_initiator_plan">		
+			<parameter name="auction_description" class="AuctionDescription">
+				<goalmapping ref="da_initiate.auction_description"/>
+			</parameter>
+			<parameter name="cfp" class="Object">
+				<goalmapping ref="da_initiate.cfp"/>
+			</parameter>
+			<parameter name="cfp_info" class="Object">
+				<goalmapping ref="da_initiate.cfp_info"/>
+			</parameter>
+			<parameter name="ontology" class="String">
+				<goalmapping ref="da_initiate.ontology"/>
+			</parameter>
+			<parameter name="language" class="String">
+				<goalmapping ref="da_initiate.language"/>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="da_initiate.conversation_id"/>
+			</parameter>
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
+				<goalmapping ref="da_initiate.interaction_state"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="da_initiate.result"/>
+			</parameter>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="da_initiate.receivers"/>
+			</parameterset>
+			<body class="DAInitiatorPlan" />
+			<trigger>
+				<goal ref="da_initiate"/>
+			</trigger>
+		</plan>		
+		
+		<plan name="da_interaction_goal_creation_plan">
+			<parameter name="goaltype" class="String">
+				<value>"da_receiver_interaction"</value>
+			</parameter>
+			<body class="InteractionGoalCreationPlan" />
+			<trigger>
+				<messageevent ref="da_inform_start_auction"/>
+			</trigger>
+		</plan>
+		
+		<plan name="da_receiver_plan" priority="-1">
+			<parameter name="message" class="IMessageEvent">
+				<goalmapping ref="da_receiver_interaction.message"/>
+				<goalmapping ref="perform_interaction.message"/>
+			</parameter>
+			<parameter name="interaction_state" class="InteractionState" direction="inout">
+				<goalmapping ref="da_receiver_interaction.interaction_state"/>
+				<goalmapping ref="perform_interaction.interaction_state"/>
+			</parameter>
+			<parameter name="interaction_description" class="Object" direction="out">
+				<goalmapping ref="da_receiver_interaction.interaction_description"/>
+				<goalmapping ref="perform_interaction.interaction_description"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="da_receiver_interaction.result"/>
+				<goalmapping ref="perform_interaction.result"/>
+			</parameter>
+			<body class="DAReceiverPlan" />
+			<trigger>
+				<goal ref="da_receiver_interaction"/>
+				<goal ref="perform_interaction">
+					<match>SFipa.PROTOCOL_DUTCH_AUCTION.equals($goal.message.getParameter(SFipa.PROTOCOL).getValue())</match>
+				</goal>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="da_inform_start_auction" type="fipa" exported="true" direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+ 			<parameter name="conversation_id" class="String"  direction="inout">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<!-- <parameter name="reply_with" class="String">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter> -->		
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<!-- This is no encoding, but this is the only parameter left. -->					
+ 			<parameter name="encoding" class="String" direction="fixed">
+ 				<value>"begin_auction"</value>
+ 			</parameter>
+ 			<parameter name="content" class="AuctionDescription" direction="inout"/>
+ 			<match>$beliefbase.da_filter.filter($messagemap) &amp;&amp; $conversation_id!=null</match>
+		</messageevent>
+		
+		<messageevent name="da_inform_end_auction" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<!-- This is no encoding, but this is the only parameter left. -->					
+ 			<parameter name="encoding" class="String" direction="fixed">
+ 				<value>"end_auction"</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+		
+		<messageevent name="da_cfp" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.CFP</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="da_propose" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.PROPOSE</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+		
+		<messageevent name="da_not_understood" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.NOT_UNDERSTOOD</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="da_reject_proposal" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.REJECT_PROPOSAL</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>
+
+		<messageevent name="da_accept_proposal" type="fipa" exported="true">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.ACCEPT_PROPOSAL</value>
+			</parameter>
+			<parameter name="protocol" class="String" direction="fixed">
+				<value>SFipa.PROTOCOL_DUTCH_AUCTION</value>
+			</parameter>
+			<parameter name="language" class="String">
+				<value>SFipa.JADEX_XML</value>
+ 			</parameter>
+ 			<match>$conversation_id!=null</match>
+		</messageevent>	
+	</events>
+	
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+	</properties>
+
+</capability>

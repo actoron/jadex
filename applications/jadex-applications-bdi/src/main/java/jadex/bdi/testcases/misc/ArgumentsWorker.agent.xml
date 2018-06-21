@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Agent for receiving agent arguments.</H3>
+
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="ArgumentsWorker"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="creator" class="IComponentIdentifier" exported="true"/>
+	</beliefs>
+
+	<plans>
+		<plan name="arguments_worker_plan">
+			<body class="ArgumentsWorkerPlan"/>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="inform_created" type="fipa" direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="content" class="String">
+				<value>"worker"</value>
+			</parameter>
+			<!-- Initialized with unique random value. -->
+			<parameter name="reply_with" class="String">
+				<value>SFipa.createUniqueId($scope.getAgentName())</value>
+			</parameter>
+			<parameterset name="receivers" class="IComponentIdentifier">
+				<value>$beliefbase.creator</value>
+			</parameterset>
+		</messageevent>
+	</events>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!--<property name="debugging">false</property> -->
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="arguments_worker_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

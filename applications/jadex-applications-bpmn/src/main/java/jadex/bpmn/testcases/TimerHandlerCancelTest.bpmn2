@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>TimerHandlerCancelTest</jadex:modelname>
+    <jadex:description>Test if a timer is cancelled when subprocess normally continues.</jadex:description>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:imports>
+      <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
+      <jadex:import>jadex.base.test.*</jadex:import>
+    </jadex:imports>
+    <jadex:results>
+      <jadex:result name="testresults" type="Testcase">
+        <jadex:description>The test results.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+    <jadex:contextvariables>
+      <jadex:contextvariable name="success" type="boolean">
+        <jadex:value>true</jadex:value>
+      </jadex:contextvariable>
+    </jadex:contextvariables>
+    <jadex:configurations>
+      <jadex:configuration name="Pool">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_RyeJoRF6Ed-qQOr2ZLx-Mw">
+    <semantic:startEvent id="_kU2mERGCEd-qQOr2ZLx-Mw">
+      <semantic:outgoing>_vLsMwRGCEd-qQOr2ZLx-Mw</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:intermediateCatchEvent name="Wait for 2 secs" id="_dENiUVm1Ed-z1-rEjWjEeQ">
+      <semantic:incoming>_duiRsVm1Ed-z1-rEjWjEeQ</semantic:incoming>
+      <semantic:outgoing>_eYGzIVm1Ed-z1-rEjWjEeQ</semantic:outgoing>
+      <semantic:timerEventDefinition>
+        <semantic:timeDuration>2000</semantic:timeDuration>
+      </semantic:timerEventDefinition>
+      <semantic:extensionElements>
+        <jadex:property name="duration">2000</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:task name="Success" id="_BnHmQRGDEd-qQOr2ZLx-Mw">
+      <semantic:incoming>_eYGzIVm1Ed-z1-rEjWjEeQ</semantic:incoming>
+      <semantic:outgoing>_O7BFQRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Timer handler  test.&quot;, true, null)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="_NyTJsRGDEd-qQOr2ZLx-Mw">
+      <semantic:incoming>_Ph6tMRGDEd-qQOr2ZLx-Mw</semantic:incoming>
+      <semantic:incoming>_O7BFQRGDEd-qQOr2ZLx-Mw</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:task name="Failure" id="_9c_IIRGCEd-qQOr2ZLx-Mw">
+      <semantic:incoming>_O7RRsVm1Ed-z1-rEjWjEeQ</semantic:incoming>
+      <semantic:outgoing>_Ph6tMRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Timer test.&quot;, false, &quot;Timer occurred although should have been cancelled.&quot;)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:subProcess id="_omlhARGCEd-qQOr2ZLx-Mw">
+      <semantic:incoming>_vLsMwRGCEd-qQOr2ZLx-Mw</semantic:incoming>
+      <semantic:outgoing>_duiRsVm1Ed-z1-rEjWjEeQ</semantic:outgoing>
+      <semantic:task name="Sub 3" id="_1E1xcRGCEd-qQOr2ZLx-Mw">
+        <semantic:incoming>_IMtLUVdtEd-gpfWhYqU7MQ</semantic:incoming>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+          <jadex:parameter direction="inout" name="name" type="String">&quot;success&quot;</jadex:parameter>
+          <jadex:parameter direction="inout" name="value" type="boolean">false</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+      <semantic:intermediateCatchEvent name="Wait for 1sec" id="_DPUEQVdtEd-gpfWhYqU7MQ">
+        <semantic:incoming>_DPd1SFdtEd-gpfWhYqU7MQ</semantic:incoming>
+        <semantic:outgoing>_IMtLUVdtEd-gpfWhYqU7MQ</semantic:outgoing>
+        <semantic:timerEventDefinition>
+          <semantic:timeDuration>1000</semantic:timeDuration>
+        </semantic:timerEventDefinition>
+        <semantic:extensionElements>
+          <jadex:property name="duration">1000</jadex:property>
+        </semantic:extensionElements>
+      </semantic:intermediateCatchEvent>
+      <semantic:task name="Sub 1" id="_omlhAxGCEd-qQOr2ZLx-Mw">
+        <semantic:outgoing>_DPd1SFdtEd-gpfWhYqU7MQ</semantic:outgoing>
+      </semantic:task>
+    </semantic:subProcess>
+    <semantic:boundaryEvent name="Cancel after 2 sec" id="_JsEsUVdtEd-gpfWhYqU7MQ" attachedToRef="_omlhARGCEd-qQOr2ZLx-Mw">
+      <semantic:outgoing>_O7RRsVm1Ed-z1-rEjWjEeQ</semantic:outgoing>
+      <semantic:timerEventDefinition>
+        <semantic:timeDuration>2000</semantic:timeDuration>
+      </semantic:timerEventDefinition>
+      <semantic:extensionElements>
+        <jadex:property name="duration">2000</jadex:property>
+      </semantic:extensionElements>
+    </semantic:boundaryEvent>
+    <semantic:sequenceFlow sourceRef="_kU2mERGCEd-qQOr2ZLx-Mw" targetRef="_omlhARGCEd-qQOr2ZLx-Mw" id="_vLsMwRGCEd-qQOr2ZLx-Mw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_dENiUVm1Ed-z1-rEjWjEeQ" targetRef="_BnHmQRGDEd-qQOr2ZLx-Mw" id="_eYGzIVm1Ed-z1-rEjWjEeQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_BnHmQRGDEd-qQOr2ZLx-Mw" targetRef="_NyTJsRGDEd-qQOr2ZLx-Mw" id="_O7BFQRGDEd-qQOr2ZLx-Mw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_9c_IIRGCEd-qQOr2ZLx-Mw" targetRef="_NyTJsRGDEd-qQOr2ZLx-Mw" id="_Ph6tMRGDEd-qQOr2ZLx-Mw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_omlhARGCEd-qQOr2ZLx-Mw" targetRef="_dENiUVm1Ed-z1-rEjWjEeQ" id="_duiRsVm1Ed-z1-rEjWjEeQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_DPUEQVdtEd-gpfWhYqU7MQ" targetRef="_1E1xcRGCEd-qQOr2ZLx-Mw" id="_IMtLUVdtEd-gpfWhYqU7MQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_omlhAxGCEd-qQOr2ZLx-Mw" targetRef="_DPUEQVdtEd-gpfWhYqU7MQ" id="_DPd1SFdtEd-gpfWhYqU7MQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_JsEsUVdtEd-gpfWhYqU7MQ" targetRef="_9c_IIRGCEd-qQOr2ZLx-Mw" id="_O7RRsVm1Ed-z1-rEjWjEeQ">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_RyeJoRF6Ed-qQOr2ZLx-Mw">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_kU2mERGCEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="40.0" width="40.0" x="100.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_dENiUVm1Ed-z1-rEjWjEeQ">
+        <dc:Bounds height="40.0" width="40.0" x="1270.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_BnHmQRGDEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="100.0" width="160.0" x="1420.0" y="210.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_NyTJsRGDEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="40.0" width="40.0" x="1740.0" y="240.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_9c_IIRGCEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="100.0" width="160.0" x="1420.0" y="370.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_omlhARGCEd-qQOr2ZLx-Mw" isExpanded="true">
+        <dc:Bounds height="150.0" width="460.0" x="480.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_JsEsUVdtEd-gpfWhYqU7MQ">
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_1E1xcRGCEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="100.0" width="160.0" x="290.0" y="30.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_DPUEQVdtEd-gpfWhYqU7MQ">
+        <dc:Bounds height="40.0" width="40.0" x="220.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_omlhAxGCEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="100.0" width="160.0" x="20.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_vLsMwRGCEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_vLsMwRGCEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_duiRsVm1Ed-z1-rEjWjEeQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_duiRsVm1Ed-z1-rEjWjEeQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Ph6tMRGDEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_Ph6tMRGDEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_O7BFQRGDEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_O7BFQRGDEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_eYGzIVm1Ed-z1-rEjWjEeQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_eYGzIVm1Ed-z1-rEjWjEeQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_DPd1SFdtEd-gpfWhYqU7MQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_IMtLUVdtEd-gpfWhYqU7MQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_O7RRsVm1Ed-z1-rEjWjEeQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_O7RRsVm1Ed-z1-rEjWjEeQ">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Alarmclock that notifies on alarm.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Alarmclock"
+	package="jadex.bdi.examples.alarmclock">
+
+	<imports>
+		<import>java.net.URL</import>
+		<import>java.util.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.types.threadpool.IThreadPoolService</import>
+	</imports>
+
+	<beliefs>
+		<!-- The filename of the alarmclock settings. -->
+		<belief name="settingsfile" class="String" exported="true">
+			<fact>"./alarmclock_settings.ser"</fact>
+		</belief>
+		<belief name="settings" class="Settings">
+			<fact>Settings.loadSettings($beliefbase.settingsfile)</fact>
+		</belief>
+
+		<beliefset name="alarms" class="Alarm">
+			<facts>((Settings)$beliefbase.getBelief("settings").getFact()).getAlarms()</facts>
+		</beliefset>
+
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(ClockFrame.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="alarm" exclude="when_failed">
+			<parameter name="alarm" class="Alarm">
+				<!-- <value>$alarm</value> -->
+				<bindingoptions>
+				    SELECT Alarm $alarm FROM $beliefbase.alarms WHERE $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
+				</bindingoptions>
+			</parameter>
+			<unique/>
+			<creationcondition>
+			    $beliefbase.alarms.length>0
+			</creationcondition>
+			<contextcondition>
+				$goal.alarm.isActive()
+			</contextcondition>
+			<dropcondition>
+				!$beliefbase.getBeliefSet("alarms").containsFact($goal.alarm)
+			</dropcondition>
+			<targetcondition>
+				$goal.alarm.getAlarmtime($scope.getTime())==Alarm.NO_ALARM
+			</targetcondition>
+		</achievegoal>
+
+		<performgoal name="notify">
+			<parameter name="alarm" class="Alarm"/>
+		</performgoal>
+
+		<performgoal name="play_song">
+			<parameter name="song" class="URL"/>
+		</performgoal>
+	</goals>
+
+	<plans>
+		<plan name="alarm_plan">
+			<parameter name="alarm" class="Alarm">
+				<goalmapping ref="alarm.alarm"/>
+			</parameter>
+			<body class="AlarmPlan" />
+			<trigger>
+				<goal ref="alarm"/>
+			</trigger>
+		</plan>
+
+		<plan name="play_song_plan">
+			<parameter name="song" class="URL">
+				<value>
+					$goal.getType().equals("notify")?
+					((Alarm)$goal.getParameter("alarm").getValue()).getFilenameUrl()
+					: $goal.getParameter("song").getValue()
+				</value>
+			</parameter>
+			<parameter name="finished" class="boolean"/>
+			<body class="PlaySongPlan" />
+			<trigger>
+				<goal ref="notify"/>
+				<goal ref="play_song"/>
+			</trigger>
+		</plan>
+
+		<plan name="beep_plan">
+			<parameter name="alarm" class="Alarm">
+				<goalmapping ref="notify.alarm"/>
+			</parameter>
+			<body class="BeepPlan" />
+			<trigger>
+				<goal ref="notify"/>
+			</trigger>
+		</plan>
+
+		<plan name="sync_settings_alarms">
+			<body class="SyncSettingsAlarmsPlan" />
+			<trigger>
+				<factadded ref="alarms"/>
+				<factremoved ref="alarms"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<services>
+		<requiredservice name="clockservice" class="IClockService">
+			<binding scope="platform"/>
+		</requiredservice>
+		<requiredservice name="tpservice" class="IThreadPoolService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
+	
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbeliefset ref="alarms">
+					<facts>
+						((Settings)$beliefbase.settings).getAlarms().length!=0
+						? ((Settings)$beliefbase.settings).getAlarms()
+						: new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
+								"jadex/bdi/examples/alarmclock/alarm.mp3", "Built-in start alarm", true),
+							new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
+								"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes", true),
+							new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
+								"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes quartely", true)}
+					</facts>
+				</initialbeliefset>
+			</beliefs>
+		</configuration>
+	</configurations>
+</agent>

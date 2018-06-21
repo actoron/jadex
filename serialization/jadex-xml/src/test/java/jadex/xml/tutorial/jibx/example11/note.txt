@@ -1,0 +1,43 @@
+Objective:
+
+Using object references in the XML.
+
+In Jadex XML an AttributeInfo can be configured to represent
+an ID or an IDREF. In case of an ID the object will be stored
+under this ID and can be fetched later in the xml via an IDREF
+attribute. In this case the value of this attribute is changed
+to the stored object.
+
+Original Jibx config and result:
+
+<binding>
+  <mapping name="timetable" class="example11.TimeTable">
+    <collection name="carriers" field="carriers"/>
+    <collection name="airports" field="airports"/>
+    <collection name="routes" field="routes">
+      <structure name="route" value-style="attribute" type="example11.Route">
+        <value name="from" field="from" ident="ref"/>
+        <value name="to" field="to" ident="ref"/>
+        <collection field="flights">
+          <structure name="flight" type="example11.Flight">
+            <value name="carrier" field="carrier" ident="ref"/>
+            <value name="number" field="number"/>
+            <value name="depart" field="departure"/>
+            <value name="arrive" field="arrival"/>
+          </structure>
+        </collection>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping name="carrier" class="example11.Carrier">
+    <value style="attribute" name="code" field="code" ident="def"/>
+    <value style="attribute" name="rating" field="rating"/>
+    <value name="url" field="url"/>
+    <value name="name" field="name"/>
+  </mapping>
+  <mapping name="airport" class="example11.Airport">
+    <value style="attribute" name="code" field="code" ident="def"/>
+    <value name="location" field="location"/>
+    <value name="name" field="name"/>
+  </mapping>
+</binding>

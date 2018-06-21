@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>This agent tests plan termination.</H3>
+
+	todo: fix me?
+	Problem: A plan has a context condition and waits
+	  internally on a similar condition. Both conditions
+	  trigger. The ProcessEventAction is executed even
+	  though the plan is/will be cleaned up. Produces
+	  an event not handled warning.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="PlanTermination"
+	package="jadex.bdi.testcases.plans">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports" >
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<belief name="context" class="boolean">
+			<fact>true</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="worker">
+			<body class="ContextPlan"/>
+			<contextcondition>
+				$beliefbase.context
+			</contextcondition>
+		</plan>
+
+		<plan name="switcher">
+			<parameter name="wait" class="long">
+				<value>100L</value>
+			</parameter>
+			<parameter name="value" class="Object">
+				<value>new Boolean(false)</value>
+			</parameter>
+			<parameter name="belief" class="String">
+				<value>"context"</value>
+			</parameter>
+			<body class="ResultPlan"/>
+		</plan>
+	</plans>
+
+	<expressions>
+		<condition name="plan_context">
+			!$beliefbase.context
+		</condition>
+	</expressions>
+
+	<properties>
+		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<!--<property name="debugging">true</property>-->
+	</properties>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="worker"/>
+				<initialplan ref="switcher"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

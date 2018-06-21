@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>SubWorkflowTest</jadex:modelname>
+    <jadex:description>Test if a subworklow can be started and wait for its results.</jadex:description>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
+    <jadex:imports>
+      <jadex:import>jadex.base.test.*</jadex:import>
+      <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
+    </jadex:imports>
+    <jadex:results>
+      <jadex:result name="testresults" type="Testcase">
+        <jadex:description>The test results.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+    <jadex:configurations>
+      <jadex:configuration name="Pool">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_V9uhoRV2Ed-yC473XtaJZQ">
+    <semantic:task name="Start subworkflow \nand wait for result" id="_V9uhoxV2Ed-yC473XtaJZQ">
+      <semantic:incoming>_YXpmYRV2Ed-yC473XtaJZQ</semantic:incoming>
+      <semantic:outgoing>_mdPj4RV9Ed-yC473XtaJZQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.CreateComponentTask</jadex:class>
+        <jadex:parameter direction="in" name="model" type="String">&quot;jadex/bpmn/testcases/Result.bpmn2&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="subcomponent" type="boolean">true</jadex:parameter>
+        <jadex:parameter direction="out" name="taskresult" type="String"/>
+        <jadex:parameter direction="in" name="resultmapping" type="String[]">new String[]{&quot;out&quot;, &quot;taskresult&quot;}</jadex:parameter>
+        <jadex:parameter direction="in" name="in" type="String">&quot;my_result&quot;</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Success" id="_m6JiURV9Ed-yC473XtaJZQ">
+      <semantic:incoming>_m6JiWhV9Ed-yC473XtaJZQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subworkflow with results.&quot;, true, null)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Failure" id="_o1iQ8RV9Ed-yC473XtaJZQ">
+      <semantic:incoming>_o1ra4RV9Ed-yC473XtaJZQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subworkflow with results.&quot;, false, &quot;Wrong result received.&quot;)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:exclusiveGateway id="_l-P6wRV9Ed-yC473XtaJZQ" default="_o1ra4RV9Ed-yC473XtaJZQ">
+      <semantic:incoming>_mdPj4RV9Ed-yC473XtaJZQ</semantic:incoming>
+      <semantic:outgoing>_m6JiWhV9Ed-yC473XtaJZQ</semantic:outgoing>
+      <semantic:outgoing>_o1ra4RV9Ed-yC473XtaJZQ</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:startEvent id="_Xr1pQRV2Ed-yC473XtaJZQ">
+      <semantic:outgoing>_YXpmYRV2Ed-yC473XtaJZQ</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:sequenceFlow sourceRef="_V9uhoxV2Ed-yC473XtaJZQ" targetRef="_l-P6wRV9Ed-yC473XtaJZQ" id="_mdPj4RV9Ed-yC473XtaJZQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_l-P6wRV9Ed-yC473XtaJZQ" targetRef="_m6JiURV9Ed-yC473XtaJZQ" id="_m6JiWhV9Ed-yC473XtaJZQ">
+      <semantic:conditionExpression>&quot;my_result&quot;.equals(taskresult)</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_l-P6wRV9Ed-yC473XtaJZQ" targetRef="_o1iQ8RV9Ed-yC473XtaJZQ" id="_o1ra4RV9Ed-yC473XtaJZQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_Xr1pQRV2Ed-yC473XtaJZQ" targetRef="_V9uhoxV2Ed-yC473XtaJZQ" id="_YXpmYRV2Ed-yC473XtaJZQ">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_V9uhoRV2Ed-yC473XtaJZQ">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_V9uhoxV2Ed-yC473XtaJZQ">
+        <dc:Bounds height="100.0" width="210.0" x="770.0" y="190.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>model</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>subcomponent</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>resultmapping</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>in</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_m6JiURV9Ed-yC473XtaJZQ">
+        <dc:Bounds height="100.0" width="160.0" x="1270.0" y="70.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_o1iQ8RV9Ed-yC473XtaJZQ">
+        <dc:Bounds height="100.0" width="160.0" x="1290.0" y="250.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_l-P6wRV9Ed-yC473XtaJZQ">
+        <dc:Bounds height="60.0" width="60.0" x="1120.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_Xr1pQRV2Ed-yC473XtaJZQ">
+        <dc:Bounds height="40.0" width="40.0" x="480.0" y="220.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_mdPj4RV9Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_mdPj4RV9Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_YXpmYRV2Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_YXpmYRV2Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_m6JiWhV9Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_o1ra4RV9Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_m6JiWhV9Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_o1ra4RV9Ed-yC473XtaJZQ">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

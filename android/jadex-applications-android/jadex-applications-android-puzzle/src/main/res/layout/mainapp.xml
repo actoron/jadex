@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.21"
+        android:text="@string/app_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/startBDI"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_bdi" />
+
+    <Button
+        android:id="@+id/startBDIBenchmark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_bdi_bench" />
+
+    <Button
+        android:id="@+id/startBDIV3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_bdiv3" />
+
+    <Button
+        android:id="@+id/startBDIV3Benchmark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_bdiv3_bench" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/status_label" />
+
+        <TextView
+            android:id="@+id/statusTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+
+</LinearLayout>

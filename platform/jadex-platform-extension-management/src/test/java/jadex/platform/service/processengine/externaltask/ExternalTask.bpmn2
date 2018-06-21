@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>ExternalTask</jadex:modelname>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="uUo+E7Iz86Nazznz">
+    <semantic:startEvent id="g0NDzyLMXStBG1xs">
+      <semantic:outgoing>zE2luSs7+aDDs5oo</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="External\nPrint Task" id="qF6CBu1UTgFil65U">
+      <semantic:incoming>wuwvQVnsja/r//+i</semantic:incoming>
+      <semantic:outgoing>lGH9A1LBQ087pz82</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Hello external task&quot;</jadex:parameter>
+        <jadex:property name="external" type="boolean">true</jadex:property>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Internal\nPrint Task" id="V6elLG56+oEVR7mB">
+      <semantic:incoming>lGH9A1LBQ087pz82</semantic:incoming>
+      <semantic:outgoing>ek+xTqoJjNcVXXcd</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+        <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;Hello internal task&quot;</jadex:parameter>
+        <jadex:property name="external" type="boolean">false</jadex:property>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="94RjaiT6rJ9Ukp88">
+      <semantic:incoming>ek+xTqoJjNcVXXcd</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:task name="Hack\n(create service agent)" id="QcjCjTvoXhILJhPT">
+      <semantic:incoming>zE2luSs7+aDDs5oo</semantic:incoming>
+      <semantic:outgoing>wuwvQVnsja/r//+i</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.CreateComponentTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="java.lang.String"/>
+        <jadex:parameter direction="in" name="model" type="java.lang.String">&quot;jadex.platform.service.processengine.ActivityExecutionAgent.class&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="configuration" type="java.lang.String"/>
+        <jadex:parameter direction="in" name="subcomponent" type="java.lang.Boolean">true</jadex:parameter>
+        <jadex:parameter direction="in" name="wait" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="suspend" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="master" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="daemon" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="autoshutdown" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="monitoring" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="synchronous" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="persistable" type="java.lang.Boolean"/>
+        <jadex:parameter direction="in" name="killlistener" type="jadex.commons.future.IResultListener"/>
+        <jadex:parameter direction="in" name="value" type="java.lang.Object"/>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:sequenceFlow sourceRef="g0NDzyLMXStBG1xs" targetRef="QcjCjTvoXhILJhPT" id="zE2luSs7+aDDs5oo">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="qF6CBu1UTgFil65U" targetRef="V6elLG56+oEVR7mB" id="lGH9A1LBQ087pz82">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="V6elLG56+oEVR7mB" targetRef="94RjaiT6rJ9Ukp88" id="ek+xTqoJjNcVXXcd">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="QcjCjTvoXhILJhPT" targetRef="qF6CBu1UTgFil65U" id="wuwvQVnsja/r//+i">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="uUo+E7Iz86Nazznz">
+        <dc:Bounds height="600.0" width="3000.0" x="81.40589101242415" y="65.70294550621206"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="g0NDzyLMXStBG1xs">
+        <dc:Bounds height="40.0" width="40.0" x="180.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="qF6CBu1UTgFil65U">
+        <dc:Bounds height="100.0" width="160.0" x="320.0" y="140.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="V6elLG56+oEVR7mB">
+        <dc:Bounds height="100.0" width="160.0" x="550.0" y="140.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="94RjaiT6rJ9Ukp88">
+        <dc:Bounds height="40.0" width="40.0" x="790.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="QcjCjTvoXhILJhPT">
+        <dc:Bounds height="100.0" width="230.0" x="160.0" y="10.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="zE2luSs7+aDDs5oo">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ek+xTqoJjNcVXXcd">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="lGH9A1LBQ087pz82">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="wuwvQVnsja/r//+i">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

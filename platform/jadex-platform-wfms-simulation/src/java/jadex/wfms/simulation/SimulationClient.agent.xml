@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The Simulation Workflow Management Application.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	   name="SimulationClientApplication"
+	   package="jadex.wfms.simulation">
+
+	<imports>
+		<import>jadex.wfms.bdi.*</import>
+		<import>jadex.wfms.bdi.ontology.*</import>
+		<import>jadex.wfms.client.IWorkitem</import>
+	</imports>
+
+	<capabilities>
+		<capability name="clientcap" file="jadex.wfms.bdi.client.cap.WfmsClientApp"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="client_gui" class="ClientSimulator">
+			<fact>new ClientSimulator($scope.getExternalAccess())</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+	</goals>
+
+	<plans>
+	</plans>
+
+	<events>
+	</events>
+
+	<expressions>
+	</expressions>
+
+	<properties>
+		<!-- <property name="debugging">true</property> -->
+	</properties>
+
+</agent>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>MakeProposalRandom</jadex:modelname>
+    <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:imports>
+      <jadex:import>jadex.bridge.IComponentIdentifier</jadex:import>
+    </jadex:imports>
+    <jadex:arguments>
+      <jadex:argument name="cfp" type="Object">
+        <jadex:description>The call for proposals.</jadex:description>
+      </jadex:argument>
+      <jadex:argument name="initiator" type="IComponentIdentifier">
+        <jadex:description>The component id of the initiator.</jadex:description>
+      </jadex:argument>
+    </jadex:arguments>
+    <jadex:results>
+      <jadex:result name="proposal" type="Object">
+        <jadex:description>The proposal (if any).</jadex:description>
+      </jadex:result>
+    </jadex:results>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_5q6OR1m7Ed-CVtZr0hfiVg">
+    <semantic:startEvent id="_aS2w0Vm8Ed-CVtZr0hfiVg">
+      <semantic:outgoing>_aS2w2lm8Ed-CVtZr0hfiVg</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:exclusiveGateway id="_ZHwPoVm8Ed-CVtZr0hfiVg" default="_cpWuKlm8Ed-CVtZr0hfiVg">
+      <semantic:incoming>_aS2w2lm8Ed-CVtZr0hfiVg</semantic:incoming>
+      <semantic:outgoing>_ZHwPqlm8Ed-CVtZr0hfiVg</semantic:outgoing>
+      <semantic:outgoing>_cpWuKlm8Ed-CVtZr0hfiVg</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:task name="Make Proposal" id="_5q6OSVm7Ed-CVtZr0hfiVg">
+      <semantic:incoming>_ZHwPqlm8Ed-CVtZr0hfiVg</semantic:incoming>
+      <semantic:outgoing>_eKz52lm8Ed-CVtZr0hfiVg</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="Object">&quot;proposal&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Object">&quot;Proposal from &quot;+$component.getComponentIdentifier().getParent().getLocalName()</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="No Proposal" id="_cpWuIVm8Ed-CVtZr0hfiVg">
+      <semantic:incoming>_cpWuKlm8Ed-CVtZr0hfiVg</semantic:incoming>
+      <semantic:outgoing>_eaAzcVm8Ed-CVtZr0hfiVg</semantic:outgoing>
+    </semantic:task>
+    <semantic:exclusiveGateway id="_eKz50Vm8Ed-CVtZr0hfiVg">
+      <semantic:incoming>_eKz52lm8Ed-CVtZr0hfiVg</semantic:incoming>
+      <semantic:incoming>_eaAzcVm8Ed-CVtZr0hfiVg</semantic:incoming>
+      <semantic:outgoing>_e4jwolm8Ed-CVtZr0hfiVg</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:endEvent id="_e4Z_oVm8Ed-CVtZr0hfiVg">
+      <semantic:incoming>_e4jwolm8Ed-CVtZr0hfiVg</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="_aS2w0Vm8Ed-CVtZr0hfiVg" targetRef="_ZHwPoVm8Ed-CVtZr0hfiVg" id="_aS2w2lm8Ed-CVtZr0hfiVg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_ZHwPoVm8Ed-CVtZr0hfiVg" targetRef="_5q6OSVm7Ed-CVtZr0hfiVg" id="_ZHwPqlm8Ed-CVtZr0hfiVg">
+      <semantic:conditionExpression>Math.random()&lt;0.666666</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_ZHwPoVm8Ed-CVtZr0hfiVg" targetRef="_cpWuIVm8Ed-CVtZr0hfiVg" id="_cpWuKlm8Ed-CVtZr0hfiVg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_5q6OSVm7Ed-CVtZr0hfiVg" targetRef="_eKz50Vm8Ed-CVtZr0hfiVg" id="_eKz52lm8Ed-CVtZr0hfiVg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_cpWuIVm8Ed-CVtZr0hfiVg" targetRef="_eKz50Vm8Ed-CVtZr0hfiVg" id="_eaAzcVm8Ed-CVtZr0hfiVg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_eKz50Vm8Ed-CVtZr0hfiVg" targetRef="_e4Z_oVm8Ed-CVtZr0hfiVg" id="_e4jwolm8Ed-CVtZr0hfiVg">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_5q6OR1m7Ed-CVtZr0hfiVg">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_aS2w0Vm8Ed-CVtZr0hfiVg">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_ZHwPoVm8Ed-CVtZr0hfiVg">
+        <dc:Bounds height="60.0" width="60.0" x="140.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_5q6OSVm7Ed-CVtZr0hfiVg">
+        <dc:Bounds height="100.0" width="160.0" x="260.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_cpWuIVm8Ed-CVtZr0hfiVg">
+        <dc:Bounds height="100.0" width="160.0" x="260.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_eKz50Vm8Ed-CVtZr0hfiVg">
+        <dc:Bounds height="60.0" width="60.0" x="660.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_e4Z_oVm8Ed-CVtZr0hfiVg">
+        <dc:Bounds height="40.0" width="40.0" x="830.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_eKz52lm8Ed-CVtZr0hfiVg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_ZHwPqlm8Ed-CVtZr0hfiVg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_cpWuKlm8Ed-CVtZr0hfiVg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_aS2w2lm8Ed-CVtZr0hfiVg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_eaAzcVm8Ed-CVtZr0hfiVg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_e4jwolm8Ed-CVtZr0hfiVg">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

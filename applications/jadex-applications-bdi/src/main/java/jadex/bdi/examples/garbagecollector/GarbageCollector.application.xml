@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The garbage collector application descriptor</H3>
+
+	It can be started to launch a garbage collector scenario.
+	This example is inspired by the "robot" example
+	of the Jason BDI agent engine.
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
+	
+	<imports>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.RoundBasedExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+	</imports>
+	
+	<!-- Space types of this application. Spaces are shared by agents of the same application. -->
+	<extensiontypes>
+	
+		<!-- Declaration of a grid environment as space type. -->
+		<env:envspacetype name="gc2dspace" width="10" height="10" class="Grid2D">
+		
+			<!-- The objecttypes of this environment. -->
+			<env:objecttypes>
+				<env:objecttype name="collector">
+					<env:property name="lastmove"/>
+				    <env:property name="rotation" dynamic="true">
+						$object.lastmove==null || $object.lastmove.equals("right")? null:
+						$object.lastmove.equals("left")? new Vector3Double(Math.PI,0,Math.PI):
+						$object.lastmove.equals("up")? new Vector3Double(0,0,Math.PI*3/2):
+						new Vector3Double(0,0,Math.PI/2)
+					</env:property>
+					<env:property name="vision_range">0</env:property>
+					<env:property name="position" event="true"/>
+					<env:property name="garbage" event="true"/>
+				</env:objecttype>
+				<env:objecttype name="burner">
+					<env:property name="vision_range">0</env:property>
+					<env:property name="garbage"/>
+					<env:property name="position"/>
+				</env:objecttype>
+				<env:objecttype name="garbage">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
+			</env:objecttypes>
+			
+			<!-- Processes run on their own in the environment. -->
+			<env:processtypes>
+				<env:processtype name="create" class="DefaultObjectCreationProcess">
+					<env:property name="tickrate">5</env:property>
+					<env:property name="type">"garbage"</env:property>
+					<env:property name="properties" dynamic="true">
+						jadex.commons.SUtil.createHashMap(
+							new String[]{Space2D.PROPERTY_POSITION},
+							new Object[]{((Space2D)$space).getRandomPosition(Vector2Int.ZERO)})
+					</env:property>
+				</env:processtype>
+			</env:processtypes>
+			
+			<!-- Data views for defining cut outs of the world objects. -->
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+				<env:dataview name="collector_view" class="LocalDataView2D" objecttype="collector">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.vision_range</env:property>
+				</env:dataview>
+				<env:dataview name="burner_view" class="LocalDataView2D" objecttype="burner">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.vision_range</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Collector" objecttype="collector"/>
+				<env:avatarmapping componenttype="Burner" objecttype="burner"/>
+			</env:avatarmappings>
+		
+			<!-- The percepttypes, generators and processors. -->
+			<env:percepttypes>
+				
+				<!-- Percepttypes that the environment produces and agents can consume. -->
+				<env:percepttype name="garbage_appeared" objecttype="garbage"/>
+				<env:percepttype name="garbage_disappeared" objecttype="garbage" />
+					
+				<!-- Percept generators define which percepts should be created -->
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
+					<env:property name="maxrange">0</env:property>
+					<env:property name="range_property">"vision_range"</env:property>
+					<!-- percept types are declared with associated action types: 
+						percepttype, actiontype1, actiontype2, ... -->
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"garbage_appeared", "appeared", "created"}, 
+							new String[]{"garbage_disappeared", "disappeared", "destroyed"}
+						}
+					</env:property>
+				</env:perceptgenerator>
+				
+				<!-- Percept processors consume percepts and push them into the agents. -->
+				<env:perceptprocessor componenttype="Collector" class="DefaultBDIVisionProcessor" >
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"garbage_appeared", "add", "garbages"}, 
+							new String[]{"garbage_disappeared", "remove", "garbages"}
+						}
+					</env:property>
+				</env:perceptprocessor>
+				
+				<env:perceptprocessor componenttype="Burner" class="DefaultBDIVisionProcessor" >
+					<env:property name="percepttypes">
+						new Object[]
+						{
+							new String[]{"garbage_appeared", "add", "garbages"}, 
+							new String[]{"garbage_disappeared", "remove", "garbages"}
+						}
+					</env:property>
+				</env:perceptprocessor>
+			</env:percepttypes>
+			
+			<!-- Actions that can be performed in the environment. -->
+			<env:actiontypes>
+				<env:actiontype name="pickup" class="PickupWasteAction">
+					<env:property name="actor_id" class="IComponentIdentifier"/>
+				</env:actiontype>
+				<env:actiontype name="drop" class="DropWasteAction" >
+					<env:property name="actor_id" class="IComponentIdentifier"/>
+				</env:actiontype>
+				<env:actiontype name="burn" class="BurnWasteAction" >
+					<env:property name="actor_id" class="IComponentIdentifier"/>
+				</env:actiontype>
+				<env:actiontype name="go" class="GoAction" >
+					<env:property name="object_id" class="Object"/>
+					<env:property name="direction" class="String"/>
+				</env:actiontype>
+			</env:actiontypes>
+			
+			<!-- Perspectives define the user-interface appearance. -->
+			<env:perspectives>
+				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
+						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
+						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector/images/collector.png" />
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdi/examples/garbagecollector/images/garbage.png">
+							<env:drawcondition>$object.garbage!=null</env:drawcondition> 
+						</env:texturedrectangle>
+<!-- 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/> -->
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
+					</env:drawable>
+					<env:drawable objecttype="burner" width="1" height="1">
+						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
+						<env:texturedrectangle width="0.8" height="0.8" layer="1" imagepath="jadex/bdi/examples/garbagecollector/images/burner.png" />
+						<env:texturedrectangle width="0.6" height="0.6" layer="2" imagepath="jadex/bdi/examples/garbagecollector/images/flames.png" >
+							<env:drawcondition>$object.garbage!=null</env:drawcondition> 
+						</env:texturedrectangle>
+<!-- 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/> -->
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
+					</env:drawable>
+					<env:drawable objecttype="garbage" width="0.7" height="0.7">
+						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/garbagecollector/images/garbage.png" />
+					</env:drawable>
+					<env:prelayers>
+						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector/images/bg.jpg" />
+						<env:gridlayer width="1.0" height="1.0" color="white" />
+					</env:prelayers>
+				</env:perspective>
+					
+				<env:perspective name="abstract" class="Perspective2D" objectplacement="center">
+					<env:drawable objecttype="collector" width="1.0" height="1.0">
+						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
+						<env:triangle layer="2" color="red" />
+						<env:rectangle layer="3" color="yellow" width="0.2" height="0.2">
+							<env:drawcondition>$object.garbage!=null</env:drawcondition> 
+						</env:rectangle>
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
+						<env:text layer="4" x="0.0" y="0.4" color="white" text="$owner$"/>
+					</env:drawable>
+					<env:drawable objecttype="burner" width="1.0" height="1.0">
+						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>	
+						<env:triangle layer="1" color="green" />
+						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
+						<env:text layer="4" x="0.0" y="0.4" color="white" text="$owner$"/>
+					</env:drawable>
+					<env:drawable objecttype="garbage" width="0.7" height="0.7">
+						<env:rectangle layer="0" color="yellow" />
+					</env:drawable>
+					<env:prelayers>
+						<env:gridlayer width="1.0" height="1.0" color="white" />
+					</env:prelayers>
+				</env:perspective>
+			</env:perspectives>
+			
+			<!-- A space executor defines the space execution policy (e.g. roundbased vs. continuous). -->
+			<env:spaceexecutor class="RoundBasedExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="execution_monitoring">false</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+	
+	<!-- Agent types of the application. -->
+	<componenttypes>
+		<componenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml"/>
+		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
+	</componenttypes>
+	
+	<!-- Application instance definitions. -->
+	<configurations>
+	
+		<configuration name="One Burner / One Collector">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">15</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="abstract"/>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+
+			<components>
+				<component type="Collector"/>
+				<component type="Burner"/>
+			</components>			
+		</configuration>
+		
+		<configuration name="One Burner / Two Collectors">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">8</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="abstract"/>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+			
+			<components>
+				<!-- Using names for agents is problemat -->
+				<!-- <component name="Collector2" type="Collector"/>
+				<component name="Collector1" type="Collector"/>
+				<component name="Burner1" type="Burner"/> -->
+				<component type="Collector" number="2"/>
+				<component type="Burner" number="1"/>
+			</components>
+		</configuration>
+		
+		<configuration name="Two Burners / Three Collectors">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="14" height="14">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">5</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="abstract" />
+					</env:observers>
+				</env:envspace>
+			</extensions>
+
+			<components>
+				<component type="Collector" number="3"/>
+				<component type="Burner" number="2"/>
+			</components>
+		</configuration>
+		
+		<configuration name="Many Burners / Too Many Collectors">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">2</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="abstract" />
+					</env:observers>
+				</env:envspace>
+			</extensions>
+
+			<components>
+				<component type="Collector" number="30"/>
+				<component type="Burner" number="5"/>
+			</components>
+		</configuration>
+		
+		<configuration name="No Agents">
+			<extensions>
+				<env:envspace name="mygc2dspace" type="gc2dspace">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">15</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" dataview="view_all" perspective="abstract"/>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+		</configuration>
+	</configurations>
+
+</applicationtype>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test an achieve goal with context condition for goal suspension.</H3>
+
+	This agent has an achieve goal associated with
+	an increment plan that increments
+	every second the belief count. The achieve
+	goal succeeds when it has count till 5.
+
+	The achieve goal has a context condition that
+	directly maps to the state of the belief <mycontext>.
+	Setting this belief to false (with the BDI-Viewer)
+	results in the achieve goal suspension.
+-->
+
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="AchieveGoal"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>java.util.logging.Level</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		
+		<belief name="count"  class="int">
+			<fact>0</fact>
+		</belief>
+		<belief name="mycontext"  class="boolean">
+			<fact>true</fact>
+		</belief>
+		<belief name="myfailure"  class="boolean">
+			<fact>false</fact>
+		</belief>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="testgoal" retry="true" exclude="never">
+			<contextcondition>
+ 				$beliefbase.mycontext
+ 			</contextcondition>
+			<targetcondition>
+ 				$beliefbase.count==5
+ 			</targetcondition>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="testplan">
+			<body class="GenerateGoalPlan"/>
+		</plan>
+		
+        <plan name="increment">
+			<parameter name="beliefname" class="String">
+				<value>"count"</value>
+			</parameter>
+			<parameter name="value" class="int">
+				<value>1</value>
+			</parameter>
+			<parameter name="rate" class="int">
+				<value>100</value>
+			</parameter>
+			<body class="BeliefIncrementPlan"/>
+			<trigger>
+				<goal ref="testgoal"/>
+			</trigger>
+		</plan>
+	</plans>
+
+	<properties>
+		<!-- <property name="logging.level">Level.INFO</property> -->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="testplan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
+

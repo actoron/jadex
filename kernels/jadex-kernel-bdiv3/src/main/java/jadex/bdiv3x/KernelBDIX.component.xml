@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BDI V3 XML kernel.
+-->
+<componenttype xmlns="http://www.activecomponents.org/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-component
+						http://www.activecomponents.org/jadex-component-${jadex_build_version}.xsd"
+	name="KernelBDIX" package="jadex.bdiv3x">
+	
+	<imports>
+		<import>jadex.bridge.service.types.factory.*</import>
+	</imports>
+	
+	<properties>
+		<property name="kernel.types" class="String[]">
+			new String[]{"agent.xml", "capability.xml"}
+		</property>
+	</properties>
+	
+	<services>
+		<providedservice class="IComponentFactory">
+			<implementation>
+				new BDIXComponentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{"debugger.panels"},new Object[]{"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel"}))
+			</implementation>
+		</providedservice>
+	</services>
+</componenttype>

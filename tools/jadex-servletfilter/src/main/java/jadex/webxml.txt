@@ -1,0 +1,36 @@
+<filter>
+	<filter-name>ForwardFilter</filter-name>
+	<filter-class>jadex.ForwardFilter</filter-class>
+	<!--
+	<init-param>
+    	<param-name>leasetime</param-name>
+    	<param-value>10</param-value>
+	</init-param>
+	<init-param>
+    	<param-name>https</param-name>
+    	<param-value>true</param-value>
+	</init-param>
+	<init-param>
+    	<param-name>authentication</param-name>
+    	<param-value>true</param-value>
+	</init-param>
+	<init-param>
+    	<param-name>adminpass</param-name>
+    	<param-value>secret</param-value>
+	</init-param>
+	<init-param>
+    	<param-name>httpsport</param-name>
+    	<param-value>9981</param-value>
+	</init-param>
+	<init-param>
+    	<param-name>filepath</param-name>
+    	<param-value>c:\temp</param-value>
+	</init-param>
+	-->
+</filter>
+
+<filter-mapping>
+	<filter-name>ForwardFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>    
+

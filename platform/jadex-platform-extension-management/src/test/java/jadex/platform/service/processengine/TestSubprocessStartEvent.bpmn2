@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>TestSubprocessStartEvent</jadex:modelname>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="mXGzRdvHUI25sRaq">
+    <semantic:subProcess id="Kp6KR82JRVzgGctR">
+      <semantic:incoming>lVGrbSa5270++aH7</semantic:incoming>
+      <semantic:startEvent id="Ik5zn29QT/yfIezp">
+        <semantic:outgoing>zssMLLpd7lPShQPE</semantic:outgoing>
+        <semantic:conditionalEventDefinition/>
+        <semantic:extensionElements>
+          <jadex:property name="eventtypes">new java.lang.String[]{&quot;SubprocessStart&quot;}</jadex:property>
+          <jadex:property name="condition">$event.value==7</jadex:property>
+        </semantic:extensionElements>
+      </semantic:startEvent>
+      <semantic:task name="Task" id="yAMNau1/DbrnVBzw">
+        <semantic:incoming>zssMLLpd7lPShQPE</semantic:incoming>
+        <semantic:extensionElements>
+          <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getComponentIdentifier()+&quot; after event: &quot;+$event</jadex:parameter>
+        </semantic:extensionElements>
+      </semantic:task>
+    </semantic:subProcess>
+    <semantic:startEvent id="mLR+eRTFPqwse2ET">
+      <semantic:outgoing>lVGrbSa5270++aH7</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:sequenceFlow sourceRef="Ik5zn29QT/yfIezp" targetRef="yAMNau1/DbrnVBzw" id="zssMLLpd7lPShQPE">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="mLR+eRTFPqwse2ET" targetRef="Kp6KR82JRVzgGctR" id="lVGrbSa5270++aH7">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="mXGzRdvHUI25sRaq">
+        <dc:Bounds height="280.0" width="660.0" x="50.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Kp6KR82JRVzgGctR" isExpanded="true">
+        <dc:Bounds height="160.0" width="340.0" x="210.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Ik5zn29QT/yfIezp">
+        <dc:Bounds height="40.0" width="40.0" x="30.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="yAMNau1/DbrnVBzw">
+        <dc:Bounds height="100.0" width="160.0" x="130.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mLR+eRTFPqwse2ET">
+        <dc:Bounds height="40.0" width="40.0" x="80.0" y="90.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="zssMLLpd7lPShQPE">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="lVGrbSa5270++aH7">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

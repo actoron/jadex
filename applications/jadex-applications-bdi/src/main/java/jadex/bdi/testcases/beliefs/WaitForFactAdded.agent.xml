@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test detection of added facts.</H3>
+
+	Testing the waitqueue using addBeliefSet() to wait for
+	fact added events.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="WaitForFactAdded"
+	package="jadex.bdi.testcases.beliefs">
+
+	<imports>
+		<import>java.text.*</import>
+		<import>java.util.Date</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults" result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+
+		<beliefset class="String" name="beliefSetToAddFacts" />
+	</beliefs>
+
+	<plans>
+		<plan name="tester">
+			<body class="WaitForFactAddedPlan"/>
+		</plan>
+		<plan name="factAdder">
+			<parameter class="String" name="instance" />
+			<body class="FactAdderPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+        <property name="debugging">false</property>
+        <property name="logging.level">java.util.logging.Level.INFO</property>
+    </properties>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="tester"/>
+				<initialplan ref="factAdder">
+ 					<parameter ref="instance">
+						 <value>"A"</value>
+ 					</parameter>
+ 				</initialplan>
+				<!-- <initialplan ref="factAdder">
+ 					<parameter ref="instance">
+						 <value>"B"</value>
+ 					</parameter>
+				</initialplan> -->
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

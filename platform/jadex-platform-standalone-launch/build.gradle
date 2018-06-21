@@ -1,0 +1,51 @@
+description 'The Jadex launch package facilitates executing the Jadex standalone platform.'
+
+dependencies
+{
+	def launcharts = new HashSet<String> ([
+										   // Core API
+										   ':jadex-commons',':jadex-bridge',':jadex-javaparser',':jadex-xml',
+										   
+										   // Kernels
+										   ':jadex-kernel-base',':jadex-kernel-micro',':jadex-kernel-bpmn',
+										   ':jadex-kernel-application',':jadex-kernel-component',':jadex-applib-bdi',
+										   ':jadex-kernel-bdiv3', ':jadex-kernel-microservice',
+										   
+										   // Platform
+										   ':jadex-platform',
+										   
+										   // Tools
+										   ':jadex-runtimetools-swing',':jadex-tools-bdi',':jadex-tools-bpmn',
+										   ':jadex-tools-comanalyzer',':jadex-rules-tools',
+										   ':jadex-runtimetools-web',
+										   
+										   // Extensions
+										   ':jadex-kernel-extension-agr',':jadex-kernel-extension-envsupport',
+										   ':jadex-kernel-extension-envsupport-opengl',
+//										   ':jadex-platform-extension-maven',
+										   ':jadex-kernel-extension-envsupport-jmonkey',' :jadex-platform-extension-webservice',
+										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
+										   ':jadex-platform-extension-relaytransport',
+										   ':jadex-platform-extension-websockettransport',
+										   ':jadex-platform-extension-webservice-desktop',
+										   // For IDEs: include manually to choose impl.
+//										   ':jadex-platform-extension-webservice-desktop-jetty',
+//										   ':jadex-platform-extension-webservice-desktop-grizzly',
+										   ])
+	
+	launcharts.retainAll(gradle.ext.includeartifacts)
+	
+	launcharts.each { art ->
+		api project(art)
+	}
+	
+}
+
+jar 
+{
+	manifest 
+	{
+		attributes('Main-Class': 'jadex.base.Starter',
+			'Class-Path': configurations.compile.collect { it.getName() }.join(' '))
+	}
+}

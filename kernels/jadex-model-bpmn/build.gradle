@@ -1,0 +1,8 @@
+description 'Business Process Model and Notation (BPMN) implementation.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':platform:jadex-bridge') // todo: remove, big problem IModelInfo 
+	api project(':serialization:jadex-xml')
+}

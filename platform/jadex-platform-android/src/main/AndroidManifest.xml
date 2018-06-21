@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="org.activecomponents.jadex.android.platform">
+    <uses-sdk android:minSdkVersion="21"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <application>
+            <service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"/>
+    </application>
+</manifest>

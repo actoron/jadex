@@ -1,0 +1,16 @@
+description 'The Jadex web service applications package contains several example applications, benchmarks and testcases using web service integration.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':serialization:jadex-xml')
+	api project(':platform:jadex-bridge')
+	api project(':kernels:jadex-kernel-micro')
+	api project(':kernels:jadex-kernel-component')
+	api project(':kernels:jadex-kernel-application')
+	api project(':platform:jadex-platform-extension-webservice')
+//	api project(':platform:jadex-platform-extension-webservice-desktop')
+	api project(':platform:jadex-platform-extension-webservice-desktop-grizzly') // todo: do not depend on specific server
+	
+	api 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Tests if the parameter sets of goals work.</H3>
+
+	Using the bdi viewer one should be able to
+	see a goal having two parameter sets.
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="ParameterSet"
+	package="jadex.bdi.testcases.goals">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.commons.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="create" class="boolean"/>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="testgoal">
+			<parameterset name="names" class="String">
+				<values>new String[]{"a", "b", "c"}</values>
+			</parameterset>
+			<parameterset name="morenames" class="String">
+				<value>"d"</value>
+				<value>"e"</value>
+				<value>"f"</value>
+			</parameterset>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="printer">
+			<parameterset name="names" class="String">
+				<goalmapping ref="testgoal.names"/>
+			</parameterset>
+			<parameterset name="morenames" class="String">
+				<goalmapping ref="testgoal.morenames"/>
+			</parameterset>
+			<body class="ParameterSetPlan"/>
+			<trigger>
+				<goal ref="testgoal"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="testgoal"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

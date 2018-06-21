@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Agent for testing flags.</H3>
+-->
+<agent xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="Flag"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.bridge.fipa.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="test_plan">
+			<body class="FlagPlan"/>
+		</plan>
+	</plans>
+
+	<properties>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>8</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test_plan"/>
+			</plans>
+		</configuration>
+		<configuration name="donothing"/>
+		<configuration name="suspend" suspend="true"/>
+		<configuration name="master" master="true"/>
+		<configuration name="daemon" daemon="true"/>
+		<configuration name="autoshutdown" autoshutdown="true"/>
+	</configurations>
+</agent>
+

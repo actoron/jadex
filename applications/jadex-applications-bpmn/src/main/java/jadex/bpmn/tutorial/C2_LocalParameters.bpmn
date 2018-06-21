@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_G1JkATZnEd-86tAf5dPynA" iD="_G1JkADZnEd-86tAf5dPynA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HGRwQDZnEd-86tAf5dPynA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HGRwQTZnEd-86tAf5dPynA" key="Description" value="&lt;h1>Local Parameters&lt;/h1> The first task requests an input value, which is printed by the second task."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HGRwQjZnEd-86tAf5dPynA" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7GgRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_G1JkBzZnEd-86tAf5dPynA" iD="_G1JkBjZnEd-86tAf5dPynA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_G1St8TZnEd-86tAf5dPynA" iD="_G1St8DZnEd-86tAf5dPynA" outgoingEdges="_Irv5SjZnEd-86tAf5dPynA" name="Enter Address" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HRKKkDZnEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HRKKkTZnEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uBl7AARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7AQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7AgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7AwRPEeCnwcpWvxOwkg" key="0:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7BARPEeCnwcpWvxOwkg" key="0:1" value="address"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7BQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7BgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Default Address&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Irv5QTZnEd-86tAf5dPynA" iD="_Irv5QDZnEd-86tAf5dPynA" outgoingEdges="_6bs26jZtEd-86tAf5dPynA" incomingEdges="_Irv5SjZnEd-86tAf5dPynA" name="Start Shipping" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PMg3kDZnEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PMg3kTZnEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uBl7BwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7CARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7CQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7CgRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7CwRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7DARPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7DQRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Shipping to: &quot;+address"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7DgRPEeCnwcpWvxOwkg" key="1:0" value="inout"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7DwRPEeCnwcpWvxOwkg" key="1:1" value="address"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7EARPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7EQRPEeCnwcpWvxOwkg" key="1:3" value="address"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6bs24TZtEd-86tAf5dPynA" iD="_6bs24DZtEd-86tAf5dPynA" incomingEdges="_6bs26jZtEd-86tAf5dPynA" name="Shipping&#xD;&#xA;Finished" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BX2JoDZuEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BX2JoTZuEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uBl7EgRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7EwRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7FARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7FQRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7FgRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7FwRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uBl7GARPEeCnwcpWvxOwkg" key="0:3" value="&quot;Arrived at: &quot;+address"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Irv5SjZnEd-86tAf5dPynA" iD="_Irv5STZnEd-86tAf5dPynA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SvJQ0DZnEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SvJQ0TZnEd-86tAf5dPynA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6bs26jZtEd-86tAf5dPynA" iD="_6bs26TZtEd-86tAf5dPynA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PpixEEbqEd-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PpixEUbqEd-qm5VDdIP35A" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

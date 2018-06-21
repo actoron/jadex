@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Basic wander, flee and eat behaviour for preys.</H3>
+
+	Three goal types are supported:<br>
+	- Running away from hunters (maintain keep alone).<br>
+	- Eating food if discovered (achieve eat_food).<br>
+	- Searching for food (perform wander around).
+-->
+<capability xmlns="http://www.activecomponents.org/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
+	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
+	name="BasicBehaviour"
+	package="jadex.bdi.examples.hunterprey_classic.creature.preys.basicbehaviour">
+
+	<imports>
+		<import>jadex.bdi.examples.hunterprey_classic.*</import>
+		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>java.util.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="actsensecap" file="jadex.bdi.examples.hunterprey_classic.creature.actsense.Creature"/>
+	</capabilities>
+
+	<beliefs>
+
+		<!-- The creature -->
+		<beliefref name="my_self" exported="true">
+			<concrete ref="actsensecap.my_self"/>
+		</beliefref>
+
+		<!-- The current vision. -->
+		<beliefref name="vision" exported="true">
+			<concrete ref="actsensecap.vision"/>
+		</beliefref>
+
+		<!-- The known hunters. -->
+		<beliefsetref name="hunters" exported="true">
+			<concrete ref="actsensecap.hunters" />
+		</beliefsetref>
+
+		<!-- The know obstacles. -->
+		<beliefsetref name="obstacles" exported="true">
+			<concrete ref="actsensecap.obstacles"/>
+		</beliefsetref>
+
+		<!-- The know food. -->
+		<beliefsetref name="food" exported="true">
+			<concrete ref="actsensecap.food"/>
+		</beliefsetref>
+
+		<!-- Private beliefs -->
+
+		<!-- Is the prey in danger. -->
+		<belief name="is_indanger" class="boolean" evaluationmode="push">
+			<fact>
+				$beliefbase.vision!=null &amp;&amp;
+				(select $object
+ 				from $beliefbase.vision.getObjects()
+				where $object instanceof Hunter).size()>0
+			</fact>
+		</belief>
+
+		<!-- Forbidden food. -->
+		<beliefset name="forbidden_food" class="Food"/>
+
+		<!-- Configuration belief stating if eating is allowed. -->
+		<belief name="eating_allowed" class="boolean">
+			<fact>true</fact>
+		</belief>
+
+	</beliefs>
+
+	<goals>
+		<maintaingoal name="keep_alone" exclude="never">
+			<deliberation>
+				<inhibits ref="eat_food" inhibit="when_in_process"/>
+				<inhibits ref="wander_around" inhibit="when_in_process" />
+			</deliberation>
+			<maintaincondition>
+				!$beliefbase.is_indanger
+			</maintaincondition>
+		</maintaingoal>
+
+		<achievegoal name="eat_food">
+			<parameter name="$food" class="Food">
+				<bindingoptions>
+				    select $food from $beliefbase.food
+					where !Arrays.asList($beliefbase.forbidden_food).contains($food)
+				</bindingoptions>
+			</parameter>
+			<unique/>
+			<creationcondition  beliefs="wastes">
+ 				$beliefbase.eating_allowed
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="wander_around"/>
+				<inhibits ref="eat_food">
+					$beliefbase.my_self.getDistance($goal.$food)
+					&lt; $beliefbase.my_self.getDistance($ref.$food)
+				</inhibits>
+			</deliberation>
+		</achievegoal>
+
+		<performgoal name="wander_around" retry="true" exclude="never">
+		</performgoal>
+
+		<achievegoal name="goto_location">
+			<parameter name="location" class="Location"/>
+		</achievegoal>
+
+		<achievegoalref name="move">
+			<concrete ref="actsensecap.move"/>
+		</achievegoalref>
+
+		<achievegoalref name="eat">
+			<concrete ref="actsensecap.eat"/>
+		</achievegoalref>
+
+	</goals>
+
+	<!-- The plans. -->
+	<plans>
+
+		<!-- Wander around plan. -->
+		<plan name="gotoloc">
+			<parameter name="location" class="Location">
+ 				<goalmapping ref="goto_location.location"/>
+			</parameter>
+			<body class="GotoLocationPlan"/>
+			<trigger>
+				<goal ref="goto_location"/>
+			</trigger>
+		</plan>
+
+		<!-- Wander around plan. -->
+		<plan name="wander">
+			<body class="WanderAroundPlan"/>
+			<trigger>
+				<goal ref="wander_around"/>
+			</trigger>
+		</plan>
+
+		<!-- Dumb move plan. -->
+		<plan name="escape">
+			<body class="EscapePreyPlan"/>
+			<trigger>
+				<goal ref="keep_alone"/>
+			</trigger>
+		</plan>
+
+		<!-- Dumb move plan. -->
+		<plan name="eatfood">
+			<parameter name="food" class="Food">
+ 				<goalmapping ref="eat_food.$food"/>
+			</parameter>
+			<body class="EatFoodPlan"/>
+			<trigger>
+				<goal ref="eat_food"></goal>
+			</trigger>
+		</plan>
+
+		<plan name="removeforbiddenfood">
+			<body class="RemoveForbiddenFoodPlan"/>
+			<trigger>
+				<factchanged ref="vision"/>
+			</trigger>
+		</plan>
+
+	</plans>
+
+	<properties>
+		<!--<property name="logging.level">Level.FINE</property>-->
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="sleep">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>false</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+		<configuration name="flee">
+			<beliefs>
+				<initialbelief ref="eating_allowed">
+					<fact>false</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal name="escapegoal" ref="keep_alone"/>
+			</goals>
+		</configuration>
+		<configuration name="wander_flee_eat">
+			<goals>
+				<initialgoal name="wandergoal" ref="wander_around"/>
+				<initialgoal name="escapegoal" ref="keep_alone"/>
+			</goals>
+		</configuration>
+	</configurations>
+
+</capability>
+

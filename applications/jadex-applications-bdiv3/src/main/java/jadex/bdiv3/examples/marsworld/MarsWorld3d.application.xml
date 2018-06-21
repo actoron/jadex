@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The mars world application descriptor</H3>
+
+	Can be used to launch the mars world example.<br>
+
+	It consists of three different kinds of agents:<br>
+	- <b>Sentry agents</b> are responsible for examining ore locations<br>
+		A ore capacity is shown on the map when an ore location was examined.<br>
+	- <b>Production agents</b> produce ore at available ore location.<br>
+	- <b>Carry agents</b> are able to carry ore to the base.<br><br>
+
+	Objective is to carry as much ore as possible to the<br>
+	home base in a predefined mission time.<br>
+-->
+<applicationtype xmlns="http://www.activecomponents.org/jadex-application"
+	xmlns:agr="http://www.activecomponents.org/jadex-agrspace"
+	xmlns:env="http://www.activecomponents.org/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
+	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
+	                    http://www.activecomponents.org/jadex-envspace 
+	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
+	name="MarsWorld3d" package="jadex.bdiv3.examples.marsworld">
+	
+	<imports>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.extension.envsupport.dataview.*</import>
+		<import>java.text.SimpleDateFormat</import>
+		<import>java.util.Date</import>
+		<import>jadex.extension.envsupport.observer.perspective.*</import>
+		<import>jadex.bdiv3.examples.marsworld.carry.*</import>
+		<import>jadex.bdiv3.examples.marsworld.producer.*</import>
+		<import>jadex.bdiv3.examples.marsworld.sentry.*</import>
+		<import>jadex.bdiv3.examples.marsworld.movement.*</import>
+		<import>jadex.extension.envsupport.evaluation.*</import>
+		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+	</imports>
+	
+	<extensiontypes>
+		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
+			<env:property name="targetradius" class="double">0.05</env:property>
+			<env:property name="border">Space2D.BORDER_RELAXED</env:property>
+		
+			<env:objecttypes>
+				<env:objecttype name="target">
+					<env:property name="abbau" class="boolean" dynamic="true">								
+						$object.getProperty("state").equals("analyzed")
+						&amp;&amp; ($object.getProperty("ore")!=0 &amp;&amp; $object.getProperty("capacity")!=0)
+					</env:property>
+					<env:property name="ore" class="int">0</env:property>
+					<env:property name="capacity" class="int">0</env:property>
+					<env:property name="state" class="String">"unknown"</env:property>
+				</env:objecttype>
+				<env:objecttype name="sentry">
+					<env:property name="rotation" class="IVector2"></env:property>
+					<env:property name="status" class="String">"drive"</env:property>
+					<env:property name="vision" class="double">0.1</env:property>
+					<env:property name="speed" class="double">0.05</env:property>
+					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="producer">
+					<env:property name="rotation" class="IVector2"/>
+					<env:property name="status" class="String">"drive"</env:property>
+					<env:property name="vision" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.1</env:property>
+					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="carry">
+					<env:property name="rotation" class="IVector2"/>
+					<env:property name="status" class="String">"drive"</env:property>
+					<env:property name="vision" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.15</env:property>
+					<env:property name="ore" class="int">0</env:property>
+					<env:property name="capacity" class="int">20</env:property>
+					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
+				</env:objecttype>
+				<env:objecttype name="homebase">
+					<env:property name="ore" class="int">0</env:property>
+					<env:property name="text" class="String" dynamic="true">
+						"Collected ore: "+$object.getProperty("ore")+" \n"+
+						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
+							- ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())))
+					</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+						
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="rotate" class="RotationTask" />
+				<env:tasktype name="analyze" class="AnalyzeTargetTask" />
+				<env:tasktype name="produce" class="ProduceOreTask" />
+				<env:tasktype name="load" class="LoadOreTask" />
+			</env:tasktypes>			
+						
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+			</env:dataviews>
+						
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Sentry" objecttype="sentry"/>
+				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
+				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
+			</env:avatarmappings>
+			
+			<env:perspectives>
+			<env:perspective3d name="Complex3D" class="Perspective3D" >
+				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+					<env:sky skypath="jadex3d/textures/sky/sky01/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
+					<env:rndterrain width="2" height="0.1" depth="2"  
+		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
+					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
+					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" shadowtype="Receive"/>
+					
+					  
+					<env:sound3d soundfile="jadex3d/sounds/misc/windboe.ogg" loop="true" volume="0.2" continuosly="true" positional="false" />
+				
+				</env:drawable3d>
+				
+				<!-- H O M E B A S E -->
+				<env:drawable3d objecttype="homebase" width="0.2" height="0.2" depth="0.2" rotation3d="false">
+					<env:property name="oresize" dynamic="true">new Vector3Double(0.52f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.52f)</env:property>
+					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
+
+					
+					<env:object3d width=".3" height=".3" depth=".3"  x="-2" y="0" z="2" rotation="$deg45y" modelpath="jadex3d/models/buildings/homebase/base.j3o" hasLightMaterials="true" shadowtype="Cast">
+					
+					</env:object3d>			
+	
+					
+					<env:object3d width=".03" height=".03" depth=".03" x="-0.5" y="0.0" z="0.5" rotation="$deg180y" modelpath="jadex3d/models/buildings/mixed/jadexflag.j3o" hasLightMaterials="true" shadowtype="Cast">
+							<env:animation name="Wave" channel="chan01" loop="true"/>
+					</env:object3d>			
+					<!-- TODO: text schein schrott zu sein
+					<env:text3d  width="2" height="2" depth="1" rotation="$deg90y" x="0" y="4" z="0" text="$object.getProperty("text")" color="#FFFFFFFF" ></env:text3d>
+					<env:text3d  width="2" height="2" depth="1" rotation="$deg270y" x="0" y="4" z="0" text="$object.getProperty("text")" color="#FFFFFFFF" ></env:text3d>
+					 -->
+					 
+					<!-- Box for Ore -->
+					<env:dome size="oresize" x="-2" y="0.15" z="2"  color="#FFFFFFFF" radius="1" samples="32" planes="16" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
+									<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:dome>
+	
+				
+				</env:drawable3d>
+				
+				<!--ERZVORKOMMEN  -->
+				<env:drawable3d objecttype="target" width="0.1" height="0.1" depth="0.1" rotation3d="false" isDynamic="true">
+				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.2,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.2)</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/800.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
+				  	<env:property name="capapos" dynamic="true">new Vector3Double(0,-0.1,0)</env:property>
+
+<!-- 						Nullpunkt  -->
+						<env:sphere width="0.06" height="0.1" depth="0.06" x="0" y="0" z="0" color="#FFB90FFF" >
+							<env:drawcondition>$object.getProperty("state").equals("unknown")</env:drawcondition>
+						</env:sphere>
+						
+<!-- 						Abgebautes erz  -->
+						<env:dome size="capa" position="capapos" color="#FFFFFFFF" radius="1" samples="10" planes="10" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
+							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
+						</env:dome>
+						
+						<env:object3d width=".5" height=".5" depth=".5"  modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true" shadowtype="Cast">
+							<env:animation name="Wave" channel="chan" loop="true">
+							</env:animation>
+							<env:drawcondition>
+							$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:object3d>
+						
+					<env:sound3d soundfile="jadex3d/sounds/misc/dadum.ogg" loop="false" volume="0.4" continuosly="false" positional="true" >
+						<env:soundcondition>
+							$object.getProperty("state").equals("analyzing")
+								&amp;&amp; ($object.getProperty("ore")!=0 )
+						</env:soundcondition>
+					</env:sound3d>
+					
+					<env:sound3d soundfile="jadex3d/sounds/misc/binglow.ogg" loop="false" volume="0.4" continuosly="false" positional="true" >
+						<env:soundcondition>
+							$object.getProperty("state").equals("analyzing")
+								&amp;&amp; ($object.getProperty("ore")==0 )
+						</env:soundcondition>
+					</env:sound3d>
+				   	
+			</env:drawable3d>
+				
+
+				<env:drawable3d objecttype="sentry" width="0.16" height="0.16" depth="0.16" autoRotation="false"> 
+					<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
+					<env:object3d width="0.8" height="0.8" depth="0.8" x="0" y="0.0" z="0.0" rotation="$deg180y" modelpath="jadex3d/models/vehicles/tank/apc.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
+				</env:drawable3d>
+					
+				<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15" autoRotation="false">
+					<env:object3d width="1.5" height="1.5" depth="1.5" rotation="$deg270y" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o"  shadowtype="Cast"/> 
+					<env:object3d width="0.8" height="0.8" depth="0.8" x="0.0" y="0.1" z="0.4" rotation="$deg90y" modelpath="jadex3d/models/props/box/woodbox.j3o" shadowtype="Cast">
+						<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+					</env:object3d> 
+<!-- 					<env:sound3d soundfile="jadex3d/sounds/misc/drop1.ogg" loop="true" volume="10" continuosly="false" positional="true" > -->
+<!-- 						<env:soundcondition>$object.getProperty("status").equals("unloading")</env:soundcondition> -->
+<!-- 					</env:sound3d> -->
+<!-- 					<env:sound3d soundfile="jadex3d/sounds/misc/cratesmash.ogg" loop="false" volume="10" continuosly="false" positional="true" > -->
+<!-- 						<env:soundcondition>$object.getProperty("status").equals("loading")</env:soundcondition> -->
+<!-- 					</env:sound3d> -->
+				</env:drawable3d>
+					
+				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15" autoRotation="false">
+					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"> 
+					<env:animation name="DigAll" channel="chan01" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("ore")</env:animationcondition>
+					</env:animation>
+					<env:animation name="Idle" channel="chan01" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("drive")</env:animationcondition>
+					</env:animation>
+					</env:object3d>
+					<env:sound3d soundfile="jadex3d/sounds/misc/digging.ogg" loop="false" volume="0.4" continuosly="false" positional="true" >
+						<env:soundcondition>$object.getProperty("status").equals("ore")</env:soundcondition>
+					</env:sound3d>
+					</env:drawable3d>	
+
+
+				</env:perspective3d>	
+
+			</env:perspectives>
+				
+
+			<!-- executor -->
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	</extensiontypes>
+
+	<componenttypes>
+		<componenttype name="Sentry" filename="jadex/bdiv3/examples/marsworld/sentry/SentryBDI.class"/>
+		<componenttype name="Producer" filename="jadex/bdiv3/examples/marsworld/producer/ProducerBDI.class"/>
+		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryBDI.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="1 Sentry / 2 Producers / 3 Carries">
+			<extensions>
+				<env:envspace name="myspace" type="2dspace">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="space">$space</env:property><!-- hack!!! -->
+							<env:property name="missiontime">
+								300000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+							</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.05, 0.7)</env:property>
+							<env:property name="ore">200</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.5, 0.6)</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+							<env:property name="ore">50</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.7, 0.4)</env:property>
+							<env:property name="ore">100</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
+							<env:property name="ore">25</env:property>
+						</env:object>
+					</env:objects>
+					
+					<env:dataproviders>
+						<env:dataprovider name="homebase_ore">
+							<env:source name="$homebase" objecttype="homebase">
+							</env:source>
+							<env:data name="time">$time</env:data>
+							<env:data name="ore_amount">$homebase.ore</env:data>
+						</env:dataprovider>
+					</env:dataproviders>
+			
+					<env:dataconsumers>
+						<env:dataconsumer name="ore_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"homebase_ore"</env:property>
+							<env:property name="title">"Ore in homebase"</env:property>
+							<env:property name="labelx">"Time"</env:property>
+							<env:property name="labely">"Ore"</env:property>
+							<env:property name="maxitemcount">500</env:property>
+							<env:property name="legend">false</env:property>
+							
+							<!-- Defines a normal series. -->
+							<env:property name="seriesname">"Ore"</env:property>
+							<env:property name="valuex">"time"</env:property>
+							<env:property name="valuey">"ore_amount"</env:property>
+						</env:dataconsumer>
+					</env:dataconsumers>
+					
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all" perspective="icons">
+							<env:plugin name="evaluation" class="EvaluationPlugin">
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("ore_chart")).getChartPanel()</env:property>
+							</env:plugin>
+						</env:observer>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="1"/>
+  				<component type="Producer" number="2"/>
+				<component type="Carry" number="3"/>
+			</components>
+ 		</configuration>
+
+		<configuration name="Multi">
+			<extensions>
+				<env:envspace name="myspace" type="2dspace" width="2" height ="2">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="space">$space</env:property><!-- hack!!! -->
+							<env:property name="missiontime">
+								3000000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+							</env:property>
+						</env:object>
+						<env:object type="target" number="20">
+							<env:property name="ore">Math.random()>0.2 ? (Integer)(5+Math.random()*35)*5 : 0</env:property>
+						</env:object>
+					</env:objects>
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all" perspective="icons"/>
+					</env:observers>
+	 			</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="1"/> <!-- todo: support more than one sentry (requires coordination between sentries) -->
+  				<component type="Producer" number="5"/>
+				<component type="Carry" number="10"/>
+			</components>
+ 		</configuration>
+	</configurations>
+
+</applicationtype>
