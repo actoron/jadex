@@ -180,9 +180,8 @@ def addProjectDir(projects, dir, blacklist, prefix)
 		{
 			if (prefix != null){
 				projects.add(prefix + dir.getName())
-				if ((prefix + dir.getName()).contains('relaytransport'))
-				println 'added !!!!! ' + prefix + dir.getName()
-				}
+				//println 'added !!!!! ' + prefix + dir.getName()
+			}
 			isgradle = true
 		}
 	}
@@ -222,8 +221,11 @@ def getExtraArtifacts(String projectid)
 			}
 		}
 		String artstr = props.getProperty('extraartifacts')
-		artstr.split(',').each { art ->
-			ret.add(':' + art.trim())
+		if (artstr != null)
+		{
+			artstr.split(',').each { art ->
+				ret.add(art.trim())
+			}
 		}
 	}
 	return ret;

@@ -3,38 +3,38 @@ description 'App that can contains the Jadex test agents. Does nothing. Started 
 dependencies
 {
 
-    releaseProvided project(':jadex-android-platformapp')
-    debugProvided project(':jadex-android-platformapp')
+    releaseProvided project(':android:jadex-android-platformapp')
+    debugProvided project(':android:jadex-android-platformapp')
 
 //    compile(project(':jadex-android-commons'))
 
-    compile(project(':jadex-applications-bpmn')) {
+    compile(project(':applications:jadex-applications-bpmn')) {
         exclude module: 'jadex-kernel-bpmn'
     }
-    compile(project(':jadex-applications-gpmn')) {
+    compile(project(':applications:jadex-applications-gpmn')) {
         exclude module: 'jadex-kernel-gpmn'
     }
 
-    compile(project(':jadex-applications-bdibpmn')) {
+    compile(project(':applications:jadex-applications-bdibpmn')) {
         exclude module: 'jadex-tools-base-swing'
         exclude module: 'jadex-kernel-extension-envsupport'
         exclude module: 'jadex-kernel-bdibpmn'
     }
 
-    compile(project(':jadex-applications-bdi')) {
+    compile(project(':applications:jadex-applications-bdi')) {
         exclude module: 'jcalendar'
         exclude module: 'jadex-tools-base-swing'
         exclude module: 'jadex-kernel-extension-envsupport'
         exclude module: 'jadex-kernel-bdi'
     }
 
-    compile(project(':jadex-applications-micro')) {
+    compile(project(':applications:jadex-applications-micro')) {
         exclude module: 'jadex-tools-base-swing'
         exclude module: 'jadex-kernel-extension-envsupport'
         exclude module: 'webcam-capture'
     }
 
-    compile(project(':jadex-applications-bdiv3')) {
+    compile(project(':applications:jadex-applications-bdiv3')) {
         exclude module: 'jcalendar'
         exclude module: 'jadex-tools-base-swing'
         exclude module: 'jadex-kernel-extension-envsupport'

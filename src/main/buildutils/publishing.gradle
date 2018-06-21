@@ -183,7 +183,8 @@ publishing {
             }
 
             groupId group
-            artifactId project.name
+            //artifactId project.name
+            artifactId (("jadex" + project.getPath()).replace(":", "-"))
             version project.version
             pom.withXml {
                 def root = asNode()
