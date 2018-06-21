@@ -2,16 +2,27 @@ description 'The Jadex platform package contains implementations of platform ser
 
 dependencies
 {
-	api project(path: ':util:jadex-commons')
-	api project(path: ':util:jadex-commons-gui')
-	api project(path: ':util:jadex-commons-security')
-	api project(path: ':serialization:jadex-binary')
-	api project(path: ':serialization:jadex-json')
-	api project(path: ':serialization:jadex-xml')
-	api project(path: ':platform:jadex-bridge')
-	api project(path: ':kernels:jadex-kernel-base')
-	api project(path: ':kernels:jadex-kernel-micro')
-	api project(path: ':util:jadex-javaparser')
+	api project(':util:jadex-commons')
+	api project(':util:jadex-commons-gui')
+	api project(':util:jadex-commons-security')
+	api project(':util:jadex-javaparser')
+	api project(':serialization:jadex-binary')
+	api project(':serialization:jadex-json')
+	api project(':serialization:jadex-xml')
+	api project(':platform:jadex-bridge')
+	api project(':kernels:jadex-kernel-base')
+	api project(':kernels:jadex-kernel-micro')
+	api project(':kernels:jadex-kernel-bpmn')
+	api project(':rules:jadex-rules-eca')
+	
+	api 'commons-daemon:commons-daemon:1.0.10'
+	
+	testImplementation project(':tools:jadex-tools-base-swing')
+	// Add transports, otherwise test fails due to consistency check.
+	//testImplementation project(':transports:jadex-platform-extension-relaytransport')
+	//testImplementation project(':transports:jadex-platform-extension-websockettransport')
+	// required for test suite (why?)
+	//testImplementation project(':kernels:jadex-kernel-component')
 	
 	apiNoAndroidRuntime 'javax.mail:mail:1.4.5'
 	api group: 'org.tukaani', name: 'xz', version: '1.5'
@@ -19,4 +30,3 @@ dependencies
 	api group: 'org.xerial.snappy', name: 'snappy-java', version: '1.1.2.6'
 	api group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
 }
-

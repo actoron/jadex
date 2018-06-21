@@ -1,4 +1,4 @@
-package jadex.platform;
+package jadex.platform.service;
 
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;

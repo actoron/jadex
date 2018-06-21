@@ -6,6 +6,6 @@ dependencies
 	api project(':platform:jadex-platform-extension-maven')
 	//api project(':jadex-platform-extension-securetransport')
 	//api project(':jadex-platform-extension-relay-standalone')
-	api project(':platform:jadex-platform-extension-management')
+	//api project(':platform:jadex-platform-extension-management')
 }
 
