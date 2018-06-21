@@ -329,18 +329,18 @@ subprojects
  		}
 	}
 
-
-
-    subprojects
+    /* subprojects
     {
 		task allDeps(type: DependencyReportTask) {}
-	}
+	}*/
 }
 
 task copyJavaDocSources(type: Copy) {
 	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocworkdir')
 	gradle.ext.maindistartifacts.each { artname ->
 		def sp = project.ext.subprojectmap.get(artname)
+		if (sp == null)
+			println 'SUBPROJECT NOT FOUND:' + ' ' + artname
 		from(sp.projectDir.getCanonicalPath() + '/src/main/java') {
 			include '**/*.java'
 			exclude '**/org/apache/**'

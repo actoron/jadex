@@ -1,8 +1,0 @@
-/** Do not print nav bar. */
-#leftPanels
-{
-	display:none;
-}
-#body.hideright #contentcolumn .main {
-    margin: 0 0 0 0;
-}

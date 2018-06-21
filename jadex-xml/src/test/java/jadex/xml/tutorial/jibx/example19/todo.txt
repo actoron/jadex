@@ -1,5 +1,0 @@
-Objective:
-
-Using post-set and pre-get methods.
-
-todo: do we need this?

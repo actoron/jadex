@@ -1,3 +1,0 @@
-Effects -> Texture Effects -> Texture...
-Texture: Bricks
-Size%: 50

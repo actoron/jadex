@@ -1,7 +1,0 @@
-Material MyMaterial : Common/MatDefs/Misc/Unshaded.j3md {
-    MaterialParameters {
-        ColorMap : Flip jadex3d/models/space/misc/512x512_seamless_texture_11.jpg
-    }
-    AdditionalRenderState {
-    }
-}

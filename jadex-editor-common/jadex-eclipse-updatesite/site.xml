@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <description name="Jadex Update-Site" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/modeltools/update/">
-      Jadex tools to create Jadex BPMN and GPMN models
-   </description>
-   <feature url="features/jadex.editor.bpmn.feature_2.0.0.201201241312.jar" id="jadex.editor.bpmn.feature" version="2.0.0.201201241312"/>
-</site>

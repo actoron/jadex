@@ -1,5 +1,0 @@
-Objective:
-
-Using different binding versions.
-
-todo: 

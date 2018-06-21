@@ -1,6 +1,0 @@
-description 'The Jadex tools benchmarks package contains a library and tools for building histories of benchmark runs.'
-
-dependencies
-{
-	runtime 'com.h2database:h2:1.3.171'
-}

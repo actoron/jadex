@@ -11,27 +11,27 @@ if (androidSdkExists())
 def depconfigfile = 'src/main/buildutils/dependencies.conf'
 
 /* Prefix used for distribution meta-packages. */
-def metaprefix = 'jadex-distribution-';
-def addonprefix = 'jadex-addon-';
+def metaprefix = 'distributions:jadex-distribution-';
+def addonprefix = 'addons:jadex-addon-';
 
 /* Blacklist of ignored projects. */
 def projectblacklist = new HashSet<String>();
 
 /* Not marked as included for 'everything' in original .csv */
-projectblacklist.add('jadex-android-integration-test')
-projectblacklist.add('jadex-android-maven-plugin')
-projectblacklist.add('jadex-android-testlauncher')
-projectblacklist.add('jadex-applications-bdibpmn')
-projectblacklist.add('jadex-applications-gpmn')
-projectblacklist.add('jadex-kernel-bdibpmn')
-projectblacklist.add('jadex-kernel-gpmn')
+projectblacklist.add(':android:jadex-android-integration-test')
+projectblacklist.add(':android:jadex-android-maven-plugin')
+projectblacklist.add(':android:jadex-android-testlauncher')
+projectblacklist.add(':applications:jadex-applications-bdibpmn')
+projectblacklist.add(':applications:jadex-applications-gpmn')
+projectblacklist.add(':kernels:jadex-kernel-bdibpmn')
+projectblacklist.add(':kernels:jadex-kernel-gpmn')
 
 /* Not included in original .csv at all. */
-projectblacklist.add('jadex-platform-extension-securetransport')
-projectblacklist.add('jadex-platform-extension-relay')
-projectblacklist.add('jadex-applications-dungeonkeeper')
-projectblacklist.add('jadex-platform-extension-relay-standalone')
-projectblacklist.add('jadex-platform-extension-relay-web')
+//projectblacklist.add(':platform:jadex-platform-extension-securetransport')
+projectblacklist.add(':platform:jadex-platform-extension-relay')
+projectblacklist.add(':applications:jadex-applications-dungeonkeeper')
+projectblacklist.add(':platform:jadex-platform-extension-relay-standalone')
+projectblacklist.add(':platform:jadex-platform-extension-relay-web')
 
 /* Distribution->Artifacts map. */
 gradle.ext.distartmap = new HashMap<String, Set<String>>();
@@ -98,7 +98,14 @@ selectedstr.split(',').each {
 	gradle.ext.selecteddists.add(it.trim())
 }
 System.out.println('Selected distributions: ' + gradle.ext.selecteddists.toString())
-gradle.ext.maindistartifacts = new HashSet()
+gradle.ext.maindistartifacts = new HashSet() {
+	public boolean add(Object o)
+	{
+		if (o == null)
+			throw new NullPointerException()
+		super.add(o)
+	}
+}
 gradle.ext.selecteddists.each {
 	def arts = gradle.ext.distartmap.get(it)
 	if (arts == null) {
@@ -156,12 +163,14 @@ def addProjectDir(projects, dir, blacklist, prefix)
 	boolean isgradle = false
 	for (int i = 0; i < content.length; ++i)
 	{
-		if (content[i].isDirectory() && !blacklist.contains(content[i].getName()) && !content[i].getName().startsWith('.'))
+		String fullprojname = prefix+dir.getName()+':'+content[i].getName()
+		
+		if (content[i].isDirectory() && !blacklist.contains(fullprojname) && !content[i].getName().startsWith('.'))
 		{
 			def pname = content[i].getName()
 			if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || pname.endsWith('-java8'))
 			{
-				if (androidSdkExists() || !pname.contains('android'))
+				if (androidSdkExists() || pname.equals('android') || !pname.contains('android') || pname.contains('gradleplugin'))
 				{
 					subprojs.add(content[i])
 				}
@@ -169,8 +178,11 @@ def addProjectDir(projects, dir, blacklist, prefix)
 		}
 		else if ("build.gradle".equals(content[i].getName().toLowerCase()))
 		{
-			if (prefix != null)
+			if (prefix != null){
 				projects.add(prefix + dir.getName())
+				if ((prefix + dir.getName()).contains('relaytransport'))
+				println 'added !!!!! ' + prefix + dir.getName()
+				}
 			isgradle = true
 		}
 	}
@@ -230,9 +242,18 @@ def getProjectDeps(String projectid)
 						if ('getprojname'.equals(pname))
 						{
 							if (args[0] instanceof String)
+							{
+								if (!args[0].startsWith(':'))
+									println 'WARNING: Missing initial colon in project ' + projectid + ' depname: ' + args[0]
 								return args[0]
+							}
 							else if (args[0] instanceof Map && args[0].get("path") != null)
-								return args[0].get("path")
+							{
+								String tst = args[0].get("path")
+								if (!tst.startsWith(':'))
+									println 'WARNING: Missing initial colon in project ' + projectid + ' depname: ' + tst
+								return tst
+							}
 							return args[0]
 						}
 						return this

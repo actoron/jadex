@@ -1,6 +1,0 @@
-description 'Jadex commons is a base package containing frequently used functionality missing in standard Java utility classes.'
-
-dependencies
-{
-}
-
