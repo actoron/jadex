@@ -4,32 +4,32 @@ dependencies
 {
 	def launcharts = new HashSet<String> ([
 										   // Core API
-										   ':jadex-commons',':jadex-bridge',':jadex-javaparser',':jadex-xml',
+										   ':util:jadex-commons',':platform:jadex-bridge',':util:jadex-javaparser',':serialization:jadex-xml',
 										   
 										   // Kernels
-										   ':jadex-kernel-base',':jadex-kernel-micro',':jadex-kernel-bpmn',
-										   ':jadex-kernel-application',':jadex-kernel-component',':jadex-applib-bdi',
-										   ':jadex-kernel-bdiv3',
+										   ':kernels:jadex-kernel-base',':kernels:jadex-kernel-micro',':kernels:jadex-kernel-bpmn',
+										   ':kernels:jadex-kernel-application',':kernels:jadex-kernel-component',':kernels:jadex-applib-bdi',
+										   ':kernels:jadex-kernel-bdiv3',
 										   
 										   // Platform
-										   ':jadex-platform',
+										   ':platform:jadex-platform',
 										   
 										   // Tools
-										   ':jadex-runtimetools-swing',':jadex-tools-bdi',':jadex-tools-bpmn',
-										   ':jadex-tools-comanalyzer',':jadex-rules-tools',
+										   ':tools:jadex-runtimetools-swing',':tools:jadex-tools-bdi',':tools:jadex-tools-bpmn',
+										   ':tools:jadex-tools-comanalyzer',':tools:jadex-rules-tools',
 										   
 										   // Extensions
-										   ':jadex-kernel-extension-agr',':jadex-kernel-extension-envsupport',
-										   ':jadex-kernel-extension-envsupport-opengl',
-//										   ':jadex-platform-extension-maven',
-										   ':jadex-kernel-extension-envsupport-jmonkey',' :jadex-platform-extension-webservice',
-										   ':jadex-platform-extension-securetransport',':jadex-platform-extension-management',
-										   ':jadex-platform-extension-webservice-desktop',
-										   ':jadex-platform-extension-webservice-desktop-jetty',
-										   ':jadex-platform-extension-webservice-desktop-grizzly',
+										   ':environments:jadex-kernel-extension-agr',':environments:jadex-kernel-extension-envsupport',
+										   ':environments:jadex-kernel-extension-envsupport-opengl',
+//										   ':platform:jadex-platform-extension-maven',
+										   ':environments:jadex-kernel-extension-envsupport-jmonkey',':platform:jadex-platform-extension-webservice',
+										   ':platform:jadex-platform-extension-management',
+										   ':platform:jadex-platform-extension-webservice-desktop',
+										   ':platform:jadex-platform-extension-webservice-desktop-jetty',
+										   ':platform:jadex-platform-extension-webservice-desktop-grizzly',
 
-										   ':jadex-platform-extension-websockettransport',
-										   ':jadex-platform-extension-relaytransport',
+										   ':transports:jadex-platform-extension-websockettransport',
+										   ':transports:jadex-platform-extension-relaytransport',
 										   ])
 	
 	launcharts.retainAll(gradle.ext.includeartifacts)
@@ -37,7 +37,7 @@ dependencies
 	launcharts.each { art ->
 		api project(art)
 	}
-	api project(':jadex-applications-micro')
+	api project(':applications:jadex-applications-micro')
 
 //	test {
 //		testLogging {

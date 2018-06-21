@@ -4,7 +4,7 @@ dependencies
 {
 	api project(':util:jadex-commons')
 	api project(':rules:jadex-rules')
-	api project(':tools:jadex-rules-tools')
+	api project(':rules:jadex-rules-tools')
 	
 	apiNoAndroidRuntime 'org.antlr:antlr-runtime:3.1.3'
 }

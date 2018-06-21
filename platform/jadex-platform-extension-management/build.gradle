@@ -14,8 +14,8 @@ dependencies
 
 	
 	// Add transports, otherwise test fails due to consistency check.
-	//testImplementation project(':transports:jadex-platform-extension-relaytransport')
-	//testImplementation project(':transports:jadex-platform-extension-websockettransport')
+	testImplementation project(':transports:jadex-platform-extension-relaytransport')
+	testImplementation project(':transports:jadex-platform-extension-websockettransport')
 	// required for test suite (why?)
 	testImplementation project(':kernels:jadex-kernel-component')
 

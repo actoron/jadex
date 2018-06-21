@@ -8,8 +8,8 @@ dependencies
 	api project(':kernels:jadex-kernel-component')
 	api project(':kernels:jadex-kernel-application')
 	api project(':kernels:jadex-kernel-bdiv3')
-	api project(':kernels:jadex-applib-bdi')
-	api project(':platforms:jadex-platform')
-	api project(':platforms:jadex-platform-extension-webservice')
-	api project(':platforms:jadex-platform-extension-webservice-desktop')
+	api project(':applications:jadex-applib-bdi')
+	api project(':platform:jadex-platform')
+	api project(':platform:jadex-platform-extension-webservice')
+	api project(':platform:jadex-platform-extension-webservice-desktop')
 }

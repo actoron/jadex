@@ -14,7 +14,7 @@ dependencies
 	testImplementation project(':platform:jadex-platform')
 	testImplementation project(':transports:jadex-platform-extension-websockettransport')
 	testImplementation project(':transports:jadex-platform-extension-relaytransport')
-}
+
 	
 	api 'com.toedter:jcalendar:1.3.2'
 	api 'de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0'

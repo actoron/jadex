@@ -21,7 +21,7 @@ dependencies
 	api project(':util:jadex-commons')
 	api project(':util:jadex-commons:jadex-commons-gui')
 	api project(':serialization:jadex-xml')
-	api project(':util:jadex-bridge')
+	api project(':platform:jadex-bridge')
 	api project(':tools:jadex-tools-base-swing')
 	api project(':kernels:jadex-kernel-micro')
 	runtime project(':kernels:jadex-kernel-component') // Todo: move component tests in own project. -<scope>runtime</scope>

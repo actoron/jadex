@@ -9,7 +9,7 @@ dependencies
 	api project(':kernels:jadex-kernel-component')
 	api project(':kernels:jadex-kernel-application')
 	api project(':platform:jadex-platform')
-	api project(':kernels:jadex-kernel-extension-envsupport')
+	api project(':environments:jadex-kernel-extension-envsupport')
 }
 
 sourceCompatibility = 1.8
