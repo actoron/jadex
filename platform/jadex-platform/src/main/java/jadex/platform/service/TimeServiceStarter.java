@@ -1,4 +1,4 @@
-package jadex.platform;
+package jadex.platform.service;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;

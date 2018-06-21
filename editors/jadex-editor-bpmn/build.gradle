@@ -3,7 +3,7 @@ description 'Editor for Business Process Model and Notation (BPMN).'
 dependencies
 {
 	api project(':util:jadex-commons')
-	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons-gui')
 	api project(':kernels:jadex-model-bpmn')
 	api project(':serialization:jadex-json')
 	api project(':serialization:jadex-xml')

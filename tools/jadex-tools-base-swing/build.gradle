@@ -3,7 +3,7 @@ description 'GUI-dependent classes for jadex-tools-base.'
 dependencies
 {
 	api project(':platform:jadex-bridge')
-	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons-gui')
 	api project(':tools:jadex-tools-base')
 	api project(':serialization:jadex-xml')
 }

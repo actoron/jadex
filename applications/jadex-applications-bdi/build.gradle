@@ -3,7 +3,7 @@ description 'The Jadex BDI applications package contains several example applica
 dependencies
 {
 	api project(':util:jadex-commons')
-	api project(':util:jadex-commons:jadex-commons-gui')
+	api project(':util:jadex-commons-gui')
 	api project(':platform:jadex-bridge')
 	api project(':tools:jadex-tools-base-swing')
 	api project(':kernels:jadex-kernel-bdiv3')
