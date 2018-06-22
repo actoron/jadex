@@ -5,6 +5,6 @@ dependencies
 	api project(':kernels:jadex-kernel-micro')
 	api project(':kernels:jadex-kernel-microservice')
 	api project(':platform:jadex-platform')
-	api project(':platform:jadex-platform-extension-relaytransport')
-	api project(':platform:jadex-platform-extension-websockettransport')
+	api project(':transports:jadex-platform-extension-relaytransport')
+	api project(':transports:jadex-platform-extension-websockettransport')
 }

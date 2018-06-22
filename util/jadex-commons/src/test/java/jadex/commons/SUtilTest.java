@@ -41,26 +41,39 @@ public class SUtilTest //extends TestCase
 	public void	testFileZipping() throws Exception
 	{
 		// for maven?:
-		File	src	= new File("../jadex-commons/src/main/java");
-		if (!src.exists()) {
-			// for gradle:
-			src = new File("jadex-commons/src/main/java");
+//		File	src	= new File("../jadex-commons/src/main/java");
+//		if (!src.exists()) {
+//			// for gradle:
+//			src = new File("jadex-commons/src/main/java");
+//		}
+		String tmpdirstr = System.getProperty("java.io.tmpdir");
+		File src = new File(tmpdirstr + File.separator + "testdir" + SUtil.createPlainRandomId("testfile", 16));
+		src.mkdirs();
+		byte[] dummydata = new byte[1024];
+		for (int i = 0; i < 10; ++ i)
+		{
+			String dummy = src.getAbsolutePath() + File.separator + SUtil.createPlainRandomId("testfile", 16);
+			SUtil.writeFile("Testdata", dummy);
 		}
-
+		
 		System.out.println(src.getAbsolutePath());
 		File dest = File.createTempFile("jadextemp", ".jar");
 //		File	dest	= new File("temp", "test.jar");
 //		System.out.println("zipping: "+dest.getAbsolutePath());
-		dest.getParentFile().mkdirs();
+		//dest.getParentFile().mkdirs();
 		
 		FileOutputStream	fos	= new FileOutputStream(dest);
 		SUtil.writeDirectory(src, new BufferedOutputStream(fos));
 		fos.close();
 		
+		dest.delete();
+		SUtil.deleteDirectory(src);
+		
 		// Hashcode needs to be moved, binary serialization not accessible in commons.
 		//Assert.assertEquals(SUtil.getHashCode(src, false), SUtil.getHashCode(dest, false));
 		
-		SUtil.deleteDirectory(dest.getParentFile());
+		// WTH, delete the temp dir? What about other processes having files there??!?
+		//SUtil.deleteDirectory(dest.getParentFile());
 	}
 	
 	@Test
