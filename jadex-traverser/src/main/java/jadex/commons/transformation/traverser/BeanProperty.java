@@ -1,7 +1,10 @@
 package jadex.commons.transformation.traverser;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 import jadex.commons.SUtil;
@@ -21,9 +24,21 @@ public class BeanProperty
 
 	/** The getter. */
 	protected Method getter;
+	
+	/** The getter handle access. */
+	protected MethodHandle getterhandle;
+	
+	/** The static getter handle access. */
+	protected MethodHandle staticgetterhandle;
 
 	/** The setter. */
 	protected Method setter;
+	
+	/** The setter handle access. */
+	protected MethodHandle setterhandle;
+	
+	/** The static getter handle access. */
+	protected MethodHandle staticsetterhandle;
 	
 	/** Readable flag */
 	protected boolean readable = true;
@@ -36,9 +51,6 @@ public class BeanProperty
 
 	/** The field. */
 	protected Field field;
-	
-	/** Accessor delegate provider. */
-	protected IBeanDelegateProvider delegateprovider;
 	
 	/** The generic type. */
 	protected Type gentype;
@@ -55,15 +67,14 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, IBeanDelegateProvider delegateprovider, 
+	public BeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, 
 		boolean readable, boolean writable, Type gentype)
 	{
 		this.name = name;
 		this.type = type;
-		this.getter = getter;
-		this.setter = setter;
+		setGetter(getter);
+		setSetter(setter);
 		this.settertype = settertype;
-		this.delegateprovider = delegateprovider;
 		this.readable = readable;
 		this.writable = writable;
 		this.gentype = gentype;
@@ -72,13 +83,12 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Field field, IBeanDelegateProvider delegateprovider)
+	public BeanProperty(String name, Field field)
 	{
 		this.name = name;
 		this.type = field.getType();
 		this.settertype = type;
-		this.field = field;
-		this.delegateprovider = delegateprovider;
+		setField(field);
 	}
 
 	//-------- methods --------
@@ -123,37 +133,67 @@ public class BeanProperty
 	 *  Get the getter.
 	 *  @return The getter.
 	 */
-//	public Method getGetter()
-//	{
-//		return this.getter;
-//	}
+	public Method getGetter()
+	{
+		return this.getter;
+	}
 
 	/**
 	 *  Set the getter.
 	 *  @param getter The getter to set.
 	 */
-//	public void setGetter(Method getter)
-//	{
-//		this.getter = getter;
-//	}
+	public void setGetter(Method getter)
+	{
+		try
+		{
+			if (!getter.isAccessible())
+				getter.setAccessible(true);
+		}
+		catch (Exception e)
+		{
+		}
+		this.getter = getter;
+		try
+		{
+			this.getterhandle = MethodHandles.lookup().unreflect(getter);
+		}
+		catch (Exception e)
+		{
+		}
+	}
 
 	/**
 	 *  Get the setter.
 	 *  @return The setter.
 	 */
-//	public Method getSetter()
-//	{
-//		return this.setter;
-//	}
+	public Method getSetter()
+	{
+		return this.setter;
+	}
 
 	/**
 	 *  Set the setter.
 	 *  @param setter The setter to set.
 	 */
-//	public void setSetter(Method setter)
-//	{
-//		this.setter = setter;
-//	}
+	public void setSetter(Method setter)
+	{
+		try
+		{
+			if (!setter.isAccessible())
+				setter.setAccessible(true);
+		}
+		catch (Exception e)
+		{
+		}
+		this.setter = setter;
+		try
+		{
+			this.setterhandle = MethodHandles.lookup().unreflect(setter);
+		}
+		catch (Exception e)
+		{
+		}
+	}
 	
 	/**
 	 *  Tests if the property is writable.
@@ -209,6 +249,38 @@ public class BeanProperty
 	public void setField(Field field)
 	{
 		this.field = field;
+		try
+		{
+			if (!field.isAccessible())
+				field.setAccessible(true);
+		}
+		catch (Exception e)
+		{
+		}
+		
+		try
+		{
+			MethodHandle mh = MethodHandles.lookup().unreflectGetter(field);
+			if (Modifier.isStatic(field.getModifiers()))
+				staticgetterhandle = mh;
+			else
+				getterhandle = mh;
+		}
+		catch (Exception e)
+		{
+		}
+		
+		try
+		{
+			MethodHandle mh = MethodHandles.lookup().unreflectSetter(field);
+			if (Modifier.isStatic(field.getModifiers()))
+				staticsetterhandle = mh;
+			else
+				setterhandle = mh;
+		}
+		catch (Exception e)
+		{
+		}
 	}
 	
 	/**
@@ -240,16 +312,26 @@ public class BeanProperty
 	public Object getPropertyValue(Object object)
 	{
 		Object ret = null;
-		IBeanAccessorDelegate accdel = delegateprovider!=null ? delegateprovider.getDelegate(object.getClass()) : null;
-		if(accdel!=null)
+		if (getterhandle != null)
 		{
 			try
 			{
-				ret = accdel.getPropertyValue(object, name);
+				ret = getterhandle.invoke(object);
 			}
-			catch(Exception e)
+			catch (Throwable e)
 			{
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
+			}
+		}
+		else if (staticgetterhandle != null)
+		{
+			try
+			{
+				ret = staticgetterhandle.invoke();
+			}
+			catch (Throwable e)
+			{
+				SUtil.throwUnchecked(e);
 			}
 		}
 		else if (getter != null)
@@ -267,7 +349,7 @@ public class BeanProperty
 		{
 			try
 			{
-				Field field = getField();
+//				Field field = getField();
 				if(!field.isAccessible())
 					field.setAccessible(true);
 				ret = field.get(object);
@@ -290,10 +372,27 @@ public class BeanProperty
 	 */
 	public void setPropertyValue(Object object, Object value)
 	{
-		IBeanAccessorDelegate accdel = delegateprovider!=null ? delegateprovider.getDelegate(object.getClass()) : null;
-		if(accdel!=null)
+		if (getterhandle != null)
 		{
-			accdel.setPropertyValue(object, name, value);
+			try
+			{
+				setterhandle.invoke(object, value);
+			}
+			catch (Throwable e)
+			{
+				SUtil.throwUnchecked(e);
+			}
+		}
+		else if (staticsetterhandle != null)
+		{
+			try
+			{
+				staticsetterhandle.invoke(value);
+			}
+			catch (Throwable e)
+			{
+				SUtil.throwUnchecked(e);
+			}
 		}
 		else if (setter != null)
 		{
@@ -310,7 +409,7 @@ public class BeanProperty
 		{
 			try
 			{
-				Field field = getField();
+//				Field field = getField();
 				if (!field.isAccessible())
 					field.setAccessible(true);
 				field.set(object, value);

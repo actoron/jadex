@@ -109,4 +109,14 @@ public interface IPacketRouter {
 	 *         = directly connected
 	 */
 	Set<String> getConnectedDeviceAddresses();
+
+	/**
+	 * Forces this router to broadcast it's table.
+	 */
+	void forceBroadcast();
+
+	/**
+	 * Forces this router to delete stale routing entries.
+	 */
+	void forceDeleteStale();
 }

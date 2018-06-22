@@ -10,6 +10,7 @@ import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IFuture;
 
 /**
@@ -89,11 +90,36 @@ public interface ISecurityService
 	public IFuture<Void> setNetwork(String networkname, String secret);
 	
 	/**
+	 *  Remove a network.
+	 * 
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove the network completely.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeNetwork(String networkname, String secret);
+	
+	/**
 	 *  Gets the current networks and secrets. 
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<Map<String, String>> getNetworks();
+	public IFuture<MultiCollection<String, String>> getNetworks();
+	
+	/** 
+	 *  Adds an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addNameAuthority(String secret);
+	
+	/** 
+	 *  Remvoes an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeNameAuthority(String secret);
 	
 	/**
 	 *  Gets the secret of a platform if available.

@@ -5,7 +5,6 @@ import java.security.SecureRandom;
 import org.bouncycastle.crypto.engines.ChaChaEngine;
 import org.bouncycastle.util.Pack;
 
-import jadex.commons.SUtil;
 import jadex.commons.security.IEntropySource;
 import jadex.commons.security.SSecurity;
 

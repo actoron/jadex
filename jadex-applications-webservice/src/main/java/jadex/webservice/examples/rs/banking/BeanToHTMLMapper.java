@@ -6,7 +6,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.BeanProperty;
-import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
+import jadex.commons.transformation.traverser.DefaultBeanIntrospector;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 
 /**
@@ -14,7 +14,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
  */
 public class BeanToHTMLMapper implements IValueMapper
 {
-	protected static final BeanReflectionIntrospector in = new BeanReflectionIntrospector();
+	protected static final DefaultBeanIntrospector in = new DefaultBeanIntrospector();
 	
 	/**
 	 * 

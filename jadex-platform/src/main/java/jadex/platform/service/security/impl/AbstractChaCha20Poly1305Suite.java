@@ -1,6 +1,7 @@
 package jadex.platform.service.security.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
@@ -52,7 +54,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected int nextstep;
 	
 	/** Hashed network names reverse lookup */
-	protected Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
+	protected MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
 	
 	// -------------- Operational state -----------------
 	
@@ -400,16 +402,20 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return Map hashed network name -> signature.
 	 */
-	protected Map<ByteArrayWrapper, byte[]> getNetworkSignatures(byte[] key, Set<ByteArrayWrapper> remotehnets)
+	protected MultiCollection<ByteArrayWrapper, byte[]> getNetworkSignatures(byte[] key, Set<ByteArrayWrapper> remotehnets)
 	{
-		Map<ByteArrayWrapper, byte[]> networksigs = new HashMap<ByteArrayWrapper, byte[]>();
+		MultiCollection<ByteArrayWrapper, byte[]> networksigs = new MultiCollection<ByteArrayWrapper, byte[]>();
 		if (remotehnets != null && hashednetworks.size() > 0)
 		{
 			for (ByteArrayWrapper hnwname : remotehnets)
 			{
-				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(hnwname);
-				if (tup != null)
-					networksigs.put(hnwname, signKey(challenge, key, tup.getSecondEntity()));
+				Collection<Tuple2<String, AbstractAuthenticationSecret>> tupc = hashednetworks.get(hnwname);
+				
+				if (tupc != null && tupc.size() > 0)
+				{
+					for (Tuple2<String, AbstractAuthenticationSecret> tup : tupc)
+						networksigs.add(hnwname, signKey(challenge, key, tup.getSecondEntity()));
+				}
 			}
 		}
 		return networksigs;
@@ -422,18 +428,28 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param networksigs The signatures.
 	 *  @return List of network that authenticated the key.
 	 */
-	protected List<String> verifyNetworkSignatures(byte[] key, Map<ByteArrayWrapper, byte[]> networksigs)
+	protected List<String> verifyNetworkSignatures(byte[] key, MultiCollection<ByteArrayWrapper, byte[]> networksigs)
 	{
 		List<String> ret = new ArrayList<String>();
 		if (networksigs != null)
 		{
-			for (Map.Entry<ByteArrayWrapper, byte[]> nwsig : networksigs.entrySet())
+			for (Map.Entry<ByteArrayWrapper, Collection<byte[]>> nwsig : networksigs.entrySet())
 			{
-				Tuple2<String, AbstractAuthenticationSecret> tup = hashednetworks.get(nwsig.getKey());
-				if (tup != null)
+				Collection<Tuple2<String, AbstractAuthenticationSecret>> tupc = hashednetworks.get(nwsig.getKey());
+				if (tupc != null && tupc.size() > 0)
 				{
-					if (verifyKey(challenge, key, tup.getSecondEntity(), nwsig.getValue()))
-						ret.add(tup.getFirstEntity());
+					sigcheck:
+					for (Tuple2<String, AbstractAuthenticationSecret> tup : tupc)
+					{
+						for (byte[] nwsigval : nwsig.getValue())
+						{
+							if (verifyKey(challenge, key, tup.getSecondEntity(), nwsigval))
+							{
+								ret.add(tup.getFirstEntity());
+								break sigcheck;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -503,16 +519,23 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param salt Salt to use.
 	 *  @return Reverse look-up map.
 	 */
-	protected static final Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> getHashedNetworks(Map<String, AbstractAuthenticationSecret> networks, byte[] salt)
+	protected static final MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> getHashedNetworks(MultiCollection<String, AbstractAuthenticationSecret> networks, byte[] salt)
 	{
-		Map<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> ret = new HashMap<ByteArrayWrapper, Tuple2<String,AbstractAuthenticationSecret>>();
+		MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> ret = new MultiCollection<ByteArrayWrapper, Tuple2<String,AbstractAuthenticationSecret>>();
 		if (networks != null)
 		{
-			for (Map.Entry<String, AbstractAuthenticationSecret> nw : networks.entrySet())
+			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> nw : networks.entrySet())
 			{
-				Tuple2<String, AbstractAuthenticationSecret> tup;
-				tup = new Tuple2<String, AbstractAuthenticationSecret>(nw.getKey(), nw.getValue());
-				ret.put(new ByteArrayWrapper(hashNetworkName(nw.getKey(), salt)), tup);
+				if (nw.getValue() != null)
+				{
+					ByteArrayWrapper namehash = new ByteArrayWrapper(hashNetworkName(nw.getKey(), salt));
+					for (AbstractAuthenticationSecret secret : nw.getValue())
+					{
+						Tuple2<String, AbstractAuthenticationSecret> tup;
+						tup = new Tuple2<String, AbstractAuthenticationSecret>(nw.getKey(), secret);
+						ret.add(namehash, tup);
+					}
+				}
 			}
 		}
 		return ret;
@@ -889,7 +912,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		protected Tuple2<byte[], byte[]> platformsecretsigs;
 		
 		/** Network signatures of the public key. */
-		protected Map<ByteArrayWrapper, byte[]> networksigs;
+		protected MultiCollection<ByteArrayWrapper, byte[]> networksigs;
 		
 		/** The available hashed network names */
 		protected Set<ByteArrayWrapper> hashednetworknames;
@@ -977,7 +1000,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @return The network signatures of the public key.
 		 */
-		public Map<ByteArrayWrapper, byte[]> getNetworkSigs()
+		public MultiCollection<ByteArrayWrapper, byte[]> getNetworkSigs()
 		{
 			return networksigs;
 		}
@@ -987,7 +1010,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @param networksigs The network signatures of the public key.
 		 */
-		public void setNetworkSigs(Map<ByteArrayWrapper, byte[]> networksigs)
+		public void setNetworkSigs(MultiCollection<ByteArrayWrapper, byte[]> networksigs)
 		{
 			this.networksigs = networksigs;
 		}

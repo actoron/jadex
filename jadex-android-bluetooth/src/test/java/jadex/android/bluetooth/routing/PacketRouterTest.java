@@ -16,12 +16,7 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 import jadex.android.bluetooth.routing.IPacketRouter.RoutingEntriesChangeListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.junit.Before;
@@ -111,15 +106,16 @@ public abstract class PacketRouterTest {
 		connectPacketRouters(packetRouter2, packetRouter1);
 		
 		packetRouter1.addConnectedDevice(device1);
-		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
-		Thread.sleep(getBroadcastWaitTime());
+		packetRouter1.forceBroadcast();
+//		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
+//		Thread.sleep(getBroadcastWaitTime());
 		assertTrue(packetRouter2.getReachableDeviceAddresses().contains(device1));
 
 		// now remove device1 from router 1
 		packetRouter1.removeConnectedDevice(device1);
-		
-		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
-		Thread.sleep(getBroadcastWaitTime());
+		packetRouter1.forceBroadcast();
+//		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
+//		Thread.sleep(getBroadcastWaitTime());
 		
 		// should be removed from router 2 now, too
 		Set<String> reachableDeviceAddresses = packetRouter2
@@ -128,8 +124,9 @@ public abstract class PacketRouterTest {
 		
 		//re-add
 		packetRouter1.addConnectedDevice(device1);
-		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
-		Thread.sleep(getBroadcastWaitTime());
+		packetRouter1.forceBroadcast();
+//		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
+//		Thread.sleep(getBroadcastWaitTime());
 		assertTrue(packetRouter2.getReachableDeviceAddresses().contains(device1));
 		//disconnect routers:
 //		packetRouter1.setPacketSender(null);
@@ -203,6 +200,14 @@ public abstract class PacketRouterTest {
 			}
 		}
 		return builder.build();
+	}
+
+	@Test
+	public void testDoNotSendMessageToUnknownDevice1000() throws MessageConvertException {
+		for (int i = 0; i < 1000; i++) {
+			testDoNotSendMessageToUnknownDevice();
+
+		}
 	}
 
 	@Test
@@ -313,8 +318,9 @@ public abstract class PacketRouterTest {
 		packetRouter2.addConnectedDevice(device1);
 		assertTrue(packetRouter2.getConnectedDeviceAddresses()
 				.contains(device1));
-		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
-		Thread.sleep(getBroadcastWaitTime());
+		packetRouter2.forceBroadcast();
+//		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
+//		Thread.sleep(getBroadcastWaitTime());
 
 		assertEquals(2, packetRouter2.getConnectedDeviceAddresses().size());
 		assertEquals(0, packetRouter2.getReachableDeviceAddresses().size());

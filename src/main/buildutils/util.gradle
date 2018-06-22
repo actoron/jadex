@@ -137,17 +137,17 @@ def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alread
  * @param configuration
  * @return
  */
-def addParentScopeMappings(Task task, Configuration configuration) {
-    def repos = task.repositories.asList()
-    if (!repos.empty) {
-        def scopeMappings = repos[0].pom.scopeMappings
-        def scope = scopeMappings.getMapping([configuration]).scope
-        configuration.extendsFrom.each {parentConfiguration ->
-//            println "add mapping for $parentConfiguration"
-            scopeMappings.addMapping(300, parentConfiguration, scope)
-        }
-    }
-}
+//def addParentScopeMappings(Task task, Configuration configuration) {
+//    def repos = task.repositories.asList()
+//    if (!repos.empty) {
+//        def scopeMappings = repos[0].pom.scopeMappings
+//        def scope = scopeMappings.getMapping([configuration]).scope
+//        configuration.extendsFrom.each {parentConfiguration ->
+////            println "add mapping for $parentConfiguration"
+//            scopeMappings.addMapping(300, parentConfiguration, scope)
+//        }
+//    }
+//}
 
 /**
  * Adds schema processing tasks:
@@ -314,20 +314,20 @@ def androidSdkExists() {
  */
 def addJavaDocJarTask(Project p) {
     if (isAndroidProject(p)) {
-        onAllVariants(p) {variant ->
-            def javadocTask = p.tasks.create("generate${variant.name}Javadoc", Javadoc) {
-                description "Generates Javadoc for $variant.name."
-                dependsOn "compileReleaseSources"
-                source = variant.javaCompile.source
-                ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
-                doFirst { classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar) }
-            }
-            def javadocJar = p.tasks.create("javadoc${variant.name}Jar", Jar) {
-                classifier = 'javadoc'
-                from javadocTask
-            }
-            p.artifacts {archives javadocJar}
+        def javadocsTask = p.tasks.create ('androidjavadocs', Javadoc) {
+            source = p.android.sourceSets.main.java.srcDirs
+            include( "**/*.java" )
+            classpath += p.files(p.android.getBootClasspath().join(File.pathSeparator))
+            ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
+            classpath += files(ext.androidJar)
         }
+
+        p.tasks.create('androidjavadocsJar', Jar) {
+            classifier = 'javadoc'
+            dependsOn javadocsTask
+            from javadocsTask.destinationDir
+        }
+
     } else {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
             classifier = 'javadoc'
@@ -345,111 +345,17 @@ def addJavaDocJarTask(Project p) {
  */
 def addSourcesJarTask(Project p) {
     if (isAndroidProject(p)) {
-        onAllVariants(p) { variant ->
-            def sourcesJar = p.tasks.create("build${variant.name}SourcesJar", Jar) {
-                classifier = 'sources'
-                from p.android.sourceSets.main.java.srcDirs
-            }
-            p.artifacts {archives sourcesJar}
+        p.tasks.create('androidsourcesJar', Jar) {
+            classifier = 'sources'
+            from p.android.sourceSets.main.java.srcDirs
         }
+
     } else {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
             classifier = 'sources'
             from p.sourceSets.main.allSource
         }
         p.artifacts {archives sourcesJar}
-    }
-}
-
-/**
- * Adds maven pom metadata to an uploadTask.
- * @param uploadTask
- * @return
- */
-def configurePomMetadata(Task uploadTask) {
-    uploadTask.project.afterEvaluate {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom {
-                project {
-                    name uploadTask.project.name
-                    description uploadTask.project.description
-
-                    scm {
-                        url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
-                    }
-
-                    url 'https://www.activecomponents.org'
-
-                    // beware: organization needs '=' assignment:
-                    // https://issues.gradle.org/browse/GRADLE-2719
-                    developers {
-                        developer {
-                            id 'alex'
-                            name 'Alexander Pokahr'
-                            email 'pokahr@gmx.net'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/84'
-//                organization 'University of Hamburg'
-//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                            organization = 'Actoron GmbH'
-                            organizationUrl 'https://actoron.com/'
-                        }
-                        developer {
-                            id 'lars'
-                            name 'Lars Braubach'
-                            email 'braubach@gmx.net'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/80'
-//                organization 'University of Hamburg'
-//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                            organization = 'Actoron GmbH'
-                            organizationUrl 'https://actoron.com/'
-                        }
-                        developer {
-                            id 'kai'
-                            name 'Kai Jander'
-                            email 'kai.jander@googlemail.com'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
-//                organization 'University of Hamburg'
-//                organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                            organization = 'Actoron GmbH'
-                            organizationUrl 'https://actoron.com/'
-                        }
-                        developer {
-                            id 'julian'
-                            name 'Julian Kalinowski'
-                            email 'kalinowski@informatik.uni-hamburg.de'
-//                url 'http://vsis-www.informatik.uni-hamburg.de/members/info.php/974'
-//                organization = 'Actoron GmbH'
-//                organizationUrl 'https://actoron.com/'
-                            organization = 'University of Hamburg'
-                            organizationUrl 'http://vsis-www.informatik.uni-hamburg.de/'
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (isCommercial(uploadTask.project)) {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.project {
-                licenses {
-                    license {
-                        name 'Actoron GmbH Commercial Licence'
-                    }
-                }
-            }
-        }
-    } else {
-        uploadTask.configure {
-            repositories.mavenDeployer.pom.project {
-                licenses {
-                    license {
-                        name 'GNU GENERAL PUBLIC LICENSE Version 3 or later'
-                        url 'http://www.activecomponents.org/bin/view/Download/License'
-                        distribution 'repo'
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -505,6 +411,20 @@ def addEclipseWorkarounds(project) {
 //	}
 }
 
+
+def getVar(String key, Project p) {
+    String value = System.getenv(key)
+//    print "key: $key, value: $value \n"
+    if (!value || value.isEmpty()) {
+        if (project.hasProperty(key)) {
+            value = project[key]
+        } else {
+            value = null
+        }
+    }
+    return value
+}
+
 // make functions externally visible
 
 ext {
@@ -521,10 +441,10 @@ ext {
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
     excludeNonAndroidRuntimeFromApk = this.&excludeNonAndroidRuntimeFromApk
-    addParentScopeMappings = this.&addParentScopeMappings
+//    addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
     addJavaDocJarTask = this.&addJavaDocJarTask
     addSourcesJarTask = this.&addSourcesJarTask
-    configurePomMetadata = this.&configurePomMetadata
     addEclipseWorkarounds = this.&addEclipseWorkarounds
+    getVar = this.&getVar
 }

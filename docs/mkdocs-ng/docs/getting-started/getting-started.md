@@ -1,3 +1,5 @@
+${SorryOutdatedv3}
+
 # Jadex Active Components
 With Jadex, you can use the *Active Components* approach to develop distributed applications. This approach combines a hierachical service component architecture (SCA) with the possibility of abstract business logic implementation based on [BDI Agents](../tutorials/bdiv3/01 Introduction) or [BPMN Workflows](../tutorials/bpmn/01 Introduction) (see [Component Types](../component-types/component-types) for more information).
 
@@ -43,6 +45,7 @@ A minimal complete build.gradle could look like this:
 apply plugin: 'java'
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -55,7 +58,6 @@ If you want to use our nightly builds, you need add another repository:
 
 ```groovy
 repositories {
-    mavenCentral()
     maven
     {
         name 'jadexsnapshots'
@@ -66,6 +68,13 @@ repositories {
   
 #### Apache Maven Project:
 ```xml
+<repositories>
+    <repository>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
+    </repository>
+</repositories>
+
 <dependency>
     <groupId>org.activecomponents.jadex</groupId>
     <artifactId>jadex-distribution-minimal</artifactId>

@@ -6,7 +6,7 @@ import java.util.Map;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.BeanProperty;
-import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
+import jadex.commons.transformation.traverser.DefaultBeanIntrospector;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 /**
@@ -14,14 +14,13 @@ import jadex.commons.transformation.traverser.IBeanIntrospector;
  */
 public class BeanIntrospectorFactory 
 {
-	/** If true, attempt to use delegate optimization */;
-	protected static final boolean OPTIMIZE = false;
-	
-	/** Class of the optimizing delegate introspector. */
-	protected static final String DELEGATE_INTRO_CLASS = "jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector";
+	protected int DEFAULT_INTROSPECTOR_CACHE_SIZE = 20000;
 	
 	/** The factor instance */
 	protected static volatile BeanIntrospectorFactory instance;
+	
+	/** The introspector. */
+	protected IBeanIntrospector introspector;
 	
 	/**
 	 *  Private constructor.
@@ -57,7 +56,9 @@ public class BeanIntrospectorFactory
 	 */
 	public IBeanIntrospector getBeanIntrospector() 
 	{
-		return getBeanIntrospector(200);
+		if (introspector == null)
+			introspector = getBeanIntrospector(DEFAULT_INTROSPECTOR_CACHE_SIZE);
+		return introspector;
 	}
 	
 	/**
@@ -67,30 +68,9 @@ public class BeanIntrospectorFactory
 	 */
 	public IBeanIntrospector getBeanIntrospector(int lrusize) 
 	{
-		IBeanIntrospector ret = null;
-		if(OPTIMIZE && !SReflect.isAndroid())
-		{
-			ClassLoader cl = BeanIntrospectorFactory.class.getClassLoader();
-			try
-			{
-				Class<?> introclass = cl.loadClass(DELEGATE_INTRO_CLASS);
-				if (introclass != null)
-				{
-					Constructor<?> con = introclass.getConstructor(int.class);
-					ret = (IBeanIntrospector) con.newInstance(lrusize);
-				}
-			}
-			catch (Exception e)
-			{
-			}
-		}
+		introspector = new DefaultBeanIntrospector(lrusize);
 		
-		if(ret == null)
-		{
-			return new BeanReflectionIntrospector(lrusize);
-		}
-		
-		return ret;
+		return introspector;
 	}
 	
 	/**

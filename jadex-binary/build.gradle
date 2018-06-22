@@ -4,4 +4,7 @@ dependencies
 {
 	api project(':jadex-traverser')
 	api project(':jadex-commons')
+	
+	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
+	testImplementation project(path: ':jadex-traverser', configuration: 'testOutput')
 }

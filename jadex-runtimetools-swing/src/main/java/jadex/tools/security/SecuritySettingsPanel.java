@@ -3,6 +3,7 @@ package jadex.tools.security;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Properties;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JPlaceholderTextField;
@@ -176,6 +178,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	{
 		usesecret = new JCheckBox(new AbstractAction("Use Secret")
 		{
+			private static final long serialVersionUID = 3199039268331252401L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				final boolean val = usesecret.isSelected();
@@ -194,6 +198,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		printsecret = new JCheckBox(new AbstractAction("Print Secret")
 		{
+			private static final long serialVersionUID = -7360330361452239905L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				final boolean val = printsecret.isSelected();
@@ -211,12 +217,16 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JButton setsecret = new JButton(new AbstractAction("Set...")
 		{
+			private static final long serialVersionUID = -5656178836803829151L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				SecretWizard wizard = new SecretWizard();
 				
 				wizard.addTerminationListener(new AbstractAction()
 				{
+					private static final long serialVersionUID = -7931248714652926912L;
+
 					public void actionPerformed(ActionEvent e)
 					{
 						if (JWizard.FINISH_ID == e.getID())
@@ -299,52 +309,66 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		nwtable = new JTable();
 		JScrollPane scroll = new JScrollPane(nwtable);
 		
-		final JPlaceholderTextField nwname = new JPlaceholderTextField();
-		nwname.setPlaceholder("Network Name");
+//		final JPlaceholderTextField nwname = new JPlaceholderTextField();
+//		nwname.setPlaceholder("Network Name");
 //		nwname.setMaximumSize(new Dimension(Short.MAX_VALUE, nwname.getMaximumSize().height));
 		
 		JButton add = new JButton(new AbstractAction("Add...")
 		{
+			private static final long serialVersionUID = 8248266251755976630L;
+
 			public void actionPerformed(ActionEvent e)
 			{
-				if (nwname.getText().length() == 0)
-				{
-					nwname.showInvalid();
-					return;
-				}
+//				if (nwname.getText().length() == 0)
+//				{
+//					nwname.showInvalid();
+//					return;
+//				}
 				
-				String nwn = nwname.getText();
-				nwname.setText("");
-				setNetwork(nwn);
+//				String nwn = nwname.getText();
+//				nwname.setText("");
+				setNetwork();
 			}
 		});
 		
-		JButton change = new JButton(new AbstractAction("Edit...")
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				int row = nwtable.getSelectedRow();
-				if (row >= 0)
-				{
-					String nwn = (String) nwtable.getModel().getValueAt(row, 0);
-					setNetwork(nwn);
-				}
-			}
-		});
+//		JButton change = new JButton(new AbstractAction("Edit...")
+//		{
+//			private static final long serialVersionUID = 65319789712239257L;
+//
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				int row = nwtable.getSelectedRow();
+//				if (row >= 0)
+//				{
+//					String nwn = (String) nwtable.getModel().getValueAt(row, 0);
+//					setNetwork(nwn);
+//				}
+//			}
+//		});
 		
 		JButton remove = new JButton(new AbstractAction("Remove")
 		{
+			private static final long serialVersionUID = 1894456300828658272L;
+
 			public void actionPerformed(ActionEvent e)
 			{
-				int row = nwtable.getSelectedRow();
-				if (row >= 0)
+				int[] rows = nwtable.getSelectedRows();
+				if (rows != null && rows.length > 0)
 				{
-					final String nwname = (String) nwtable.getModel().getValueAt(row, 0);
+					final String[] nwnames = new String[rows.length];
+					final String[] nwsecrets = new String[rows.length];
+					for (int i = 0; i < rows.length; ++i)
+					{
+						nwnames[i] = (String) nwtable.getModel().getValueAt(rows[i], 0);
+						nwsecrets[i] = (String) nwtable.getModel().getValueAt(rows[i], 1);
+					}
+					
 					jccaccess.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							secservice.setNetwork(nwname, null).get();
+							for (int i = 0; i < nwnames.length; ++i)
+								secservice.removeNetwork(nwnames[i], nwsecrets[i]).get();
 							refreshNetworks();
 							return IFuture.DONE;
 						};
@@ -355,6 +379,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JButton refresh = new JButton(new AbstractAction("Refresh")
 		{
+			private static final long serialVersionUID = -5577499766624680290L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				refreshNetworks();
@@ -371,12 +397,18 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		ParallelGroup vgroup = l.createParallelGroup();
 		
-		for (JComponent comp : new JComponent[] { nwname, add, change, remove, refresh })
+		for (JComponent comp : new JComponent[] { add, remove, refresh })
 		{
 			vgroup.addComponent(comp);
 			hgroup.addComponent(comp);
 		}
-		l.linkSize(SwingConstants.VERTICAL, nwname, add, change, remove, refresh);
+		l.linkSize(SwingConstants.VERTICAL, add, remove, refresh);
+//		for (JComponent comp : new JComponent[] { nwname, add, change, remove, refresh })
+//		{
+//			vgroup.addComponent(comp);
+//			hgroup.addComponent(comp);
+//		}
+//		l.linkSize(SwingConstants.VERTICAL, nwname, add, change, remove, refresh);
 		
 		l.setVerticalGroup(vgroup);
 		l.setHorizontalGroup(hgroup);
@@ -423,6 +455,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JButton add = new JButton(new AbstractAction("Add")
 		{
+			private static final long serialVersionUID = -3636160157428186911L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				final String entity = entityname.getText();
@@ -457,6 +491,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JButton remove = new JButton(new AbstractAction("Remove...")
 		{
+			private static final long serialVersionUID = 7003483731709427886L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				int ind = roletable.getSelectedRow();
@@ -490,6 +526,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 									JPanel buttonpanel = new JPanel();
 									JButton okbutton = new JButton(new AbstractAction("OK")
 									{
+										private static final long serialVersionUID = 9140455080961018315L;
+
 										public void actionPerformed(ActionEvent e)
 										{
 											final List<String> removal = new ArrayList<String>();
@@ -525,6 +563,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 									
 									JButton cancelbutton = new JButton(new AbstractAction("Cancel")
 									{
+										private static final long serialVersionUID = 1997807029644448744L;
+
 										public void actionPerformed(ActionEvent e)
 										{
 											frame.dispose();
@@ -554,6 +594,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JButton refresh = new JButton(new AbstractAction("Refresh")
 		{
+			private static final long serialVersionUID = -1813011770525012609L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				refreshRoles();
@@ -607,24 +649,28 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 *  
 	 *  @param nwn The network name.
 	 */
-	protected void setNetwork(final String nwn)
+	protected void setNetwork()
 	{
 		SecretWizard wizard = new SecretWizard();
-		wizard.setEntity(nwn);
+		//wizard.setEntity(nwn);
+		wizard.setEntityType("the network name");
 		
 		wizard.addTerminationListener(new AbstractAction()
 		{
+			private static final long serialVersionUID = -3403001893533826804L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				if (e.getID() == JWizard.FINISH_ID)
 				{
+					final String nw = ((SecretWizard) e.getSource()).getEntity();
 					final String secret = ((SecretWizard) e.getSource()).getResult().toString();
 					
 					jccaccess.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							secservice.setNetwork(nwn, secret).get();
+							secservice.setNetwork(nw, secret).get();
 							refreshNetworks();
 							
 							return IFuture.DONE;
@@ -675,7 +721,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final Map<String, String> nws = secservice.getNetworks().get();
+				final MultiCollection<String, String> nws = secservice.getNetworks().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -687,11 +733,17 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 							table = new String[nws.size()][2];
 							
 							int i = 0;
-							for (Map.Entry<String, String> entry : nws.entrySet())
+							for (Map.Entry<String, Collection<String>> entry : nws.entrySet())
 							{
-								table[i][0] = entry.getKey();
-								table[i][1] = entry.getValue();
-								++i;
+								if (entry.getValue() != null)
+								{
+									for (String secret : entry.getValue())
+									{
+										table[i][0] = entry.getKey();
+										table[i][1] = secret;
+										++i;
+									}
+								}
 							}
 						}
 						else

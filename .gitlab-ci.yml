@@ -4,8 +4,9 @@ quicktest:
     - master
   variables:
     GIT_STRATEGY: fetch
+    GIT_DEPTH: "1"
   script:
-    - gradlew --parallel --continue :jadex-applications-micro:test :jadex-integration-test:test test -x :jadex-integration-performance-test:test -x javadoc -x lint -x generatereleaseJavadoc -x lintVitalRelease -x transformClassesWithDexBuilderForRelease -x processSchemas
+    - gradlew -Pdist=publishdists clean test -x javadoc --info --stacktrace --no-daemon
   tags:
     - win
   cache:

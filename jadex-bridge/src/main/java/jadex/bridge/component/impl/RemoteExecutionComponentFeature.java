@@ -49,6 +49,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 
 /**
@@ -233,8 +234,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		Long timeout	= null;	// TODO: custom search timeout?
 		@SuppressWarnings({"rawtypes"})
-		Class	clazz	= query.getFilter() instanceof IAsyncFilter
-			? IIntermediateFuture.class	// TODO: subscription for persistent queries?
+		Class	clazz	= query.isMultiple()
+			? IIntermediateFuture.class
 			: IFuture.class;
 		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
 	}
@@ -598,7 +599,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			
 			if(!trusted)
 			{
-				System.out.println("Untrusted command not executed: "+msg);
+				getComponent().getLogger().info("Untrusted command not executed: "+msg);
 			}
 //			else
 //			{

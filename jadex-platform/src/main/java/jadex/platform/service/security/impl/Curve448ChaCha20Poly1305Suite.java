@@ -1,13 +1,13 @@
 package jadex.platform.service.security.impl;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
@@ -167,11 +167,11 @@ public class Curve448ChaCha20Poly1305Suite extends AbstractChaCha20Poly1305Suite
 		SecurityAgent fakeagent = new SecurityAgent()
 		{
 			{
-				networks = new HashMap<String, AbstractAuthenticationSecret>();
+				networks = new MultiCollection<String, AbstractAuthenticationSecret>();
 //				networks.put("test", new PasswordSecret("password:123456789012345"));
 				byte[] key = new byte[32];
 				SSecurity.getSecureRandom().nextBytes(key);
-				networks.put("test", new KeySecret(key));
+				networks.add("test", new KeySecret(key));
 			}
 			
 			public void sendSecurityHandshakeMessage(IComponentIdentifier receiver, Object message)

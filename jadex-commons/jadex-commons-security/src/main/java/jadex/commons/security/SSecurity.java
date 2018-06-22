@@ -10,8 +10,13 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Provider.Service;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -107,6 +112,12 @@ public class SSecurity
 	/** Entropy source for seeding CSPRNGS. */
 	protected static volatile IEntropySource ENTROPY_SOURCE;
 	
+	/** Flag if the fallback warning has been issued before. */
+	protected static boolean ENTROPY_FALLBACK_WARNING_DONE = false;
+	
+	/** Enable this to test the seeding fallback, do not change, used by tests only. */
+	protected static boolean TEST_ENTROPY_FALLBACK = false;
+	
 	/**
 	 *  Gets access to the common secure PRNG.
 	 *  @return Common secure PRNG.
@@ -124,6 +135,50 @@ public class SSecurity
 					else
 						SECURE_RANDOM = generateSecureRandom();
 				}
+				
+				if (Security.getProvider("Jadex") == null)
+				{
+					Security.insertProviderAt(new Provider("Jadex", 1.0, "")
+					{
+						{
+							putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.security.JadexSecureRandomSpi", null, null));
+						}
+						private static final long serialVersionUID = -3208767101511459503L;
+						
+					}, 1);
+				}
+				
+				// Attempt to overwrite UUID secure random.
+//				try
+//				{
+//					Class<?>[] cls = UUID.class.getDeclaredClasses();
+//					Class<?> holdercl = null;
+//					if (cls != null)
+//					{
+//						for (Class<?> cl : cls)
+//						{
+//							if ("java.util.UUID.Holder".equals(cl.getCanonicalName()))
+//							{
+//								holdercl = cl;
+//								break;
+//							}
+//						}
+//					}
+//					
+//					if (holdercl != null)
+//					{
+//						Field prngfield = holdercl.getDeclaredField("numberGenerator");
+//						VmHacks.get().setAccessible(prngfield, true);
+//						Field modifiersfield = Field.class.getDeclaredField("modifiers");
+//						VmHacks.get().setAccessible(modifiersfield, true);
+//						modifiersfield.setInt(prngfield, prngfield.getModifiers() & ~Modifier.FINAL);
+//						prngfield.set(null, SECURE_RANDOM);
+//					}
+//					
+//				}
+//				catch (Exception e)
+//				{
+//				}
 			}
 		}
 		return SECURE_RANDOM;
@@ -147,10 +202,11 @@ public class SSecurity
 //						protected long bcount = 0;
 						
 						/** Input stream for POSIX-like systems. */
-						protected InputStream urandomis;
+						protected File urandom = null;
 						
 						{
-							File urandom = new File("/dev/urandom");
+							urandom = new File("/dev/urandom");
+							FileInputStream urandomis = null;
 							if (urandom.exists())
 							{
 								try
@@ -159,11 +215,24 @@ public class SSecurity
 								}
 								catch (Exception e)
 								{
-									SUtil.close(urandomis);
+									urandom = null;
+								}
+								finally
+								{
+									if (urandomis != null)
+									{
+										try
+										{
+											urandomis.close();
+										}
+										catch (Exception e)
+										{
+										}
+									}
 								}
 							}
 							
-							if (urandomis == null)
+							if (urandom == null)
 							{
 								urandom = new File("/dev/random");
 								if (urandom.exists())
@@ -174,85 +243,99 @@ public class SSecurity
 									}
 									catch (Exception e)
 									{
-										SUtil.close(urandomis);
+										urandom = null;
+									}
+									finally
+									{
+										if (urandomis != null)
+										{
+											try
+											{
+												urandomis.close();
+											}
+											catch (Exception e)
+											{
+											}
+										}
 									}
 								}
 							}
 						}
 						
-						public synchronized void getEntropy(byte[] ret)
+						public synchronized void getEntropy(byte[] output)
 						{
 //							bcount += ret.length;
 //							System.out.println("Entropy bytes: " + bcount);
-							boolean noseed = true;
-							boolean urandomworked = false;
-							if (urandomis != null)
+//							boolean urandomworked = false;
+							byte[] empty = new byte[output.length];
+							byte[] ret = null;
+							if (urandom != null)
 							{
+								FileInputStream urandomis = null;
+								ret = new byte[output.length];
 								try
 								{
-									SUtil.readStream(ret, urandomis);
-									noseed = false;
-									urandomworked = true;
+									urandomis = new FileInputStream(urandom);
+									int read = 0;
+									int off = 0;
+									while (read < ret.length)
+									{
+										read = urandomis.read(ret, off, ret.length - read);
+										off += read;
+									}
 								}
 								catch (Exception e)
 								{
+									ret = null;
+								}
+								finally
+								{
 									if (urandomis != null)
-										SUtil.close(urandomis);
-									urandomis = null;
+									{
+										try
+										{
+											urandomis.close();
+										}
+										catch (Exception e)
+										{
+										}
+									}
 								}
 							}
 							
-							if (noseed)
+							if (ret == null || Arrays.equals(ret, empty))
 							{
 								// For Windows, use Windows API to gather entropy data
-								String osname = System.getProperty("os.name");
-								String osversion = System.getProperty("os.version");
-								int minmajwinversion = 6;
-								if (osname != null &&
-									osname.startsWith("Windows") &&
-									osversion != null &&
-									osversion.contains(".") &&
-									Integer.parseInt(osversion.substring(0, osversion.indexOf('.'))) >= minmajwinversion)
+								try
 								{
-									try
-									{
-										Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
-										Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
-										byte[]	tmpret = (byte[]) getrandomfromwindows.invoke(null, ret.length);
-										if(tmpret == null || ret.length != tmpret.length)
-										{
-											noseed	= true;
-										}
-										else
-										{
-											ret	= tmpret;
-										}
-									}
-									catch(Throwable e)
-									{
-									}
+									Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
+									Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
+									ret = (byte[]) getrandomfromwindows.invoke(null, output.length);
+								}
+								catch(Throwable e)
+								{
+									ret = null;
 								}
 							}
 							
-							if (noseed)
+							if (TEST_ENTROPY_FALLBACK)
+								ret = null;
+							
+							// Fallback
+							while (ret == null || Arrays.equals(ret, empty))
 							{
-								// Fallback to Java if nothing works.
-								ret = SecureRandom.getSeed(ret.length);
-							}
-							else
-							{
-								if (!urandomworked)
+								if (!ENTROPY_FALLBACK_WARNING_DONE)
 								{
-									byte[] addent = SecureRandom.getSeed(ret.length);
-									xor(ret, addent);
+									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
+									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
+								ret = SecureRandom.getSeed(output.length);
 							}
-						}
-						
-						protected void finalize() throws Throwable
-						{
-							if (urandomis != null)
-								SUtil.close(urandomis);
+							
+							System.arraycopy(ret, 0, output, 0, output.length);
+							
+							if (output == null || Arrays.equals(output, empty))
+								throw new SecurityException("Entropy gathering failed.");
 						}
 					};
 					
@@ -766,7 +849,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(new SecureRandom());
+		prngs.add(getDefaultSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
@@ -1112,9 +1195,39 @@ public class SSecurity
 	}
 	
 	/**
+	 *  Creates default algorithm secure random.
+	 */
+	private static final SecureRandom getDefaultSecureRandom()
+	{
+		String alg = "SHA1PRNG";
+		Provider p = Security.getProvider("SUN");
+		if (p != null)
+		{
+			for (Service serv : p.getServices())
+			{
+	            if (serv.getType().equals("SecureRandom"))
+	            {
+	                alg = serv.getAlgorithm();
+	                break;
+	            }
+	        }
+		}
+		try
+		{
+			return SecureRandom.getInstance(alg);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
+	/**
 	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
+		System.out.println(getSecureRandom().nextInt());
+//		SecureRandom sec = new SecureRandom();
 	}
 }

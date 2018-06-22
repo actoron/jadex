@@ -128,6 +128,28 @@ public class SUtil
 	/** ISO-8859-1 charset. */
 	public static final Charset ISO8859_1 = Charset.forName("ISO-8859-1");
 	
+	/** Access to non-secure fast random source. */
+	public static final Random FAST_RANDOM = new FastThreadedRandom();
+	
+	/** Access to secure random source. */
+	public static final SecureRandom SECURE_RANDOM;
+	static
+	{
+		SecureRandom secrand = null;
+		try
+		{
+			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
+			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+		}
+		catch (Exception e)
+		{
+			secrand = new SecureRandom();
+		}
+		SECURE_RANDOM = secrand;
+		
+	}
+	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
 
@@ -214,27 +236,6 @@ public class SUtil
 		}
 	};
 	
-	/** Access to non-secure fast random source. */
-	public static final Random FAST_RANDOM = new FastThreadedRandom();
-	
-	/** Access to secure random source. */
-	public static final SecureRandom SECURE_RANDOM;
-	static
-	{
-		SecureRandom secrand = null;
-		try
-		{
-			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
-			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
-			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
-		}
-		catch (Exception e)
-		{
-			secrand = new SecureRandom();
-		}
-		SECURE_RANDOM = secrand;
-	}
-
 	/** An empty string array. */
 	public static final String[] EMPTY_STRING_ARRAY	= new String[0];
 

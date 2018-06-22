@@ -12,7 +12,7 @@ import java.util.BitSet;
  *  This implementation does not support remove() because
  *  clearing a bit that is used by more than one element
  *  might lead to false negatives. (If remove is required
- *  a couting filter needs to be used).
+ *  a counting filter needs to be used).
  */
 public class BloomFilter
 {

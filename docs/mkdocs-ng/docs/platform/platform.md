@@ -1,3 +1,5 @@
+${SorryOutdatedv3}
+
 # Jadex Platform
 For Active Components to be executed, a *Platform* needs to be running.
 The Jadex Platform provides important runtime services such as lifecycle management, remote service invocation and component management. For more information about services provided by the Jadex Platform itself, skip to [Platform services](#platform-services).

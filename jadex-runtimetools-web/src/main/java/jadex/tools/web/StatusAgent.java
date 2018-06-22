@@ -25,7 +25,6 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
-import jadex.commons.SReflect;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -62,7 +61,7 @@ public class StatusAgent implements IStatusService
 	protected IFuture<Void>	setup()
 	{
 		IWebPublishService	wps	= SServiceProvider.getLocalService(agent, IWebPublishService.class);
-		return wps.publishResources("[http://localhost:8081/]", SReflect.getPackageName(getClass()).replace(".", "/")+"/static_content");
+		return wps.publishResources("[http://localhost:8081/]", "META-INF/resources");
 	}
 	
 	@Override

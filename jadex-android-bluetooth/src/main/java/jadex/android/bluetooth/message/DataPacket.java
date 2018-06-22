@@ -6,6 +6,7 @@ import jadex.android.bluetooth.exceptions.MessageToLongException;
 import jadex.android.bluetooth.util.Helper;
 
 import java.util.Arrays;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -87,6 +88,8 @@ public class DataPacket {
 	 * Max Data Size
 	 */
 	public static final short DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
+
+	public static Random random = new Random();
 
 	/**
 	 * Create a DataPacket from a {@link BluetoothMessage}
@@ -310,7 +313,11 @@ public class DataPacket {
 	 * Generates a new random Packet ID for this DataPacket
 	 */
 	public void newPaketID() {
-		this._pktId = UUID.randomUUID().toString();
+		StringBuilder sb = new StringBuilder();
+		while (sb.length() < 21) {
+			sb.append(Long.toHexString(random.nextLong()));
+		}
+		this._pktId = sb.toString();
 		this._pktId = this._pktId.substring(_pktId.length() - 21,
 				_pktId.length());
 	}

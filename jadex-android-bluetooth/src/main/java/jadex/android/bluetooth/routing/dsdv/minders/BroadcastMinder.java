@@ -53,15 +53,7 @@ public class BroadcastMinder extends Thread {
 		while (!abort) {
 			try {
 				Thread.sleep(ConfigInfo.periodicRouteBroadcast);
-
-				// increase my seq num everytime I broadcast it
-				RoutingTableEntryWrapper me = rt.getRoutingEntry(rm
-						.getOwnAddress());
-				me.increaseSeqNum();
-
-				// send out my routing table
-				rm.broadcastRouteTableMessage();
-
+				broadcastRoute();
 				// logRouteTable();
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
@@ -70,6 +62,21 @@ public class BroadcastMinder extends Thread {
 			}
 
 		}
+	}
+
+	/**
+	 * Broadcast route table instantly.
+	 */
+	public void broadcastRoute() {
+		// increase my seq num everytime I broadcast it
+		RoutingTableEntryWrapper me = rt.getRoutingEntry(rm
+				.getOwnAddress());
+		if (me!= null) {
+			me.increaseSeqNum();
+		}
+
+		// send out my routing table
+		rm.broadcastRouteTableMessage();
 	}
 
 	/**

@@ -110,7 +110,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected boolean allowplatformroles = false;
 	
 	/** Available virtual networks. */
-	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
+//	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
+	protected MultiCollection<String, AbstractAuthenticationSecret> networks = new MultiCollection<>();
+	
+	protected Set<AbstractX509PemSecret> nameauthorities = new HashSet<>();
 	
 	/** Available crypt suites. */
 	protected Map<String, Class<?>> allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
@@ -385,7 +388,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (nn != null)
 				{
 					for (int i = 0; i < nn.length; ++i)
-						networks.put(nn[i], AbstractAuthenticationSecret.fromString(ns[i]));
+						networks.add(nn[i], AbstractAuthenticationSecret.fromString(ns[i]));
 				}
 				else
 				{
@@ -397,8 +400,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				if (printsecret)
 				{
-					for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
-						System.out.println("Available network '" + entry.getKey() + "' with secret " + entry.getValue());
+					for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
+					{
+						if (entry.getValue() != null)
+						{
+							for (AbstractAuthenticationSecret secret : entry.getValue())
+								System.out.println("Available network '" + entry.getKey() + "' with secret " + secret);
+						}
+					}
 				}
 				
 				if (usesecret && platformsecret == null)
@@ -736,10 +745,46 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Sets a new network.
 	 * 
 	 *  @param networkname The network name.
-	 *  @param secret The secret, null to remove.
+	 *  @param secret The secret.
 	 *  @return Null, when done.
 	 */
 	public IFuture<Void> setNetwork(final String networkname, final String secret)
+	{
+		if (secret == null)
+			return new Future<>(new IllegalArgumentException("Secret is null."));
+		
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
+				
+				Collection<AbstractAuthenticationSecret> secrets = networks.get(networkname);
+				if (secrets != null && secrets.contains(asecret))
+					return IFuture.DONE;
+				
+				networks.add(networkname, asecret);
+				networknames.add(networkname);
+				
+				saveSettings();
+				
+				resetCryptoSuites();
+				
+				//TODO: RESET keys / sessions?
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Remove a network.
+	 * 
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove the network completely.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeNetwork(String networkname, String secret)
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
@@ -752,9 +797,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				}
 				else
 				{
-					AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
-					networks.put(networkname, asecret);
-					networknames.add(networkname);
+					Collection<AbstractAuthenticationSecret> secrets = networks.get(networkname);
+					secrets.remove(AbstractAuthenticationSecret.fromString(secret));
+					if (secrets.isEmpty())
+					{
+						networks.remove(networkname);
+						networknames.remove(networkname);
+					}
 				}
 				
 				saveSettings();
@@ -773,20 +822,65 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<Map<String, String>> getNetworks()
+	public IFuture<MultiCollection<String, String>> getNetworks()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Map<String, String>>()
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<MultiCollection<String, String>>()
 		{
-			public IFuture<Map<String, String>> execute(IInternalAccess ia)
+			public IFuture<MultiCollection<String, String>> execute(IInternalAccess ia)
 			{
-				Map<String, String> ret = new HashMap<String, String>();
+				MultiCollection<String, String> ret = new MultiCollection<String, String>();
 				
-				for(Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
+				for(Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 				{
-					ret.put(entry.getKey(), entry.getValue().toString());
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+						ret.add(entry.getKey(), secret.toString());
 				}
 				
-				return new Future<Map<String,String>>(ret);
+				return new Future<MultiCollection<String,String>>(ret);
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addNameAuthority(final String secret)
+	{
+		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
+		if (!(asecret instanceof AbstractX509PemSecret))
+			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				nameauthorities.add((AbstractX509PemSecret) asecret);
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/** 
+	 *  Remvoes an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeNameAuthority(String secret)
+	{
+		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
+		if (!(asecret instanceof AbstractX509PemSecret))
+			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				nameauthorities.remove((AbstractX509PemSecret) asecret);
+				
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -989,7 +1083,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 * 
 	 *  @return The stored virtual network configurations.
 	 */
-	public Map<String, AbstractAuthenticationSecret> getInternalNetworks()
+	public MultiCollection<String, AbstractAuthenticationSecret> getInternalNetworks()
 	{
 		return networks;
 	}

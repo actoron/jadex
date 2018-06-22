@@ -315,92 +315,125 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		// disable Future debugging during testcase scan for performance reasons.
 		boolean originalDebug = Future.DEBUG;
 		Future.DEBUG = false;
-		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) {
+		for(int projectIndex = 0; projectIndex < roots.length; projectIndex++)
+		{
 			File[] project = roots[projectIndex];
-			for (int rootIndex = 0; rootIndex < project.length; rootIndex++) {
+			for(int rootIndex = 0; rootIndex < project.length; rootIndex++)
+			{
 				// Scan for test cases.
 				List<String> scanForTestCases = getAllFiles(project[rootIndex]);
-				this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 1 + 0.05 * scanForTestCases.size());    // Timeout for loading models.
+				this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 1 + 0.05 * scanForTestCases.size()); // Timeout
+																																			// for
+																																			// loading
+																																			// models.
 				startTimer();
 				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
-				for (String abspath : scanForTestCases) {
+				for(String abspath : scanForTestCases)
+				{
 					boolean exclude = false;
 					boolean include = (tests == null);
 
-					for (int i = 0; !exclude && excludes != null && i < excludes.length; i++) {
+					for(int i = 0; !exclude && excludes != null && i < excludes.length; i++)
+					{
 						exclude = abspath.indexOf(excludes[i]) != -1;
 					}
 
-					for (int i = 0; !include && i < tests.length; i++) {
+					for(int i = 0; !include && i < tests.length; i++)
+					{
 						include = abspath.indexOf(tests[i]) != -1;
 					}
 
-					if (!exclude && include) {
-						try {
+					if(!exclude && include)
+					{
+						try
+						{
 							IResourceIdentifier rid = rids[projectIndex];
 
-							if ((SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue()) {
+							if((SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
+							{
 								boolean startable = SComponentFactory.isStartable(platform, abspath, rid).get().booleanValue();
 								IModelInfo model = SComponentFactory.loadModel(platform, abspath, rid).get();
 								boolean istest = false;
-								if (model != null && model.getReport() == null && startable) {
+								if(model != null && model.getReport() == null && startable)
+								{
 									IArgument[] results = model.getResults();
-									for (int i = 0; !istest && i < results.length; i++) {
-										if (results[i].getName().equals("testresults") && Testcase.class.equals(
-												results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports()))) {
+									for(int i = 0; !istest && i < results.length; i++)
+									{
+										if(results[i].getName().equals("testresults") && Testcase.class.equals(results[i].getClazz().getType(libsrv.getClassLoader(rid).get(), model.getAllImports())))
+										{
 											istest = true;
 										}
 									}
 								}
 
-								if (istest) {
+								if(istest)
+								{
 									System.out.print(".");
-									if (runtests) {
-										ComponentTest test = SAME_PLATFORM
-											? new ComponentTest(cms, model, this)
-											: new ComponentTest(conf, args, roots, cms, model, this);
+									if(runtests)
+									{
+										ComponentTest test = SAME_PLATFORM ? new ComponentTest(cms, model, this) : new ComponentTest(conf, args, roots, cms, model, this);
 										test.setName(abspath);
 										addTest(test);
-										if (ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE) {
+										if(ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE)
+										{
 											ctimeout = Timeout.NONE;
-										} else {
+										}
+										else
+										{
 											ctimeout += test.getTimeout();
 										}
 									}
-								} else if (startable && model.getReport() == null) {
+								}
+								else if(startable && model.getReport() == null)
+								{
 									System.out.print(".");
-									if (start) {
+									if(start)
+									{
 										ComponentStartTest test = new ComponentStartTest(cms, model, this);
 										test.setName(abspath);
 										addTest(test);
-										if (ctimeout == Timeout.NONE) {
+										if(ctimeout == Timeout.NONE)
+										{
 											ctimeout = Timeout.NONE;
-										} else {
-											// Delay instead of timeout as start test should be finished after that.
+										}
+										else
+										{
+											// Delay instead of timeout as start
+											// test should be finished after
+											// that.
 											ctimeout += test.getTimeout();
 										}
 									}
-								} else if (load) {
+								}
+								else if(load)
+								{
 									System.out.print(".");
 									ComponentLoadTest test = new ComponentLoadTest(model, model.getReport());
 									test.setName(abspath);
 									addTest(test);
 								}
 							}
-						} catch (final RuntimeException e) {
-							if (load) {
-								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport() {
-									public String getErrorText() {
+						}
+						catch(final RuntimeException e)
+						{
+							if(load)
+							{
+								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
+								{
+									public String getErrorText()
+									{
 										StringWriter sw = new StringWriter();
 										e.printStackTrace(new PrintWriter(sw));
 										return "Error loading model: " + sw.toString();
 									}
 
-									public String getErrorHTML() {
+									public String getErrorHTML()
+									{
 										return getErrorText();
 									}
 
-									public Map<String, String> getDocuments() {
+									public Map<String, String> getDocuments()
+									{
 										return null;
 									}
 								});
@@ -416,7 +449,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 				Logger.getLogger("ComponentTestSuite").info("Finished Building Suite for " + project[rootIndex] + ", cumulated execution timeout is: " + ctimeout);
 			}
 		}
-		this.timeout	= ctimeout;
+		this.timeout = ctimeout;
 	}
 
 	protected void	stopTimer()
