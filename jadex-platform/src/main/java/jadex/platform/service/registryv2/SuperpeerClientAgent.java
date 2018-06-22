@@ -119,6 +119,7 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 				public void terminated(Exception reason)
 				{
 					// On failure -> just retry
+					System.out.println(agent+" super peer connection for network "+networkname+" from super peer "+sp+" failed due to: "+reason);
 					startSuperpeerSearch(networkname);
 				}
 			});
@@ -280,6 +281,7 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		config.setGui(true);
 //		config.setLogging(true);
 		config.addComponent(SuperpeerClientAgent.class);
+		config.addComponent(SuperpeerRegistryAgent.class);
 		config.setNetworkNames("test");
 		config.setNetworkSecrets("test");
 		Starter.createPlatform(config, args).get();

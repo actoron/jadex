@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.registryv2;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -8,6 +9,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  Service for service registry superpeers.
  *
  */
+@Service(system=true)
 public interface ISuperpeerService extends IRemoteRegistryService
 {
 	/**

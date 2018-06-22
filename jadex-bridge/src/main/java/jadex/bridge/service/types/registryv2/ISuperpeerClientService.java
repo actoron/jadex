@@ -10,7 +10,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  Uses subscription futures instead of client calling update method on super peer
  *  to determine automatically, when connection is lost (e.g. client down). 
  */
-@Service
+@Service(system=true)
 public interface ISuperpeerClientService
 {
 	/**
