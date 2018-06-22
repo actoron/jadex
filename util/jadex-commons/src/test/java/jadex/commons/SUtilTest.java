@@ -49,7 +49,6 @@ public class SUtilTest //extends TestCase
 		String tmpdirstr = System.getProperty("java.io.tmpdir");
 		File src = new File(tmpdirstr + File.separator + "testdir" + SUtil.createPlainRandomId("testfile", 16));
 		src.mkdirs();
-		byte[] dummydata = new byte[1024];
 		for (int i = 0; i < 10; ++ i)
 		{
 			String dummy = src.getAbsolutePath() + File.separator + SUtil.createPlainRandomId("testfile", 16);
