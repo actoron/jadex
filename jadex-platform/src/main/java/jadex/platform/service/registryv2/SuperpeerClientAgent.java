@@ -291,23 +291,27 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		// Super peer AB
 		config	= spbaseconfig.clone();
 		config.setPlatformName("SPAB_*");
-		config.setNetworkNames("network-a", "network-b");
-		config.setNetworkSecrets("secret-a", "secret-b");
+//		config.setNetworkNames("network-a", "network-b");
+//		config.setNetworkSecrets("secret-a", "secret-b");
+		config.setNetworkNames("network-a");
+		config.setNetworkSecrets("secret-a");
 		Starter.createPlatform(config, args).get();
 		
-		// Super peer BC
-		config	= spbaseconfig.clone();
-		config.setPlatformName("SPBC_*");
-		config.setNetworkNames("network-c", "network-b");
-		config.setNetworkSecrets("secret-c", "secret-b");
-		Starter.createPlatform(config, args).get();
+//		// Super peer BC
+//		config	= spbaseconfig.clone();
+//		config.setPlatformName("SPBC_*");
+//		config.setNetworkNames("network-c", "network-b");
+//		config.setNetworkSecrets("secret-c", "secret-b");
+//		Starter.createPlatform(config, args).get();
 
 		// Client ABC
 		config	= baseconfig.clone();
 		config.addComponent(SuperpeerClientAgent.class);
-		config.setPlatformName("Client_*");
-		config.setNetworkNames("network-a", "network-b", "network-c");
-		config.setNetworkSecrets("secret-a", "secret-b", "secret-c");
+		config.setPlatformName("ClientABC_*");
+//		config.setNetworkNames("network-a", "network-b", "network-c");
+//		config.setNetworkSecrets("secret-a", "secret-b", "secret-c");
+		config.setNetworkNames("network-a");
+		config.setNetworkSecrets("secret-a");
 		Starter.createPlatform(config, args).get();
 	}
 }
