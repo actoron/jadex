@@ -2,8 +2,8 @@ description 'The jadex-platform-android package contains extensions needed to ru
 
 dependencies
 {
-    api(project(':jadex-platform'))
-    api project(':jadex-android-commons')
+    api(project(':platform:jadex-platform'))
+    api project(':android:jadex-android-commons')
     testImplementation libraries.robotium
     testImplementation libraries.robolectric
 }

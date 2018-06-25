@@ -2,11 +2,11 @@ description 'Jadex-Android chat sample application'
 
 dependencies
 {
-    api project(':jadex-platform-android')
-    api project(':jadex-android-commons')
-    api project(':jadex-android-xmlpull')
-    api project(':jadex-android-antlr')
-    api project(':jadex-runtimetools-android')
+    api project(':android:jadex-platform-android')
+    api project(':android:jadex-android-commons')
+    api project(':android:jadex-android-xmlpull')
+    api project(':android:jadex-android-antlr')
+    api project(':android:jadex-runtimetools-android')
 
 
 }
