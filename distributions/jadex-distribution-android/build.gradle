@@ -6,8 +6,8 @@ dependencies
 	api project(':android:jadex-android-bluetooth')
 
 	api project(':android:jadex-android-antlr')
-	api project(':android::jadex-android-commons')
-	api project(':android::jadex-android-xmlpull')
+	api project(':android:jadex-android-commons')
+	api project(':android:jadex-android-xmlpull')
 	api project(':platform:jadex-bridge')
 	api project(':util:jadex-commons')
 	api project(':util:jadex-commons-gui')

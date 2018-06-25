@@ -12,7 +12,6 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.buildship.core.classpathprovider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-tcptransport false&#13;&#10;-awareness false&#13;&#10;-acr false&#13;&#10;-platformname ssp1&#13;&#10;-supersuperpeer true&#13;&#10;-rt.forwarding true&#13;&#10;-rt.debug true&#13;&#10;-xlogging true&#13;&#10;-wsport 12345&#13;&#10;-rspublish true&#13;&#10;-component jadex.tools.web.StatusAgent.class"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-distribution-standard"/>
