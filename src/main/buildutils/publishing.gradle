@@ -189,9 +189,11 @@ publishing {
                 }
             }
 
-            groupId group
+            //groupId group
+            groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
             //artifactId project.name
             artifactId (("jadex" + project.getPath()).replace(":", "-"))
+//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
             version project.version
             pom.withXml {
                 def root = asNode()

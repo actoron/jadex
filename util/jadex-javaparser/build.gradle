@@ -1,6 +1,0 @@
-description 'The Jadex Java parser allows arbitrary Java terms being parsed. The parser accepts input that can be written as right hand side of a Java assignment (exp = term), i.e. procedural language aspects like loops or branches.'
-
-dependencies
-{
-	api project(':util:jadex-commons')
-}

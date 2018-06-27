@@ -59,13 +59,19 @@ buildscript
 allprojects
 {
 	version = rootProject.version
+	def gsuffix = ""
+	if (path.split(":").length > 2)
+	{
+		println path
+		gsuffix = path.substring(0, path.lastIndexOf(":")).replace(":",".").substring(1)
+	}
     if(isCommercial(project))
     {
-	    group = 'com.actoron.jadex'
+	    group = 'com.actoron.jadex' + gsuffix
 	}
 	else
 	{
-	    group = 'org.activecomponents.jadex'
+	    group = 'org.activecomponents.jadex' + gsuffix
 	}
 
     repositories

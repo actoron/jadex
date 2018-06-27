@@ -1,0 +1,6 @@
+description 'Jadex BPMN editor.'
+
+dependencies
+{
+	api project(':editors:bpmn')
+}

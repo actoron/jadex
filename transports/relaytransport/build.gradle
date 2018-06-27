@@ -1,0 +1,6 @@
+description 'Message transport implementing relay routing.'
+
+dependencies
+{
+	api project(':platform:base')
+}

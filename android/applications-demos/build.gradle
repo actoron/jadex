@@ -1,0 +1,17 @@
+description 'This project contains an android application to demonstrate some jadex features.'
+
+dependencies
+{
+    api project(':android:platform')
+    api project(':android:commons')
+    api project(':kernels:component')
+    api project(':kernels:bpmn')
+//    api project(':kernels:bdi')
+    api project(':android:bdiv3')
+    api project(':android:runtimetools')
+    api project(':android:webservice')
+    api project(':android:xmlpull')
+    api project(':android:antlr')
+
+//    api 'com.android.support:multidex:1.0.1' // For minSdkVersion 20 or lower, this is required for multidex
+}

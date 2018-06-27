@@ -1,0 +1,32 @@
+description 'JSON support for Jadex.'
+
+//apply plugin: 'maven-publish'
+
+dependencies 
+{
+	api project(':util:commons')
+	api project(':serialization:traverser')
+	
+	// Wrong way: (doesn't work for eclipse, depends on generated jar from gradle build)
+//	testImplementation files(project(':serialization:traverser').sourceSets.test.output)
+//	testImplementation files(project(':serialization:traverser').sourceSets.test.runtimeClasspath)
+	
+	// Correct(?) way: (project dependency correctly interpreted by eclipse import as well as gradle build)
+	testImplementation project(path: ':serialization:traverser', configuration: 'testOutput')
+
+	api 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+	
+	//api 'com.google.code.gson:gson:2.3.1'
+	//api 'com.thoughtworks.xstream:xstream:1.4.8'
+}
+
+//publishing 
+//{
+//   publications 
+//    {
+//        mavenJava(MavenPublication) 
+//        {
+//            from components.java
+//        }
+//    }
+//}

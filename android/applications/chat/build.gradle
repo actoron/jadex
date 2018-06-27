@@ -1,0 +1,12 @@
+description 'Jadex-Android chat sample application'
+
+dependencies
+{
+    api project(':android:platform')
+    api project(':android:commons')
+    api project(':android:xmlpull')
+    api project(':android:antlr')
+    api project(':android:runtimetools')
+
+
+}

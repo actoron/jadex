@@ -1,0 +1,50 @@
+description 'The Jadex launch package facilitates executing the Jadex standalone platform.'
+
+dependencies
+{
+	def launcharts = new HashSet<String> ([
+										   // Core API
+										   ':util:commons',':platform:bridge',':util:javaparser',':serialization:xml',
+										   
+										   // Kernels
+										   ':kernels:base',':kernels:micro',':kernels:bpmn',
+										   ':kernels:application',':kernels:component',':kernels:jadex-applib-bdi',
+										   ':kernels:bdiv3', ':kernels:microservice',
+										   
+										   // Platform
+										   ':platform:base',
+										   
+										   // Tools
+										   ':tools:runtimetools-swing',':tools:bdi',':tools:bpmn',
+										   ':tools:comanalyzer',':rules:tools',
+										   ':tools:runtimetools-web',
+										   
+										   // Extensions
+										   ':environments:agr',':environments:envsupport',
+										   ':environments:envsupport-opengl',
+//										   ':platform:maven',
+										   ':environments:envsupport-jmonkey',' :platform:webservice',
+										   ':transports:relaytransport',
+										   ':transports:websockettransport',
+										   ':platform:webservice-desktop',
+										   // For IDEs: include manually to choose impl.
+//										   ':platform:webservice-desktop-jetty',
+//										   ':platform:webservice-desktop-grizzly',
+										   ])
+	
+	launcharts.retainAll(gradle.ext.includeartifacts)
+	
+	launcharts.each { art ->
+		api project(art)
+	}
+	
+}
+
+jar 
+{
+	manifest 
+	{
+		attributes('Main-Class': 'jadex.base.Starter',
+			'Class-Path': configurations.compile.collect { it.getName() }.join(' '))
+	}
+}

@@ -2,36 +2,41 @@ apply from: "$rootDir/src/main/buildutils/util.gradle"
 
 /** Standard distributions */
 //gradle.ext.publishdists='minimal,standard,pro,android,addongradleplugin,addon3d,addonws,addonmaven,addonmgmt,editorbpmn' // no editorgpmn until kernel not available
-gradle.ext.publishdists='minimal,standard,pro,addongradleplugin,addon3d,addonws,editorbpmn' // no editorgpmn until kernel not available
+gradle.ext.publishdists='minimal,standard,pro,addon3d,addonws,editorbpmn' // no editorgpmn until kernel not available
+
+/* Blacklist of ignored projects. */
+def projectblacklist = new HashSet<String>();
+
 // Only add 'android' dist if SDK is available, right?
 if (androidSdkExists())
-	gradle.ext.publishdists=gradle.ext.publishdists+',android'
+	gradle.ext.publishdists=gradle.ext.publishdists+',addongradleplugin,android'
+else
+	projectblacklist.add(':addons:gradleplugin')
 
 /* Generated dependency config file. */
 def depconfigfile = 'src/main/buildutils/dependencies.conf'
 
 /* Prefix used for distribution meta-packages. */
-def metaprefix = 'distributions:jadex-distribution-';
-def addonprefix = 'addons:jadex-addon-';
+def metaprefix = 'distributions:';
+def addonprefix = 'addons:';
 
-/* Blacklist of ignored projects. */
-def projectblacklist = new HashSet<String>();
+
 
 /* Not marked as included for 'everything' in original .csv */
-projectblacklist.add(':android:jadex-android-integration-test')
-projectblacklist.add(':android:jadex-android-maven-plugin')
-projectblacklist.add(':android:jadex-android-testlauncher')
-projectblacklist.add(':applications:jadex-applications-bdibpmn')
-projectblacklist.add(':applications:jadex-applications-gpmn')
-projectblacklist.add(':kernels:jadex-kernel-bdibpmn')
-projectblacklist.add(':kernels:jadex-kernel-gpmn')
+projectblacklist.add(':android:integration-test')
+projectblacklist.add(':android:maven-plugin')
+projectblacklist.add(':android:testlauncher')
+projectblacklist.add(':applications:bdibpmn')
+projectblacklist.add(':applications:gpmn')
+projectblacklist.add(':kernels:bdibpmn')
+projectblacklist.add(':kernels:gpmn')
 
 /* Not included in original .csv at all. */
 //projectblacklist.add(':platform:jadex-platform-extension-securetransport')
-projectblacklist.add(':platform:jadex-platform-extension-relay')
-projectblacklist.add(':applications:jadex-applications-dungeonkeeper')
-projectblacklist.add(':platform:jadex-platform-extension-relay-standalone')
-projectblacklist.add(':platform:jadex-platform-extension-relay-web')
+projectblacklist.add(':platform:relay')
+projectblacklist.add(':applications:dungeonkeeper')
+projectblacklist.add(':platform:relay-standalone')
+projectblacklist.add(':platform:relay-web')
 
 /* Distribution->Artifacts map. */
 gradle.ext.distartmap = new HashMap<String, Set<String>>();
@@ -168,13 +173,15 @@ def addProjectDir(projects, dir, blacklist, prefix)
 		if (content[i].isDirectory() && !blacklist.contains(fullprojname) && !content[i].getName().startsWith('.'))
 		{
 			def pname = content[i].getName()
-			if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || pname.endsWith('-java8'))
+			if (androidSdkExists() || !pname.contains('android'))
+				subprojs.add(content[i])
+			/*if (JavaVersion.current() >= JavaVersion.VERSION_1_8 || pname.endsWith('-java8'))
 			{
 				if (androidSdkExists() || pname.equals('android') || !pname.contains('android') || pname.contains('gradleplugin'))
 				{
 					subprojs.add(content[i])
 				}
-			}
+			}*/
 		}
 		else if ("build.gradle".equals(content[i].getName().toLowerCase()))
 		{

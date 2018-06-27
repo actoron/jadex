@@ -1,8 +1,0 @@
-description 'Basic servletfilter for Jadex'
-
-dependencies
-{
-	api project(':util:jadex-commons')
-	
-	api 'javax.servlet:javax.servlet-api:3.0.1'
-}

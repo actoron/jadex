@@ -1,7 +1,0 @@
-description 'Future support for Jadex.'
-
-dependencies 
-{
-	api project(':util:jadex-commons')
-	api project(':serialization:jadex-binary')
-}
