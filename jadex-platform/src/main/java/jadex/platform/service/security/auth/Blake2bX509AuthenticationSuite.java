@@ -19,6 +19,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.SecurityAgent;
 
@@ -206,7 +207,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		List<byte[]> networks = new ArrayList<byte[]>();
 		if (r1list.get(4).length > 0 && agent.getInternalNetworks().size() > 0)
 		{ 
-			Map<ByteArrayWrapper, PasswordSecret> reversemap = new HashMap<ByteArrayWrapper, PasswordSecret>();
+			MultiCollection<ByteArrayWrapper, PasswordSecret> reversemap = new MultiCollection<ByteArrayWrapper, PasswordSecret>();
 			
 			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : agent.getInternalNetworks().entrySet())
 			{
@@ -215,7 +216,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 					for (AbstractAuthenticationSecret secret : entry.getValue())
 					{
 						if (secret instanceof PasswordSecret)
-							reversemap.put(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), (PasswordSecret) secret);
+							reversemap.add(new ByteArrayWrapper(createSaltedId(entry.getKey(), idsalt)), (PasswordSecret) secret);
 					}
 				}
 			}
@@ -227,22 +228,25 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			for (int i = 0; i < nwloads.size(); i = i + 2)
 			{
 				ByteArrayWrapper key = new ByteArrayWrapper(nwloads.get(i));
-				PasswordSecret secret = reversemap.get(key);
-				JadexJPakeParticipant part = pakestate.get(secret);
-				
-				if (part != null)
+				Collection<PasswordSecret> secrets = reversemap.get(key);
+				for (PasswordSecret secret : secrets)
 				{
-					JPAKERound1Payload r1 = bytesToRound1(nwloads.get(i + 1));
+					JadexJPakeParticipant part = pakestate.get(secret);
 					
-					try
+					if (part != null)
 					{
-						part.validateRound1PayloadReceived(r1);
-						networks.add(key.getArray());
-						networks.add(round2ToBytes(part.createRound2PayloadToSend()));
-					}
-					catch (Exception e)
-					{
-						pakestate.remove(agent.getInternalPlatformSecret());
+						JPAKERound1Payload r1 = bytesToRound1(nwloads.get(i + 1));
+						
+						try
+						{
+							part.validateRound1PayloadReceived(r1);
+							networks.add(key.getArray());
+							networks.add(round2ToBytes(part.createRound2PayloadToSend()));
+						}
+						catch (Exception e)
+						{
+							pakestate.remove(agent.getInternalPlatformSecret());
+						}
 					}
 				}
 			}
@@ -394,8 +398,8 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				
 				if (jpake != null)
 					dk = jpake.getDerivedKey();
-				
-				
+				else
+					throw new SecurityException("J-PAKE key not found for password " + secret);
 			}
 			else
 			{
