@@ -1,11 +1,15 @@
 package jadex.platform.service;
 
+import org.junit.Ignore;
+
 import jadex.base.test.ComponentTestSuite;
 import junit.framework.Test;
 
 /**
  *  Run all component tests in test folder.
  */
+// Doesn't make sense in platform project (who put this here???)
+@Ignore
 public class ManagementExtensionTest extends ComponentTestSuite
 {
 	/**
