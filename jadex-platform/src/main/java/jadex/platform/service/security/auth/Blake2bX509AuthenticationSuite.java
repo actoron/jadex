@@ -229,23 +229,26 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			{
 				ByteArrayWrapper key = new ByteArrayWrapper(nwloads.get(i));
 				Collection<PasswordSecret> secrets = reversemap.get(key);
-				for (PasswordSecret secret : secrets)
+				if (secrets != null)
 				{
-					JadexJPakeParticipant part = pakestate.get(secret);
-					
-					if (part != null)
+					for (PasswordSecret secret : secrets)
 					{
-						JPAKERound1Payload r1 = bytesToRound1(nwloads.get(i + 1));
+						JadexJPakeParticipant part = pakestate.get(secret);
 						
-						try
+						if (part != null)
 						{
-							part.validateRound1PayloadReceived(r1);
-							networks.add(key.getArray());
-							networks.add(round2ToBytes(part.createRound2PayloadToSend()));
-						}
-						catch (Exception e)
-						{
-							pakestate.remove(agent.getInternalPlatformSecret());
+							JPAKERound1Payload r1 = bytesToRound1(nwloads.get(i + 1));
+							
+							try
+							{
+								part.validateRound1PayloadReceived(r1);
+								networks.add(key.getArray());
+								networks.add(round2ToBytes(part.createRound2PayloadToSend()));
+							}
+							catch (Exception e)
+							{
+								pakestate.remove(agent.getInternalPlatformSecret());
+							}
 						}
 					}
 				}
