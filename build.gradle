@@ -26,6 +26,11 @@ project.subprojects.each { sp ->
 	addSubproject(sp)
 }
 
+project.ext.keepplural = new HashSet<String>()
+project.ext.keepplural.add('rules')
+project.ext.keepplural.add('tools')
+project.ext.keepplural.add('applications')
+
 project.ext.timestamp=timestamp
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
@@ -122,17 +127,16 @@ subprojects
 	
 	if (getProjectDepth(project) > 1)
 	{
-		def keepplural = new HashSet<String>()
-		keepplural.add('rules')
-		keepplural.add('applications')
+		
 		def toplevelname = project.path.substring(1);
 		toplevelname = toplevelname.substring(0, toplevelname.indexOf(':'))
-		if (toplevelname.endsWith('s') && !keepplural.contains(toplevelname))
-			toplevelname = toplevelname.substring(0, toplevelname.length() - 1)
+		toplevelname = singularize(toplevelname)
+		/*if (toplevelname.endsWith('s') && !keepplural.contains(toplevelname))
+			toplevelname = toplevelname.substring(0, toplevelname.length() - 1)*/
 		eclipse.project.name = toplevelname + '-' + project.name
 	}
-	else if (project.path.equals(':applications')) // Hack! Should not be needed?
-		eclipse.project.name = 'applications'
+	else if (getProjectDepth(project) == 1) // Hack! Should not be needed?
+		eclipse.project.name = project.path.substring(1)
 	
 	//if (project.getPath().toString().startsWith(":kernels") && !project.getPath().toString().equals(":kernels"))
 	//{

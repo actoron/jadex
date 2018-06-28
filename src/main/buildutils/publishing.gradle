@@ -97,7 +97,9 @@ class PomConfig {
 def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
 
 // Selects the projects to publish, add a better heuristic here if available
-def includedproject = project.path.split(":").length > 2
+def includedproject = getProjectDepth(project) > 1
+// Empty project
+includedproject &= !project.path.equals(':android:applications')
 
 if (project.hasProperty('signing.secretKeyRingFile')) {
     signing {
@@ -192,8 +194,17 @@ publishing {
             //groupId group
             groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
             //artifactId project.name
-            artifactId (("jadex" + project.getPath()).replace(":", "-"))
-//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+            def artid = 'jadex'
+            def pathcomps = project.getPath().split(':')
+            for (int i = 1; i < pathcomps.length; ++i) {
+            	def comp = pathcomps[i]
+            	if (i == 1)
+            		comp = singularize(comp)
+            	artid += '-' + comp
+            }
+            artifactId artid
+            if (artid.contains('serialization'))
+			println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
             version project.version
             pom.withXml {
                 def root = asNode()

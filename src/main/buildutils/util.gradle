@@ -434,6 +434,13 @@ def getVar(String key, Project p) {
     return value
 }
 
+def singularize(name) {
+	if (name.endsWith('s') && !project.ext.keepplural.contains(name))
+		name = name.substring(0, name.length() - 1)
+	return name;
+}
+
+
 // make functions externally visible
 
 ext {
@@ -444,6 +451,7 @@ ext {
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
     getProjectDepth = this.&getProjectDepth
+    singularize = this.&singularize
     isTestParallel = this.&isTestParallel
     androidSdkExists = this.&androidSdkExists
     onVariant = this.&onVariant
