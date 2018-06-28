@@ -26,6 +26,11 @@ project.subprojects.each { sp ->
 	addSubproject(sp)
 }
 
+project.ext.keepplural = new HashSet<String>()
+project.ext.keepplural.add('rules')
+project.ext.keepplural.add('tools')
+project.ext.keepplural.add('applications')
+
 project.ext.timestamp=timestamp
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
@@ -54,18 +59,25 @@ buildscript
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
+//apply plugin: 'eclipse'
+//eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
 
 allprojects
 {
 	version = rootProject.version
+	def gsuffix = ""
+	if (getProjectDepth(project) > 1)
+	{
+		gsuffix = path.substring(0, path.lastIndexOf(":")).replace(":",".").substring(1)
+	}
     if(isCommercial(project))
     {
-	    group = 'com.actoron.jadex'
+	    group = 'com.actoron.jadex' + gsuffix
 	}
 	else
 	{
-	    group = 'org.activecomponents.jadex'
+	    group = 'org.activecomponents.jadex' + gsuffix
 	}
 
     repositories
@@ -112,7 +124,25 @@ subprojects
 
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
-
+	
+	if (getProjectDepth(project) > 1)
+	{
+		
+		def toplevelname = project.path.substring(1);
+		toplevelname = toplevelname.substring(0, toplevelname.indexOf(':'))
+		toplevelname = singularize(toplevelname)
+		/*if (toplevelname.endsWith('s') && !keepplural.contains(toplevelname))
+			toplevelname = toplevelname.substring(0, toplevelname.length() - 1)*/
+		eclipse.project.name = toplevelname + '-' + project.name
+	}
+	else if (getProjectDepth(project) == 1) // Hack! Should not be needed?
+		eclipse.project.name = project.path.substring(1)
+	
+	//if (project.getPath().toString().startsWith(":kernels") && !project.getPath().toString().equals(":kernels"))
+	//{
+		//eclipse.project.name = 'kernel-' + project.name
+	//}
+	
     ext.libraries = [
             android_support: "com.android.support:support-v4:26.1.0",
             android_compat: "com.android.support:appcompat-v7:26.1.0",
@@ -261,7 +291,9 @@ subprojects
 			artifacts {
 				archives jar
 			}
+			war.baseName = getArtifactName(project)
 		}
+		jar.baseName = getArtifactName(project)
 //			test {
 //				reports.html.enabled = false
 //			}
@@ -329,18 +361,18 @@ subprojects
  		}
 	}
 
-
-
-    subprojects
+    /* subprojects
     {
 		task allDeps(type: DependencyReportTask) {}
-	}
+	}*/
 }
 
 task copyJavaDocSources(type: Copy) {
 	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocworkdir')
 	gradle.ext.maindistartifacts.each { artname ->
 		def sp = project.ext.subprojectmap.get(artname)
+		if (sp == null)
+			println 'SUBPROJECT NOT FOUND:' + ' ' + artname
 		from(sp.projectDir.getCanonicalPath() + '/src/main/java') {
 			include '**/*.java'
 			exclude '**/org/apache/**'

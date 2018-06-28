@@ -1,0 +1,14 @@
+description 'The Jadex rules tools package contains tools for the Jadex rule engine.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:gui')
+	api project(':rules:base')
+	
+	api 'net.sourceforge.collections:collections-generic:4.01'
+	api 'net.sf.jung:jung-api:2.0.1'
+	api 'net.sf.jung:jung-graph-impl:2.0.1'
+	api 'net.sf.jung:jung-visualization:2.0.1'
+	api 'net.sf.jung:jung-algorithms:2.0.1'
+}

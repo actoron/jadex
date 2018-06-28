@@ -1,0 +1,15 @@
+description 'The server distribution of the Jadex middleware includes useful modules for running server side jadex applications.'
+
+dependencies
+{
+	api project(':distributions:minimal')
+	api project(':kernels:model-bpmn')
+	api project(':kernels:bpmn')
+	api project(':kernels:component')
+	api project(':kernels:application')
+	api project(':kernels:bdiv3')
+	api project(':applications:applib-bdi')
+	api project(':platform:base')
+	api project(':platform:webservice')
+	api project(':platform:webservice-desktop')
+}

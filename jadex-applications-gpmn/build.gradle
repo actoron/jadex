@@ -1,6 +1,0 @@
-description 'The Jadex micro applications package contains several example applications, benchmarks and testcases using micro agents.'
-
-dependencies
-{
-	api project(':jadex-kernel-gpmn')
-}

@@ -1,0 +1,10 @@
+description 'The Jadex tools bpmn package contains JCC plugins for Jadex BPMN components.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':platform:bridge')
+	api project(':kernels:bpmn')
+	api project(':tools:runtimetools-swing')
+	api project(':editors:bpmn')
+}

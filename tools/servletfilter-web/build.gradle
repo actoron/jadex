@@ -1,0 +1,6 @@
+description 'Servletfilter Web-App.'
+
+dependencies
+{
+	api project(':tools:servletfilter')
+}

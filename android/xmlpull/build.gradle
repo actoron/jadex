@@ -1,0 +1,12 @@
+description 'This Project includes a variant of the Jadex XML Parser that uses the Android XML Pull API.'
+
+dependencies
+{
+    api libraries.android
+    api(project(':serialization:xml'))
+//    testImplementation project(':jadex-commons').sourceSets.test.output
+    testImplementation(project(':serialization:xml'))
+    testImplementation project(path: ':serialization:traverser', configuration: 'testOutput')
+//    testImplementation project(path: ':jadex-commons', configuration: 'testOutput')
+//    testImplementation files(project(':jadex-commons').sourceSets.test.output)
+}

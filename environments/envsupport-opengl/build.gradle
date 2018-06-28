@@ -1,0 +1,11 @@
+description 'Open GL support for environment space perspectives.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:javaparser')
+	api project(':environments:envsupport')
+
+	// Hack!!! Not available in maven central :-(
+	api files('lib/gluegen-rt.jar', 'lib/jogl.jar')
+}

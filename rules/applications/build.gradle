@@ -1,0 +1,10 @@
+description 'The Jadex rules applications package contains several example applications using rules.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':rules:base')
+	api project(':rules:tools')
+	
+	apiNoAndroidRuntime 'org.antlr:antlr-runtime:3.1.3'
+}

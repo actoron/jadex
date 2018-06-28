@@ -1,0 +1,10 @@
+description 'GUI-dependent classes for jadex-tools-base.'
+
+dependencies
+{
+	api project(':platform:bridge')
+	api project(':util:gui')
+	api project(':tools:base')
+	api project(':serialization:xml')
+}
+

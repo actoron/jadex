@@ -1,0 +1,19 @@
+description 'The Jadex applib BDI package contains ready to use functionalities for BDI agents mostly in form of modules called capabilities.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':platform:bridge')
+	api project(':tools:base-swing')
+	api project(':kernels:bdiv3')
+//	api project(':kernels:bdibpmn')
+	api project(':util:javaparser')
+	api project(':serialization:xml')
+	api project(':environments:envsupport')
+	
+	testImplementation project(':platform:base')
+
+	apiNoAndroidRuntime 'javax.mail:mail:1.4.5'
+	api 'jivesoftware:smack:3.1.0' 
+	api 'jivesoftware:smackx:3.1.0' 
+}

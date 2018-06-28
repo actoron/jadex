@@ -1,0 +1,14 @@
+description 'Some web gui functionality.'
+
+dependencies
+{
+	implementation project(':platform:base')
+	implementation project(':platform:webservice')
+	
+	// bootstrap also pulls jquery
+	implementation 'org.webjars.bower:bootstrap:3.3.7'
+	
+	implementation 'org.webjars.bower:angular:1.5.1'
+	implementation 'org.webjars.bower:angular-route:1.5.1'
+	
+}

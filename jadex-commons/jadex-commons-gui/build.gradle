@@ -1,7 +1,0 @@
-description 'Common GUI support classes.'
-
-dependencies
-{
-	api project(':jadex-commons')
-	api project(':jadex-concurrent')
-}
