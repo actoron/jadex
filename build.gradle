@@ -291,7 +291,9 @@ subprojects
 			artifacts {
 				archives jar
 			}
+			war.baseName = getArtifactName(project)
 		}
+		jar.baseName = getArtifactName(project)
 //			test {
 //				reports.html.enabled = false
 //			}

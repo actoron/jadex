@@ -194,17 +194,8 @@ publishing {
             //groupId group
             groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
             //artifactId project.name
-            def artid = 'jadex'
-            def pathcomps = project.getPath().split(':')
-            for (int i = 1; i < pathcomps.length; ++i) {
-            	def comp = pathcomps[i]
-            	if (i == 1)
-            		comp = singularize(comp)
-            	artid += '-' + comp
-            }
-            artifactId artid
-            if (artid.contains('serialization'))
-			println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+            artifactId getArtifactName(project)
+			//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
             version project.version
             pom.withXml {
                 def root = asNode()

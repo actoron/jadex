@@ -332,6 +332,7 @@ def addJavaDocJarTask(Project p) {
         }
 
         p.tasks.create('androidjavadocsJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'javadoc'
             dependsOn javadocsTask
             from javadocsTask.destinationDir
@@ -339,6 +340,7 @@ def addJavaDocJarTask(Project p) {
 
     } else {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'javadoc'
             from p.javadoc
         }
@@ -355,12 +357,14 @@ def addJavaDocJarTask(Project p) {
 def addSourcesJarTask(Project p) {
     if (isAndroidProject(p)) {
         p.tasks.create('androidsourcesJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'sources'
             from p.android.sourceSets.main.java.srcDirs
         }
 
     } else {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'sources'
             from p.sourceSets.main.allSource
         }
@@ -440,6 +444,18 @@ def singularize(name) {
 	return name;
 }
 
+def getArtifactName(project) {
+	def ret = 'jadex'
+    def pathcomps = project.getPath().split(':')
+    for (int i = 1; i < pathcomps.length; ++i) {
+    	def comp = pathcomps[i]
+    	if (i == 1)
+    		comp = singularize(comp)
+    	ret += '-' + comp
+    }
+    return ret
+}
+
 
 // make functions externally visible
 
@@ -451,7 +467,6 @@ ext {
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
     getProjectDepth = this.&getProjectDepth
-    singularize = this.&singularize
     isTestParallel = this.&isTestParallel
     androidSdkExists = this.&androidSdkExists
     onVariant = this.&onVariant
@@ -465,4 +480,6 @@ ext {
     addSourcesJarTask = this.&addSourcesJarTask
     addEclipseWorkarounds = this.&addEclipseWorkarounds
     getVar = this.&getVar
+    singularize = this.&singularize
+    getArtifactName = this.&getArtifactName
 }
