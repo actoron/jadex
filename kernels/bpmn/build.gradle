@@ -1,0 +1,12 @@
+description 'The Jadex BPMN kernel provides a workflow kernel for the standardized business process modeling notation. The kernel relies on annotated BPMN diagrams, which include detailed execution information.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:gui')
+	api project(':util:javaparser')
+	api project(':platform:bridge')
+	api project(':serialization:xml')
+	api project(':kernels:base')
+	api project(':kernels:model-bpmn')
+}

@@ -1,0 +1,17 @@
+description 'The Jadex BDI-BPMN applications package contains several example applications, benchmarks and testcases using BDI agents that have BPMN plans.'
+
+dependencies
+{
+	api project(':platform:bridge')
+	api project(':serialization:xml')
+	api project(':util:commons')
+	api project(':kernels:bpmn')
+	api project(':kernels:application')
+	api project(':kernels:bdi')
+	api project(':kernels:bdibpmn')
+	api project(':applications:bdi')
+	api project(':environments:envsupport')
+	api project(':environments:agr')
+	api project(':tools:base-swing')
+	api project(':rules:base')
+}

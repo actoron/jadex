@@ -1,0 +1,14 @@
+description 'The Jadex BDI-BPMN kernel allows to use BPMN workflow descriptions as alternative description for BDI agent plans.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':serialization:xml')
+	api project(':rules:base')
+	api project(':util:javaparser')
+	api project(':platform:bridge')
+	api project(':kernels:base')
+	api project(':kernels:bdi')
+	api project(':kernels:bpmn')
+}
+

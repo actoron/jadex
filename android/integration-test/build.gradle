@@ -1,0 +1,11 @@
+description 'Provides an entry point for unit tests on android.\n' +
+        '\tTestlauncher project MUST be installed for this to work. \n' +
+        '\t(see http://code.google.com/p/maven-android-plugin/issues/detail?id=142)'
+//build.onlyIf { gradle.startParameter.taskRequests.args.size()>0 && gradle.startParameter.taskRequests.args[0].contains("test") }
+dependencies
+{
+    provided libraries.android_test
+    provided libraries.junit
+    androidTestCompile (project(':android:testlauncher'))
+    androidTestCompile (project(':android:platform'))
+}

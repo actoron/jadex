@@ -1,7 +1,0 @@
-description 'The Jadex rules tools package contains tools for the Jadex active components infrastructure.'
-
-dependencies
-{
-	api project(':jadex-tools-base-swing')
-	api project(':jadex-platform')
-}

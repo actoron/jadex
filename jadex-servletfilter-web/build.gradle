@@ -1,6 +1,0 @@
-description 'Servletfilter Web-App.'
-
-dependencies
-{
-	api project(':jadex-servletfilter')
-}

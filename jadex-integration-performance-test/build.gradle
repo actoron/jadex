@@ -1,9 +1,0 @@
-description 'Performance tests'
-
-dependencies
-{
-	api project(':jadex-integration-test')
-	api project(':jadex-applications-micro')
-}
-
-task performanceTest(dependsOn:test)

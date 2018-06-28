@@ -1,7 +1,0 @@
-# Tracing options for the jadex.tools.gpmn.diagram plug-in
-
-# Common issues
-jadex.tools.gpmn.diagram/debug=false
-
-# Visual IDs
-jadex.tools.gpmn.diagram/debug/visualID=false
