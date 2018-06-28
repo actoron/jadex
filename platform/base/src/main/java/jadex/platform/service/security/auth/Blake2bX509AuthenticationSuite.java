@@ -327,7 +327,7 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				{
 					for (AbstractAuthenticationSecret secret : entry.getValue())
 					{
-						if (entry.getValue() instanceof PasswordSecret)
+						if (secret instanceof PasswordSecret)
 						{
 							JadexJPakeParticipant p = pakestate.get(secret);
 							if (p != null)
