@@ -4,32 +4,31 @@ dependencies
 {
 	def launcharts = new HashSet<String> ([
 										   // Core API
-										   ':util:jadex-commons',':platform:jadex-bridge',':util:jadex-javaparser',':serialization:jadex-xml',
+										   ':util:commons',':platform:bridge',':util:javaparser',':serialization:xml',
 										   
 										   // Kernels
-										   ':kernels:jadex-kernel-base',':kernels:jadex-kernel-micro',':kernels:jadex-kernel-bpmn',
-										   ':kernels:jadex-kernel-application',':kernels:jadex-kernel-component',':kernels:jadex-applib-bdi',
-										   ':kernels:jadex-kernel-bdiv3',
+										   ':kernels:base',':kernels:micro',':kernels:bpmn',
+										   ':kernels:application',':kernels:component',':applications:applib-bdi',
+										   ':kernels:bdiv3',
 										   
 										   // Platform
-										   ':platform:jadex-platform',
+										   ':platform:base',
 										   
 										   // Tools
-										   ':tools:jadex-runtimetools-swing',':tools:jadex-tools-bdi',':tools:jadex-tools-bpmn',
-										   ':tools:jadex-tools-comanalyzer',':tools:jadex-rules-tools',
+										   ':tools:runtimetools-swing',':tools:bdi',':tools:bpmn',
+										   ':tools:comanalyzer',':tools:rules',
 										   
 										   // Extensions
-										   ':environments:jadex-kernel-extension-agr',':environments:jadex-kernel-extension-envsupport',
-										   ':environments:jadex-kernel-extension-envsupport-opengl',
+										   ':environments:agr',':environments:envsupport',
+										   ':environments:envsupport-opengl',
 //										   ':platform:jadex-platform-extension-maven',
-										   ':environments:jadex-kernel-extension-envsupport-jmonkey',':platform:jadex-platform-extension-webservice',
-										   ':platform:jadex-platform-extension-management',
-										   ':platform:jadex-platform-extension-webservice-desktop',
-										   ':platform:jadex-platform-extension-webservice-desktop-jetty',
-										   ':platform:jadex-platform-extension-webservice-desktop-grizzly',
+										   ':environments:envsupport-jmonkey',':platform:webservice',
+										   ':platform:webservice-desktop',
+										   ':platform:webservice-desktop-jetty',
+										   ':platform:webservice-desktop-grizzly',
 
-										   ':transports:jadex-platform-extension-websockettransport',
-										   ':transports:jadex-platform-extension-relaytransport',
+										   ':transports:websockettransport',
+										   ':transports:relaytransport',
 										   ])
 	
 	launcharts.retainAll(gradle.ext.includeartifacts)
