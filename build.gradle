@@ -54,15 +54,16 @@ buildscript
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
+//apply plugin: 'eclipse'
+//eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
 
 allprojects
 {
 	version = rootProject.version
 	def gsuffix = ""
-	if (path.split(":").length > 2)
+	if (getProjectDepth(project) > 1)
 	{
-		println path
 		gsuffix = path.substring(0, path.lastIndexOf(":")).replace(":",".").substring(1)
 	}
     if(isCommercial(project))
@@ -118,7 +119,26 @@ subprojects
 
 	apply plugin: 'eclipse' // hack to allow starting web projects in eclipse with correct dependencies
 	apply plugin: 'eclipse-wtp' // hack to allow starting web projects in eclipse with correct dependencies
-
+	
+	if (getProjectDepth(project) > 1)
+	{
+		def keepplural = new HashSet<String>()
+		keepplural.add('rules')
+		keepplural.add('applications')
+		def toplevelname = project.path.substring(1);
+		toplevelname = toplevelname.substring(0, toplevelname.indexOf(':'))
+		if (toplevelname.endsWith('s') && !keepplural.contains(toplevelname))
+			toplevelname = toplevelname.substring(0, toplevelname.length() - 1)
+		eclipse.project.name = toplevelname + '-' + project.name
+	}
+	else if (project.path.equals(':applications')) // Hack! Should not be needed?
+		eclipse.project.name = 'applications'
+	
+	//if (project.getPath().toString().startsWith(":kernels") && !project.getPath().toString().equals(":kernels"))
+	//{
+		//eclipse.project.name = 'kernel-' + project.name
+	//}
+	
     ext.libraries = [
             android_support: "com.android.support:support-v4:26.1.0",
             android_compat: "com.android.support:appcompat-v7:26.1.0",
