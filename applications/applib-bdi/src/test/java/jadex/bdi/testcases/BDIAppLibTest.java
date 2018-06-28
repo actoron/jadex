@@ -14,7 +14,7 @@ public class BDIAppLibTest	extends	ComponentTestSuite
 	public BDIAppLibTest()	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		super("jadex-applib-bdi", null, true);
+		super("applib-bdi", null, true);
 	}
 	
 //	/**

@@ -5803,12 +5803,17 @@ public class SUtil
 	 * @param project
 	 * @return File
 	 */
-	private static File findDirForProject(String project) {
-		File result = new File(project);
-		if(!result.exists()) 
+	public static File findDirForProject(String project)
+	{
+		File	cur	= new File(".").getAbsoluteFile();
+		File result;
+		do 
 		{
-			result = new File("../" + project);
+			result = new File(cur, project);
+			cur	= cur.getParentFile();
 		}
+		while(!result.exists() && cur!=null);
+		
 		return result;
 	}
 	
