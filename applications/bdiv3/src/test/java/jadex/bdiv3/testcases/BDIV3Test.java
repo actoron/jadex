@@ -1,5 +1,7 @@
 package jadex.bdiv3.testcases;
 
+import java.io.File;
+
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import junit.framework.Test;
@@ -41,7 +43,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BDIV3Test()	throws Exception {
-		super("jadex-applications-bdiv3", EXCLUDES, true);
+		super("applications"+File.separator+"bdiv3", EXCLUDES, true);
 	}
 
 //	/**

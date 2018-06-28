@@ -1,5 +1,7 @@
 package jadex.bpmn.testcases;
 
+import java.io.File;
+
 import jadex.base.test.ComponentTestSuite;
 import junit.framework.Test;
 
@@ -37,7 +39,7 @@ public class BPMNTest	extends ComponentTestSuite
 	 */
 	public BPMNTest()	throws Exception
 	{
-		super("jadex-applications-bpmn", EXCLUDES, true);
+		super("applications"+File.separator+"bpmn", EXCLUDES, true);
 	}
 	
 //	/**

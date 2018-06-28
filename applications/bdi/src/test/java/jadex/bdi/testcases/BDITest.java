@@ -62,7 +62,7 @@ public class BDITest	extends	ComponentTestSuite
 		super(new String[]
 		{
 			"-df", "true"	// Required for some old BDI (start) tests
-		}, new File[][]{SUtil.findOutputDirs("jadex-applications-bdi", true)}, null, EXCLUDES, true, true, true);
+		}, new File[][]{SUtil.findOutputDirs("applications"+File.separator+"bdi", true)}, null, EXCLUDES, true, true, true);
 	}
 
 //	/**

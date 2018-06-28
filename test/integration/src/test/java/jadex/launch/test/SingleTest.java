@@ -24,11 +24,11 @@ public class SingleTest extends	ComponentTestSuite
 	public SingleTest(String... tests) throws Exception
 	{
 		super(findOutputDirs(
-//				"jadex-platform-extension-securetransport",
-//				"jadex-applications-bdi",
-//				"jadex-applications-bdiv3",
-				"jadex-applications-micro",
-				"jadex-applications-bpmn"), tests, new String[0]);
+//				"applications"+File.separator+"securetransport",
+//				"applications"+File.separator+"bdi",
+//				"applications"+File.separator+"bdiv3",
+				"applications"+File.separator+"micro",
+				"applications"+File.separator+"bpmn"), tests, new String[0]);
 	}
 
 	private static File[][] findOutputDirs(String... projects) 

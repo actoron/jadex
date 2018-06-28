@@ -10,6 +10,8 @@ dependencies
 	api project(':util:javaparser')
 	api project(':serialization:xml')
 	api project(':environments:envsupport')
+	
+	testImplementation project(':platform:base')
 
 	apiNoAndroidRuntime 'javax.mail:mail:1.4.5'
 	api 'jivesoftware:smack:3.1.0' 
