@@ -1,0 +1,15 @@
+description 'The Jadex kernel extension envsupport allows for using 2D spaces in concert with components.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:gui')
+	api project(':util:javaparser')
+	api project(':platform:bridge')
+	api project(':serialization:xml')
+	api project(':kernels:component')
+	api project(':kernels:micro')
+	api project(':kernels:application')
+	
+	api 'jfree:jfreechart:1.0.12'
+}

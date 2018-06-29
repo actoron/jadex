@@ -1,0 +1,16 @@
+description 'Provides webservice support via Grizzly.'
+
+//def jersey_version	= 2.11
+
+dependencies 
+{
+	api project(':platform:webservice-desktop')
+
+	api 'org.glassfish.grizzly:grizzly-http-servlet:2.3.22'
+	api 'org.glassfish.jersey.media:jersey-media-multipart:2.11'
+	api 'org.glassfish.grizzly:grizzly-http-server-multipart:2.3.16'
+	api 'org.glassfish.grizzly:grizzly-http-server:2.3.16'
+	api 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.11'
+	api 'org.glassfish.jersey.core:jersey-client:2.11'
+	api 'org.glassfish.jersey.media:jersey-media-moxy:2.11'
+}

@@ -1,0 +1,10 @@
+description 'The Jadex mixed applications package contains example applications using mixed types of components.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':platform:bridge')
+	api project(':kernels:micro')
+	api project(':applications:bdi')
+}
+

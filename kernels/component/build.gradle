@@ -1,0 +1,11 @@
+description 'The Jadex component kernel provides basic support for active components. A component may be composed of subcomponents.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:javaparser')
+	api project(':platform:bridge')
+	api project(':serialization:xml')
+	api project(':kernels:base')
+}
+

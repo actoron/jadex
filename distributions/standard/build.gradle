@@ -1,0 +1,23 @@
+description 'The standard distribution of the Jadex middleware including all typical modules such as all standard kernels and tools.'
+
+dependencies
+{
+	api project(':distributions:minimal')
+
+	api project(':tools:runtimetools-swing')
+	api project(':tools:runtimetools-web')
+	api project(':tools:bdi')
+	api project(':applications:applib-bdi')
+	api project(':tools:bpmn')
+	api project(':tools:comanalyzer')
+	api project(':rules:tools')
+
+	api project(':environments:agr')
+	api project(':environments:envsupport')
+	
+	// excluded? ---> why??? Comment removed
+	api project(':platform:webservice')
+	api project(':platform:webservice-desktop')
+	api project(':platform:webservice-desktop-jetty')
+	api project(':platform:webservice-desktop-grizzly') // todo: remove grizzly dependency in jadex-application-webservice
+}

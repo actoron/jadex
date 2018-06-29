@@ -1,0 +1,10 @@
+description 'Dungeon Keeper with BDI Agents.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':platform:bridge')
+	api project(':kernels:micro')
+	api project(':kernels:application')
+	api project(':environments:envsupport')
+}

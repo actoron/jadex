@@ -1,0 +1,12 @@
+description 'Jadex bridge is a base package for kernels and platforms, i.e. it is used by both and provides commonly used interfaces and classes for active components and their management.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:concurrent')
+	api project(':util:javaparser')
+	api project(':util:bytecode')
+	api project(':rules:eca') // Remove this stuff, don't know how :-(
+
+	api 'junit:junit:4.11'	// required for component test suite classes
+}

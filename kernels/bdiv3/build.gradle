@@ -1,0 +1,29 @@
+description 'BDIV3 Kernel that supports annotated POJOs and uses byte code manipulation for performance improvements.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:javaparser')
+	api project(':platform:bridge')
+	api project(':kernels:base')
+	api project(':kernels:component')
+	api project(':kernels:micro')
+	api project(':rules:eca')
+	api project(':serialization:xml')
+	api project(':util:bytecode')
+	
+	apiNoAndroidRuntime 'org.ow2.asm:asm-all:6.0_ALPHA'
+//	api 'org.ow2.asm:asm-all:6.0_ALPHA'
+}
+
+task mappings {
+	doLast {
+		conf2ScopeMappings.mappings.each {
+			Conf2ScopeMapping mapping = it.getValue()
+			//println "${it.getKey()} -> $mapping.scope"
+			mapping.configuration.allDependencies.each {
+				println it
+			}
+		}
+	}
+}
