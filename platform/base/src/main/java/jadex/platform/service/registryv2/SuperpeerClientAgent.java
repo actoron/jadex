@@ -280,7 +280,7 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		// Common base configuration
 		IPlatformConfiguration	baseconfig	= PlatformConfigurationHandler.getMinimalComm();
 //		baseconfig.setGui(true);
-//		config.setLogging(true);
+		baseconfig.setLogging(true);
 		
 		// Super peer base configuration
 		IPlatformConfiguration	spbaseconfig	= baseconfig.clone();
