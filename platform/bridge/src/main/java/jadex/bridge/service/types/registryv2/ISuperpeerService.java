@@ -4,7 +4,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableFuture;
 
 /**
  *  Service for service registry superpeers.
@@ -15,16 +14,16 @@ public interface ISuperpeerService extends IRemoteRegistryService
 {
 	/**
 	 *  Initiates the client registration procedure
-	 *  (super peer will answer initially with a forward command,
+	 *  (super peer will answer initially with an empty intermediate result,
 	 *  client will send updates with backward commands).
 	 *  
 	 *  @param networkname	Network for this connection. 
 	 *  
-	 *  @return Does not return while connection is running.
+	 *  @return Does not return any more results while connection is running.
 	 */
-	// TODO: replace internal commands with typed channel (i.e. bidirectional / reverse subscription future)
+	// TODO: replace internal commands with typed channel (i.e. bidirectional / reverse subscription future), first step terminable tuple2 future?
 	// TODO: network name required for server?
-	public ITerminableFuture<Void> registerClient(String networkname);
+	public ISubscriptionIntermediateFuture<Void> registerClient(String networkname);
 	
 	/**
 	 *  Add a service query to the registry.
