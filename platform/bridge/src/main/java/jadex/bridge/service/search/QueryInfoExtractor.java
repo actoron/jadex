@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 
 /**
  *  Extractor for query infos.
  */
-public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IService>>
+public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServiceIdentifier>>
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -80,10 +80,10 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	 *  @param value The value.
 	 *  @return The key values.
 	 */
-	public Set<String> getKeyValues(String keytype, ServiceQueryInfo<IService> sqi)
+	public Set<String> getKeyValues(String keytype, ServiceQueryInfo<IServiceIdentifier> sqi)
 	{
 		Set<String> ret = null;
-		ServiceQuery<IService> query = sqi.getQuery();
+		ServiceQuery<IServiceIdentifier> query = sqi.getQuery();
 		if(ServiceKeyExtractor.KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			if(query.getServiceType()!=null)
@@ -158,7 +158,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	 *  @param value The value.
 	 *  @return The key matching mode.
 	 */
-	public Boolean getKeyMatchingMode(String keytype, ServiceQueryInfo<IService> query)
+	public Boolean getKeyMatchingMode(String keytype, ServiceQueryInfo<IServiceIdentifier> query)
 	{
 		Boolean ret = query.getQuery().getMatchingMode(keytype);
 		if(ret == null && KEY_TYPE_TAGS.equals(keytype))

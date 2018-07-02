@@ -3,7 +3,7 @@ package jadex.bridge.service.search;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -15,18 +15,28 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 public interface IServiceRegistry
 {
 	/**
+	 *  Search for a service.
+	 */
+	public <T> T searchService(ServiceQuery<T> query);
+	
+	/**
+	 *  Search for services.
+	 */
+	public <T> Set<T> searchServices(ServiceQuery<T> query);
+	
+	/**
 	 *  Add a service to the registry.
 	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(IService service);
+	public void addService(IServiceIdentifier service);
 	
 	/**
 	 *  Remove a service from the registry.
 	 *  @param service The service.
 	 */
 	// write
-	public void removeService(IService service);
+	public void removeService(IServiceIdentifier service);
 	
 	/**
 	 *  Remove services of a platform from the registry.
@@ -43,68 +53,32 @@ public interface IServiceRegistry
 	public void removeServicesExcept(IComponentIdentifier platform);
 	
 	/**
-	 *  Search for services.
-	 */
-	public <T> T searchServiceSync(ServiceQuery<T> query);
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> Set<T> searchServicesSync(ServiceQuery<T> query);
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> IFuture<T> searchServiceAsync(ServiceQuery<T> query);
-	
-	/**
-	 *  Search for services.
-	 */
-	public <T> ISubscriptionIntermediateFuture<T> searchServicesAsync(ServiceQuery<T> query);
-	
-	/**
-	 *  Search for services.
-	 *  Is deprecated because only used by relay.
-	 */
-//	// read
-	@Deprecated
-	public <T> T searchService(ServiceQuery<T> query, boolean excluded);
-	
-	/**
 	 *  Add a service query to the registry.
 	 *  @param query ServiceQuery.
 	 */
 	// write
-	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query);
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
 	
 	/**
 	 *  Remove a service query from the registry.
 	 *  @param query ServiceQuery.
 	 */
 	// write
-	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query);
+	public <T> void removeQuery(ServiceQuery<T> query);
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
 	 *  @param owner The query owner.
 	 */
 	// write
-	public IFuture<Void> removeQueries(IComponentIdentifier owner);
+	public void removeQueries(IComponentIdentifier owner);
 	
 	/**
 	 *  Remove all service queries of a specific platform from the registry.
 	 *  @param platform The platform from which the query owner comes.
 	 */
 	// write
-	public IFuture<Void> removeQueriesFromPlatform(IComponentIdentifier platform);
-	
-	/**
-	 *  Get queries per type.
-	 *  @param type The interface type. If type is null all services are returned.
-	 *  @return The queries.
-	 */
-	// read
-//	public <T> Set<ServiceQueryInfo<T>> getQueries(ClassInfo type);
+	public void removeQueriesFromPlatform(IComponentIdentifier platform);
 	
 	/**
 	 *  Add an excluded component. 
@@ -118,7 +92,7 @@ public interface IServiceRegistry
 	 *  @param The component identifier.
 	 */
 	// write
-	public IFuture<Void> removeExcludedComponent(IComponentIdentifier cid);
+	public void removeExcludedComponent(IComponentIdentifier cid);
 	
 	/**
 	 *  Test if a service is included.
@@ -126,38 +100,17 @@ public interface IServiceRegistry
 	 *  @return True if is included.
 	 */
 	// read
-	public boolean isIncluded(IComponentIdentifier cid, IService ser);
-	
-//	/**
-//	 *  Get the superpeer.
-//	 *  @param force If trues forces fresh search.
-//	 *  @return The superpeer.
-//	 */
-//	public IFuture<IComponentIdentifier> getSuperpeer(boolean force);
+	public boolean isIncluded(IComponentIdentifier cid, IServiceIdentifier ser);
 	
 	/**
 	 *  Get all services.
 	 *  @return All services (copy).
 	 */
-	public Set<IService> getAllServices();
+	public Set<IServiceIdentifier> getAllServices();
 	
 	/**
 	 *  Get all queries.
 	 *  @return All queries (copy).
 	 */
-	public Set<ServiceQueryInfo<IService>> getAllQueries();
-	
-	
-	// todo: move superpeer to platform data?! 
-	/**
-	 *  Get the superpeer.
-	 *  @return the superpeer.
-	 */
-	public IComponentIdentifier getSuperpeer();
-
-	/**
-	 *  Set the superpeer.
-	 *  @param superpeer The superpeer to set.
-	 */
-	public void setSuperpeer(IComponentIdentifier superpeer);
+	public Set<ServiceQueryInfo<IServiceIdentifier>> getAllQueries();
 }

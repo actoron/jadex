@@ -6,18 +6,16 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import jadex.bridge.ClassInfo;
-import jadex.bridge.sensor.service.TagProperty;
-import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Responsible for extracting values.
  */
-public class ServiceKeyExtractor implements IKeyExtractor<IService>
+public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -71,7 +69,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 	 *  @param service The service.
 	 *  @return The keys matching the type.
 	 */
-	public Set<String> getKeyValues(String keytype, IService serv)
+	public Set<String> getKeyValues(String keytype, IServiceIdentifier serv)
 	{
 		return getKeysStatic(keytype, serv);
 	}
@@ -94,7 +92,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 	 *  @return The keys matching the type.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final Set<String> getKeysStatic(String keytype, IService serv)
+	public static final Set<String> getKeysStatic(String keytype, IServiceIdentifier serv)
 	{
 //		if(serv instanceof IService)
 //		{
@@ -103,13 +101,11 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 //		}
 		Set<String> ret = null;
 		
-		IService service = (IService)serv;
-		
 		if(KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			ret = new HashSet<String>();
-			ret.add(service.getServiceIdentifier().getServiceType().toString());
-			ClassInfo[] supertypes = service.getServiceIdentifier().getServiceSuperTypes();
+			ret.add(serv.getServiceType().toString());
+			ClassInfo[] supertypes = serv.getServiceSuperTypes();
 			if (supertypes != null)
 			{
 				for (ClassInfo supertype : supertypes)
@@ -121,27 +117,27 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 //			Map<String, Object> sprops = service.getPropertyMap();
 //			if(sprops != null)
 //				ret = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
-			ret = service.getServiceIdentifier().getTags();
+			ret = serv.getTags();
 		}
 		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
-			ret = new SetWrapper<String>(service.getServiceIdentifier().getProviderId().toString());
+			ret = new SetWrapper<String>(serv.getProviderId().toString());
 		}
 		else if(KEY_TYPE_PLATFORM.equals(keytype))
 		{
-			ret = new SetWrapper<String>(service.getServiceIdentifier().getProviderId().getRoot().toString());
+			ret = new SetWrapper<String>(serv.getProviderId().getRoot().toString());
 		}
 		else if(KEY_TYPE_SID.equals(keytype))
 		{
-			ret = new SetWrapper<String>(service.getServiceIdentifier().toString());
+			ret = new SetWrapper<String>(serv.toString());
 		}
 		else if(KEY_TYPE_NETWORKS.equals(keytype))
 		{
-			ret = new HashSet<String>(service.getServiceIdentifier().getNetworkNames());
+			ret = new HashSet<String>(serv.getNetworkNames());
 		}
 		else if(KEY_TYPE_UNRESTRICTED.equals(keytype))
 		{
-			ret = new SetWrapper<String>(""+service.getServiceIdentifier().isUnrestricted());
+			ret = new SetWrapper<String>(""+serv.isUnrestricted());
 		}
 		return ret;
 	}
@@ -154,7 +150,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IService>
 	 *  @param value The value.
 	 *  @return The key matching mode.
 	 */
-	public Boolean getKeyMatchingMode(String keytype, IService value)
+	public Boolean getKeyMatchingMode(String keytype, IServiceIdentifier value)
 	{
 		if(KEY_TYPE_TAGS.equals(keytype))
 			return Boolean.TRUE;

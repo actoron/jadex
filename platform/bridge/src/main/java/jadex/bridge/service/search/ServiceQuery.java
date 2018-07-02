@@ -601,7 +601,7 @@ public class ServiceQuery<T>
 	 *  @return True, if the service matches the keys.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected boolean matchesSync(IService service)
+	protected boolean matchesSync(IServiceIdentifier service)
 	{
 		return (matchesKeys(service) && ((IFilter) filter).filter(service));
 	}
@@ -613,7 +613,7 @@ public class ServiceQuery<T>
 	 *  @return True, if the service matches the keys.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected IFuture<Boolean> matchesAsync(IService service)
+	protected IFuture<Boolean> matchesAsync(IServiceIdentifier service)
 	{
 		IFuture<Boolean> ret = null;
 		if (matchesKeys(service))
@@ -631,9 +631,9 @@ public class ServiceQuery<T>
 	 *  @param service The service.
 	 *  @return True, if the service matches the keys.
 	 */
-	protected boolean matchesKeys(IService service)
+	protected boolean matchesKeys(IServiceIdentifier service)
 	{
-		if (servicetype != null && !service.getServiceIdentifier().getServiceType().getGenericTypeName().equals(servicetype))
+		if (servicetype != null && !service.getServiceType().getGenericTypeName().equals(servicetype))
 			return false;
 		
 		if (servicetags != null)
@@ -651,10 +651,10 @@ public class ServiceQuery<T>
 			}
 		}
 		
-		if (provider != null && !provider.equals(service.getServiceIdentifier().getProviderId()))
+		if (provider != null && !provider.equals(service.getProviderId()))
 			return false;
 		
-		if (platform != null && !platform.equals(service.getServiceIdentifier().getProviderId().getRoot()))
+		if (platform != null && !platform.equals(service.getProviderId().getRoot()))
 			return false;
 		
 		return true;
