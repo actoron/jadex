@@ -375,13 +375,13 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 								((ServiceIdentifier)sid).setTags(tags);
 								// Hack!!! re-index
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
-								Indexer<IService> indexer = reg.getIndexer();
+								Indexer<IServiceIdentifier> indexer = reg.getIndexer();
 								String	sid	= getServiceIdentifier().toString();
-								Set<IService> origs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_SID, sid);
+								Set<IServiceIdentifier> origs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_SID, sid);
 								// Hack!!! Race condition bug in init???
 								if(origs!=null)
 								{
-									IService orig = origs.iterator().next();
+									IServiceIdentifier orig = origs.iterator().next();
 									indexer.addValue(orig);
 								}
 								else

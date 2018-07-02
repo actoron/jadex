@@ -45,7 +45,6 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -132,8 +131,6 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				sermap.put(key, newpsi);
 			}
 			
-			FutureBarrier<Void> bar = new FutureBarrier<Void>();
-			
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
 			{
@@ -149,7 +146,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getComponentIdentifier()));
 					
-					bar.addFuture(addService(service, info));
+					addService(service, info);
 				}
 				else
 				{
@@ -184,27 +181,21 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 							component, ser, info.getName(), type, info.getImplementation().getProxytype(), ics, 
 							moni, info, info.getScope());
 						
-						bar.addFuture(addService(proxy, info));
+						addService(proxy, info);
 					}
 				}
 			}
 			
-			bar.waitFor().addResultListener(new DelegationResultListener<Void>(ret)
+			// Start the services.
+			Collection<IInternalService>	allservices	= getAllServices();
+			if(!allservices.isEmpty())
 			{
-				public void customResultAvailable(Void result)
-				{
-					// Start the services.
-					Collection<IInternalService>	allservices	= getAllServices();
-					if(!allservices.isEmpty())
-					{
-						initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-					else
-					{
-						ret.setResult(null);
-					}
-				}
-			});
+				initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		catch(Exception e)
 		{
@@ -252,7 +243,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param service	The service object.
 	 *  @param info	 The service info.
 	 */
-	protected IFuture<Void> addService(IInternalService service, ProvidedServiceInfo info)
+	protected void addService(IInternalService service, ProvidedServiceInfo info)
 	{
 		if(serviceinfos==null)
 			serviceinfos = new HashMap<IServiceIdentifier, ProvidedServiceInfo>();
@@ -292,7 +283,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
 		
-		return ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service);
+		ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service.getServiceIdentifier());
 //		return bar.waitFor();
 	}
 	
@@ -317,7 +308,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
-			registry.removeService(service);
+			registry.removeService(service.getServiceIdentifier());
 		}
 	}
 	
@@ -1163,13 +1154,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			getComponent(), service, name, type, proxytype, ics, moni, 
 			info, scope!=null ? scope : info!=null? info.getScope(): null);
 		
-		addService(proxy, info).addResultListener(new DelegationResultListener<Void>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				initService(proxy).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
+		addService(proxy, info);
+		initService(proxy).addResultListener(new DelegationResultListener<Void>(ret));
 				
 		return ret;
 	}

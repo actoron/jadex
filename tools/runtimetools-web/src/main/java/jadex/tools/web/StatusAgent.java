@@ -13,7 +13,6 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
@@ -197,11 +196,11 @@ public class StatusAgent implements IStatusService
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
 		IntermediateFuture<IServiceIdentifier>	ret	= new IntermediateFuture<IServiceIdentifier>();
 		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getComponentIdentifier());
-		for(IService ser: reg.getAllServices())
+		for(IServiceIdentifier ser: reg.getAllServices())
 		{
-			if(scopes==null || scopes.contains(ser.getServiceIdentifier().getScope()))
+			if(scopes==null || scopes.contains(ser.getScope()))
 			{
-				ret.addIntermediateResult(ser.getServiceIdentifier());
+				ret.addIntermediateResult(ser);
 			}
 		}
 		ret.setFinished();

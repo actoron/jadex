@@ -662,7 +662,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		else
 		{
 			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
-			IExecutionService exe = ServiceRegistry.getRegistry(component).searchServiceSync(query);
+			IExecutionService exe = ServiceRegistry.getRegistry(component).searchService(query);
 			// Hack!!! service is foudn before it is started, grrr.
 			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{

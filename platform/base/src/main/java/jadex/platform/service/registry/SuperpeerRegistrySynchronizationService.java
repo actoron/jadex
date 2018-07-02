@@ -1190,7 +1190,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //			IMsgSecurityInfos secinfo = (IMsgSecurityInfos)ServiceCall.getCurrentInvocation().getProperty("securityinfo");
 			query.setNetworkNames(networknames);
 			
-			Set<IService> sers = getRegistry().searchServicesSync(query);
+			Set<IService> sers = getRegistry().searchServices(query);
 			if(sers!=null)
 			{
 				for(Iterator<IService> it=sers.iterator(); it.hasNext(); )

@@ -145,7 +145,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
 		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_GLOBAL, null, owner==null? cid: owner, null);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
-		Set<IService> added = reg.searchServicesSync(query);
+		Set<IService> added = reg.searchServices(query);
 		
 		// Remove only non-globally-scoped services
 //		Set<IComponentIdentifier> clients = new HashSet<IComponentIdentifier>();

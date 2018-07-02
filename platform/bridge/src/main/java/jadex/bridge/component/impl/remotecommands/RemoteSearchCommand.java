@@ -12,7 +12,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
-import jadex.commons.IAsyncFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -75,24 +74,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 ////			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 //		}
 		
-		final IFuture<Collection<T>>	ret;
-		if(query.getFilter() instanceof IAsyncFilter)
-		{
-			ret	= ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesAsync(query);
-		}
-		else
-		{
-			Collection<T> res = ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServicesSync(query);
-			ret	= new Future<Collection<T>>(res);				
-//			if((""+query.getServiceType()).indexOf("ISuperpeerRegistrySynchronizationService")!=-1)
-//			{
-//				System.out.println("result is: "+res+" "+query);
-//				if(res==null || res.size()==0)
-//					System.out.println("not found");
-//			}
-		}
-		
-		return ret;
+		return new Future<Collection<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServices(query));				
 	}
 	
 	/**
@@ -117,7 +99,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		if(ret==null)
 		{
 			IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
-			ISuperpeerRegistrySynchronizationService srss = reg.searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
+			ISuperpeerRegistrySynchronizationService srss = reg.searchService(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
 			if(srss!=null)
 			{
 				ret = ServiceIdentifier.getSecurityLevel(ISuperpeerRegistrySynchronizationService.class);
