@@ -57,6 +57,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	/** Collection of potential superpeers (level 1). */
 	protected List<IComponentIdentifier> superpeers;
 	
+	
+	
 	/** The peer search functionality. */
 	protected PeerSearchFunctionality psfunc;
 	
@@ -463,7 +465,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public IFuture<IComponentIdentifier> getSuperpeer(boolean force)
 	{
 		if(force)
-			getRegistry().setSuperpeer(null);
+			superpeer	= null;
 		
 		IFuture<IComponentIdentifier> ret = psfunc.getPeer(force);
 		
@@ -472,7 +474,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			@Override
 			public void resultAvailable(IComponentIdentifier result)
 			{
-				getRegistry().setSuperpeer(result);
+				superpeer	= result;
 			}
 			
 			@Override
@@ -484,18 +486,18 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 		return ret;
 	}
 	
+	IComponentIdentifier superpeer;
+	
 	/**
 	 *  Get the superpeer. Triggers search in background if none available.
 	 *  @return The superpeer.
 	 */
 	public IComponentIdentifier getSuperpeerSync()
 	{
-		IComponentIdentifier ret = getRegistry().getSuperpeer();
-		
-		if(ret==null) 
+		if(superpeer==null) 
 			getSuperpeer(false);
 			
-		return ret;
+		return superpeer;
 	}
 	
 //	/**

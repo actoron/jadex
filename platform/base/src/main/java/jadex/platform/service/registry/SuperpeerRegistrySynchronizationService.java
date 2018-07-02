@@ -783,7 +783,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					if(checkScope(ser))
 					{
 						System.out.println("added ser: "+ser);
-						reg.addService(ser);
+						reg.addService(ser.getServiceIdentifier());
 					}
 					else
 					{
@@ -801,7 +801,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				for(IService ser: removed)
 				{
 					System.out.println("removed ser due to event: "+ser);
-					reg.removeService(ser);
+					reg.removeService(ser.getServiceIdentifier());
 					
 					if(plat==null)
 						plat = ser.getServiceIdentifier().getProviderId().getRoot();
@@ -1439,7 +1439,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query)
 	{
-		return getRegistry().removeQuery(query); 
+		getRegistry().removeQuery(query);
+		return IFuture.DONE;
 	}
 	
 //	/**

@@ -471,7 +471,7 @@ public class Starter
 //					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
 //					if(config.getRegistrySync())
 //					{
-						putPlatformValue(cid, DATA_SERVICEREGISTRY, new ServiceRegistry(cid, 5000));
+						putPlatformValue(cid, DATA_SERVICEREGISTRY, new ServiceRegistry());
 //					}
 //					else
 //					{
