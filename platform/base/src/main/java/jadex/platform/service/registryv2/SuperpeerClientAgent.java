@@ -9,15 +9,11 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.registryv2.ISuperpeerClientService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
@@ -25,11 +21,10 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -39,7 +34,7 @@ import jadex.micro.annotation.Binding;
  */
 @Agent(autoprovide=Boolean3.TRUE)
 @Service
-public class SuperpeerClientAgent	implements ISuperpeerClientService
+public class SuperpeerClientAgent
 {
 	//-------- attributes --------
 	
@@ -52,7 +47,7 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		= new LinkedHashMap<>();
 
 	/** The current super peer connections for each network (only set when found, i.e. when not searching for the network). */
-	protected Map<String, Tuple2<ISuperpeerService, SubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>>>	superpeers
+	protected Map<String, Tuple2<ISuperpeerService, ITerminableFuture<Void>>>	superpeers
 		= new LinkedHashMap<>();
 	
 	//-------- agent life cycle --------
@@ -81,58 +76,6 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		});
 		
 		return ret;
-	}
-	
-	//-------- ISuperpeerClientService interface --------
-	
-	/**
-	 *  Subscribes a super peer to the client,
-	 *  receiving events of services added to or
-	 *  removed from the client.
-	 *  
-	 *  @param networkname	The relevant network (i.e. only services for this network will be passed to the super peer).
-	 *  @param sp	The super peer.
-	 *  
-	 *  @return Added/removed service events.
-	 */
-	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> addSuperpeerSubscription(String networkname, ISuperpeerService sp)
-	{
-		SubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	sub;
-
-		if(superpeers.containsKey(networkname))
-		{
-			// Only keep first connection (i.e. assumed fastest/closest server)
-			System.out.println(agent+" ignored additional super peer connection for network "+networkname+" from super peer: "+sp);
-			sub	= new SubscriptionIntermediateFuture<>(new IllegalStateException("Already connected."));
-		}
-		
-		else
-		{
-			System.out.println(agent+" received super peer connection for network "+networkname+" from super peer: "+sp);
-			
-			// Stop ongoing search, if any
-			stopSuperpeerSearch(networkname);
-			
-			sub = new SubscriptionIntermediateFuture<>(new TerminationCommand()
-			{
-				@Override
-				public void terminated(Exception reason)
-				{
-					// On failure -> just retry
-					System.out.println(agent+" super peer connection for network "+networkname+" from super peer "+sp+" failed due to: "+reason);
-					startSuperpeerSearch(networkname);
-				}
-			});
-			
-			SFuture.avoidCallTimeouts(sub, agent);
-			superpeers.put(networkname, new Tuple2<ISuperpeerService, SubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>>(sp, sub));
-			
-			// TODO: add initial services
-
-			// TODO: send updates from registry
-		}
-		
-		return sub;
 	}
 	
 	//------- helper methods ---------
@@ -174,19 +117,38 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 				public void intermediateResultAvailable(ISuperpeerService sp)
 				{
 					System.out.println(agent+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
-					sp.registerClient(networkname, SuperpeerClientAgent.this)
-						.addResultListener(new IResultListener<Void>()
+					ITerminableFuture<Void>	fut	= sp.registerClient(networkname);
+					fut.addResultListener(new IFutureCommandResultListener<Void>()
 					{
+						@Override
+						public void commandAvailable(Object command)
+						{
+							// First command -> connected (shouldn't be any other commands).
+							System.out.println(agent+" received super peer connection for network "+networkname+" from super peer: "+sp);
+							
+							// Stop ongoing search, if any
+							stopSuperpeerSearch(networkname);
+							superpeers.put(networkname, new Tuple2<ISuperpeerService, ITerminableFuture<Void>>(sp, fut));
+							
+							// TODO: add initial services
+
+							// TODO: send updates from registry	
+						}	
+						
 						@Override
 						public void resultAvailable(Void result)
 						{
-							checkRetry(result);
+							// On failure -> just retry
+							System.out.println(agent+" super peer connection for network "+networkname+" from super peer "+sp+" finished. (why?)");
+							startSuperpeerSearch(networkname);
 						}
 						
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							checkRetry(exception);
+							// On failure -> just retry
+							System.out.println(agent+" super peer connection for network "+networkname+" from super peer "+sp+" failed due to: "+exception);
+							startSuperpeerSearch(networkname);
 						}
 					});
 				}
@@ -267,7 +229,7 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		if(superpeers.containsKey(networkname))
 		{
 			System.out.println(agent+" dropping super peer connection for network "+networkname+" from super peer: "+superpeers.get(networkname).getFirstEntity());
-			superpeers.get(networkname).getSecondEntity().setFinishedIfUndone();
+			superpeers.get(networkname).getSecondEntity().terminate();
 			superpeers.remove(networkname);
 		}
 	}
@@ -280,7 +242,7 @@ public class SuperpeerClientAgent	implements ISuperpeerClientService
 		// Common base configuration
 		IPlatformConfiguration	baseconfig	= PlatformConfigurationHandler.getMinimalComm();
 //		baseconfig.setGui(true);
-//		config.setLogging(true);
+		baseconfig.setLogging(true);
 		
 		// Super peer base configuration
 		IPlatformConfiguration	spbaseconfig	= baseconfig.clone();
