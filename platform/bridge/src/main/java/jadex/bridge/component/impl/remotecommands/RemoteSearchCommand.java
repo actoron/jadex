@@ -4,15 +4,10 @@ import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -74,7 +69,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 ////			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 //		}
 		
-		return new Future<Collection<T>>(ServiceRegistry.getRegistry(access.getComponentIdentifier()).searchServices(query));				
+		return access.getComponentFeature(IRequiredServicesFeature.class).searchServices(getQuery());				
 	}
 	
 	/**
@@ -96,15 +91,15 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 		// Search access depends on the (imaginary) registry service access
 		// Because no explicit service is available it checks if a global-superpeer is used
 		// This is checked by fetching the level of ISuperpeerRegistrySynchronizationService.class (if available)
-		if(ret==null)
-		{
-			IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
-			ISuperpeerRegistrySynchronizationService srss = reg.searchService(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
-			if(srss!=null)
-			{
-				ret = ServiceIdentifier.getSecurityLevel(ISuperpeerRegistrySynchronizationService.class);
-			}
-		}
+//		if(ret==null)
+//		{
+//			IServiceRegistry reg = ServiceRegistry.getRegistry(access.getComponentIdentifier());
+//			ISuperpeerRegistrySynchronizationService srss = reg.searchService(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, access.getComponentIdentifier(), null));
+//			if(srss!=null)
+//			{
+//				ret = ServiceIdentifier.getSecurityLevel(ISuperpeerRegistrySynchronizationService.class);
+//			}
+//		}
 		
 		return ret;
 	}

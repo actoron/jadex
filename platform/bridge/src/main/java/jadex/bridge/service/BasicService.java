@@ -25,8 +25,6 @@ import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.Indexer;
-import jadex.bridge.service.search.ServiceKeyExtractor;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -375,19 +373,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 								((ServiceIdentifier)sid).setTags(tags);
 								// Hack!!! re-index
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
-								Indexer<IServiceIdentifier> indexer = reg.getIndexer();
-								String	sid	= getServiceIdentifier().toString();
-								Set<IServiceIdentifier> origs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_SID, sid);
-								// Hack!!! Race condition bug in init???
-								if(origs!=null)
-								{
-									IServiceIdentifier orig = origs.iterator().next();
-									indexer.addValue(orig);
-								}
-								else
-								{
-									internalaccess.getLogger().severe("Cannot add service to indexer (init bug?): "+this);
-								}
+								reg.updateService(sid);
 							}
 							ret.setResult(null);
 						}
