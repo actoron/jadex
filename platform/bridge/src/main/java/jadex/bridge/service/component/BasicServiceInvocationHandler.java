@@ -780,14 +780,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 *  Static method for creating a delegation service proxy for 
 	 *  provided service that is not offered by the component itself.
 	 */
+	// TODO: not currently used in apps???
 	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), ia.getComponentDescription().getCause(), false);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
+//		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));	// TODO
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
-//		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 		return (IInternalService)ProxyFactory.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader, ia.getModel().getAllImports())}, handler); //sid.getServiceType()
 	}
 
@@ -815,8 +815,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), ia.getComponentDescription().getCause(), true);
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
-			if(binding!=null && binding.isRecover())
-				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
+			// Dropped for v4???
+//			if(binding!=null && binding.isRecover())
+//				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getServiceIdentifier()));
