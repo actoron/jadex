@@ -24,7 +24,6 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.component.FeatureNotAvailableException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -34,7 +33,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -1088,34 +1086,28 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-															.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Boolean>(ret)
+														ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+														ls.getClassLoader(model.getResourceIdentifier())
+															.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
 														{
-															public void customResultAvailable(ILibraryService ls)
+															public void customResultAvailable(ClassLoader cl)
 															{
-																ls.getClassLoader(model.getResourceIdentifier())
-																	.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+																IArgument[]	results	= model.getResults();
+																boolean	istest	= false;
+																for(int i=0; !istest && i<results.length; i++)
 																{
-																	public void customResultAvailable(ClassLoader cl)
-																	{
-																		IArgument[]	results	= model.getResults();
-																		boolean	istest	= false;
-																		for(int i=0; !istest && i<results.length; i++)
-																		{
 //																			if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
 //																				&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
 //																			{	
 //																				istest	= true;
 //																			}
-																			if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
-																				&& Testcase.class.equals(results[i].getClazz().getType(cl, model.getAllImports())))
-																			{
-																				istest	= true;
-																			}
-																		}
-																		ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+																	if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
+																		&& Testcase.class.equals(results[i].getClazz().getType(cl, model.getAllImports())))
+																	{
+																		istest	= true;
 																	}
-																});
+																}
+																ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
 															}
 														});
 													}
@@ -1163,47 +1155,41 @@ public class SRemoteGui
 				final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 				try
 				{
-					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Map<String, Object>>(ret)
+					ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ls.getClassLoader(modelrid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Map<String, Object>>(ret)
 					{
-						public void customResultAvailable(ILibraryService ls)
+						public void customResultAvailable(ClassLoader cl)
 						{
-							ls.getClassLoader(modelrid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Map<String, Object>>(ret)
+							Map<String, Object> args = SCollection.createHashMap();
+							String errortext = null;
+							for(String argname: rawargs.keySet())
 							{
-								public void customResultAvailable(ClassLoader cl)
+								String argval = rawargs.get(argname);
+								if(argval.length()>0)
 								{
-									Map<String, Object> args = SCollection.createHashMap();
-									String errortext = null;
-									for(String argname: rawargs.keySet())
+									Object arg = null;
+									try
 									{
-										String argval = rawargs.get(argname);
-										if(argval.length()>0)
-										{
-											Object arg = null;
-											try
-											{
-												arg = new JavaCCExpressionParser().parseExpression(argval, null, null, cl).getValue(null);
-											}
-											catch(Exception e)
-											{
-												if(errortext==null)
-													errortext = "Error within argument expressions:\n";
-												errortext += argname+" "+e.getMessage()+"\n";
-											}
-											args.put(argname, arg);
-											
-										}
+										arg = new JavaCCExpressionParser().parseExpression(argval, null, null, cl).getValue(null);
 									}
-									if(errortext==null)
+									catch(Exception e)
 									{
-										ret.setResult(args);
+										if(errortext==null)
+											errortext = "Error within argument expressions:\n";
+										errortext += argname+" "+e.getMessage()+"\n";
 									}
-									else
-									{
-										ret.setException(new RuntimeException(errortext));
-									}
+									args.put(argname, arg);
+									
 								}
-							});
+							}
+							if(errortext==null)
+							{
+								ret.setResult(args);
+							}
+							else
+							{
+								ret.setException(new RuntimeException(errortext));
+							}
 						}
 					});
 				}
@@ -1234,44 +1220,38 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
+					ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					if(!tl)
 					{
-						public void customResultAvailable(final ILibraryService ls)
+						// todo: workspace=true?
+						ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
 						{
-							if(!tl)
+							public void customResultAvailable(IResourceIdentifier rid)
 							{
-								// todo: workspace=true?
-								ls.addURL(parid, url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
-								{
-									public void customResultAvailable(IResourceIdentifier rid)
-									{
-										ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-	//									exception.printStackTrace();
-										super.exceptionOccurred(exception);
-									}
-								});
+								ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
 							}
-							else
+							public void exceptionOccurred(Exception exception)
 							{
-								ls.addTopLevelURL(url).addResultListener(new ExceptionDelegationResultListener<Void, Tuple2<URL, IResourceIdentifier>>(ret)
-								{
-									public void customResultAvailable(Void result)
-									{
-										ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, null));
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-	//									exception.printStackTrace();
-										super.exceptionOccurred(exception);
-									}
-								});
+//									exception.printStackTrace();
+								super.exceptionOccurred(exception);
 							}
-						}
-					});
+						});
+					}
+					else
+					{
+						ls.addTopLevelURL(url).addResultListener(new ExceptionDelegationResultListener<Void, Tuple2<URL, IResourceIdentifier>>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, null));
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+//									exception.printStackTrace();
+								super.exceptionOccurred(exception);
+							}
+						});
+					}
 				}
 				catch(Exception e)
 				{

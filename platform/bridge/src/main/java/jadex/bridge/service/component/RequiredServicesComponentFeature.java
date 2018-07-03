@@ -24,6 +24,7 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -38,6 +39,9 @@ import jadex.commons.future.TerminationCommand;
 // Todo: synchronous or asynchronous (for search)?
 public class RequiredServicesComponentFeature	extends AbstractComponentFeature implements IRequiredServicesFeature, IInternalServiceMonitoringFeature
 {
+	/** Marker for duplicate declarations of same type. */
+	private static final RequiredServiceInfo	ISS_MEHR_WURST	= new RequiredServiceInfo();
+	
 	//-------- attributes --------
 	
 	/** The required service infos. */
@@ -173,6 +177,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			for(int i=0; i<requiredservices.length; i++)
 			{
 				this.requiredserviceinfos.put(requiredservices[i].getName(), requiredservices[i]);
+				if(requiredservices[i].getType()!=null)
+				{
+					if(requiredserviceinfos.containsKey(requiredservices[i].getType().getTypeName()))
+					{
+						this.requiredserviceinfos.put(requiredservices[i].getType().getTypeName(), ISS_MEHR_WURST);
+					}
+					else
+					{
+						this.requiredserviceinfos.put(requiredservices[i].getType().getTypeName(), requiredservices[i]);
+					}
+				}
 			}
 		}
 	}
@@ -200,7 +215,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> IFuture<T> getService(Class<T> type)
 	{
-		return resolveService(getServiceQuery(getServiceInfo(type)), getServiceInfo(type));
+		RequiredServiceInfo	info	= getServiceInfo(type);
+		if(info==null)
+		{
+			// Convenience case: switch to search when type not declared
+			return searchService(new ServiceQuery<>(type));
+		}
+		else
+		{
+			return resolveService(getServiceQuery(info), info);
+			
+		}
 	}
 	
 	/**
@@ -222,7 +247,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type)
 	{
-		return resolveServices(getServiceQuery(getServiceInfo(type)), getServiceInfo(type));
+		RequiredServiceInfo	info	= getServiceInfo(type);
+		if(info==null)
+		{
+			// Convenience case: switch to search when type not declared
+			return searchServices(new ServiceQuery<>(type));
+		}
+		else
+		{
+			return resolveServices(getServiceQuery(info), info);
+			
+		}
 	}
 	
 	/**
@@ -244,7 +279,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> T getLocalService(Class<T> type)
 	{
-		return resolveLocalService(getServiceQuery(getServiceInfo(type)), getServiceInfo(type));
+		RequiredServiceInfo	info	= getServiceInfo(type);
+		if(info==null)
+		{
+			// Convenience case: switch to search when type not declared
+			return searchLocalService(new ServiceQuery<>(type));
+		}
+		else
+		{
+			return resolveLocalService(getServiceQuery(info), info);
+			
+		}
 	}
 	
 	/**
@@ -266,7 +311,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> Collection<T> getLocalServices(Class<T> type)
 	{
-		return resolveLocalServices(getServiceQuery(getServiceInfo(type)), getServiceInfo(type));
+		RequiredServiceInfo	info	= getServiceInfo(type);
+		if(info==null)
+		{
+			// Convenience case: switch to search when type not declared
+			return searchLocalServices(new ServiceQuery<>(type));
+		}
+		else
+		{
+			return resolveLocalServices(getServiceQuery(info), info);
+			
+		}
 	}
 	
 	//-------- methods for searching --------
@@ -577,10 +632,10 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected RequiredServiceInfo	getServiceInfo(Class<?> type)
 	{
-		RequiredServiceInfo	info	= requiredserviceinfos.get(type.getName());
-		if(info==null)
+		RequiredServiceInfo	info	= requiredserviceinfos.get(SReflect.getClassName(type));
+		if(info==ISS_MEHR_WURST)
 		{
-			throw new IllegalArgumentException("No unique required service found for type: "+type);
+			throw new IllegalArgumentException("Multiple required service declarations found for type: "+type);
 		}
 		return info;
 	}
