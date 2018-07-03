@@ -2,12 +2,8 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IAsyncFilter;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -16,8 +12,12 @@ import jadex.commons.future.ITerminableIntermediateFuture;
  */
 public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 {
+	//-------- attributes --------
+	
 	/** The delegate. */
 	protected IRequiredServicesFeature delegate;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new adapter.
@@ -26,188 +26,155 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	{
 		this.delegate = delegate;
 	}
+
+	//-------- accessors for declared services --------
 	
 	/**
-	 *  Get the required service infos.
-	 */
-	public RequiredServiceInfo[] getRequiredServiceInfos()
-	{
-		return delegate.getRequiredServiceInfos();
-	}
-	
-	/**
-	 *  Get the required service info.
-	 *  @param name The name.
-	 *  @return The required service info.
-	 */
-	public RequiredServiceInfo getRequiredServiceInfo(String name)
-	{
-		return delegate.getRequiredServiceInfo(rename(name));
-	}
-	
-	/**
-	 *  Get a required service of a given name.
+	 *  Resolve a declared required service of a given name.
+	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name)
+	public <T> IFuture<T> getService(String name)
 	{
-		return delegate.getRequiredService(rename(name));
+		return delegate.getService(rename(name));
 	}
 	
 	/**
-	 *  Get a required services of a given name.
+	 *  Resolve a required service of a given type.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param type The service type.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getService(Class<T> type)
+	{
+		return delegate.getService(type);
+	}
+	
+	/**
+	 *  Resolve a required services of a given name.
+	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
+	public <T> ITerminableIntermediateFuture<T> getServices(String name)
 	{
-		return delegate.getRequiredServices(rename(name));
+		return delegate.getServices(rename(name));
 	}
 	
 	/**
-	 *  Get a required service.
+	 *  Resolve a required services of a given type.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param type The services type.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type)
+	{
+		return delegate.getServices(type);
+	}
+	
+	/**
+	 *  Resolve a declared required service of a given name.
+	 *  Synchronous method only for locally available services.
+	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
+	public <T> T getLocalService(String name)
 	{
-		return delegate.getRequiredService(rename(name), rebind);
+		return delegate.getLocalService(rename(name));
 	}
 	
 	/**
-	 *  Get a required services.
-	 *  @return Each service as an intermediate result and a collection of services as final result.
-	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
-	{
-		return delegate.getRequiredServices(rename(name), rebind);
-	}
-	
-	/**
-	 *  Get a required service.
+	 *  Resolve a required service of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The service type.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter)
+	public <T> T getLocalService(Class<T> type)
 	{
-		return delegate.getRequiredService(rename(name), rebind, filter);
+		return delegate.getLocalService(type);
 	}
 	
 	/**
-	 *  Get a required services.
+	 *  Resolve a required services of a given name.
+	 *  Synchronous method only for locally available services.
+	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
+	public <T> Collection<T> getLocalServices(String name)
 	{
-		return delegate.getRequiredServices(rename(name), rebind, filter);
+		return delegate.getLocalServices(rename(name));
 	}
 	
 	/**
-	 *  Get a required service using tags.
-	 *  @param name The required service name.
-	 *  @param rebind If false caches results.
-	 *  @param tags The service tags.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, String... tags)
-	{
-		return delegate.getRequiredService(name, rebind, tags);
-	}
-	
-	/**
-	 *  Get a required services using tags.
-	 *  @param name The required service name.
-	 *  @param rebind If false caches results.
-	 *  @param tags The service tags.
+	 *  Resolve a required services of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The services type.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, String... tags)
+	public <T> Collection<T> getLocalServices(Class<T> type)
 	{
-		return delegate.getRequiredServices(name, rebind, tags);
+		return delegate.getLocalServices(type);
+	}
+
+	//-------- methods for searching --------
+	
+	/**
+	 *  Search for matching services and provide first result.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> IFuture<T> searchService(ServiceQuery<T> query)
+	{
+		return delegate.searchService(query);
 	}
 	
 	/**
-	 *  Get the result of the last search.
-	 *  @param name The required service name.
-	 *  @return The last result.
+	 *  Search for matching services and provide first result.
+	 *  Synchronous method only for locally available services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T getLastRequiredService(String name)
+	public <T> T searchLocalService(ServiceQuery<T> query)
 	{
-		return delegate.getLastRequiredService(rename(name));
+		return delegate.searchLocalService(query);
 	}
 	
 	/**
-	 *  Get the result of the last search.
-	 *  @param name The required services name.
-	 *  @return The last result.
+	 *  Search for all matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> getLastRequiredServices(String name)
+	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
 	{
-		return delegate.getLastRequiredServices(rename(name));
-	}
-	
-	// extra methods for searching
-	
-	/**
-	 *  Get one service of a type from a specific component.
-	 *  @param type The class.
-	 *  @param cid The component identifier of the target component.
-	 *  @return The corresponding service.
-	 */
-	public <T> IFuture<T> searchService(Class<T> type, IComponentIdentifier cid)
-	{
-		return delegate.searchService(type, cid);
+		return delegate.searchServices(query);
 	}
 	
 	/**
-	 *  Get one service of a type.
-	 *  @param type The class.
-	 *  @return The corresponding service.
+	 *  Search for all matching services.
+	 *  Synchronous method only for locally available services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> IFuture<T> searchService(Class<T> type)
+	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
 	{
-		return delegate.searchService(type);
+		return delegate.searchLocalServices(query);
 	}
 	
-	/**
-	 *  Get one service of a type.
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-	public <T> IFuture<T> searchService(Class<T> type, String scope)
-	{
-		return delegate.searchService(type, scope);
-	}
-	
-	/**
-	 *  Get all services of a type.
-	 *  @param type The class.
-	 *  @return Each service as an intermediate result and a collection of services as final result.
-	 */
-	public <T> IIntermediateFuture<T> searchServices(Class<T> type)
-	{
-		return delegate.searchServices(type);
-	}
-	
-	/**
-	 *  Get all services of a type.
-	 *  @param type The class.
-	 *  @return Each service as an intermediate result and a collection of services as final result.
-	 */
-	public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
-	{
-		return delegate.searchServices(type, scope);
-	}
-	
+	//-------- query methods --------
+
 	/**
 	 *  Add a service query.
-	 *  @param type The service type.
-	 *  @param scope The scope.
-	 *  @param filter The filter.
+	 *  Continuously searches for matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type, String scope, IAsyncFilter<T> filter)
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
-		return delegate.addQuery(type, scope, filter);
+		return delegate.addQuery(query);
 	}
+	
+	//-------- template methods --------
 	
 	/**
 	 *  Rename if necessary.
