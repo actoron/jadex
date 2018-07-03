@@ -12,7 +12,7 @@ import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 /**
  *  Extractor for query infos.
  */
-public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServiceIdentifier>>
+public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 {
 	/** Key type for the service interface. */
 	public static final String KEY_TYPE_INTERFACE = "interface";
@@ -80,10 +80,10 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	 *  @param value The value.
 	 *  @return The key values.
 	 */
-	public Set<String> getKeyValues(String keytype, ServiceQueryInfo<IServiceIdentifier> sqi)
+	public Set<String> getKeyValues(String keytype, ServiceQueryInfo<?> sqi)
 	{
 		Set<String> ret = null;
-		ServiceQuery<IServiceIdentifier> query = sqi.getQuery();
+		ServiceQuery<?> query = sqi.getQuery();
 		if(ServiceKeyExtractor.KEY_TYPE_INTERFACE.equals(keytype))
 		{
 			if(query.getServiceType()!=null)
@@ -158,7 +158,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<IServi
 	 *  @param value The value.
 	 *  @return The key matching mode.
 	 */
-	public Boolean getKeyMatchingMode(String keytype, ServiceQueryInfo<IServiceIdentifier> query)
+	public Boolean getKeyMatchingMode(String keytype, ServiceQueryInfo<?> query)
 	{
 		Boolean ret = query.getQuery().getMatchingMode(keytype);
 		if(ret == null && KEY_TYPE_TAGS.equals(keytype))
