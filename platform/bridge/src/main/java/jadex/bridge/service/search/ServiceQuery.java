@@ -259,9 +259,10 @@ public class ServiceQuery<T>
 	 *  Set the service type.
 	 *  @param type The service type to set
 	 */
-	public void setServiceType(ClassInfo servicetype)
+	public ServiceQuery<T> setServiceType(ClassInfo servicetype)
 	{
 		this.servicetype = servicetype;
+		return this;
 	}
 	
 	/**
@@ -277,9 +278,10 @@ public class ServiceQuery<T>
 	 *  Set the return type.
 	 *  @param type The return type to set
 	 */
-	public void setReturnType(ClassInfo returntype)
+	public ServiceQuery<T> setReturnType(ClassInfo returntype)
 	{
 		this.returntype = returntype;
+		return this;
 	}
 	
 	/**
@@ -295,9 +297,10 @@ public class ServiceQuery<T>
 	 *  Set the scope.
 	 *  @param scope The scope to set
 	 */
-	public void setScope(String scope)
+	public ServiceQuery<T> setScope(String scope)
 	{
 		this.scope = scope;
+		return this;
 	}
 	
 	/**
@@ -314,10 +317,11 @@ public class ServiceQuery<T>
 	 *  Sets the service tags.
 	 *  @param servicetags The service tags. 
 	 */
-	public void setServiceTags(String[] servicetags)
+	public ServiceQuery<T> setServiceTags(String[] servicetags)
 	{
 		TagProperty.checkReservedTags(servicetags);
 		this.servicetags = servicetags;
+		return this;
 	}
 	
 	/**
@@ -326,9 +330,10 @@ public class ServiceQuery<T>
 	 *  
 	 *  todo: move or refactor to hide complexity!?
 	 */
-	public void setServiceTags(String[] servicetags, IExternalAccess component)
+	public ServiceQuery<T> setServiceTags(String[] servicetags, IExternalAccess component)
 	{
 		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags!=null ? servicetags.length : 0]);
+		return this;
 	}
 	
 	/**
@@ -362,9 +367,10 @@ public class ServiceQuery<T>
 	 *  Set the platform.
 	 *  @param platform The platform
 	 */
-	public void setPlatform(IComponentIdentifier platform)
+	public ServiceQuery<T> setPlatform(IComponentIdentifier platform)
 	{
 		this.platform = platform;
+		return this;
 	}
 	
 	/**
@@ -382,9 +388,10 @@ public class ServiceQuery<T>
 	 *
 	 *  @param serviceidentifier The service identifier.
 	 */
-	public void setServiceIdentifier(IServiceIdentifier serviceidentifier)
+	public ServiceQuery<T> setServiceIdentifier(IServiceIdentifier serviceidentifier)
 	{
 		this.serviceidentifier = serviceidentifier;
+		return this;
 	}
 
 	/**
@@ -400,9 +407,10 @@ public class ServiceQuery<T>
 	 *  Set the owner.
 	 *  @param owner The owner to set
 	 */
-	public void setOwner(IComponentIdentifier owner)
+	public ServiceQuery<T> setOwner(IComponentIdentifier owner)
 	{
 		this.owner = owner;
+		return this;
 	}
 	
 	/**
@@ -420,9 +428,10 @@ public class ServiceQuery<T>
 	 *  
 	 *  @param excludeowner True, if the services should be excluded.
 	 */
-	public void setExcludeOwner(boolean excludeowner)
+	public ServiceQuery<T> setExcludeOwner(boolean excludeowner)
 	{
 		this.excludeowner = excludeowner;
+		return this;
 	}
 	
 	/**
@@ -438,9 +447,10 @@ public class ServiceQuery<T>
 	 *  Set the id.
 	 *  @param id The id to set
 	 */
-	public void setId(String id)
+	public ServiceQuery<T> setId(String id)
 	{
 		this.id = id;
+		return this;
 	}
 	
 	/**
@@ -456,9 +466,10 @@ public class ServiceQuery<T>
 	 *  Set the multiple.
 	 *  @param multiple The multiple to set
 	 */
-	public void setMultiple(boolean multiple)
+	public ServiceQuery<T> setMultiple(boolean multiple)
 	{
 		this.multiple = multiple;
+		return this;
 	}
 
 	/**
@@ -511,11 +522,12 @@ public class ServiceQuery<T>
 	 *  @param key The key name.
 	 *  @param and True for and.
 	 */
-	public void setMatchingMode(String key, Boolean and)
+	public ServiceQuery<T> setMatchingMode(String key, Boolean and)
 	{
 		if(matchingmodes==null)
 			matchingmodes = new HashMap<String, Boolean>();
 		matchingmodes.put(key, and);
+		return this;
 	}
 	
 	
@@ -532,9 +544,10 @@ public class ServiceQuery<T>
 	 *  Set the unrestricted mode.
 	 *  @param unrestricted the unrestricted to set
 	 */
-	public void setUnrestricted(Boolean unrestricted)
+	public ServiceQuery<T> setUnrestricted(Boolean unrestricted)
 	{
 		this.unrestricted = unrestricted;
+		return this;
 	}
 
 	/**
@@ -640,9 +653,10 @@ public class ServiceQuery<T>
 	 *  Set the networknames.
 	 *  @param networknames The networknames to set
 	 */
-	public void setNetworkNames(String... networknames)
+	public ServiceQuery<T> setNetworkNames(String... networknames)
 	{
 		this.networknames = networknames;
+		return this;
 	}
 
 	/**
