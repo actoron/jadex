@@ -10,6 +10,7 @@ import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimer;
@@ -38,7 +39,9 @@ public class SRemoteClock
 	public static IFuture<Void>	setDilation(final double dilation, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		ServiceQuery<IClockService> query = new ServiceQuery<>(IClockService.class);
+		query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+		SServiceProvider.searchService(exta, query)
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -82,7 +85,9 @@ public class SRemoteClock
 	public static IFuture<Void>	setDelta(final long delta, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		ServiceQuery<IClockService> query = new ServiceQuery<>(IClockService.class);
+		query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+		SServiceProvider.searchService(exta, query)
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
