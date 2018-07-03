@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -29,7 +28,6 @@ import jadex.bridge.IPriorityComponentStep;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.SFuture;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
@@ -38,14 +36,12 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
@@ -63,7 +59,6 @@ import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
@@ -71,7 +66,6 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.functional.Consumer;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
@@ -79,8 +73,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -405,42 +397,29 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		if(delay>=0)
 		{
-			// External access because allowed to by called on non-component thread (cf. ExternalAccess.waitForDelay())
-			SServiceProvider.searchService(getComponent().getExternalAccess(), new ServiceQuery<>(IClockService.class))
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+			// OK to fetch sync even from external access because everything thread safe.
+			IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
+			ITimedObject	to	= new ITimedObject()
 			{
-				public void customResultAvailable(IClockService cs)
+				public void timeEventOccurred(long currenttime)
 				{
-					ITimedObject	to	= new ITimedObject()
-					{
-						public void timeEventOccurred(long currenttime)
-						{
-	//						System.out.println("step: "+step);
-							scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
-						}
-						
-						public String toString()
-						{
-							return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
-						}
-					};
-					if(realtime)
-					{
-						cs.createRealtimeTimer(delay, to);
-					}
-					else
-					{
-						cs.createTimer(delay, to);					
-					}
+//						System.out.println("step: "+step);
+					scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 				}
 				
-				@Override
-				public void exceptionOccurred(Exception exception)
+				public String toString()
 				{
-					// TODO: why soemtimes happens during shutdown!?
-					getComponent().getLogger().warning(SUtil.getExceptionStacktrace(exception));
+					return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
 				}
-			}));
+			};
+			if(realtime)
+			{
+				cs.createRealtimeTimer(delay, to);
+			}
+			else
+			{
+				cs.createTimer(delay, to);					
+			}
 		}
 		else
 		{
@@ -465,7 +444,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
 		ITimedObject	to	=  	new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
@@ -525,7 +504,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //	{
 //		final Future<ITimer> ret = new Future<ITimer>();
 //		
-//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
 //		ITimedObject	to	=  	new ITimedObject()
 //		{
 //			public void timeEventOccurred(long currenttime)
@@ -554,7 +533,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -586,7 +565,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -624,7 +603,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Add to parent and wake up parent.
 			if(parenta==null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+				// Todo w/o proxy???
+				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
 				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
@@ -656,8 +637,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
-			IExecutionService exe = ServiceRegistry.getRegistry(component).searchService(query);
+			IExecutionService exe = getRawService(new ServiceQuery<>(IExecutionService.class));
 			// Hack!!! service is foudn before it is started, grrr.
 			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
@@ -1215,7 +1195,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(breakpoint_triggered)
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService	cms	= getRawService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.suspendComponent(getComponent().getComponentDescription().getName());
 		}
 		
@@ -1400,57 +1380,46 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
-											SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-												.addResultListener(new IResultListener<IExecutionService>()
+											IExecutionService	exe	= getRawService(new ServiceQuery<>(IExecutionService.class));
+											// Hack!!! service is foudn before it is started, grrr.
+											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 											{
-												public void resultAvailable(IExecutionService exe)
+												if(bootstrap)
 												{
-													// Hack!!! service is foudn before it is started, grrr.
-													if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-													{
-														if(bootstrap)
-														{
-															// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-															available	= true;
-														}
-														else
-														{
-															exe.execute(ExecutionComponentFeature.this);
-														}
-													}
-													else
-													{
-														exceptionOccurred(null);
-													}
+													// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+													available	= true;
 												}
-												
-												public void exceptionOccurred(Exception exception)
+												else
 												{
-													// Happens during platform bootstrapping -> execute on platform rescue thread.
-													if(!bootstrap)
+													exe.execute(ExecutionComponentFeature.this);
+												}
+											}
+											else
+											{
+												// Happens during platform bootstrapping -> execute on platform rescue thread.
+												if(!bootstrap)
+												{
+													bootstrap	= true;
+													Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
 													{
-														bootstrap	= true;
-														Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+														public void run()
 														{
-															public void run()
+															boolean	again	= true;
+															while(!available && again)
 															{
-																boolean	again	= true;
-																while(!available && again)
-																{
-																	again	= execute();
-																}
-																bootstrap	= false;
-																
-																if(again)
-																{					
-																	// Bootstrapping finished -> do real kickoff
-																	wakeup();
-																}
+																again	= execute();
 															}
-														});
-													}
+															bootstrap	= false;
+															
+															if(again)
+															{					
+																// Bootstrapping finished -> do real kickoff
+																wakeup();
+															}
+														}
+													});
 												}
-											});
+											}
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
@@ -2204,5 +2173,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public String toString()
 	{
 		return "ExecutionFeature("+getComponent().getComponentIdentifier()+")";
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get a service raw (i.e. w/o required proxy).
+	 */
+	protected <T>	T	getRawService(ServiceQuery<T> query)
+	{
+		@SuppressWarnings("unchecked")
+		T	ret	= (T)ServiceRegistry.getRegistry(getComponent())
+			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
+		return ret;
 	}
 }
