@@ -37,6 +37,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -277,8 +278,10 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		platform	= Starter.createPlatform(conf, args).get();
 //		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
-		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		ILibraryService libsrv	= SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		ServiceQuery<IComponentManagementService> cmsquery = new ServiceQuery<>(IComponentManagementService.class);
+		IComponentManagementService cms = SServiceProvider.searchService(platform, cmsquery).get();
+		ServiceQuery<ILibraryService> lsquery = new ServiceQuery<>(ILibraryService.class);
+		ILibraryService libsrv	= SServiceProvider.searchService(platform, lsquery).get();
 
 		// Only works with x-rids hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
