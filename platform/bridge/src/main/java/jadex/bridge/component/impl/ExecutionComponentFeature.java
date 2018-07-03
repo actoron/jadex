@@ -43,7 +43,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -398,7 +397,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(delay>=0)
 		{
 			// OK to fetch sync even from external access because everything thread safe.
-			IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
+			IClockService	cs	= getRawService(IClockService.class);
 			ITimedObject	to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -444,7 +443,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
+		IClockService	cs	= getRawService(IClockService.class);
 		ITimedObject	to	=  	new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
@@ -533,7 +532,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
+		IClockService	cs	= getRawService(IClockService.class);
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -565,7 +564,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
+		IClockService	cs	= getRawService(IClockService.class);
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -637,7 +636,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			IExecutionService exe = getRawService(new ServiceQuery<>(IExecutionService.class));
+			IExecutionService exe = getRawService(IExecutionService.class);
 			// Hack!!! service is foudn before it is started, grrr.
 			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
@@ -1195,7 +1194,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(breakpoint_triggered)
 		{
-			IComponentManagementService	cms	= getRawService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService	cms	= getRawService(IComponentManagementService.class);
 			cms.suspendComponent(getComponent().getComponentDescription().getName());
 		}
 		
@@ -1380,7 +1379,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
-											IExecutionService	exe	= getRawService(new ServiceQuery<>(IExecutionService.class));
+											IExecutionService	exe	= getRawService(IExecutionService.class);
 											// Hack!!! service is foudn before it is started, grrr.
 											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 											{
@@ -2173,18 +2172,5 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public String toString()
 	{
 		return "ExecutionFeature("+getComponent().getComponentIdentifier()+")";
-	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Get a service raw (i.e. w/o required proxy).
-	 */
-	protected <T>	T	getRawService(ServiceQuery<T> query)
-	{
-		@SuppressWarnings("unchecked")
-		T	ret	= (T)ServiceRegistry.getRegistry(getComponent())
-			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
-		return ret;
 	}
 }

@@ -34,9 +34,7 @@ import jadex.bridge.component.streams.InputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.component.streams.StreamPacket;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -455,7 +453,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected Collection<ITransportService> getAllTransports()
 	{
-		return SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+		return getRawServices(ITransportService.class);
 	}
 	
 	/**
@@ -787,7 +785,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	protected ISecurityService getSecurityService()
 	{
 		if (secservice == null)
-			secservice = SServiceProvider.getLocalService(component, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+			secservice = getRawService(ISecurityService.class);
 		return secservice;
 	}
 	

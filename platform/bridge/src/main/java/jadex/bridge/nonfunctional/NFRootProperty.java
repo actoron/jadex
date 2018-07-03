@@ -3,7 +3,9 @@ package jadex.bridge.nonfunctional;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -54,7 +56,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 			this.injected = true;
 			
 			// Add property to root component
-			IComponentManagementService cms = SServiceProvider.getLocalService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService cms = comp.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess root)

@@ -19,8 +19,8 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -131,30 +131,19 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		
 		final Future<Void> res = new Future<Void>();
 		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(res)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				// NOTE: in current implementation application waits for subcomponents
-				// to be finished and cms implements a hack to get the external
-				// access of an uninited parent.
-				
-				// (NOTE1: parent cannot wait for subcomponents to be all created
-				// before setting itself inited=true, because subcomponents need
-				// the parent external access.)
-				
-				// (NOTE2: subcomponents must be created one by one as they
-				// might depend on each other (e.g. bdi factory must be there for jcc)).
-				
-				createComponent(components, cms, component.getModel(), 0, res, cids);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				super.exceptionOccurred(exception);
-			}
-		}));
+		IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		// NOTE: in current implementation application waits for subcomponents
+		// to be finished and cms implements a hack to get the external
+		// access of an uninited parent.
+		
+		// (NOTE1: parent cannot wait for subcomponents to be all created
+		// before setting itself inited=true, because subcomponents need
+		// the parent external access.)
+		
+		// (NOTE2: subcomponents must be created one by one as they
+		// might depend on each other (e.g. bdi factory must be there for jcc)).
+		
+		createComponent(components, cms, component.getModel(), 0, res, cids);
 		
 		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
 		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
@@ -414,7 +403,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 					Future<Void>	ret	= new Future<Void>();
 					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 					{
-						long time = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+						long time = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
 							MonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), time, PublishEventLevel.COARSE);
 						me.setProperty("details", desc);

@@ -4,9 +4,8 @@ import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -84,8 +83,9 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+		IMonitoringComponentFeature	feat	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
+		
+		if(feat!=null && feat.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 		{
 			// Hack, necessary because getService() is not a service call and the first contained
 			// service call (getChildren) will reset the call context afterwards :-(
@@ -103,7 +103,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 			
 	//		if(context.getMethod().getName().indexOf("log")!=-1)
 	//			System.out.println("log");
-			IMonitoringService monser = SServiceProvider.getLocalService0(getComponent(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, false);
+			IMonitoringService monser = ((AbstractComponentFeature)feat).getRawService(IMonitoringService.class);
 			if(monser!=null)
 			{
 				long start = System.currentTimeMillis();
@@ -215,8 +215,9 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
-			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class)!=null 
-				&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+			IMonitoringComponentFeature	feat	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
+			
+			if(feat!=null && feat.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 			{
 				// Hack, necessary because getService() is not a service call and the first contained
 				// service call (getChildren) will reset the call context afterwards :-(
@@ -229,7 +230,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 //				sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
 //				CallAccess.setCurrentInvocation(sc); 
 	
-				IMonitoringService monser = SServiceProvider.getLocalService0(getComponent(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, false);
+				IMonitoringService monser = ((AbstractComponentFeature)feat).getRawService(IMonitoringService.class);
 				if(monser!=null)
 				{
 					long end = System.currentTimeMillis();

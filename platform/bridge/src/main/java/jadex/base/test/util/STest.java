@@ -6,7 +6,9 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
@@ -64,16 +66,7 @@ public class STest {
 
     public static IComponentManagementService getCMS(IExternalAccess platform) 
     {
-        IFuture<IComponentManagementService> fut = platform.scheduleStep(new IComponentStep<IComponentManagementService>() {
-            @Override
-            public IFuture<IComponentManagementService> execute(IInternalAccess ia) 
-            {
-                IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class);
-                return new Future<IComponentManagementService>(cms);
-            }
-        });
-        IComponentManagementService cms = fut.get();
-        return cms;
+        return SServiceProvider.searchService(platform, new ServiceQuery<>(IComponentManagementService.class)).get();
     }
 
     public static void terminatePlatform(IExternalAccess platform) 
