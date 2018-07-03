@@ -235,6 +235,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 				lock.unlock();
 		}
+		
+		proxyrwlock.writeLock().lock();
+		try
+		{
+			localserviceproxies.remove(service);
+		}
+		finally
+		{
+			proxyrwlock.writeLock().unlock();
+		}
 	}
 	
 	/**
@@ -244,11 +254,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void removeServices(IComponentIdentifier platform)
 	{
+		Set<IServiceIdentifier> pservs = null;
+		
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try
 		{
-			Set<IServiceIdentifier> pservs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
+			pservs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
 			if(pservs != null)
 			{
 				for(IServiceIdentifier serv : pservs)
@@ -272,6 +284,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			lock.unlock();
 		}
+		
+		if (pservs != null && pservs.size() > 0)
+		{
+			proxyrwlock.writeLock().lock();
+			try
+			{
+				for (IServiceIdentifier serv : pservs)
+					localserviceproxies.remove(serv);
+			}
+			finally
+			{
+				proxyrwlock.writeLock().unlock();
+			}
+		}
 	}
 	
 	/**
@@ -279,7 +305,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param platform The platform.
 	 */
 	// write
-	public void removeServicesExcept(IComponentIdentifier platform)
+	/*public void removeServicesExcept(IComponentIdentifier platform)
 	{
 		Lock lock = rwlock.writeLock();
 		lock.lock();
@@ -315,7 +341,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			lock.unlock();
 		}
-	}
+	}*/
 	
 	/** 
 	 *  Returns the service proxy of a local service identified by service ID.

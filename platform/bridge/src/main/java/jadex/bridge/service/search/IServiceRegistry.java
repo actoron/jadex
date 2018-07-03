@@ -57,7 +57,7 @@ public interface IServiceRegistry
 	 *  @param platform The platform.
 	 */
 	// write
-	public void removeServicesExcept(IComponentIdentifier platform);
+	//public void removeServicesExcept(IComponentIdentifier platform);
 	
 	/**
 	 *  Add a service query to the registry.
