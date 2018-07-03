@@ -26,9 +26,11 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -655,83 +657,77 @@ public class Starter
 		
 		if(components!=null && i<components.size())
 		{
-			SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			IComponentManagementService cms = instance.getComponentFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
+			String name	= null;
+			String config	= null;
+			String args = null;
+			String comp	= components.get(i);
+			Map<String, Object> oargs = null;
+			
+			// check if name:type are both present (to not find last : check that no ( before)
+			int	i1	= comp.indexOf(':');
+			int i11 = comp.indexOf('(');
+			if(i1!=-1 && (i11==-1 || i11>i1))
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				name	= comp.substring(0, i1);
+				comp	= comp.substring(i1+1);
+			}
+			
+			// check if (config:args) part is present
+			int	i2	= comp.indexOf('(');
+			if(i2!=-1)
+			{
+				// must end with )
+				// must have : if both are presents otherwise all is configname
+				if(!comp.endsWith(")"))
 				{
-					String name	= null;
-					String config	= null;
-					String args = null;
-					String comp	= components.get(i);
-					Map<String, Object> oargs = null;
-					
-					// check if name:type are both present (to not find last : check that no ( before)
-					int	i1	= comp.indexOf(':');
-					int i11 = comp.indexOf('(');
-					if(i1!=-1 && (i11==-1 || i11>i1))
-					{
-						name	= comp.substring(0, i1);
-						comp	= comp.substring(i1+1);
-					}
-					
-					// check if (config:args) part is present
-					int	i2	= comp.indexOf('(');
-					if(i2!=-1)
-					{
-						// must end with )
-						// must have : if both are presents otherwise all is configname
-						if(!comp.endsWith(")"))
-						{
-							throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)[:<args>]]) : "+components.get(i));
-						}
+					throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)[:<args>]]) : "+components.get(i));
+				}
 
-						int i3 = comp.indexOf(":");
-						if(i3!=-1)
-						{
-							if(comp.length()-i3>1)
-								args = comp.substring(i3+1, comp.length()-1);
-							if(i3-i2>1)
-								config	= comp.substring(i2+1, i3-1);
-						}
-						else
-						{
-							config = comp.substring(i2+1, comp.length()-1);
-						}
-						
-						comp = comp.substring(0, i2);	
-					}
-//					System.out.println("comp: "+comp+" config: "+config+" args: "+args);
-					
-					if(args!=null)
+				int i3 = comp.indexOf(":");
+				if(i3!=-1)
+				{
+					if(comp.length()-i3>1)
+						args = comp.substring(i3+1, comp.length()-1);
+					if(i3-i2>1)
+						config	= comp.substring(i2+1, i3-1);
+				}
+				else
+				{
+					config = comp.substring(i2+1, comp.length()-1);
+				}
+				
+				comp = comp.substring(0, i2);	
+			}
+//			System.out.println("comp: "+comp+" config: "+config+" args: "+args);
+			
+			if(args!=null)
+			{
+				try
+				{
+//					args = args.replace("\\\"", "\"");
+					Object o = SJavaParser.evaluateExpression(args, null);
+					if(!(o instanceof Map))
 					{
-						try
-						{
-//							args = args.replace("\\\"", "\"");
-							Object o = SJavaParser.evaluateExpression(args, null);
-							if(!(o instanceof Map))
-							{
-								throw new RuntimeException("Arguments must evaluate to Map<String, Object>"+args);
-							}
-							oargs = (Map<String, Object>)o;
-						}
-						catch(Exception e)
-						{
-//							System.out.println("args: "+args);
-//							e.printStackTrace();
-							throw new RuntimeException("Arguments evaluation error: "+e);
-						}
+						throw new RuntimeException("Arguments must evaluate to Map<String, Object>"+args);
 					}
-					
-					cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
-							startComponents(i+1, components, instance)
-								.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-					});
+					oargs = (Map<String, Object>)o;
+				}
+				catch(Exception e)
+				{
+//					System.out.println("args: "+args);
+//					e.printStackTrace();
+					throw new RuntimeException("Arguments evaluation error: "+e);
+				}
+			}
+			
+			cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			{
+				public void customResultAvailable(IComponentIdentifier result)
+				{
+					startComponents(i+1, components, instance)
+						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -876,7 +872,45 @@ public class Starter
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		SServiceProvider.getService(remote, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+		SServiceProvider.searchService(remote, query).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
+			{
+				remotetas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
+					{
+						ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+						SServiceProvider.searchService(local, query).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						{
+							public void customResultAvailable(ITransportAddressService localtas) throws Exception
+							{
+								localtas.addManualAddresses(remoteaddrs).addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(ret)
+								{
+									public void customResultAvailable(Void result) throws Exception
+									{
+										ServiceQuery<IComponentManagementService> query = (new ServiceQuery<>(IComponentManagementService.class)).setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+										SServiceProvider.searchService(local, query)
+											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+										{
+											public void customResultAvailable(final IComponentManagementService localcms)
+											{
+												Map<String, Object>	args = new HashMap<String, Object>();
+												args.put("component", remote.getComponentIdentifier().getRoot());
+												CreationInfo ci = new CreationInfo(args);
+												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+											}
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		/*SServiceProvider.getService(remote, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
@@ -910,7 +944,7 @@ public class Starter
 					}
 				});
 			}
-		});
+		});*/
 
 		// Add remote addresses to local address book
 //		TransportAddressBook	tab1	= TransportAddressBook.getAddressBook(local.getComponentIdentifier());
