@@ -39,6 +39,14 @@ public interface IServiceRegistry
 	public void addLocalService(IService service);
 	
 	/**
+	 *  Updates a service if the service meta-information
+	 *  has changes.
+	 *  
+	 *  @param service The service.
+	 */
+	public void updateService(IServiceIdentifier service);
+	
+	/**
 	 *  Remove a service from the registry.
 	 *  @param service The service.
 	 */

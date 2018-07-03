@@ -212,6 +212,26 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Updates a service if the service meta-information
+	 *  has changes.
+	 *  
+	 *  @param service The service.
+	 */
+	public void updateService(IServiceIdentifier service)
+	{
+		rwlock.writeLock().lock();
+		try
+		{
+			indexer.removeValue(service);
+			indexer.addValue(service);
+		}
+		finally
+		{
+			rwlock.writeLock().unlock();
+		}
+	}
+	
+	/**
 	 *  Remove a service from the registry.
 	 *  @param sid The service id.
 	 */
