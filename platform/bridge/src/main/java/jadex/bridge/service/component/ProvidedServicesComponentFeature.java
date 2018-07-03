@@ -33,8 +33,8 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -478,7 +478,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			
 			if (pi.isMulti())
 			{
-				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IIntermediateResultListener<IPublishService>()
+				getComponent().getComponentFeature(IRequiredServicesFeature.class)
+					.searchServices(new ServiceQuery<>(IPublishService.class, pi.getPublishScope()))
+					.addResultListener(new IIntermediateResultListener<IPublishService>()
 				{
 					/** Flag if published at least once. */
 					protected boolean published = false;
@@ -635,7 +637,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, scope, null);
+			IFuture<Collection<IPublishService>> fut = instance.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IPublishService.class, scope));
 			fut.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
 				@Override
@@ -1118,7 +1120,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		}
 		else
 		{
-			ILibraryService ls = SServiceProvider.getLocalService(getComponent(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ILibraryService ls = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 			ls.getClassLoader(sid.getResourceIdentifier())
 				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class<?>>(ret)
 			{

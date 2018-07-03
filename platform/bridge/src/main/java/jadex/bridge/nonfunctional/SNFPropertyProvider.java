@@ -8,8 +8,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -193,7 +193,8 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getNFPropertyNames(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -225,7 +226,7 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getNFAllPropertyNames(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -258,7 +259,7 @@ public class SNFPropertyProvider
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, INFPropertyMetaInfo>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -303,7 +304,7 @@ public class SNFPropertyProvider
 	public static IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, INFPropertyMetaInfo>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -337,7 +338,7 @@ public class SNFPropertyProvider
 	public static <T> IFuture<T> getNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
 		final Future<T> ret = new Future<T>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -373,7 +374,7 @@ public class SNFPropertyProvider
 	public static <T, U> IFuture<T> getNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final String name, final U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -405,7 +406,7 @@ public class SNFPropertyProvider
 	public static IFuture<Void> addNFProperty(IExternalAccess component, final IServiceIdentifier sid, final INFProperty<?, ?> nfprop)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -437,7 +438,7 @@ public class SNFPropertyProvider
 	public static IFuture<Void> removeNFProperty(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -468,7 +469,7 @@ public class SNFPropertyProvider
 	public static IFuture<Void> shutdownNFPropertyProvider(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -502,7 +503,7 @@ public class SNFPropertyProvider
 	public static IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> getMethodNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> ret = new Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -535,7 +536,7 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getMethodNFPropertyNames(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -568,7 +569,7 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getMethodNFAllPropertyNames(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -600,7 +601,7 @@ public class SNFPropertyProvider
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getMethodNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, INFPropertyMetaInfo>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -634,7 +635,7 @@ public class SNFPropertyProvider
 	public static IFuture<INFPropertyMetaInfo> getMethodNFPropertyMetaInfo(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, INFPropertyMetaInfo>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -669,7 +670,7 @@ public class SNFPropertyProvider
 	public static <T> IFuture<T> getMethodNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
 		final Future<T> ret = new Future<T>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -720,7 +721,7 @@ public class SNFPropertyProvider
 	public static <T, U> IFuture<T> getMethodNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name, final U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -753,7 +754,7 @@ public class SNFPropertyProvider
 	public static IFuture<Void> addMethodNFProperty(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final INFProperty<?, ?> nfprop)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -786,7 +787,7 @@ public class SNFPropertyProvider
 	public static IFuture<Void> removeMethodNFProperty(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

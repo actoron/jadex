@@ -108,16 +108,16 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype)
 	{
-		this(servicetype, null, null, null);
+		this(servicetype, null);
 	}
-//	
-//	/**
-//	 *  Create a new service query.
-//	 */
-//	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-//	{
-//		this(new ClassInfo(servicetype), scope, filter, provider, owner);
-//	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope)
+	{
+		this(servicetype, scope, null, null);
+	}
 //	
 //	/**
 //	 *  Create a new service query.

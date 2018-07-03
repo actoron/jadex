@@ -872,8 +872,7 @@ public class Starter
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-		SServiceProvider.searchService(remote, query).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		SServiceProvider.searchService(remote, new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
@@ -881,8 +880,7 @@ public class Starter
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-						SServiceProvider.searchService(local, query).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						SServiceProvider.searchService(local, new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
@@ -890,8 +888,7 @@ public class Starter
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										ServiceQuery<IComponentManagementService> query = (new ServiceQuery<>(IComponentManagementService.class)).setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-										SServiceProvider.searchService(local, query)
+										SServiceProvider.searchService(local, new ServiceQuery<>(IComponentManagementService.class))
 											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)

@@ -34,13 +34,13 @@ import jadex.bridge.component.impl.PropertiesComponentFeature;
 import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.component.impl.SubcomponentsComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -368,7 +368,7 @@ public class SComponentFactory
 		
 //				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
-				SServiceProvider.getServices(ea, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchServices(ea, new ServiceQuery<>(IComponentFactory.class))
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
@@ -590,48 +590,30 @@ public class SComponentFactory
 			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future<Object> ret = new Future<Object>();
-				SServiceProvider.getServices(ia, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Object>(ret)
+				Collection<IComponentFactory> result	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+				boolean found = false;
+				if(result!=null)
 				{
-					public void customResultAvailable(Collection<IComponentFactory> result)
+					for(Iterator<IComponentFactory> it=result.iterator(); it.hasNext() && !found; )
 					{
-						boolean found = false;
-						if(result!=null)
+						IComponentFactory fac = (IComponentFactory)it.next();
+						if(SUtil.arrayToSet(fac.getComponentTypes()).contains(type))
 						{
-							for(Iterator<IComponentFactory> it=result.iterator(); it.hasNext() && !found; )
+							Map<String, Object> res = fac.getProperties(type);
+							if(res!=null && res.containsKey(key))
 							{
-								IComponentFactory fac = (IComponentFactory)it.next();
-								if(SUtil.arrayToSet(fac.getComponentTypes()).contains(type))
-								{
-									Map<String, Object> res = fac.getProperties(type);
-									if(res!=null && res.containsKey(key))
-									{
-										ret.setResult(res.get(key));
-										found = true;
-									}
-								}
+								ret.setResult(res.get(key));
+								found = true;
 							}
-							if(!found)
-								ret.setResult(null);
-						}
-						else
-						{
-							ret.setResult(null);
 						}
 					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
-						{
-							ret.setResult(null);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
-					}
-				});
+					if(!found)
+						ret.setResult(null);
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 				return ret;
 			}
 		}).addResultListener(new DelegationResultListener<Object>(ret));
@@ -652,35 +634,29 @@ public class SComponentFactory
 			public IFuture<String> execute(final IInternalAccess ia)
 			{
 				final Future<String> ret = new Future<String>();
-				SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ILibraryService, String>(ret)
-				{
-					public void customResultAvailable(ILibraryService ls)
-					{
+				ILibraryService ls = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 //						IFuture<IComponentFactory> fut = SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
 //							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid));
 //						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
-						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-						fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
+				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+				fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
+				{
+					public void customResultAvailable(IComponentFactory fac)
+					{
+						fac.getComponentType(model, null, rid)
+							.addResultListener(new DelegationResultListener<String>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
 						{
-							public void customResultAvailable(IComponentFactory fac)
-							{
-								fac.getComponentType(model, null, rid)
-									.addResultListener(new DelegationResultListener<String>(ret));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ServiceNotFoundException)
-								{
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						}));
+							ret.setResult(null);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
 					}
 				}));
 				return ret;
@@ -695,29 +671,48 @@ public class SComponentFactory
 	 */
 	protected static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
-		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		Collection<IComponentFactory> facs = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
 		
-		IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(ia, 
-			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, filter);
+		facs = excludeMultiFactory(facs);
 		
-		fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
+		if(facs!=null && facs.size()>0)
 		{
-			public void customResultAvailable(Collection<IComponentFactory> facs)
+			return filterFactory(filter, facs.iterator());
+		}
+		else
+		{
+			return new Future<IComponentFactory>(new ServiceNotFoundException(""+filter));
+		}
+	}
+	
+	protected static IFuture<IComponentFactory>	filterFactory(FactoryFilter filter, Iterator<IComponentFactory> it)
+	{
+		if(it.hasNext())
+		{
+			IComponentFactory	fac	= it.next();
+			Future<IComponentFactory>	ret	= new Future<>();
+			filter.filter(fac).addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
 			{
-				facs = excludeMultiFactory(facs);
-				
-				if(facs!=null && facs.size()>0)
+				@Override
+				public void customResultAvailable(Boolean result) throws Exception
 				{
-					ret.setResult(facs.iterator().next());
+					if(result)
+					{
+						ret.setResult(fac);
+					}
+					else
+					{
+						filterFactory(filter, it).addResultListener(new DelegationResultListener<>(ret));
+					}
 				}
-				else
-				{
-					ret.setException(new ServiceNotFoundException(""+filter));
-				}
-			}
-		}));
-		
-		return ret;
+			});
+			
+			return ret;
+		}
+		else
+		{
+			return new Future<IComponentFactory>(new ServiceNotFoundException(""+filter));			
+		}
 	}
 	
 	/**

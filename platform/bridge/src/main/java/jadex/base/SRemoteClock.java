@@ -39,9 +39,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDilation(final double dilation, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		ServiceQuery<IClockService> query = new ServiceQuery<>(IClockService.class);
-		query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-		SServiceProvider.searchService(exta, query)
+		SServiceProvider.searchService(exta, new ServiceQuery<>(IClockService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -85,9 +83,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDelta(final long delta, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		ServiceQuery<IClockService> query = new ServiceQuery<>(IClockService.class);
-		query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-		SServiceProvider.searchService(exta, query)
+		SServiceProvider.searchService(exta, new ServiceQuery<>(IClockService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)

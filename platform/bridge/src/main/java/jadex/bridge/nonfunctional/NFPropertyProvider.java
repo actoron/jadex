@@ -10,8 +10,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -74,7 +74,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		
 		if(getParentId()!=null)
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess component) 
@@ -178,7 +178,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 				{
 					public void customResultAvailable(IExternalAccess component) 
@@ -223,7 +223,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getParentId()).addResultListener(new ComponentResultListener<IExternalAccess>(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess pacomponent) 
@@ -271,7 +271,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getInternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess component) 
