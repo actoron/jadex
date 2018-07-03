@@ -102,6 +102,14 @@ public interface IServiceRegistry
 	// read
 	//public boolean isIncluded(IComponentIdentifier cid, IServiceIdentifier ser);
 	
+	/** 
+	 *  Returns the service proxy of a local service identified by service ID.
+	 *  
+	 *  @param serviceid The service ID.
+	 *  @return The service proxy.
+	 */
+	public IService getLocalService(IServiceIdentifier serviceid);
+	
 	/**
 	 *  Get all services.
 	 *  @return All services (copy).

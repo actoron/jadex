@@ -46,6 +46,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/** The excluded services cache. */
 	protected Map<IComponentIdentifier, Set<IServiceIdentifier>> excludedservices;
 	
+	/** Read-Write Lock for proxy map. */
+	protected ReadWriteLock proxyrwlock;
+	
 	/** Map for looking up local services using the service identifier. */
 	protected BiHashMap<IServiceIdentifier, IService> localserviceproxies;
 	
@@ -57,6 +60,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public ServiceRegistry()
 	{
 		this.rwlock = new ReentrantReadWriteLock(false);
+		this.proxyrwlock = new ReentrantReadWriteLock(false);
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
 		this.localserviceproxies = new BiHashMap<>();
@@ -194,9 +198,15 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public void addLocalService(IService service)
 	{
 		// TODO: Optimize write lock acquisition (done twice for local service)
-		rwlock.writeLock().lock();
-		localserviceproxies.put(service.getServiceIdentifier(), service);
-		rwlock.writeLock().unlock();
+		proxyrwlock.writeLock().lock();
+		try
+		{
+			localserviceproxies.put(service.getServiceIdentifier(), service);
+		}
+		finally
+		{
+			proxyrwlock.writeLock().unlock();
+		}
 		
 		addService(service.getServiceIdentifier());
 	}
@@ -305,6 +315,27 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			lock.unlock();
 		}
+	}
+	
+	/** 
+	 *  Returns the service proxy of a local service identified by service ID.
+	 *  
+	 *  @param serviceid The service ID.
+	 *  @return The service proxy.
+	 */
+	public IService getLocalService(IServiceIdentifier serviceid)
+	{
+		IService ret = null;
+		proxyrwlock.readLock().lock();
+		try
+		{
+			ret = localserviceproxies.get(serviceid);
+		}
+		finally
+		{
+			proxyrwlock.readLock().unlock();
+		}
+		return ret;
 	}
 	
 	/**
