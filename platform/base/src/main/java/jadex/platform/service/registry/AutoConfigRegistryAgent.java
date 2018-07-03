@@ -63,7 +63,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	@AgentArgument
 	protected long checkdelay = 3000;
 	
-	/** Minimum number of sps .*/
+	// Support 
+	/** Minimum number of superpeers (sps) .*/
 	@AgentArgument
 	protected int min_sps = 2;
 	
@@ -73,7 +74,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	
 	/** Repeat search until action.*/
 	@AgentArgument
-	protected int rep = 3;
+	protected int max_rep = 3;
 	
 	/**
 	 *  The agent body.
@@ -81,14 +82,21 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	@AgentBody
 	public void body()
 	{
-		searchForSuperpeers(new ArrayList<Integer>(), new ArrayList<Integer>());
+		// todo: do not run periodically
+		searchForSuperpeers(new ResultCountTracker());
 	}
 	
 	/**
-	 * 
+	 *  Search for superpeers.
 	 */
-	protected void searchForSuperpeers(final List<Integer> foundless, final List<Integer> foundmore)
+	protected void searchForSuperpeers(final ResultCountTracker tracker)
 	{
+		// todo: use confsps = sps - autoconfigs
+		//       use confpeers = autoconig - sps
+		// todo: use networks of services for selecting networks
+		// todo: use networks as part of power calculation (the more networks the better)
+		
+		// todo: use normal searchServices() - internally should find out that it has to use addAll
 		ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
 			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
 		
@@ -121,174 +129,157 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			{
 				int foundcnt = sps.size();
 				
-				System.out.println("found: "+foundcnt+" "+foundless+" "+foundmore);
+				System.out.println("found: "+foundcnt+" "+tracker);
 				
-				if(foundcnt<min_sps)
+				Counting c = tracker.addResultCount(foundcnt);
+				
+				// When too less are found search a peer is searched and promoted to superpeer
+				if(c==Counting.TOO_LESS)
 				{
-					foundmore.clear();
-					foundless.add(foundcnt);
-					
-					if(foundless.size()>rep)
+					findPeers().addResultListener(new IResultListener<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>()
 					{
-						findPeers().addResultListener(new IResultListener<Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>()
+						public void resultAvailable(Set<Tuple2<IPeerRegistrySynchronizationService, Double>> peers)
 						{
-							public void resultAvailable(Set<Tuple2<IPeerRegistrySynchronizationService, Double>> peers)
+							// make the winner to a SP
+							Tuple2<IPeerRegistrySynchronizationService, Double> winner = peers.iterator().next();
+							System.out.println("new superpeer: "+winner);
+							makeSuperpeer(winner.getFirstEntity()==null? agent.getComponentIdentifier(): 
+								((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
+								.addResultListener(new IResultListener<Void>()
 							{
-								// make the winner to a SP
-								Tuple2<IPeerRegistrySynchronizationService, Double> winner = peers.iterator().next();
-								System.out.println("new superpeer: "+winner);
-								makeSuperpeer(winner.getFirstEntity()==null? agent.getComponentIdentifier(): 
-									((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
+								public void resultAvailable(Void result)
+								{
+									searchAfterDelay(tracker);
+								}
+
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									searchAfterDelay(tracker);
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							searchAfterDelay(tracker);
+						}
+					});
+					
+				}
+				// When too many are found degrade the worst superpeer
+				else if(c==Counting.TOO_MANY)
+				{
+					// ask sps for power value
+					final Set<Tuple2<ISuperpeerRegistrySynchronizationService, Double>> superpeers  
+						 = new TreeSet<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>(new Comparator<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>()
+					{
+						public int compare(Tuple2<ISuperpeerRegistrySynchronizationService, Double> o1, Tuple2<ISuperpeerRegistrySynchronizationService, Double> o2)
+						{
+							return (int)((o1.getSecondEntity()-o2.getSecondEntity())*100);
+						}
+					});
+				
+					FutureBarrier<Double> fb = new FutureBarrier<Double>();
+					for(ISuperpeerRegistrySynchronizationService sp: sps)
+					{
+						Future<Double> fut = computePower(((IService)sp).getServiceIdentifier().getProviderId().getRoot());
+						fb.addFuture(fut);
+					}
+					
+					fb.waitForResults().addResultListener(new IResultListener<Collection<Double>>()
+					{
+						public void resultAvailable(Collection<Double> result)
+						{
+							Iterator<Double> it = result.iterator();
+							for(ISuperpeerRegistrySynchronizationService sp: sps)
+							{
+								superpeers.add(new Tuple2<ISuperpeerRegistrySynchronizationService, Double>(sp, it.next()));
+							}
+							
+							if(isSuperpeer())
+							{
+								computePower(agent.getComponentIdentifier().getRoot()).addResultListener(new IResultListener<Double>()
+								{
+									public void resultAvailable(Double result)
+									{
+										superpeers.add(new Tuple2<ISuperpeerRegistrySynchronizationService, Double>(null, result));
+										proceed();
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										searchAfterDelay(tracker);
+									}
+								});
+							}
+							else
+							{
+								proceed();
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							searchAfterDelay(tracker);
+						}
+						
+						protected void proceed()
+						{
+							if(superpeers.size()>0)
+							{
+								// make the loser to normal peer
+								Tuple2<ISuperpeerRegistrySynchronizationService, Double> loser = ((TreeSet<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>)superpeers).last();
+								System.out.println("new downgraded peer (from sp): "+loser);
+								makeClient(loser.getFirstEntity()==null? agent.getComponentIdentifier(): 
+									((IService)loser.getFirstEntity()).getServiceIdentifier().getProviderId())
 									.addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
 									{
-										searchAfterDelay(foundless, foundmore);
+										searchAfterDelay(tracker);
 									}
 
 									public void exceptionOccurred(Exception exception)
 									{
-										exception.printStackTrace();
-										searchAfterDelay(foundless, foundmore);
+										searchAfterDelay(tracker);
 									}
 								});
 							}
-							
-							public void exceptionOccurred(Exception exception)
+							else
 							{
-								searchAfterDelay(foundless, foundmore);
+								searchAfterDelay(tracker);
 							}
-						});
-					}
-					else
-					{
-						searchAfterDelay(foundless, foundmore);
-					}
-				}
-				else if(foundcnt>max_sps)
-				{
-					foundless.clear();
-					foundmore.add(foundcnt);
-					
-					if(foundmore.size()>rep)
-					{
-						// ask sps for power value
-						final Set<Tuple2<ISuperpeerRegistrySynchronizationService, Double>> superpeers  
-							 = new TreeSet<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>(new Comparator<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>()
-						{
-							public int compare(Tuple2<ISuperpeerRegistrySynchronizationService, Double> o1, Tuple2<ISuperpeerRegistrySynchronizationService, Double> o2)
-							{
-								return (int)((o1.getSecondEntity()-o2.getSecondEntity())*100);
-							}
-						});
-					
-						FutureBarrier<Double> fb = new FutureBarrier<Double>();
-						for(ISuperpeerRegistrySynchronizationService sp: sps)
-						{
-							Future<Double> fut = computePower(((IService)sp).getServiceIdentifier().getProviderId().getRoot());
-							fb.addFuture(fut);
 						}
-						
-						fb.waitForResults().addResultListener(new IResultListener<Collection<Double>>()
-						{
-							public void resultAvailable(Collection<Double> result)
-							{
-								Iterator<Double> it = result.iterator();
-								for(ISuperpeerRegistrySynchronizationService sp: sps)
-								{
-									superpeers.add(new Tuple2<ISuperpeerRegistrySynchronizationService, Double>(sp, it.next()));
-								}
-								
-								if(isSuperpeer())
-								{
-									computePower(agent.getComponentIdentifier().getRoot()).addResultListener(new IResultListener<Double>()
-									{
-										public void resultAvailable(Double result)
-										{
-											superpeers.add(new Tuple2<ISuperpeerRegistrySynchronizationService, Double>(null, result));
-											proceed();
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											searchAfterDelay(foundless, foundmore);
-										}
-									});
-								}
-								else
-								{
-									proceed();
-								}
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								searchAfterDelay(foundless, foundmore);
-							}
-							
-							protected void proceed()
-							{
-								if(superpeers.size()>0)
-								{
-									// make the loser to normal peer
-									Tuple2<ISuperpeerRegistrySynchronizationService, Double> loser = ((TreeSet<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>)superpeers).last();
-									System.out.println("new downgraded peer (from sp): "+loser);
-									makeClient(loser.getFirstEntity()==null? agent.getComponentIdentifier(): 
-										((IService)loser.getFirstEntity()).getServiceIdentifier().getProviderId())
-										.addResultListener(new IResultListener<Void>()
-									{
-										public void resultAvailable(Void result)
-										{
-											searchAfterDelay(foundless, foundmore);
-										}
-	
-										public void exceptionOccurred(Exception exception)
-										{
-											searchAfterDelay(foundless, foundmore);
-										}
-									});
-								}
-								else
-								{
-									searchAfterDelay(foundless, foundmore);
-								}
-							}
-						});
-					}
-					else
-					{
-						searchAfterDelay(foundless, foundmore);
-					}
+					});
 				}
 				else
 				{
-					foundless.clear();
-					foundmore.clear();
-					
 					// found at least one SP -> wait before checking again
-					searchAfterDelay(foundless, foundmore);
+					searchAfterDelay(tracker);
 				}
 			}
 		});
 	}
 	
+	
 	/**
-	 * 
+	 *  Initiate a search after a delay.
 	 */
-	protected void searchAfterDelay(final List<Integer> foundless, final List<Integer> foundmore)
+	protected void searchAfterDelay(final ResultCountTracker tracker)
 	{
 		System.out.println("search after delay: "+checkdelay);
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(checkdelay).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				searchForSuperpeers(foundless, foundmore);
+				searchForSuperpeers(tracker);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				agent.getLogger().warning(exception.getMessage());
-				searchForSuperpeers(foundless, foundmore);
+				searchForSuperpeers(tracker);
 			}
 		});
 	}
@@ -454,7 +445,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	}
 	
 	/**
-	 * 
+	 *  Fetch power values from a host.
 	 */
 	protected IFuture<Number[]> fetchPowerValues(IComponentIdentifier cid)
 	{
@@ -670,5 +661,72 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		{
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Enum as result type for counting.
+	 */
+	public enum Counting
+	{
+		TOO_LESS,
+		TOO_MANY,
+		OK
+	}
+	
+	/**
+	 *  Helper class for tracking the results and deciding 
+	 *  if too_less or many superpeers have been found.
+	 */
+	public class ResultCountTracker
+	{
+		/** The number of results in each round. */
+		protected List<Integer> resultcounts;
+	
+		/** Counts how ofter more superpeers than necessary. */
+		protected int foundmore;
+
+		/** Counts how ofter less superpeers than necessary. */
+		protected int foundless;
+		
+		/**
+		 *  Add a result count.
+		 */
+		protected Counting addResultCount(int cnt)
+		{
+			Counting ret = Counting.OK;
+			
+			if(resultcounts==null)
+				resultcounts = new ArrayList<>();
+			resultcounts.add(cnt);
+			
+			if(resultcounts.size()>10)
+				resultcounts.remove(0);
+			
+			if(cnt<min_sps)
+			{
+				foundmore = 0;
+				foundless++;
+				if(foundless>max_rep)
+					ret = Counting.TOO_LESS;
+					
+			}
+			else if(cnt>max_sps)
+			{
+				foundless = 0;
+				foundmore++;
+				if(foundmore>max_rep)
+					ret = Counting.TOO_MANY;
+			}
+			
+			return ret;
+		}
+
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return "ResultCountTracker [resultcounts=" + resultcounts + ", foundmore=" + foundmore + ", foundless=" + foundless + "]";
+		}
 	}
 }
