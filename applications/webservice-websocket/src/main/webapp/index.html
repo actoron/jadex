@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=UTF-8>
+        <script src="wswebapi/jadex.js"></script>
+        
+        <script type="text/javascript">
+            var SCOPE_PLATFORM = jadex.Scopes.SCOPE_PLATFORM;
+            var SCOPE_GLOBAL = jadex.Scopes.SCOPE_GLOBAL;
+            var SCOPE_SESSION = jadex.Scopes.SCOPE_SESSION;
+            var jadex = new jadex.Jadex();
+
+	        /*var service;
+        	jadex.getService("com.actoron.webservice.IWebsocketTestService").then(function(ser) 
+        	{ 
+        		service = ser;
+        	});*/
+        
+        	var serclazz = "com.actoron.webservice.IWebsocketTestService";
+        	
+        	function sayHelloTo(name)
+        	{
+        		jadex.getService(serclazz, SCOPE_PLATFORM)
+	   				.then(function(service) 
+	   			{
+	       			service.sayHelloTo(!name? "Lars": name)
+			  			.then(function(hello)
+			  		{
+			  			alert(hello);	
+			  		})
+			  			.catch(function(err) 
+	       	       	{
+	       				alert(JSON.stringify(err));
+	       	       	});
+	   			})
+       			.catch(function(err) 
+       			{
+       				console.log(err);
+       		  		//alert('Error', JSON.stringify(err));
+       			});
+        	}
+        	
+        	function add(a, b)
+        	{
+        		jadex.getService(serclazz)
+	   				.then(function(service) 
+	   			{
+	       			service.add(a, b)
+			  			.then(function(result)
+			  		{
+			  			alert(result);	
+			  		})
+			  			.catch(function(err) 
+	       	       	{
+	       				alert(JSON.stringify(err));
+	       	       	});
+	   			})
+       			.catch(function(err) 
+       			{
+       				console.log(err);
+       		  		//alert('Error', JSON.stringify(err));
+       			});
+        	}
+        	
+        	function produceException()
+        	{
+        		jadex.getService(serclazz)
+	   				.then(function(service) 
+	   			{
+	   				service.produceException()
+			  			.then(function(result)
+			  		{
+			  			alert("Should not produce result: "+result);	
+			  		})
+	       				.catch(function(err) 
+	       	       	{
+	       				alert(JSON.stringify(err));
+	       	       	});
+	   			})
+       			.catch(function(err) 
+       			{
+       				console.log(err);
+       		  		//alert('Error', JSON.stringify(err));
+       			});
+        	}
+        	
+        	// Testing future terminate
+       		function count(cnt)
+           	{
+           		jadex.getService(serclazz)
+   	   				.then(function(service) 
+   	   			{
+   	   				var prom = service.count(cnt, 3000, function(result)
+ 	 	       		{
+ 	 	       			//alert(result);
+ 	 	       			console.log(result);
+ 	 	       				
+ 	 	       			if(result==2)
+ 	 	       				prom.terminate();
+ 	 	       		});
+ 	 	       	       	
+ 	 	       		prom.then(function(res)
+ 	    			{
+ 	    				//alert(res);	
+ 	    			  	console.log(res);
+ 	    			})
+ 	    				.catch(function(err) 
+ 	    	       	{
+ 	    				console.log(err);
+ 	    	       		//alert(JSON.stringify(err));
+ 	    	       	});
+	   	   		})
+	   			.catch(function(err) 
+	   			{
+	   				console.log(err);
+	   		  		//alert('Error', JSON.stringify(err));
+	   			});
+           	}
+       		
+       		function pullResult(cnt)
+           	{
+           		jadex.getService(serclazz)
+   	   				.then(function(service) 
+   	   			{
+   	   				//var cnt = 5;	
+   	   					
+   	   				var prom = service.pull(cnt, function(result)
+ 	 	       		{
+ 	 	       			//alert(result);
+ 	 	       			console.log(result);
+ 	 	       		});
+ 	 	       	   
+   	   				var i = 0;
+   	   				var delay = 1000;
+   	   				var pu = function()
+   	   				{
+   	   					if(i++<cnt)
+   	   					{
+   	   						//console.log("Pulling next: "+i);
+   	   						prom.pull();
+   	   						setTimeout(pu, delay);
+   	   					}
+   	   				};
+   	   				setTimeout(pu, delay);
+   	   				
+ 	 	       		prom.then(function(res)
+ 	    			{
+ 	    				//alert(res);	
+ 	    			  	console.log(res);
+ 	    			})
+ 	    				.catch(function(err) 
+ 	    	       	{
+ 	    				console.log(err);
+ 	    	       		//alert(JSON.stringify(err));
+ 	    	       	});
+	   	   		})
+	   			.catch(function(err) 
+	   			{
+	   				console.log(err);
+	   		  		//alert('Error', JSON.stringify(err));
+	   			});
+           	}
+       		
+       		function sayHelloToAll(name)
+        	{
+        		jadex.getServices(serclazz, function(service) 
+	   			{
+	       			service.sayHelloTo(!name? "Lars": name)
+			  			.then(function(hello)
+			  		{
+			  			alert(hello);	
+			  		})
+			  			.catch(function(err) 
+	       	       	{
+	       				alert(JSON.stringify(err));
+	       	       	});
+	   			})
+	   			.then(function (res)
+	   			{
+        			console.log(res);
+	   			})
+       			.catch(function(err) 
+       			{
+       				console.log(err);
+       		  		//alert('Error', JSON.stringify(err));
+       			});
+        	}
+        </script>
+    </head>
+    
+    <body>
+        <h1>Jadex Call Test</h1>
+        
+        <input type="text" id="name" value="Lars"></input>
+        <button onclick="sayHelloTo(document.getElementById('name').value)">Call sayHelloTo()</button>
+        <br/><br/>
+ 
+        <input type="text" id="a" value="1"></input>
+        <input type="text" id="b" value="4"></input>
+        <button onclick="add(document.getElementById('a').value,document.getElementById('b').value)">Call add()</button>
+        <br/><br/>
+        
+        <button onclick="produceException()">Call produceException()</button>
+        <br/><br/>
+        
+        <input type="text" id="max1" value="4"></input>
+        <input type="text" id="delay" value="2000"></input>
+        <button onclick="count(document.getElementById('max1').value, document.getElementById('delay').value)">Call count()</button>
+        <br/><br/>
+        
+        <input type="text" id="max2" value="6"></input>
+        <button onclick="pullResult(document.getElementById('max2').value)">Call pullResult()</button>
+        <br/><br/>
+        
+        <button onclick="sayHelloToAll('Lars')">Call sayHelloTo() on all components</button>
+    </body>
+</html>

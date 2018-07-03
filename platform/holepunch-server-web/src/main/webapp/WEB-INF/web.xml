@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>actoron-holepunch-server-web</display-name>
+  <servlet>
+    <servlet-name>HolepunchServlet</servlet-name>
+    <servlet-class>com.actoron.udp.holepunching.server.web.HpServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<description>
+  	</description>
+  	<display-name>HpServlet</display-name>
+  	<servlet-name>HpServlet</servlet-name>
+  	<servlet-class>com.actoron.udp.holepunching.server.web.HpServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>HpServlet</servlet-name>
+  	<url-pattern>/HpServlet</url-pattern>
+  </servlet-mapping>
+  <listener>
+  	<listener-class>
+  		com.actoron.udp.holepunching.server.web.HpServletContextListener
+  	</listener-class>
+  </listener>
+</web-app>

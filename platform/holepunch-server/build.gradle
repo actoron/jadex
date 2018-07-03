@@ -1,0 +1,20 @@
+apply plugin: 'java'
+
+repositories
+{
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies
+{
+}
+
+jar
+{
+	manifest
+	{
+		attributes 'Main-Class': 'org.activecomponents.udp.holepunching.server.Server'
+	}
+}
+
