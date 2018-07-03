@@ -3,8 +3,8 @@ package jadex.bridge.service.search;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
@@ -29,7 +29,14 @@ public interface IServiceRegistry
 	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(IServiceIdentifier service);
+	public void addService(IServiceIdentifier service);
+	
+	/**
+	 *  Add a local service to the registry.
+	 *  @param service The local service.
+	 */
+	// write
+	public void addLocalService(IService service);
 	
 	/**
 	 *  Remove a service from the registry.

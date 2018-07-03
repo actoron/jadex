@@ -6,6 +6,7 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.ServiceQuery;
@@ -49,30 +50,13 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 *  @param query The search query.
 	 *  @return The first matching service or null if not found.
 	 */
-	public <T> IFuture<T> searchService(ServiceQuery<T> query)
+	public IFuture<IServiceIdentifier> searchService(ServiceQuery<?> query)
 	{
-		T ret = null;
+		IServiceIdentifier ret = null;
 		boolean localowner = query.getOwner().getRoot().equals(platformid);
 		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
 		{
-			@SuppressWarnings("unchecked")
-			Set<T> indexerresults = (Set<T>) serviceregistry.getServicesFromIndexer(query);
-			if (localowner)
-			{
-				for (T ser : indexerresults)
-				{
-					if (serviceregistry.checkScope(ser, query.getOwner(), query.getScope()))
-					{
-						ret = ser;
-						break;
-					}
-				}
-				
-			}
-			else if (indexerresults.size() > 0)
-			{
-				ret = indexerresults.iterator().next();
-			}
+			ret = serviceregistry.searchService(query);
 		}
 		
 		return new Future<>(ret);
@@ -84,29 +68,15 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 *  @param query The search query.
 	 *  @return The matching services or empty set if none are found.
 	 */
-	public <T> IFuture<Set<T>> searchServices(ServiceQuery<T> query)
+	public IFuture<Set<IServiceIdentifier>> searchServices(ServiceQuery<?> query)
 	{
-		Set<T> ret = Collections.emptySet();
+		Set<IServiceIdentifier> ret = Collections.emptySet();
 		
 		boolean localowner = query.getOwner().getRoot().equals(platformid);
 		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
 		{
-			@SuppressWarnings("unchecked")
-			Set<T> indexerresults = (Set<T>) serviceregistry.getServicesFromIndexer(query);
-			if (localowner)
-			{
-				ret = new HashSet<>();
-				for (T ser : indexerresults)
-				{
-					if (serviceregistry.checkScope(ser, query.getOwner(), query.getScope()))
-						ret.add(ser);
-				}
-			}
-			else
-			{
-				ret = indexerresults;
-			}
+			ret = serviceregistry.searchServices(query);
 		}
-		return new Future<Set<T>>(ret);
+		return new Future<>(ret);
 	}
 }

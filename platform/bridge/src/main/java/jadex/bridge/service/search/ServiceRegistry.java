@@ -1,5 +1,6 @@
 package jadex.bridge.service.search;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,8 +13,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.collection.BiHashMap;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -43,6 +46,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/** The excluded services cache. */
 	protected Map<IComponentIdentifier, Set<IServiceIdentifier>> excludedservices;
 	
+	/** Map for looking up local services using the service identifier. */
+	protected BiHashMap<IServiceIdentifier, IService> localserviceproxies;
+	
 	//-------- methods --------
 	
 	/**
@@ -53,6 +59,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		this.rwlock = new ReentrantReadWriteLock(false);
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
+		this.localserviceproxies = new BiHashMap<>();
 	}
 	
 	/**
@@ -102,7 +109,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public Set<IServiceIdentifier> searchServices(ServiceQuery<?> query)
 	{
-		Set<IServiceIdentifier> ret = null;
+		Set<IServiceIdentifier> ret = Collections.emptySet();
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
 			ret = getServices(query);
@@ -140,9 +147,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(IServiceIdentifier service)
+	public void addService(IServiceIdentifier service)
 	{
-		IFuture<Void> ret = null;
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try
@@ -165,10 +171,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			else
 			{
-				lock.unlock();
-				lock = null;
+				// Downgrade to read lock.
+				lock = rwlock.readLock();
+				lock.lock();
+				rwlock.writeLock().unlock();
 				
-				ret = checkQueries(service, ServiceEvent.SERVICE_ADDED);
+				checkQueries(service, ServiceEvent.SERVICE_ADDED);
 			}
 		}
 		finally
@@ -176,8 +184,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			if(lock != null)
 				lock.unlock();
 		}
+	}
+	
+	/**
+	 *  Add a local service to the registry.
+	 *  @param service The local service.
+	 */
+	// write
+	public void addLocalService(IService service)
+	{
+		// TODO: Optimize write lock acquisition (done twice for local service)
+		rwlock.writeLock().lock();
+		localserviceproxies.put(service.getServiceIdentifier(), service);
+		rwlock.writeLock().unlock();
 		
-		return ret == null ? IFuture.DONE : ret;
+		addService(service.getServiceIdentifier());
 	}
 	
 	/**

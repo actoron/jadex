@@ -283,7 +283,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
 		
-		ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service.getServiceIdentifier());
+		ServiceRegistry.getRegistry(component.getComponentIdentifier()).addLocalService(service);
 //		return bar.waitFor();
 	}
 	
