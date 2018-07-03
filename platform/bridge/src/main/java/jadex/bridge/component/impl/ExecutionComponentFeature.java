@@ -42,6 +42,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
@@ -405,7 +406,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(delay>=0)
 		{
 			// External access because allowed to by called on non-component thread (cf. ExternalAccess.waitForDelay())
-			SServiceProvider.getService(getComponent().getExternalAccess(), IClockService.class)
+			SServiceProvider.searchService(getComponent().getExternalAccess(), new ServiceQuery<>(IClockService.class))
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 			{
 				public void customResultAvailable(IClockService cs)
@@ -464,61 +465,55 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+		IClockService	cs	= getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		ITimedObject	to	=  	new ITimedObject()
 		{
-			public void customResultAvailable(IClockService cs)
+			public void timeEventOccurred(long currenttime)
 			{
-				ITimedObject	to	=  	new ITimedObject()
+				scheduleStep(new IComponentStep<Void>()
 				{
-					public void timeEventOccurred(long currenttime)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								ret.setResult(null);
-								return IFuture.DONE;
-							}
-							
-							public String toString()
-							{
-								return "waitForDelay("+getComponent().getComponentIdentifier()+")";
-							}
-						}).addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// Ignore outdated timer entries when component is already dead.
-								// propblem this can occur on clock thread
-//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
-//								{
-									ret.setExceptionIfUndone(exception);									
-//								}
-							}
-						});
+						ret.setResult(null);
+						return IFuture.DONE;
 					}
 					
 					public String toString()
 					{
 						return "waitForDelay("+getComponent().getComponentIdentifier()+")";
 					}
-				};
-				
-				if(realtime)
+				}).addResultListener(new IResultListener<Void>()
 				{
-					cs.createRealtimeTimer(delay, to);
-				}
-				else
-				{
-					cs.createTimer(delay, to);
-				}
+					public void resultAvailable(Void result)
+					{
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Ignore outdated timer entries when component is already dead.
+						// propblem this can occur on clock thread
+//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
+//								{
+							ret.setExceptionIfUndone(exception);									
+//								}
+					}
+				});
 			}
-		}));
+			
+			public String toString()
+			{
+				return "waitForDelay("+getComponent().getComponentIdentifier()+")";
+			}
+		};
+		
+		if(realtime)
+		{
+			cs.createRealtimeTimer(delay, to);
+		}
+		else
+		{
+			cs.createTimer(delay, to);
+		}
 		
 		return ret;
 	}
@@ -559,7 +554,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{

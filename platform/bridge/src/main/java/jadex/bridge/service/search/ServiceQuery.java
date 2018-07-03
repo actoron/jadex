@@ -103,13 +103,13 @@ public class ServiceQuery<T>
 //		this(servicetype, scope, (IFilter<T>) null, provider, owner);
 //	}
 //	
-//	/**
-//	 *  Create a new service query.
-//	 */
-//	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
-//	{
-//		this(servicetype, scope, (IFilter<T>) null, provider, owner);
-//	}
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype)
+	{
+		this(servicetype, null, null, null);
+	}
 //	
 //	/**
 //	 *  Create a new service query.

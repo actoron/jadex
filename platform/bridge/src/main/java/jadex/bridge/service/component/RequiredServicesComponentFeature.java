@@ -436,6 +436,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			return new Future<T>(new ComponentTerminatedException(id));
 //		}
 		
+		// Set owner if not yet set
+		if(query.getOwner()==null)
+		{
+			query.setOwner(getComponent().getComponentIdentifier());
+		}
+		
 		// When service not declared (i.e. search) -> create matching info from query.
 		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
 		
@@ -467,6 +473,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			return new Future<T>(new ComponentTerminatedException(id));
 //		}
 
+		// Set owner if not yet set
+		if(query.getOwner()==null)
+		{
+			query.setOwner(getComponent().getComponentIdentifier());
+		}
+		
 		// When service not declared (i.e. search) -> create matching info from query.
 		info	= info!=null ? info : createServiceInfo(query);
 		
@@ -489,6 +501,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //		{
 //			return new Future<T>(new ComponentTerminatedException(id));
 //		}
+		
+		// Set owner if not yet set
+		if(query.getOwner()==null)
+		{
+			query.setOwner(getComponent().getComponentIdentifier());
+		}
 		
 		// When service not declared (i.e. search) -> create matching info from query.
 		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
@@ -524,6 +542,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			return new Future<T>(new ComponentTerminatedException(id));
 //		}
 
+		// Set owner if not yet set
+		if(query.getOwner()==null)
+		{
+			query.setOwner(getComponent().getComponentIdentifier());
+		}
+		
 		// When service not declared (i.e. search) -> create matching info from query.
 		info	= info!=null ? info : createServiceInfo(query);
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
