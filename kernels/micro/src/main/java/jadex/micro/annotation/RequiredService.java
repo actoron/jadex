@@ -39,10 +39,11 @@ public @interface RequiredService
 	 */
 	public Binding binding() default @Binding();
 	
-	/**
-	 *  The multiplex type.
-	 */
-	public Class<?> multiplextype() default Object.class;
+//	/**
+//	 *  The multiplex type.
+//	 */
+//	public Class<?> multiplextype() default Object.class;
+	// Dropped support for v4
 
 	/**
 	 *  The required service non functional properties.

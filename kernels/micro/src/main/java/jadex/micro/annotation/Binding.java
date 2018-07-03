@@ -103,34 +103,37 @@ public @interface Binding
 //	 */
 //	public String creationtype() default "";
 	
-	/**
-	 *  The creation info (cannot use @Component as no cycles are allowed in annotations). 
-	 */
-	public CreationInfo creationinfo() default @CreationInfo;
+//	/**
+//	 *  The creation info (cannot use @Component as no cycles are allowed in annotations). 
+//	 */
+//	public CreationInfo creationinfo() default @CreationInfo;
+	// Dropped support for v4
 	
 	/**
 	 *  The search scope.
 	 */
 	public String scope() default "";//RequiredServiceInfo.SCOPE_APPLICATION;
 
-	/**
-	 *  The dynamic binding flag.
-	 */
-	public boolean dynamic() default false;
+//	/**
+//	 *  The dynamic binding flag.
+//	 */
+//	public boolean dynamic() default false;
+	// Dropped support for v4
 
-	/**
-	 *  The create component flag.
-	 */
-	public boolean create() default false;
+//	/**
+//	 *  The create component flag.
+//	 */
+//	public boolean create() default false;
+	// Dropped support for v4
 	
-	/**
-	 *  The error recover flag.
-	 */
-	public boolean recover() default false;
+//	/**
+//	 *  The error recover flag.
+//	 */
+//	public boolean recover() default false;
+	// Dropped support for v4
 	
 	/**
 	 *  The interceptors.
 	 */
-	public Value[] interceptors() default {};
-	
+	public Value[] interceptors() default {};	
 }

@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -74,8 +73,8 @@ import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentResult;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
@@ -761,7 +760,7 @@ public class MicroClassReader
 								RequiredServiceBinding binding = createBinding(reqs[j].binding());
 								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-									Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops, Arrays.asList(reqs[j].tags()));
+									binding, nfprops, Arrays.asList(reqs[j].tags()));
 		//						configinfo.setRequiredServices(rsis);
 								configinfo.addRequiredService(rsi);
 							}
@@ -945,7 +944,7 @@ public class MicroClassReader
 					if(iftype==null || Object.class.equals(iftype))
 						throw new RuntimeException("No service interface found for service query");
 					
-					RequiredServiceInfo rsi = new RequiredServiceInfo(name, iftype, asq.scope(), null);
+					RequiredServiceInfo rsi = new RequiredServiceInfo(name, iftype, asq.scope());
 					rsi.setMultiple(asq.multiple());
 					mi.addRequiredService(rsi);
 					
@@ -1168,7 +1167,7 @@ public class MicroClassReader
 		}
 		
 		RequiredServiceInfo rsis = new RequiredServiceInfo(rs.name(), rs.type(), 
-			rs.multiple(), Object.class.equals(rs.multiplextype())? null: rs.multiplextype(), binding, nfprops, Arrays.asList(rs.tags()));
+			rs.multiple(), binding, nfprops, Arrays.asList(rs.tags()));
 		
 		return rsis;
 	}
@@ -1727,8 +1726,8 @@ public class MicroClassReader
 	{
 		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-			bd.dynamic(), bd.scope().length()==0? null: bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
-			bd.proxytype(), bd.creationinfo().type().length()>0? createComponentInstanceInfo(bd.creationinfo()): null);
+			bd.scope().length()==0? null: bd.scope(), createUnparsedExpressions(bd.interceptors()),
+			bd.proxytype());
 	}
 	
 	/**

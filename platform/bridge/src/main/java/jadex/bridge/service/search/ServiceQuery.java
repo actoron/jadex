@@ -214,9 +214,9 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this(servicetype, scope, provider, owner, filter, servicetype);
+		this(servicetype, scope, provider, owner, null, servicetype);
 	}
 	
 	/**

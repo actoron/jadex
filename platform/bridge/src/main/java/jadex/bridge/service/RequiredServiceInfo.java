@@ -1,13 +1,13 @@
 package jadex.bridge.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *  Struct for information about a required service.
@@ -76,8 +76,9 @@ public class RequiredServiceInfo
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
 	
-	/** The multiplex type. */
-	protected ClassInfo multiplextype;
+//	/** The multiplex type. */
+//	protected ClassInfo multiplextype;
+	// Dropped support for v4
 
 	// binding specification
 	
@@ -110,7 +111,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class<?> type)
 	{
-		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION, null);
+		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION);
 	}
 	
 	/**
@@ -118,39 +119,36 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(Class<?> type)
 	{
-		this(null, type, RequiredServiceInfo.SCOPE_APPLICATION, null);
+		this(null, type, RequiredServiceInfo.SCOPE_APPLICATION);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<?> type, String scope, Class<?> multiplextype)
+	public RequiredServiceInfo(String name, Class<?> type, String scope)
 	{
-		this(name, type, false, multiplextype, new RequiredServiceBinding(name, scope), null, null);
+		this(name, type, false, new RequiredServiceBinding(name, scope), null, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
 	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
-		Class<?> multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
+		RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
 		this(name, type!=null ? new ClassInfo(SReflect.getClassName(type)) : null,
-			multiple,
-			multiplextype!=null ? new ClassInfo(SReflect.getClassName(multiplextype)) : null,
-			binding, nfprops, tags);
+			multiple, binding, nfprops, tags);
 	}
 
 	/**
 	 *  Create a new service info.
 	 */
 	public RequiredServiceInfo(String name, ClassInfo type, boolean multiple, 
-		ClassInfo multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
+		RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
 		this.name = name;
 		this.type	= type;
 		this.multiple = multiple;
-		this.multiplextype	= multiplextype;
 		this.binding = binding;
 		this.nfproperties = nfprops;
 		this.tags = tags;
@@ -194,24 +192,6 @@ public class RequiredServiceInfo
 		this.type = type;
 	}
 	
-	/**
-	 *  Get the multiplextype.
-	 *  @return The multiplextype.
-	 */
-	public ClassInfo getMultiplexType()
-	{
-		return multiplextype;
-	}
-
-	/**
-	 *  Set the multiplextype.
-	 *  @param multiplextype The multiplextype to set.
-	 */
-	public void setMultiplexType(ClassInfo multiplextype)
-	{
-		this.multiplextype = multiplextype;
-	}
-
 	/**
 	 *  Get the multiple.
 	 *  @return the multiple.
@@ -323,5 +303,4 @@ public class RequiredServiceInfo
 		return SCOPE_NONE.equals(scope) || SCOPE_LOCAL.equals(scope) || SCOPE_COMPONENT.equals(scope)
 			|| SCOPE_APPLICATION.equals(scope) || SCOPE_PLATFORM.equals(scope) || SCOPE_PARENT.equals(scope);
 	}
-	
 }

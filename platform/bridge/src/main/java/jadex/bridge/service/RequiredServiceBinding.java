@@ -26,26 +26,20 @@ public class RequiredServiceBinding
 	/** Information about the component to create. */
 	protected ComponentInstanceInfo creationinfo;
 	
-//	/** The component creation name. */
-//	protected String creationname;
-
-//	/** The component creation type. */
-//	protected String creationtype;
-	
-	/** The component filename. */
-//	protected String componentfilename;
-	
-	/** Flag if binding is dynamic. */
-	protected boolean dynamic;
+	// Decided to drop caching support for v4
+//	/** Flag if binding is dynamic. */
+//	protected boolean dynamic;
 
 	/** The search scope. */
 	protected String scope;
 	
-	/** The create flag. */
-	protected boolean create;
+//	/** The create flag. */
+//	protected boolean create;
+	// Dropped support for v4
 	
-	/** The recover flag. */
-	protected boolean recover;
+//	/** The recover flag. */
+//	protected boolean recover;
+	// Dropped support for v4
 	
 	/** The interceptors. */
 	protected List<UnparsedExpression> interceptors;
@@ -67,36 +61,21 @@ public class RequiredServiceBinding
 	 */
 	public RequiredServiceBinding(String name, String scope)
 	{
-		this(name, scope, false);
-	}
-	
-	/**
-	 *  Create a new binding. 
-	 */
-	public RequiredServiceBinding(String name, String scope, boolean dynamic)
-	{
-		this(name, null, null, dynamic, scope, false, false, null, 
-			BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null);
+		this(name, null, null,
+			scope, null, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 	}
 
 	/**
 	 *  Create a new binding.
 	 */
-	public RequiredServiceBinding(String name, String componentname,
-		String componenttype, boolean dynamic, String scope, boolean create, boolean recover,
-		UnparsedExpression[] interceptors, String proxytype, ComponentInstanceInfo component)//String creationtype, String creationname)
+	public RequiredServiceBinding(String name, String componentname, String componenttype,
+		String scope, UnparsedExpression[] interceptors, String proxytype)
 	{
 		this.name = name;
 		this.componentname = componentname;
 		this.componenttype = componenttype;
-		this.dynamic = dynamic;
 		this.scope = scope;
-		this.create = create;
-		this.recover = recover;
 		this.proxytype = proxytype;
-		this.creationinfo = component;
-//		this.creationtype = creationtype;
-//		this.creationname = creationname;
 		if(interceptors!=null)
 		{
 			for(int i=0; i<interceptors.length; i++)
@@ -104,7 +83,6 @@ public class RequiredServiceBinding
 				addInterceptor(interceptors[i]);
 			}
 		}
-//		this.componentfilename = componentfilename;
 	}
 	
 	/**
@@ -113,8 +91,7 @@ public class RequiredServiceBinding
 	public RequiredServiceBinding(RequiredServiceBinding orig)
 	{
 		this(orig.getName(), orig.getComponentName(), orig.getComponentType(), 
-			orig.isDynamic(), orig.getScope(), orig.isCreate(), orig.isRecover(), 
-			orig.getInterceptors(), orig.getProxytype(), orig.getCreationInfo());//orig.getCreationType(), orig.getCreationName());
+			orig.getScope(), orig.getInterceptors(), orig.getProxytype());
 	}
 
 	//-------- methods --------
@@ -192,24 +169,6 @@ public class RequiredServiceBinding
 	}
 
 	/**
-	 *  Get the dynamic.
-	 *  @return the dynamic.
-	 */
-	public boolean isDynamic()
-	{
-		return dynamic;
-	}
-
-	/**
-	 *  Set the dynamic.
-	 *  @param dynamic The dynamic to set.
-	 */
-	public void setDynamic(boolean dynamic)
-	{
-		this.dynamic = dynamic;
-	}
-
-	/**
 	 *  Get the scope.
 	 *  @return the scope.
 	 */
@@ -225,42 +184,6 @@ public class RequiredServiceBinding
 	public void setScope(String scope)
 	{
 		this.scope = scope;
-	}
-
-	/**
-	 *  Get the create.
-	 *  @return The create.
-	 */
-	public boolean isCreate()
-	{
-		return create;
-	}
-
-	/**
-	 *  Set the create.
-	 *  @param create The create to set.
-	 */
-	public void setCreate(boolean create)
-	{
-		this.create = create;
-	}
-
-	/**
-	 *  Get the recover.
-	 *  @return The recover.
-	 */
-	public boolean isRecover()
-	{
-		return recover;
-	}
-
-	/**
-	 *  Set the recover.
-	 *  @param recover The recover to set.
-	 */
-	public void setRecover(boolean recover)
-	{
-		this.recover = recover;
 	}
 	
 	/**
@@ -352,10 +275,8 @@ public class RequiredServiceBinding
 	 */
 	public String toString()
 	{
-		return " scope=" + scope + ", dynamic="+ dynamic + ", create=" + create + ", recover=" 
-			+ recover+ ", componentname=" + componentname + ", componenttype="+ componenttype
-			+" , creationcomp="+creationinfo;//+" , creationname="+creationname;
-//			+" , creationtype="+creationtype+" , creationname="+creationname;
+		return " scope=" + scope + ", componentname=" + componentname
+			+ ", componenttype="+ componenttype	+" , creationcomp="+creationinfo;
 	}
 
 	
