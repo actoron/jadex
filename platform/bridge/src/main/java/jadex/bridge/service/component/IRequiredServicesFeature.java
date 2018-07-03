@@ -23,7 +23,7 @@ public interface IRequiredServicesFeature
 	public <T> IFuture<T> getService(String name);
 	
 	/**
-	 *  Resolve a required service of a given type.
+	 *  Resolve a declared required service of a given type.
 	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param type The service type.
 	 *  @return The service.
@@ -31,7 +31,7 @@ public interface IRequiredServicesFeature
 	public <T> IFuture<T> getService(Class<T> type);
 	
 	/**
-	 *  Resolve a required services of a given name.
+	 *  Resolve a declared required services of a given name.
 	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
@@ -39,7 +39,7 @@ public interface IRequiredServicesFeature
 	public <T> ITerminableIntermediateFuture<T> getServices(String name);
 	
 	/**
-	 *  Resolve a required services of a given type.
+	 *  Resolve a declared required services of a given type.
 	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param type The services type.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
@@ -55,7 +55,7 @@ public interface IRequiredServicesFeature
 	public <T> T getLocalService(String name);
 	
 	/**
-	 *  Resolve a required service of a given type.
+	 *  Resolve a declared required service of a given type.
 	 *  Synchronous method only for locally available services.
 	 *  @param type The service type.
 	 *  @return The service.
@@ -63,7 +63,7 @@ public interface IRequiredServicesFeature
 	public <T> T getLocalService(Class<T> type);
 	
 	/**
-	 *  Resolve a required services of a given name.
+	 *  Resolve a declared required services of a given name.
 	 *  Synchronous method only for locally available services.
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
@@ -71,7 +71,7 @@ public interface IRequiredServicesFeature
 	public <T> Collection<T> getLocalServices(String name);
 	
 	/**
-	 *  Resolve a required services of a given type.
+	 *  Resolve a declared required services of a given type.
 	 *  Synchronous method only for locally available services.
 	 *  @param type The services type.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
