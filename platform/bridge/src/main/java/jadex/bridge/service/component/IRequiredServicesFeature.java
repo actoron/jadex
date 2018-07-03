@@ -119,7 +119,7 @@ public interface IRequiredServicesFeature
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
-	
+
 //	//-------- old --------
 //	
 //	/**

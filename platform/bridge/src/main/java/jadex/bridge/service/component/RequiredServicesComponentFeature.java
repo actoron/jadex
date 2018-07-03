@@ -327,19 +327,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return new SubscriptionIntermediateFuture<>(new UnsupportedOperationException("TODO"));
 	}
 	
-	//-------- old --------
-	
-	/**
-	 *  Get a required service info.
-	 *  @return The required service info.
-	 */
-	public RequiredServiceInfo getRequiredServiceInfo(String name)
-	{
-//		if(shutdowned)
-//			throw new ComponentTerminatedException(id);
-
-		return requiredserviceinfos==null? null: (RequiredServiceInfo)requiredserviceinfos.get(name);
-	}
+	//-------- event interface --------
 	
 	/**
 	 *  Get the required services.
@@ -353,21 +341,6 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return requiredserviceinfos==null? new RequiredServiceInfo[0]: 
 			(RequiredServiceInfo[])requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
 	}
-	
-	/**
-	 *  Set the required services.
-	 *  @param required services The required services to set.
-	 */
-	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
-	{
-//		if(shutdowned)
-//			throw new ComponentTerminatedException(id);
-
-		this.requiredserviceinfos = null;
-		addRequiredServiceInfos(requiredservices);
-	}
-
-	//-------- event interface --------
 	
 	/**
 	 *  Listen to service call events (call, result and commands).

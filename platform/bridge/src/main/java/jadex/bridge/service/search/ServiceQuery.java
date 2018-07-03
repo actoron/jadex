@@ -349,9 +349,10 @@ public class ServiceQuery<T>
 	 *  Set the provider.
 	 *  @param provider The provider to set
 	 */
-	public void setProvider(IComponentIdentifier provider)
+	public ServiceQuery<T> setProvider(IComponentIdentifier provider)
 	{
 		this.provider = provider;
+		return this;
 	}
 	
 	/**
