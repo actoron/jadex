@@ -17,19 +17,19 @@ public interface IServiceRegistry
 	/**
 	 *  Search for a service.
 	 */
-	public <T> T searchService(ServiceQuery<T> query);
+	public IServiceIdentifier searchService(ServiceQuery<?> query);
 	
 	/**
 	 *  Search for services.
 	 */
-	public <T> Set<T> searchServices(ServiceQuery<T> query);
+	public Set<IServiceIdentifier> searchServices(ServiceQuery<?> query);
 	
 	/**
 	 *  Add a service to the registry.
 	 *  @param service The service.
 	 */
 	// write
-	public void addService(IServiceIdentifier service);
+	public IFuture<Void> addService(IServiceIdentifier service);
 	
 	/**
 	 *  Remove a service from the registry.
@@ -60,13 +60,6 @@ public interface IServiceRegistry
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
 	
 	/**
-	 *  Remove a service query from the registry.
-	 *  @param query ServiceQuery.
-	 */
-	// write
-	public <T> void removeQuery(ServiceQuery<T> query);
-	
-	/**
 	 *  Remove all service queries of a specific component from the registry.
 	 *  @param owner The query owner.
 	 */
@@ -78,7 +71,7 @@ public interface IServiceRegistry
 	 *  @param platform The platform from which the query owner comes.
 	 */
 	// write
-	public void removeQueriesFromPlatform(IComponentIdentifier platform);
+	public void removeQueriesOfPlatform(IComponentIdentifier platform);
 	
 	/**
 	 *  Add an excluded component. 
@@ -100,7 +93,7 @@ public interface IServiceRegistry
 	 *  @return True if is included.
 	 */
 	// read
-	public boolean isIncluded(IComponentIdentifier cid, IServiceIdentifier ser);
+	//public boolean isIncluded(IComponentIdentifier cid, IServiceIdentifier ser);
 	
 	/**
 	 *  Get all services.
@@ -112,5 +105,5 @@ public interface IServiceRegistry
 	 *  Get all queries.
 	 *  @return All queries (copy).
 	 */
-	public Set<ServiceQueryInfo<IServiceIdentifier>> getAllQueries();
+	public Set<ServiceQueryInfo<?>> getAllQueries();
 }

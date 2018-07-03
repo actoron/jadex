@@ -54,11 +54,6 @@ public class ServiceQuery<T>
 	/** Should the service be unrestricted. */
 	protected Boolean unrestricted;
 	
-	/** Filter for checking further service attributes. Either IAsyncFilter<T> or IFilter<T> .*/
-	// todo: should be removed or replaced with a more declarative variant
-	protected Object filter;
-	
-	
 	/** The search scope. */
 	protected String scope;
 	
@@ -197,32 +192,32 @@ public class ServiceQuery<T>
 	 *  Create a new service query.
 	 *  owner = startpoint
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this(servicetype, scope, provider, owner, filter, null);
+		this(servicetype, scope, provider, owner, null);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, Class<?> returntype)
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Class<?> returntype)
 	{
 		this(servicetype!=null? new ClassInfo(servicetype): null, scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope,
-			provider, owner, filter, returntype!=null? new ClassInfo(returntype): null);
+			provider, owner, returntype!=null? new ClassInfo(returntype): null);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
 	{
-		this(servicetype, scope, provider, owner, filter, servicetype);
+		this(servicetype, scope, provider, owner, servicetype);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Object filter, ClassInfo returntype)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, ClassInfo returntype)
 	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
@@ -231,7 +226,6 @@ public class ServiceQuery<T>
 		this.scope = scope;
 		this.provider = provider;
 		this.owner = owner;
-		this.filter = filter;
 		this.returntype = returntype;
 		
 		this.id = SUtil.createUniqueId();
@@ -248,7 +242,6 @@ public class ServiceQuery<T>
 		this.servicetype = original.servicetype;
 		this.scope = original.scope;
 		this.servicetags = original.servicetags;
-		this.filter = original.filter;
 		this.owner = original.owner;
 		this.id = original.id;
 		this.networknames = original.networknames;
@@ -310,42 +303,6 @@ public class ServiceQuery<T>
 	public void setScope(String scope)
 	{
 		this.scope = scope;
-	}
-	
-	/**
-	 *  Get the filter.
-	 *  @return The filter
-	 */
-	public Object getFilter()
-	{
-		return filter;
-	}
-	
-	/**
-	 *  Set the filter.
-	 *  @param filter The filter to set
-	 */
-	public void setFilter(Object filter)
-	{
-		this.filter = filter;
-	}
-	
-	/**
-	 *  Set the filter.
-	 *  @param filter The filter to set
-	 */
-	public <ST> void setSyncFilter(IFilter<ST> filter)
-	{
-		this.filter = filter;
-	}
-
-	/**
-	 *  Set the filter.
-	 *  @param filter The filter to set
-	 */
-	public <ST> void setAsyncFilter(IAsyncFilter<ST> filter)
-	{
-		this.filter = filter;
 	}
 	
 	/**
@@ -595,37 +552,6 @@ public class ServiceQuery<T>
 	}
 	
 	/**
-	 *  Tests if the query matches a service.
-	 *  
-	 *  @param service The service.
-	 *  @return True, if the service matches the keys.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected boolean matchesSync(IServiceIdentifier service)
-	{
-		return (matchesKeys(service) && ((IFilter) filter).filter(service));
-	}
-	
-	/**
-	 *  Tests if the query matches a service.
-	 *  
-	 *  @param service The service.
-	 *  @return True, if the service matches the keys.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected IFuture<Boolean> matchesAsync(IServiceIdentifier service)
-	{
-		IFuture<Boolean> ret = null;
-		if (matchesKeys(service))
-		{
-			ret = ((IAsyncFilter) filter).filter(service);
-		}
-		else
-			ret = new Future<Boolean>(false);
-		return ret;
-	}
-	
-	/**
 	 *  Tests if the query keys matches a service.
 	 *  
 	 *  @param service The service.
@@ -761,7 +687,7 @@ public class ServiceQuery<T>
 	public String toString()
 	{
 		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", provider=" + provider + ", platform=" + platform 
-			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", filter=" + filter + ", scope=" + scope + ", owner=" + owner
+			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", scope=" + scope + ", owner=" + owner
 			+ ", id=" + id + ")";
 	}
 }
