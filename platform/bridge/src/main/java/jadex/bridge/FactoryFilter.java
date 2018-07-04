@@ -14,7 +14,7 @@ import jadex.commons.future.IFuture;
  *  a) per model type (bdi, mirco, etc.)
  *  b) per model filename
  */
-public class FactoryFilter implements IAsyncFilter
+public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 {
 	//-------- attributes --------
 
@@ -60,27 +60,20 @@ public class FactoryFilter implements IAsyncFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public IFuture<Boolean> filter(Object obj)
+	public IFuture<Boolean> filter(IComponentFactory obj)
 	{
 		Future<Boolean> ret =  new Future<Boolean>();
 		
-		if(obj instanceof IComponentFactory)
+		IComponentFactory fac = (IComponentFactory)obj;
+		
+		if(type!=null)
 		{
-			IComponentFactory fac = (IComponentFactory)obj;
-			
-			if(type!=null)
-			{
-				ret.setResult(Arrays.asList(fac.getComponentTypes()).contains(type));
-			}
-			else
-			{
-				fac.isLoadable(model, imports, rid)
-					.addResultListener(new DelegationResultListener<Boolean>(ret));
-			}
+			ret.setResult(Arrays.asList(fac.getComponentTypes()).contains(type));
 		}
 		else
 		{
-			ret.setResult(Boolean.FALSE);
+			fac.isLoadable(model, imports, rid)
+				.addResultListener(new DelegationResultListener<Boolean>(ret));
 		}
 		
 		return ret;

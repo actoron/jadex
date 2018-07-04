@@ -13,16 +13,14 @@ import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -95,7 +93,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr4 = new TestReport("#4", "Test if can find service via SServiceProvider.getServices()");
 		try
 		{
-			Collection<ITestService> sers = SServiceProvider.getTaggedServices(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
+			Collection<ITestService> sers = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(TagProperty.PLATFORM_NAME)); 
 			tr4.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -107,7 +105,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr5 = new TestReport("#5", "Test if can find service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
+			ITestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(TagProperty.PLATFORM_NAME)); 
 			tr5.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -119,7 +117,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, new String[]{null}).get(); 
+			ITestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{null})); 
 			tr6.setSucceeded(true);
 		}
 		catch(Exception e)

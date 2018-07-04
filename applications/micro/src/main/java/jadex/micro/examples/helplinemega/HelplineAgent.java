@@ -9,7 +9,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
@@ -105,7 +104,7 @@ public class HelplineAgent	implements IHelpline
 			ret.addIntermediateResult(entry);
 		}
 		
-		SServiceProvider.getTaggedServices(agent, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, person).
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
 			addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 		{
 			boolean finished	= false;
@@ -182,7 +181,7 @@ public class HelplineAgent	implements IHelpline
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				SServiceProvider.getTaggedServices(ia, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, person).
+				ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
 					addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 				{
 					@Override

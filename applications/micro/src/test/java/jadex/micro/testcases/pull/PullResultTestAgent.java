@@ -18,8 +18,8 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -236,78 +236,81 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				final IClockService clock	= SServiceProvider.searchLocalService(root, new ServiceQuery<>( IClockService.class));
-								IResourceIdentifier	rid	= new ResourceIdentifier(
-									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-		//						System.out.println("Using rid: "+rid);
-								final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
-								CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
-								cms.createComponent(null, PullResultProviderAgent.class.getName()+".class", ci, null)
-									.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-								{	
-									public void customResultAvailable(final IComponentIdentifier cid)
+				// TODO: use some internal/external access for fetching service???
+				@SuppressWarnings("unchecked")
+				IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
+					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class)));
+				IResourceIdentifier	rid	= new ResourceIdentifier(
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//						System.out.println("Using rid: "+rid);
+				final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
+				CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+				cms.createComponent(null, PullResultProviderAgent.class.getName()+".class", ci, null)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+				{	
+					public void customResultAvailable(final IComponentIdentifier cid)
+					{
+						System.out.println("cid is: "+cid);
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class, cid))
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
+						{
+							public void customResultAvailable(IPullResultService service)
+							{
+								// Invoke service agent
+								System.out.println("Invoking");
+								IPullIntermediateFuture<String> fut = service.getResultsA(max);
+								
+								fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+								{
+									protected List<String> res = new ArrayList<String>();
+									
+									public void intermediateResultAvailable(String result)
 									{
-										System.out.println("cid is: "+cid);
-										agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class, cid))
-											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
-										{
-											public void customResultAvailable(IPullResultService service)
-											{
-												// Invoke service agent
-												System.out.println("Invoking");
-												IPullIntermediateFuture<String> fut = service.getResultsA(max);
-												
-												fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
-												{
-													protected List<String> res = new ArrayList<String>();
-													
-													public void intermediateResultAvailable(String result)
-													{
-														System.out.println("intermediateResultAvailable: "+result);
-														res.add(result);
-													}
-													public void finished()
-													{
-														System.out.println("finished: ");
-														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
-														if(res.size()==max)
-														{
-															tr.setSucceeded(true);
-														}
-														else
-														{
-															tr.setReason("Not all results did arrive: ("+res.size()+" / "+max);
-														}
-		//												cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-													public void resultAvailable(Collection<String> result)
-													{
-														System.out.println("resultAvailable: "+result);
-														TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-														tr.setReason("resultAvailable was called");
-		//												cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-													public void exceptionOccurred(Exception exception)
-													{
-														System.out.println("exceptionOccurred: "+exception);
-														TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-														tr.setFailed(exception);
-														ret.setResult(tr);
-													}
-												}));
-												System.out.println("Added listener");
-												
-												for(int i=0; i<max; i++)
-												{
-													System.out.println("pulling");
-													fut.pullIntermediateResult();
-												}
-											}		
-										}));
+										System.out.println("intermediateResultAvailable: "+result);
+										res.add(result);
 									}
-								});
+									public void finished()
+									{
+										System.out.println("finished: ");
+										TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
+										if(res.size()==max)
+										{
+											tr.setSucceeded(true);
+										}
+										else
+										{
+											tr.setReason("Not all results did arrive: ("+res.size()+" / "+max);
+										}
+//												cms.destroyComponent(cid);
+										ret.setResult(tr);
+									}
+									public void resultAvailable(Collection<String> result)
+									{
+										System.out.println("resultAvailable: "+result);
+										TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+										tr.setReason("resultAvailable was called");
+//												cms.destroyComponent(cid);
+										ret.setResult(tr);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										System.out.println("exceptionOccurred: "+exception);
+										TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+										tr.setFailed(exception);
+										ret.setResult(tr);
+									}
+								}));
+								System.out.println("Added listener");
+								
+								for(int i=0; i<max; i++)
+								{
+									System.out.println("pulling");
+									fut.pullIntermediateResult();
+								}
+							}		
+						}));
+					}
+				});
 			}	
 		});
 		
@@ -342,82 +345,85 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				final IClockService clock	= SServiceProvider.searchLocalService(root, new ServiceQuery<>( IClockService.class));
-								IResourceIdentifier	rid	= new ResourceIdentifier(
-									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-		//						System.out.println("Using rid: "+rid);
-								final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
-								CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
-								cms.createComponent(null, PullResultProviderAgent.class.getName()+".class", ci, null)
-									.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-								{	
-									public void customResultAvailable(final IComponentIdentifier cid)
+				// TODO: use some internal/external access for fetching service???
+				@SuppressWarnings("unchecked")
+				IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
+					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class)));
+				IResourceIdentifier	rid	= new ResourceIdentifier(
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//						System.out.println("Using rid: "+rid);
+				final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
+				CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+				cms.createComponent(null, PullResultProviderAgent.class.getName()+".class", ci, null)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+				{	
+					public void customResultAvailable(final IComponentIdentifier cid)
+					{
+						System.out.println("cid is: "+cid);
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class, cid))
+							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
+						{
+							public void customResultAvailable(IPullResultService service)
+							{
+								// Invoke service agent
+								System.out.println("Invoking B");
+								IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
+								
+								fut2.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+								{
+									protected List<String> res = new ArrayList<String>();
+									
+									public void intermediateResultAvailable(String result)
 									{
-										System.out.println("cid is: "+cid);
-										agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class, cid))
-											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
-										{
-											public void customResultAvailable(IPullResultService service)
-											{
-												// Invoke service agent
-												System.out.println("Invoking B");
-												IPullSubscriptionIntermediateFuture<String> fut2 = service.getResultsB(max);
-												
-												fut2.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
-												{
-													protected List<String> res = new ArrayList<String>();
-													
-													public void intermediateResultAvailable(String result)
-													{
-														System.out.println("intermediateResultAvailable: "+result);
-														res.add(result);
-													}
-													public void finished()
-													{
-														System.out.println("finished: ");
-														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
-														tr.setReason("Exception did not occur");
-														cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-													public void resultAvailable(Collection<String> result)
-													{
-														System.out.println("resultAvailable: "+result);
-														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
-														tr.setReason("Exception did not occur");
-														cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-													public void exceptionOccurred(Exception exception)
-													{
-														System.out.println("exceptionOccurred: "+exception);
-														
-														TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
-														if(exception instanceof FutureTerminatedException)
-														{
-															tr.setSucceeded(true);
-														}
-														else
-														{
-															tr.setReason("Other exception: ("+exception);
-														}
-														cms.destroyComponent(cid);
-														ret.setResult(tr);
-													}
-												}));
-												System.out.println("Added listener");
-												
-												fut2.pullIntermediateResult();
-												
-												fut2.terminate();
-												
-												// Test expects exception, because of message overtakes
-		//										for(int i=0; i<max-1; i++)
-													fut2.pullIntermediateResult();
-											}		
-										}));
+										System.out.println("intermediateResultAvailable: "+result);
+										res.add(result);
 									}
-								});
+									public void finished()
+									{
+										System.out.println("finished: ");
+										TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
+										tr.setReason("Exception did not occur");
+										cms.destroyComponent(cid);
+										ret.setResult(tr);
+									}
+									public void resultAvailable(Collection<String> result)
+									{
+										System.out.println("resultAvailable: "+result);
+										TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
+										tr.setReason("Exception did not occur");
+										cms.destroyComponent(cid);
+										ret.setResult(tr);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										System.out.println("exceptionOccurred: "+exception);
+										
+										TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
+										if(exception instanceof FutureTerminatedException)
+										{
+											tr.setSucceeded(true);
+										}
+										else
+										{
+											tr.setReason("Other exception: ("+exception);
+										}
+										cms.destroyComponent(cid);
+										ret.setResult(tr);
+									}
+								}));
+								System.out.println("Added listener");
+								
+								fut2.pullIntermediateResult();
+								
+								fut2.terminate();
+								
+								// Test expects exception, because of message overtakes
+//										for(int i=0; i<max-1; i++)
+									fut2.pullIntermediateResult();
+							}		
+						}));
+					}
+				});
 			}	
 		});
 		

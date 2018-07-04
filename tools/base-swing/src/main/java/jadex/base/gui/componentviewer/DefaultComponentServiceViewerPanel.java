@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
@@ -55,19 +56,20 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		SServiceProvider.getDeclaredServices(component)
-			.addResultListener(new IResultListener<Collection<IService>>()
-		{
-			public void resultAvailable(Collection<IService> result)
-			{
-				createPanels(component, result).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		// TODO: should use SRemoteGui for observing minimal platforms
+//		SServiceProvider.getDeclaredServices(component)
+//			.addResultListener(new IResultListener<Collection<IService>>()
+//		{
+//			public void resultAvailable(Collection<IService> result)
+//			{
+//				createPanels(component, result).addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		
 		return ret;
 	}

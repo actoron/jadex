@@ -92,7 +92,8 @@ public class NFRPropertyProperties extends PropertiesPanel
 				{
 					public IFuture<Object> execute(IInternalAccess ia)
 					{
-						Object res = fmultiple? ia.getComponentFeature(IRequiredServicesFeature.class).getLastRequiredServices(fname): ia.getComponentFeature(IRequiredServicesFeature.class).getLastRequiredService(fname);
+						//TODO lastrequiredservice???
+						Object res = fmultiple? ia.getComponentFeature(IRequiredServicesFeature.class).getServices(fname): ia.getComponentFeature(IRequiredServicesFeature.class).getService(fname);
 						return new Future<Object>(res);
 					}
 				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()

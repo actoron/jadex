@@ -314,6 +314,19 @@ public class SFuture
 		
 		return ret;
 	}
+
+	/**
+	 *  Blocking wait for first result.
+	 *  Future is terminated after first result is received.
+	 *  @param fut	The future.
+	 *  @return The first result.
+	 */
+	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
+	{
+		T	ret	= fut.getNextIntermediateResult();
+		fut.terminate();
+		return ret;
+	}
 	
 
 }

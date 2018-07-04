@@ -325,7 +325,7 @@ public class ServiceQuery<T>
 	 *  Sets the service tags.
 	 *  @param servicetags The service tags. 
 	 */
-	public ServiceQuery<T> setServiceTags(String[] servicetags)
+	public ServiceQuery<T> setServiceTags(String... servicetags)
 	{
 		TagProperty.checkReservedTags(servicetags);
 		this.servicetags = servicetags;

@@ -3,8 +3,9 @@ package jadex.micro.examples.lottery;
 import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -24,7 +25,8 @@ public class HumanPlayerAgent
 	public void body()
 	{
 //		final ILotteryService ls = SServiceProvider.searchService(agent.getExternalAccess(), new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		final ILotteryService ls = (ILotteryService)SServiceProvider.waitForService(agent, "ls", 3, 3000).get();
+		final ILotteryService ls = (ILotteryService)SFuture.getFirstResultAndTerminate(
+			agent.getComponentFeature(IRequiredServicesFeature.class).addQuery("ls"));
 		
 		ITerminableIntermediateFuture<String> sub = ls.subscribeToLottery();
 		

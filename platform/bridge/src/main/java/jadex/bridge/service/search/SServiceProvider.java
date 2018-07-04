@@ -10,15 +10,21 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
+import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
+import jadex.bridge.nonfunctional.search.IServiceRanker;
+import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
+import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
 
 /**
  *  Static helper class for searching services.
@@ -462,29 +468,29 @@ public class SServiceProvider
 //	
 //	//-------- other methods --------
 //	
-//	/**
-//	 *  Rank the services of a search with a specific ranker.
-//	 */
-//	public static <S> ITerminableIntermediateFuture<S> rankServices(ITerminableIntermediateFuture<S> searchfut, 
-//		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
-//	{
-//		TerminableIntermediateDelegationFuture<S> ret = new TerminableIntermediateDelegationFuture<S>();
-//		searchfut.addResultListener(new ServiceRankingDelegationResultListener<S>(ret, searchfut, ranker, decider));
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Rank the services of a search with a specific ranker and emit the scores.
-//	 */
-//	public static <S> ITerminableIntermediateFuture<Tuple2<S, Double>> rankServicesWithScores(ITerminableIntermediateFuture<S> searchfut, 
-//		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
-//	{
-//		TerminableIntermediateDelegationFuture<Tuple2<S, Double>> ret = new TerminableIntermediateDelegationFuture<Tuple2<S, Double>>();
-//		searchfut.addResultListener(new ServiceRankingDelegationResultListener2<S>(ret, searchfut, ranker, decider));
-//		return ret;
-//	}	
-//	
-//	
+	/**
+	 *  Rank the services of a search with a specific ranker.
+	 */
+	public static <S> ITerminableIntermediateFuture<S> rankServices(ITerminableIntermediateFuture<S> searchfut, 
+		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
+	{
+		TerminableIntermediateDelegationFuture<S> ret = new TerminableIntermediateDelegationFuture<S>();
+		searchfut.addResultListener(new ServiceRankingDelegationResultListener<S>(ret, searchfut, ranker, decider));
+		return ret;
+	}
+	
+	/**
+	 *  Rank the services of a search with a specific ranker and emit the scores.
+	 */
+	public static <S> ITerminableIntermediateFuture<Tuple2<S, Double>> rankServicesWithScores(ITerminableIntermediateFuture<S> searchfut, 
+		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
+	{
+		TerminableIntermediateDelegationFuture<Tuple2<S, Double>> ret = new TerminableIntermediateDelegationFuture<Tuple2<S, Double>>();
+		searchfut.addResultListener(new ServiceRankingDelegationResultListener2<S>(ret, searchfut, ranker, decider));
+		return ret;
+	}	
+	
+	
 //	// todo: remove these methods, move to marshal service
 //	
 //	/**
@@ -1612,77 +1618,6 @@ public class SServiceProvider
 //		return ServiceRegistry.getRegistry(cid).addQuery(query);
 //	}
 //	
-//	/**
-//	 *  Gets a proxy for a known service at a target component.
-//	 *  @return Service proxy.
-//	 */
-//	public static <S> S getServiceProxy(IInternalAccess component, final IComponentIdentifier providerid, final Class<S> servicetype)
-//	{				
-//		S ret = null;
-//		
-//		boolean local = component.getComponentIdentifier().getRoot().equals(providerid.getRoot());
-//		if(local)
-//		{
-//			ret = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype, providerid));
-//		}
-//		else
-//		{
-//			try
-//			{
-//				final IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, new ClassInfo(servicetype), null, "NULL", null, RequiredServiceInfo.SCOPE_GLOBAL, null, true);
-//
-//				Class<?>[] interfaces = new Class[]{servicetype, IService.class};
-//				ProxyInfo pi = new ProxyInfo(interfaces);
-//				pi.addMethodReplacement(new MethodInfo("equals", new Class[]{Object.class}), new IMethodReplacement()
-//				{
-//					public Object invoke(Object obj, Object[] args)
-//					{
-//						return Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
-//							&& ProxyFactory.getInvocationHandler(obj).equals(ProxyFactory.getInvocationHandler(args[0])));
-//					}
-//				});
-//				pi.addMethodReplacement(new MethodInfo("hashCode", new Class[0]), new IMethodReplacement()
-//				{
-//					public Object invoke(Object obj, Object[] args)
-//					{
-//						return Integer.valueOf(ProxyFactory.getInvocationHandler(obj).hashCode());
-//					}
-//				});
-//				pi.addMethodReplacement(new MethodInfo("toString", new Class[0]), new IMethodReplacement()
-//				{
-//					public Object invoke(Object obj, Object[] args)
-//					{
-//						return "Fake proxy for service("+sid+")";
-//					}
-//				});
-//				pi.addMethodReplacement(new MethodInfo("getServiceIdentifier", new Class[0]), new IMethodReplacement()
-//				{
-//					public Object invoke(Object obj, Object[] args)
-//					{
-//						return sid;
-//					}
-//				});
-//				Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
-//				pi.addExcludedMethod(new MethodInfo(getclass));
-//				
-//				RemoteReference rr = new RemoteReference(providerid, sid);
-//				ProxyReference pr = new ProxyReference(pi, rr);
-//				Class<?> h = SReflect.classForName0("jadex.platform.service.serialization.RemoteMethodInvocationHandler", null);
-//				Constructor<?> c = h.getConstructor(new Class[]{IInternalAccess.class, ProxyReference.class});
-//				InvocationHandler handler = (InvocationHandler)c.newInstance(new Object[]{component, pr});
-//				ret = (S)ProxyFactory.newProxyInstance(component.getClassLoader(), 
-//					interfaces, handler);
-////				ret = (S)ProxyFactory.newProxyInstance(component.getClassLoader(), 
-////					interfaces, new RemoteMethodInvocationHandler(component, pr));
-//			}
-//			catch(Exception e)
-//			{
-//				SUtil.rethrowAsUnchecked(e);
-//			}
-//		}
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Gets a external access proxy for a known component.

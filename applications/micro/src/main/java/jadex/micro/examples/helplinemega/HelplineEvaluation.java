@@ -169,7 +169,7 @@ public class HelplineEvaluation
 					try
 					{
 						// search for person 1 (single: only present on second platform, multi: present once on each platform)
-						found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person1").get();
+						found	= SServiceProvider.searchServices(firstplatform, new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags("person1")).get();
 					}
 					catch(Exception e)
 					{

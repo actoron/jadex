@@ -372,6 +372,30 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	//-------- query methods --------
 
 	/**
+	 *  Add a query for a declared required service.
+	 *  Continuously searches for matching services.
+	 *  @param name The name of the required service declaration.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(String name)
+	{
+		// TODO: global registry query.
+		return new SubscriptionIntermediateFuture<>(new UnsupportedOperationException("TODO"));
+	}
+
+	/**
+	 *  Add a query for a declared required service.
+	 *  Continuously searches for matching services.
+	 *  @param type The type of the required service declaration.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type)
+	{
+		// TODO: global registry query.
+		return new SubscriptionIntermediateFuture<>(new UnsupportedOperationException("TODO"));		
+	}
+
+	/**
 	 *  Add a service query.
 	 *  Continuously searches for matching services.
 	 *  @param query	The search query.

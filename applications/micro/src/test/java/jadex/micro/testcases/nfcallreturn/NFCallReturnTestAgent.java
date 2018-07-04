@@ -6,9 +6,11 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
@@ -190,13 +192,15 @@ public class NFCallReturnTestAgent extends TestAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if returning changed nf props works with provided proxy");
-		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, ITestService.class, false));
+		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
-			public void customResultAvailable(final ITestService ts)
+			public void customResultAvailable(ITestService ts)
 			{
+				// Unwrap required proxy (TODO: easier get without proxy? also for users???)
+				BasicServiceInvocationHandler	bsih	= (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(ts);
+				ts	= (ITestService)bsih.getDomainService();
 				callService(ts, tr).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 		});

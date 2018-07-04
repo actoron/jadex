@@ -17,6 +17,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -25,7 +26,6 @@ import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -276,13 +276,8 @@ public class ServiceCallTestNFClearTest
 				else
 				{
 //					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getService(requiredOrProvidedServiceName).get();
-					service = SServiceProvider.waitForService(ia, new IResultCommand<IFuture<IServiceCallService>, Void>()
-					{
-						public jadex.commons.future.IFuture<IServiceCallService> execute(Void args) 
-						{
-							return ia.getComponentFeature(IRequiredServicesFeature.class).getService(requiredOrProvidedServiceName);
-						}
-					}, 7, 1500).get();
+					service = SFuture.getFirstResultAndTerminate(
+						ia.getComponentFeature(IRequiredServicesFeature.class).addQuery(requiredOrProvidedServiceName));
 						
 				}
 				assertServiceCallResetsServiceInvocation(service);
