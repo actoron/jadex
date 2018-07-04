@@ -120,7 +120,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				else if(currentsearch==null)
 				{
 //					System.out.println("created search");
-					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null));
+					//TODO
+//					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null));
 					final ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> fcurrentsearch = currentsearch;
 					
 					addCall(currentsearch, ret);
@@ -185,8 +186,9 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				if(fini)
 				{
 					// add superpeers as last chance
-					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+					//TODO
+//					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+//						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
 				}
 				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
@@ -546,7 +548,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public static ISuperpeerRegistrySynchronizationService getSuperpeerRegistrySynchronizationService(IInternalAccess component, IComponentIdentifier cid)
 	{
 		IComponentIdentifier sspcid = new ComponentIdentifier("registrysuperpeer@"+cid.getPlatformName());
-		ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
-		return sps;
+		//TODO
+//		ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
+		return null;
 	}
 }

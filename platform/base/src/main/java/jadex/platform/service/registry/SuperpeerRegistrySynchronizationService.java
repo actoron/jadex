@@ -24,7 +24,6 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -1094,7 +1093,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		System.out.println("Remove client with all services: "+ci.getPlatformId());
 		
 		getRegistry().removeServices(ci.getPlatformId());
-		getRegistry().removeQueriesFromPlatform(ci.getPlatformId());
+		//TODO
+//		getRegistry().removeQueriesFromPlatform(ci.getPlatformId());
 		
 		Set<IComponentIdentifier> icls = ci.getIndirectClients();
 		if(icls!=null)
@@ -1102,7 +1102,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			for(IComponentIdentifier icl: icls)
 			{
 				getRegistry().removeServices(icl);
-				getRegistry().removeQueriesFromPlatform(icl);
+				//TODO
+//				getRegistry().removeQueriesFromPlatform(icl);
 			}
 		}
 	}
@@ -1441,7 +1442,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query)
 	{
-		getRegistry().removeQuery(query);
+		//TODO
+//		getRegistry().removeQuery(query);
 		return IFuture.DONE;
 	}
 	

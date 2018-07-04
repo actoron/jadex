@@ -85,7 +85,8 @@ public class SuperpeerRegistrySynchronizationAgent
 		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
 		
 		// Remove all remote services handled by the registry 
-		reg.removeServicesExcept(component.getComponentIdentifier().getRoot());
+		//TODO
+//		reg.removeServicesExcept(component.getComponentIdentifier().getRoot());
 		
 		// Produces problems in platform shutdown
 //		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));

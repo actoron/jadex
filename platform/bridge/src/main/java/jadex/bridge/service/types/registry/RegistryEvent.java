@@ -2,7 +2,6 @@ package jadex.bridge.service.types.registry;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import jadex.bridge.service.IService;
 
@@ -63,7 +62,7 @@ public class RegistryEvent extends ARegistryEvent
 	 *  @param addedservices The added services.
 	 *  @param removedservices The removed services.
 	 */
-	public RegistryEvent(Set<IService> addedservices, Set<IService> removedservices, int eventslimit, long timelimit, boolean delta, String clienttype)
+	public RegistryEvent(Collection<IService> addedservices, Collection<IService> removedservices, int eventslimit, long timelimit, boolean delta, String clienttype)
 	{
 		super(eventslimit, timelimit);
 		this.timestamp = System.currentTimeMillis();

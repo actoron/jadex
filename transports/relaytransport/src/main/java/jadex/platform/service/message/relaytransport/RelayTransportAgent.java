@@ -36,7 +36,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -772,7 +771,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						try
 						{
 //							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
-							Collection<IRoutingService> addrs = SServiceProvider.getTaggedServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL, "forwarding=true").get(MAX_ROUTING_SERVICE_DELAY, true);
+							Collection<IRoutingService> addrs = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, Binding.SCOPE_GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
 							for (IRoutingService rs : addrs)
 							{
 								IComponentIdentifier rsprov = ((IService) rs).getServiceIdentifier().getProviderId();

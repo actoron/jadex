@@ -68,7 +68,8 @@ public abstract class DependenciesHandler
 			for(IComponentIdentifier c: tmp)
 			{
 				getRegistry().removeServices(c);
-				getRegistry().removeQueriesFromPlatform(c);
+				//TODO
+//				getRegistry().removeQueriesFromPlatform(c);
 			}
 			
 			// Find new ones by taking send ones minus existing ones
