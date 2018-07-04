@@ -9,6 +9,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.TimeoutException;
@@ -27,7 +28,7 @@ public class EndStateAbortPlan extends Plan
 	{
 		// Create worker agent.
 		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
-			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IComponentIdentifier	worker	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml",
 			new CreationInfo(getComponentIdentifier())).getFirstResult();
 		

@@ -8,6 +8,7 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
@@ -27,7 +28,7 @@ public class ConfigElementRefPlan extends Plan
 		
 		// Create worker agent (kills itself automatically).
 		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
-			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		cms.createComponent("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml",

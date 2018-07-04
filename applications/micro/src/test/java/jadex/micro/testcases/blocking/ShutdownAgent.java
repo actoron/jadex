@@ -8,6 +8,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
@@ -60,7 +61,7 @@ public class ShutdownAgent
 					{
 						// call several times a blocking method on the agent and then terminate it
 						
-						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IBlockService.class, cid)
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class, cid))
 							.addResultListener(new ExceptionDelegationResultListener<IBlockService, Void>(ret)
 						{
 							public void customResultAvailable(IBlockService bs)

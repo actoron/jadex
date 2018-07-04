@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -34,7 +35,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="clockservice", type=IClockService.class, 
 		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL)),
+		binding=@Binding(scope=Binding.SCOPE_GLOBAL)),
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments({
@@ -85,7 +86,7 @@ public class ChatE5Agent
 								}
 								else
 								{
-									agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IChatService.class, cid)
+									agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid))
 										.addResultListener(new DefaultResultListener<IChatService>()
 									{
 										public void resultAvailable(IChatService cs)

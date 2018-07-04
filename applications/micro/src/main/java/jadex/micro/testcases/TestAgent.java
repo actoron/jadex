@@ -223,7 +223,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -263,7 +263,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -301,7 +301,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)

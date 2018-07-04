@@ -53,6 +53,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -380,7 +381,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -516,7 +517,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -789,7 +790,7 @@ public class GuiPanel extends JPanel
 			// These orders are not added to the agent (see manager.agent.xml).
 			try
 			{
-				IClockService clock	= agent.getComponentIdentifier().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class,  Binding.SCOPE_PLATFORM));
+				IClockService clock	= SServiceProvider.searchService(agent, new ServiceQuery<>( IClockService.class,  Binding.SCOPE_PLATFORM)).get();
 				if(buy)
 				{
 					orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));

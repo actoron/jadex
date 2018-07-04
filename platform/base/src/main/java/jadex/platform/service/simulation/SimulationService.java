@@ -95,7 +95,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	deregistered	= new Future<Void>();
-		SServiceProvider.searchService(access, new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -144,7 +144,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		SServiceProvider.searchService(access, new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -174,7 +174,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			{
 				final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.searchService(access, new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
+				access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
 					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)

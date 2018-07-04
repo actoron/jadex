@@ -52,7 +52,7 @@ public class UserAgent
 		});
 		
 		// get remote management service 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(final IComponentManagementService cms)

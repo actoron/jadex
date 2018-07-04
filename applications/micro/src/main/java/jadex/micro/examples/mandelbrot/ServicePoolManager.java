@@ -13,6 +13,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -152,7 +153,7 @@ public class ServicePoolManager
 		// Start timer to be triggered when search is not finished after 1 second.
 		if(timer==null)
 		{
-			component.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)

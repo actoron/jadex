@@ -10,7 +10,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.filetransfer.FileData;
@@ -162,7 +162,7 @@ public class FileTransferService implements IFileTransferService
 	public IFuture<Void> openFile(final String path)
 	{
 		final Future<Void> ret = new Future<Void>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IContextService.class))
+		SServiceProvider.searchService(agent, new ServiceQuery<>( IContextService.class))
 			.addResultListener(new DefaultResultListener<IContextService>()
 		{
 			public void resultAvailable(IContextService cs)

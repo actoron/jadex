@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -44,7 +45,7 @@ public class BAgent implements IBService
 		final List<TestReport> tests = new ArrayList<TestReport>();
 
 		final Future<Void> ret = new Future<Void>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IAService>()
 		{
 			public void resultAvailable(IAService ser)

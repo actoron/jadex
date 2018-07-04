@@ -7,6 +7,7 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.TimeoutException;
@@ -26,7 +27,7 @@ public class ArgumentsPlan extends Plan
 		try
 		{
 			IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
-				.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+				.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			Map<String, Object> args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());
 			cms.createComponent("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml",

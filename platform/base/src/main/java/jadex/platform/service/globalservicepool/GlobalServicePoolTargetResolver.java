@@ -12,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.collection.IndexMap;
@@ -252,7 +251,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				}
 				
 				// send infos to global pool
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( sid.getProviderId()), IGlobalPoolManagementService.class)
+				SServiceProvider.searchService(agent, new ServiceQuery<>(IGlobalPoolManagementService.class, sid.getProviderId()))
 					.addResultListener(new ExceptionDelegationResultListener<IGlobalPoolManagementService, Void>(ret) 
 				{
 					public void customResultAvailable(final IGlobalPoolManagementService pms) 

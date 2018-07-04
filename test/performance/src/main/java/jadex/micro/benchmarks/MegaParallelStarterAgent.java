@@ -206,7 +206,7 @@ public class MegaParallelStarterAgent
 		IFuture<IClockService> clock = null;	// Uncomment for no caching.
 		if(clock==null)
 		{
-			clock	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM); // Raw service
+			clock	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)); // Raw service
 //			clock	= getService("clockservice");	// Required service proxy
 		}
 		return clock;

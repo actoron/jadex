@@ -9,6 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -164,7 +165,7 @@ public class KillComponentTestAgent extends TestAgent
 	
 	private Future<IComponentManagementService> getCms() {
 		Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new DelegationResultListener<IComponentManagementService>(ret));
 		return ret;
 	}

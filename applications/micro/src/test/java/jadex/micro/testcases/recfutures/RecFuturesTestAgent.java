@@ -275,7 +275,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		});
 		
 		// Start service agent
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)

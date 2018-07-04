@@ -58,7 +58,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		IComponentManagementService	cms	= agent.getComponentIdentifier().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
 		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getComponentIdentifier().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override

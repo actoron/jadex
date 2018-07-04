@@ -15,6 +15,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -70,7 +71,7 @@ public class ProxyAgent	implements IProxyAgentService
 //	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, rcid.getRoot())
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, rcid.getRoot()))
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms) 
@@ -202,7 +203,7 @@ public class ProxyAgent	implements IProxyAgentService
 			}
 		};
 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
