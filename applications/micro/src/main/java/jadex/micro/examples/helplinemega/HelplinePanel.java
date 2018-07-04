@@ -283,7 +283,7 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new BasicComponentIdentifier(person, ia.getComponentIdentifier())));
+					IHelpline	helpline	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class, new BasicComponentIdentifier(person, ia.getComponentIdentifier())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)
@@ -297,7 +297,7 @@ public class HelplinePanel extends JPanel
 						{
 							if(event instanceof CMSCreatedEvent)
 							{
-								IHelpline	helpline	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(event.getComponentIdentifier()));
+								IHelpline	helpline	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class, event.getComponentIdentifier()));
 								if(helpline==null)
 								{
 									exceptionOccurred(new RuntimeException("No service after creation for "+person));

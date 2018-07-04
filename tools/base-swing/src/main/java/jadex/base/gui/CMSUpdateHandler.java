@@ -123,7 +123,7 @@ public class CMSUpdateHandler
 			Integer	cnt	= Integer.valueOf(1);
 			tup	= new Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer>(ret, cnt);
 			listeners.put(cid, tup);
-			SServiceProvider.searchService(access, new ServiceQuery<>(IComponentManagementService.class).setProvider(cid)).
+			SServiceProvider.searchService(access, new ServiceQuery<>(IComponentManagementService.class, cid)).
 				addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 			{
 				@Override

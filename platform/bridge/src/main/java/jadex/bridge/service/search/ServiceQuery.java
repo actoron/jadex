@@ -108,7 +108,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype)
 	{
-		this(servicetype, null);
+		this(servicetype, null, null, null);
 	}
 	
 	/**
@@ -117,6 +117,14 @@ public class ServiceQuery<T>
 	public ServiceQuery(Class<T> servicetype, String scope)
 	{
 		this(servicetype, scope, null, null);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, IComponentIdentifier provider)
+	{
+		this(servicetype, null, provider, null);
 	}
 //	
 //	/**

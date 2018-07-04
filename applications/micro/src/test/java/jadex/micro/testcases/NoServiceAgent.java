@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -36,7 +37,7 @@ public class NoServiceAgent extends JunitAgentTest
 		
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(INoService.class).addResultListener(new IResultListener<Collection<INoService>>()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(INoService.class)).addResultListener(new IResultListener<Collection<INoService>>()
 		{
 			public void resultAvailable(Collection<INoService> result)
 			{

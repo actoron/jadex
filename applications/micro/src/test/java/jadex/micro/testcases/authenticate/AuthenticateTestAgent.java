@@ -191,7 +191,7 @@ public class AuthenticateTestAgent extends TestAgent
 		final Future<boolean[]>	ret	= new Future<boolean[]>();
 //		System.out.println("invokeServices "+IComponentIdentifier.LOCAL.get());
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(ITestService.class, Binding.SCOPE_GLOBAL)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, Binding.SCOPE_GLOBAL))
 			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
 		{
 			@Override

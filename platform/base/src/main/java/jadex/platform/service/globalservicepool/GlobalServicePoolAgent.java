@@ -235,7 +235,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
 			IService poolser = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
-			IService ser = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceIdentifier().getProviderId()));
+			IService ser = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype, poolser.getServiceIdentifier().getProviderId()));
 			return method.invoke(ser, args);
 		}
 	}

@@ -8,7 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -241,7 +241,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 					{
 						if(dtps==null)
 						{
-							component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDaemonThreadPoolService.class))
+							SServiceProvider.searchService(component, new ServiceQuery<>(IDaemonThreadPoolService.class))
 								.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Integer>(read)
 							{
 								public void customResultAvailable(IDaemonThreadPoolService result)

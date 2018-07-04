@@ -150,7 +150,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 							// Hack for speed
 							if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
 							{
-								SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
+								SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
 									.addResultListener(new IResultListener<IProxyAgentService>()
 								{
 									public void resultAvailable(IProxyAgentService ser)

@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -68,7 +69,7 @@ public class ClientAgent
 
 	private ISubscriptionIntermediateFuture<ICountdownService> searchCdServices()
 	{
-		IIntermediateFuture<ICountdownService> searchServices = access.getComponentFeature(IRequiredServicesFeature.class).searchServices(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+		IIntermediateFuture<ICountdownService> searchServices = access.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 		searchServices.addIntermediateResultListener(cdService -> {
 			subscription.addIntermediateResult(cdService);
 		}, () -> {

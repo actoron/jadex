@@ -173,7 +173,7 @@ public class UploadFileCommand extends ACliCommand
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)

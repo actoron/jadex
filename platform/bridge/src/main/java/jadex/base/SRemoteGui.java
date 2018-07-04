@@ -108,7 +108,7 @@ public class SRemoteGui
 					ProvidedServiceInfo[]	pis	= null;
 					IServiceIdentifier[]	sis	= null;
 					
-					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null).setProvider(ia.getComponentIdentifier());
+					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null, ia.getComponentIdentifier());
 					Collection<IService>	result	= ia.getComponentFeature0(IRequiredServicesFeature.class)==null? null: (ia.getComponentFeature(IRequiredServicesFeature.class)).searchLocalServices(query);
 					if(result!=null)
 					{

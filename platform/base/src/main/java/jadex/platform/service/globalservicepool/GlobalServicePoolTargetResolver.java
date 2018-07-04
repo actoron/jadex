@@ -196,7 +196,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
 		// Fetch the global pools management service via its component id.
-		SServiceProvider.searchService(agent, new ServiceQuery<>(IGlobalPoolManagementService.class).setProvider(sid.getProviderId()))
+		SServiceProvider.searchService(agent, new ServiceQuery<>(IGlobalPoolManagementService.class, sid.getProviderId()))
 			.addResultListener(new IResultListener<IGlobalPoolManagementService>() 
 		{
 			public void resultAvailable(final IGlobalPoolManagementService pms) 

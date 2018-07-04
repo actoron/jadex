@@ -186,7 +186,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
 	        		                            	{
 	        		                            		@SuppressWarnings("unchecked")
-														IFuture<IService> fut = (IFuture<IService>)SServiceProvider.searchService(exta, new ServiceQuery<>(servicetype).setProvider(exta.getComponentIdentifier()));
+														IFuture<IService> fut = (IFuture<IService>)SServiceProvider.searchService(exta, new ServiceQuery<>(servicetype, exta.getComponentIdentifier()));
 	        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
 	        											{
 	        		                        				public void customResultAvailable(IService service) throws Exception
@@ -212,7 +212,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getComponentIdentifier()));
+	        	                            	 IService service = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype, exta.getComponentIdentifier()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
