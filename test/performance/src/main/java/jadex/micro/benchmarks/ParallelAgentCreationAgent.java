@@ -11,6 +11,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -53,12 +54,12 @@ public class ParallelAgentCreationAgent
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class)).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{

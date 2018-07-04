@@ -9,6 +9,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -34,7 +35,7 @@ public class ScenarioAgent
 //		ILibraryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		System.out.println("ls:"+ls);
 		
-		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class);
 		fut.addResultListener(new DefaultResultListener<ILibraryService>()
 		{

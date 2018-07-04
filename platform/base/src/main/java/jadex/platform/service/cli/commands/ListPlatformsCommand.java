@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IProxyAgentService.State;
 import jadex.commons.SUtil;
@@ -70,7 +71,7 @@ public class ListPlatformsCommand extends ACliCommand
 		
 		final boolean state = args.containsKey("-s");
 		
-		SServiceProvider.getServices(comp, IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchServices(comp, new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 		{
 			protected int ongoing = 0;

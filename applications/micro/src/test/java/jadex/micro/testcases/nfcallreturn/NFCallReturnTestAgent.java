@@ -170,7 +170,7 @@ public class NFCallReturnTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if returning changed nf props works with required proxy");
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
+		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{

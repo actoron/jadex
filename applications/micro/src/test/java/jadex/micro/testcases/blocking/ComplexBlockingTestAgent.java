@@ -10,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -47,7 +48,7 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();
+		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
 		
 //		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);

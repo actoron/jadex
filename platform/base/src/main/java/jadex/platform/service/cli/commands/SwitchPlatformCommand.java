@@ -83,7 +83,7 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			final IComponentIdentifier cid = new BasicComponentIdentifier((String)args.get(null));
 			
-			SServiceProvider.getServices(comp, IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			SServiceProvider.searchServices(comp, new ServiceQuery<>(IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
 			{
 				boolean found = false;

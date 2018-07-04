@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
@@ -35,7 +36,7 @@ public class TreeStressTestAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

@@ -173,7 +173,7 @@ public class ServiceHandler implements InvocationHandler
 	{
 		final Future<IService> ret = new Future<IService>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IService>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -506,8 +506,8 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = SServiceProvider.getService(component, 
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IComponentManagementService> fut = component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -542,8 +542,8 @@ public class ServiceHandler implements InvocationHandler
 		}
 		else
 		{
-			SServiceProvider.getService(component, 
-				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
+				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new DelegationResultListener<IClockService>(ret)
 			{
 				public void customResultAvailable(IClockService cs)

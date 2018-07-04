@@ -184,7 +184,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 				valmap.put(null, self);
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
-				SServiceProvider.getServices(access, IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchServices(access, new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)

@@ -32,6 +32,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -116,7 +117,7 @@ public class ChatService implements IChatService, IChatGuiService
 			status	= STATE_AWAY;	// Changes to idle only when a gui is connected.
 			
 			final PropProvider pp = new PropProvider();
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)
@@ -229,7 +230,7 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			});
 			
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)

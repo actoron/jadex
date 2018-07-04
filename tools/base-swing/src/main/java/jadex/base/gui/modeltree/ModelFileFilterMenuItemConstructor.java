@@ -23,6 +23,7 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -151,7 +152,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	public IFuture<Set<String>> getSupportedComponentTypes()
 	{
 		final Future<Set<String>> ret = new Future<Set<String>>();
-		SServiceProvider.getServices(exta, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchServices(exta, new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingExceptionDelegationResultListener<Collection<IComponentFactory>, Set<String>>(ret)
 		{
 			public void customResultAvailable(Collection<IComponentFactory> facts)

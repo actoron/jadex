@@ -342,7 +342,7 @@ public class MessagePerformanceAgent
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		if(auto)
 		{
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 				.addResultListener(new IResultListener<IEchoService>()
 			{
 				public void resultAvailable(IEchoService result)

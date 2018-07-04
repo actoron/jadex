@@ -16,6 +16,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.Tuple2;
@@ -73,8 +74,8 @@ public class BPMNRecoveryTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IPersistenceService	ps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IPersistenceService	ps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		IExternalAccess	exta	= cms.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();

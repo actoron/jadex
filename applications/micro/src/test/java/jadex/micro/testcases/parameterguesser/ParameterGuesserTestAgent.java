@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
@@ -60,7 +61,7 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 //			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
 			IComponentIdentifier cid = cms.createComponent(model, new CreationInfo(agent.getComponentIdentifier())).getFirstResult();
 
-			IInjectionTestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IInjectionTestService.class, cid).get();
+			IInjectionTestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class, cid)).get();
 
 			Object[] meta = ser.getInjectionClasses();
 			Object[] injections = ser.getInjections();

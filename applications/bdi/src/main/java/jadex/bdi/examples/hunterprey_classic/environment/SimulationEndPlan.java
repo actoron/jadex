@@ -6,6 +6,7 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -22,7 +23,7 @@ public class SimulationEndPlan extends Plan
 	public void body()
 	{
 		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
-			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		Environment en = (Environment)getBeliefbase().getBelief("environment").getFact();
 		Creature[] creatures = en.getCreatures();

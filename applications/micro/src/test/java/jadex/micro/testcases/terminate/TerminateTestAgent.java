@@ -15,6 +15,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
@@ -197,7 +198,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
 		// Start service agent
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -223,7 +224,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 						});
 						
 //						System.out.println("cid is: "+cid);
-						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITerminableService.class, cid)
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class, cid))
 							.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
 						{
 							public void customResultAvailable(final ITerminableService service)

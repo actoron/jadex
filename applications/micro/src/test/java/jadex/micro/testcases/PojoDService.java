@@ -11,6 +11,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -53,7 +54,7 @@ public class PojoDService implements IDService
 						public void customResultAvailable(IComponentIdentifier cid)
 						{
 //							IComponentIdentifier cid = (IComponentIdentifier)result;
-							IFuture<IDService> serfut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDService.class, cid);
+							IFuture<IDService> serfut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDService.class, cid));
 							serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
 							{
 								public void customResultAvailable(IDService otherser)

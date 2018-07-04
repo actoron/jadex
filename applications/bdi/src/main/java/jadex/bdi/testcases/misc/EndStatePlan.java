@@ -10,6 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -27,7 +28,7 @@ public class EndStatePlan extends Plan
 	public void body()
 	{
 		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
-			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		// Store report message from worker agent.
 		getWaitqueue().addMessageEvent("inform_reports");

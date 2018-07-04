@@ -77,7 +77,7 @@ public class DFTestAgent extends JunitAgentTest
 
 		// Deregister agent.
 		// Todo: use fix component service container
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDF, Void>(ret)
 		{
 			public void customResultAvailable(IDF df)

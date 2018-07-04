@@ -11,6 +11,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -45,7 +46,7 @@ public class IntermediateBlockingTestAgent extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();
+		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
 		
 		final IIntermediateFuture<Integer>	fut	= step.performSteps(3, 1000);
 

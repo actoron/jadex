@@ -45,6 +45,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -450,7 +451,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 				
 				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
-					.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+					.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 				cms.createComponent("BlackjackDealer", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml",
 					new CreationInfo(ia.getComponentIdentifier().getParent()))
 				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
@@ -502,7 +503,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				if(dealer!=null)
 				{
 					IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
-						.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+						.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 					cms.destroyComponent(dealer);
 					bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
 				}
@@ -662,7 +663,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						bia.getLogger().info("starting playerAgent: "+player.getName());
 						
 						IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
-							.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+							.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
@@ -709,7 +710,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
-						.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+						.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 					cms.destroyComponent(player.getAgentID());
 					return IFuture.DONE;
 				}

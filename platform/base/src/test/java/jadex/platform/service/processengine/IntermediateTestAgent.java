@@ -14,6 +14,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -252,7 +253,7 @@ public class IntermediateTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
@@ -296,7 +297,7 @@ public class IntermediateTestAgent
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
@@ -354,7 +355,7 @@ public class IntermediateTestAgent
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
@@ -399,7 +400,7 @@ public class IntermediateTestAgent
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
@@ -445,7 +446,7 @@ public class IntermediateTestAgent
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();

@@ -704,7 +704,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -1158,7 +1158,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -1300,7 +1300,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -1352,7 +1352,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(Void result) 
 			{
-				component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 				{
 					public void customResultAvailable(ISettingsService settings)
@@ -1381,7 +1381,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 //		System.out.println("shut");
 		final Future<Void>	saved	= new Future<Void>();
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(saved)
 		{
 			public void customResultAvailable(ISettingsService settings)

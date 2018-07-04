@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
@@ -56,7 +57,7 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		{
 			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
 			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
-			IInfoService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IInfoService.class, cid).get();
+			IInfoService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class, cid)).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);
 		}

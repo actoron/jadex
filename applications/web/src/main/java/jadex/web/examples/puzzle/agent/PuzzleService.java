@@ -72,7 +72,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		exta	= agent.getExternalAccess();
 		entries	= new HashMap<Integer, SortedSet<HighscoreEntry>>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -223,7 +223,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)

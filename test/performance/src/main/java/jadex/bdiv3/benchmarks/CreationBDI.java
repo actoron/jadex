@@ -17,6 +17,7 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -150,7 +151,7 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new DefaultResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService result)
@@ -302,7 +303,7 @@ public class CreationBDI
 	 */
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 
 	/**
@@ -310,6 +311,6 @@ public class CreationBDI
 	 */
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 }
