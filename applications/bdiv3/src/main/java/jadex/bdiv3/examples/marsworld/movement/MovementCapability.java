@@ -17,7 +17,8 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -165,9 +166,9 @@ public class MovementCapability
 	 */
 	protected long getTime()
 	{
-		IClockService cs = SServiceProvider.getLocalService(capa.getAgent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		// todo: capa.getAgent().getComponentFeature().getRequiredService() does not work in init expressions only from plans :-(
-//		IClockService cs =  (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
+		IClockService cs = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		// todo: capa.getAgent().getComponentFeature().getService() does not work in init expressions only from plans :-(
+//		IClockService cs =  (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();
 	}
 	

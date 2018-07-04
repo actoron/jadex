@@ -13,7 +13,6 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.MObjectType;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 

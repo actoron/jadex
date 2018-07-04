@@ -924,7 +924,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
 //			}
 			
-//			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms)
@@ -1015,7 +1015,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //				getComponent().getLogger().warning("Component received stream, but ha no communication feature: "+fcon);
 //			}
 			
-//			SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms)

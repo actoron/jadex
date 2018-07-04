@@ -49,7 +49,7 @@ public class ListenerWaitBDI
 		
 //		agent.createResultListener(listener)
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
 //		agent.createResultListener(listener)
 		fut.addResultListener(new IResultListener<IComponentManagementService>()
 		{

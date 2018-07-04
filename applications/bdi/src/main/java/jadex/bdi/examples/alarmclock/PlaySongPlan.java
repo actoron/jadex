@@ -44,8 +44,8 @@ public class PlaySongPlan extends Plan
 		final URL song = (URL)getParameter("song").getValue();
 		final Future<Void>	play	= new Future<Void>();
 		
-//		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get();
-		IThreadPoolService tp = (IThreadPoolService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get();
+//		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.searchService(getScope().getServiceProvider(), new ServiceQuery<>( IThreadPoolService.class)).get();
+		IThreadPoolService tp = (IThreadPoolService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("tpservice").get();
 		final ClassLoader cl = getScope().getClassLoader();
 		tp.execute(new Runnable()
 		{

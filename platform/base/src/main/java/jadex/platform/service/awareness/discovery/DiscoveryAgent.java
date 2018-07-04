@@ -14,7 +14,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -139,7 +140,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 //		
 ////		System.out.println(getMicroAgent().getChildrenIdentifiers()+" delay: "+delay);
 //		
-//		final IMessageService msgser = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		final IMessageService msgser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		msgser.getDefaultCodecs().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
 //		{
 //			public void customResultAvailable(ICodec[] result)
@@ -537,13 +538,13 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+		ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 		List<TransportAddress> addresses = tas.getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addresses, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
 				getExcludes(), null, awa);
 		ret.setResult(info);
 //		System.out.println("awa: "+awa);
-//		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
+//		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("tas");
 //		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
 //		{
 //			public void customResultAvailable(ITransportAddressService tas)
@@ -570,12 +571,12 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+		ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 		List<TransportAddress> addresses = tas.getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addresses, state, getDelay(), getIncludes(), 
 				getExcludes(), masterid, awa);
 		ret.setResult(info);
-//		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tas");
+//		IFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("tas");
 //		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportAddressService, AwarenessInfo>(ret)
 //		{
 //			public void customResultAvailable(ITransportAddressService tas)

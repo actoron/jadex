@@ -8,7 +8,6 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -19,7 +18,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -236,7 +235,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				final IClockService clock	= SServiceProvider.getLocalService(root, IClockService.class);
+				final IClockService clock	= root.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class));
 								IResourceIdentifier	rid	= new ResourceIdentifier(
 									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		//						System.out.println("Using rid: "+rid);
@@ -248,7 +247,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 									public void customResultAvailable(final IComponentIdentifier cid)
 									{
 										System.out.println("cid is: "+cid);
-										SServiceProvider.getService(agent, cid, IPullResultService.class)
+										agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IPullResultService.class))
 											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 										{
 											public void customResultAvailable(IPullResultService service)
@@ -342,7 +341,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				final IClockService clock	= SServiceProvider.getLocalService(root, IClockService.class);
+				final IClockService clock	= root.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class));
 								IResourceIdentifier	rid	= new ResourceIdentifier(
 									new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		//						System.out.println("Using rid: "+rid);
@@ -354,7 +353,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 									public void customResultAvailable(final IComponentIdentifier cid)
 									{
 										System.out.println("cid is: "+cid);
-										SServiceProvider.getService(agent, cid, IPullResultService.class)
+										agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IPullResultService.class))
 											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 										{
 											public void customResultAvailable(IPullResultService service)

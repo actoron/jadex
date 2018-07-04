@@ -71,7 +71,7 @@ public class DisplayAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<IMandelbrotService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("mandelservice");
+		IFuture<IMandelbrotService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("mandelservice");
 		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
 		{
 			public void customResultAvailable(IMandelbrotService result)

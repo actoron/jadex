@@ -225,7 +225,7 @@ public class IntermediateTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		try
 		{
@@ -253,7 +253,7 @@ public class IntermediateTestAgent
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
@@ -297,7 +297,7 @@ public class IntermediateTestAgent
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
@@ -355,7 +355,7 @@ public class IntermediateTestAgent
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
@@ -400,7 +400,7 @@ public class IntermediateTestAgent
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
@@ -446,7 +446,7 @@ public class IntermediateTestAgent
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		

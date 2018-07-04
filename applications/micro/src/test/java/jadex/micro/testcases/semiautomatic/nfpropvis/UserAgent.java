@@ -89,7 +89,7 @@ public class UserAgent
 //			{
 //				ComposedEvaluator<IAService> ranker = new ComposedEvaluator<IAService>();
 //				ranker.addEvaluator(new WaitqueueEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
-//				ITerminableIntermediateFuture<IAService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
+//				ITerminableIntermediateFuture<IAService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
 //				Collection<Tuple2<IAService, Double>> res = SServiceProvider.rankServicesWithScores(sfut, ranker, null).get();
 //				System.out.println("Found: "+res);
 //				if(agent.getConfiguration().equals("with gui"))
@@ -157,7 +157,7 @@ public class UserAgent
 			}
 		};
 		
-		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
+		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
 		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class)
 			.createResultListener(new IResultListener<Collection<Tuple2<ICryptoService, Double>>>()
 		{

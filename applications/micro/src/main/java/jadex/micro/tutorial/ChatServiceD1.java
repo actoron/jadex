@@ -46,7 +46,7 @@ public class ChatServiceD1 implements IChatService
 	{
 		final Future<Void> ret = new Future<Void>();
 		this.format = new SimpleDateFormat("hh:mm:ss");
-		IFuture<IClockService>	fut	= requiredServicesFeature.getRequiredService("clockservice");
+		IFuture<IClockService>	fut	= requiredServicesFeature.getService("clockservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService result)

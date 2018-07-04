@@ -415,7 +415,7 @@ public class SimulationServicePlugin extends AbstractServicePlugin
 //					args.put("component", cid);
 //					
 //					ComponentTreePanel ctp = svp.getPanel().getComponentTreePanel();
-//					SServiceProvider.getService(ctp.getExternalAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					SServiceProvider.searchService(ctp.getExternalAccess().getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //						.addResultListener(new DefaultResultListener()		
 //					{
 //						public void resultAvailable(Object result)

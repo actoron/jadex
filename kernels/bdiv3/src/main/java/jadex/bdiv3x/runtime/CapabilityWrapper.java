@@ -291,13 +291,13 @@ public class CapabilityWrapper implements ICapability
 //	 *  Get a required service.
 //	 *  @return The service.
 //	 */
-//	public IFuture getRequiredService(final String name);
+//	public IFuture getService(final String name);
 //	
 //	/**
 //	 *  Get a required services.
 //	 *  @return The services.
 //	 */
-//	public IFuture getRequiredServices(final String name);
+//	public IFuture getServices(final String name);
 
 	//-------- helper methods --------
 

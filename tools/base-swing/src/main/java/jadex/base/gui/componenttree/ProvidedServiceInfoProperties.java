@@ -14,8 +14,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -72,21 +72,15 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 			{
 				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 				{
-					SServiceProvider.getService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new SwingDefaultResultListener<ILibraryService>()
+					ILibraryService ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ls.getClassLoader(sid.getResourceIdentifier())
+						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 					{
-						public void customResultAvailable(ILibraryService ls)
+						public void customResultAvailable(ClassLoader cl)
 						{
-							ls.getClassLoader(sid.getResourceIdentifier())
-								.addResultListener(new SwingDefaultResultListener<ClassLoader>()
-							{
-								public void customResultAvailable(ClassLoader cl)
-								{
-									Class<?> type = service.getType().getType(cl);
-		//							System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
-									internalSetService(type);
-								}
-							});
+							Class<?> type = service.getType().getType(cl);
+//							System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
+							internalSetService(type);
 						}
 					});
 					

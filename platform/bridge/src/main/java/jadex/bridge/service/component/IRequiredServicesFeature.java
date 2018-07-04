@@ -140,7 +140,7 @@ public interface IRequiredServicesFeature
 //	 *  @param rebind If false caches results.
 //	 *  @return The service.
 //	 */
-//	public <T> IFuture<T> getRequiredService(String name, boolean rebind);
+//	public <T> IFuture<T> getService(String name, boolean rebind);
 //	
 //	/**
 //	 *  Get a required services.
@@ -148,7 +148,7 @@ public interface IRequiredServicesFeature
 //	 *  @param rebind If false caches results.
 //	 *  @return Each service as an intermediate result and a collection of services as final result.
 //	 */
-//	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
+//	public <T> ITerminableIntermediateFuture<T> getServices(String name, boolean rebind);
 //	
 //	/**
 //	 *  Get a required service.
@@ -157,7 +157,7 @@ public interface IRequiredServicesFeature
 //	 *  @param tags The async filter.
 //	 *  @return The service.
 //	 */
-//	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter);
+//	public <T> IFuture<T> getService(String name, boolean rebind, IAsyncFilter<T> filter);
 //	
 //	/**
 //	 *  Get a required services.
@@ -166,7 +166,7 @@ public interface IRequiredServicesFeature
 //	 *  @param tags The async filter.
 //	 *  @return Each service as an intermediate result and a collection of services as final result.
 //	 */
-//	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter);
+//	public <T> ITerminableIntermediateFuture<T> getServices(String name, boolean rebind, IAsyncFilter<T> filter);
 //	
 //	/**
 //	 *  Get a required service using tags.
@@ -175,7 +175,7 @@ public interface IRequiredServicesFeature
 //	 *  @param tags The service tags.
 //	 *  @return The service.
 //	 */
-//	public <T> IFuture<T> getRequiredService(String name, boolean rebind, String... tags);
+//	public <T> IFuture<T> getService(String name, boolean rebind, String... tags);
 //	
 //	/**
 //	 *  Get a required services using tags.
@@ -184,7 +184,7 @@ public interface IRequiredServicesFeature
 //	 *  @param tags The service tags.
 //	 *  @return Each service as an intermediate result and a collection of services as final result.
 //	 */
-//	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, String... tags);
+//	public <T> ITerminableIntermediateFuture<T> getServices(String name, boolean rebind, String... tags);
 //	
 //	/**
 //	 *  Get the result of the last search.

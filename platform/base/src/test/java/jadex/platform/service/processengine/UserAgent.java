@@ -61,12 +61,12 @@ public class UserAgent
 		
 		final TestReport[] trs = new TestReport[2];
 		
-		IFuture<IProcessEngineService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine");
+		IFuture<IProcessEngineService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, Void>(ret)
 		{
 			public void customResultAvailable(final IProcessEngineService mons)
 			{
-				IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libs");
+				IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("libs");
 				fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
 					public void customResultAvailable(ILibraryService libs)
@@ -106,7 +106,7 @@ public class UserAgent
 		
 		final String model = "jadex.platform.service.processengine.ConditionEventStart.bpmn2";
 		
-		IFuture<IProcessEngineService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine");
+		IFuture<IProcessEngineService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IProcessEngineService engine)
@@ -212,7 +212,7 @@ public class UserAgent
 		final String model = "jadex.platform.service.processengine.TimerEventStart.bpmn2";
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		
-		IFuture<IProcessEngineService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("engine");
+		IFuture<IProcessEngineService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IProcessEngineService mons)

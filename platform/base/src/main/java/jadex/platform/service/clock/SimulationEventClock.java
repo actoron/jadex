@@ -1,7 +1,6 @@
 package jadex.platform.service.clock;
 
 import jadex.bridge.service.types.clock.IClock;
-import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.ChangeEvent;
 
 

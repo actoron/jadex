@@ -1,6 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -34,7 +33,7 @@ public class ChatC3Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getRequiredService("cms");
+		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getService("cms");
 		cms.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(final IComponentManagementService cms)

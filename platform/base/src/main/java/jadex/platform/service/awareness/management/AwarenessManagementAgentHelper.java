@@ -14,7 +14,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -76,7 +77,7 @@ public class AwarenessManagementAgentHelper
 						// Start relay mechanism agent
 						if(on && found == null)
 						{
-							SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+							ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(
 								ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 							{
 								public void customResultAvailable(IComponentManagementService cms)
@@ -97,7 +98,7 @@ public class AwarenessManagementAgentHelper
 						else if(!on && found != null)
 						{
 							final IComponentIdentifier cid = found;
-							SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
+							ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(
 								ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 							{
 								public void customResultAvailable(IComponentManagementService cms)
@@ -289,9 +290,9 @@ public class AwarenessManagementAgentHelper
 	 */
 	public static IFuture<Collection<IExternalAccess>> getChildrenAccesses(final IInternalAccess component)
 	{
-		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
+		final Future<Collection<IExternalAccess>>	ret	= new Future<>();
 
-		SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 			new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService result)

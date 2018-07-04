@@ -3,7 +3,6 @@ package jadex.micro.testcases.stream;
 import java.io.InputStream;
 import java.util.Map;
 
-import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;

@@ -17,6 +17,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -153,7 +154,7 @@ public class AuthenticateTestAgent extends TestAgent
 						// Access with custom roles should work -> add roles to new platform.
 						if(cus)
 						{
-							SServiceProvider.getService(exta, ISecurityService.class)
+							SServiceProvider.searchService(exta, new ServiceQuery<>( ISecurityService.class))
 								.addResultListener(new ExceptionDelegationResultListener<ISecurityService, IExternalAccess>(ret)
 							{
 								@Override
@@ -334,7 +335,7 @@ public class AuthenticateTestAgent extends TestAgent
 //	{
 //		final Future<TestReport> ret = new Future<TestReport>();
 //		
-//		final ISecurityService	sec	= SServiceProvider.getLocalService(agent, ISecurityService.class);
+//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
 //		
 //		sec.addRole(agent.getComponentIdentifier().getPlatformPrefix(), "testuser")
 //			.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)

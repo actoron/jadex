@@ -62,7 +62,7 @@ public class ChatE5Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
 		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 		{
 			public void resultAvailable(final IRegistryServiceE3 rs)

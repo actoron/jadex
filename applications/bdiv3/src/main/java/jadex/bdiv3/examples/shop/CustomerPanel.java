@@ -113,7 +113,7 @@ public class CustomerPanel extends JPanel
 						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
 						if(remote.isSelected())
 						{
-							IFuture<Collection<IShopService>> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("remoteshopservices");
+							IFuture<Collection<IShopService>> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("remoteshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret)
 							{
 								public void exceptionOccurred(Exception exception)
@@ -124,7 +124,7 @@ public class CustomerPanel extends JPanel
 						}
 						else
 						{
-							IFuture<Collection<IShopService>> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localshopservices");
+							IFuture<Collection<IShopService>> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("localshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret)
 							{
 								public void exceptionOccurred(Exception exception)

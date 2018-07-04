@@ -289,7 +289,7 @@ public class MethodCallTask implements ITask
 //		final String	fservice	= service;
 //		final String	fmethod	= method;
 //		final String	fresultparam	= resultparam;
-//		process.getServiceContainer().getRequiredService(service, rebind)
+//		process.getServiceContainer().getService(service, rebind)
 //			.addResultListener(new DelegationResultListener(ret)
 //		{
 //			public void customResultAvailable(Object result)
@@ -365,7 +365,7 @@ public class MethodCallTask implements ITask
 				
 				if(reqname!=null && methodname!=null)
 				{
-					RequiredServiceInfo reqser = mi.getRequiredService(reqname);
+					RequiredServiceInfo reqser = mi.getService(reqname);
 					if(reqser!=null)
 					{
 						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl, mi.getAllImports());
@@ -465,9 +465,9 @@ public class MethodCallTask implements ITask
 						String.class, "\""+reqname+"\"", null);
 					mprop.setInitialValue(uexp);
 					
-					if(reqname!=null && model.getRequiredService(reqname)!=null)
+					if(reqname!=null && model.getService(reqname)!=null)
 					{
-						RequiredServiceInfo reqser = model.getRequiredService(reqname);
+						RequiredServiceInfo reqser = model.getService(reqname);
 						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl, model.getAllImports());
 						
 						if(type!=null)
@@ -519,7 +519,7 @@ public class MethodCallTask implements ITask
 			DefaultComboBoxModel mo = ((DefaultComboBoxModel)cbsername.getModel());
 			mo.removeAllElements();
 			
-			RequiredServiceInfo[] reqs = model.getRequiredServices();
+			RequiredServiceInfo[] reqs = model.getServices();
 			
 			ActionListener[] als = cbsername.getActionListeners();
 			for(ActionListener al: als)
@@ -547,7 +547,7 @@ public class MethodCallTask implements ITask
 					String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
 //					System.out.println(task.getName()+" "+mprop.getInitialValueString());
 					
-					RequiredServiceInfo reqser = model.getRequiredService(sername);
+					RequiredServiceInfo reqser = model.getService(sername);
 					if(reqser!=null)
 					{
 						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl, model.getAllImports());

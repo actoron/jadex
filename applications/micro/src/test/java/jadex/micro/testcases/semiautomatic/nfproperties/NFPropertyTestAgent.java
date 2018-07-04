@@ -5,7 +5,8 @@ import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -24,7 +25,7 @@ public class NFPropertyTestAgent
 	@AgentBody
 	public IFuture<Void> body()
 	{
-		ICoreDependentService cds = SServiceProvider.getService(agent, ICoreDependentService.class).get();
+		ICoreDependentService cds = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICoreDependentService.class)).get();
 		IService iscds = (IService)cds;
 //		INFPropertyProvider prov = (INFPropertyProvider)iscds.getExternalComponentFeature(INFPropertyComponentFeature.class);
 		String[] names = SNFPropertyProvider.getNFPropertyNames(agent.getExternalAccess(), iscds.getServiceIdentifier()).get();

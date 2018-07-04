@@ -25,10 +25,6 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,8 +36,6 @@ import javax.swing.ImageIcon;
 
 import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple;
 import jadex.commons.Tuple3;
 
 /**

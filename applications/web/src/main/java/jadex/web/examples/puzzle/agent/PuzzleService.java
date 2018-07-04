@@ -18,6 +18,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -112,7 +113,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		
 		// Does not work, because capability service container no longer available after component cleanup. 
 //		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		SServiceProvider.getService(exta, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(exta, new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -146,7 +147,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		
 		final IGoal	goal	= agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().createGoal("makemove");
 		goal.getParameter("board").setValue(board);	// It is safe to use the board object, as it is passed as a copy to the service automatically.
-		long time = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+		long time = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 		goal.getParameter("deadline").setValue(timeout!=-1 ? time+timeout : -1);
 		
 		agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)

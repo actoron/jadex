@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 
@@ -49,7 +50,7 @@ public class MainH4
 		System.out.println("Started chat component: "+cid);
 		
 		// Fetch the chat service
-		IChatService	chat	= SServiceProvider.getService(platform, cid, IChatService.class).get();
+		IChatService	chat	= SServiceProvider.searchService(platform, new ServiceQuery<>( cid, IChatService.class)).get();
 		chat.message("Main", "Chat started.");
 
 	}

@@ -70,7 +70,7 @@ public class WatchdogAgent	implements IWatchdogService
 						public void resultAvailable(Object result)
 						{
 							// Pinging finished: Search for new watchdogs.
-							agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("watchdogs").addResultListener(new IResultListener()
+							agent.getComponentFeature(IRequiredServicesFeature.class).getServices("watchdogs").addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{

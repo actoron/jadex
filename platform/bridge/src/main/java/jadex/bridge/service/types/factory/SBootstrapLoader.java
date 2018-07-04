@@ -2,7 +2,6 @@ package jadex.bridge.service.types.factory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -14,7 +13,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.SCloner;
-import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Helper methods for loading component models without a running platform.

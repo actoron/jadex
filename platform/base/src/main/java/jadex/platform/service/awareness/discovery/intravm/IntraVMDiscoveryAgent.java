@@ -11,7 +11,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -188,7 +189,7 @@ public class IntraVMDiscoveryAgent implements IDiscoveryService
 	protected AwarenessInfo getAwarenessInfo()
 	{
 		IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
-		List<TransportAddress> addr = SServiceProvider.getLocalService(agent, ITransportAddressService.class).getAddresses().get();
+		List<TransportAddress> addr = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addr, running ? AwarenessInfo.STATE_ONLINE : AwarenessInfo.STATE_OFFLINE, Timeout.NONE, null, null, null, "IntraVM");
 		return info;
 	}

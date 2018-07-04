@@ -528,7 +528,7 @@ public class SBpmnModelWriter
 	 */
 	protected static final void writeRequiredServices(PrintStream out, int ind, MBpmnModel mmodel)
 	{
-		RequiredServiceInfo[] rss = mmodel.getModelInfo().getRequiredServices();
+		RequiredServiceInfo[] rss = mmodel.getModelInfo().getServices();
 		if (rss != null && rss.length > 0)
 		{
 			out.print(getIndent(ind));
@@ -821,7 +821,7 @@ public class SBpmnModelWriter
 					out.println("</jadex:providedserviceconfigurations>");
 				}
 				
-				RequiredServiceInfo[] rss = conf.getRequiredServices();
+				RequiredServiceInfo[] rss = conf.getServices();
 				if (rss != null && rss.length > 0)
 				{
 					out.print(getIndent(ind));

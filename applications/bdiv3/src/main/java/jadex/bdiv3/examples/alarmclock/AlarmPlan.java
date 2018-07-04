@@ -13,7 +13,8 @@ import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 
 /**
@@ -46,7 +47,7 @@ public class AlarmPlan
 		while(true)
 		{
 			// Check if there is an alarm to do.
-			long	time	= SServiceProvider.getLocalService(scope.getAgent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+			long	time	= scope.getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 			long alarmtime = goal.getAlarm().getAlarmtime(time);
 //			System.out.println("Alarm plan alarmtime: "+alarmtime);
 			if(alarmtime==Alarm.NO_ALARM)

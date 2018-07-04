@@ -90,7 +90,7 @@ public class ExecutionService implements IExecutionService
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		if (!info.getExecutionServiceId().equals(id))
 		{
-			ia.getServiceContainer().getRequiredServices("execution_services").addResultListener(new ExceptionDelegationResultListener<Collection<Object>, IModelInfo>(ret)
+			ia.getServiceContainer().getServices("execution_services").addResultListener(new ExceptionDelegationResultListener<Collection<Object>, IModelInfo>(ret)
 			{
 				public void customResultAvailable(Collection<Object> result)
 				{
@@ -137,7 +137,7 @@ public class ExecutionService implements IExecutionService
 	public IFuture<IComponentIdentifier> startProcess(final ProcessResourceInfo info, Object id, final Map arguments)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		ia.getServiceContainer().getRequiredService("cms").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getService("cms").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -249,7 +249,7 @@ public class ExecutionService implements IExecutionService
 		if (procListeners == null)
 		{
 			procListeners = new HashMap<IComponentIdentifier, Set<IProcessListener>>();
-			ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+			ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

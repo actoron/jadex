@@ -59,7 +59,7 @@ public abstract class ReceiveHandler
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Start the receiver thread.
-		IFuture<IDaemonThreadPoolService>	tpfut	= agent.getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("threadpool");
+		IFuture<IDaemonThreadPoolService>	tpfut	= agent.getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getService("threadpool");
 		tpfut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
 			public void resultAvailable(final IDaemonThreadPoolService tp)
@@ -217,7 +217,7 @@ public abstract class ReceiveHandler
 			
 //			System.out.println(System.currentTimeMillis()+" "+agent.getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 			
-			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
+			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getService("management");
 			msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 			{
 				public void resultAvailable(IAwarenessManagementService ms)

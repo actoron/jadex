@@ -52,7 +52,7 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IMultiplexExampleService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
+		IFuture<IMultiplexExampleService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("ms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IMultiplexExampleService, Void>(ret)
 		{
 			public void customResultAvailable(IMultiplexExampleService ser)

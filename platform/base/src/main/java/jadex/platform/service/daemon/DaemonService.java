@@ -248,7 +248,7 @@ public class DaemonService implements IDaemonService
 		// Clone current classpath if not set. 
 		if(options.getClassPath()==null || options.getClassPath().length()==0)
 		{
-			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libservice");
+			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, StartOptions>(ret)
 			{
 				public void customResultAvailable(ILibraryService result)

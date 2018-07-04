@@ -14,6 +14,7 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
@@ -59,7 +60,7 @@ public class StatusAgent implements IStatusService
 	@AgentCreated
 	protected IFuture<Void>	setup()
 	{
-		IWebPublishService	wps	= SServiceProvider.getLocalService(agent, IWebPublishService.class);
+		IWebPublishService	wps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IWebPublishService.class));
 		return wps.publishResources("[http://localhost:8081/]", "META-INF/resources");
 	}
 	

@@ -54,7 +54,7 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, "Test if creating service without explicit implementation works.");
 		try
 		{
-			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
 			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
 			IInfoService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IInfoService.class, cid).get();
 			String res = ser.getInfo().get();

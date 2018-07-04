@@ -7,7 +7,6 @@ import java.util.StringTokenizer;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
 
 /**
  *  Class representing a transport address of a specific platform.

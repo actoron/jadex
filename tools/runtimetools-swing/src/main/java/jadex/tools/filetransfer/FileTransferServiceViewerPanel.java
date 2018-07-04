@@ -219,7 +219,7 @@ public class FileTransferServiceViewerPanel	implements IAbstractViewerPanel
 //	protected IFuture<IExternalAccess> getJCCAccess(IExternalAccess acc, final IComponentIdentifier cid)
 //	{
 //		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-//		SServiceProvider.getService(acc, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		SServiceProvider.searchService(acc, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)

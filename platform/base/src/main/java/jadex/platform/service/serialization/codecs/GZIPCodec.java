@@ -3,11 +3,9 @@ package jadex.platform.service.serialization.codecs;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 
 /**

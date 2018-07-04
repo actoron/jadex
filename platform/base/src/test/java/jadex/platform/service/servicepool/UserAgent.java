@@ -88,7 +88,7 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)
@@ -118,12 +118,12 @@ public class UserAgent
 	{
 		final Future<Tuple2<IAService, IBService>> ret = new Future<Tuple2<IAService, IBService>>();
 		
-		IFuture<IAService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aser");
+		IFuture<IAService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("aser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IAService, Tuple2<IAService, IBService>>(ret)
 		{
 			public void customResultAvailable(final IAService aser)
 			{				
-				IFuture<IBService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("bser");
+				IFuture<IBService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("bser");
 				fut.addResultListener(new ExceptionDelegationResultListener<IBService, Tuple2<IAService, IBService>>(ret)
 				{
 					public void customResultAvailable(final IBService bser)

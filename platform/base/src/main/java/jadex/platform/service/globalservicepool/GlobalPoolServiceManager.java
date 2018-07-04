@@ -17,7 +17,9 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -427,7 +429,7 @@ public class GlobalPoolServiceManager
 							{
 								public void resultAvailable(IExternalAccess ea)
 								{
-									Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea, servicetype, RequiredServiceInfo.SCOPE_LOCAL);
+									Future<IService> fut = (Future<IService>)SServiceProvider.searchService(ea, new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
 									fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
 									{
 										public void resultAvailable(final IService ser)
@@ -611,7 +613,7 @@ public class GlobalPoolServiceManager
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
-		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		
 		cms.destroyComponent(workercid).addResultListener(
 			inta.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
@@ -670,7 +672,7 @@ public class GlobalPoolServiceManager
 		
 		final Future<ITimer> ret = new Future<ITimer>();
 		
-		IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService cs = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		ret.setResult(cs.createTimer(delay, to));
 		
 		return ret;

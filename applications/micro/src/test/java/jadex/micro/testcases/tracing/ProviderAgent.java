@@ -4,7 +4,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -44,7 +45,7 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		System.out.println("Called method1: "+msg+" "+sc+" "+Thread.currentThread());
 		
-		SServiceProvider.getService(agent, ITestService.class, RequiredServiceInfo.SCOPE_LOCAL)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, RequiredServiceInfo.SCOPE_LOCAL))
 			.addResultListener(new ExceptionDelegationResultListener<ITestService, Void>(ret)
 		{
 			public void customResultAvailable(ITestService ts)

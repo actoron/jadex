@@ -27,6 +27,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -193,7 +194,7 @@ public class ServiceHandler implements InvocationHandler
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea, servicetype, RequiredServiceInfo.SCOPE_LOCAL);
+								Future<IService> fut = (Future<IService>)SServiceProvider.searchService(ea, new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
 								fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
 								{
 									public void customResultAvailable(IService ser)

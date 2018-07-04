@@ -91,7 +91,7 @@ public class AnalyzeTargetPlan
 
 		try
 		{
-			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("produceser");
+			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("produceser");
 			Collection<IProduceService> ansers = fut.get();
 			
 			for(IProduceService anser: ansers)

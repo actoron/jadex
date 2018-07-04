@@ -318,7 +318,7 @@ public class FileUpdateAgent extends UpdateAgent
 		}
 		else if(newestversion!=-1)
 		{
-			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libservice");
+			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Long>(ret)
 			{
 				public void customResultAvailable(ILibraryService libser)

@@ -19,6 +19,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
@@ -211,7 +212,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 //		// Local component when platform name is same as JCC platform name
 //		if(cid.getPlatformName().equals(jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
 //		{
-//			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			SServiceProvider.searchService(jcc.getJCCAccess().getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new DelegationResultListener(ret)
 //			{
 //				public void customResultAvailable(Object result)
@@ -232,7 +233,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 //		// Remote component
 //		else
 //		{
-//			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			SServiceProvider.searchService(jcc.getJCCAccess().getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new DelegationResultListener(ret)
 //			{
 //				public void customResultAvailable(Object result)
@@ -256,7 +257,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	{
 		final Future<ClassLoader>	ret	= new Future<ClassLoader>();
 		
-		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -265,7 +266,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 				{
 					public void customResultAvailable(final IExternalAccess exta)
 					{
-						SServiceProvider.getService(jcc.getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 						{
 							public void customResultAvailable(final ILibraryService libservice)
@@ -356,7 +357,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 							for(int i=0; i<nodes.length; i++)
 							{
 								final IComponentIdentifier	cid	= ((ProxyComponentTreeNode)nodes[i]).getComponentIdentifier();
-								SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 									.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
 								{
 									public void customResultAvailable(IComponentManagementService cms)

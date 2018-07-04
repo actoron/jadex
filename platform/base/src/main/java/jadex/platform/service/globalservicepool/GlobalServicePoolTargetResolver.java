@@ -12,7 +12,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -194,7 +196,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
 		// Fetch the global pools management service via its component id.
-		SServiceProvider.getService(agent, sid.getProviderId(), IGlobalPoolManagementService.class)
+		SServiceProvider.searchService(agent, new ServiceQuery<>(IGlobalPoolManagementService.class).setProvider(sid.getProviderId()))
 			.addResultListener(new IResultListener<IGlobalPoolManagementService>() 
 		{
 			public void resultAvailable(final IGlobalPoolManagementService pms) 
@@ -250,7 +252,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				}
 				
 				// send infos to global pool
-				SServiceProvider.getService(agent, sid.getProviderId(), IGlobalPoolManagementService.class)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( sid.getProviderId()), IGlobalPoolManagementService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IGlobalPoolManagementService, Void>(ret) 
 				{
 					public void customResultAvailable(final IGlobalPoolManagementService pms) 

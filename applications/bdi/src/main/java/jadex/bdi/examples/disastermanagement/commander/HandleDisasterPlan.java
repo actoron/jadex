@@ -1,10 +1,8 @@
 package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.runtime.IBelief;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 
 /**
  *  Handle a disaster by assigning units.
@@ -99,7 +97,7 @@ public class HandleDisasterPlan extends Plan
 //			if(chemicals>chemicalunits.size())
 //			{
 ////				Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get();
-//				Collection clearchemser = (Collection)getScope().getRequiredServices("clearchemicalsservices").get();
+//				Collection clearchemser = (Collection)getScope().getServices("clearchemicalsservices").get();
 //				if(clearchemser.size()>0)
 //				{
 //					Iterator it=clearchemser.iterator();
@@ -136,7 +134,7 @@ public class HandleDisasterPlan extends Plan
 //			if(fire>fireunits.size())
 //			{
 ////				Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get();
-//				Collection exfireser = (Collection)getScope().getRequiredServices("extinguishfireservices").get();
+//				Collection exfireser = (Collection)getScope().getServices("extinguishfireservices").get();
 //				if(exfireser.size()>0)
 //				{
 //					Iterator it=exfireser.iterator();
@@ -174,7 +172,7 @@ public class HandleDisasterPlan extends Plan
 //			if(chemicals==0 && victims>ambulanceunits.size())
 //			{
 ////				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get();
-//				Collection treatvicser = (Collection)getScope().getRequiredServices("treatvictimservices").get();
+//				Collection treatvicser = (Collection)getScope().getServices("treatvictimservices").get();
 //				if(treatvicser.size()>0)
 //				{
 //					Iterator it=treatvicser.iterator();

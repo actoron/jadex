@@ -62,7 +62,7 @@ public class UserAgent
 			e.printStackTrace();
 		}
 		
-//		IFuture<IQuoteService> fut = agent.getServiceContainer().getRequiredService("qs");
+//		IFuture<IQuoteService> fut = agent.getServiceContainer().getService("qs");
 //		fut.addResultListener(new DefaultResultListener<IQuoteService>()
 //		{
 //			public void resultAvailable(IQuoteService qs)

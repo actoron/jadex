@@ -9,6 +9,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.FutureBarrier;
 
@@ -199,7 +200,7 @@ public class SecurityEvaluation
 		long start	= System.nanoTime();
 		for(int i=0; i<platforms.length; i++)
 		{
-			IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
+			IComponentManagementService	cms	= SServiceProvider.searchService(platforms[i], new ServiceQuery<>( IComponentManagementService.class)).get();
 			for(int j=0; j<cnt; j++)
 			{
 				fubar.addFuture(cms.createComponent(null, ServiceProviderAgent.class.getName()+".class", null, null));

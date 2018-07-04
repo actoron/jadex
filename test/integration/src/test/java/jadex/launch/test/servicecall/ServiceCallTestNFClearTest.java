@@ -23,9 +23,9 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IResultCommand;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -103,7 +103,7 @@ public class ServiceCallTestNFClearTest
 	public void testMain_toProvidedRaw()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
-		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
+		IServiceCallService service = SServiceProvider.searchService(exta, new ServiceQuery<>( IServiceCallService.class)).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 
@@ -114,7 +114,7 @@ public class ServiceCallTestNFClearTest
 	public void testMain_toProvidedDirect()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, DirectServiceAgent.class);
-		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
+		IServiceCallService service = SServiceProvider.searchService(exta, new ServiceQuery<>( IServiceCallService.class)).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 
@@ -125,7 +125,7 @@ public class ServiceCallTestNFClearTest
 	public void testMain_toProvidedDecoupled()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IServiceCallService service = SServiceProvider.getService(exta, IServiceCallService.class).get(timeout);
+		IServiceCallService service = SServiceProvider.searchService(exta, new ServiceQuery<>( IServiceCallService.class)).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 
@@ -275,12 +275,12 @@ public class ServiceCallTestNFClearTest
 				}
 				else
 				{
-//					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName).get();
+//					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getService(requiredOrProvidedServiceName).get();
 					service = SServiceProvider.waitForService(ia, new IResultCommand<IFuture<IServiceCallService>, Void>()
 					{
 						public jadex.commons.future.IFuture<IServiceCallService> execute(Void args) 
 						{
-							return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(requiredOrProvidedServiceName);
+							return ia.getComponentFeature(IRequiredServicesFeature.class).getService(requiredOrProvidedServiceName);
 						}
 					}, 7, 1500).get();
 						
@@ -306,7 +306,7 @@ public class ServiceCallTestNFClearTest
 
 	private IExternalAccess createServiceAgent(IExternalAccess platform, Class< ? > clazz)
 	{
-		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
+		IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
 		cms.createComponent(clazz.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()

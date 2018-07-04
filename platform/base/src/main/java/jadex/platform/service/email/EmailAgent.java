@@ -1,7 +1,6 @@
 package jadex.platform.service.email;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -416,7 +415,7 @@ public class EmailAgent implements IEmailService
 			{
 				SubscriptionInfo si = subscriptions.get(fut);
 				final long start = System.currentTimeMillis();
-				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("emailfetcher").get();
+				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("emailfetcher").get();
 //				System.out.println("Email fetcher ser: "+fetcher);
 				fetcher.fetchEmails(si).addResultListener(new IResultListener<Collection<Email>>()
 				{

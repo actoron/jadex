@@ -198,7 +198,7 @@ public class ServicePoolManager
 			searching	= true;
 			
 //			System.out.println("wurksn0");
-			component.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(name).addResultListener(
+			component.getComponentFeature(IRequiredServicesFeature.class).getServices(name).addResultListener(
 				new IIntermediateResultListener<Object>()
 			{
 				/**

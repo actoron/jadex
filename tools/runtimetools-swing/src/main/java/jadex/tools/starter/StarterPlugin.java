@@ -25,6 +25,7 @@ import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
@@ -255,7 +256,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 				final Map args = new HashMap();
 				args.put("component", cid);
 				
-				SServiceProvider.getService(getJCC().getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchService(getJCC().getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener()		
 				{
 					public void resultAvailable(Object result)

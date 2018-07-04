@@ -104,7 +104,7 @@ public class HandleDisasterPlan
 //			if(chemicals>chemicalunits.size())
 //			{
 ////				Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
-//				Collection clearchemser = (Collection)getScope().getRequiredServices("clearchemicalsservices").get(this);
+//				Collection clearchemser = (Collection)getScope().getServices("clearchemicalsservices").get(this);
 //				if(clearchemser.size()>0)
 //				{
 //					Iterator it=clearchemser.iterator();
@@ -141,7 +141,7 @@ public class HandleDisasterPlan
 //			if(fire>fireunits.size())
 //			{
 ////				Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get(this);
-//				Collection exfireser = (Collection)getScope().getRequiredServices("extinguishfireservices").get(this);
+//				Collection exfireser = (Collection)getScope().getServices("extinguishfireservices").get(this);
 //				if(exfireser.size()>0)
 //				{
 //					Iterator it=exfireser.iterator();
@@ -179,7 +179,7 @@ public class HandleDisasterPlan
 //			if(chemicals==0 && victims>ambulanceunits.size())
 //			{
 ////				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
-//				Collection treatvicser = (Collection)getScope().getRequiredServices("treatvictimservices").get(this);
+//				Collection treatvicser = (Collection)getScope().getServices("treatvictimservices").get(this);
 //				if(treatvicser.size()>0)
 //				{
 //					Iterator it=treatvicser.iterator();

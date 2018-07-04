@@ -1,8 +1,5 @@
 package jadex.micro.testcases.nfservicetags;
 
-import org.junit.Ignore;
-
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,16 +9,11 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
-import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.sensor.service.TagProperty;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
@@ -64,7 +56,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if can find service withouts tags.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser1").get();
+			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser1").get();
 			tr1.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -76,7 +68,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if can find service with tags in required service defition.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser2").get();
+			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser2").get();
 			tr2.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -88,7 +80,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr3 = new TestReport("#3", "Test if can find service with tags in required service defition that are not defined on service.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser3").get();
+			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser3").get();
 			tr3.setReason("Found service that does not have the tag");
 		}
 		catch(Exception e)

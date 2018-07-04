@@ -14,7 +14,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -56,7 +56,7 @@ public class CAgent extends JunitAgentTest implements ICService
 		final List<TestReport> testcases = new ArrayList<TestReport>();
 		
 		// Test with required service proxy.
-		IFuture<ICService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cservice");
+		IFuture<ICService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("cservice");
 		fut.addResultListener(new DefaultResultListener<ICService>()
 		{
 			public void resultAvailable(ICService result)
@@ -67,7 +67,7 @@ public class CAgent extends JunitAgentTest implements ICService
 					public void resultAvailable(Void result)
 					{
 						// Test with provided service proxy.
-						SServiceProvider.getService(agent, ICService.class)
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICService.class))
 							.addResultListener(new DefaultResultListener<ICService>()
 						{
 							public void resultAvailable(ICService result)

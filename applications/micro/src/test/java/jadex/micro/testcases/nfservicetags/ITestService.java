@@ -2,7 +2,6 @@ package jadex.micro.testcases.nfservicetags;
 
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.commons.future.IFuture;
 

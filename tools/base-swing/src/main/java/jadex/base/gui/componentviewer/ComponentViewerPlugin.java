@@ -37,6 +37,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
@@ -342,12 +343,12 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
 //						final IService service = node.getService();
 						
-						IFuture<IService> fut = SServiceProvider.getService(getJCC().getJCCAccess(), node.getServiceIdentifier());
+						IFuture<IService> fut = SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(node.getServiceIdentifier()));
 						fut.addResultListener(new SwingDefaultResultListener<IService>(comptree)
 						{
 							public void customResultAvailable(final IService service)
 							{
-								SServiceProvider.getService(getJCC().getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //								AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
 									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 								{
@@ -417,7 +418,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						IFuture<IComponentManagementService> fut = SServiceProvider.getService(getJCC().getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						IFuture<IComponentManagementService> fut = SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 						fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(comptree)
 						{
 							public void customResultAvailable(IComponentManagementService cms)
@@ -426,7 +427,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								{
 									public void customResultAvailable(final IExternalAccess exta)
 									{
-										SServiceProvider.getService(getJCC().getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //										AbstractJCCPlugin.getClassLoader(cid, getJCC())
 											.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 										{
@@ -569,7 +570,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					viewables.put(sid, fut);
 //					final long start	= System.currentTimeMillis();
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(getJCC().getJCCAccess(), sid)
+					SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(sid))
 						.addResultListener(new SwingExceptionDelegationResultListener<Object, Boolean>(fut)
 					{
 						public void customResultAvailable(Object result)
@@ -610,7 +611,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(getJCC().getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Boolean>(fut)
 					{
 						public void customResultAvailable(final IComponentManagementService cms)

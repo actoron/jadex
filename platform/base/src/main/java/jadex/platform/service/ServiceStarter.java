@@ -31,7 +31,7 @@ public class ServiceStarter implements Daemon
 //		// Wait for platform to exit.
 //		final Future<Void> exit = new Future<Void>();
 //		
-//		IComponentManagementService cms = SServiceProvider.getService(instance.platform.getServiceProvider(), IComponentManagementService.class)
+//		IComponentManagementService cms = SServiceProvider.searchService(instance.platform.getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class))
 //			.get(new ThreadSuspendable());
 //		cms.addComponentResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
 //		{

@@ -27,7 +27,7 @@ public abstract class HandleForcesPlan extends Plan
 		while(true)
 		{
 			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-			Collection forces = (Collection)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename).get();
+			Collection forces = (Collection)getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices(servicename).get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 							
@@ -119,7 +119,7 @@ public abstract class HandleForcesPlan extends Plan
 //			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 //			String servicename = (String)getParameter("servicename").getValue();
 //			String typename = (String)getParameter("typename").getValue();
-//			Collection forces = (Collection)getScope().getRequiredServices(servicename).get();
+//			Collection forces = (Collection)getScope().getServices(servicename).get();
 //			int number = ((Integer)disaster.getProperty(typename)).intValue();
 //			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 //							

@@ -14,7 +14,8 @@ import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -88,7 +89,7 @@ public class UpdateEnvironmentPlan extends Plan
 	{
 		try
 		{
-			IDF df = (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			IDF df = (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
 			IDFComponentDescription ad = new DFComponentDescription(null, sd);
 			IDFComponentDescription[] tas = df.search(ad, null).get();

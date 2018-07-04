@@ -10,7 +10,8 @@ import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -96,7 +97,7 @@ public class CMInitiatorPlan extends Plan
 //							System.out.println("cancel retry checking if exists: "+arec);
 							try
 							{
-								SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, Binding.SCOPE_PLATFORM)
+								getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM))
 									.getComponentDescription((IComponentIdentifier)it.next()).get(10000);
 //								System.out.println("cancel retry not removed: "+arec);
 							}

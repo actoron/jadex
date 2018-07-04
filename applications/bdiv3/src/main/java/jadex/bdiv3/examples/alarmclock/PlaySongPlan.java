@@ -45,7 +45,7 @@ public class PlaySongPlan
 	public void body(IInternalAccess agent)
 	{
 		final URL song = (URL)goal.getSong();
-		IThreadPoolService tp = (IThreadPoolService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get();
+		IThreadPoolService tp = (IThreadPoolService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("tpservice").get();
 		final ClassLoader cl = agent.getClassLoader();
 		
 		final Future<Void>	fut	= new Future<Void>();

@@ -22,6 +22,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -245,7 +246,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 				}
 				else
 				{
-					IFuture<IService> fut = SServiceProvider.getService(ea, sid);
+					IFuture<IService> fut = SServiceProvider.searchService(ea, new ServiceQuery<>( (Class<IService>)null).setServiceIdentifier(sid));
 					fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 					{
 						public void resultAvailable(IService ser) 

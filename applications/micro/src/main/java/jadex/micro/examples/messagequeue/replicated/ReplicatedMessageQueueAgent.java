@@ -313,7 +313,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 */
 	private IIntermediateFuture<IMessageQueueReplicationService> getOtherServices() 
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("replication");
+		return agent.getComponentFeature(IRequiredServicesFeature.class).getServices("replication");
 	}
 
 	/**

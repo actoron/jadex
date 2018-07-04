@@ -6,13 +6,18 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.annotation.*;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 
 /**
@@ -53,7 +58,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent.getComponentIdentifier(), IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+		IComponentManagementService	cms	= agent.getComponentIdentifier().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
 		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getComponentIdentifier().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override
@@ -69,13 +74,13 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule external local has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		cms	= SServiceProvider.getService(exta, IComponentManagementService.class, Binding.SCOPE_PLATFORM).get();
+		cms	= SServiceProvider.searchService(exta, new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
 		cms.getComponentDescription(exta.getComponentIdentifier()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 		
-		ITestService	ts	= SServiceProvider.getService(exta, ITestService.class, Binding.SCOPE_LOCAL).get();
+		ITestService	ts	= SServiceProvider.searchService(exta, new ServiceQuery<>( ITestService.class, Binding.SCOPE_LOCAL)).get();
 		ts.method(agent.getExternalAccess()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote callback: "+ServiceCall.getCurrentInvocation()+", "+sc));

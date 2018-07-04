@@ -6,9 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -62,7 +60,7 @@ public class ChatE3Agent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+		IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IRegistryServiceE3, Void>(ret)
 		{
 			public void customResultAvailable(final IRegistryServiceE3 rs)
@@ -74,8 +72,8 @@ public class ChatE3Agent
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("exception, could not find appreg service: "+exception);
-//				IRegistryServiceE3 reg = SServiceProvider.getLocalService(agent, IRegistryServiceE3.class);
-				IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+//				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
+				IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
 				super.exceptionOccurred(exception);
 			}
 		});
@@ -89,7 +87,7 @@ public class ChatE3Agent
 	@AgentBody
 	public void executeBody()
 	{
-//		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+//		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
 //		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 //		{
 //			public void resultAvailable(final IRegistryServiceE3 rs)

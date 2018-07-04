@@ -380,7 +380,7 @@ public class ClockFrame extends JFrame
 				{
 					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
-					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
 					fut.addResultListener(new SwingDefaultResultListener<IClockService>(ClockFrame.this)
 					{
 						public void customResultAvailable(final IClockService cs)

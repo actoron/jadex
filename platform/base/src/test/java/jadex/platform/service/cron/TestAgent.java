@@ -138,7 +138,7 @@ public class TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("crons");
+		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("crons");
 		fut.addResultListener(new IResultListener<ICronService>()
 		{
 			public void resultAvailable(final ICronService crons)

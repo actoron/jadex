@@ -54,12 +54,12 @@ public class MultiServiceAgent extends JunitAgentTest implements IAddService, IS
 		final Future<Void>	ret	= new Future<Void>();
 		final Future fut = new Future();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("add").addResultListener(new DelegationResultListener(fut)
+		agent.getComponentFeature(IRequiredServicesFeature.class).getService("add").addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IAddService	add	= (IAddService)result;
-				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("sub").addResultListener(new DelegationResultListener(fut)
+				agent.getComponentFeature(IRequiredServicesFeature.class).getService("sub").addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{

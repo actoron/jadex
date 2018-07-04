@@ -2,8 +2,6 @@ package jadex.platform.service.message.websockettransport;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +18,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.threadpool.JadexExecutorServiceAdapter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.platform.service.transport.ITransportHandler;
 
 /**

@@ -54,7 +54,7 @@ This annotation is one of three [lifecycle annotations](../../components/compone
 
 ```java
 
-IFuture<IClockService> fut = requiredServicesFeature.getRequiredService("clockservice");
+IFuture<IClockService> fut = requiredServicesFeature.getService("clockservice");
 fut.addResultListener(new DefaultResultListener<IClockService>()
 {
   public void resultAvailable(IClockService cs)
@@ -67,7 +67,7 @@ fut.addResultListener(new DefaultResultListener<IClockService>()
 
 ## Verify the Component Behavior
 
-The declared service is looked up via its name using the RequiredServicesFeature's *getRequiredService("clockservice")* method. 
+The declared service is looked up via its name using the RequiredServicesFeature's *getService("clockservice")* method. 
 Fetching a required service makes Jadex inspect the binding definition of that service and possibly initiates an implicit service search.
 As resolving the binding may involve complex lookups it is realized as asynchronous call using a *future* return value (also nearly all services are defined this way). This means that the call immediately returns the future that represents a holder for the 'real' return value. 
 The future allows the caller to be decoupled from the action of the callee because the method call can return without waiting for the callee to finish processing and the result is set by the callee whenever it is ready. (For further details on futures e.g. refer to [Wikipedia](http://en.wikipedia.org/wiki/Futures_and_promises) ).
@@ -81,7 +81,7 @@ In this execise we will use another service of the platform and invoke a method 
 
 -   Create a Java class called *ChatC3Agent.java* by copying the agent from the last lecture.
 -   Change the required service specification to look for the *IComponentManagementService.class** and change the name to *cms*. The scope can be kept the same as this service is also made available by the platform component itself. 
--   Adapt the ```getRequiredService()``` call to use the new service name cms and type ```IComponentManagementService```.
+-   Adapt the ```getService()``` call to use the new service name cms and type ```IComponentManagementService```.
 -   Change the parameter type of the ```resultAvailable``` method to ```IComponentManagementService```.
 -   Invoke the *getComponentDescriptions()* method on the service to get an array of all components in the platform. 
 Note, that the call returns a future so that you will have to add a result listener again for result processing.

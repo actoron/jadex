@@ -15,7 +15,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.bridge.service.types.df.IProperty;

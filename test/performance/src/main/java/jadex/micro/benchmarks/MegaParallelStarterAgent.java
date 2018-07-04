@@ -10,7 +10,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -78,7 +78,7 @@ public class MegaParallelStarterAgent
 				
 				final int max = ((Integer)args.get("max")).intValue();
 				
-				IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				String model = MegaParallelCreationAgent.class.getName().replaceAll("\\.", "/")+".class";
 				for(int i=1; i<=max; i++)
 				{
@@ -167,7 +167,7 @@ public class MegaParallelStarterAgent
 	{
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
-		IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier());
 		IResultListener lis = new IResultListener()
 		{
@@ -195,7 +195,7 @@ public class MegaParallelStarterAgent
 //		if(cms==null)
 //		{
 //			cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class); // Raw service
-////			cms	= getRequiredService("cmsservice");	// Required service proxy
+////			cms	= getService("cmsservice");	// Required service proxy
 //		}
 //		return cms;
 //	}
@@ -207,7 +207,7 @@ public class MegaParallelStarterAgent
 		if(clock==null)
 		{
 			clock	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM); // Raw service
-//			clock	= getRequiredService("clockservice");	// Required service proxy
+//			clock	= getService("clockservice");	// Required service proxy
 		}
 		return clock;
 	}

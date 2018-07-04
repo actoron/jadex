@@ -99,7 +99,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
 		final Future<Void>	fut	= new Future<Void>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
+		agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
 		{
 			@SuppressWarnings("deprecation")
 			public void customResultAvailable(Object result)

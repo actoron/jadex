@@ -359,7 +359,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
+		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();
 	}
 	

@@ -1,7 +1,6 @@
 package jadex.micro.testcases.prepostconditions;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import jadex.base.test.TestReport;

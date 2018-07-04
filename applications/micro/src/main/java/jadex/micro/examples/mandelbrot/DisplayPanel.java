@@ -36,6 +36,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -392,8 +393,8 @@ public class DisplayPanel extends JComponent
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										// do not depend on hosting component!
-//										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
-										IFuture<IComponentManagementService>	fut	= SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getService("cmsservice");
+										IFuture<IComponentManagementService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
 										{
 											public void resultAvailable(IComponentManagementService cms)
@@ -413,7 +414,7 @@ public class DisplayPanel extends JComponent
 																{
 																	// It is not really possible to define the progress services as required service.
 																	// Needs component specific progress service.
-																	SServiceProvider.getService(ea, IProgressService.class)
+																	SServiceProvider.searchService(ea, new ServiceQuery<>( IProgressService.class))
 																		.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
 																	{
 																		public void resultAvailable(IProgressService	ps)
@@ -1016,7 +1017,7 @@ public class DisplayPanel extends JComponent
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("generateservice")
+					ia.getComponentFeature(IRequiredServicesFeature.class).getService("generateservice")
 						.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)

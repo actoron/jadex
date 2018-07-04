@@ -224,7 +224,7 @@ public class MicroClassReader
 //			IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
 //			IArgument[] results = metainfo!=null? metainfo.getResults(): null;
 //			Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
-//			RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
+//			RequiredServiceInfo[] required = metainfo!=null? metainfo.getServices(): null;
 //			ProvidedServiceInfo[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
 //			IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
 //			IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;

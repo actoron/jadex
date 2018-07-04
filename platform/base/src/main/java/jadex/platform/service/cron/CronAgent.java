@@ -14,7 +14,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -203,7 +203,7 @@ public class CronAgent implements ICronService
 						if(jobs.containsKey(job.getId()))
 						{
 							final IComponentStep<Void> self = this;
-							IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser");
+							IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockser");
 							fut.addResultListener(new DefaultResultListener<IClockService>()
 							{
 								public void resultAvailable(IClockService clockser)
@@ -313,7 +313,7 @@ public class CronAgent implements ICronService
 		
 		if(useworkeragent)
 		{
-			IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(final IComponentManagementService cms)

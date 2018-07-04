@@ -107,7 +107,7 @@ public class ChartPanel extends JPanel
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IFuture<IChartService> csfut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("chartservice");
+							IFuture<IChartService> csfut = ia.getComponentFeature(IRequiredServicesFeature.class).getService("chartservice");
 							csfut.addResultListener(new SwingDefaultResultListener<IChartService>()
 							{
 								public void customResultAvailable(IChartService chartservice)

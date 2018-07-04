@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -166,12 +165,12 @@ public class ServiceCallTestAgent extends TestAgent
 //		{
 //			public IFuture<IServiceCallService> execute(Void args)
 //			{
-//				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
-//				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename, true, 
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).getService(servicename);
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).getService(servicename, true, 
 //					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
 //			}
 //		}, 7, 1500);
-		IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+		IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService(servicename);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{

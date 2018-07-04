@@ -10,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
@@ -32,7 +33,7 @@ public class UserAgent
     public void init() 
     {
         System.out.println("Agent created");
-        IFuture<Collection<ITestService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("testService");
+        IFuture<Collection<ITestService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("testService");
         Collection<ITestService> sers = fut.get();
         System.out.println("fetched all available services: "+sers.size());
     }
@@ -41,7 +42,7 @@ public class UserAgent
 	{
 //    	ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get();
-		IComponentManagementService cms = SServiceProvider.getService(plat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService cms = SServiceProvider.searchService(plat, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		final Future<Void> fut = new Future<Void>();
 		

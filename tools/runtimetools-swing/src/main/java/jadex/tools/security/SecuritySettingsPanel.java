@@ -34,7 +34,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Properties;
 import jadex.commons.collection.MultiCollection;
@@ -95,7 +96,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				secservice = (ISecurityService) SServiceProvider.getService(ia, sid, true).get();
+				secservice = (ISecurityService) ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( sid, true)).get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{

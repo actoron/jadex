@@ -60,6 +60,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -1465,7 +1466,7 @@ public class StarterPanel extends JLayeredPane
 		
 		if(model!=null)
 		{
-			RequiredServiceInfo[] required = model.getRequiredServices();
+			RequiredServiceInfo[] required = model.getServices();
 			
 			if(required.length>0)
 			{
@@ -1656,7 +1657,7 @@ public class StarterPanel extends JLayeredPane
 		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
-		SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

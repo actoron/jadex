@@ -101,12 +101,12 @@ public class CliEmailAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cliser");
+		IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cliser");
 		clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Void>(ret)
 		{
 			public void customResultAvailable(final ICliService cliser)
 			{
-				IFuture<IEmailService> emlfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("emailser");
+				IFuture<IEmailService> emlfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("emailser");
 				emlfut.addResultListener(new ExceptionDelegationResultListener<IEmailService, Void>(ret)
 				{
 					public void customResultAvailable(final IEmailService emailser)
@@ -175,7 +175,7 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
-			IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cliser");
+			IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
 				public void customResultAvailable(final ICliService cliser)
@@ -238,7 +238,7 @@ public class CliEmailAgent
 							
 							throw new UnsupportedOperationException("todo: fix security check");
 							
-//							IFuture<ISecurityService> secfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("secser");
+//							IFuture<ISecurityService> secfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("secser");
 //							secfut.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Email>(ret)
 //							{
 //								public void customResultAvailable(final ISecurityService secser)

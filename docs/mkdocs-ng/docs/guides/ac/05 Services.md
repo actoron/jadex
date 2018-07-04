@@ -19,10 +19,10 @@ public interface IServiceContainer
   public IService getProvidedService(String name);
   public IService[] getProvidedServices(Class clazz);
 
-  public <T> IFuture<T> getRequiredService(String name);
-  public <T> IIntermediateFuture<T> getRequiredServices(String name);
-  public <T> IFuture<T> getRequiredService(String name, boolean rebind);
-  public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
+  public <T> IFuture<T> getService(String name);
+  public <T> IIntermediateFuture<T> getServices(String name);
+  public <T> IFuture<T> getService(String name, boolean rebind);
+  public <T> IIntermediateFuture<T> getServices(String name, boolean rebind);
 
   public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid);
   public <T> IFuture<T> searchService(Class<T> type);
@@ -46,7 +46,7 @@ The first block of methods allows for fetching, adding and removing provided ser
 Required Services
 ------------------------------
 
-The second block of methods shows how required services can be used. There is amethod to fetch a single service *getRequiredService()* and another one for fetching multiple services (those that have been defined with *multiple=true*) *getRequiredServices()*. Both methods come in two variants. The first variant only requires the *name* as argument. The second variant includes a *rebind* flag that allows for initiating a fresh binding by searching again the services according to the required service definition. This is only required if the service definition is static, i.e. *dynamic=false* which is the default. 
+The second block of methods shows how required services can be used. There is amethod to fetch a single service *getService()* and another one for fetching multiple services (those that have been defined with *multiple=true*) *getServices()*. Both methods come in two variants. The first variant only requires the *name* as argument. The second variant includes a *rebind* flag that allows for initiating a fresh binding by searching again the services according to the required service definition. This is only required if the service definition is static, i.e. *dynamic=false* which is the default. 
 
 Service Search
 ---------------------------

@@ -81,7 +81,7 @@ public class BDIDemoActivity extends JadexAndroidActivity
 		{
 			// Get DisplayService
 			IExternalAccess platformAccess = getPlatformAccess();
-			SServiceProvider.getService(platformAccess, IDisplayTextService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.searchService(platformAccess, new ServiceQuery<>( IDisplayTextService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(
 					new DefaultResultListener<IDisplayTextService>()
 					{

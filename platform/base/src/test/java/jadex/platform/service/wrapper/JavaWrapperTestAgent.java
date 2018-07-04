@@ -57,7 +57,7 @@ public class JavaWrapperTestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IJavaWrapperService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("wrapperservice");
+		IFuture<IJavaWrapperService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("wrapperservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IJavaWrapperService, Void>(ret)
 		{
 			public void customResultAvailable(IJavaWrapperService result)

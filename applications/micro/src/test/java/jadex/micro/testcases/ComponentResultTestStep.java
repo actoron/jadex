@@ -83,7 +83,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	{
 		final Future<Void>	fut	= new Future<Void>();
 
-		ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms")
+		ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms")
 			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
 		{
 			public void customResultAvailable(Object result)

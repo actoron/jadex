@@ -54,7 +54,7 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IParallelService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("paser");
+		IFuture<IParallelService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("paser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IParallelService, Void>(ret)
 		{
 			public void customResultAvailable(IParallelService paser)

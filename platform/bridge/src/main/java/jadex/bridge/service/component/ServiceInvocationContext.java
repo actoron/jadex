@@ -17,8 +17,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -457,7 +455,7 @@ public class ServiceInvocationContext
 		{
 //			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
 //			if(method.getName().indexOf("performSteps")!=-1)
-//				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+SServiceProvider.getLocalService(platform, IClockService.class).getTime());
+//				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+platform.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 			IFuture<Void>	fut	= interceptor.execute(this);
 			if(fut.isDone())
 			{

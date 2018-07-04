@@ -23,6 +23,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
@@ -149,7 +150,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 							// Hack for speed
 							if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
 							{
-								SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+								SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
 									.addResultListener(new IResultListener<IProxyAgentService>()
 								{
 									public void resultAvailable(IProxyAgentService ser)

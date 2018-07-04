@@ -50,7 +50,7 @@ public class ChatServiceD5 implements IChatService
 		final Future<Void> ret = new Future<Void>();
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
-		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
 		fut.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService result)

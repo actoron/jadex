@@ -183,7 +183,7 @@ public class SRemoteGui
 //		
 //		try
 //		{
-//			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService	cms)
@@ -205,7 +205,7 @@ public class SRemoteGui
 //									final Future<Void>	ret	= new Future<Void>();
 //									try
 //									{
-//										SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//										ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //											.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //										{
 //											public void customResultAvailable(IComponentManagementService cms)
@@ -245,7 +245,7 @@ public class SRemoteGui
 //	public static IFuture<Void>	deregisterRemoteCMSListener(final IExternalAccess access, final IComponentIdentifier cid, final String id0)
 //	{
 //		final Future<Void>	ret	= new Future<Void>();
-//		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)
@@ -263,7 +263,7 @@ public class SRemoteGui
 //								final Future<Void>	ret	= new Future<Void>();
 //								try
 //								{
-//									SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//									ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //										.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //									{
 //										public void customResultAvailable(IComponentManagementService cms)

@@ -8,6 +8,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Binding;
@@ -57,7 +58,7 @@ public class DirectConnectionDemo
 		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", remote_cid);
 		CreationInfo ci = new CreationInfo(args);
-		IComponentManagementService	cms	= SServiceProvider.getService(platform, IComponentManagementService.class, Binding.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
 		cms.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 	}
 	

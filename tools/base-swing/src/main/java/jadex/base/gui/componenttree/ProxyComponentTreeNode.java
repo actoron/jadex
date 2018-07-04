@@ -14,6 +14,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -238,7 +239,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		
 		if(cid==null)
 		{
-			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+			SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)
@@ -268,7 +269,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	protected IFuture<State> getConnectionState()
 	{
 		final Future<State> ret = new Future<State>();
-		SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+		SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
 			.addResultListener(new IResultListener<IProxyAgentService>()
 //			.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 		{

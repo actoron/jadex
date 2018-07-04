@@ -5,6 +5,7 @@ import java.util.Map;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -61,7 +62,7 @@ public class SaveSettingsCommand extends ACliCommand
 		final String filename = (String)args.get(null);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-		SServiceProvider.getService(comp, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(comp, new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 		{
 			public void customResultAvailable(ISettingsService ss)

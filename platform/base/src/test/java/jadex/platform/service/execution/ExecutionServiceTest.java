@@ -12,6 +12,7 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.concurrent.IExecutable;
 
@@ -25,7 +26,7 @@ public class ExecutionServiceTest
 		minimal.getExtendedPlatformConfiguration().setWsTransport(false);
 		minimal.setValue("settings.readonly", true);
 		IExternalAccess	platform	= Starter.createPlatform(minimal).get();
-		IExecutionService	exe	= SServiceProvider.getService(platform, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IExecutionService	exe	= SServiceProvider.searchService(platform, new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		final List<String>	list	= new ArrayList<String>();		
 		exe.execute(new IExecutable()

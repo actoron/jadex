@@ -3,7 +3,6 @@ package jadex.extension.rs.publish;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 
 /**

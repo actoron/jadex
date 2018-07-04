@@ -629,7 +629,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServices()
+	public RequiredServiceInfo[] getServices()
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
 			requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
@@ -665,7 +665,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the required service.
 	 *  @return The required service.
 	 */
-	public RequiredServiceInfo getRequiredService(String name)
+	public RequiredServiceInfo getService(String name)
 	{
 		return requiredservices!=null? requiredservices.get(name): null;
 	}

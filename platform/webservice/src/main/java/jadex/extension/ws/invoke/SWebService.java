@@ -1,7 +1,5 @@
 package jadex.extension.ws.invoke;
 
-import java.lang.reflect.Proxy;
-
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 

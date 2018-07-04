@@ -1136,12 +1136,12 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 //				if(confname!=null)
 //				{
 //					getModelInfo().getConfiguration(confname).addRequiredService(rs);
-//					row = getModelInfo().getConfiguration(confname).getRequiredServices().length;
+//					row = getModelInfo().getConfiguration(confname).getServices().length;
 //				}
 //				else
 //				{
 					getModelInfo().addRequiredService(rs);
-//					row = getModelInfo().getRequiredServices().length;
+//					row = getModelInfo().getServices().length;
 //				}
 				
 				modelcontainer.setDirty(true);
@@ -1159,7 +1159,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				
 				Arrays.sort(ind);
 				
-				RequiredServiceInfo[] services = getModelInfo().getRequiredServices();
+				RequiredServiceInfo[] services = getModelInfo().getServices();
 				for(int i = ind.length - 1; i >= 0; --i)
 				{
 					getModelInfo().removeRequiredService(services[i]);
@@ -2334,7 +2334,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public int getRowCount()
 		{
-			return getModelInfo().getRequiredServices().length;
+			return getModelInfo().getServices().length;
 		}
 		
 		/**
@@ -2356,7 +2356,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
+			RequiredServiceInfo rs = getModelInfo().getServices()[rowIndex];
 			RequiredServiceInfo cs = getReqService(rs.getName(), getModel().getModelInfo().getConfiguration((String)confmodel.getSelectedItem()));
 			switch(columnIndex)
 			{
@@ -2416,7 +2416,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
-			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
+			RequiredServiceInfo rs = getModelInfo().getServices()[rowIndex];
 			ConfigurationInfo conf = getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem());
 			RequiredServiceInfo cs = getReqService(rs.getName(), conf);
 			if((columnIndex == 3 ||
@@ -2444,7 +2444,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 								itcs.setName(newname);
 						}
 						rs.setName(newname);
-						getModelInfo().setRequiredServices(getModelInfo().getRequiredServices());
+						getModelInfo().setRequiredServices(getModelInfo().getServices());
 					}
 					break;
 				}
@@ -2588,7 +2588,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	{
 		public boolean filter(String obj)
 		{
-			RequiredServiceInfo[] rsi = getModelInfo().getRequiredServices();
+			RequiredServiceInfo[] rsi = getModelInfo().getServices();
 			for (int i = 0; i < rsi.length; ++i)
 			{
 				if (obj.equals(rsi[i].getName()))
@@ -2831,7 +2831,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			return null;
 		}
 		
-		RequiredServiceInfo[] services = conf.getRequiredServices();
+		RequiredServiceInfo[] services = conf.getServices();
 		
 		if (services == null)
 		{

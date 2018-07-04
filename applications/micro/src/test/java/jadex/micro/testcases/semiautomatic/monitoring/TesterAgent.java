@@ -52,7 +52,7 @@ public class TesterAgent implements ITestService
 	@AgentBody
 	public void body()
 	{
-		final IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+		final IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
 
 		if(agent.getConfiguration().equals("created"))
 		{
@@ -62,7 +62,7 @@ public class TesterAgent implements ITestService
 		}
 		else
 		{	
-//			IMonitoringService mons = SServiceProvider.getService(agent.getServiceProvider(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+//			IMonitoringService mons = SServiceProvider.searchService(agent.getServiceProvider(), new ServiceQuery<>( IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //			mons.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 //			{
 //				public boolean filter(IMonitoringEvent obj)

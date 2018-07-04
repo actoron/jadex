@@ -5,7 +5,8 @@ import java.util.Date;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.df.IDF;
 
 /**
@@ -22,7 +23,7 @@ public class DFKeepRegisteredPlan	extends Plan
 			lease	= desc.getLeaseTime().getTime()-getTime();
 		}
 		
-		IDF	df = SServiceProvider.getLocalService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IDF	df = getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		df.register(desc).get();
 		while(lease!=-1)
 		{

@@ -1,9 +1,6 @@
 package jadex.base.test.impl;
 
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
@@ -30,6 +27,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.TupleResult;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
 /**
  *  Test a component.

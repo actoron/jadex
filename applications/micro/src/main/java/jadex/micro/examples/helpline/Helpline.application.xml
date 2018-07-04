@@ -22,8 +22,8 @@
 	
 	<!--<properties>
 		<property name="clock" class="IFuture">
-			 SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM) 
-			SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			 SServiceProvider.searchService($component, new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)) 
+			$component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 		</property>
 	</properties>-->
 	
@@ -35,9 +35,9 @@
 						<argument name="infos">
 							new InformationEntry[]
 							{
-								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()-2*60*60*1000),
-								new InformationEntry("Lennie Lost", "Brought to collection point.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()-1*60*60*1000),
-								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())
+								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", ((IClockService)$component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()-2*60*60*1000),
+								new InformationEntry("Lennie Lost", "Brought to collection point.", ((IClockService)$component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()-1*60*60*1000),
+								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", ((IClockService)$component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime())
 							}
 						</argument>
 					</arguments>

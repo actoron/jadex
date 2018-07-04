@@ -97,13 +97,13 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 					
 					// Uses required service info to search service
-					RequiredServiceInfo	info = model.getModelInfo().getRequiredService(sername);				
+					RequiredServiceInfo	info = model.getModelInfo().getService(sername);				
 										
 					for(int j=0; j<infos.length; j++)
 					{
 						if(infos[j].getFieldInfo()!=null)
 						{
-							final IFuture<Object> sfut = callGetRequiredService(sername, info);
+							final IFuture<Object> sfut = callgetService(sername, info);
 							final Field	f	= infos[j].getFieldInfo().getField(component.getClassLoader());
 							
 							// todo: what about multi case?
@@ -286,7 +286,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							}
 							else
 							{
-								final IFuture<Object> sfut = callGetRequiredService(sername, info);
+								final IFuture<Object> sfut = callgetService(sername, info);
 								
 								if(info.isMultiple())
 								{
@@ -421,7 +421,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 *  @param info
 	 *  @return
 	 */
-	protected IFuture<Object> callGetRequiredService(String sername, RequiredServiceInfo info)
+	protected IFuture<Object> callgetService(String sername, RequiredServiceInfo info)
 	{
 		final IFuture<Object>	sfut;
 		if(info!=null && info.isMultiple())

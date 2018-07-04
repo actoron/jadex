@@ -1,7 +1,6 @@
 package jadex.bridge.sensor.service;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;

@@ -46,12 +46,12 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("crons");
+		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("crons");
 		fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Void>(ret)
 		{
 			public void customResultAvailable(final ICronService crons)
 			{
-				IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("libs");
+				IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("libs");
 				fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
 					public void customResultAvailable(ILibraryService libs)

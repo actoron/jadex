@@ -31,6 +31,7 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -331,7 +332,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture loadPlatformProperties()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getJCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(getJCC().getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -379,7 +380,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture pushPlatformSettings()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getJCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(getJCC().getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -694,7 +695,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		return ModelTreePanel.createResourceIdentifier(jcc.getPlatformAccess(), filepath);
 		
 //		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-//		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		SServiceProvider.searchService(jcc.getPlatformAccess().getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 //		{
 //			public void customResultAvailable(ILibraryService ls)

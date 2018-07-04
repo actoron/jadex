@@ -1,18 +1,15 @@
 package jadex.base.test.impl;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.IAbortableTestSuite;
-import jadex.base.test.impl.ComponentStartTestLazyPlatform;
-import jadex.base.test.impl.ComponentTestLazyPlatform;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
 
 /**
  * Suite that can run multiple test agents.

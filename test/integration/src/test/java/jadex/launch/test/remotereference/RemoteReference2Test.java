@@ -48,7 +48,7 @@ public class RemoteReference2Test //extends TestCase
 //		{
 //			public IFuture<ILocalService> execute(Void args)
 //			{
-//				return SServiceProvider.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+//				return SServiceProvider.searchService(platform1, new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 //			}
 //		}, 7, 1500).get();
 		
@@ -61,7 +61,7 @@ public class RemoteReference2Test //extends TestCase
 //		{
 //			public IFuture<ISearchService> execute(Void args)
 //			{
-//				return SServiceProvider.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+//				return SServiceProvider.searchService(platform1, new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 //			}
 //		}, 7, 1500).get();
 		

@@ -166,7 +166,7 @@ public class BuyerBDI implements INegotiationAgent
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
+		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();
 	}
 	
@@ -184,7 +184,7 @@ public class BuyerBDI implements INegotiationAgent
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-		IBuyBookService[]	services = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
+		IBuyBookService[]	services = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("buyservice").get().toArray(new IBuyBookService[0]);
 		if(services.length == 0)
 		{
 //			System.out.println("No seller found, purchase failed.");

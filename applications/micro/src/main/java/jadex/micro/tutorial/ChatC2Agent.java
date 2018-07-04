@@ -2,7 +2,6 @@ package jadex.micro.tutorial;
 
 import java.util.Date;
 
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
@@ -35,7 +34,7 @@ public class ChatC2Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IClockService> fut = requiredServicesFeature.getRequiredService("clockservice");
+		IFuture<IClockService> fut = requiredServicesFeature.getService("clockservice");
 		fut.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService cs)

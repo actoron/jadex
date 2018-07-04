@@ -1,7 +1,5 @@
 package jadex.extension.rs.invoke;
 
-import java.lang.reflect.Proxy;
-
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.extension.rs.RSFactory;

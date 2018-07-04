@@ -2,9 +2,6 @@ package jadex.bridge.component.impl.remotecommands;
 
 import java.util.Map;
 
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.annotation.Security;
-
 /**
  *  Base class for Jadex built-in remote commands.
  *  Handles exchange of non-functional properties.

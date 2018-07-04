@@ -314,11 +314,11 @@ public class ClockService extends BasicService implements IClockService, IProper
 		final Future<Void> ret = new Future<Void>();
 
 		threadpool = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IThreadPoolService.class));
-//		ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 //		System.out.println("clock: "+ServiceCall.get);
 		
-//		SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
 //			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
 //		{
 //			public void customResultAvailable(IThreadPoolService result)
@@ -334,7 +334,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 						settings.registerPropertiesProvider("clockservice", ClockService.this)
 							.addResultListener(new DelegationResultListener<Void>(ret));
 						
-//						SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//						component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //							.addResultListener(new IResultListener<ISettingsService>()
 //						{
 //							public void resultAvailable(ISettingsService settings)

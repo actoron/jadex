@@ -25,6 +25,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ICommand;
@@ -65,9 +66,9 @@ public class JadexGatewayServlet extends HttpServlet
 	    this.platform = startPlatform();
 	    ServletCallAccess.purgeServiceCalls();
 	    
-		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //		cms.createComponent(ExternalRSPublishAgent.class.getName()+".class", null).getFirstResult();
-		this.handler = SServiceProvider.getService(platform, IRequestHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		this.handler = SServiceProvider.searchService(platform, new ServiceQuery<>( IRequestHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 
 		// create components
 		Enumeration<String> pnames = config.getInitParameterNames();

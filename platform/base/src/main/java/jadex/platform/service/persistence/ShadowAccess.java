@@ -28,7 +28,7 @@ public class ShadowAccess //implements IExternalAccess
 //		this.access	= access;
 //		this.provider	= new ShadowServiceProvider();
 //		
-//		SServiceProvider.getService(access, ISwapService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		SServiceProvider.searchService(access, new ServiceQuery<>( ISwapService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new IResultListener<ISwapService>()
 //		{
 //			public void resultAvailable(ISwapService swapservice)
@@ -998,32 +998,32 @@ public class ShadowAccess //implements IExternalAccess
 //			throw new UnsupportedOperationException();
 //		}
 //		
-//		public <T> IFuture<T> getRequiredService(String name)
+//		public <T> IFuture<T> getService(String name)
 //		{
 //			throw new UnsupportedOperationException();
 //		}
 //		
-//		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
+//		public <T> ITerminableIntermediateFuture<T> getServices(String name)
 //		{
 //			throw new UnsupportedOperationException();
 //		}
 //		
-//		public <T> IFuture<T> getRequiredService(String name, boolean rebind)
+//		public <T> IFuture<T> getService(String name, boolean rebind)
 //		{
 //			throw new UnsupportedOperationException();
 //		}
 //		
-//		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
+//		public <T> ITerminableIntermediateFuture<T> getServices(String name, boolean rebind)
 //		{
 //			throw new UnsupportedOperationException();
 //		}
 //		
-//		public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter)
+//		public <T> IFuture<T> getService(String name, boolean rebind, IAsyncFilter<T> filter)
 //		{
 //			throw new UnsupportedOperationException();
 //		}
 //		
-//		public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
+//		public <T> ITerminableIntermediateFuture<T> getServices(String name, boolean rebind, IAsyncFilter<T> filter)
 //		{
 //			throw new UnsupportedOperationException();
 //		}

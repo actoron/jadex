@@ -4,8 +4,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -46,7 +44,7 @@ public class StepAgent	implements	IStepService
 	 */
 	public IIntermediateFuture<Integer>	performSteps(final int steps, final long millis)
 	{
-//		System.out.println("Perform steps called: "+SServiceProvider.getLocalService(agent, IClockService.class).getTime());
+//		System.out.println("Perform steps called: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		final IntermediateFuture<Integer>	ret	= new IntermediateFuture<Integer>();
 		
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
@@ -55,7 +53,7 @@ public class StepAgent	implements	IStepService
 			{
 				for(int i=1; i<=steps; i++)
 				{
-//					System.out.println("Perform steps before wait for step "+i+": "+SServiceProvider.getLocalService(agent, IClockService.class).getTime());
+//					System.out.println("Perform steps before wait for step "+i+": "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 					ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}

@@ -1,8 +1,5 @@
 package jadex.bdiv3.testcases.goals;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.annotation.Goal;
@@ -12,8 +9,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.bdiv3.testcases.goals.GoalRebuildBDI.SomeGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;

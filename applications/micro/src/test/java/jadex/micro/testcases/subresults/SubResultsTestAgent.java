@@ -42,7 +42,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
 		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getComponentIdentifier())).getFirstResult();
 		IExternalAccess ea = cms.getExternalAccess(cid).get();
 		

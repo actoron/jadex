@@ -1,7 +1,6 @@
 package jadex.bdiv3.examples.disastermanagement;
 
 import jadex.commons.future.ITerminableFuture;
-import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *  Clear chemicals service interface.

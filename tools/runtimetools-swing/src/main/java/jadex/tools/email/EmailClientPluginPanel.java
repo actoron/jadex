@@ -22,6 +22,7 @@ import javax.swing.border.TitledBorder;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DefaultResultListener;
 
@@ -119,7 +120,7 @@ public class EmailClientPluginPanel extends JPanel
 				}
 				final long vd = mil;
 				
-				SServiceProvider.getService(jcc.getPlatformAccess(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener<ISecurityService>()
 				{
 					public void resultAvailable(ISecurityService sser)

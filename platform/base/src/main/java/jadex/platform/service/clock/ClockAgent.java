@@ -3,8 +3,6 @@ package jadex.platform.service.clock;
 
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;

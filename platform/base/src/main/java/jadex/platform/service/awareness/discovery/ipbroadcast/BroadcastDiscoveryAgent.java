@@ -6,8 +6,6 @@ import java.net.ServerSocket;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.component.IExecutionFeature;
-
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
@@ -17,7 +15,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.DiscoveryAgent;
 import jadex.platform.service.awareness.discovery.MasterSlaveDiscoveryAgent;

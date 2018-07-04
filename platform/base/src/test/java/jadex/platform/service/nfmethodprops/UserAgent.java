@@ -61,7 +61,7 @@ public class UserAgent
 //	{
 //		registerServices().get();
 //		
-//		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
+//		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser").get();
 //		
 //		for(int i=0; i<100; i++)
 //		{
@@ -79,7 +79,7 @@ public class UserAgent
 	{
 		registerServices().get();
 		
-		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
+		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
 		final long wa = 500;
@@ -158,7 +158,7 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)

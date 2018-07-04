@@ -27,6 +27,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
@@ -572,7 +573,7 @@ public class StarterPluginPanel extends JPanel
 	public IFuture loadPlatformProperties()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(jcc.getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -621,7 +622,7 @@ public class StarterPluginPanel extends JPanel
 	{
 		final Future	ret	= new Future();
 //		System.out.println("fetching settings service");
-		SServiceProvider.getService(jcc.getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

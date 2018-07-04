@@ -3,7 +3,6 @@ package jadex.launch.test.remotereference;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
@@ -11,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -44,7 +44,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
 		// Find local service (as local provided service proxy).
-		ILocalService service1 = SServiceProvider.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+		ILocalService service1 = SServiceProvider.searchService(platform1, new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 
 		platform2 = Starter.createPlatform(
 			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
@@ -66,7 +66,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 //			public IFuture<Void> execute(IInternalAccess ia)
 //			{
 //				Future<Void> ret = new Future<Void>();
-//				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+//				ILocalService locService = SServiceProvider.searchService(ia.getExternalAccess(), new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 //				// call service with @Reference Object
 //				locService.executeCallback(new MyCallbackReference()).addResultListener(new DelegationResultListener<Void>(ret));
 //				;
@@ -86,7 +86,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				Future<Void> ret = new Future<Void>();
-				ILocalService locService = SServiceProvider.getService(ia.getExternalAccess(), ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+				ILocalService locService = SServiceProvider.searchService(ia.getExternalAccess(), new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 				// call service without @Reference Object
 				locService.executeCallback(new MyCallback()).addResultListener(new DelegationResultListener<Void>(ret));
 				;

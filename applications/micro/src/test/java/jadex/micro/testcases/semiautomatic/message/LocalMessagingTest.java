@@ -8,6 +8,7 @@ import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 
@@ -28,7 +29,7 @@ public class LocalMessagingTest
 //		Starter.createPlatform(config).get();
 		
 		final IExternalAccess	access	= Starter.createPlatform(config).get();
-		IComponentManagementService	cms	= SServiceProvider.getService(access, IComponentManagementService.class).get();
+		IComponentManagementService	cms	= SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class)).get();
 		//cms.createComponent(SenderAgent.class.getName()+".class",
 		cms.createComponent(BenchmarkAgent.class.getName()+".class",
 			new CreationInfo(new HashMap<String, Object>(){{

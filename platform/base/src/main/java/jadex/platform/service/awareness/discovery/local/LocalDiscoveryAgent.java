@@ -25,7 +25,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -181,7 +181,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				Method registermethod = pathclazz.getMethod("register", new Class<?>[] { wsclazz, kindsarray.getClass() });
 				registermethod.invoke(path, new Object[]{watchservice, kindsarray});
 				
-				IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("threadpool");
+				IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("threadpool");
 				IDaemonThreadPoolService tp = fut.get();
 				final IExternalAccess ea = agent.getExternalAccess();
 				
@@ -263,7 +263,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			}
 		}
 		
-		SServiceProvider.getLocalService(agent, ITransportAddressService.class).subscribeToLocalAddresses().addIntermediateResultListener(new IIntermediateResultListener<Tuple2<TransportAddress,Boolean>>()
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).subscribeToLocalAddresses().addIntermediateResultListener(new IIntermediateResultListener<Tuple2<TransportAddress,Boolean>>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -355,17 +355,17 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				
 //				final String awa = SReflect.getInnerClassName(this.getClass());
 				final String awa = "Local";
-//				IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
+//				IFuture<IMessageService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("ms");
 //				IMessageService cms = fut.get();
-//				IMessageService	cms	= SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//				ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//				IMessageService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//				ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				
 //				IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //				IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //				ITransportComponentIdentifier root = fut2.get();
 				IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
 //				Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
-				List<TransportAddress> addr = SServiceProvider.getLocalService(agent, ITransportAddressService.class).getAddresses().get();
+				List<TransportAddress> addr = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
 				
 //				System.out.println("=====" + agent + "======");
 //				for (TransportAddress entry : addr)
@@ -519,7 +519,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					
 					final AwarenessInfo ai = es.get(0).getFirstEntity();
 					
-					IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("management");
+					IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("management");
 					msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 					{
 						public void resultAvailable(IAwarenessManagementService ms)

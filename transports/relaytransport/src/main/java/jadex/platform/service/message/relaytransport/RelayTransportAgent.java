@@ -24,6 +24,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IUntrustedMessageHandler;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
@@ -34,7 +35,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Tags;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -183,7 +186,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		this.cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, Binding.SCOPE_PLATFORM, false);
+		this.cms = ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
 		if (debug)
 			System.out.println("Started relay transport");
@@ -191,7 +194,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		
 		maxhops = SConfigParser.getIntValue(args.get(PROPERTY_MAX_HOPS), maxhops);
 		
-		secservice = SServiceProvider.getLocalService(agent, ISecurityService.class);
+		secservice = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
 		
 		int cachesize = SConfigParser.getIntValue(PROPERTY_ROUTING_CACHE_SIZE, 5000);
 		routes = new LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>>(cachesize, null, true);
@@ -240,7 +243,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			}
 			if (relayaddrs.size() > 0)
 			{
-				ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+				ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 				tas.addManualAddresses(relayaddrs).get();
 			}
 		}

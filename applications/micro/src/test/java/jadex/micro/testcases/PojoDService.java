@@ -1,7 +1,5 @@
 package jadex.micro.testcases;
 
-import java.lang.reflect.Proxy;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -42,7 +40,7 @@ public class PojoDService implements IDService
 		
 		if("first".equals(agent.getConfiguration()))
 		{
-			IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+			IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
 			cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

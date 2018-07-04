@@ -102,12 +102,12 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	}
 	
 	/**
-	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getRequiredService()
+	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getService()
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name)
+	public <T> IFuture<T> getService(String name)
 	{
 		return getComponentFeature(IRequiredServicesFeature.class).getService(name);
 	}

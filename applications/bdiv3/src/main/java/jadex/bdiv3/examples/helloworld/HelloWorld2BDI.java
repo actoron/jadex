@@ -16,7 +16,6 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

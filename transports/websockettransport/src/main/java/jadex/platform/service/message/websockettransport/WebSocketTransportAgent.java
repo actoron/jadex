@@ -2,9 +2,6 @@ package jadex.platform.service.message.websockettransport;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.IFuture;
@@ -55,7 +52,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 		websocketfactory = new WebSocketFactory(); //.setConnectionTimeout(5000);
 		websocketfactory.setConnectionTimeout((int) connecttimeout);
 		threadpoolsrv = SServiceProvider.getLocalService0(agent, IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM, null, false);
-//		threadpoolsrv = SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class);
+//		threadpoolsrv = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class));
 		return super.init();
 	}
 	

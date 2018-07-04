@@ -51,7 +51,7 @@ public class PurchaseBookPlan extends Plan
 		// Find available seller agents.
 		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
 		IRequiredServicesFeature rsf = getAgent().getComponentFeature(IRequiredServicesFeature.class);
-		ITerminableIntermediateFuture<IBuyBookService>  fut = rsf.getRequiredServices("buyservice");
+		ITerminableIntermediateFuture<IBuyBookService>  fut = rsf.getServices("buyservice");
 		fut.addIntermediateResultListener(new TimeoutIntermediateResultListener<IBuyBookService>(5000, getExternalAccess(),
 			new IIntermediateResultListener<IBuyBookService>()
 		{
@@ -101,7 +101,7 @@ public class PurchaseBookPlan extends Plan
 			}
 		}));
 		
-//		IBuyBookService[] services = getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("buyservice").get().toArray(new IBuyBookService[0]);
+//		IBuyBookService[] services = getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("buyservice").get().toArray(new IBuyBookService[0]);
 //		if(services.length == 0)
 //		{
 //			System.out.println("No seller found, purchase failed.");

@@ -18,7 +18,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -100,7 +100,7 @@ public class DFTestAgent extends JunitAgentTest
 		reports.add(tr);
 
 		//agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		SServiceProvider.getService(agent, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)  
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))  
 			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
 		{
 			public void resultAvailable(IDF df)
@@ -142,7 +142,7 @@ public class DFTestAgent extends JunitAgentTest
 		reports.add(tr);
 
 		// Create a service description to search for.
-		SServiceProvider.getService(agent, IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)  
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))  
 			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
 		{
 			public void resultAvailable(IDF df)

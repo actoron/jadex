@@ -8,7 +8,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

@@ -49,7 +49,7 @@ public class ChatD1Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<Collection<IChatService>>	chatservices	= requiredServicesFeature.getRequiredServices("chatservices");
+		IFuture<Collection<IChatService>>	chatservices	= requiredServicesFeature.getServices("chatservices");
 		chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 		{
 			public void resultAvailable(Collection<IChatService> result)

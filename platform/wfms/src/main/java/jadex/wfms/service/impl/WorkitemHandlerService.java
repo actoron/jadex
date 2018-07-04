@@ -81,7 +81,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	{
 		final Future ret = new Future();
 		
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -126,7 +126,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture shutdownService()
 	{
 		final Future ret = new Future();
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -355,7 +355,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture<Set<IWorkitem>> getAvailableWorkitems(final String username)
 	{
 		final Future ret = new Future();
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -412,7 +412,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -515,7 +515,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	public IFuture<Void> addActivityListener(final IComponentIdentifier client, final IActivityListener listener)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -566,7 +566,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	
 	private void fireWorkitemAddedEvent(final IWorkitem workitem)
 	{
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -608,7 +608,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	{
 		// Workitem Disposed event CANNOT be here since its semantics are different
 		// (workitems are not "disposed" when an activity starts)
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
@@ -649,7 +649,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	
 	private void fireActivityAddedEvent(final String userName, final IClientActivity activity)
 	{
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -684,7 +684,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 	
 	private void fireActivityRemovedEvent(final String userName, final IClientActivity activity)
 	{
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

@@ -4,13 +4,13 @@ import java.util.Map;
 
 import org.junit.Ignore;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
@@ -57,8 +57,8 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(ServiceCallbackProviderAgent.class.getName()+".class",
 				local ? new CreationInfo(agent.getComponentIdentifier()) : null);	// Start as subcomponent in local case
 			IComponentIdentifier	provider	= fut.getFirstResult();
-			ICallerService	service	= local ? SServiceProvider.getService(agent, ICallerService.class).get()
-				: SServiceProvider.getService(agent, ICallerService.class, Binding.SCOPE_GLOBAL).get(); // Search globally in remote case.
+			ICallerService	service	= local ? agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
+				: agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, Binding.SCOPE_GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
 			cms.destroyComponent(provider).get();
 			ret.get().setSucceeded(true);

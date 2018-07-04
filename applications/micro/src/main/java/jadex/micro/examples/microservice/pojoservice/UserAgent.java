@@ -2,7 +2,8 @@ package jadex.micro.examples.microservice.pojoservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -21,7 +22,7 @@ public class UserAgent
 	{
 		try
 		{
-			PojoMicroservice ser = SServiceProvider.getService(agent, PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+			PojoMicroservice ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			System.out.println(ser.sayHello("Lars"));
 		}
 		catch(Exception e)

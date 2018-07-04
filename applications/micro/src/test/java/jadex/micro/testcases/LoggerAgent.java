@@ -62,7 +62,7 @@ public class LoggerAgent extends JunitAgentTest
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

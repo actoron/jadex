@@ -1,13 +1,10 @@
 package jadex.platform.service.registry;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Delay runner based on agent time scheduling.

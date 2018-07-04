@@ -232,7 +232,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>() {
 			@Classname("create-component")
 			public IFuture<S> execute(IInternalAccess ia) {
-				return SServiceProvider.getService(ia, serviceClazz, scope);
+				return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceClazz, scope));
 			}
 		});
 	}

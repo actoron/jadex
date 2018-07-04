@@ -6,7 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -39,7 +39,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");
 		try
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class);
+			IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 			System.out.println("Found: "+cms);
 			tr1.setSucceeded(true);
 		}
@@ -52,7 +52,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if system service can be found without scope with required service def");
 		try
 		{
-			IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+			IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
 			System.out.println("Found: "+fut.get());
 			tr2.setSucceeded(true);
 		}

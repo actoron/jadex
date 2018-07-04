@@ -379,7 +379,7 @@ public class ClockFrame extends JFrame
 				{
 					AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 					final Settings sets = agent.getSettings();
-					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
 					fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
 						public void resultAvailable(IClockService cs)

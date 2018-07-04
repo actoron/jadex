@@ -5,8 +5,6 @@ import java.util.Collection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.IResultCommand;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -25,14 +23,14 @@ public class PlayerAgent
 	@AgentBody
 	public void body()
 	{
-//		final ILotteryService ls = SServiceProvider.getService(agent, ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL).get();
+//		final ILotteryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		final ILotteryService ls = (ILotteryService)SServiceProvider.waitForService(agent, "ls", 3, 3000).get();
 		
 //		ILotteryService ls = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<ILotteryService>, Void>()
 //		{
 //			public IFuture<ILotteryService> execute(Void args)
 //			{
-//				return SServiceProvider.getService(agent, ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 //			}
 //		}, 10, 3000).get();
 		

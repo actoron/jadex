@@ -113,7 +113,7 @@ public class RSHelloTest
     @Test
 	public void testAccessRestService() throws InterruptedException
 	{
-		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc, IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IHelloService> fut = SServiceProvider.searchService(extAcc, new ServiceQuery<>( IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 		IHelloService hs = fut.get();
 		

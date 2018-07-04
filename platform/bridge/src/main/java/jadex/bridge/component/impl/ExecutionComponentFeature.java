@@ -604,7 +604,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				// Todo w/o proxy???
 				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-//				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+//				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false));
 				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
@@ -677,7 +677,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					});
 				}
 			}
-//			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
 //				.addResultListener(new IResultListener<IExecutionService>()
 //			{
 //				public void resultAvailable(IExecutionService exe)

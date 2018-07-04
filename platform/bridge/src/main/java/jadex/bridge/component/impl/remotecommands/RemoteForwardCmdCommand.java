@@ -1,7 +1,6 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.IRemoteConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;

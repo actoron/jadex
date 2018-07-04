@@ -1,10 +1,8 @@
 package jadex.bridge.component.impl.remotecommands;
 
-import java.util.Collection;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.IRemoteOrderedConversationCommand;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateFuture;

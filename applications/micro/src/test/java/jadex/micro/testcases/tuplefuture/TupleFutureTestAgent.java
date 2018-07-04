@@ -9,7 +9,17 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ITuple2Future;
-import jadex.micro.annotation.*;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 /**
  * 
@@ -42,7 +52,7 @@ public class TupleFutureTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		ITestService ts = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ts").get();
+		ITestService ts = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("ts").get();
 		
 		ITuple2Future<String, Integer> fut = ts.getSomeResults();
 		

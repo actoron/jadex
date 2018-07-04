@@ -3,13 +3,11 @@ package jadex.platform.service.awareness.discovery.registry;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Properties;
 import jadex.platform.service.awareness.discovery.ConnectionException;
 import jadex.platform.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.platform.service.awareness.discovery.ReceiveHandler;

@@ -21,7 +21,7 @@ public class PrintTimeStep implements IComponentStep<Void>
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
-		IFuture<IClockService> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+		IFuture<IClockService> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
 		fut.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService cs)

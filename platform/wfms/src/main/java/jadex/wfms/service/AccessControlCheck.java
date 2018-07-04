@@ -28,7 +28,7 @@ public class AccessControlCheck
 	
 	public void checkAccess(final Future targetFuture, IServiceContainer provider, final ICommand actionCommand)
 	{
-		provider.getRequiredService("aaa_service").addResultListener(new DelegationResultListener(targetFuture)
+		provider.getService("aaa_service").addResultListener(new DelegationResultListener(targetFuture)
 		{
 			public void customResultAvailable(Object result)
 			{

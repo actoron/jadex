@@ -17,7 +17,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -144,7 +144,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			}
 		}));
 		
-//		IAService aser = (IAService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aser").get();
+//		IAService aser = (IAService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("aser").get();
 //		
 //		IFuture<IFuture<String>> futa = aser.methodA();
 //		futa.addResultListener(new DefaultResultListener<IFuture<String>>()
@@ -290,7 +290,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{
-						SServiceProvider.getService(agent, cid, IAService.class)
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IAService.class))
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
 						{
 							public void customResultAvailable(IAService service)

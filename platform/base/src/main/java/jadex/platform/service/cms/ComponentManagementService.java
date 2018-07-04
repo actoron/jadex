@@ -48,6 +48,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -211,32 +212,26 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		else
 		{
-			SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, IModelInfo>(ret)
+			ILibraryService	ls	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
+			IFuture<IComponentFactory> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid)));
+			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 			{
-				public void customResultAvailable(final ILibraryService ls)
+				public void customResultAvailable(IComponentFactory factory)
 				{
-					IFuture<IComponentFactory> fut = SServiceProvider.getService(agent, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid));
-					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+					factory.loadModel(filename, null, rid)
+						.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof ServiceNotFoundException)
 					{
-						public void customResultAvailable(IComponentFactory factory)
-						{
-							factory.loadModel(filename, null, rid)
-								.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(exception instanceof ServiceNotFoundException)
-							{
-								ret.setResult(null);
-							}
-							else
-							{
-								super.exceptionOccurred(exception);
-							}
-						}
-					}));
+						ret.setResult(null);
+					}
+					else
+					{
+						super.exceptionOccurred(exception);
+					}
 				}
 			}));
 		}
@@ -1025,7 +1020,7 @@ public class ComponentManagementService implements IComponentManagementService
 		try
 		{
 			// Hack for platform init
-			ILibraryService libservice = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ILibraryService libservice = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			libservice.getClassLoader(rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
 			{
 				public void customResultAvailable(ClassLoader cl)
@@ -2999,7 +2994,7 @@ public class ComponentManagementService implements IComponentManagementService
 					components.put(agent.getComponentIdentifier(), access);
 					
 					ret.setResult(null);
-//					SServiceProvider.getService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //						.addResultListener(createResultListener(new IResultListener<IMessageService>()
 //					{
 //						public void resultAvailable(IMessageService result)
@@ -3015,7 +3010,7 @@ public class ComponentManagementService implements IComponentManagementService
 //						
 //						protected void cont()
 //						{
-//							SServiceProvider.getService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//							agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //								.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 //							{
 //								public void customResultAvailable(IClockService result)
@@ -3331,7 +3326,7 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		try
 		{
-			ret = SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ret = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		}
 		catch(ServiceNotFoundException e)
 		{
@@ -3349,7 +3344,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		
 //		try
 //		{
-//			ret = SServiceProvider.getLocalService(agent, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//			ret = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		}
 //		catch(ServiceNotFoundException e)
 //		{

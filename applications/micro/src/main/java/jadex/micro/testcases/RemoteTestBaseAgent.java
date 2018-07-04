@@ -1,10 +1,10 @@
 package jadex.micro.testcases;
 
-import org.junit.Ignore;
-
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Ignore;
 
 import jadex.base.Starter;
 import jadex.base.test.impl.JunitAgentTest;
@@ -12,7 +12,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
@@ -50,7 +51,7 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	{
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(agent, IComponentManagementService.class);
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 		for(IComponentIdentifier proxy: proxies)
 		{
 			IFuture<Map<String, Object>>	kill	= cms.destroyComponent(proxy);

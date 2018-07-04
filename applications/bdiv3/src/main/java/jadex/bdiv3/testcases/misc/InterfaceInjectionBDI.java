@@ -6,7 +6,8 @@ import jadex.bdiv3.IBDIAgent;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
@@ -38,7 +39,7 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 		TestReport tr2 = new TestReport("#2", "Test if platform access interface injection works.");
 		try
 		{
-			IComponentManagementService	cms	= SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService	cms	= this.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			if(cms!=null)
 			{
 				tr2.setSucceeded(true);

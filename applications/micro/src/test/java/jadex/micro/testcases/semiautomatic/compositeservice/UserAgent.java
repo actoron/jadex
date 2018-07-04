@@ -31,7 +31,7 @@ public class UserAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("addservice").addResultListener(new DefaultResultListener()
+		agent.getComponentFeature(IRequiredServicesFeature.class).getService("addservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

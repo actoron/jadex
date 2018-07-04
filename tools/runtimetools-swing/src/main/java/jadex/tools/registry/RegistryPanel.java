@@ -53,6 +53,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -139,12 +140,12 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				buswitchpeer.setEnabled(false);
 				
-				SServiceProvider.getService(getActiveComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new IResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(final IComponentManagementService cms)
 					{
-						SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 						{
 							public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
@@ -155,7 +156,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								SServiceProvider.getService(getActiveComponent(), IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 									.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
 								{
 									public void resultAvailable(IPeerRegistrySynchronizationService ps)
@@ -441,7 +442,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-//		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 //		{
 //			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
@@ -493,7 +494,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	 */
 	protected void fetchSuperpeer()
 	{
-		SServiceProvider.getService(getActiveComponent(), IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -540,7 +541,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
 			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
@@ -582,7 +583,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(getActiveComponent(), new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
 			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)

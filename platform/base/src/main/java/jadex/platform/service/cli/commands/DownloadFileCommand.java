@@ -15,7 +15,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.commons.SUtil;
@@ -221,7 +221,7 @@ public class DownloadFileCommand extends ACliCommand
 			}));
 			
 			// does not work due to cid has no address
-//			SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IDeploymentService>(ret)
 //			{
 //				public void customResultAvailable(final IComponentManagementService cms)
@@ -244,7 +244,7 @@ public class DownloadFileCommand extends ACliCommand
 		}
 		else
 		{
-			SServiceProvider.getService(ia, IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
 		}
 		

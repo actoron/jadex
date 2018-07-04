@@ -37,10 +37,11 @@ import jadex.base.gui.StatusBar;
 import jadex.bridge.VersionInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.gui.BrowserLauncher;
 import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.BrowserLauncher;
 import jadex.commons.gui.SGUI;
 
 /**
@@ -162,7 +163,7 @@ public class ControlCenterWindow extends JFrame
 			{
 				final boolean sel = soe.isSelected();
 				controlcenter.setSaveOnExit(sel);
-				SServiceProvider.getService(controlcenter.getPCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchService(controlcenter.getPCC().getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new IResultListener<ISettingsService>()
 				{
 					public void resultAvailable(ISettingsService setser)

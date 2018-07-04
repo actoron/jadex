@@ -64,7 +64,7 @@ public class Par2Agent implements IParallelService
 		{
 			public void customResultAvailable(Void result)
 			{
-				IFuture<ISequentialService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("seqser");
+				IFuture<ISequentialService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("seqser");
 				fut.addResultListener(new ExceptionDelegationResultListener<ISequentialService, Void>(ret)
 				{
 					public void customResultAvailable(ISequentialService result)

@@ -10,7 +10,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
@@ -733,7 +732,7 @@ public class SServiceProvider
 //		{
 //			public IFuture<T> execute(Void args)
 //			{
-//				return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(reqservicename);
+//				return agent.getComponentFeature(IRequiredServicesFeature.class).getService(reqservicename);
 //			}
 //		};
 //		
@@ -753,7 +752,7 @@ public class SServiceProvider
 //				{
 //					public IFuture<T> execute(IInternalAccess ia)
 //					{
-//						return ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(reqservicename);
+//						return ia.getComponentFeature(IRequiredServicesFeature.class).getService(reqservicename);
 //					}
 //				});
 //			}
@@ -791,7 +790,7 @@ public class SServiceProvider
 //	{
 //		final Future<T> ret = new Future<T>();
 //		
-////		final IFuture<T> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(servicename);
+////		final IFuture<T> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService(servicename);
 //		final IFuture<T> fut = searchcmd.execute(null);
 //		
 //		fut.addResultListener(new DelegationResultListener<T>(ret)
@@ -1301,7 +1300,7 @@ public class SServiceProvider
 ////				// local component?
 ////				else if(cid.getRoot().equals(component.getComponentIdentifier().getRoot()))
 ////				{
-////					SServiceProvider.getService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+////					component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 ////						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 ////					{
 ////						public void customResultAvailable(IComponentManagementService cms)
@@ -1335,7 +1334,7 @@ public class SServiceProvider
 ////				{
 ////					IResultListener<T> lis = proxy? new ProxyResultListener<T>(ret, component, type.getType(component.getClassLoader())): new DelegationResultListener<T>(ret);
 ////					
-////					IRemoteServiceManagementService rms	= SServiceProvider.getLocalService(component, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+////					IRemoteServiceManagementService rms	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 ////					IFuture<T> fut = rms.getServiceProxy(component.getComponentIdentifier(), cid, type, scope, null);
 ////					fut.addResultListener(new ComponentResultListener<T>(lis, component));
 ////				}
@@ -1624,7 +1623,7 @@ public class SServiceProvider
 //		boolean local = component.getComponentIdentifier().getRoot().equals(providerid.getRoot());
 //		if(local)
 //		{
-//			ret = SServiceProvider.getLocalService(component, servicetype, providerid);
+//			ret = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype, providerid));
 //		}
 //		else
 //		{

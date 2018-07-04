@@ -71,7 +71,7 @@ public class ServiceCallPlan
 		
 		final Future<Void> ret = new Future<Void>();
 
-//		IIntermediateFuture<Object> services = agent.getServiceContainer().getRequiredServices(service);
+//		IIntermediateFuture<Object> services = agent.getServiceContainer().getServices(service);
 		IIntermediateFuture<Object> services = agent.getComponentFeature(IRequiredServicesFeature.class).getServices(service);
 		
 		services.addResultListener(new IIntermediateResultListener<Object>()

@@ -32,7 +32,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -187,7 +188,7 @@ public class AlarmSettingsDialog extends JDialog
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						BDIAgent bia = (BDIAgent)ia;
-						long cur = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+						long cur = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 						Date now = new Date(cur);
 						date.setDate(now);
 						time.setValue(now);								
@@ -347,7 +348,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					long cur = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+					long cur = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 					al.setTime(new Time(new Date(cur)));
 					setAlarm(al);
 					return IFuture.DONE;

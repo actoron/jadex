@@ -58,6 +58,7 @@ import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceCallEvent;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -230,7 +231,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			public void customResultAvailable(Void result)
 			{
 				// Todo: use remote access for clock !?
-				SServiceProvider.getService(getJCC().getJCCAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 				{
 					public void customResultAvailable(IClockService result)
@@ -599,7 +600,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 
 //		jcc.addAgentListListener(this);
 		
-//		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+//		SServiceProvider.searchService(getJCC().getExternalAccess().getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class)).addResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object result)
 //			{
@@ -1552,7 +1553,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-//				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+//				SServiceProvider.searchService(jcc.getJCCAccess().getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1663,7 +1664,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-//				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+//				SServiceProvider.searchService(jcc.getJCCAccess().getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1798,7 +1799,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */	
 	protected void addMessageListener(final List<Component> added)
 	{
-		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 		{
 			public void customResultAvailable(IComponentManagementService cms)

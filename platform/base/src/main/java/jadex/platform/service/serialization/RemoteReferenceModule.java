@@ -47,7 +47,8 @@ import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.ServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
@@ -847,7 +848,7 @@ public class RemoteReferenceModule
 //				public IFuture<IExternalAccess> execute(IInternalAccess ia)
 //				{
 //					final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-//					SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //	//						.addResultListener(component.createResultListener(new IResultListener()
 //					{
@@ -874,7 +875,7 @@ public class RemoteReferenceModule
 			}
 			ret	= access.getExternalAccess();
 			
-//			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms) 
@@ -944,7 +945,9 @@ public class RemoteReferenceModule
 			if(pr.getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
 			{
 				IServiceIdentifier	sid	= (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier();
-				ret	= SServiceProvider.getLocalService(null, sid, sid.getServiceType().getType(classloader));
+				// Hack???
+				ret	= ServiceRegistry.getRegistry(platform).getLocalService(ServiceRegistry.getRegistry(platform)
+					.searchService(new ServiceQuery<>(sid.getServiceType().getType(classloader)).setProvider(sid.getProviderId())));
 			}
 			else if(pr.getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
 			{

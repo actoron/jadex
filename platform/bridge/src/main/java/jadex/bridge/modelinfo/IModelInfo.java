@@ -166,13 +166,13 @@ public interface IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServices();
+	public RequiredServiceInfo[] getServices();
 
 	/**
 	 *  Get the required service.
 	 *  @return The required service.
 	 */
-	public RequiredServiceInfo getRequiredService(String name);
+	public RequiredServiceInfo getService(String name);
 	
 	/**
 	 *  Get the provided services.

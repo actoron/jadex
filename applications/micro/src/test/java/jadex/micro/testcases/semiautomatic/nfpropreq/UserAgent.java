@@ -44,7 +44,7 @@ public class UserAgent
 			{
 				ComposedEvaluator<IAService> ranker = new ComposedEvaluator<IAService>();
 				ranker.addEvaluator(new ExecutionTimeEvaluator(agent.getExternalAccess(), new MethodInfo(IAService.class.getMethod("test", new Class[0])), true));
-				ITerminableIntermediateFuture<IAService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
+				ITerminableIntermediateFuture<IAService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
 				Collection<Tuple2<IAService, Double>> res = SServiceProvider.rankServicesWithScores(sfut, ranker, null).get();
 				System.out.println("Found: "+res);
 				IAService aser = res.iterator().next().getFirstEntity();

@@ -139,7 +139,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dealerpan")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentManagementService>	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+				IFuture<IComponentManagementService>	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
 //					Thread.dumpStack();
 				cms.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
@@ -168,7 +168,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms")
+						ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms")
 							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
@@ -374,7 +374,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{

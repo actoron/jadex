@@ -271,7 +271,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> subscribe()
 	{
 		final Future<Void> fut = new Future<Void>();
-		SServiceProvider.getService(platform, IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(platform, new ServiceQuery<>( IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService service)
@@ -381,7 +381,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> sendMessage(final String message)
 	{
 		final Future<Void> fut = new Future<Void>();
-		SServiceProvider.getService(platform, IChatGuiService.class, Binding.SCOPE_PLATFORM).addResultListener(
+		SServiceProvider.searchService(platform, new ServiceQuery<>( IChatGuiService.class, Binding.SCOPE_PLATFORM)).addResultListener(
 				new DefaultResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService chat)

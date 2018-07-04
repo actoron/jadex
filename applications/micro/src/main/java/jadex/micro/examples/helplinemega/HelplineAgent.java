@@ -8,7 +8,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -62,7 +64,7 @@ public class HelplineAgent	implements IHelpline
 	public IFuture<Void>	addInformation(String info)
 	{
 		// Create and store information record.
-		InformationEntry	entry	= new InformationEntry(person, info, SServiceProvider.getLocalService(agent, IClockService.class).getTime());
+		InformationEntry	entry	= new InformationEntry(person, info, agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		infos.add(entry);
 
 		// forward information to other interested services.

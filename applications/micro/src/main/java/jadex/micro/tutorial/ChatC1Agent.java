@@ -42,7 +42,7 @@ public class ChatC1Agent
 //	@AgentBody
 //	public void executeBody()
 //	{
-//		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice")
+//		agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice")
 //			.addResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object result)

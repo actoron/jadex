@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.transformation.traverser.SCloner;
-import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  The dependency resolver can be used to find a valid

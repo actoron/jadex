@@ -105,7 +105,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		results.add(tr);
 		
 		tr = new TestReport("#4", "Required services");
-		RequiredServiceInfo[] reqs = agent.getModel().getRequiredServices();
+		RequiredServiceInfo[] reqs = agent.getModel().getServices();
 //		System.out.println("req sers: "+SUtil.arrayToString(reqs));
 		if(reqs[0].getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_LOCAL))
 		{

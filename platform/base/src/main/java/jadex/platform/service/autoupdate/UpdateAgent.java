@@ -291,7 +291,7 @@ public class UpdateAgent implements IUpdateService
 	{
 		// Todo: version service!?
 		final Future<String>	ret	= new Future<String>();
-		IFuture<IComponentManagementService>	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+		IFuture<IComponentManagementService>	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
 		cms.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -338,7 +338,7 @@ public class UpdateAgent implements IUpdateService
 		// notify via chat
 		final Future<Void> firstret = new Future<Void>(); 
 		firstret.addResultListener(lis);
-		IFuture<IChatGuiService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("chatser");
+		IFuture<IChatGuiService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("chatser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatGuiService, Void>(firstret)
 		{
 			public void customResultAvailable(IChatGuiService chatser)
@@ -368,7 +368,7 @@ public class UpdateAgent implements IUpdateService
 		if(receivers!=null && receivers.length>0)
 		{
 //			System.out.println("update send email");
-			IFuture<IEmailService> efut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("emailser");
+			IFuture<IEmailService> efut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("emailser");
 			efut.addResultListener(new IResultListener<IEmailService>()
 			{
 				public void resultAvailable(IEmailService emailser)
@@ -478,7 +478,7 @@ public class UpdateAgent implements IUpdateService
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		IFuture<IDaemonService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("daeser");
+		IFuture<IDaemonService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("daeser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IDaemonService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IDaemonService daeser)
@@ -533,7 +533,7 @@ public class UpdateAgent implements IUpdateService
 		
 //		String cmd = System.getProperty("sun.java.command");
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, StartOptions>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

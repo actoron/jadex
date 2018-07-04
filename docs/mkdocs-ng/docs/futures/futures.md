@@ -25,7 +25,7 @@ The typical case of working with futures is calling a method from the Jadex fram
 In this case, you can either call *get()* on the future, which will block until the result is available, or **add a result listener** (which will be the default case in this chapter from now on):
 
 ```java
-IFuture<IComponentManagementService> fut = SServiceProvider.getService(access, IComponentManagementService.class);
+IFuture<IComponentManagementService> fut = SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class));
 fut.addResultListener(new DefaultResultListener<IComponentManagementService>() {
     public void resultAvailable(IComponentManagementService result) {
         // do your work with the result

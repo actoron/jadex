@@ -12,6 +12,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -59,7 +60,7 @@ public class SuperpeerClientAgent
 	protected IFuture<Void>	init()
 	{
 		Future<Void>	ret	= new Future<>();
-		ISecurityService	secser	= SServiceProvider.getLocalService(agent, ISecurityService.class);
+		ISecurityService	secser	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
 		secser.getNetworkNames().addResultListener(agent.getComponentFeature(IExecutionFeature.class)
 			.createResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
 		{
@@ -98,7 +99,7 @@ public class SuperpeerClientAgent
 		{
 			// Platform already super peer for network?
 //			ISuperpeerService	sp	= 
-			SServiceProvider.getLocalService(agent, query, true);	// TODO: getLocalService0()?
+			agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(query));	// TODO: getLocalService0()?
 			
 			// no need to store own platform?
 //			superpeers.put(network, new Tuple2<ISuperpeerService, SubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>>(sp, null));

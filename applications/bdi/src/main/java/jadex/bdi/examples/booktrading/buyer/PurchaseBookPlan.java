@@ -41,8 +41,8 @@ public class PurchaseBookPlan extends Plan
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-//		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get();
-		IDF	df	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dfservice").get();
+//		IDF	df	= (IDF)SServiceProvider.searchService(getScope().getServiceProvider(), new ServiceQuery<>( IDF.class)).get();
+		IDF	df	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("dfservice").get();
 		IDFServiceDescription	service	= new DFServiceDescription(null, "service_seller", null);
 		IDFComponentDescription	desc	= new DFComponentDescription(null, service);
 		IDFComponentDescription[] result = df.search(desc, null).get();

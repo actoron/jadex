@@ -16,7 +16,8 @@ import javax.swing.JTable;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -67,7 +68,7 @@ public class DaemonPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 				{
 					public void customResultAvailable(IDaemonService result)
@@ -107,7 +108,7 @@ public class DaemonPanel extends JPanel
 		
 		this.listener = new DaemonChangeListener(platformt);
 		
-		SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 		{
 			public void customResultAvailable(IDaemonService result)
@@ -125,7 +126,7 @@ public class DaemonPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener<IDaemonService>()
 				{
 					public void customResultAvailable(IDaemonService result)
@@ -154,7 +155,7 @@ public class DaemonPanel extends JPanel
 	public IFuture<Void> shutdown()
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(agent, IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDaemonService, Void>(ret)
 		{
 			public void customResultAvailable(IDaemonService ds)

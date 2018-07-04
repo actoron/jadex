@@ -140,12 +140,12 @@ public interface IInternalAccess
 	public IInternalAccess getInternalAccess();
 		
 	/**
-	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getRequiredService()
+	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getService()
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name);
+	public <T> IFuture<T> getService(String name);
 	
 //	/**
 //	 *  Get the arguments.

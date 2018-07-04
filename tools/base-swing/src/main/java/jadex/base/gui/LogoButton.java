@@ -11,8 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 
-import jadex.commons.gui.BrowserLauncher2;
 import jadex.commons.SUtil;
+import jadex.commons.gui.BrowserLauncher2;
 import jadex.commons.gui.SGUI;
 
 /**

@@ -10,7 +10,8 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.DelegationResultListener;
@@ -47,7 +48,7 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		IFuture<IStreamService> fut = agent.getServiceContainer().getRequiredService("ss");
+//		IFuture<IStreamService> fut = agent.getServiceContainer().getService("ss");
 //		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 //		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 
@@ -159,7 +160,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				SServiceProvider.getService(agent, cid, IStreamService.class)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStreamService.class).setProvider(cid))
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)
@@ -222,7 +223,7 @@ public class StreamUserAgent extends TestAgent
 //			public void customResultAvailable(final IComponentIdentifier cid) 
 //			{
 //				System.out.println("created: "+cid+" by "+agent.getComponentIdentifier());
-//				SServiceProvider.getService(agent, cid, IStreamService.class)
+//				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IStreamService.class))
 //					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 //				{
 //					public void customResultAvailable(final IStreamService ss)

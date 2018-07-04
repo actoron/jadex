@@ -1,7 +1,6 @@
 package jadex.bdi.examples.disastermanagement;
 
 import jadex.commons.future.ITerminableFuture;
-import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *  Interface for treat victim service.

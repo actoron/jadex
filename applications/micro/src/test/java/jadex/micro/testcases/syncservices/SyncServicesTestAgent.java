@@ -45,7 +45,7 @@ public class SyncServicesTestAgent extends JunitAgentTest
 	{
 		final List<TestReport> results = new ArrayList<TestReport>();
 		
-		ISynchronousExampleService ser = (ISynchronousExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("syncser").get();
+		ISynchronousExampleService ser = (ISynchronousExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("syncser").get();
 		
 		TestReport tr1 = new TestReport("#1", "Test if can use synchronous get with int value.");
 		try

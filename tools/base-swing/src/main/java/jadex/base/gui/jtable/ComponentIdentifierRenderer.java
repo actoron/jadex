@@ -10,7 +10,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.commons.SUtil;
@@ -72,7 +73,7 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 			// Try fetching each time to also receive updates
 			try
 			{
-				ITransportAddressService	tas	= SServiceProvider.getLocalService(platform, ITransportAddressService.class);
+				ITransportAddressService	tas	= platform.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 				tas.getAddresses(cid.getRoot()).addResultListener(new IResultListener<List<TransportAddress>>()
 				{
 					@Override

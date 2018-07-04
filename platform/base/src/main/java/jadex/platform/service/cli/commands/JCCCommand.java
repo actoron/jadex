@@ -7,7 +7,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -78,7 +79,7 @@ public class JCCCommand extends CreateComponentCommand
 				{
 					final Future<Void> ret = new Future<Void>();
 			
-					final IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					final IComponentManagementService cms = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 					IComponentDescription adesc = new CMSComponentDescription(null, null, false, false, false, false, false, null, "jadex.tools.jcc.JCC", null, null, -1, null, null, false);
 					cms.searchComponents(adesc, null, false).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
 					{

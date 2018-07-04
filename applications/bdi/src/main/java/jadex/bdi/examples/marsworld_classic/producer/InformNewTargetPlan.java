@@ -9,7 +9,8 @@ import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.fipa.SearchConstraints;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -56,7 +57,7 @@ public class InformNewTargetPlan extends Plan
 
 		// Search for Production_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)SServiceProvider.getService(getAgent(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IDF	df	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IDFServiceDescription sd = new DFServiceDescription("service_sentry", null, null);
 		IDFComponentDescription dfadesc = new DFComponentDescription(null, sd);
 

@@ -18,6 +18,7 @@ import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -99,7 +100,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					
 					if(sid!=null)
 					{
-						IFuture<IService> fut = SServiceProvider.getService(ea, sid);
+						IFuture<IService> fut = SServiceProvider.searchService(ea, new ServiceQuery<>( (Class<IService>)null).setServiceIdentifier(sid));
 						fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 						{
 							public void resultAvailable(IService ser) 

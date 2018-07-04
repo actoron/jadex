@@ -14,7 +14,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
@@ -97,7 +98,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 			{
 				public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
 				{
-					ITransportAddressService tas = SServiceProvider.getLocalService(ia, ITransportAddressService.class);
+					ITransportAddressService tas = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 					return tas.getAddresses();
 				}
 			});

@@ -72,7 +72,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		String	config	= getComponent().getConfiguration();
 		
 		// Required services. (Todo: prefix for capabilities)
-		RequiredServiceInfo[] ms = model.getRequiredServices();
+		RequiredServiceInfo[] ms = model.getServices();
 		
 		Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
 		for(int i=0; i<ms.length; i++)
@@ -85,7 +85,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		if(config!=null && model.getConfiguration(config)!=null)
 		{
 			ConfigurationInfo cinfo = model.getConfiguration(config);
-			RequiredServiceInfo[] cs = cinfo.getRequiredServices();
+			RequiredServiceInfo[] cs = cinfo.getServices();
 			for(int i=0; i<cs.length; i++)
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(/*getServicePrefix()+*/cs[i].getName());

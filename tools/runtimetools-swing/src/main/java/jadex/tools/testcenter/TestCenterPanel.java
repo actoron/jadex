@@ -51,6 +51,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
@@ -1245,7 +1246,7 @@ public class TestCenterPanel extends JSplitPanel
 					
 					plugin.getJCC().setStatusText("Performing test "+name);
 					final Future	ret	= new Future();
-					SServiceProvider.getService(plugin.getJCC().getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.searchService(plugin.getJCC().getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new SwingDelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)

@@ -35,6 +35,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -270,7 +271,7 @@ public class ModelTreePanel extends FileTreePanel
 		});
 		
 		final String lid = exta.getComponentIdentifier().toString() + localexta.getComponentIdentifier().toString() + "_" + LISTENER_COUNTER++;
-		SServiceProvider.getService(exta, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(exta, new ServiceQuery<>( IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -285,7 +286,7 @@ public class ModelTreePanel extends FileTreePanel
 			}
 		});
 		
-		SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -400,7 +401,7 @@ public class ModelTreePanel extends FileTreePanel
 			{
 				final IResourceIdentifier rid = ((RIDNode)node).getResourceIdentifier();
 				
-				SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 				{
 					public void customResultAvailable(final ILibraryService ls)
@@ -499,7 +500,7 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(kernellistener!=null)
 		{
-			SServiceProvider.getService(exta, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+			SServiceProvider.searchService(exta, new ServiceQuery<>( IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -514,7 +515,7 @@ public class ModelTreePanel extends FileTreePanel
 		}
 		if(libservicelistener!=null)
 		{
-			SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)

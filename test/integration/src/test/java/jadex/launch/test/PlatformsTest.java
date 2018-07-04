@@ -18,6 +18,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
@@ -125,7 +126,7 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();
-			IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+			IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 			cms.listenToComponent(platform.getComponentIdentifier()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 			{
 				@Override
@@ -275,7 +276,7 @@ public class PlatformsTest //extends TestCase
 //		defmodel.getSubcomponentTypes();
 //		defmodel.getExtensionTypes();
 //		
-//		defmodel.getRequiredServices();
+//		defmodel.getServices();
 //
 //		defmodel.getAutoShutdown(null);
 //		defmodel.getDaemon(null);

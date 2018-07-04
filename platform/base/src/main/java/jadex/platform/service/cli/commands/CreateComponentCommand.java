@@ -9,7 +9,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -74,7 +76,7 @@ public class CreateComponentCommand extends ACliCommand
 			{
 				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 				
-				SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(final IComponentManagementService cms)
@@ -88,7 +90,7 @@ public class CreateComponentCommand extends ACliCommand
 						
 						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
 				
-						SServiceProvider.getService(comp, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						SServiceProvider.searchService(comp, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ILibraryService  libs)

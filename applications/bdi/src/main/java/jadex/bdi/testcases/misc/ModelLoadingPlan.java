@@ -29,10 +29,10 @@ public class ModelLoadingPlan //extends Plan
 //			throw new RuntimeException(fnfe);
 //		}
 //
-//		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("factory").get();
+//		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getService("factory").get();
 //		fac.loadAgentModel("helloworld", input, "helloagent.agent.xml", getInterpreter().getModel().getResourceIdentifier()).get();
 //
-//		IComponentManagementService cms	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
+//		IComponentManagementService cms	= (IComponentManagementService)getInterpreter().getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
 //		Future<Collection<Tuple2<String, Object>>>	finished	= new Future<Collection<Tuple2<String, Object>>>();
 //		cms.createComponent("hw1", "helloagent.agent.xml", new CreationInfo(getComponentIdentifier()), new DelegationResultListener<Collection<Tuple2<String, Object>>>(finished)).get();
 //

@@ -223,7 +223,7 @@ public class HelplinePanel extends JPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(
+				ia.getComponentFeature(IRequiredServicesFeature.class).getServices(
 					remote ? "remotehelplineservices" : "localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
 					public void customResultAvailable(Object result) 
@@ -262,11 +262,11 @@ public class HelplinePanel extends JPanel
 				IIntermediateFuture<IHelpline> ret;
 				if(remote)
 				{
-					ret	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("remotehelplineservices");
+					ret	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("remotehelplineservices");
 				}
 				else
 				{
-					ret	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("localhelplineservices");
+					ret	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("localhelplineservices");
 				}
 				return ret;
 			}

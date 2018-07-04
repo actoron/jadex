@@ -94,7 +94,7 @@ public class SettingsAgent	implements ISettingsService
 		//this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		//contextService = SServiceProvider.getLocalService(access, IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		//contextService = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;

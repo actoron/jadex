@@ -8,6 +8,7 @@ import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 
@@ -51,7 +52,7 @@ public class RemoteMessagingTest
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
-		IComponentManagementService	cms	= SServiceProvider.getService(access2, IComponentManagementService.class).get();
+		IComponentManagementService	cms	= SServiceProvider.searchService(access2, new ServiceQuery<>( IComponentManagementService.class)).get();
 
 		// Add addresses of first platform to second
 //		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());

@@ -39,7 +39,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
@@ -590,14 +590,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getRequiredService()
+	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getService()
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name)
+	public <T> IFuture<T> getService(String name)
 	{
-		return getComponentFeature(IRequiredServicesFeature.class).getRequiredService(name);
+		return getComponentFeature(IRequiredServicesFeature.class).getService(name);
 	}
 	
 	/**
@@ -710,7 +710,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			this.exception	= e;
 		}
-		IComponentManagementService cms = SServiceProvider.getLocalService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService cms = this.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IFuture<Map<String, Object>> ret = cms.destroyComponent(getComponentIdentifier());
 		return ret;
 //		if(getComponentIdentifier().getParent()==null)
@@ -1035,51 +1035,45 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		else
 		{
-			SServiceProvider.getService(this, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
+			IComponentManagementService cms = getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			// Can use the parent resource identifier as child must depend on parent
+			cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(
+				new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier[]>(ret)
 			{
-				public void customResultAvailable(final IComponentManagementService cms)
+				public void customResultAvailable(IModelInfo model)
 				{
-					// Can use the parent resource identifier as child must depend on parent
-					cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(
-						new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier[]>(ret)
+					final String modelname = model.getFullName();
+				
+					final Future<Collection<IExternalAccess>>	childaccesses	= new Future<Collection<IExternalAccess>>();
+					cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
 					{
-						public void customResultAvailable(IModelInfo model)
+						public void customResultAvailable(IComponentIdentifier[] children)
 						{
-							final String modelname = model.getFullName();
-						
-							final Future<Collection<IExternalAccess>>	childaccesses	= new Future<Collection<IExternalAccess>>();
-							cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
+							IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+								new DelegationResultListener<Collection<IExternalAccess>>(childaccesses));
+							for(int i=0; !ret.isDone() && i<children.length; i++)
 							{
-								public void customResultAvailable(IComponentIdentifier[] children)
-								{
-									IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
-										new DelegationResultListener<Collection<IExternalAccess>>(childaccesses));
-									for(int i=0; !ret.isDone() && i<children.length; i++)
-									{
-										cms.getExternalAccess(children[i]).addResultListener(crl);
-									}
-								}
-							});
-							childaccesses.addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, IComponentIdentifier[]>(ret)
+								cms.getExternalAccess(children[i]).addResultListener(crl);
+							}
+						}
+					});
+					childaccesses.addResultListener(getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, IComponentIdentifier[]>(ret)
+					{
+						public void customResultAvailable(Collection<IExternalAccess> col)
+						{
+							List<IComponentIdentifier> res = new ArrayList<IComponentIdentifier>();
+							for(Iterator<IExternalAccess> it=col.iterator(); it.hasNext(); )
 							{
-								public void customResultAvailable(Collection<IExternalAccess> col)
+								IExternalAccess subcomp = it.next();
+								if(modelname.equals(subcomp.getModel().getFullName()))
 								{
-									List<IComponentIdentifier> res = new ArrayList<IComponentIdentifier>();
-									for(Iterator<IExternalAccess> it=col.iterator(); it.hasNext(); )
-									{
-										IExternalAccess subcomp = it.next();
-										if(modelname.equals(subcomp.getModel().getFullName()))
-										{
-											res.add(subcomp.getComponentIdentifier());
-										}
-									}
-									ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
+									res.add(subcomp.getComponentIdentifier());
 								}
-							}));
+							}
+							ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
 						}
 					}));
-				}	
+				}
 			}));
 		}
 		

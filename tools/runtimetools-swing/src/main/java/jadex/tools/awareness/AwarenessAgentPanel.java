@@ -53,6 +53,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
@@ -151,7 +152,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 	public IFuture<Void> init(final IControlCenter jcc, final IService service)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -208,7 +209,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 //				map.repaint();
 //				panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 //
-//				SServiceProvider.getService(component, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new SwingResultListener<IMessageService>(new IResultListener<IMessageService>()
 //				{
 //					public void resultAvailable(IMessageService ms)

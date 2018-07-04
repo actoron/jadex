@@ -2,9 +2,6 @@ package jadex.base.test.impl;
 
 import org.junit.Test;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;

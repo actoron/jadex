@@ -2,7 +2,6 @@ package jadex.bdiv3.tutorial.e1;
 
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;

@@ -6,8 +6,6 @@ import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -21,6 +19,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.RegistryEvent;
@@ -331,7 +330,7 @@ public class HelplineEvaluation
 			long start	= System.nanoTime();
 			for(int i=0; i<platforms.length; i++)
 			{
-				IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
+				IComponentManagementService	cms	= SServiceProvider.searchService(platforms[i], new ServiceQuery<>( IComponentManagementService.class)).get();
 				for(int j=0; j<cnt/measurecnt; j++)
 				{
 					int num	= multi

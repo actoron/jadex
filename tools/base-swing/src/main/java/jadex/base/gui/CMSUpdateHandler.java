@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.SUtil;
@@ -122,7 +123,7 @@ public class CMSUpdateHandler
 			Integer	cnt	= Integer.valueOf(1);
 			tup	= new Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer>(ret, cnt);
 			listeners.put(cid, tup);
-			SServiceProvider.getService(access, cid, IComponentManagementService.class).
+			SServiceProvider.searchService(access, new ServiceQuery<>(IComponentManagementService.class).setProvider(cid)).
 				addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 			{
 				@Override

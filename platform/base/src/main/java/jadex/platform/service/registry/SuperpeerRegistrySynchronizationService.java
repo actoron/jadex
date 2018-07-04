@@ -21,6 +21,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -332,7 +333,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			try
 			{
-				IAwarenessManagementService awas = SServiceProvider.getLocalService(component, IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IAwarenessManagementService awas = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				
 				awas.subscribeToPlatformList(true).addIntermediateResultListener(new IIntermediateResultListener<DiscoveryInfo>()
 				{
@@ -499,7 +500,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //							RegistryEvent event = new RegistryEvent(true, ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
 							ARegistryEvent event = getCurrentStateEvent();
 							event.setClientType(ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
-//							event.addAddedService((IService)SServiceProvider.getLocalService(component, ISuperpeerRegistrySynchronizationService.class));
+//							event.addAddedService((IService)component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class)));
 							ssp.updateClientData(event).addResultListener(this);
 //							System.out.println("Send full update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
 						}
@@ -600,8 +601,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //			{
 //				public IFuture<ISuperpeerRegistrySynchronizationService> execute(Void args)
 //				{
-////					return SServiceProvider.getService(component, cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false);
-//					return SServiceProvider.getService(component, query);
+////					return component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false));
+//					return component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( query));
 //				}
 //			}, 3, 10000).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 //			{

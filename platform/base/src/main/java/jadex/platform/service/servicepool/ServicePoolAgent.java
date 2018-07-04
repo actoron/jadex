@@ -1,6 +1,5 @@
 package jadex.platform.service.servicepool;
 
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 

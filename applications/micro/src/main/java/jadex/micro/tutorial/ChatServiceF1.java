@@ -36,7 +36,7 @@ public class ChatServiceF1 implements IChatService
 		final ChatBotF1Agent	chatbot	= (ChatBotF1Agent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 		if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 		{
-			IFuture<Collection<IChatService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+			IFuture<Collection<IChatService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			fut.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 			{
 				public void resultAvailable(Collection<IChatService> result)

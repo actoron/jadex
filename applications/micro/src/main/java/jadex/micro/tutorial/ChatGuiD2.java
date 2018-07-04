@@ -63,7 +63,7 @@ public class ChatGuiD2 extends JFrame
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+						IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
 						chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 						{
 							public void resultAvailable(Collection<IChatService> result)

@@ -84,7 +84,7 @@ public class GenerateService implements IGenerateService
 				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
 				
 //				System.out.println("invoke: "+service);
-				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("displayservice").addResultListener(new DefaultResultListener()
+				agent.getComponentFeature(IRequiredServicesFeature.class).getService("displayservice").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -148,7 +148,7 @@ public class GenerateService implements IGenerateService
 			public IFuture createService()
 			{
 				final Future	ret	= new Future();
-				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cmsservice").addResultListener(new DelegationResultListener(ret)
+				agent.getComponentFeature(IRequiredServicesFeature.class).getService("cmsservice").addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

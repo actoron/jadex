@@ -15,6 +15,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -426,7 +427,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		{
 			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, Binding.SCOPE_COMPONENT, null, platformid, null);
 			
-			ITransportAddressService rtas = SServiceProvider.getService(agent, query).get();
+			ITransportAddressService rtas = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(query).get();
 			if (rtas != null)
 			{
 				ret = rtas.getAddresses().get();
@@ -491,7 +492,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		try
 		{
-			IAwarenessManagementService awa = SServiceProvider.getLocalService(agent, IAwarenessManagementService.class);
+			IAwarenessManagementService awa = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class));
 			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
 			if (info != null)
 				ret = info.getAddresses();

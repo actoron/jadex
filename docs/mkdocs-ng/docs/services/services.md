@@ -177,14 +177,14 @@ public class PiAgent {
 This will look up the value of the field *pi* in the *piService* and inject it into the component field. Note that both field names have to be equal.
 
 ## Using Component Features
-You can also access the required services of a component by using the RequiredServicesFeature. Inject the feature inside the code of your component and call *getRequiredService()*:
+You can also access the required services of a component by using the RequiredServicesFeature. Inject the feature inside the code of your component and call *getService()*:
 
 ```java
 @AgentFeature
 private IRequiredServiceFeature reqFeat;
 ...
 {
-    ISumService sum = reqFeat.getRequiredService("sumService").get();
+    ISumService sum = reqFeat.getService("sumService").get();
 }
 ```
 
@@ -249,7 +249,7 @@ The *SServiceProvider* helper class provides means to obtain services from any c
 The method ```getService(provider, cid, type)``` allows fetching a declared service of a specific component directly:
 
 ```java
-ISumService sum = SServiceProvider.getService(platformAccess, providerCid, ISumService.class).get();
+ISumService sum = SServiceProvider.searchService(platformAccess, new ServiceQuery<>( providerCid, ISumService.class)).get();
 ```
 
 Note that we use the platform as search entry point, but we specify the cid of the component providing the service. Thus we state that we want to search for the *ISumService* only in this specific component.

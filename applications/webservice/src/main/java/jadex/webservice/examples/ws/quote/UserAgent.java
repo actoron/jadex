@@ -90,7 +90,7 @@ public class UserAgent
 							public IFuture<Object> execute(IInternalAccess ia)
 							{
 								final Future<Object> ret = new Future<Object>();
-								IFuture<IQuoteService> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("quoteservice");
+								IFuture<IQuoteService> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getService("quoteservice");
 								fut.addResultListener(new ExceptionDelegationResultListener<IQuoteService, Object>(ret)
 								{
 									public void customResultAvailable(IQuoteService qs)

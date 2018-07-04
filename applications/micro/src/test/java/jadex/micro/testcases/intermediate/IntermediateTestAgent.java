@@ -18,7 +18,6 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -227,8 +226,8 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //				System.out.println("root is: "+root)
 				// Hack!!! use remote platform as search owner
 				ServiceQuery<IClockService>	query	= new ServiceQuery<IClockService>(IClockService.class, null, new BasicComponentIdentifier("clock", root), root, null);
-//				SServiceProvider.getService(agent, new BasicComponentIdentifier("clock", root), IClockService.class)
-				SServiceProvider.getService(agent, query)
+//				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( new BasicComponentIdentifier("clock", root)), IClockService.class)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( query))
 					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
 				{
 					public void customResultAvailable(final IClockService clock)
@@ -245,7 +244,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
 //								System.out.println("cid is: "+cid);
-								SServiceProvider.getService(agent, cid, IIntermediateResultService.class)
+								agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IIntermediateResultService.class))
 									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IIntermediateResultService service)

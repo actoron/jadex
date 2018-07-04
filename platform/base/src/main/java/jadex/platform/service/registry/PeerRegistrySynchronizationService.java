@@ -18,6 +18,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -379,7 +380,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 					ServiceQuery<ISuperpeerRegistrySynchronizationService>	query
 						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, spcid, component.getComponentIdentifier(), null);
 					query.setUnrestricted(true);
-					SServiceProvider.getService(component, query).addResultListener(
+					component.getComponentFeature(IRequiredServicesFeature.class).searchService(query).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
 					{
 						public void customResultAvailable(final ISuperpeerRegistrySynchronizationService spser)

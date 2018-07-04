@@ -113,13 +113,13 @@ public class CustomerPanel extends JPanel
 						if(remote.isSelected())
 						{
 							// Hack!!! Todo: add executing capability as thread local in all capability steps 
-							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("customercap/remoteshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getServices("customercap/remoteshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						else
 						{
 							// Hack!!! Todo: add executing capability as thread local in all capability steps 
-							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("customercap/localshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getServices("customercap/localshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						return ret;

@@ -15,7 +15,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -199,7 +200,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					SServiceProvider.getLocalService(ia, IComponentManagementService.class).createComponent(AutoTerminateTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(AutoTerminateTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}
