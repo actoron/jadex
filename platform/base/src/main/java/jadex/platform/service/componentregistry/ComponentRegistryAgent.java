@@ -25,8 +25,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -146,7 +148,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
         final Future<Void> ret = new Future<Void>();
 
-        ILibraryService ls = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+        ILibraryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
         ls.getClassLoader(info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
         	public void customResultAvailable(ClassLoader cl) throws Exception
@@ -188,7 +190,8 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        									{
 	        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
 	        		                            	{
-	        		                            		IFuture<IService> fut = (IFuture)SServiceProvider.getService(exta, exta.getComponentIdentifier(), servicetype);
+	        		                            		@SuppressWarnings("unchecked")
+														IFuture<IService> fut = (IFuture<IService>)SServiceProvider.searchService(exta, new ServiceQuery<>(servicetype).setProvider(exta.getComponentIdentifier()));
 	        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
 	        											{
 	        		                        				public void customResultAvailable(IService service) throws Exception
@@ -214,7 +217,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)SServiceProvider.getLocalService(agent, servicetype, exta.getComponentIdentifier());
+	        	                            	 IService service = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getComponentIdentifier()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
@@ -270,7 +273,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-            final IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+            final IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
             	info.setParent(agent.getComponentIdentifier());
             cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()

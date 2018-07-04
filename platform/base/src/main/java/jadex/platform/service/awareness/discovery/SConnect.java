@@ -3,15 +3,13 @@ package jadex.platform.service.awareness.discovery;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.micro.annotation.Binding;
 
 /**
  *  Class helping with manual connects to remote platforms.
@@ -47,7 +45,7 @@ public class SConnect
 		args.put("component", remotecid);
 		CreationInfo ci = new CreationInfo(args);
 		ci.setDaemon(true);
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
+		IComponentManagementService	cms	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 	}
 }

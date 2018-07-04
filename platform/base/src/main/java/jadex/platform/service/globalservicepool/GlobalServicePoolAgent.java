@@ -3,7 +3,6 @@ package jadex.platform.service.globalservicepool;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +21,8 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.CounterResultListener;
@@ -117,7 +117,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		// Create one service manager per service type
 		GlobalPoolServiceManager manager = new GlobalPoolServiceManager(agent, servicetype, componentmodel, info, strategy);
 		managers.put(servicetype, manager);
-		IServicePoolService ser = SServiceProvider.getLocalService(agent, IServicePoolService.class);
+		IServicePoolService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
 		// todo: fix if more than one service type should be supported by one worker (not intended)
 		if(info==null)
 		{
@@ -160,7 +160,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 	public IFuture<Void> removeServiceType(final Class<?> servicetype)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IServicePoolService ser = SServiceProvider.getLocalService(agent, IServicePoolService.class);
+		IServicePoolService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
 		managers.remove(servicetype);
 		ser.removeServiceType(servicetype).addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -234,8 +234,8 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			IService poolser = (IService)SServiceProvider.getLocalService(agent, IServicePoolService.class);
-			IService ser = (IService)SServiceProvider.getLocalService(agent, servicetype, poolser.getServiceIdentifier().getProviderId());
+			IService poolser = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
+			IService ser = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceIdentifier().getProviderId()));
 			return method.invoke(ser, args);
 		}
 	}

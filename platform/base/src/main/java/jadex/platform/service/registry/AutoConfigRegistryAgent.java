@@ -23,6 +23,7 @@ import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -35,14 +36,13 @@ import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationServ
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultTuple2ResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -89,7 +89,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected void searchForSuperpeers(final List<Integer> foundless, final List<Integer> foundmore)
 	{
-		ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
+		ITerminableIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
 			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
 		
 		search.addIntermediateResultListener(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
@@ -312,7 +312,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		});
 		
 				
-		ISubscriptionIntermediateFuture<IPeerRegistrySynchronizationService> search = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(
+		ITerminableIntermediateFuture<IPeerRegistrySynchronizationService> search = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(
 			new ServiceQuery<IPeerRegistrySynchronizationService>(IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
 
 		search.addIntermediateResultListener(new IIntermediateResultListener<IPeerRegistrySynchronizationService>()
@@ -385,17 +385,10 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IFuture<Void> makeSuperpeer(IComponentIdentifier cid)
 	{
-		final Future<Void> ret = new Future<Void>();
 		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getComponentIdentifier(), null);
 		q.setPlatform(cid.getRoot());
-		SServiceProvider.getService(agent, q).addResultListener(new ExceptionDelegationResultListener<IAutoConfigRegistryService, Void>(ret)
-		{
-			public void customResultAvailable(IAutoConfigRegistryService auser) throws Exception
-			{
-				auser.makeRegistrySuperpeer().addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		return ret;
+		IAutoConfigRegistryService	auser	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(q);
+		return auser.makeRegistrySuperpeer();
 	}
 	
 	/**
@@ -404,17 +397,10 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IFuture<Void> makeClient(IComponentIdentifier cid)
 	{
-		final Future<Void> ret = new Future<Void>();
 		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getComponentIdentifier(), null);
 		q.setPlatform(cid.getRoot());
-		SServiceProvider.getService(agent, q).addResultListener(new ExceptionDelegationResultListener<IAutoConfigRegistryService, Void>(ret)
-		{
-			public void customResultAvailable(IAutoConfigRegistryService auser) throws Exception
-			{
-				auser.makeRegistryClient().addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		return ret;
+		IAutoConfigRegistryService	auser	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(q);
+		return auser.makeRegistryClient();
 	}
 	
 	/**
@@ -553,7 +539,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerRegistrySynchronizationService spser=null;
 		try
 		{
-			spser = SServiceProvider.getLocalService(agent, ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			spser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class));
 		}
 		catch(ServiceNotFoundException e)
 		{
@@ -561,7 +547,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(spser==null)
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.createComponent("spreg", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null).
 				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
@@ -600,7 +586,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		IPeerRegistrySynchronizationService pser = null;
 		try
 		{
-			pser = SServiceProvider.getLocalService(agent, IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			pser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
 		}
 		catch(Exception e)
 		{
@@ -608,7 +594,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(pser==null)
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.createComponent("peerreg",PeerRegistrySynchronizationAgent.class.getName()+".class", null).
 				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
@@ -645,7 +631,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		boolean ret = false;
 		try
 		{
-			ISuperpeerRegistrySynchronizationService spser = SServiceProvider.getLocalService(agent, ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ISuperpeerRegistrySynchronizationService spser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class));
 			ret = spser!=null;
 		}
 		catch(ServiceNotFoundException e)
@@ -663,7 +649,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		boolean ret = false;
 		try
 		{
-			IPeerRegistrySynchronizationService pser = SServiceProvider.getLocalService(agent, IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IPeerRegistrySynchronizationService pser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
 			ret = pser!=null;
 		}
 		catch(ServiceNotFoundException e)

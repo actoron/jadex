@@ -47,6 +47,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.IDependencyService;
@@ -964,7 +965,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
 		String	name	= rid.getGlobalIdentifier().getResourceId().substring(2).replace('+', '-').replace('/', '_') + ".jar";
-		IContextService localService = SServiceProvider.getLocalService(component, IContextService.class);
+		IContextService localService = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IContextService.class));
 		// use contextService to get private data dir on android
 		IFuture<File> future = localService.getFile(SUtil.JADEXDIR + "resources/"+name);
 		File file = future.get();

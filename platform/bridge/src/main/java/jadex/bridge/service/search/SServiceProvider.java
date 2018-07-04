@@ -1,12 +1,23 @@
 package jadex.bridge.service.search;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.Collection;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ProxyFactory;
+import jadex.bridge.SFuture;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -1673,73 +1684,73 @@ public class SServiceProvider
 //		
 //		return ret;
 //	}
-//	
-//	/**
-//	 *  Gets a external access proxy for a known component.
-//	 *  @return External access proxy.
-//	 */
-//	public static IExternalAccess getExternalAccessProxy(final IInternalAccess component, final IComponentIdentifier providerid)
-//	{
-//		Object ret = ProxyFactory.newProxyInstance(component.getClassLoader(), 
-//			new Class[]{IExternalAccess.class}, new InvocationHandler()
-//		{
-//			protected IExternalAccess access;
-//			
-//			public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-//			{
-//				Object ret = null;
-//				
-//				if(access==null)
-//				{
-//					IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-//
-//					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
-//					{
-//						ret = SFuture.getFuture(method.getReturnType());
-//						final Future<IExternalAccess> sret = (Future<IExternalAccess>)ret;
-//						
-//						cms.getExternalAccess(providerid).addResultListener(new IResultListener<IExternalAccess>()
-//						{
-//							public void resultAvailable(IExternalAccess result) 
-//							{
-//								access = result;
-//								Object res;
-//								try
-//								{
-//									res = method.invoke(access, args);
-//									((Future<IExternalAccess>)res).addResultListener(new DelegationResultListener<IExternalAccess>((Future<IExternalAccess>)sret));
-//								}
-//								catch(Exception e)
-//								{
-//									((Future<IExternalAccess>)sret).setException(e);
-//								}
-//							}
-//	
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								component.getLogger().warning(exception.getMessage());
-//							}
-//						});
-//						
-//					}
-//					else
-//					{
-//						access = cms.getExternalAccess(providerid).get();
-//						ret = method.invoke(access, args);
-//					}
-//				}
-//				else
-//				{
-//					ret = method.invoke(access, args);
-//				}
-//				
-//				return ret;
-//			}
-//		});
-//		
-//		return (IExternalAccess)ret;
-//	}
-//	
+	
+	/**
+	 *  Gets a external access proxy for a known component.
+	 *  @return External access proxy.
+	 */
+	// TODO: remove?
+	public static IExternalAccess getExternalAccessProxy(final IInternalAccess component, final IComponentIdentifier providerid)
+	{
+		Object ret = ProxyFactory.newProxyInstance(component.getClassLoader(), 
+			new Class[]{IExternalAccess.class}, new InvocationHandler()
+		{
+			protected IExternalAccess access;
+			
+			public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
+			{
+				Object ret = null;
+				
+				if(access==null)
+				{
+					IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+
+					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					{
+						ret = SFuture.getFuture(method.getReturnType());
+						final Future<IExternalAccess> sret = (Future<IExternalAccess>)ret;
+						
+						cms.getExternalAccess(providerid).addResultListener(new IResultListener<IExternalAccess>()
+						{
+							public void resultAvailable(IExternalAccess result) 
+							{
+								access = result;
+								Object res;
+								try
+								{
+									res = method.invoke(access, args);
+									((Future<IExternalAccess>)res).addResultListener(new DelegationResultListener<IExternalAccess>((Future<IExternalAccess>)sret));
+								}
+								catch(Exception e)
+								{
+									((Future<IExternalAccess>)sret).setException(e);
+								}
+							}
+	
+							public void exceptionOccurred(Exception exception)
+							{
+								component.getLogger().warning(exception.getMessage());
+							}
+						});
+						
+					}
+					else
+					{
+						access = cms.getExternalAccess(providerid).get();
+						ret = method.invoke(access, args);
+					}
+				}
+				else
+				{
+					ret = method.invoke(access, args);
+				}
+				
+				return ret;
+			}
+		});
+		
+		return (IExternalAccess)ret;
+	}
 }
 
 

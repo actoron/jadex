@@ -28,7 +28,8 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -1348,7 +1349,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		ISettingsService ret = null;
 		try
 		{
-			ret = SServiceProvider.getLocalService(agent, ISettingsService.class, Binding.SCOPE_PLATFORM);
+			ret = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 		}
 		catch (Exception e)
 		{

@@ -22,7 +22,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
@@ -106,7 +107,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 //		}
 
 		// Start listening thread.
-		IDaemonThreadPoolService	dtps	= SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class);
+		IDaemonThreadPoolService	dtps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
 		dtps.executeForever(new Receiver(recvsocket, true));
 		// Also listen for single-cast response messages -> TODO: use NIO to spare one thread
 		dtps.executeForever(new Receiver(sendsocket, false));
@@ -213,7 +214,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 	protected IFuture<Void> sendInfo(final String address, final int port)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ITransportAddressService tas = SServiceProvider.getLocalService(agent, ITransportAddressService.class);
+		ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override

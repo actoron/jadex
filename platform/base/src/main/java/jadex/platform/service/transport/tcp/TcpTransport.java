@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -79,7 +80,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 */
 	public void	init(ITransportHandler<SocketChannel> handler)
 	{
-		tps = SServiceProvider.getLocalService(handler.getAccess(), IDaemonThreadPoolService.class, false);
+		tps = ((AbstractComponentFeature)handler.getAccess().getComponentFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
 		this.handler	= handler;
 	}
 		

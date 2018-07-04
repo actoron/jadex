@@ -4,9 +4,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
@@ -55,11 +57,11 @@ public class SuperpeerRegistrySynchronizationAgent
 		try
 		{
 			// Kill peer agent
-			IPeerRegistrySynchronizationService pser = SServiceProvider.getLocalService(component, IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IPeerRegistrySynchronizationService pser = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
 			
 			if(pser!=null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.destroyComponent(((IService)pser).getServiceIdentifier().getProviderId());
 			}
 		}
