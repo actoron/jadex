@@ -12,10 +12,9 @@ import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
@@ -144,7 +143,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			final FieldInfo[]	pis	= model.getParentInjections();
 			if(pis.length>0)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{

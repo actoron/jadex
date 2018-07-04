@@ -21,7 +21,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
@@ -195,7 +197,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-			IComponentManagementService cms = SServiceProvider.getLocalService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IComponentManagementService cms = instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			// Todo: If remote remember subprocess and kill on cancel.
 
 			final CreationInfo	info = thread.hasPropertyValue("creation info")? 

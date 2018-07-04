@@ -175,7 +175,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		{
 			for(final ServiceCallInfo call: calls)
 			{
-				IFuture<IService> fut = getComponent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService(call.getRequiredName());
+				IFuture<IService> fut = getComponent().getComponentFeature(IRequiredServicesFeature.class).getService(call.getRequiredName());
 				fut.addResultListener(new IResultListener<IService>()
 				{
 					public void resultAvailable(IService service)

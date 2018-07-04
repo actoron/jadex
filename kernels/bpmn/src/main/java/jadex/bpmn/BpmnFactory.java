@@ -21,10 +21,9 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -145,18 +144,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Void> startService()
 	{
-		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-		{
-			public void customResultAvailable(ILibraryService result)
-			{
-				libservice = result;
-				libservice.addLibraryServiceListener(libservicelistener);
-				BpmnFactory.super.startService().addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		return ret;
+		libservice = provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
+		return BpmnFactory.super.startService();
 	}
 	
 	//-------- methods --------

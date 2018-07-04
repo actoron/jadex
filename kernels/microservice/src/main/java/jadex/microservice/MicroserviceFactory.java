@@ -13,9 +13,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -491,6 +490,6 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: SServiceProvider.getLocalService(internalaccess, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return internalaccess==null? null: internalaccess.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 }

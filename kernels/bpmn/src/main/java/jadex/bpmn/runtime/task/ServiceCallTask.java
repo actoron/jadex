@@ -45,6 +45,7 @@ import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -174,7 +175,7 @@ public class ServiceCallTask implements ITask
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
 		
-		Class<?> servicetype = process.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
+		Class<?> servicetype = ((IInternalServiceMonitoringFeature)process.getComponentFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
 		Method[] methods = servicetype.getMethods();
 		Method met = null;
 		for(Method meth : methods)
@@ -221,7 +222,7 @@ public class ServiceCallTask implements ITask
 				ComposedEvaluator<Object> ranker = new ComposedEvaluator<Object>();
 				ranker.addEvaluator(eval);
 				
-				process.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(service)
+				process.getComponentFeature(IRequiredServicesFeature.class).getServices(service)
 					.addResultListener(new ServiceRankingResultListener<Object>(new ExceptionDelegationResultListener<Collection<Tuple2<Object, Double>>, Void>(ret)
 				{
 					public void customResultAvailable(Collection<Tuple2<Object, Double>> results)
@@ -247,7 +248,7 @@ public class ServiceCallTask implements ITask
 		}
 		else
 		{
-			process.getComponentFeature(IRequiredServicesFeature.class).getRequiredService(service)
+			process.getComponentFeature(IRequiredServicesFeature.class).getService(service)
 				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 			{
 				public void customResultAvailable(Object result)

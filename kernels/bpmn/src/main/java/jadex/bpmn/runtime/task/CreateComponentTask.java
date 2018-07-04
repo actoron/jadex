@@ -20,8 +20,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -98,164 +98,158 @@ public class CreateComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-			instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		IComponentManagementService cms	= instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		String name = (String)context.getParameterValue("name");
+		String model = (String)context.getParameterValue("model");
+		String config = (String)context.getParameterValue("configuration");
+		boolean suspend = context.getParameterValue("suspend")!=null? ((Boolean)context.getParameterValue("suspend")).booleanValue(): false;
+		boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
+		final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
+		final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
+		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
+		Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
+		Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
+		Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
+		Boolean synchronous = context.getParameterValue("synchronous")!=null? (Boolean)context.getParameterValue("synchronous"): null;
+		Boolean persistable = context.getParameterValue("persistable")!=null? (Boolean)context.getParameterValue("persistable"): null;
+		Boolean monitoring = context.getParameterValue("monitoring")!=null? (Boolean)context.getParameterValue("monitoring"): null;
+		RequiredServiceBinding[] bindings = context.getParameterValue("bindings")!=null? (RequiredServiceBinding[])context.getParameterValue("bindings"): null;
+		
+		Map<String, Object> args = (Map<String, Object>)context.getParameterValue("arguments");
+		if(args==null)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			args = new HashMap<String, Object>();
+			IndexMap<String, MParameter> params = context.getActivity().getParameters();
+			if(params!=null)
 			{
-				String name = (String)context.getParameterValue("name");
-				String model = (String)context.getParameterValue("model");
-				String config = (String)context.getParameterValue("configuration");
-				boolean suspend = context.getParameterValue("suspend")!=null? ((Boolean)context.getParameterValue("suspend")).booleanValue(): false;
-				boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
-				final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
-				final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
-				final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
-				Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
-				Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
-				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
-				Boolean synchronous = context.getParameterValue("synchronous")!=null? (Boolean)context.getParameterValue("synchronous"): null;
-				Boolean persistable = context.getParameterValue("persistable")!=null? (Boolean)context.getParameterValue("persistable"): null;
-				Boolean monitoring = context.getParameterValue("monitoring")!=null? (Boolean)context.getParameterValue("monitoring"): null;
-				RequiredServiceBinding[] bindings = context.getParameterValue("bindings")!=null? (RequiredServiceBinding[])context.getParameterValue("bindings"): null;
-				
-				Map<String, Object> args = (Map<String, Object>)context.getParameterValue("arguments");
-				if(args==null)
+				for(Iterator it=params.values().iterator(); it.hasNext(); )
 				{
-					args = new HashMap<String, Object>();
-					IndexMap<String, MParameter> params = context.getActivity().getParameters();
-					if(params!=null)
+					MParameter param = (MParameter)it.next();
+					if(!reserved.contains(param.getName()))
+						args.put(param.getName(), context.getParameterValue(param.getName()));
+				}
+			}
+		}
+//				System.out.println("args: "+args);
+		
+		IIntermediateResultListener<Tuple2<String, Object>> lis = new IIntermediateResultListener<Tuple2<String, Object>>()
+		{
+			protected Map<String, Object> results;
+			
+			public void intermediateResultAvailable(Tuple2<String, Object> result)
+			{
+				addResult(result.getFirstEntity(), result.getSecondEntity());
+				
+				if(resultmapping!=null)
+				{
+					for(int i=0; i<resultmapping.length/2; i++)
 					{
-						for(Iterator it=params.values().iterator(); it.hasNext(); )
+						if(resultmapping[i].equals(result.getFirstEntity()))
 						{
-							MParameter param = (MParameter)it.next();
-							if(!reserved.contains(param.getName()))
-								args.put(param.getName(), context.getParameterValue(param.getName()));
+							context.setOrCreateParameterValue(resultmapping[i+1], result.getSecondEntity());
+							break;
 						}
 					}
 				}
-//				System.out.println("args: "+args);
 				
-				IIntermediateResultListener<Tuple2<String, Object>> lis = new IIntermediateResultListener<Tuple2<String, Object>>()
+				if(killlistener instanceof IIntermediateResultListener)
+					((IIntermediateResultListener<Tuple2<String, Object>>)killlistener).intermediateResultAvailable(result);
+			}
+			
+			public void finished()
+			{
+				if(killlistener instanceof IIntermediateResultListener)
 				{
-					protected Map<String, Object> results;
-					
-					public void intermediateResultAvailable(Tuple2<String, Object> result)
+					((IIntermediateResultListener)killlistener).finished();
+				}
+				else if(killlistener!=null)
+				{
+					killlistener.resultAvailable(getResultCollection());
+				}
+				
+				if(wait)
+					ret.setResult(null);
+			}
+			
+			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			{
+				if(result!=null && resultmapping!=null)
+				{
+					Map<String, Object> results = Argument.convertArguments(result);
+					for(int i=0; i<resultmapping.length/2; i++)
 					{
-						addResult(result.getFirstEntity(), result.getSecondEntity());
+						Object value = results.get(resultmapping[i]);
+						context.setOrCreateParameterValue(resultmapping[i+1], value);
 						
-						if(resultmapping!=null)
-						{
-							for(int i=0; i<resultmapping.length/2; i++)
-							{
-								if(resultmapping[i].equals(result.getFirstEntity()))
-								{
-									context.setOrCreateParameterValue(resultmapping[i+1], result.getSecondEntity());
-									break;
-								}
-							}
-						}
-						
-						if(killlistener instanceof IIntermediateResultListener)
-							((IIntermediateResultListener<Tuple2<String, Object>>)killlistener).intermediateResultAvailable(result);
-					}
-					
-					public void finished()
-					{
-						if(killlistener instanceof IIntermediateResultListener)
-						{
-							((IIntermediateResultListener)killlistener).finished();
-						}
-						else if(killlistener!=null)
-						{
-							killlistener.resultAvailable(getResultCollection());
-						}
-						
-						if(wait)
-							ret.setResult(null);
-					}
-					
-					public void resultAvailable(Collection<Tuple2<String, Object>> result)
-					{
-						if(result!=null && resultmapping!=null)
-						{
-							Map<String, Object> results = Argument.convertArguments(result);
-							for(int i=0; i<resultmapping.length/2; i++)
-							{
-								Object value = results.get(resultmapping[i]);
-								context.setOrCreateParameterValue(resultmapping[i+1], value);
-								
 //								System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
-							}
-						}
-						if(killlistener!=null)
-							killlistener.resultAvailable(result);
+					}
+				}
+				if(killlistener!=null)
+					killlistener.resultAvailable(result);
 //						listener.resultAvailable(CreateComponentTask.this, null);
-						
-						if(wait)
-							ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(killlistener!=null)
-							killlistener.exceptionOccurred(exception);
+				
+				if(wait)
+					ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(killlistener!=null)
+					killlistener.exceptionOccurred(exception);
 //						listener.exceptionOccurred(CreateComponentTask.this, exception);
-						ret.setException(exception);
-					}
-					
-					protected void addResult(String name, Object value)
-					{
-						if(results==null)
-						{
-							results = new HashMap<String, Object>();
-						}
-						results.put(name, value);
-					}
-					
-					public synchronized Collection<Tuple2<String, Object>> getResultCollection()
-					{
-						Collection<Tuple2<String, Object>> ret = null;
-						if(results!=null)
-						{
-							ret = new ArrayList<Tuple2<String, Object>>();
-							for(Iterator<String> it=results.keySet().iterator(); it.hasNext(); )
-							{
-								String key = it.next();
-								ret.add(new Tuple2<String, Object>(key, results.get(key)));
-							}
-						}
-						return ret;
-					}
-				};
-				
-				// todo: rid
-				// todo: monitoring
-				PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
-				cms.createComponent(name, model,
-					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
-						instance.getModel().getAllImports(), bindings,
-						instance.getModel().getResourceIdentifier()), lis)
-					.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(creationfuture)));
-				
-				creationfuture.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				ret.setException(exception);
+			}
+			
+			protected void addResult(String name, Object value)
+			{
+				if(results==null)
 				{
-					public void customResultAvailable(IComponentIdentifier cid)
+					results = new HashMap<String, Object>();
+				}
+				results.put(name, value);
+			}
+			
+			public synchronized Collection<Tuple2<String, Object>> getResultCollection()
+			{
+				Collection<Tuple2<String, Object>> ret = null;
+				if(results!=null)
+				{
+					ret = new ArrayList<Tuple2<String, Object>>();
+					for(Iterator<String> it=results.keySet().iterator(); it.hasNext(); )
 					{
-						// If should not wait notify that was created
-						if(!wait)
-							ret.setResult(null);
+						String key = it.next();
+						ret.add(new Tuple2<String, Object>(key, results.get(key)));
 					}
-				}));
+				}
+				return ret;
+			}
+		};
+		
+		// todo: rid
+		// todo: monitoring
+		PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
+		cms.createComponent(name, model,
+			new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
+				suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
+				instance.getModel().getAllImports(), bindings,
+				instance.getModel().getResourceIdentifier()), lis)
+			.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(creationfuture)));
+		
+		creationfuture.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+		{
+			public void customResultAvailable(IComponentIdentifier cid)
+			{
+				// If should not wait notify that was created
+				if(!wait)
+					ret.setResult(null);
+			}
+		}));
 
 //				if(!wait)
 //				{
 //					ret.setResult(null);
 ////					listener.resultAvailable(this, null);
 //				}
-			}
-		}));
 		
 		return ret;
 	}
@@ -271,28 +265,15 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				SServiceProvider.getService(instance, IComponentManagementService.class, 
-					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
+				IComponentManagementService cms	= instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				IFuture<Map<String, Object>> fut = cms.destroyComponent(cid);
+				fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
-					public void resultAvailable(IComponentManagementService cms)
+					public void customResultAvailable(Map<String, Object> result)
 					{
-						IFuture<Map<String, Object>> fut = cms.destroyComponent(cid);
-						fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
-						{
-							public void customResultAvailable(Map<String, Object> result)
-							{
-								ret.setResult(null);
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
 						ret.setResult(null);
 					}
-					
-				}));
+				});
 			}
 			
 			public void exceptionOccurred(Exception exception)

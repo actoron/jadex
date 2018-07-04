@@ -1067,10 +1067,11 @@ public class SBpmnModelReader
 				}
 				rs.setDefaultBinding(new RequiredServiceBinding());
 				rs.getDefaultBinding().setScope(scope);
-				if(dyn!=null)
-					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
-				if(create!=null)
-					rs.getDefaultBinding().setCreate(Boolean.parseBoolean(create));
+				// Dropped in v4??
+//				if(dyn!=null)
+//					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
+//				if(create!=null)
+//					rs.getDefaultBinding().setCreate(Boolean.parseBoolean(create));
 				((ModelInfo)model.getModelInfo()).addRequiredService(rs);
 			}
 			else if ("requiredserviceconfiguration".equals(tag.getLocalPart()))

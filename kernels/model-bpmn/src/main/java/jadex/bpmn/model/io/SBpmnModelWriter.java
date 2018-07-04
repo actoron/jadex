@@ -563,13 +563,14 @@ public class SBpmnModelWriter
 						out.print(escapeString(scope));
 					}
 					
-					boolean dyn = rs.getDefaultBinding().isDynamic();
-					out.print("\" dynamic=\"");
-					out.print(dyn);
-					
-					boolean create = rs.getDefaultBinding().isCreate();
-					out.print("\" create=\"");
-					out.print(create);
+					// dropped in v4???
+//					boolean dyn = rs.getDefaultBinding().isDynamic();
+//					out.print("\" dynamic=\"");
+//					out.print(dyn);
+//					
+//					boolean create = rs.getDefaultBinding().isCreate();
+//					out.print("\" create=\"");
+//					out.print(create);
 				}
 				
 				out.println("\"/>");

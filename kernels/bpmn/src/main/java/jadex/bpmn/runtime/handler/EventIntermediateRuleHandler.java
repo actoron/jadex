@@ -13,8 +13,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -65,7 +65,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		final Map<String, Object>	fparams	= params;
 		
 		// Todo: allow injecting service binding from outside?
-		IInternalProcessEngineService ipes = SServiceProvider.getLocalService(instance, IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION);
+		IInternalProcessEngineService ipes = instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 		
 		final IExternalAccess	exta	= instance.getExternalAccess();
 		final String	actid	= activity.getId();
@@ -132,7 +132,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				{
 					public void customResultAvailable(final String id)
 					{
-						IInternalProcessEngineService ipes = SServiceProvider.getLocalService(instance, IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION);
+						IInternalProcessEngineService ipes = instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 						
 						System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
 						
