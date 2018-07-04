@@ -14,6 +14,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -382,7 +383,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	{
 		try
 		{
-			IAwarenessManagementService awa = SServiceProvider.getLocalService0(agent, IAwarenessManagementService.class, Binding.SCOPE_PLATFORM, null, true);
+			IAwarenessManagementService awa = agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(IAwarenessManagementService.class);
 			if(awa!=null)
 			{
 				DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
@@ -455,7 +456,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		
 		try
 		{
-			Collection<IPassiveAwarenessService> awas = SServiceProvider.getLocalServices(agent, IPassiveAwarenessService.class);
+			Collection<IPassiveAwarenessService> awas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
 			for (IPassiveAwarenessService awa : awas)
 			{
 				try
@@ -518,7 +519,8 @@ public class TransportAddressAgent implements ITransportAddressService
 			return null;
 		
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
-		final ITerminableIntermediateFuture<ITransportAddressService> fut = SServiceProvider.getServices(agent, ITransportAddressService.class, Binding.SCOPE_GLOBAL);
+		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(Binding.SCOPE_GLOBAL);
+		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(query);
 		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
 		{
 			/** The peers. */
