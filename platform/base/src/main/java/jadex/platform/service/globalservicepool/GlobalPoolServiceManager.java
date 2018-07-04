@@ -38,6 +38,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.micro.annotation.Binding;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
@@ -128,7 +129,9 @@ public class GlobalPoolServiceManager
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
 		// Check if service is available in global pool itself
-		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices(component, servicetype);
+		@SuppressWarnings("unchecked")
+		Collection<IService> ownsers = (Collection<IService>) component.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(servicetype));
+//		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices(component, servicetype);
 		if(ownsers!=null)
 		{
 			for(IService ser: ownsers)
@@ -301,7 +304,9 @@ public class GlobalPoolServiceManager
 		}
 //		else
 //		{
-			SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			
+			//SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			component.getComponentFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(Binding.SCOPE_GLOBAL)))
 				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
 			{
 				public void customIntermediateResultAvailable(IComponentManagementService cms) 
