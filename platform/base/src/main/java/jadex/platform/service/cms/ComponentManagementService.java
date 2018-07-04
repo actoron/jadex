@@ -63,7 +63,9 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.IResultCommand;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -76,6 +78,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -199,6 +202,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  @param name The component name.
 	 *  @return The model info of the 
 	 */
+	@SuppressWarnings("unchecked")
 	public IFuture<IModelInfo> loadComponentModel(final String filename, final IResourceIdentifier rid)
 	{
 //		if(filename!=null && filename.indexOf("Remote")!=-1)
@@ -213,27 +217,28 @@ public class ComponentManagementService implements IComponentManagementService
 		else
 		{
 			ILibraryService	ls	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
-			IFuture<IComponentFactory> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(filename, null, rid)));
-			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+			Collection<IComponentFactory> facs = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
+			
+			SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
 			{
-				public void customResultAvailable(IComponentFactory factory)
+				public void resultAvailable(Collection<IComponentFactory> result)
 				{
-					factory.loadModel(filename, null, rid)
-						.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					if(exception instanceof ServiceNotFoundException)
+					if (result != null && result.size() > 0)
 					{
-						ret.setResult(null);
+						result.iterator().next().loadModel(filename, null, rid)
+							.addResultListener(new DelegationResultListener<IModelInfo>(ret));
 					}
 					else
 					{
-						super.exceptionOccurred(exception);
+						ret.setResult(null);
 					}
 				}
-			}));
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
 		}
 		return ret;
 	}
@@ -1138,43 +1143,37 @@ public class ComponentManagementService implements IComponentManagementService
 		{
 //			System.out.println("searching factories");
 			
-			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(agent, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
-			{
-				public void customResultAvailable(Collection<IComponentFactory> facts)
+			Collection<IComponentFactory> facts = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+			if(!facts.isEmpty())
+			{						
+				// Reorder factories to assure that delegating multi loaders are last (if present).
+				if(facts.size()>1)
 				{
-					if(!facts.isEmpty())
-					{						
-						// Reorder factories to assure that delegating multi loaders are last (if present).
-						if(facts.size()>1)
+					List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
+					List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
+					for(IComponentFactory fac: facts)
+					{
+//						if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+						if(isMultiFactory(fac))
+//						if(((IService)fac).getServiceIdentifier().getProviderId().getLocalName().indexOf("multi")!=-1)
 						{
-							List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
-							List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
-							for(IComponentFactory fac: facts)
-							{
-//								if(fac.toString().toLowerCase().indexOf("multi")!=-1)
-								if(isMultiFactory(fac))
-//								if(((IService)fac).getServiceIdentifier().getProviderId().getLocalName().indexOf("multi")!=-1)
-								{
-									multies.add(fac);
-								}
-								else
-								{
-									singles.add(fac);
-									// Remove fallback factory when first real factory is found.
-									componentfactory = null;
-								}
-							}
-							facts	= singles;
-							facts.addAll(multies);
+							multies.add(fac);
+						}
+						else
+						{
+							singles.add(fac);
+							// Remove fallback factory when first real factory is found.
+							componentfactory = null;
 						}
 					}
-					factories = facts.isEmpty() ? null : facts;
-					
-					// Invoke again, now with up-to-date cache.
-					getComponentFactory(model, cinfo, rid, true, false).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+					facts	= singles;
+					facts.addAll(multies);
 				}
-			}));
+			}
+			factories = facts.isEmpty() ? null : facts;
+			
+			// Invoke again, now with up-to-date cache.
+			getComponentFactory(model, cinfo, rid, true, false).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 		}
 		
 		// Cache available or recently searched.
@@ -2812,7 +2811,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		open.add(fut);
 		if(remote)
 		{
-			IFuture<Collection<IComponentManagementService>> futi = SServiceProvider.getServices(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			IFuture<Collection<IComponentManagementService>> futi = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(Binding.SCOPE_GLOBAL)));
 			futi.addResultListener(createResultListener(new IResultListener<Collection<IComponentManagementService>>()
 			{
 				public void resultAvailable(Collection<IComponentManagementService> result)
@@ -3296,9 +3295,9 @@ public class ComponentManagementService implements IComponentManagementService
 //		});
 //		return ret;
 
-		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);		
-		sq.setPlatform(cid.getRoot());
-		return ((ServiceRegistry)ServiceRegistry.getRegistry(agent)).searchServiceAsyncByAskOnePlatform(sq, cid);		
+		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);
+		sq.setPlatform(cid.getRoot()).setProvider(cid);
+		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(sq);
 	}
 	
 //	/**
