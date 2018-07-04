@@ -24,7 +24,8 @@ import jadex.commons.Tuple3;
 public class ServiceQuery<T>
 {
 	/** Marker for networks not set. */
-	protected static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
+	//Hack!!! should not be public??? 
+	public static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
 	
 	//-------- attributes --------
 	
@@ -483,7 +484,7 @@ public class ServiceQuery<T>
 
 	/**
 	 *  Gets the specification for the indexer.
-	 *  Query needs to be enhanced before calling this method. See ServiceRegistry.enhanceQuery()
+	 *  Query needs to be enhanced before calling this method. See RequiredServiceFeature.enhanceQuery()
 	 *  
 	 *  @return The specification for the indexer.
 	 */
@@ -635,21 +636,6 @@ public class ServiceQuery<T>
 //	}
 	
 	
-	
-	/**
-	 *  Static helper method to get the current network names.
-	 *  @param cid The platform cid.
-	 *  @return The current network names.
-	 */
-	public static String[] getNetworkNames(IComponentIdentifier cid)
-	{
-		if(cid==null)
-			return SUtil.EMPTY_STRING_ARRAY;
-		
-		Set<String> nnames = (Set<String>)Starter.getPlatformValue(cid, Starter.DATA_NETWORKNAMESCACHE);
-		return nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY;
-	}
-
 	/**
 	 *  Get the networknames.
 	 *  @return the networknames

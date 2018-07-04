@@ -220,7 +220,9 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		ret = proserprops.get(sid);
 		if(ret==null)
 		{
-			ret = new NFMethodPropertyProvider(getComponent().getComponentIdentifier(), getComponent()); 
+			// TODO: parent???
+//			ret = new NFMethodPropertyProvider(getComponent().getComponentIdentifier(), getComponent()); 
+			ret = new NFMethodPropertyProvider(null, getComponent()); 
 			proserprops.put(sid, ret);
 		}
 		return ret;

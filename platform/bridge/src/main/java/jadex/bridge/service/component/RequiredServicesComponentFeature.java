@@ -20,12 +20,14 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -484,16 +486,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> IFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
-//		if(shutdowned)
-//		{
-//			return new Future<T>(new ComponentTerminatedException(id));
-//		}
-		
-		// Set owner if not yet set
-		if(query.getOwner()==null)
-		{
-			query.setOwner(getComponent().getComponentIdentifier());
-		}
+		enhanceQuery(query, false);
 		
 		// When service not declared (i.e. search) -> create matching info from query.
 		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
@@ -521,16 +514,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> T resolveLocalService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
-//		if(shutdowned)
-//		{
-//			return new Future<T>(new ComponentTerminatedException(id));
-//		}
-
-		// Set owner if not yet set
-		if(query.getOwner()==null)
-		{
-			query.setOwner(getComponent().getComponentIdentifier());
-		}
+		enhanceQuery(query, false);
 		
 		// When service not declared (i.e. search) -> create matching info from query.
 		info	= info!=null ? info : createServiceInfo(query);
@@ -556,16 +540,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T>  ITerminableIntermediateFuture<T> resolveServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
-//		if(shutdowned)
-//		{
-//			return new Future<T>(new ComponentTerminatedException(id));
-//		}
-		
-		// Set owner if not yet set
-		if(query.getOwner()==null)
-		{
-			query.setOwner(getComponent().getComponentIdentifier());
-		}
+		enhanceQuery(query, true);
 		
 		// When service not declared (i.e. search) -> create matching info from query.
 		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
@@ -596,16 +571,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> Collection<T> resolveLocalServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
-//		if(shutdowned)
-//		{
-//			return new Future<T>(new ComponentTerminatedException(id));
-//		}
-
-		// Set owner if not yet set
-		if(query.getOwner()==null)
-		{
-			query.setOwner(getComponent().getComponentIdentifier());
-		}
+		enhanceQuery(query, true);
 		
 		// When service not declared (i.e. search) -> create matching info from query.
 		info	= info!=null ? info : createServiceInfo(query);
@@ -681,5 +647,67 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		T ret	= (T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
 			(IService)service, null, info, null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier()));
 		return ret;
+	}
+	
+
+	/**
+	 *  Enhance a query before processing.
+	 *  Does some necessary preprocessing and needs to be called at least once before processing the query,
+	 *  e.g. at start of a registry method or before sending a remote query.
+	 *  Safe to be called multiple times, only the first time will have effect.
+	 *  @param query	The query to be enhanced.
+	 */
+	protected <T> void	enhanceQuery(ServiceQuery<T> query, boolean multi)
+	{
+//		if(shutdowned)
+//		{
+//			return new Future<T>(new ComponentTerminatedException(id));
+//		}
+
+		// Set owner if not yet set
+		if(query.getOwner()==null)
+		{
+			query.setOwner(getComponent().getComponentIdentifier());
+		}
+		
+		// Set networks if not set for remote queries
+		// TODO: more extensible way of checking for remote query
+		if(query.isRemote())
+		{
+			// Fix multiple flag according to single/multi method 
+			if(multi && !query.isMultiple())
+			{
+				query.setMultiple(true);
+			}
+			else if(query.isMultiple() && !multi)
+			{
+				throw new IllegalStateException("Multi query for single method: "+query);
+			}
+			
+			// Network names not set by user?
+			if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
+			{
+				// Unrestricted?
+				if(Boolean.TRUE.equals(query.isUnrestricted())
+					|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(getComponent(), query.getServiceType().getType(getComponent().getClassLoader()))) 
+				{
+					// Unrestricted -> Don't check networks.
+					query.setNetworkNames((String[])null);
+				}
+				else
+				{
+					// Not unrestricted -> only find services from my local networks
+					@SuppressWarnings("unchecked")
+					Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
+					query.setNetworkNames(nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY);
+				}
+			}
+		}
+		
+		// Disable local checks by default
+		else if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
+		{
+			query.setNetworkNames((String[])null);
+		}			
 	}
 }
