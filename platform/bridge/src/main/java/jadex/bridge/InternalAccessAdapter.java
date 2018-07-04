@@ -3,12 +3,10 @@ package jadex.bridge;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
@@ -111,7 +109,7 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 */
 	public <T> IFuture<T> getRequiredService(String name)
 	{
-		return getComponentFeature(IRequiredServicesFeature.class).getRequiredService(name);
+		return getComponentFeature(IRequiredServicesFeature.class).getService(name);
 	}
 	
 	/**

@@ -616,7 +616,8 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get the required service info for a name.
 	 *  @param name	The required service name.
 	 */
-	protected RequiredServiceInfo	getServiceInfo(String name)
+	// Hack!!! used by multi invoker?
+	public RequiredServiceInfo	getServiceInfo(String name)
 	{
 		RequiredServiceInfo	info	= requiredserviceinfos.get(name);
 		if(info==null)

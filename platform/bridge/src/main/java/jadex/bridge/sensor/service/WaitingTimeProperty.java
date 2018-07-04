@@ -1,7 +1,6 @@
 package jadex.bridge.sensor.service;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,14 +9,13 @@ import jadex.bridge.ProxyFactory;
 import jadex.bridge.sensor.time.TimedProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Property for the waiting time of a method or a service as a whole.
@@ -48,20 +46,7 @@ public class WaitingTimeProperty extends TimedProperty
 		this.method = method;
 		this.sid = service.getServiceIdentifier();
 		
-		SServiceProvider.getService(comp, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IClockService>()
-		{
-			public void resultAvailable(IClockService result)
-			{
-				WaitingTimeProperty.this.clock = result;
-//				System.out.println("assigned clock");
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				comp.getLogger().warning("Could not fetch time service in property.");
-			}
-		});
+		WaitingTimeProperty.this.clock = comp.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		
 		if(ProxyFactory.isProxyClass(service.getClass()))
 		{

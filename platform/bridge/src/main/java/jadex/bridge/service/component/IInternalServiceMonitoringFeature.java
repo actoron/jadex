@@ -8,6 +8,13 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  */
 public interface IInternalServiceMonitoringFeature
 {
+	/**
+	 *  Get the required service info for a name.
+	 *  @param name	The required service name.
+	 */
+	// Hack!!! used by multi invoker?
+	public RequiredServiceInfo	getServiceInfo(String name);
+
 	//-------- all declared services (e.g. JCC component details) --------
 	
 	/**

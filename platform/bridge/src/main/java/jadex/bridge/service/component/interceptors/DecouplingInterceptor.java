@@ -1,9 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,11 +26,11 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.TimeoutException;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -73,6 +75,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			e.printStackTrace();
 		}
 	}
+	
+	/** The reference method cache (method -> boolean[] (is reference)). */
+	public static final Map methodreferences = Collections.synchronizedMap(new LRU(500));
 
 	//-------- attributes --------
 	
@@ -147,7 +152,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				System.out.println("sdfsdfsdf");
 			
 			Method method = sic.getMethod();
-			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
+			boolean[] refs = getReferenceInfo(method, !copy, true);
 			
 			Object[] args = sic.getArgumentArray();
 			List<Object> copyargs = new ArrayList<Object>(); 
@@ -639,5 +644,45 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	public final ISerializationServices getSerializationServices()
 	{
 		return (ISerializationServices)Starter.getPlatformValue(ia.getComponentIdentifier(), Starter.DATA_SERIALIZATIONSERVICES);
+	}
+	
+	/**
+	 *  Get the copy info for method parameters.
+	 */
+	public static boolean[] getReferenceInfo(Method method, boolean refdef, boolean local)
+	{
+		boolean[] ret;
+		Object[] tmp = (Object[])methodreferences.get(method);
+		if(tmp!=null)
+		{
+			ret = (boolean[])tmp[local? 0: 1];
+		}
+		else
+		{
+			int params = method.getParameterTypes().length;
+			boolean[] localret = new boolean[params];
+			boolean[] remoteret = new boolean[params];
+			
+			for(int i=0; i<params; i++)
+			{
+				Annotation[][] ann = method.getParameterAnnotations();
+				localret[i] = refdef;
+				remoteret[i] = refdef;
+				for(int j=0; j<ann[i].length; j++)
+				{
+					if(ann[i][j] instanceof Reference)
+					{
+						Reference nc = (Reference)ann[i][j];
+						localret[i] = nc.local();
+						remoteret[i] = nc.remote();
+						break;
+					}
+				}
+			}
+			
+			methodreferences.put(method, new Object[]{localret, remoteret});
+			ret = local? localret: remoteret;
+		}
+		return ret;
 	}
 }

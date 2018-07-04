@@ -20,8 +20,8 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -169,7 +169,7 @@ public class ComponentStartTest extends	ComponentTest
 	public static void main(String[] args) throws IOException
 	{
 		IExternalAccess	platform	= Starter.createPlatform(STest.getDefaultTestConfig()).get();
-		IComponentManagementService	cms	= SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= SServiceProvider.searchService(platform, new ServiceQuery<>(IComponentManagementService.class)).get();
 		
 		String	filename	= null;
 		String	ridname	= null;

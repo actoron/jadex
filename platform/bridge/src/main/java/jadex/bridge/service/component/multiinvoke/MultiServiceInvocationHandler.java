@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.MultiplexCollector;
 import jadex.bridge.service.annotation.MultiplexDistributor;
 import jadex.bridge.service.annotation.TargetMethod;
 import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
@@ -52,7 +53,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 	{
 		this.agent = agent;
 		this.reqname = reqname;
-		RequiredServiceInfo reqs = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo(reqname);
+		RequiredServiceInfo reqs = ((IInternalServiceMonitoringFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getServiceInfo(reqname);
 		if(reqs==null)
 			throw new RuntimeException("Required service not found: "+reqname);
 		this.servicetype = reqs.getType().getType(agent.getClassLoader(), agent.getModel().getAllImports());
@@ -85,7 +86,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		}
 		final Method sermethod = servicetype.getMethod(methodname, params);
 		
-		IIntermediateFuture<Object> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(reqname);
+		IIntermediateFuture<Object> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices(reqname);
 
 		if(SReflect.isSupertype(IIntermediateFuture.class, rettype))
 		{

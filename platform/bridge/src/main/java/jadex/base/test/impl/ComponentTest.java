@@ -22,6 +22,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -186,8 +187,8 @@ public class ComponentTest extends TestCase
 		if(conf!=null)
 		{
 			IExternalAccess	exta	= Starter.createPlatform(conf, args).get(timeout, true);
-			cms	= SServiceProvider.getService(exta, IComponentManagementService.class).get(timeout, true);
-			ILibraryService	libsrv	= SServiceProvider.getService(exta, ILibraryService.class).get(timeout, true);
+			cms	= SServiceProvider.searchService(exta, new ServiceQuery<>(IComponentManagementService.class)).get(timeout, true);
+			ILibraryService	libsrv	= SServiceProvider.searchService(exta, new ServiceQuery<>(ILibraryService.class)).get(timeout, true);
 			
 			for (int projectIndex=0; projectIndex < dirs.length; projectIndex++) {
 				File[] project = dirs[projectIndex];

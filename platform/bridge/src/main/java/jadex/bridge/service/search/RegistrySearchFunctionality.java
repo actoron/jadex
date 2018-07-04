@@ -605,32 +605,32 @@ public class RegistrySearchFunctionality
 		
 		IComponentIdentifier cid = queryinfo.getQuery().getOwner();
 		String scope = queryinfo.getQuery().getScope();
-		IAsyncFilter<IService> filter = (IAsyncFilter)queryinfo.getQuery().getFilter();
+//		IAsyncFilter<IService> filter = (IAsyncFilter)queryinfo.getQuery().getFilter();
 		if(!checkSearchScope(cid, service, scope, false) || !checkPublicationScope(cid, service))
 		{
 			ret.setResult(Boolean.FALSE);
 		}
 		else
 		{
-			if(filter==null)
-			{
+//			if(filter==null)
+//			{
 				ret.setResult(Boolean.TRUE);
-			}
-			else
-			{
-				filter.filter(service).addResultListener(new IResultListener<Boolean>()
-				{
-					public void resultAvailable(Boolean result)
-					{
-						ret.setResult(result!=null && result.booleanValue()? Boolean.TRUE: Boolean.FALSE);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setResult(Boolean.FALSE);
-					}
-				});
-			}
+//			}
+//			else
+//			{
+//				filter.filter(service).addResultListener(new IResultListener<Boolean>()
+//				{
+//					public void resultAvailable(Boolean result)
+//					{
+//						ret.setResult(result!=null && result.booleanValue()? Boolean.TRUE: Boolean.FALSE);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						ret.setResult(Boolean.FALSE);
+//					}
+//				});
+//			}
 		}
 		
 		return ret;
