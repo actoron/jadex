@@ -22,6 +22,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.SReflect;
@@ -514,6 +515,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		T ret	=  (T)ServiceRegistry.getRegistry(getComponent())
 			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
 		
+		if(ret==null)
+		{
+			// TODO 0..1 vs 1 multiplicity
+			throw new ServiceNotFoundException(query.toString());
+		}
+		
 		// Wraps result in proxy, if required. 
 		return createServiceProxy(ret, info);
 	}
@@ -609,7 +616,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> RequiredServiceInfo	createServiceInfo(ServiceQuery<T> query)
 	{
-		return new RequiredServiceInfo(null, query.getServiceType(), query.isMultiple(), null, null, Arrays.asList(query.getServiceTags()));
+		return new RequiredServiceInfo(null, query.getServiceType(), query.isMultiple(), null, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
 	}
 	
 	/**
