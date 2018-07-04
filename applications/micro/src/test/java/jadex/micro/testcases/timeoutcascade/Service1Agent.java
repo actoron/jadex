@@ -18,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent(autoprovide=Boolean3.TRUE)
 @Service
 @RequiredServices({@RequiredService(name = "ser2", type=IService2.class, 
-	binding = @Binding(dynamic = true, scope = Binding.SCOPE_PLATFORM))})
+	binding = @Binding(scope = Binding.SCOPE_PLATFORM))})
 public class Service1Agent implements IService1
 {
 	@Agent

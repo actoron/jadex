@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.registry;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,11 +16,11 @@ public class RegistryEvent extends ARegistryEvent
 	public static long LEASE_TIME = 10000;
 	
 	/** The added services. */
-	protected Set<IService> addedservices;
+	protected Collection<IService> addedservices;
 //	protected Set<IServiceIdentifier> addedservices;
 	
 	/** The removed services. */
-	protected Set<IService> removedservices;
+	protected Collection<IService> removedservices;
 //	protected Set<IServiceIdentifier> removedservices;
 
 	/** Flag if is delta (or full) registry content. */
@@ -76,7 +77,7 @@ public class RegistryEvent extends ARegistryEvent
 	 *  Get the addedservices.
 	 *  @return the addedservices
 	 */
-	public Set<IService> getAddedServices()
+	public Collection<IService> getAddedServices()
 	{
 		return addedservices;
 	}
@@ -84,7 +85,7 @@ public class RegistryEvent extends ARegistryEvent
 	/**
 	 *  Set the added services.
 	 */
-	public void setAddedServices(Set<IService> services)
+	public void setAddedServices(Collection<IService> services)
 	{
 		this.addedservices = services;
 //		if(services!=null && services.size()>0)
@@ -101,7 +102,7 @@ public class RegistryEvent extends ARegistryEvent
 	 *  Get the removedservices.
 	 *  @return the removedservices
 	 */
-	public Set<IService> getRemovedServices()
+	public Collection<IService> getRemovedServices()
 	{
 		return removedservices;
 	}
@@ -109,7 +110,7 @@ public class RegistryEvent extends ARegistryEvent
 	/**
 	 *  Set the removed services.
 	 */
-	public void setRemovedServices(Set<IService> services)
+	public void setRemovedServices(Collection<IService> services)
 	{
 		this.removedservices = services;
 //		if(services!=null && services.size()>0)

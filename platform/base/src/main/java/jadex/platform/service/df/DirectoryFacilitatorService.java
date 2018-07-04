@@ -11,6 +11,7 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
@@ -20,7 +21,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -30,7 +30,6 @@ import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.bridge.service.types.df.IProperty;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -212,7 +211,7 @@ public class DirectoryFacilitatorService	implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider, IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
+			provider.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IDF.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -429,41 +428,26 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-			.addResultListener(new DelegationResultListener(ret)
+		cms	= ((AbstractComponentFeature)provider.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+		boolean	setresult;
+		synchronized(services)
 		{
-			public void customResultAvailable(Object result)
-			{
-				cms	= (IComponentManagementService)result;
-				boolean	setresult;
-				synchronized(services)
-				{
-					services[0]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
+			services[0]	= true;
+			setresult	= services[0] && services[1];
+		}
+		if(setresult)
+			ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
-			}
-		});
 		
-		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-			.addResultListener(new DelegationResultListener(ret)
+		clockservice	= ((AbstractComponentFeature)provider.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		synchronized(services)
 		{
-			public void customResultAvailable(Object result)
-			{
-				clockservice	= (IClockService)result;
-				boolean	setresult;
-				synchronized(services)
-				{
-					services[1]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
+			services[1]	= true;
+			setresult	= services[0] && services[1];
+		}
+		if(setresult)
+			ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
-			}
-		});
 		
 		return ret;
 	}

@@ -133,7 +133,7 @@ Attribution 3.0 and converted by us for the use in JMonkey<br><br>
 	
 	<properties>
 		<property name="clock" class="IFuture">
-			SServiceProvider.searchService($component, new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			SServiceProvider.searchService($component, new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 		</property>
 	</properties>
 

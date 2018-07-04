@@ -134,7 +134,7 @@ public class MessagePerformanceAgent
 					f.setLocation(SGUI.calculateMiddlePosition(f));
 					f.setVisible(true);
 					
-					SServiceProvider.getServices(agent, IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+					agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 						.addResultListener(new SwingIntermediateResultListener<IEchoService>(new IIntermediateResultListener<IEchoService>()
 					{
 						boolean first = true;

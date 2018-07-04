@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -33,8 +34,8 @@ public class RemoteBlockingTestAgent	extends TestAgent
 		// timeout none due to remote call and simulation mode
 		IExternalAccess	exta	= createPlatform(null).get(Timeout.NONE);
 		
-		IComponentManagementService	cms	= SServiceProvider.getService(exta,
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(Timeout.NONE);
+		IComponentManagementService	cms	= SServiceProvider.searchService(exta,
+			new ServiceQuery<>(IComponentManagementService.class)).get(Timeout.NONE);
 		
 		cms.getComponentDescriptions().get(Timeout.NONE);
 		

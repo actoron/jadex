@@ -10,7 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -56,8 +56,7 @@ public class TesterAgent implements ITestService
 
 		if(agent.getConfiguration().equals("created"))
 		{
-			ITestService tsa = SServiceProvider.getService(agent, 
-				agent.getComponentIdentifier().getParent(), ITestService.class).get();
+			ITestService tsa = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, agent.getComponentIdentifier().getParent())).get();
 			tsa.test(0).get();
 		}
 		else
@@ -117,7 +116,7 @@ public class TesterAgent implements ITestService
 //		System.out.println("invoked test on: "+agent.getComponentIdentifier()+" level="+level+" "+ServiceCall.getCurrentInvocation().getCause());
 		if(level<10)
 		{
-			Collection<ITestService> tss = SServiceProvider.getServices(agent, ITestService.class).get();
+			Collection<ITestService> tss = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class)).get();
 			if(tss.size()>0)
 			{
 				int num = (int)(Math.random()*tss.size());

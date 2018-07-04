@@ -21,7 +21,7 @@
 	<beliefs>
 		<!-- The environment as singleton object. -->
 		<belief name="environment" class="Environment">
-			<fact>Environment.createInstance((IClockService)$component.getComponentIdentifier().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))</fact>
+			<fact>Environment.createInstance((IClockService)$component.getComponentIdentifier().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))</fact>
 	  	</belief>
 
 		<belief name="gui" class="jadex.commons.gui.GuiCreator">

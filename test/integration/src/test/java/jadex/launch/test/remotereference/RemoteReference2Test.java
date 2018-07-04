@@ -11,6 +11,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
@@ -43,7 +44,7 @@ public class RemoteReference2Test //extends TestCase
 		// Find local service with direct remote search.
 		System.out.println("searching local");
 		ILocalService	service1	= SServiceProvider
-			.getService(platform1, ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
+			.searchService(platform1, new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 //		ILocalService	service1 = SServiceProvider.waitForService(platform1, new IResultCommand<IFuture<ILocalService>, Void>()
 //		{
 //			public IFuture<ILocalService> execute(Void args)
@@ -55,7 +56,7 @@ public class RemoteReference2Test //extends TestCase
 		// Search for remote search service from local platform
 		System.out.println("searching global");
 		ISearchService	search	= SServiceProvider
-			.getService(platform1, ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(timeout);
+			.searchService(platform1, new ServiceQuery<>(ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 		// Search for remote search service from local platform
 //		ISearchService	search = SServiceProvider.waitForService(platform1, new IResultCommand<IFuture<ISearchService>, Void>()
 //		{

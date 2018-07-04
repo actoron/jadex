@@ -10,7 +10,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.annotation.Agent;
@@ -38,7 +39,7 @@ public class ServiceQueryAgent
 			{
 				final long start = System.currentTimeMillis();
 				
-				SServiceProvider.getServices(agent, IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK))
 					.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
 				{
 					Set<IComponentIdentifier> plats = new HashSet<IComponentIdentifier>();

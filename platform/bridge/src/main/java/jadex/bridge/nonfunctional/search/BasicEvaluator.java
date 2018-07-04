@@ -4,6 +4,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
@@ -108,7 +109,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	{
 		final Future<T> ret = new Future<T>();
 		
-		<>new ServiceQuery<>(IComponentManagementService.class))
+		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

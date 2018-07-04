@@ -20,6 +20,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
@@ -169,8 +170,8 @@ public class GenerateService implements IGenerateService
 								{
 									public void customResultAvailable(Object result)
 									{
-										SServiceProvider.getService((IExternalAccess)result,
-											ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL).addResultListener(
+										SServiceProvider.searchService((IExternalAccess)result,
+											new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL)).addResultListener(
 											agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)

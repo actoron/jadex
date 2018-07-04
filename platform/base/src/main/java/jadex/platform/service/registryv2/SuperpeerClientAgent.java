@@ -13,7 +13,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
@@ -110,7 +109,7 @@ public class SuperpeerClientAgent
 			
 			// Not found locally -> Need to choose remote super peer
 			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut;
-			queryfut	= SServiceProvider.addQuery(agent, query, true);
+			queryfut	= agent.getComponentFeature(IRequiredServicesFeature.class).addQuery(query);
 			queries.put(networkname, queryfut);
 			queryfut.addResultListener(new IntermediateDefaultResultListener<ISuperpeerService>()
 			{

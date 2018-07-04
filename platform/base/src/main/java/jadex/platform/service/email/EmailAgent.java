@@ -20,7 +20,6 @@ import javax.net.ssl.SSLServerSocketFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -40,10 +39,11 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -64,9 +64,9 @@ import jadex.micro.annotation.RequiredServices;
 		description="The default email account that is used to send/receive emails.")
 })
 @ProvidedServices(@ProvidedService(type = IEmailService.class))
-@RequiredServices(@RequiredService(name="emailfetcher", type=IEmailFetcherService.class, binding=@Binding(dynamic=true, scope=RequiredServiceInfo.SCOPE_NONE,
-	create=true, creationinfo=@CreationInfo(type="fetcher"))))
+@RequiredServices(@RequiredService(name="emailfetcher", type=IEmailFetcherService.class))
 @ComponentTypes(@ComponentType(name="fetcher", clazz=EmailFetcherAgent.class))
+@Configurations(@Configuration(name="default", components=@Component(type="fetcher")))
 public class EmailAgent implements IEmailService
 {
 	//-------- constants --------

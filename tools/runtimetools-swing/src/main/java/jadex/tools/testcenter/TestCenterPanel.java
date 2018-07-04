@@ -1295,8 +1295,8 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			final Future<Void>	ret	= new Future<Void>();
 			
-			SServiceProvider.getService(plugin.getJCC().getJCCAccess(),
-				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.searchService(plugin.getJCC().getJCCAccess(),
+				new ServiceQuery<>(IComponentManagementService.class))
 				.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)

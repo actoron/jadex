@@ -33,9 +33,9 @@ import jadex.micro.testcases.TestAgent;
  *  Agent providing a direct service.
  */
 @RequiredServices({
-	@RequiredService(name="raw", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_RAW, dynamic=true, scope=Binding.SCOPE_GLOBAL)),
-	@RequiredService(name="direct", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DIRECT, dynamic=true, scope=Binding.SCOPE_GLOBAL)),
-	@RequiredService(name="decoupled", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DECOUPLED, dynamic=true, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="raw", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_RAW, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="direct", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DIRECT, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="decoupled", type=IServiceCallService.class, binding=@Binding(proxytype=Binding.PROXYTYPE_DECOUPLED, scope=Binding.SCOPE_GLOBAL)),
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 @Agent

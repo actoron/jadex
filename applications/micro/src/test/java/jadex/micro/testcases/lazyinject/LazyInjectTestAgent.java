@@ -14,7 +14,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -28,10 +27,11 @@ import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -47,9 +47,10 @@ import jadex.micro.annotation.Results;
 })
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class,
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, creationinfo=@CreationInfo(type="provider"))),
+	@RequiredService(name="ts", type=ITestService.class),
 })
+@Configurations(@Configuration(name="default", components=@Component(type="provider")))
+
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Scope global causes search timeouts -> increase test timeout to exceed search timeout
 // Hangs with jadex_deftimeout -1 when incompatible platforms are online, because global search does not return and creation binding never happens :(

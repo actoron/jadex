@@ -11,10 +11,11 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -31,11 +32,11 @@ import jadex.micro.annotation.Results;
 })
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class,
+	@RequiredService(name="ts", type=ITestService.class)
 		// Hangs with global search during micro tests?
 //		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
-	binding=@Binding(create=true, creationinfo=@CreationInfo(type="ta"))),
 })
+@Configurations(@Configuration(name="default", components=@Component(type="ts")))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Scope global causes search timeouts -> increase test timeout to exceed search timeout
 // Hangs with jadex_deftimeout -1 when incompatible platforms are online, because global search does not return and creation binding never happens :(

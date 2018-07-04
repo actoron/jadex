@@ -44,7 +44,7 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 	@RequiredService(name="aser", type=ITestService.class, multiple=true,
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
+		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL),
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 public class NFLatencyTestAgent extends TestAgent

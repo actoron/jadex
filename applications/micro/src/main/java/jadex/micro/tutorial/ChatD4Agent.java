@@ -23,7 +23,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="clockservice", type=IClockService.class, 
 		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
 	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_PLATFORM))
+		binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 public class ChatD4Agent
 {

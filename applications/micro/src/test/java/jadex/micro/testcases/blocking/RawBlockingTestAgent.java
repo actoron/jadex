@@ -6,7 +6,8 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
@@ -27,8 +28,8 @@ public class RawBlockingTestAgent extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IComponentManagementService	cms	= SServiceProvider.getService(agent,
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		
 		cms.getComponentDescriptions().get();
 		

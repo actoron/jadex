@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.collection.SCollection;
@@ -19,7 +18,6 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  The synchronous execution service that executes all tasks in zero to one thread.
@@ -183,113 +181,102 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		
 		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Void result)
+			public void customResultAvailable(Void v)
 			{
-				provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-					.addResultListener(new IResultListener<IThreadPoolService>()
+				IThreadPoolService	result	= ((AbstractComponentFeature)provider.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				executor = new Executor(result, new IExecutable()
 				{
-					public void resultAvailable(IThreadPoolService result)
+					public boolean execute()
 					{
-						executor = new Executor(result, new IExecutable()
+						// Perform one task a time.
+						
+						// assert task==null;
+						synchronized(SyncExecutionService.this)
 						{
-							public boolean execute()
+							if(state==State.RUNNING && !queue.isEmpty())
 							{
-								// Perform one task a time.
-								
-								// assert task==null;
-								synchronized(SyncExecutionService.this)
-								{
-									if(state==State.RUNNING && !queue.isEmpty())
-									{
-										// Hack!!! Is there a better way to get first element from queue without creating iterator?
-										Iterator<IExecutable> iterator = queue.iterator();
-										task = iterator.next();
-										iterator.remove();
-									}
-								}
-								
-								boolean again = false;
-								if(task!=null)
-								{
-									try
-									{
+								// Hack!!! Is there a better way to get first element from queue without creating iterator?
+								Iterator<IExecutable> iterator = queue.iterator();
+								task = iterator.next();
+								iterator.remove();
+							}
+						}
+						
+						boolean again = false;
+						if(task!=null)
+						{
+							try
+							{
 //										if(DEBUG)
 //											System.out.println("Executing task: "+task+", "+this);
-										again = task.execute();
-									}
-									catch(Throwable e)
-									{
-										System.out.println("Exception during executing task: "+task);
-										e.printStackTrace();
-									}									
-								}
-
-								Future<Void> idf = null;
-								List<Future<Void>>	remfuts	= null;
-								synchronized(SyncExecutionService.this)
-								{
-									if(removedtask==null)
-									{
-										if(again && state==State.RUNNING)
-										{
-											queue.add(task);
-										}
-									}
-									else if(removedtask==task)
-									{
-										removedtask = null;
-										remfuts	= new ArrayList<Future<Void>>(removedfut);
-										removedfut.clear();
-									}
-									else
-									{
-										throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
-									}
-									
-									task = null;
-//									System.out.println("task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching());
-									if(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())
-									{
-										idf = idlefuture;
-										idlefuture = null;
-		//								perform = idlefuture!=null;
-									}
-
-									// Perform next task when queue is not empty and service is running.
-									again	= state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching();
-								}
-
-								
-								// When no more executables, inform idle commands.
-								if(idf!=null)
-								{
-//									System.out.println("Idle");
-									idf.setResult(null);
-		//							Iterator it	= idlecommands.iterator();
-		//							while(it.hasNext())
-		//							{
-		//								((ICommand)it.next()).execute(null);
-		//							}
-								}
-								if(remfuts!=null)
-								{
-									for(int i=0; i<remfuts.size(); i++)
-										remfuts.get(i).setResult(null);									
-								}
-								
-								return again;
+								again = task.execute();
 							}
-						});
+							catch(Throwable e)
+							{
+								System.out.println("Exception during executing task: "+task);
+								e.printStackTrace();
+							}									
+						}
+
+						Future<Void> idf = null;
+						List<Future<Void>>	remfuts	= null;
+						synchronized(SyncExecutionService.this)
+						{
+							if(removedtask==null)
+							{
+								if(again && state==State.RUNNING)
+								{
+									queue.add(task);
+								}
+							}
+							else if(removedtask==task)
+							{
+								removedtask = null;
+								remfuts	= new ArrayList<Future<Void>>(removedfut);
+								removedfut.clear();
+							}
+							else
+							{
+								throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
+							}
+							
+							task = null;
+//									System.out.println("task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching());
+							if(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())
+							{
+								idf = idlefuture;
+								idlefuture = null;
+//								perform = idlefuture!=null;
+							}
+
+							// Perform next task when queue is not empty and service is running.
+							again	= state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching();
+						}
+
 						
-						state	= State.RUNNING;
-						ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
+						// When no more executables, inform idle commands.
+						if(idf!=null)
+						{
+//									System.out.println("Idle");
+							idf.setResult(null);
+//							Iterator it	= idlecommands.iterator();
+//							while(it.hasNext())
+//							{
+//								((ICommand)it.next()).execute(null);
+//							}
+						}
+						if(remfuts!=null)
+						{
+							for(int i=0; i<remfuts.size(); i++)
+								remfuts.get(i).setResult(null);									
+						}
+						
+						return again;
 					}
 				});
+				
+				state	= State.RUNNING;
+				ret.setResult(null);
 			}
 		});
 		

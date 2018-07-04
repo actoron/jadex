@@ -19,7 +19,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -33,8 +32,8 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that uses a multiplexed service.
  */
-@RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true, 
-	multiplextype=IMultiplexExampleService.class, binding=@Binding(dynamic=true)))
+@RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true))
+//	multiplextype=IMultiplexExampleService.class))	// TODO? removed in v4
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
 @ComponentTypes(@ComponentType(name="provider", filename="ProviderAgent.class"))

@@ -26,7 +26,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices(
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))
+		binding=@Binding(scope=Binding.SCOPE_GLOBAL))
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
 @Agent

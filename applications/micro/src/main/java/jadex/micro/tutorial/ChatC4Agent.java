@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -38,8 +39,8 @@ public class ChatC4Agent
 //		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent.getServiceContainer(), 
 //			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT));
 		
-		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent,
-			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
+		IFuture<IComponentFactory>	factory	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(
+			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT)));
 		
 		//factory.addResultListener(agent.getCompocreateResultListener(new IResultListener<IComponentFactory>()
 		factory.addResultListener(new IResultListener<IComponentFactory>()

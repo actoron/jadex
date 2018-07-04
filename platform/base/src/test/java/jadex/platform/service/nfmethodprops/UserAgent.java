@@ -11,7 +11,6 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.DefaultPoolStrategy;
@@ -22,10 +21,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -39,13 +39,11 @@ import jadex.platform.service.servicepool.IServicePoolService;
 @Service
 @RequiredServices(
 {
-	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, 
-		creationinfo=@CreationInfo(type="spa"))),
-	@RequiredService(name="testser", type=ITestService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="provider")))
+	@RequiredService(name="poolser", type=IServicePoolService.class),
+	@RequiredService(name="testser", type=ITestService.class)
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="spa")))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class UserAgent
 {

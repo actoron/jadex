@@ -1,14 +1,14 @@
 package jadex.platform.service.parallelizer;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.servicepool.IServicePoolService;
@@ -22,11 +22,10 @@ import jadex.platform.service.servicepool.IServicePoolService;
 })
 @RequiredServices(
 {
-	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, 
-		creationinfo=@CreationInfo(type="spa"))),
+	@RequiredService(name="poolser", type=IServicePoolService.class),
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="spa")))
 public class ParallelizerAgent
 {
 	//-------- attributes --------

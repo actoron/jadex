@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.email.Email;
@@ -31,10 +30,11 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -62,18 +62,20 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices(
 {
-	@RequiredService(name="emailser", type=IEmailService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="emailagent"))),
-	@RequiredService(name="cliser", type=ICliService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="cliagent"))),
-	@RequiredService(name="secser", type=ISecurityService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="emailser", type=IEmailService.class),
+	@RequiredService(name="cliser", type=ICliService.class),
+	@RequiredService(name="secser", type=ISecurityService.class)
 })
 @ComponentTypes(
 {
 	@ComponentType(name="emailagent", filename="jadex/platform/service/email/EmailAgent.class"),
 	@ComponentType(name="cliagent", filename="jadex/platform/service/cli/CliAgent.class")
 })
+@Configurations(@Configuration(name="default", components=
+{
+	@Component(type="emailagent"),
+	@Component(type="cliagent")
+}))
 @Agent
 public class CliEmailAgent
 {

@@ -47,8 +47,11 @@ import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -65,9 +68,9 @@ import jadex.xml.writer.XMLWriterFactory;
 {	
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="emailagent"))),
+	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="daemon")))
+	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Arguments(
 {
@@ -84,6 +87,11 @@ import jadex.xml.writer.XMLWriterFactory;
 	@ComponentType(name="emailagent", filename="jadex/platform/service/email/EmailAgent.class"),
 	@ComponentType(name="daemon", filename="jadex/platform/service/daemon/DaemonAgent.class")
 })
+@Configurations(@Configuration(name="default", components=
+{
+	@Component(type="emailagent"),
+	@Component(type="daemon")
+}))
 public class UpdateAgent implements IUpdateService
 {
 	//-------- attributes --------

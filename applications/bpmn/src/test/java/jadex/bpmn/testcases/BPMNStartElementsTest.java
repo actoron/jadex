@@ -7,8 +7,8 @@ import org.junit.Test;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
@@ -47,7 +47,7 @@ public class BPMNStartElementsTest //extends TestCase
 		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+			.searchService(platform, new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
 
 		
 		CreationInfo ci = new CreationInfo();

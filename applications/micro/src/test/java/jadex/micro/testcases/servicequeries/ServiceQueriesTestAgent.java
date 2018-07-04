@@ -12,6 +12,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
@@ -67,7 +68,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 		final TestReport tr = new TestReport("#1", "Test if ");
 		try
 		{
-			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL, null);
+			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(new ServiceQuery<>(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL));
 			queryfut.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
 			{
 				int num = 0;

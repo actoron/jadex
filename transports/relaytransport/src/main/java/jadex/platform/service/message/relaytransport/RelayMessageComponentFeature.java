@@ -11,9 +11,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
@@ -82,7 +82,7 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 	protected Collection<ITransportService> getAllTransports()
 	{
 		List<ITransportService> ret = new ArrayList<ITransportService>();
-		Collection<ITransportService> all = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+		Collection<ITransportService> all = ((AbstractComponentFeature)component.getComponentFeature(IRequiredServicesFeature.class)).getRawServices(ITransportService.class);
 		if (all != null)
 		{
 			for (Iterator<ITransportService> it = all.iterator(); it.hasNext(); )

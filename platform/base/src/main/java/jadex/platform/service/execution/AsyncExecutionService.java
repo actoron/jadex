@@ -5,9 +5,7 @@ import java.util.Map;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
@@ -264,28 +262,16 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-						.addResultListener(new IResultListener<IThreadPoolService>()
+					threadpool	= ((AbstractComponentFeature)component.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+					try
 					{
-						public void resultAvailable(IThreadPoolService result)
-						{
-							try
-							{
-								threadpool = result;
-								state	= State.RUNNING;
-								ret.setResult(null);
-							}
-							catch(RuntimeException e)
-							{
-								ret.setException(e);
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+						state	= State.RUNNING;
+						ret.setResult(null);
+					}
+					catch(RuntimeException e)
+					{
+						ret.setException(e);
+					}
 				}
 			}
 		});

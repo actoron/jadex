@@ -3,7 +3,6 @@ package jadex.micro.tutorial;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -42,15 +41,15 @@ public class MainH4
 		System.out.println("Started platform: "+platform.getComponentIdentifier());
 		
 		// Get the CMS service from the platform
-		IComponentManagementService	cms	= SServiceProvider.getService(platform,
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IComponentManagementService	cms	= SServiceProvider.searchService(platform,
+			new ServiceQuery<>(IComponentManagementService.class)).get();
 		
 		// Start the chat component
 		IComponentIdentifier	cid	= cms.createComponent(null, ChatD2Agent.class.getName()+".class", null, null).get();
 		System.out.println("Started chat component: "+cid);
 		
 		// Fetch the chat service
-		IChatService	chat	= SServiceProvider.searchService(platform, new ServiceQuery<>( cid, IChatService.class)).get();
+		IChatService	chat	= SServiceProvider.searchService(platform, new ServiceQuery<>(IChatService.class, cid)).get();
 		chat.message("Main", "Chat started.");
 
 	}

@@ -7,10 +7,9 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -22,10 +21,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -39,13 +39,13 @@ import jadex.micro.annotation.Results;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, 
-		creationinfo=@CreationInfo(type="spa"))),
+	@RequiredService(name="poolser", type=IServicePoolService.class),
 	@RequiredService(name="aser", type=IAService.class),
 	@RequiredService(name="bser", type=IBService.class)
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="spa")))
+
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {
@@ -164,7 +164,7 @@ public class UserAgent
 						
 						final TestReport rep3 = new TestReport("#3", "Test if no A services besides proxy can be found");
 						// Ensure that only 
-						SServiceProvider.getServices(agent, IAService.class)
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAService.class))
 							.addResultListener(new ExceptionDelegationResultListener<Collection<IAService>, Void>(ret)
 						{
 							public void customResultAvailable(Collection<IAService> result)

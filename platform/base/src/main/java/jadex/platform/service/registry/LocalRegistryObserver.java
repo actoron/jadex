@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceEvent;
@@ -57,11 +58,10 @@ public abstract class LocalRegistryObserver extends EventCollector
 //		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>(ServiceEvent.CLASSINFO, (ClassInfo)null, Binding.SCOPE_PLATFORM, (IAsyncFilter)null, null, cid);
 		
 		// This is the query that is used to get change notifications from local registry
-		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>((ClassInfo)null, 
-			Binding.SCOPE_PLATFORM, null, cid, (IAsyncFilter)null, ServiceEvent.CLASSINFO);
+		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>((Class<ServiceEvent<IService>>)null, cid).setReturnType(ServiceEvent.CLASSINFO);
 		
 //		localregsub = ServiceRegistry.getRegistry(cid).addQuery(query);
-		localregsub = SServiceProvider.addQuery(component, query, true);
+		localregsub = component.getComponentFeature(IRequiredServicesFeature.class).addQuery(query);
 		localregsub.addIntermediateResultListener(new IIntermediateResultListener<ServiceEvent<IService>>()
 		{
 //			AtomicInteger c = new AtomicInteger();
@@ -140,12 +140,10 @@ public abstract class LocalRegistryObserver extends EventCollector
 	 */
 	public RegistryEvent getCurrentStateEvent(IComponentIdentifier owner)
 	{
-		IServiceRegistry reg = ServiceRegistry.getRegistry(cid);
-		
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
 		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_GLOBAL, null, owner==null? cid: owner, null);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
-		Set<IService> added = reg.searchServices(query);
+		Collection<IService> added = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(query);
 		
 		// Remove only non-globally-scoped services
 //		Set<IComponentIdentifier> clients = new HashSet<IComponentIdentifier>();

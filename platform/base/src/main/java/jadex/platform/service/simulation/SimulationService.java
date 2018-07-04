@@ -6,13 +6,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -144,83 +144,48 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		ISettingsService	settings	= access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+		settings.registerPropertiesProvider("simulationservice", SimulationService.this)
+			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
-			{
-				ISettingsService	settings	= (ISettingsService)result;
-				settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						proceed();
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurred(exception);
-					}
-				}));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore.
-				proceed();
-			}
-			
-			public void proceed()
+			public void customResultAvailable(Object result)
 			{
 				final boolean[]	services	= new boolean[2];
 
-				access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				exeservice	= ((AbstractComponentFeature)access.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+				services[0]	= true;
+				if(services[0] && services[1])
 				{
-					public void customResultAvailable(Object result)
+					if(startoninit)
 					{
-						exeservice = (IExecutionService)result;
-						services[0]	= true;
-						if(services[0] && services[1])
-						{
-							if(startoninit)
-							{
-								startoninit	= false;
-								start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-							}
-							else
-							{
-								ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-							}
-						}
+						startoninit	= false;
+						start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 					}
-				}));
+					else
+					{
+						ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
+					}
+				}
 						
-				access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				clockservice	= ((AbstractComponentFeature)access.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+				clockservice = (IClockService)result;
+				services[1]	= true;
+				if(services[0] && services[1])
 				{
-					public void customResultAvailable(Object result)
+					if(startoninit)
 					{
-						clockservice = (IClockService)result;
-						services[1]	= true;
-						if(services[0] && services[1])
-						{
-							if(startoninit)
-							{
-								startoninit	= false;
-								start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-							}
-							else
-							{
-								ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-							}
-						}
+						startoninit	= false;
+						start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 					}
-				}));						
+					else
+					{
+						ret.setResult(null);
+//										ret.setResult(getServiceIdentifier());
+					}
+				}
 			}
-		}));				
+		}));
 
 		return ret;
 	}
@@ -385,17 +350,10 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IThreadPoolService	tps	= (IThreadPoolService)result;
-						clockservice.setClock(type, tps);
-						notifyListeners(new ChangeEvent(this, "clock_type", type));
-						fut.setResult(null);
-					}
-				}));
+				IThreadPoolService	tps	= ((AbstractComponentFeature)access.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				clockservice.setClock(type, tps);
+				notifyListeners(new ChangeEvent(this, "clock_type", type));
+				fut.setResult(null);
 			}
 			else
 			{

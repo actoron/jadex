@@ -30,10 +30,11 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -59,8 +60,8 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
 @Service
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes(@ComponentType(name="aagent", clazz=AAgent.class))
-@RequiredServices(@RequiredService(name="aser", type=IAService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_NONE, create=true, creationinfo=@CreationInfo(type="aagent"))))
+@RequiredServices(@RequiredService(name="aser", type=IAService.class))
+@Configurations(@Configuration(name="default", components=@Component(type="aagent")))
 @Ignore
 public class RecFuturesTestAgent extends RemoteTestBaseAgent
 {
@@ -290,7 +291,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{
-						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IAService.class))
+						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class, cid))
 							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
 						{
 							public void customResultAvailable(IAService service)

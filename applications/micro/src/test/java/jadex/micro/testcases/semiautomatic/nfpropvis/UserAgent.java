@@ -56,7 +56,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  Ranking of a requires services via an waitqueue ranker.
  */
-@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true)))
+@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 //ranker="new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryttoService.class.getMethod(\"encrypt\", new Class[]{String.class}))))"
 
 @Agent

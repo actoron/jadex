@@ -17,6 +17,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -372,7 +373,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Collection<IProxyAgentService> sers = SServiceProvider.getLocalServices(component, IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						Collection<IProxyAgentService> sers = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	
 						if(sers!=null && sers.size()>0)
 						{
@@ -776,7 +777,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			IComponentIdentifier plat = null;
 			
 			// Only add if registry is multi type
-			Set<IService> added = event.getAddedServices();
+			Collection<IService> added = event.getAddedServices();
 			if(added!=null)
 			{
 				for(IService ser: added)
@@ -796,7 +797,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				}
 			}
 			
-			Set<IService> removed = event.getRemovedServices();
+			Collection<IService> removed = event.getRemovedServices();
 			if(removed!=null)
 			{
 				for(IService ser: removed)
@@ -1191,13 +1192,13 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //			IMsgSecurityInfos secinfo = (IMsgSecurityInfos)ServiceCall.getCurrentInvocation().getProperty("securityinfo");
 			query.setNetworkNames(networknames);
 			
-			Set<IService> sers = getRegistry().searchServices(query);
+			Set<IServiceIdentifier> sers = getRegistry().searchServices(query);
 			if(sers!=null)
 			{
-				for(Iterator<IService> it=sers.iterator(); it.hasNext(); )
+				for(Iterator<IServiceIdentifier> it=sers.iterator(); it.hasNext(); )
 				{
-					IService ser = it.next();
-					if(clients==null || !clients.containsKey(ser.getServiceIdentifier().getProviderId().getRoot()))
+					IServiceIdentifier ser = it.next();
+					if(clients==null || !clients.containsKey(ser.getProviderId().getRoot()))
 						it.remove();
 				}
 				res.setSuperpeers(sers.toArray(new ISuperpeerRegistrySynchronizationService[sers.size()]));

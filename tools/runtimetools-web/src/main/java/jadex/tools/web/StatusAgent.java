@@ -16,7 +16,6 @@ import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -69,7 +68,7 @@ public class StatusAgent implements IStatusService
 	{
 		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
 		FutureBarrier<Collection<PlatformData>>	fubar	= new FutureBarrier<Collection<PlatformData>>();
-		for(ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
+		for(ITransportInfoService tis: agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			IIntermediateFuture<PlatformData>	fut	= tis.getConnections();
 			fut.addIntermediateResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
@@ -126,7 +125,7 @@ public class StatusAgent implements IStatusService
 		});
 		
 		// TODO: Use query for dynamically added platforms
-		for(final ITransportInfoService tis: SServiceProvider.getLocalServices(agent, ITransportInfoService.class))
+		for(final ITransportInfoService tis: agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
 			fut.addResultListener(new IIntermediateResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
@@ -215,7 +214,7 @@ public class StatusAgent implements IStatusService
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
 	{
-		Collection<IMemstatService>	stats	= SServiceProvider.getLocalServices(agent, IMemstatService.class, Binding.SCOPE_PLATFORM);
+		Collection<IMemstatService>	stats	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, Binding.SCOPE_PLATFORM));
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		for(IMemstatService stat: stats)
 		{

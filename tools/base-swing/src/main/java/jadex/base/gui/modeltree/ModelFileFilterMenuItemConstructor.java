@@ -226,7 +226,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	{
 		if(isEnabled())
 		{
-			SServiceProvider.getServices(exta, IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.searchServices(exta, new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
 				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
 			{

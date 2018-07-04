@@ -30,9 +30,11 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -45,10 +47,11 @@ import jadex.micro.annotation.Results;
 {
 	@RequiredService(name="clock", type=IClockService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="crons", type=ICronService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="cronagent", configuration="platform clock"))),
+	@RequiredService(name="crons", type=ICronService.class),
 })
 @ComponentTypes(@ComponentType(name="cronagent", clazz=CronAgent.class))
+@Configurations(@Configuration(name="default", components=@Component(type="wrapagent", configuration="platform clock")))
+
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class TestAgent

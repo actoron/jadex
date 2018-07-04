@@ -244,7 +244,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
 //								System.out.println("cid is: "+cid);
-								agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IIntermediateResultService.class))
+								agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IIntermediateResultService.class, cid))
 									.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IIntermediateResultService service)

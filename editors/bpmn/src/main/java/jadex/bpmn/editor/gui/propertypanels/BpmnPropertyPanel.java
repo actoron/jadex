@@ -2389,7 +2389,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						rs = cs;
 					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
 					{
-						ret = rs.getDefaultBinding().isDynamic();
+//						ret = rs.getDefaultBinding().isDynamic();
 					}
 					return ret;
 				}
@@ -2400,7 +2400,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						rs = cs;
 					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
 					{
-						ret = rs.getDefaultBinding().isCreate();
+//						ret = rs.getDefaultBinding().isCreate();
 					}
 					return ret;
 				}
@@ -2492,7 +2492,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					if(cs != null)
 					{
 						createBinding(cs);
-						cs.getDefaultBinding().setDynamic((Boolean)value);
+//						cs.getDefaultBinding().setDynamic((Boolean)value);
 						if(compareService(rs, cs))
 						{
 							conf.removeRequiredService(cs);
@@ -2501,7 +2501,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					else
 					{
 						createBinding(rs);
-						rs.getDefaultBinding().setDynamic((Boolean)value);
+//						rs.getDefaultBinding().setDynamic((Boolean)value);
 						for(ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getReqService(rs.getName(), itconf);
@@ -2517,7 +2517,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					if(cs != null)
 					{
 						createBinding(cs);
-						cs.getDefaultBinding().setDynamic((Boolean)value);
+//						cs.getDefaultBinding().setDynamic((Boolean)value);
 						if(compareService(rs, cs))
 						{
 							conf.removeRequiredService(cs);
@@ -2526,7 +2526,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					else
 					{
 						createBinding(rs);
-						rs.getDefaultBinding().setCreate((Boolean)value);
+//						rs.getDefaultBinding().setCreate((Boolean)value);
 						for(ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getReqService(rs.getName(), itconf);

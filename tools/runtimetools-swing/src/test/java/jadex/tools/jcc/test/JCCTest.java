@@ -13,8 +13,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SNonAndroid;
 import jadex.commons.future.DelegationResultListener;
@@ -47,7 +47,7 @@ public class JCCTest //extends TestCase
 		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+			.searchService(platform, new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
 
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
 			new BasicComponentIdentifier("jcc", platform.getComponentIdentifier())).get(timeout);

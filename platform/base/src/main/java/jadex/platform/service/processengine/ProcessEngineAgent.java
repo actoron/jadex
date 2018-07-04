@@ -62,8 +62,11 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.CronAgent;
@@ -80,13 +83,14 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 {
 	@RequiredService(name="libs", type=ILibraryService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="crons", type=ICronService.class, 
-		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="cronagent"))),
+	@RequiredService(name="crons", type=ICronService.class),
 })
 @ComponentTypes(
 {
 	@ComponentType(name="cronagent", clazz=CronAgent.class)
 })
+@Configurations(@Configuration(name="default", components=@Component(type="cronagent")))
+
 public class ProcessEngineAgent implements IProcessEngineService, IInternalProcessEngineService
 {
 	/** The agent. */

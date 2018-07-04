@@ -2,13 +2,13 @@ package jadex.platform.service.message.websockettransport;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
 import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.ITransport;
 
@@ -51,7 +51,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	{
 		websocketfactory = new WebSocketFactory(); //.setConnectionTimeout(5000);
 		websocketfactory.setConnectionTimeout((int) connecttimeout);
-		threadpoolsrv = SServiceProvider.getLocalService0(agent, IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM, null, false);
+		threadpoolsrv = ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
 //		threadpoolsrv = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class));
 		return super.init();
 	}

@@ -22,7 +22,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(ChatServiceF4.class)))
 @RequiredServices({
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_PLATFORM))
+		binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 @Arguments({
 	@Argument(name="keyword", clazz=String.class, defaultvalue="\"nerd\"", description="The keyword to react to."),

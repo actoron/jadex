@@ -123,7 +123,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				// Get service reference of created agent.
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, Binding.SCOPE_PLATFORM)
+				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, Binding.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Collection<TestReport>>(testfut)
 				{
 					public void customResultAvailable(final IServiceCallService scs)
