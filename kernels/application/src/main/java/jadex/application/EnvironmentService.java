@@ -5,16 +5,15 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -115,17 +114,7 @@ public class EnvironmentService	implements IEnvironmentService
 	 */
 	public static IFuture<Object> getSpace(IInternalAccess component, final String name)
 	{
-		final Future<Object>	ret	= new Future<Object>();
-		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IEnvironmentService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentService, Object>(ret)
-		{
-			public void customResultAvailable(IEnvironmentService es)
-			{
-				es.getSpace(name).addResultListener(new DelegationResultListener<Object>(ret));
-			}
-		});
-		
-		return ret;
+		IEnvironmentService es	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IEnvironmentService.class));
+		return es.getSpace(name);
 	}
 }

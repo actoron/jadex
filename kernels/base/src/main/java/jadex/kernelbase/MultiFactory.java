@@ -42,8 +42,8 @@ import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -61,11 +61,9 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
 
 
 /**
@@ -227,7 +225,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		};
 		
-		libservice	= SServiceProvider.getLocalService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		libservice	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 		
 		final IExternalAccess exta = ia.getExternalAccess();
 		liblistener = new ILibraryServiceListener()
@@ -429,19 +427,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	@ServiceShutdown
 	public IFuture<Void> shutdownService()
 	{
-		final Future<Void> ret = new Future<Void>();
-		
-		ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-		{
-			public void customResultAvailable(ILibraryService ls)
-			{
-				ls.removeLibraryServiceListener(liblistener)
-					.addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		
-		return ret;
+		ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return ls.removeLibraryServiceListener(liblistener);
 	}
 	
 	/**
@@ -606,8 +593,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		if (icon == null)
 		{
-			ITerminableIntermediateFuture<IComponentFactory> ffut = SServiceProvider.getServices(ia, IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION);
-			Collection<IComponentFactory> facs = ffut.get();
+			Collection<IComponentFactory> facs = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION));
 			if (facs != null)
 			{
 				for (IComponentFactory fac : facs)
@@ -854,66 +840,56 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		//SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
 		final Future ret = new Future();
-		SServiceProvider.getServices(ia, IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION)
-			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		Collection factories = ia.getComponentFeature(IRequiredServicesFeature.class)
+			.searchLocalServices(new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION));
+
+//		if(model.indexOf("ich")!=-1)
+//			System.out.println("found factories: "+result);
+				
+		final IResultListener factorypicker = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
+			new CollectionResultListener(factories.size(), true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
-			public void exceptionOccurred(Exception exception)
+			public void resultAvailable(Object result)
 			{
-				super.exceptionOccurred(exception);
-			}
-			
-			public void customResultAvailable(Object result)
-			{
-				final Collection factories = (Collection) result;
-//				if(model.indexOf("ich")!=-1)
-//					System.out.println("found factories: "+result);
-				
-				final IResultListener factorypicker = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-					new CollectionResultListener(factories.size(), true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+				Collection viablefactories = (Collection) result;
+				if (!viablefactories.isEmpty())
+					ret.setResult(viablefactories.iterator().next());
+				else
 				{
-					public void resultAvailable(Object result)
-					{
-						Collection viablefactories = (Collection) result;
-						if (!viablefactories.isEmpty())
-							ret.setResult(viablefactories.iterator().next());
-						else
-						{
-							ret.setResult(null);
-						}
-					}
-				})));
-				
-				for (Iterator it = factories.iterator(); it.hasNext(); )
-				{
-					final IComponentFactory factory = (IComponentFactory)it.next();
-					if(((IService)factory).getServiceIdentifier().equals(sid))
-					{
-//						if(model.indexOf("ich")!=-1)
-//							System.out.println("removed: "+factory);
-						factorypicker.exceptionOccurred(new RuntimeException());
-						continue;
-					}
-					
-//					System.out.println("Trying isloadable :" + factory + " for " + model);
-					factory.isLoadable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							if (Boolean.TRUE.equals(result))
-								factorypicker.resultAvailable(factory);
-							else
-								factorypicker.exceptionOccurred(new RuntimeException());
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							exception.printStackTrace();
-							factorypicker.exceptionOccurred(exception);
-						}
-					}));
+					ret.setResult(null);
 				}
 			}
-		}));
+		})));
+		
+		for (Iterator it = factories.iterator(); it.hasNext(); )
+		{
+			final IComponentFactory factory = (IComponentFactory)it.next();
+			if(((IService)factory).getServiceIdentifier().equals(sid))
+			{
+//						if(model.indexOf("ich")!=-1)
+//							System.out.println("removed: "+factory);
+				factorypicker.exceptionOccurred(new RuntimeException());
+				continue;
+			}
+			
+//					System.out.println("Trying isloadable :" + factory + " for " + model);
+			factory.isLoadable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					if (Boolean.TRUE.equals(result))
+						factorypicker.resultAvailable(factory);
+					else
+						factorypicker.exceptionOccurred(new RuntimeException());
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+					factorypicker.exceptionOccurred(exception);
+				}
+			}));
+		}
 		return ret; 
 	}
 	
@@ -1091,140 +1067,120 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							{
 //								System.out.println("Starting kernel2: " + kernelmodel);
 								final IModelInfo	info	= (IModelInfo)result;
-								SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+								IComponentManagementService cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+								final CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
+								String	name	= info.getName().toLowerCase();
+								if(name.startsWith("kernel"))
+									name	= name.substring(6);
+								final String fname	= "kernel_"+name;
+								
+								libservice.getClassLoader(info.getResourceIdentifier())
+									.addResultListener(new DelegationResultListener<ClassLoader>(ret)
 								{
-									public void exceptionOccurred(Exception exception)
+									public void customResultAvailable(ClassLoader result)
 									{
-										super.exceptionOccurred(exception);
-									}
-									
-									public void customResultAvailable(Object result)
-									{
-//										System.out.println("Starting kernel3: " + kernelmodel);
-										final IComponentManagementService cms = (IComponentManagementService) result;										
-										final CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
-										String	name	= info.getName().toLowerCase();
-										if(name.startsWith("kernel"))
-											name	= name.substring(6);
-										final String fname	= "kernel_"+name;
-										
-										libservice.getClassLoader(info.getResourceIdentifier())
-											.addResultListener(new DelegationResultListener<ClassLoader>(ret)
-										{
-											public void customResultAvailable(ClassLoader result)
-											{
-												final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, result) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, result);
+										final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, result) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, result);
 //												System.out.println("multi creates factory: "+kernelmodel);
-												cms.createComponent(fname, kernelmodel, ci, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-												{
-													public void resultAvailable(Object result)
-													{
+										cms.createComponent(fname, kernelmodel, ci, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
 //														System.out.println("Killed kernel4: " + kernelmodel);
-														activekernelsdirty = true;
-														for(int i = 0; i < kexts.length; ++i)
-															factorycache.remove(kexts[i]);
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
+												activekernelsdirty = true;
+												for(int i = 0; i < kexts.length; ++i)
+													factorycache.remove(kexts[i]);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
 //														System.out.println("Killed kernel5: " + kernelmodel+", "+exception);
 //														exception.printStackTrace();
-														resultAvailable(null);
-													}
-												})).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+												resultAvailable(null);
+											}
+										})).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+//														System.out.println("Starting kernel6: " + kernelmodel);
+												findActiveKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object result)
 													{
-//														System.out.println("Starting kernel6: " + kernelmodel);
-														findActiveKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+														final IComponentFactory kernel = (IComponentFactory) result;
+														if(kernel == null)
 														{
-															public void resultAvailable(Object result)
-															{
-																final IComponentFactory kernel = (IComponentFactory) result;
-																if(kernel == null)
-																{
-																	ret.setResult(null);
-																	return;
-																}
-																for(int i = 0; i < kexts.length; ++i)
-																{
+															ret.setResult(null);
+															return;
+														}
+														for(int i = 0; i < kexts.length; ++i)
+														{
 //																	System.out.println("putting in cache: "+kexts[i]+" "+kernel);
-																	factorycache.put(kexts[i], kernel);
-																}
-																
-																// If this is a new kernel, gather types and icons
-																if(!activatedkernels.contains(kernelmodel))
+															factorycache.put(kexts[i], kernel);
+														}
+														
+														// If this is a new kernel, gather types and icons
+														if(!activatedkernels.contains(kernelmodel))
+														{
+															final String[] types = kernel.getComponentTypes();
+															componenttypes.addAll(Arrays.asList(types));
+															
+															activatedkernels.add(kernelmodel);
+															
+															if(SReflect.HAS_GUI)
+															{
+																final IResultListener typecounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(types.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 																{
-																	final String[] types = kernel.getComponentTypes();
-																	componenttypes.addAll(Arrays.asList(types));
-																	
-																	activatedkernels.add(kernelmodel);
-																	
-																	if(SReflect.HAS_GUI)
+																	public void customResultAvailable(Object result)
 																	{
-																		final IResultListener typecounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(types.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+																		MultiFactory.this.fireTypesAdded(types).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 																		{
 																			public void customResultAvailable(Object result)
 																			{
-																				SServiceProvider.getService(ia, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-																					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-																				{
-																					public void customResultAvailable(Object result)
-																					{
-																						MultiFactory.this.fireTypesAdded(types).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-																						{
-																							public void customResultAvailable(Object result)
-																							{
-																								ret.setResult(kernel);
-																							};
-																						}));
-																					};
-																				}));
+																				ret.setResult(kernel);
 																			};
-																		})));
-																		
-																		for(int i = 0; i < types.length; ++i)
-																		{
-																			final int fi = i;
-																			kernel.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
-																			{
-																				public void resultAvailable(byte[] result)
-																				{
-//																					System.out.println("adding icon: "+types[fi]);
-																					iconcache.put(types[fi], result);
-																					typecounter.resultAvailable(null);
-																				}
-																				public void exceptionOccurred(Exception exception)
-																				{
-																					typecounter.exceptionOccurred(exception);
-																				}
-																			});
-																		}
-																	}
-																	else
-																	{
-																		ret.setResult(kernel);
-																	}
-																}
-																else
+																		}));
+																	};
+																})));
+																
+																for(int i = 0; i < types.length; ++i)
 																{
-																	ret.setResult(kernel);
+																	final int fi = i;
+																	kernel.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
+																	{
+																		public void resultAvailable(byte[] result)
+																		{
+//																					System.out.println("adding icon: "+types[fi]);
+																			iconcache.put(types[fi], result);
+																			typecounter.resultAvailable(null);
+																		}
+																		public void exceptionOccurred(Exception exception)
+																		{
+																			typecounter.exceptionOccurred(exception);
+																		}
+																	});
 																}
 															}
-														}));
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-//														System.out.println("Starting kernel7: " + kernelmodel+", "+exception);
-														ret.setException(exception);
+															else
+															{
+																ret.setResult(kernel);
+															}
+														}
+														else
+														{
+															ret.setResult(kernel);
+														}
 													}
 												}));
 											}
-										});
+											
+											public void exceptionOccurred(Exception exception)
+											{
+//														System.out.println("Starting kernel7: " + kernelmodel+", "+exception);
+												ret.setException(exception);
+											}
+										}));
 									}
-								}));
+								});
 							}
 						}));
 					}

@@ -63,11 +63,10 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.ICommand;
@@ -799,7 +798,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				
 				if(mbel.getUpdaterateValue(component)>0)
 				{
-					final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					IClockService	cs	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 //					cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
 					ITimedObject to = new ITimedObject()
 					{
@@ -925,7 +924,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							
 							if(mparam.getUpdaterateValue(component)>0)
 							{
-								final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								IClockService	cs	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 								ITimedObject to = new ITimedObject()
 								{
 									ITimedObject self = this;

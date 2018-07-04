@@ -4,8 +4,8 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -66,7 +66,7 @@ public class ComponentPlanBody implements IPlanBody
 		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 		// Todo: should also set processing state and RPLANS thread local?
 		
-		IComponentManagementService cms = SServiceProvider.getLocalService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IComponentManagementService cms = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		cms.createComponent(null, component, new CreationInfo(ia.getComponentIdentifier()))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
@@ -101,9 +101,8 @@ public class ComponentPlanBody implements IPlanBody
 	{
 		if(cid!=null)
 		{
-			// Hack!!! Use local cid as may be called from inner or outer component.
-			// todo: fix synchronous subcomponents!?
-			IComponentManagementService cms = SServiceProvider.getLocalService(IComponentIdentifier.LOCAL.get(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
+			IComponentManagementService cms = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.destroyComponent(cid);
 		}
 	}

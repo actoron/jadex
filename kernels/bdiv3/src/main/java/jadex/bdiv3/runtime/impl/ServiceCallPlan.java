@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
@@ -71,7 +72,7 @@ public class ServiceCallPlan
 		final Future<Void> ret = new Future<Void>();
 
 //		IIntermediateFuture<Object> services = agent.getServiceContainer().getRequiredServices(service);
-		IIntermediateFuture<Object> services = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(service);
+		IIntermediateFuture<Object> services = agent.getComponentFeature(IRequiredServicesFeature.class).getServices(service);
 		
 		services.addResultListener(new IIntermediateResultListener<Object>()
 		{
@@ -87,7 +88,7 @@ public class ServiceCallPlan
 					Method tmp;
 					if(method==null)
 					{
-						RequiredServiceInfo rsi = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo(service);
+						RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getServiceInfo(service);
 						Class<?> cl = rsi.getType().getType(agent.getClassLoader());
 						tmp = cl.getDeclaredMethods()[0];
 					}

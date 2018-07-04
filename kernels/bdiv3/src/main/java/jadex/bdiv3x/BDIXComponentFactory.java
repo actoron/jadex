@@ -24,11 +24,9 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -142,7 +140,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= SServiceProvider.getLocalService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				libservice	= provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 				loader = new BDIXModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()
@@ -160,7 +158,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 					}
 				};
 				
-				libservice.addLibraryServiceListener(libservicelistener);
+				libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 						
 				ret.setResult(null);
 			}

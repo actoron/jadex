@@ -15,8 +15,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -140,61 +140,54 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		{
 			public void customResultAvailable(Void result)
 			{
-				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+				libservice	= provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+						
+				// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
+				String[]	extensions	= new String[]
 				{
-					public void customResultAvailable(ILibraryService result)
+					"jadex.extension.envsupport.MEnvSpaceType", "getXMLMapping",
+					"jadex.extension.agr.AGRExtensionService", "getXMLMapping"
+				};
+				List<Set<?>>	mappings	= new ArrayList<Set<?>>();
+				for(int i=0; i<extensions.length; i+=2)
+				{
+					try
 					{
-						libservice = result;
-						
-						// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
-						String[]	extensions	= new String[]
-						{
-							"jadex.extension.envsupport.MEnvSpaceType", "getXMLMapping",
-							"jadex.extension.agr.AGRExtensionService", "getXMLMapping"
-						};
-						List<Set<?>>	mappings	= new ArrayList<Set<?>>();
-						for(int i=0; i<extensions.length; i+=2)
-						{
-							try
-							{
-								Class<?>	clazz	= Class.forName(extensions[i], true, getClass().getClassLoader());
-								Method	m	= clazz.getMethod(extensions[i+1], new Class[0]);
-								mappings.add((Set<?>)m.invoke(null, new Object[0]));
-							}
-							catch(ClassNotFoundException e)
-							{
-								// Extension not present -> ignore.
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();				
-							}
-							
-						}
-						
-						loader = new ApplicationModelLoader(mappings.toArray(new Set[0]));
-						
-						libservicelistener = new ILibraryServiceListener()
-						{
-							public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
-							{
-								loader.clearModelCache();
-								return IFuture.DONE;
-							}
-							
-							public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean rem)
-							{
-								loader.clearModelCache();
-								return IFuture.DONE;
-							}
-						};
-						
-						libservice.addLibraryServiceListener(libservicelistener);
-						
-						ret.setResult(null);
+						Class<?>	clazz	= Class.forName(extensions[i], true, getClass().getClassLoader());
+						Method	m	= clazz.getMethod(extensions[i+1], new Class[0]);
+						mappings.add((Set<?>)m.invoke(null, new Object[0]));
 					}
-				});
+					catch(ClassNotFoundException e)
+					{
+						// Extension not present -> ignore.
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();				
+					}
+					
+				}
+				
+				loader = new ApplicationModelLoader(mappings.toArray(new Set[0]));
+				
+				libservicelistener = new ILibraryServiceListener()
+				{
+					public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, IResourceIdentifier rid)
+					{
+						loader.clearModelCache();
+						return IFuture.DONE;
+					}
+					
+					public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, IResourceIdentifier rid, boolean rem)
+					{
+						loader.clearModelCache();
+						return IFuture.DONE;
+					}
+				};
+				
+				libservice.addLibraryServiceListener(libservicelistener);
+				
+				ret.setResult(null);
 			}
 		});
 		

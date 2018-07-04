@@ -2,18 +2,16 @@ package jadex.bdiv3.features.impl;
 
 import java.util.Collection;
 
-import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.impl.IPlanBody;
 import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
-import jadex.commons.IAsyncFilter;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
@@ -32,119 +30,154 @@ public class BDIRequiredServicesComponentFeature extends RequiredServicesCompone
 		super(component, cinfo);
 	}
 
+	//-------- accessors for declared services --------
+	
 	/**
-	 *  Get a required service of a given name.
+	 *  Resolve a declared required service of a given name.
+	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name)
+	public <T> IFuture<T> getService(String name)
 	{
-		return super.getRequiredService(rename(name), false, (IAsyncFilter<T>)null);
+		return super.getService(rename(name));
 	}
 	
 	/**
-	 *  Get a required services of a given name.
+	 *  Resolve a required service of a given type.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param type The service type.
+	 *  @return The service.
+	 */
+	public <T> IFuture<T> getService(Class<T> type)
+	{
+		return super.getService(type);
+	}
+	
+	/**
+	 *  Resolve a required services of a given name.
+	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param name The services name.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getServices(String name)
+	{
+		return super.getServices(rename(name));
+	}
+	
+	/**
+	 *  Resolve a required services of a given type.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param type The services type.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type)
+	{
+		return super.getServices(type);
+	}
+	
+	/**
+	 *  Resolve a declared required service of a given name.
+	 *  Synchronous method only for locally available services.
+	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
+	public <T> T getLocalService(String name)
 	{
-		return super.getRequiredServices(rename(name), false, (IAsyncFilter<T>)null);
+		return super.getLocalService(rename(name));
 	}
 	
 	/**
-	 *  Get a required service.
+	 *  Resolve a required service of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The service type.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
+	public <T> T getLocalService(Class<T> type)
 	{
-		return super.getRequiredService(rename(name), rebind, (IAsyncFilter<T>)null);
+		return super.getLocalService(type);
 	}
 	
 	/**
-	 *  Get a required services.
-	 *  @return The services.
+	 *  Resolve a required services of a given name.
+	 *  Synchronous method only for locally available services.
+	 *  @param name The services name.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
+	public <T> Collection<T> getLocalServices(String name)
 	{
-		return super.getRequiredServices(rename(name), rebind, (IAsyncFilter<T>)null);
+		return super.getLocalServices(rename(name));
 	}
 	
 	/**
-	 *  Get a required services.
-	 *  @return The services.
+	 *  Resolve a required services of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The services type.
+	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IAsyncFilter<T> filter)
+	public <T> Collection<T> getLocalServices(Class<T> type)
 	{
-		return super.getRequiredServices(rename(name), rebind, filter);
+		return super.getLocalServices(type);
+	}
+
+	//-------- methods for searching --------
+	
+	/**
+	 *  Search for matching services and provide first result.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> IFuture<T> searchService(ServiceQuery<T> query)
+	{
+		return super.searchService(query);
 	}
 	
 	/**
-	 *  Get a multi service.
-	 *  @param reqname The required service name.
-	 *  @param multitype The interface of the multi service.
+	 *  Search for matching services and provide first result.
+	 *  Synchronous method only for locally available services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> T getMultiService(String reqname, Class<T> multitype)
+	public <T> T searchLocalService(ServiceQuery<T> query)
 	{
-		return super.getMultiService(rename(reqname), multitype);
-	}
-	
-//	/**
-//	 *  Get a required service.
-//	 *  @return The service.
-//	 */
-//	protected <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
-//	{
-//		super.getRequiredService(info, binding, rebind, filter);
-//	}
-	
-//	/**
-//	 *  Get required services.
-//	 *  @return The services.
-//	 */
-//	protected <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IAsyncFilter<T> filter)
-//	{
-//		super.getRequiredService(info, binding, rebind, filter);
-//	}
-	
-	/**
-	 *  Get a required service.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IAsyncFilter<T> filter)
-	{
-		return super.getRequiredService(rename(name), rebind, filter);
+		return super.searchLocalService(query);
 	}
 	
 	/**
-	 *  Get the result of the last search.
-	 *  @param name The required service name.
-	 *  @return The last result.
+	 *  Search for all matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> T getLastRequiredService(String name)
+	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
 	{
-		return super.getLastRequiredService(rename(name));
+		return super.searchServices(query);
 	}
 	
 	/**
-	 *  Get the result of the last search.
-	 *  @param name The required services name.
-	 *  @return The last result.
+	 *  Search for all matching services.
+	 *  Synchronous method only for locally available services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	public <T> Collection<T> getLastRequiredServices(String name)
+	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
 	{
-		return super.getLastRequiredService(rename(name));
+		return super.searchLocalServices(query);
 	}
 	
+	//-------- query methods --------
+
 	/**
-	 *  Get a required service fetcher.
-	 *  @param name The required service name.
-	 *  @return The service fetcher.
+	 *  Add a service query.
+	 *  Continuously searches for matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	protected IRequiredServiceFetcher getRequiredServiceFetcher(String name)
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
-		return super.getRequiredServiceFetcher(rename(name));
+		return super.addQuery(query);
 	}
+	
+	//-------- template methods --------
 	
 	/**
 	 *  Rename the service name according to the current capability.
