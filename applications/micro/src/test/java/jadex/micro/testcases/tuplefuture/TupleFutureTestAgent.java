@@ -36,7 +36,7 @@ import jadex.micro.annotation.Results;
 		// Hangs with global search during micro tests?
 //		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
 })
-@Configurations(@Configuration(name="default", components=@Component(type="ts")))
+@Configurations(@Configuration(name="default", components=@Component(type="ta")))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Scope global causes search timeouts -> increase test timeout to exceed search timeout
 // Hangs with jadex_deftimeout -1 when incompatible platforms are online, because global search does not return and creation binding never happens :(

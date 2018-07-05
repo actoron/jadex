@@ -19,6 +19,7 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -1373,7 +1374,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				return ia.getFeature(IRequiredServicesFeature.class).searchService(query);
+				return ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).resolveService(query, null);	// null for no proxy
 			}
 		});
 	}
@@ -1390,7 +1391,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
 			{
-				return ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
+				return ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).resolveServices(query, null);	// null for no proxy
 			}
 		});
 	}
@@ -1410,6 +1411,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
 			{
+				// TODO no proxy
 				return ia.getFeature(IRequiredServicesFeature.class).addQuery(query);
 			}
 		});
