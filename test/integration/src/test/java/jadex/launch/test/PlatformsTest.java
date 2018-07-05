@@ -73,7 +73,7 @@ public class PlatformsTest //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess	ea	= Starter.createPlatform("-gui", "false").get();
+		IExternalAccess	ea	= Starter.createPlatform("-gui", "false","-logging","true").get();
 		ea.killComponent().get();
 		
 //		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
