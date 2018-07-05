@@ -67,7 +67,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8QRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8gRPEeCnwcpWvxOwkg" key="0:1" value="text"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj8wRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj9ARPEeCnwcpWvxOwkg" key="0:3" value="$component.getComponentIdentifier().getLocalName()+&quot; received &quot;+message_number+&quot; messages.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_l4Lj9ARPEeCnwcpWvxOwkg" key="0:3" value="$component.getIdentifier(.getLocalName()+&quot; received &quot;+message_number+&quot; messages.&quot;"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_bjpHwc-aEd6NWbZHdUI2WQ" iD="_bjpHwM-aEd6NWbZHdUI2WQ"/>

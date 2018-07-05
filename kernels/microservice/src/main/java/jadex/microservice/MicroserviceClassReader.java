@@ -140,7 +140,7 @@ public class MicroserviceClassReader
 		if(sifs.size()>0)
 		{
 			String firstname = sifs.get(0).getName()+"ms";
-			String exp = "$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\""+firstname+"\")";
+			String exp = "$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\""+firstname+"\")";
 			boolean first = true;
 			for(Class<?> sif: sifs)
 			{

@@ -53,7 +53,7 @@
 		</providedservice>
 		<providedservice class="IDynamicBDIFactory">
 			<implementation>
-				$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("component_factory")
+				$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("component_factory")
 			</implementation>
 		</providedservice>
 	</services>

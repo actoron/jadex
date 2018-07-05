@@ -443,54 +443,61 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getRawService(IClockService.class);
-		ITimedObject	to	=  	new ITimedObject()
+		try
 		{
-			public void timeEventOccurred(long currenttime)
+			IClockService	cs	= getRawService(IClockService.class);
+			ITimedObject	to	=  	new ITimedObject()
 			{
-				scheduleStep(new IComponentStep<Void>()
+				public void timeEventOccurred(long currenttime)
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
+					scheduleStep(new IComponentStep<Void>()
 					{
-						ret.setResult(null);
-						return IFuture.DONE;
-					}
-					
-					public String toString()
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							ret.setResult(null);
+							return IFuture.DONE;
+						}
+						
+						public String toString()
+						{
+							return "waitForDelay("+getComponent().getIdentifier()+")";
+						}
+					}).addResultListener(new IResultListener<Void>()
 					{
-						return "waitForDelay("+getComponent().getIdentifier()+")";
-					}
-				}).addResultListener(new IResultListener<Void>()
+						public void resultAvailable(Void result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Ignore outdated timer entries when component is already dead.
+							// propblem this can occur on clock thread
+	//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
+	//								{
+								ret.setExceptionIfUndone(exception);									
+	//								}
+						}
+					});
+				}
+				
+				public String toString()
 				{
-					public void resultAvailable(Void result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// Ignore outdated timer entries when component is already dead.
-						// propblem this can occur on clock thread
-//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
-//								{
-							ret.setExceptionIfUndone(exception);									
-//								}
-					}
-				});
-			}
+					return "waitForDelay("+getComponent().getIdentifier()+")";
+				}
+			};
 			
-			public String toString()
+			if(realtime)
 			{
-				return "waitForDelay("+getComponent().getIdentifier()+")";
+				cs.createRealtimeTimer(delay, to);
 			}
-		};
-		
-		if(realtime)
-		{
-			cs.createRealtimeTimer(delay, to);
+			else
+			{
+				cs.createTimer(delay, to);
+			}
 		}
-		else
+		catch(Exception e)
 		{
-			cs.createTimer(delay, to);
+			ret.setException(e);
 		}
 		
 		return ret;

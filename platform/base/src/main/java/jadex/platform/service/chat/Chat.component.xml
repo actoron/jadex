@@ -18,7 +18,7 @@
 		</providedservice>
 		<providedservice class="IChatGuiService">
 			<implementation>
-				$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("chat")
+				$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("chat")
 			</implementation>
 		</providedservice>
 		<requiredservice name="chatservices" class="IChatService" multiple="true">

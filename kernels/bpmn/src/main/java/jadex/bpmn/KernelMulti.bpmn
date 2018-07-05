@@ -53,7 +53,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpggaP4tEeCPEIwlbR2FIA" key="1:0" value="name1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpqRYP4tEeCPEIwlbR2FIA" key="1:1" value="IMultiKernelNotifierService"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpqRYf4tEeCPEIwlbR2FIA" key="1:2" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpqRYv4tEeCPEIwlbR2FIA" key="1:3" value="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(IComponentFactory.class)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpqRYv4tEeCPEIwlbR2FIA" key="1:3" value="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(IComponentFactory.class)"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LpqRY_4tEeCPEIwlbR2FIA" key="1:4" value="jadex_providedservices_table_Initial-Impl_f4987aee-2d8f-42ab-bf84-69fc1812043e_complex"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-Cr4GJwFEeCTM9TB44euIw" source="jadex_providedservices_table_Initial-Impl_f5ae30de-8983-496a-bb88-1d0b26793b1d_complex"/>

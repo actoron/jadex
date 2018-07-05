@@ -71,7 +71,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE0kaIEeGu3abGvlI-pQ" key="1:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE00aIEeGu3abGvlI-pQ" key="1:1" value="caller"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE1EaIEeGu3abGvlI-pQ" key="1:2" value="IComponentIdentifier"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE1UaIEeGu3abGvlI-pQ" key="1:3" value="$component.getComponentIdentifier()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE1UaIEeGu3abGvlI-pQ" key="1:3" value="$component.getIdentifier("/>
       </eAnnotations>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_FDudEUaYEeGu3abGvlI-pQ" iD="_FDudEEaYEeGu3abGvlI-pQ"/>
       <eventHandlers xmi:type="bpmn:Activity" xmi:id="_EAihwUaYEeGu3abGvlI-pQ" iD="_EAihwEaYEeGu3abGvlI-pQ" outgoingEdges="_FDudEUaYEeGu3abGvlI-pQ" activityType="EventIntermediateError"/>

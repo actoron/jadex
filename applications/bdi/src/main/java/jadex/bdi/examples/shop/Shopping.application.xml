@@ -35,7 +35,7 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getIdentifier(.getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -49,7 +49,7 @@
 				</component>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Herzie, "+$component.getIdentifier(.getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -68,7 +68,7 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getIdentifier(.getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -88,7 +88,7 @@
 			<components>
 				<component type="ShopAndCustomer" name="Ladl">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getIdentifier(.getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -102,7 +102,7 @@
 				</component>
 				<component type="ShopAndCustomer" name="Herzie">
 					<arguments>
-						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Herzie, "+$component.getIdentifier(.getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
