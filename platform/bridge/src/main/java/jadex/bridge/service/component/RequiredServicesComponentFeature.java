@@ -3,18 +3,22 @@ package jadex.bridge.service.component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
@@ -27,13 +31,18 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 
@@ -510,27 +519,64 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  @param info	Used for required service proxy configuration -> null for no proxy.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> IFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
+	public <T> ITerminableFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, false);
 		
 		@SuppressWarnings("unchecked")
-		T ret	=  (T)ServiceRegistry.getRegistry(getComponent())
+		T service	=  (T)ServiceRegistry.getRegistry(getComponent())
 			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
 		
-		// TODO: global registry search.
-		IFuture<T>	search	= ret!=null ? new Future<T>(ret) : new Future<>(new UnsupportedOperationException("TODO"));
-		
-		// Schedule result on component thread and wrap result in proxy, if required
-		return FutureFunctionality.getDelegationFuture(search,
-			new ComponentFutureFunctionality(getComponent())
+		if(service!=null)
 		{
-			@Override
-			public Object handleResult(Object result) throws Exception
+			TerminableFuture<T>	ret	= new TerminableFuture<>();
+			ret.setResult(createServiceProxy(service, info));			
+			return ret;
+		}
+		else
+		{
+			TerminableFuture<T>	fut	= new TerminableFuture<>();
+			ITerminableIntermediateFuture<T>	search	= searchRemoteServices(query);
+			search.addResultListener(new IIntermediateResultListener<T>()
 			{
-				return createServiceProxy(result, info);
-			}
-		});
+				@Override
+				public void intermediateResultAvailable(T result)
+				{
+					fut.setResult(result);
+					search.terminate();
+				}
+				
+				@Override
+				public void finished()
+				{
+					fut.setException(new ServiceNotFoundException(query.toString()));
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					fut.setException(exception);
+				}
+				
+				@Override
+				public void resultAvailable(Collection<T> result)
+				{
+					assert false: "Shouldn't happen?";
+				}
+			});
+			
+			// Schedule result on component thread and wrap result in proxy, if required
+			@SuppressWarnings("unchecked")
+			ITerminableFuture<T>	ret	= (ITerminableFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(getComponent())
+			{
+				@Override
+				public Object handleResult(Object result) throws Exception
+				{
+					return createServiceProxy(result, info);
+				}
+			});
+			return ret;
+		}
 	}
 	
 	/**
@@ -569,23 +615,21 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		enhanceQuery(query, true);
 		
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
-		Collection<IServiceIdentifier> results	=  registry.searchServices(query);
+		Collection<IServiceIdentifier> localresults	=  registry.searchServices(query);
+		TerminableIntermediateFuture<T>	search	= searchRemoteServices(query);
 		
-		// TODO: global registry search.
-		TerminableIntermediateFuture<T>	search	= new TerminableIntermediateFuture<>();//new UnsupportedOperationException("TODO"));
-		
-		// Wraps result in proxy, if required. 
-		for(IServiceIdentifier result: results)
+		// extract services for local results
+		for(IServiceIdentifier result: localresults)
 		{
 			@SuppressWarnings("unchecked")
-			T	service	= (T)createServiceProxy(registry.getLocalService(result), info);
+			T	service	= (T)registry.getLocalService(result);
 			search.addIntermediateResult(service);
 		}
 		
 		// Schedule result on component thread and wrap result in proxy, if required
 		@SuppressWarnings("unchecked")
-		ITerminableIntermediateFuture<T>	ret	= (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(search,
-			new ComponentFutureFunctionality(getComponent())
+		ITerminableIntermediateFuture<T>	ret	= (ITerminableIntermediateFuture<T>)FutureFunctionality
+			.getDelegationFuture(search, new ComponentFutureFunctionality(getComponent())
 		{
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
@@ -740,5 +784,97 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		{
 			query.setNetworkNames((String[])null);
 		}			
+	}
+	
+	//-------- remote methods (TODO) --------
+
+	/**
+	 *  Search for services on remote platforms.
+	 *  @param caller	The component that started the search.
+	 *  @param type The type.
+	 *  @param filter The filter.
+	 */
+	protected <T> TerminableIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
+	{
+		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		
+		// Check for awareness service
+		Collection<IPassiveAwarenessService>	pawas	= searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
+		if(!pawas.isEmpty())
+		{
+			IPassiveAwarenessService	pawa	= pawas.iterator().next();
+			// Count awa search + platform searches (+ async filtering, if any).
+			final AtomicInteger	cnt	= new AtomicInteger(1);
+			
+			// Search for other platforms
+			pawa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
+			{
+				@Override
+				public void intermediateResultAvailable(final IComponentIdentifier platform)
+				{
+//					System.out.println(cid + " searching remote platform: "+platform+", "+query);
+					
+					// Only (continue to) search remote when future not yet finished or cancelled.
+					if(!ret.isDone())
+					{
+						cnt.incrementAndGet();
+						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)getComponent().getFeature(IRemoteExecutionFeature.class))
+								.executeRemoteSearch(platform, query);
+						
+//						System.out.println(cid + " searching remote platform3: "+platform+", "+query);
+						remotesearch.addResultListener(new IResultListener<Collection<T>>()
+						{
+							public void resultAvailable(Collection<T> result)
+							{
+//								System.out.println(cid + " searched remote platform: "+platform+", "+result);
+								if(result != null)
+								{
+									for(Iterator<T> it = result.iterator(); it.hasNext(); )
+									{
+										T ser = it.next();
+										ret.addIntermediateResultIfUndone(ser);
+									}
+								}
+								doFinished();
+							}
+
+							public void exceptionOccurred(Exception exception)
+							{
+//								System.out.println(cid + " searched remote platform: "+platform+", "+exception);
+								doFinished();
+							}
+						});
+					}
+				}
+				
+				@Override
+				public void finished()
+				{
+					doFinished();
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// ignore exception
+					doFinished();
+				}
+				
+				private void doFinished()
+				{
+					if(cnt.decrementAndGet()==0)
+					{
+						// Undone, because gets terminated on first result for search one
+						ret.setFinishedIfUndone();
+					}
+				}
+			});
+		}
+		else
+		{
+			ret.setFinished();
+		}
+		
+		return ret;
 	}
 }
