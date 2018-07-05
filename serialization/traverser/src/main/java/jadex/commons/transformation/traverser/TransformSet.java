@@ -213,16 +213,19 @@ public class TransformSet<E> extends SetWrapper<E> implements ITransformableObje
 	 */
 	protected void notifyListeners(ChangeEvent<E> event)
 	{
-		IChangeListener<E>[] liss;
-		synchronized(mutex) 
+		if (listeners != null)
 		{
-			liss = listeners.toArray(new IChangeListener[listeners.size()]);
-		}
-
-		// Do not call listener with lock held
-		for(IChangeListener<E> lis: liss)
-		{
-			lis.changeOccurred(event);
+			IChangeListener<E>[] liss;
+			synchronized(mutex) 
+			{
+				liss = listeners.toArray(new IChangeListener[listeners.size()]);
+			}
+	
+			// Do not call listener with lock held
+			for(IChangeListener<E> lis: liss)
+			{
+				lis.changeOccurred(event);
+			}
 		}
 	}
 	
