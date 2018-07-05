@@ -740,6 +740,13 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			query.setOwner(getComponent().getIdentifier());
 		}
 		
+		// Set scope if not set
+		if(query.getScope()==null)
+		{
+			query.setScope(ServiceIdentifier.isSystemService(query.getServiceType().getType(getComponent().getClassLoader()))
+				? RequiredServiceInfo.SCOPE_PLATFORM : RequiredServiceInfo.SCOPE_APPLICATION);
+		}
+		
 		// Set networks if not set for remote queries
 		// TODO: more extensible way of checking for remote query
 		if(query.isRemote())

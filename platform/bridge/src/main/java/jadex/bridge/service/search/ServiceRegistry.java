@@ -16,6 +16,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -690,9 +691,6 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		boolean ret = false;
 		
 		String scope = query.getScope();
-		
-		if(scope==null)
-			scope = RequiredServiceInfo.SCOPE_APPLICATION;
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{

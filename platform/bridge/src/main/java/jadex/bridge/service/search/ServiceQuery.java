@@ -205,7 +205,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Class<?> returntype)
 	{
-		this(servicetype!=null? new ClassInfo(servicetype): null, scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope,
+		this(servicetype!=null? new ClassInfo(servicetype): null, scope,
 			provider, owner, returntype!=null? new ClassInfo(returntype): null);
 	}
 	
