@@ -519,14 +519,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	/**
 	 *  Search for matching services and provide first result.
 	 *  @param query	The search query.
+	 *  @param info	Used for required service proxy configuration -> null for no proxy.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	protected <T> IFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
+	public <T> IFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, false);
-		
-		// When service not declared (i.e. search) -> create matching info from query.
-		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
 		
 		@SuppressWarnings("unchecked")
 		T ret	=  (T)ServiceRegistry.getRegistry(getComponent())
@@ -542,7 +540,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			@Override
 			public Object handleResult(Object result) throws Exception
 			{
-				return createServiceProxy(result, finfo);
+				return createServiceProxy(result, info);
 			}
 		});
 	}
@@ -551,14 +549,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Search for matching services and provide first result.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
+	 *  @param info	Used for required service proxy configuration -> null for no proxy.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	protected <T> T resolveLocalService(ServiceQuery<T> query, RequiredServiceInfo info)
+	public <T> T resolveLocalService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, false);
-		
-		// When service not declared (i.e. search) -> create matching info from query.
-		info	= info!=null ? info : createServiceInfo(query);
 		
 		@SuppressWarnings("unchecked")
 		T ret	=  (T)ServiceRegistry.getRegistry(getComponent())
@@ -577,14 +573,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	/**
 	 *  Search for all matching services.
 	 *  @param query	The search query.
+	 *  @param info	Used for required service proxy configuration -> null for no proxy.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	protected <T>  ITerminableIntermediateFuture<T> resolveServices(ServiceQuery<T> query, RequiredServiceInfo info)
+	public <T>  ITerminableIntermediateFuture<T> resolveServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, true);
-		
-		// When service not declared (i.e. search) -> create matching info from query.
-		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
 		
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
 		Collection<IServiceIdentifier> results	=  registry.searchServices(query);
@@ -608,7 +602,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
 			{
-				return createServiceProxy(result, finfo);
+				return createServiceProxy(result, info);
 			}
 		});
 		
@@ -619,15 +613,13 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Search for all matching services.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
+	 *  @param info	Used for required service proxy configuration -> null for no proxy.
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
-	protected <T> Collection<T> resolveLocalServices(ServiceQuery<T> query, RequiredServiceInfo info)
+	public <T> Collection<T> resolveLocalServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, true);
 		
-		// When service not declared (i.e. search) -> create matching info from query.
-		info	= info!=null ? info : createServiceInfo(query);
-
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
 		Collection<IServiceIdentifier> results	=  registry.searchServices(query);
 		
@@ -696,17 +688,15 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	protected <T>	T	createServiceProxy(T service, RequiredServiceInfo info)
 	{
 		@SuppressWarnings("unchecked")
-		T ret	= (T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-			(IService)service, null, info, null, Starter.isRealtimeTimeout(getComponent().getIdentifier()));
+		T ret	= info==null ? service : (T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+			(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getIdentifier()));
 		return ret;
 	}
 	
 
 	/**
 	 *  Enhance a query before processing.
-	 *  Does some necessary preprocessing and needs to be called at least once before processing the query,
-	 *  e.g. at start of a registry method or before sending a remote query.
-	 *  Safe to be called multiple times, only the first time will have effect.
+	 *  Does some necessary preprocessing and needs to be called at least once before processing the query.
 	 *  @param query	The query to be enhanced.
 	 */
 	protected <T> void	enhanceQuery(ServiceQuery<T> query, boolean multi)
