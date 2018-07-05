@@ -35,7 +35,6 @@ import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -535,33 +534,30 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		}
 		else
 		{
+//			if(query.toString().indexOf("IComponentManagementService")!=-1)
+//				System.out.println("dumdidadi");
+			
 			TerminableFuture<T>	fut	= new TerminableFuture<>();
 			ITerminableIntermediateFuture<T>	search	= searchRemoteServices(query);
-			search.addResultListener(new IIntermediateResultListener<T>()
+			search.addResultListener(new IntermediateDefaultResultListener<T>()
 			{
 				@Override
 				public void intermediateResultAvailable(T result)
 				{
-					fut.setResult(result);
+					fut.setResultIfUndone(result);
 					search.terminate();
 				}
 				
 				@Override
 				public void finished()
 				{
-					fut.setException(new ServiceNotFoundException(query.toString()));
+					fut.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
 				}
 				
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					fut.setException(exception);
-				}
-				
-				@Override
-				public void resultAvailable(Collection<T> result)
-				{
-					assert false: "Shouldn't happen?";
+					fut.setExceptionIfUndone(exception);
 				}
 			});
 			
@@ -738,12 +734,11 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			return new Future<T>(new ComponentTerminatedException(id));
 //		}
 
-		// Check if owner set to wrong component
-		if(query.getOwner()!=null && !getComponent().getIdentifier().equals(query.getOwner()))
+		// Set owner if not set
+		if(query.getOwner()==null)
 		{
-			throw new IllegalArgumentException("Query owner must be local component: "+query);
+			query.setOwner(getComponent().getIdentifier());
 		}
-		query.setOwner(getComponent().getIdentifier());
 		
 		// Set networks if not set for remote queries
 		// TODO: more extensible way of checking for remote query

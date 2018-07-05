@@ -5,9 +5,11 @@ import java.util.Collection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -69,7 +71,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 ////			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 //		}
 		
-		return access.getFeature(IRequiredServicesFeature.class).searchServices(getQuery());				
+		return new Future<Collection<T>>(((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).resolveLocalServices(getQuery(), null));				
 	}
 	
 	/**
