@@ -92,7 +92,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			{
 				for(IServiceIdentifier ser : sers)
 				{
-					if(checkScope(query, ser) &&
+					if(checkRestrictions(query, ser) &&
 					   (ownerservices == null || !ownerservices.contains(ser)))
 					{
 						ret = ser;
@@ -133,7 +133,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				for(Iterator<IServiceIdentifier> it = ret.iterator(); it.hasNext(); )
 				{
 					IServiceIdentifier ser = it.next();
-					if(!checkScope(query, ser) ||
+					if(!checkRestrictions(query, ser) ||
 					   !(ownerservices == null || !ownerservices.contains(ser)))
 					{
 						it.remove();
@@ -640,7 +640,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				ServiceQuery<?> query = sqi.getQuery();
 				
 				//ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()));
-				if (checkScope(query, ser))
+				if (checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(sqi, ser, eventtype);
 				}
@@ -670,15 +670,16 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
-	 *  Check the services according the the scope.
-	 *  @param it The services.
-	 *  @param cid The component id.
-	 *  @param scope The scope.
-	 *  @return The services that fit to the scope.
+	 *  Check the services according additional restrictions like scope.
+	 *  @param query The query.
+	 *  @param ser The service.
+	 *  @return True, if service passes tests.
 	 */
-	protected boolean checkScope(ServiceQuery<?> query, final IServiceIdentifier ser)
+	protected boolean checkRestrictions(ServiceQuery<?> query, final IServiceIdentifier ser)
 	{
-		return checkSearchScope(query, ser) && checkPublicationScope(query, ser);
+		boolean ret = checkSearchScope(query, ser) && checkPublicationScope(query, ser);
+		ret &= (excludedservices == null || !excludedservices.containsKey(ser.getProviderId())) || (query.getOwner().equals(ser.getProviderId()));
+		return ret;
 	}
 	
 	/**
