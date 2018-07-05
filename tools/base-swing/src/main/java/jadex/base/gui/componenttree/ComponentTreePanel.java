@@ -485,7 +485,7 @@ public class ComponentTreePanel extends JSplitPane
 							public void customResultAvailable(IExternalAccess ea)
 							{
 								
-								if(ea.getComponentIdentifier().getRoot().equals(jccaccess.getComponentIdentifier().getRoot()))
+								if(ea.getIdentifier().getRoot().equals(jccaccess.getIdentifier().getRoot()))
 								{
 									ea.scheduleStep(new IComponentStep<Void>()
 									{

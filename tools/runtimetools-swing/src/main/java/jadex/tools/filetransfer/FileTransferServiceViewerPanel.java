@@ -98,7 +98,7 @@ public class FileTransferServiceViewerPanel	implements IAbstractViewerPanel
 		
 		panel = new JPanel(new BorderLayout());
 		panel.add(ftp, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title+" ("+exta.getComponentIdentifier().getPlatformName()+")"));
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title+" ("+exta.getIdentifier().getPlatformName()+")"));
 	}
 	
 	/**

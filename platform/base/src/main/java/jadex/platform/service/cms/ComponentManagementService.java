@@ -691,7 +691,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	final IInternalAccess pad = getParentComponent(cinfo);
 																	IExternalAccess parent = pad.getExternalAccess();
-																	pacid = parent.getComponentIdentifier();
+																	pacid = parent.getIdentifier();
 
 																	String paname = pacid.getName().replace('@', '.');
 																	

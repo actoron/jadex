@@ -150,7 +150,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				
 				public void exceptionOccurred(final Exception exception)
 				{
-					Starter.scheduleRescueStep(access.getComponentIdentifier(), new Runnable()
+					Starter.scheduleRescueStep(access.getIdentifier(), new Runnable()
 					{
 						public void run()
 						{

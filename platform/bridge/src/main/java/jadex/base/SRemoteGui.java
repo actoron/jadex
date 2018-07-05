@@ -664,7 +664,7 @@ public class SRemoteGui
 	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IAsyncFilter filter, IExternalAccess exta)
 	{
 		IIntermediateFuture<FileData> ret = null;
-		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
+		if(!isComponentStepNecessary(exta.getIdentifier()))
 		{
 //			System.out.println("direct listFiles");
 			ret = listFiles(dir, filter);
@@ -846,7 +846,7 @@ public class SRemoteGui
 	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IAsyncFilter filter, IExternalAccess exta)
 	{
 		ISubscriptionIntermediateFuture<FileData> ret = null;
-		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
+		if(!isComponentStepNecessary(exta.getIdentifier()))
 		{
 //			System.out.println("direct listJarFileEntries");
 			ret = listJarFileEntries(file, filter);

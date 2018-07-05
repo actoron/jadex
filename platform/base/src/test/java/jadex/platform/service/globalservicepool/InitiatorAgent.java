@@ -117,7 +117,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(pls.get(1).getComponentIdentifier(), testno, false)
+				performTest(pls.get(1).getIdentifier(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});

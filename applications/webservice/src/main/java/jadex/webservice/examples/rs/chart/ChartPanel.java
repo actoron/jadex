@@ -166,7 +166,7 @@ public class ChartPanel extends JPanel
 	 */
 	public static JFrame createChartFrame(IExternalAccess agent)
 	{
-		JFrame f = new JFrame(agent.getComponentIdentifier().getName());
+		JFrame f = new JFrame(agent.getIdentifier().getName());
 		JPanel p = new ChartPanel(agent);
 		f.add(p, BorderLayout.CENTER);
 		f.pack();

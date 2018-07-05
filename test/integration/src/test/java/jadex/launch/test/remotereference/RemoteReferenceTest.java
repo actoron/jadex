@@ -30,7 +30,7 @@ public class RemoteReferenceTest //extends TestCase
 		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
 		config1.addComponent(LocalServiceProviderAgent.class);
 		final IExternalAccess	platform1	= Starter.createPlatform(config1).get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
+		timeout	= Starter.getLocalDefaultTimeout(platform1.getIdentifier());
 		
 		// Find local service (as local provided service proxy).
 		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);

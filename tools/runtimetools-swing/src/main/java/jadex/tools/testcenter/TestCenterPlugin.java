@@ -207,8 +207,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			}
 //		});
 
-		mpanel = new ModelTreePanel(getJCC().getPlatformAccess(), jcc.getJCCAccess(), !getJCC().getJCCAccess().getComponentIdentifier().getPlatformName()
-			.equals(getJCC().getPlatformAccess().getComponentIdentifier().getPlatformName()));
+		mpanel = new ModelTreePanel(getJCC().getPlatformAccess(), jcc.getJCCAccess(), !getJCC().getJCCAccess().getIdentifier().getPlatformName()
+			.equals(getJCC().getPlatformAccess().getIdentifier().getPlatformName()));
 //		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 //			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 

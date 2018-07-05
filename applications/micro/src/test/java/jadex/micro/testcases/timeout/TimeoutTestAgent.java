@@ -38,7 +38,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
 public class TimeoutTestAgent extends TestAgent
 {
 	/**
@@ -102,7 +102,7 @@ public class TimeoutTestAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				System.out.println("PLATFORM DONE< PERFORM TEST");
-				performTest(platform.getComponentIdentifier(), testno, false)
+				performTest(platform.getIdentifier(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

@@ -96,8 +96,8 @@ public class ComponentIconCache
 			else
 			{
 				List<IComponentIdentifier>	todo	= new ArrayList<IComponentIdentifier>();
-				todo.add(jccaccess.getComponentIdentifier().getRoot());	// Search local first.
-				if(!jccaccess.getComponentIdentifier().getRoot().equals(node.getComponentIdentifier().getRoot()))
+				todo.add(jccaccess.getIdentifier().getRoot());	// Search local first.
+				if(!jccaccess.getIdentifier().getRoot().equals(node.getComponentIdentifier().getRoot()))
 					todo.add(node.getComponentIdentifier().getRoot());	// Search remote if not found locally.
 				
 				Future<Icon>	ifut	= new Future<Icon>();

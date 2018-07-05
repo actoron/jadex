@@ -110,7 +110,7 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	public boolean	isLocal()
 	{
 		return ((IService)getService()).getServiceIdentifier().getProviderId().getRoot()
-			.equals(getJCC().getJCCAccess().getComponentIdentifier().getRoot());
+			.equals(getJCC().getJCCAccess().getIdentifier().getRoot());
 	}
 	
 	/**

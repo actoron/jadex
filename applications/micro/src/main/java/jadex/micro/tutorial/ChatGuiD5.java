@@ -43,7 +43,7 @@ public class ChatGuiD5 extends JFrame
 	 */
 	public ChatGuiD5(IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getName());
+		super(agent.getIdentifier().getName());
 		this.agent	= agent;
 		this.setLayout(new BorderLayout());
 		
@@ -77,7 +77,7 @@ public class ChatGuiD5 extends JFrame
 									IChatService cs = it.next();
 									try
 									{
-										cs.message(ChatGuiD5.this.agent.getComponentIdentifier().getName(), text);
+										cs.message(ChatGuiD5.this.agent.getIdentifier().getName(), text);
 									}
 									catch(Exception e)
 									{
@@ -89,7 +89,7 @@ public class ChatGuiD5 extends JFrame
 							public void intermediateResultAvailable(IChatService cs)
 							{
 								System.out.println("found: "+cs);
-								cs.message(ChatGuiD5.this.agent.getComponentIdentifier().getName(), text);
+								cs.message(ChatGuiD5.this.agent.getIdentifier().getName(), text);
 							}
 							
 							public void finished()

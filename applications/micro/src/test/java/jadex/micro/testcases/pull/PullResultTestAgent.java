@@ -172,12 +172,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTestA(platform.getComponentIdentifier(), testno, delay, max)
+							performTestA(platform.getIdentifier(), testno, delay, max)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
 								public void customResultAvailable(final TestReport result1)
 								{
-									performTestB(platform.getComponentIdentifier(), testno+1, delay, max)
+									performTestB(platform.getIdentifier(), testno+1, delay, max)
 										.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
 										public void customResultAvailable(final TestReport result2)

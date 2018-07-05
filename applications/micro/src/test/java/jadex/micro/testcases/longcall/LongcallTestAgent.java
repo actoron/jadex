@@ -45,7 +45,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 10)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 10)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
 public class LongcallTestAgent extends TestAgent
 {
 	/**
@@ -144,7 +144,7 @@ public class LongcallTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				performTests(exta.getComponentIdentifier(), testno, false)
+				performTests(exta.getIdentifier(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 			}
 		});

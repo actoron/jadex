@@ -148,7 +148,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					public void resultAvailable(final IComponentManagementService ces)
 					{
 //						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
-						dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
+						dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getIdentifier().getParent());
 						dealertf.setText(dealeraid.getName());
 					}
 					public void exceptionOccurred(Exception exception)
@@ -380,7 +380,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 							public void customResultAvailable(Object result)
 							{
 								final IComponentManagementService	cms	= (IComponentManagementService)result;
-								cms.destroyComponent(agent.getComponentIdentifier().getParent());
+								cms.destroyComponent(agent.getIdentifier().getParent());
 							}
 						});
 

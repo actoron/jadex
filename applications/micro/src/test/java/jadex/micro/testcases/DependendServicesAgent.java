@@ -114,7 +114,7 @@ public class DependendServicesAgent extends JunitAgentTest
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
-                                  System.out.println("del: "+child.getComponentIdentifier()+" "+res);
+                                  System.out.println("del: "+child.getIdentifier()+" "+res);
 //                                    Map res = (Map)result;
                                     List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);

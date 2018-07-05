@@ -43,7 +43,7 @@ public class CreatePlatformTask implements ITask
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{
-				context.setParameterValue("cid", exta.getComponentIdentifier());
+				context.setParameterValue("cid", exta.getIdentifier());
 //				System.out.println("cid: "+exta.getComponentIdentifier().getAddresses());
 				ret.setResult(null);
 			}

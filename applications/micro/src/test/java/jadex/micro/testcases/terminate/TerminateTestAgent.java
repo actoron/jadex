@@ -158,7 +158,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getComponentIdentifier(), testno, delay)
+							performTest(platform.getIdentifier(), testno, delay)
 								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
 							{
 								public void customResultAvailable(final Collection<TestReport> result)

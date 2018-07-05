@@ -510,7 +510,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 												
 												for(int i=0; i<reqs.length; i++)
 												{
-													String nid = ea.getComponentIdentifier()+"."+reqs[i].getName();
+													String nid = ea.getIdentifier()+"."+reqs[i].getName();
 													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
 													if(sn==null)
 														sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid, ea);

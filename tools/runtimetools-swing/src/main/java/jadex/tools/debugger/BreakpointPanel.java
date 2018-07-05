@@ -89,7 +89,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		this.description	= description;
 		this.access = access;
 	
-		sub	= cmshandler.addCMSListener(access.getComponentIdentifier());
+		sub	= cmshandler.addCMSListener(access.getIdentifier());
 		sub.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
 			@Override

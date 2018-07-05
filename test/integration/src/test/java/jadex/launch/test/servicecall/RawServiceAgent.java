@@ -12,7 +12,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices(
 		@ProvidedService(
 			type=IServiceCallService.class,
-			implementation=@Implementation(expression="new RawServiceCallService($component.getComponentIdentifier())",
+			implementation=@Implementation(expression="new RawServiceCallService($component.getIdentifier())",
 			proxytype=Implementation.PROXYTYPE_RAW),
 			scope=RequiredServiceInfo.SCOPE_GLOBAL
 		)

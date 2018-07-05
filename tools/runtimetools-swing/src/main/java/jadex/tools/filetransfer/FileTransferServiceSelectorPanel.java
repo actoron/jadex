@@ -70,7 +70,7 @@ public class FileTransferServiceSelectorPanel extends AbstractServiceSelectorPan
 					public void customResultAvailable(Object result) 
 					{
 						IExternalAccess component = (IExternalAccess)result; 
-						boolean remote = !jcc.getJCCAccess().getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
+						boolean remote = !jcc.getJCCAccess().getIdentifier().getPlatformName().equals(component.getIdentifier().getPlatformName());
 						FileTransferServiceViewerPanel dp = new FileTransferServiceViewerPanel(component, jcc, remote, (IFileTransferService)service, nodehandler, title);
 						ret.setResult(dp);
 					};

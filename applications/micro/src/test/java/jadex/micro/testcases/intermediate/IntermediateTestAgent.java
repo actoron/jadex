@@ -173,7 +173,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getComponentIdentifier(), testno, delay, max)
+							performTest(platform.getIdentifier(), testno, delay, max)
 							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
 							public void customResultAvailable(final TestReport result)

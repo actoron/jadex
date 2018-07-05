@@ -70,7 +70,7 @@ public class TableCanvas extends ToolCanvas
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setBackground(UIManager.getColor("List.background"));
 		table.setPreferredScrollableViewportSize(new Dimension(800, 70));
-		table.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(tooltab.getPlugin().getJCC().getJCCAccess().getComponentIdentifier().getRoot()));
+		table.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(tooltab.getPlugin().getJCC().getJCCAccess().getIdentifier().getRoot()));
 		// setDefaultRenderer(Object.class, new ContentRenderer());
 		table.setDefaultRenderer(IComponentIdentifier[].class, new ComponentIdentifiersRenderer());
 		table.setDefaultRenderer(Date.class, new DateTimeRenderer());

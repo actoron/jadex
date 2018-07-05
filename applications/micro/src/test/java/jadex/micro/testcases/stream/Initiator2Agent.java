@@ -83,7 +83,7 @@ public class Initiator2Agent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-               	performTest(exta.getComponentIdentifier(), testno)
+               	performTest(exta.getIdentifier(), testno)
                		.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});

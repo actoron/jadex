@@ -97,7 +97,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	public EnvironmentGui(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getLocalName());
+		super(agent.getIdentifier().getLocalName());
 //		System.out.println("EnvGui: "+EnvironmentLocalBDI.class.getClassLoader());
 //		System.out.println(EnvironmentGui.class.getClassLoader()+" "+EnvironmentLocalBDI.class.getClassLoader());
 

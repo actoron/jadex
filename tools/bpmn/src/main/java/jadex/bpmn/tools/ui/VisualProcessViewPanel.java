@@ -586,7 +586,7 @@ public class VisualProcessViewPanel extends JPanel
 				}
 			});
 			
-			cmshandler.addCMSListener(access.getComponentIdentifier())
+			cmshandler.addCMSListener(access.getIdentifier())
 				.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 
@@ -1075,7 +1075,7 @@ public class VisualProcessViewPanel extends JPanel
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				IFuture<Void> ret = cms.stepComponent(access.getComponentIdentifier(), getStepInfo());
+				IFuture<Void> ret = cms.stepComponent(access.getIdentifier(), getStepInfo());
 				ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
@@ -1123,7 +1123,7 @@ public class VisualProcessViewPanel extends JPanel
 					{
 						public void customResultAvailable(final IComponentManagementService cms)
 						{
-							cms.setComponentBreakpoints(access.getComponentIdentifier(), (String[])abps.toArray(new String[abps.size()]))
+							cms.setComponentBreakpoints(access.getIdentifier(), (String[])abps.toArray(new String[abps.size()]))
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});
@@ -1146,7 +1146,7 @@ public class VisualProcessViewPanel extends JPanel
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getComponentDescription(access.getComponentIdentifier())
+				cms.getComponentDescription(access.getIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, List<String>>(ret)
 				{
 					public void customResultAvailable(IComponentDescription desc) 

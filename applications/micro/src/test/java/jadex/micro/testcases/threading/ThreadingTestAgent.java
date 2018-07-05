@@ -107,7 +107,7 @@ public class ThreadingTestAgent extends TestAgent
 			{
 				System.out.println("Test remote1: "+agent.getModel().getFullName());
 				
-				performTest(platform.getComponentIdentifier(), testno, max, false)
+				performTest(platform.getIdentifier(), testno, max, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

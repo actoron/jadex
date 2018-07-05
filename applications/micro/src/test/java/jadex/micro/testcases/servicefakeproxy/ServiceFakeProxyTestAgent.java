@@ -87,7 +87,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			// awareness is disabled in testsuite
 //			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
 			
-			IComponentManagementService cms = getServiceProxy(agent, plat.getComponentIdentifier(), IComponentManagementService.class);
+			IComponentManagementService cms = getServiceProxy(agent, plat.getIdentifier(), IComponentManagementService.class);
 			IComponentDescription[] descs = cms.getComponentDescriptions().get();
 			System.out.println(Arrays.toString(descs));
 			tr2.setSucceeded(true);

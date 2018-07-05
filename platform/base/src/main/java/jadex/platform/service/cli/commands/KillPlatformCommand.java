@@ -67,7 +67,7 @@ public class KillPlatformCommand extends ACliCommand
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.destroyComponent(comp.getComponentIdentifier().getRoot())
+				cms.destroyComponent(comp.getIdentifier().getRoot())
 					.addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
 			}
 		});

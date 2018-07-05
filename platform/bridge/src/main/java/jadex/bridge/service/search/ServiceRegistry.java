@@ -50,7 +50,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected ReadWriteLock proxyrwlock;
 	
 	/** Map for looking up local services using the service identifier. */
-	protected BiHashMap<IServiceIdentifier, IService> localserviceproxies;
+	protected Map<IServiceIdentifier, IService> localserviceproxies;
 	
 	//-------- methods --------
 	
@@ -63,7 +63,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		this.proxyrwlock = new ReentrantReadWriteLock(false);
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
-		this.localserviceproxies = new BiHashMap<>();
+		this.localserviceproxies = new HashMap<>();
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public Set<IServiceIdentifier> searchServices(ServiceQuery<?> query)
 	{
-		Set<IServiceIdentifier> ret = Collections.emptySet();
+		Set<IServiceIdentifier> ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
 			ret = getServices(query);
@@ -142,6 +142,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				}
 			}
 		}
+		
+		if (ret == null)
+			ret = Collections.emptySet();
 		
 		return ret;
 	}
