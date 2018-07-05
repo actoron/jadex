@@ -31,7 +31,7 @@ public class ProviderAgent implements ITestService
 	@AgentCreated
 	public void created()
 	{
-		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		System.out.println("Called method1: "+msg+" "+sc+" "+Thread.currentThread());
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, RequiredServiceInfo.SCOPE_LOCAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, RequiredServiceInfo.SCOPE_LOCAL))
 			.addResultListener(new ExceptionDelegationResultListener<ITestService, Void>(ret)
 		{
 			public void customResultAvailable(ITestService ts)

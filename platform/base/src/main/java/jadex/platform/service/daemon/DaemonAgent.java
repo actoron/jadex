@@ -44,7 +44,7 @@ public class DaemonAgent
 	@AgentMessageArrived
 	public void messageArrived(Map<String, Object> msg)
 	{
-		DaemonService	ds	= (DaemonService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IDaemonService.class);
+		DaemonService	ds	= (DaemonService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IDaemonService.class);
 		ds.messageReceived((IComponentIdentifier)msg.get(SFipa.SENDER), (String)msg.get(SFipa.CONTENT));
 	}
 }

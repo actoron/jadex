@@ -102,8 +102,8 @@ public class ServiceCallTestAgent extends TestAgent
 	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int rawfactor, final int directfactor, final int decoupledfactor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
-			? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+		CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getIdentifier().getPlatformName())
+			? new CreationInfo(agent.getIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 		
 		String an = agentname.toLowerCase();
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
@@ -115,15 +115,15 @@ public class ServiceCallTestAgent extends TestAgent
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				final Future<Void>	ret2 = new Future<Void>();
-				performSingleTest(tag, "raw", rawfactor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+				performSingleTest(tag, "raw", rawfactor).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performSingleTest(tag, "direct", directfactor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
+						performSingleTest(tag, "direct", directfactor).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
 						{
 							public void customResultAvailable(Void result)
 							{
-								performSingleTest(tag, "decoupled", decoupledfactor).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
+								performSingleTest(tag, "decoupled", decoupledfactor).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)));
 							}
 						}));
 					}
@@ -170,7 +170,7 @@ public class ServiceCallTestAgent extends TestAgent
 //					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
 //			}
 //		}, 7, 1500);
-		IFuture<IServiceCallService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService(servicename);
+		IFuture<IServiceCallService> fut = agent.getFeature(IRequiredServicesFeature.class).getService(servicename);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{

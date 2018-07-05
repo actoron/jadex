@@ -109,7 +109,7 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 */
 	public <T> IFuture<T> getService(String name)
 	{
-		return getComponentFeature(IRequiredServicesFeature.class).getService(name);
+		return getFeature(IRequiredServicesFeature.class).getService(name);
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 */
 	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+		return getFeature(IExecutionFeature.class).scheduleStep(step);
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
 	{
-		return getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+		return getFeature(IExecutionFeature.class).waitForDelay(delay, step);
 	}
 	
 	/**
@@ -152,9 +152,9 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getComponentIdentifier()
+	public IComponentIdentifier	getIdentifier()
 	{
-		return access.getComponentIdentifier();
+		return access.getIdentifier();
 	}
 	
 	/**
@@ -162,9 +162,9 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
 	 */
-	public <T> T getComponentFeature(Class<? extends T> type)
+	public <T> T getFeature(Class<? extends T> type)
 	{
-		return access.getComponentFeature(type);
+		return access.getFeature(type);
 	}
 	
 	/**
@@ -172,9 +172,9 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
 	 */
-	public <T> T getComponentFeature0(Class<? extends T> type)
+	public <T> T getFeature0(Class<? extends T> type)
 	{
-		return access.getComponentFeature0(type);
+		return access.getFeature0(type);
 	}
 	
 	/**
@@ -182,9 +182,9 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 *  @return	The component description.
 	 */
 	// Todo: hack??? should be internal to CMS!?
-	public IComponentDescription	getComponentDescription()
+	public IComponentDescription	getDescription()
 	{
-		return access.getComponentDescription();
+		return access.getDescription();
 	}
 	
 	/**

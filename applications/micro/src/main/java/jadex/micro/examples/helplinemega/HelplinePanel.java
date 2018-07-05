@@ -283,13 +283,13 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class, new BasicComponentIdentifier(person, ia.getComponentIdentifier())));
+					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class, new BasicComponentIdentifier(person, ia.getIdentifier())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getComponentIdentifier());
-					ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(ci, person, HelplineAgent.class.getName()+".class")
+					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getIdentifier());
+					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(ci, person, HelplineAgent.class.getName()+".class")
 						.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 					{
 						@Override
@@ -297,7 +297,7 @@ public class HelplinePanel extends JPanel
 						{
 							if(event instanceof CMSCreatedEvent)
 							{
-								IHelpline	helpline	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class, event.getComponentIdentifier()));
+								IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class, event.getComponentIdentifier()));
 								if(helpline==null)
 								{
 									exceptionOccurred(new RuntimeException("No service after creation for "+person));
@@ -365,7 +365,7 @@ public class HelplinePanel extends JPanel
 //					}
 //				});
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

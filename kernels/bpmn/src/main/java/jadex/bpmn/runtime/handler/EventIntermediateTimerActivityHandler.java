@@ -30,7 +30,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public void	doWait(final MActivity activity, final IInternalAccess instance, final ProcessThread thread, final long duration)
 	{
 		final Future<ITimer>	wifuture	= new Future<ITimer>(); 
-		IClockService cs	= instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		IClockService cs	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		ITimedObject	to	= new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)

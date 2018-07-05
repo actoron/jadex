@@ -117,7 +117,7 @@ public class HelloWorld2BDI
 		{
 			System.out.println("1: "+goal.getText());
 			
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

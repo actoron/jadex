@@ -415,7 +415,7 @@ public class EmailAgent implements IEmailService
 			{
 				SubscriptionInfo si = subscriptions.get(fut);
 				final long start = System.currentTimeMillis();
-				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("emailfetcher").get();
+				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getFeature(IRequiredServicesFeature.class).getService("emailfetcher").get();
 //				System.out.println("Email fetcher ser: "+fetcher);
 				fetcher.fetchEmails(si).addResultListener(new IResultListener<Collection<Email>>()
 				{

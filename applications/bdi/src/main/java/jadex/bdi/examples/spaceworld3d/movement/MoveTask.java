@@ -72,7 +72,7 @@ public class MoveTask extends AbstractTask
 				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+					IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 					for(Iterator<ISpaceObject> it=objects.iterator(); it.hasNext(); )
 					{
 						final ISpaceObject so = (ISpaceObject)it.next();

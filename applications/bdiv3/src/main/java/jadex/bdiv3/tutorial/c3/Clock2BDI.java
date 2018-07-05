@@ -38,7 +38,7 @@ public class Clock2BDI
 		
 	    for(int i=0; i<5; i++) 
 	    {
-	    	agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+	    	agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 	        setTime(System.currentTimeMillis());
 	    }
 	}

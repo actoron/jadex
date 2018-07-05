@@ -24,7 +24,7 @@ public class ProxyLatencyProperty extends NFRootProperty<Long, TimeUnit>
 	 */
 	public ProxyLatencyProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo("latency "+((IComponentIdentifier)comp.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("component")).getName(), long.class, null, true, 0, true, Target.Root), false);
+		super(comp, new NFPropertyMetaInfo("latency "+((IComponentIdentifier)comp.getFeature(IArgumentsResultsFeature.class).getArguments().get("component")).getName(), long.class, null, true, 0, true, Target.Root), false);
 //		super(comp, new NFPropertyMetaInfo("latency "+((ProxyAgent)comp).rcid.getName(), long.class, null, true, 0, true, Target.Root), false);
 	}
 	
@@ -33,7 +33,7 @@ public class ProxyLatencyProperty extends NFRootProperty<Long, TimeUnit>
 	 */
 	public Long measureValue()
 	{
-		ProxyAgent pa = (ProxyAgent)getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		ProxyAgent pa = (ProxyAgent)getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 		pa.getCurrentLatency().addResultListener(new IResultListener<Long>()
 		{
 			public void resultAvailable(Long result)

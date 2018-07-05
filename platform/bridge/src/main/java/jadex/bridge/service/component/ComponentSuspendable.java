@@ -65,7 +65,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 			try
 			{
 				COMSUPS.set(this);
-				((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
+				((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
 					.block(this, timeout, realtime);
 			}
 //			catch(Error e)
@@ -101,10 +101,10 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	{
 //		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
 //		Thread.dumpStack();
-		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 		{
 //			System.out.println("ComponentSuspendable.resume1 "+Thread.currentThread());
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -117,7 +117,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 						{
 //							System.out.println("ComponentSuspendable.resume4 "+Thread.currentThread());
 							beforeSwitch();
-							((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
+							((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
 								.unblock(ComponentSuspendable.this, null);
 						}
 					}
@@ -136,7 +136,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 				{
 //					System.out.println("ComponentSuspendable.resume7 "+Thread.currentThread());
 //					beforeSwitch();	// Todo: why not beforeSwitch()?
-					((IInternalExecutionFeature)agent.getComponentFeature(IExecutionFeature.class))
+					((IInternalExecutionFeature)agent.getFeature(IExecutionFeature.class))
 						.unblock(this, null);
 				}
 			}
@@ -168,7 +168,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	 */
 	public long getDefaultTimeout()
 	{
-		return Starter.getLocalDefaultTimeout(agent.getComponentIdentifier());
+		return Starter.getLocalDefaultTimeout(agent.getIdentifier());
 //		return ((INonUserAccess)agent).getPlatformData().
 	}
 

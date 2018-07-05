@@ -318,17 +318,17 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	protected IFuture<Void> initNFProperties()
 	{
 		final Future<Void> ret = new Future<Void>();
-		if(getInternalAccess().getComponentFeature0(INFPropertyComponentFeature.class)!=null)
+		if(getInternalAccess().getFeature0(INFPropertyComponentFeature.class)!=null)
 		{
-			final INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
-			IProvidedServicesFeature psf = getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
-			IInternalService ser = (IInternalService)getInternalAccess().getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
+			final INFPropertyComponentFeature nfcf = getInternalAccess().getFeature(INFPropertyComponentFeature.class);
+			IProvidedServicesFeature psf = getInternalAccess().getFeature(IProvidedServicesFeature.class);
+			IInternalService ser = (IInternalService)getInternalAccess().getFeature(IProvidedServicesFeature.class).getProvidedService(type);
 			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
 			// todo: make internal interface for initProperties
 //			if(type!=null && type.getName().indexOf("ITest")!=-1)
 //				System.out.println("sdfsdf");
 			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype)
-				.addResultListener(getInternalAccess().getComponentFeature(IExecutionFeature.class)	// TODO: why wrong thread (start 2x autoterminate on 6-core) 
+				.addResultListener(getInternalAccess().getFeature(IExecutionFeature.class)	// TODO: why wrong thread (start 2x autoterminate on 6-core) 
 					.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 			{
 				public void customResultAvailable(Void result) throws Exception
@@ -340,7 +340,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //							System.out.println("Starting serviceINIT: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 							Collection<String> coll = result == null ? new ArrayList<String>() : new LinkedHashSet<String>((Collection<String>)result);
 							
-							IValueFetcher vf = (IValueFetcher) internalaccess.getComponentFeature(IArgumentsResultsFeature.class);
+							IValueFetcher vf = (IValueFetcher) internalaccess.getFeature(IArgumentsResultsFeature.class);
 							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
 							for (int si = 0; si < sertypes.length; ++si)
 							{

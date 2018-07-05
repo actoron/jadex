@@ -32,7 +32,7 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public ITerminableFuture<Void> clearChemicals(final Object disasterId)
 	{
-		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
+		final IBDIXAgentFeature capa = agent.getFeature(IBDIXAgentFeature.class);
 		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
@@ -104,6 +104,6 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public String toString()
 	{
-		return "ClearChemicalsService, "+agent.getComponentIdentifier();
+		return "ClearChemicalsService, "+agent.getIdentifier();
 	}
 }

@@ -29,7 +29,7 @@ public class HelloWorldPlanBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("printHello").get();
+		agent.getFeature(IBDIAgentFeature.class).adoptPlan("printHello").get();
 	}
 	
 	/**

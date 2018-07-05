@@ -63,7 +63,7 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 		
 //		System.out.println("find applicable candidates 1: "+element);
 		final APL apl = element.getApplicablePlanList();
-		apl.build(ia).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+		apl.build(ia).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -80,7 +80,7 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 //					if(element.toString().indexOf("go_home")!=-1)
 //						System.out.println("find applicable candidates 2b: "+element.getId()+" "+apl);
 					element.setState(RProcessableElement.State.APLAVAILABLE);
-					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(element));
+					ia.getFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(element));
 				}
 				ret.setResult(null);
 			}

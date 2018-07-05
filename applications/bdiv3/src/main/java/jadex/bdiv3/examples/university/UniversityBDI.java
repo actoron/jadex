@@ -77,7 +77,7 @@ public class UniversityBDI
 //			raining = true;
 		try
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new ComeToUniGoal()).get();
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new ComeToUniGoal()).get();
 		}
 		catch(Exception e)
 		{

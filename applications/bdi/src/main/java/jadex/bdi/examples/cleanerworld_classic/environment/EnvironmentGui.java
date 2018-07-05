@@ -117,9 +117,9 @@ public class EnvironmentGui	extends JFrame
 //					}
 //				});
 				
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -419,7 +419,7 @@ public class EnvironmentGui	extends JFrame
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										// Hack, as long as we do not have a specific XML feature interface
-										IBDIXAgentFeature capa = (IBDIXAgentFeature)ia.getComponentFeature(IBDIXAgentFeature.class);
+										IBDIXAgentFeature capa = (IBDIXAgentFeature)ia.getFeature(IBDIXAgentFeature.class);
 										
 										Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 										

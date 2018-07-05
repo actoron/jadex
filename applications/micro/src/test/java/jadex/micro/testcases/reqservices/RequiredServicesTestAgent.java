@@ -52,7 +52,7 @@ public class RequiredServicesTestAgent extends JunitAgentTest
 			tr1.setFailed("Component management service was not injected: "+cms);
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
 		agent.killComponent();
 	}
 }

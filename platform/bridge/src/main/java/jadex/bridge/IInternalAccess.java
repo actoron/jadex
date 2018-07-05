@@ -32,28 +32,28 @@ public interface IInternalAccess
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getComponentIdentifier();
+	public IComponentIdentifier	getIdentifier();
 	
 	/**
 	 *  Get a feature of the component.
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
 	 */
-	public <T> T getComponentFeature(Class<? extends T> type);
+	public <T> T getFeature(Class<? extends T> type);
 	
 	/**
 	 *  Get a feature of the component without throwing exception if not present.
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
 	 */
-	public <T> T getComponentFeature0(Class<? extends T> type);
+	public <T> T getFeature0(Class<? extends T> type);
 	
 	/**
 	 *  Get the component description.
 	 *  @return	The component description.
 	 */
 	// Todo: hack??? should be internal to CMS!?
-	public IComponentDescription	getComponentDescription();
+	public IComponentDescription	getDescription();
 	
 	/**
 	 *  Kill the component.

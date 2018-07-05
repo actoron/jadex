@@ -64,7 +64,7 @@ public class MicroPreyAgent
 			{
 				env	= (Grid2D)result;
 		
-				myself	= env.getAvatar(agent.getComponentDescription());
+				myself	= env.getAvatar(agent.getDescription());
 				listener = new IResultListener()
 				{
 					public void exceptionOccurred(Exception e)
@@ -148,7 +148,7 @@ public class MicroPreyAgent
 		{
 			// Perform eat action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, agent.getComponentDescription());
+			params.put(ISpaceAction.ACTOR_ID, agent.getDescription());
 			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performSpaceAction("eat", params, listener);
 		}
@@ -185,7 +185,7 @@ public class MicroPreyAgent
 			
 			// Perform move action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, agent.getComponentDescription());
+			params.put(ISpaceAction.ACTOR_ID, agent.getDescription());
 			params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 			env.performSpaceAction("move", params, listener);
 		}

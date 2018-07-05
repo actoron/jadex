@@ -67,7 +67,7 @@ class CleanerPanel extends JPanel
 					public IFuture<DrawData> execute(IInternalAccess ia)
 					{
 						// Hack, as long as we do not have a specific XML feature interface
-						IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 						
 						DrawData	drawdata	= new DrawData();
 						drawdata.daytime = ((Boolean)capa.getBeliefbase().getBelief("daytime").getFact()).booleanValue();

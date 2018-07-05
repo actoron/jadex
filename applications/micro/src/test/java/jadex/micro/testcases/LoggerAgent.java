@@ -62,7 +62,7 @@ public class LoggerAgent extends JunitAgentTest
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		agent.getFeature(IRequiredServicesFeature.class).getService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -120,7 +120,7 @@ public class LoggerAgent extends JunitAgentTest
 					tr2.setReason("TestLogHandler was not found: "+SUtil.arrayToString(handlers));
 				reports.add(tr2);
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);
 			}
 		});

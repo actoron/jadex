@@ -60,7 +60,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		IRequiredServicesFeature rsf = agent.getComponentFeature(IRequiredServicesFeature.class);
+		IRequiredServicesFeature rsf = agent.getFeature(IRequiredServicesFeature.class);
 		
 		// Create user as subcomponent -> should be able to find the service with publication scope application
 		final int cnt = 3;
@@ -89,7 +89,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 				public void intermediateResultAvailable(IExampleService result)
 				{
 					System.out.println("received: "+result+" "+cms.getRootIdentifier().get()+" "+((IService)result).getServiceIdentifier().getProviderId().getRoot());
-					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getComponentFeature0(IExecutionFeature.class).isComponentThread());
+					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
 					if(cms.getRootIdentifier().get().equals(((IService)result).getServiceIdentifier().getProviderId().getRoot()))
 					{
 						num++;
@@ -114,8 +114,8 @@ public class ServiceQueriesTestAgent extends TestAgent
 			});
 
 			// The creation info is important to be able to resolve the class/model
-			CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName())
-				? new CreationInfo(agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+			CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getIdentifier().getPlatformName())
+				? new CreationInfo(agent.getIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 
 			for(int i=0; i<cnt; i++)
 			{
@@ -126,7 +126,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			// Wait some time and then terminate query
 			
 			long start = System.currentTimeMillis();
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(local? 1000: 11000, true).get();
 			System.out.println("wait dur: "+(System.currentTimeMillis()-start));
 			
 			queryfut.terminate();

@@ -46,7 +46,7 @@ public class FirstAgent
 //		System.out.println("MY PLATFORM :" + ia.getComponentIdentifier().getPlatformName());
 		
 		@SuppressWarnings({"unchecked", "rawtypes"})
-		Collection<IMessageService> services = (Collection)ia.getComponentFeature(IRequiredServicesFeature.class).getServices("MessageService").get();
+		Collection<IMessageService> services = (Collection)ia.getFeature(IRequiredServicesFeature.class).getServices("MessageService").get();
 		IServiceIdentifier[] res = new IServiceIdentifier[services!=null? services.size(): 0];
 		if(services!=null)
 		{
@@ -55,7 +55,7 @@ public class FirstAgent
 			{
 				res[i] = ((IService)it.next()).getServiceIdentifier();
 			}
-			ia.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("found", res);
+			ia.getFeature(IArgumentsResultsFeature.class).getResults().put("found", res);
 			if(selfkill)
 				ia.killComponent();
 		}

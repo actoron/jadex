@@ -71,7 +71,7 @@ public class ProxyAgent	implements IProxyAgentService
 //	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, rcid.getRoot()))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, rcid.getRoot()))
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms) 
@@ -81,19 +81,19 @@ public class ProxyAgent	implements IProxyAgentService
 //				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //				next.setProperty("debugsource", "ProxyAgent.agentCreated()");
 				
-				cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
+				cms.getExternalAccess(agent.getIdentifier().getRoot())
 					.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess pl)
 					{
-						pl.getArguments().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
+						pl.getArguments().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
 						{
 							public void resultAvailable(Map<String, Object> args)
 							{
 								Boolean b = (Boolean)args.get("sensors");
 								if(b!=null && b.booleanValue())
 								{
-									INFMixedPropertyProvider nfpp = agent.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+									INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
 									LatencyProperty lt = new LatencyProperty(agent, (IService)rcms, null);
 									nfpp.addNFProperty(lt).addResultListener(new IResultListener<Void>()
 									{
@@ -203,7 +203,7 @@ public class ProxyAgent	implements IProxyAgentService
 			}
 		};
 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -275,7 +275,7 @@ public class ProxyAgent	implements IProxyAgentService
 	{
 		if(rcms!=null && injected)
 		{
-			INFMixedPropertyProvider nfpp = agent.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+			INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
 			return nfpp.getNFPropertyValue(LatencyProperty.NAME);
 		}
 		else

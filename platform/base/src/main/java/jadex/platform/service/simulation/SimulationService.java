@@ -95,14 +95,14 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	deregistered	= new Future<Void>();
-		access.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		access.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				ISettingsService	settings	= (ISettingsService)result;
 				settings.deregisterPropertiesProvider("simulationservice")
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(deregistered)));
+					.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(deregistered)));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -113,7 +113,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		}));
 			
 		final Future	ret	= new Future();
-		deregistered.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		deregistered.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -127,7 +127,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					stopped	= IFuture.DONE;
 				}
 				
-				stopped.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				stopped.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
 		
@@ -144,22 +144,22 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		ISettingsService	settings	= access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+		ISettingsService	settings	= access.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 		settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final boolean[]	services	= new boolean[2];
 
-				exeservice	= ((AbstractComponentFeature)access.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+				exeservice	= ((AbstractComponentFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 				services[0]	= true;
 				if(services[0] && services[1])
 				{
 					if(startoninit)
 					{
 						startoninit	= false;
-						start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+						start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 					}
 					else
 					{
@@ -168,7 +168,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					}
 				}
 						
-				clockservice	= ((AbstractComponentFeature)access.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+				clockservice	= ((AbstractComponentFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 				clockservice = (IClockService)result;
 				services[1]	= true;
 				if(services[0] && services[1])
@@ -176,7 +176,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					if(startoninit)
 					{
 						startoninit	= false;
-						start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+						start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 					}
 					else
 					{
@@ -350,7 +350,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				IThreadPoolService	tps	= ((AbstractComponentFeature)access.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				IThreadPoolService	tps	= ((AbstractComponentFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 				clockservice.setClock(type, tps);
 				notifyListeners(new ChangeEvent(this, "clock_type", type));
 				fut.setResult(null);
@@ -455,7 +455,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		if(idlelistener!=null)
 			idlelistener.outdated	= true;
 		idlelistener	= new IdleListener();
-		getExecutorService().getNextIdleFuture().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(idlelistener));
+		getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
 	}
 	
 	/**
@@ -480,7 +480,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //					System.out.println("Advanced clock");
 					if(idlelistener==null)
 						idlelistener	= new IdleListener();
-					getExecutorService().getNextIdleFuture().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(idlelistener));
+					getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
 				}
 				else
 				{

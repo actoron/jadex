@@ -44,7 +44,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("current service call before schedule is NULL. This was not really the purpose of this test."));
 		}
 
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>() {
+		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>() {
 			@Override
 			@Classname("myuniquestepname")
 			public IFuture<Void> execute(IInternalAccess ia) {
@@ -58,8 +58,8 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
-		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getComponentIdentifier().getRoot()).get();
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
+		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getIdentifier().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override
 			@Classname("myuniquestepname")

@@ -79,8 +79,8 @@ public class ListDirectoryCommand extends ACliCommand
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, FileData[]>(ret)
+				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, FileData[]>(ret)
 				{
 					public void customResultAvailable(final IFileTransferService ds)
 					{

@@ -89,8 +89,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected void searchForSuperpeers(final List<Integer> foundless, final List<Integer> foundmore)
 	{
-		ITerminableIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
-			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
+		ITerminableIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
+			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getIdentifier(), null));
 		
 		search.addIntermediateResultListener(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
@@ -137,7 +137,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 								// make the winner to a SP
 								Tuple2<IPeerRegistrySynchronizationService, Double> winner = peers.iterator().next();
 								System.out.println("new superpeer: "+winner);
-								makeSuperpeer(winner.getFirstEntity()==null? agent.getComponentIdentifier(): 
+								makeSuperpeer(winner.getFirstEntity()==null? agent.getIdentifier(): 
 									((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
 									.addResultListener(new IResultListener<Void>()
 								{
@@ -201,7 +201,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 								
 								if(isSuperpeer())
 								{
-									computePower(agent.getComponentIdentifier().getRoot()).addResultListener(new IResultListener<Double>()
+									computePower(agent.getIdentifier().getRoot()).addResultListener(new IResultListener<Double>()
 									{
 										public void resultAvailable(Double result)
 										{
@@ -233,7 +233,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 									// make the loser to normal peer
 									Tuple2<ISuperpeerRegistrySynchronizationService, Double> loser = ((TreeSet<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>)superpeers).last();
 									System.out.println("new downgraded peer (from sp): "+loser);
-									makeClient(loser.getFirstEntity()==null? agent.getComponentIdentifier(): 
+									makeClient(loser.getFirstEntity()==null? agent.getIdentifier(): 
 										((IService)loser.getFirstEntity()).getServiceIdentifier().getProviderId())
 										.addResultListener(new IResultListener<Void>()
 									{
@@ -278,7 +278,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	protected void searchAfterDelay(final List<Integer> foundless, final List<Integer> foundmore)
 	{
 		System.out.println("search after delay: "+checkdelay);
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(checkdelay).addResultListener(new IResultListener<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(checkdelay).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -312,8 +312,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		});
 		
 				
-		ITerminableIntermediateFuture<IPeerRegistrySynchronizationService> search = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(
-			new ServiceQuery<IPeerRegistrySynchronizationService>(IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
+		ITerminableIntermediateFuture<IPeerRegistrySynchronizationService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(
+			new ServiceQuery<IPeerRegistrySynchronizationService>(IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getIdentifier(), null));
 
 		search.addIntermediateResultListener(new IIntermediateResultListener<IPeerRegistrySynchronizationService>()
 		{
@@ -349,7 +349,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					{
 						if(isClient())
 						{
-							computePower(agent.getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<Double, Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>(ret)
+							computePower(agent.getIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<Double, Set<Tuple2<IPeerRegistrySynchronizationService, Double>>>(ret)
 							{
 								public void customResultAvailable(Double result) throws Exception
 								{
@@ -385,9 +385,9 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IFuture<Void> makeSuperpeer(IComponentIdentifier cid)
 	{
-		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getComponentIdentifier(), null);
+		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getIdentifier(), null);
 		q.setPlatform(cid.getRoot());
-		IAutoConfigRegistryService	auser	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(q);
+		IAutoConfigRegistryService	auser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
 		return auser.makeRegistrySuperpeer();
 	}
 	
@@ -397,9 +397,9 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IFuture<Void> makeClient(IComponentIdentifier cid)
 	{
-		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getComponentIdentifier(), null);
+		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getIdentifier(), null);
 		q.setPlatform(cid.getRoot());
-		IAutoConfigRegistryService	auser	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(q);
+		IAutoConfigRegistryService	auser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
 		return auser.makeRegistryClient();
 	}
 	
@@ -526,7 +526,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IServiceRegistry getRegistry()
 	{
-		return ServiceRegistry.getRegistry(agent.getComponentIdentifier());
+		return ServiceRegistry.getRegistry(agent.getIdentifier());
 	}
 	
 	/**
@@ -539,7 +539,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerRegistrySynchronizationService spser=null;
 		try
 		{
-			spser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class));
+			spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class));
 		}
 		catch(ServiceNotFoundException e)
 		{
@@ -547,7 +547,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(spser==null)
 		{
-			IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.createComponent("spreg", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null).
 				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
@@ -586,7 +586,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		IPeerRegistrySynchronizationService pser = null;
 		try
 		{
-			pser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
+			pser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
 		}
 		catch(Exception e)
 		{
@@ -594,7 +594,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(pser==null)
 		{
-			IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.createComponent("peerreg",PeerRegistrySynchronizationAgent.class.getName()+".class", null).
 				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
@@ -631,7 +631,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		boolean ret = false;
 		try
 		{
-			ISuperpeerRegistrySynchronizationService spser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class));
+			ISuperpeerRegistrySynchronizationService spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class));
 			ret = spser!=null;
 		}
 		catch(ServiceNotFoundException e)
@@ -649,7 +649,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		boolean ret = false;
 		try
 		{
-			IPeerRegistrySynchronizationService pser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
+			IPeerRegistrySynchronizationService pser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
 			ret = pser!=null;
 		}
 		catch(ServiceNotFoundException e)

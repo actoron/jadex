@@ -44,7 +44,7 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 //		if(context.getMethod().getName().indexOf("methodA")!=-1)
 //			System.out.println("interceptor: "+component.getComponentIdentifier());
 //		boolean ret = component.getServiceContainer().hasMethodListeners(sid, new MethodInfo(context.getMethod()));
-		boolean ret = super.isApplicable(context) && getComponent().getComponentFeature(IProvidedServicesFeature.class).hasMethodListeners(sid, new MethodInfo(context.getMethod()));
+		boolean ret = super.isApplicable(context) && getComponent().getFeature(IProvidedServicesFeature.class).hasMethodListeners(sid, new MethodInfo(context.getMethod()));
 //		System.out.println("app: "+context.getMethod().getName()+" "+ret);
 		return ret;
 	}
@@ -57,7 +57,7 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 	{
 //		System.out.println("method call lis start: "+sic.hashCode());
 		Future<Void> ret = new Future<Void>();
-		getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, true, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+		getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, true, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 		sic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -76,17 +76,17 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 							
 						public void finished()
 						{
-							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void resultAvailable(Collection<Object> result)
 						{
-							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 					};
 					
@@ -105,18 +105,18 @@ public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 					{
 						public void resultAvailable(Object result)
 						{
-							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 					});
 				}
 				else
 				{
-					getComponent().getComponentFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+					getComponent().getFeature(IProvidedServicesFeature.class).notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 				}
 				super.customResultAvailable(result);
 			}

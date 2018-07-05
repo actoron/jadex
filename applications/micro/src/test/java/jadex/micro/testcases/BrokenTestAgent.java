@@ -55,7 +55,7 @@ public class BrokenTestAgent extends JunitAgentTest
 		final TestReport	tr1	= new TestReport("#1", "Body exception subcomponent.");
 		
 		testBrokenComponent(BodyExceptionAgent.class.getName()+".class")
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -91,7 +91,7 @@ public class BrokenTestAgent extends JunitAgentTest
 //					{
 						final TestReport	tr3	= new TestReport("#3", "PojoBodyExceptionAgent");
 						testBrokenComponent(PojoBodyExceptionAgent.class.getName()+".class")
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -107,7 +107,7 @@ public class BrokenTestAgent extends JunitAgentTest
 							
 							protected void next()
 							{
-								agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr3}));
+								agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr3}));
 								ret.setResult(null);
 							}
 						}));
@@ -125,7 +125,7 @@ public class BrokenTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -153,7 +153,7 @@ public class BrokenTestAgent extends JunitAgentTest
 					}
 				};
 				
-				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), lis)
+				cms.createComponent(null, model, new CreationInfo(agent.getIdentifier()), lis)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)

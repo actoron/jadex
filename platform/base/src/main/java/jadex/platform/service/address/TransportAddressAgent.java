@@ -216,7 +216,7 @@ public class TransportAddressAgent implements ITransportAddressService
 				IFuture<List<TransportAddress>> search = searches.get(platformid);
 				if (search == null)
 				{
-					search = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<List<TransportAddress>>()
+					search = agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<List<TransportAddress>>()
 					{
 						public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
 						{
@@ -291,7 +291,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		Future<Void> ret = new Future<Void>();
 		if (addresses != null)
 		{
-			IComponentIdentifier local = agent.getComponentIdentifier().getRoot();
+			IComponentIdentifier local = agent.getIdentifier().getRoot();
 			boolean ok = true;
 			for (TransportAddress addr : addresses)
 			{
@@ -381,7 +381,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	{
 		try
 		{
-			IAwarenessManagementService awa = agent.getComponentFeature(IRequiredServicesFeature.class).getLocalService(IAwarenessManagementService.class);
+			IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IAwarenessManagementService.class);
 			if(awa!=null)
 			{
 				DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
@@ -426,7 +426,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		{
 			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, Binding.SCOPE_COMPONENT, null, platformid, null);
 			
-			ITransportAddressService rtas = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(query).get();
+			ITransportAddressService rtas = agent.getFeature(IRequiredServicesFeature.class).searchService(query).get();
 			if (rtas != null)
 			{
 				ret = rtas.getAddresses().get();
@@ -454,7 +454,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		
 		try
 		{
-			Collection<IPassiveAwarenessService> awas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
+			Collection<IPassiveAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
 			for (IPassiveAwarenessService awa : awas)
 			{
 				try
@@ -491,7 +491,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		try
 		{
-			IAwarenessManagementService awa = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class));
+			IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class));
 			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
 			if (info != null)
 				ret = info.getAddresses();
@@ -518,7 +518,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
 		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(Binding.SCOPE_GLOBAL);
-		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(query);
+		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getFeature(IRequiredServicesFeature.class).searchServices(query);
 		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
 		{
 			/** The peers. */
@@ -575,7 +575,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected List<TransportAddress> getAddressesFromCache(IComponentIdentifier platformid)
 	{
 		List<TransportAddress> ret = null;
-		if (platformid == null || agent.getComponentIdentifier().getRoot().equals(platformid))
+		if (platformid == null || agent.getIdentifier().getRoot().equals(platformid))
 		{
 			ret = new ArrayList<TransportAddress>(localaddresses);
 		}
@@ -630,7 +630,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		{
 			for (TransportAddress addr : addrs)
 			{
-				if (agent.getComponentIdentifier().getRoot().equals(addr.getPlatformId()))
+				if (agent.getIdentifier().getRoot().equals(addr.getPlatformId()))
 				{
 					if (!localaddresses.contains(addr))
 					{

@@ -54,7 +54,7 @@ public class UserAgent
 			public void intermediateResultAvailable(Event event)
 			{
 				System.out.println("Received: "
-						+ agent.getComponentIdentifier() + " " + event);
+						+ agent.getIdentifier() + " " + event);
 			}
 
 			public void exceptionOccurred(Exception exception)
@@ -72,17 +72,17 @@ public class UserAgent
 				if(!(cnt[0] % 2 == 0))
 				{
 					// publish also remote
-					mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()), true);
+					mq.publish(topic, new Event("some type", cnt[0]++, agent.getIdentifier()), true);
 				}
 				else
 				{
 					// just publish local
-					mq.publish(topic,new Event("some type", cnt[0]++, agent.getComponentIdentifier()), false);
+					mq.publish(topic,new Event("some type", cnt[0]++, agent.getIdentifier()), false);
 				}
 				
 				if(cnt[0] < 10)
 				{
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				}
 				else
 				{
@@ -91,6 +91,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
 	}
 }

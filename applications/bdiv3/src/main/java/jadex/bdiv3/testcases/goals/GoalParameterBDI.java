@@ -73,7 +73,7 @@ public class GoalParameterBDI
 	{
 		g.inc();
 //		plan.waitFor(200).get();
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(200).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(200).get();
 //		System.out.println("plan end");
 	}
 	
@@ -84,14 +84,14 @@ public class GoalParameterBDI
 
 		final TestReport tr = new TestReport("#1", "Test if a goal condition can be triggered by a goal parameter.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				ret.setResultIfUndone(null);
@@ -99,9 +99,9 @@ public class GoalParameterBDI
 			}
 		});
 		
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal()).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal()).get();
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		ret.setResultIfUndone(null);
 		
 		return ret;

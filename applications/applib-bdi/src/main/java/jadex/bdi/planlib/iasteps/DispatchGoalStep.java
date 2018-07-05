@@ -54,7 +54,7 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 	
 	public IFuture<Map<String, Object>> execute(IInternalAccess ia)
 	{
-		final IGoal goal = ia.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().createGoal(goaltype);
+		final IGoal goal = ia.getFeature(IBDIXAgentFeature.class).getGoalbase().createGoal(goaltype);
 		if(parameters != null)
 		{
 			for(Iterator it = parameters.entrySet().iterator(); it.hasNext(); )
@@ -76,7 +76,7 @@ public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 //			{
 //			}
 //		});
-		ia.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
+		ia.getFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
 		.addResultListener(new IResultListener<Object>()
 		{
 			public void exceptionOccurred(Exception exception)

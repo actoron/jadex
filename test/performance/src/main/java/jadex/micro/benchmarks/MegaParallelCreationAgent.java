@@ -40,7 +40,7 @@ public class MegaParallelCreationAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		System.out.println("Created peer: "+num+" "+agent.getComponentIdentifier());		
+		System.out.println("Created peer: "+num+" "+agent.getIdentifier());		
 		return new Future<Void>(); // never kill?!
 	}
 

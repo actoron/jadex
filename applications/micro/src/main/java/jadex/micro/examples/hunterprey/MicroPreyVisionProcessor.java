@@ -56,7 +56,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 							@Classname("food")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								MicroPreyAgent mp = (MicroPreyAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+								MicroPreyAgent mp = (MicroPreyAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 								
 								ISpaceObject nearfood	= mp.getNearestFood();
 								

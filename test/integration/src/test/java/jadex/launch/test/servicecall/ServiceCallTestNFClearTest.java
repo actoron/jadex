@@ -270,14 +270,14 @@ public class ServiceCallTestNFClearTest
 					// service = (IServiceCallService)
 					// ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(requiredOrProvidedServiceName);
 					// } else {
-					service = ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
+					service = ia.getFeature(IProvidedServicesFeature.class).getProvidedService(IServiceCallService.class);
 					// }
 				}
 				else
 				{
 //					service = (IServiceCallService)ia.getComponentFeature(IRequiredServicesFeature.class).getService(requiredOrProvidedServiceName).get();
 					service = SFuture.getFirstResultAndTerminate(
-						ia.getComponentFeature(IRequiredServicesFeature.class).addQuery(requiredOrProvidedServiceName));
+						ia.getFeature(IRequiredServicesFeature.class).addQuery(requiredOrProvidedServiceName));
 						
 				}
 				assertServiceCallResetsServiceInvocation(service);

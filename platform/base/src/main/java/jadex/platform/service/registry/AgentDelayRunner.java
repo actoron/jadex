@@ -36,7 +36,7 @@ public class AgentDelayRunner implements IDelayRunner
 			throw new RuntimeException("Runner was cancelled already");
 		
 		final boolean valid[] = new boolean[]{true};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IConditionalComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IConditionalComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

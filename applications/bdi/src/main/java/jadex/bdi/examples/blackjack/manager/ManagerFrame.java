@@ -140,7 +140,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dealerpan")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentManagementService>	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+				IFuture<IComponentManagementService>	cms	= ia.getFeature(IRequiredServicesFeature.class).getService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
 //					Thread.dumpStack();
 				cms.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
@@ -169,7 +169,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms")
+						ia.getFeature(IRequiredServicesFeature.class).getService("cms")
 							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
@@ -262,7 +262,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("players")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				final Player[] players = (Player[])bia.getBeliefbase().getBeliefSet("players").getFacts();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -291,7 +291,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -375,7 +375,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -448,12 +448,12 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final Future<Void>	ret	= new Future<Void>();
-				final IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				final IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				
-				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
+				IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
 					.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 				cms.createComponent("BlackjackDealer", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml",
-					new CreationInfo(ia.getComponentIdentifier().getParent()))
+					new CreationInfo(ia.getIdentifier().getParent()))
 				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					@Override
@@ -498,11 +498,11 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("destroy")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
 				if(dealer!=null)
 				{
-					IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
+					IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
 						.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 					cms.destroyComponent(dealer);
 					bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
@@ -659,16 +659,16 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					final Future<Void>	ret	= new Future<Void>();
 					try
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						bia.getLogger().info("starting playerAgent: "+player.getName());
 						
-						IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
+						IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
 							.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
 						cms.createComponent(player.getName(), "jadex/bdi/examples/blackjack/player/Player.agent.xml",
-							new CreationInfo(args, ia.getComponentIdentifier().getParent()))
+							new CreationInfo(args, ia.getIdentifier().getParent()))
 						.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
 							@Override
@@ -709,7 +709,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				@Classname("stop")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class)
+					IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
 						.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 					cms.destroyComponent(player.getAgentID());
 					return IFuture.DONE;

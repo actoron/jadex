@@ -364,7 +364,7 @@ public class EasyDeliberationStrategy implements IDeliberationStrategy
 	 */
 	protected RCapability getCapability()
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getCapability();
 	}
 	
 	/**

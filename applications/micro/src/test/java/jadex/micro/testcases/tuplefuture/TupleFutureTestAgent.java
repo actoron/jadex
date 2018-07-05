@@ -53,7 +53,7 @@ public class TupleFutureTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		ITestService ts = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("ts").get();
+		ITestService ts = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("ts").get();
 		
 		ITuple2Future<String, Integer> fut = ts.getSomeResults();
 		
@@ -105,7 +105,7 @@ public class TupleFutureTestAgent extends JunitAgentTest
 					tr2.setFailed("Received wrong results.");
 				}
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 				agent.killComponent();
 			}
 			
@@ -114,7 +114,7 @@ public class TupleFutureTestAgent extends JunitAgentTest
 				System.out.println("ex: "+exception);
 				tr2.setFailed(exception);
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 				agent.killComponent();
 			}
 		});

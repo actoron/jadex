@@ -53,21 +53,21 @@ public class WaitBDI
 		tr[0] = new TestReport("#1", "Test waitForFactAdded");
 		tr[1] = new TestReport("#2", "Test waitForFactRemoved");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("Adding");
 				addName("a");
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						System.out.println("Removing");
 						removeName("a");
 						
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -95,7 +95,7 @@ public class WaitBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class WaitBDI
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 		
-		rplan.waitForFactAdded("names").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
+		rplan.waitForFactAdded("names").addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
 			public void customResultAvailable(ChangeInfo<?> result)
 			{
@@ -137,7 +137,7 @@ public class WaitBDI
 			}
 		}));
 		
-		rplan.waitForFactRemoved("names").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
+		rplan.waitForFactRemoved("names").addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
 			public void customResultAvailable(ChangeInfo<?> result)
 			{

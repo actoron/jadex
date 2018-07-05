@@ -62,13 +62,13 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
 
-				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -96,8 +96,8 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(agent.getComponentIdentifier(), testno, true)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+				performTest(agent.getIdentifier(), testno, true)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -118,7 +118,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(Void result) 
 			{
 				performTest(pls.get(1).getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -187,7 +187,7 @@ public class InitiatorAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
-		IIntermediateFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
+		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
 			boolean called;
@@ -252,7 +252,7 @@ public class InitiatorAgent extends TestAgent
 						ts.methodA(i*10+j).addResultListener(lis);
 					}
 					
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000).get();
+					agent.getFeature(IExecutionFeature.class).waitForDelay(10000).get();
 				}
 			}
 		});

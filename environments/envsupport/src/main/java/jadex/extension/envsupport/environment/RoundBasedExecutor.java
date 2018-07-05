@@ -267,7 +267,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 			// Only print warning for sub-components
 			if(task instanceof ExecutionComponentFeature)
 			{
-				IComponentIdentifier	cid	= ((ExecutionComponentFeature)task).getComponent().getComponentIdentifier();
+				IComponentIdentifier	cid	= ((ExecutionComponentFeature)task).getComponent().getIdentifier();
 				IComponentIdentifier	test	= cid;
 				while(test!=null && !test.equals(ea.getComponentIdentifier()))
 				{

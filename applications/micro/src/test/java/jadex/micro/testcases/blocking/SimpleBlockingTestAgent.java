@@ -25,9 +25,9 @@ public class SimpleBlockingTestAgent  extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));
 	}
 }

@@ -91,7 +91,7 @@ public class TimeProviderAgent	implements ITimeService
 	public void body(IInternalAccess ia)
 	{
 		// The execution feature provides methods for controlling the execution of the agent.
-		IExecutionFeature	exe	= ia.getComponentFeature(IExecutionFeature.class);
+		IExecutionFeature	exe	= ia.getFeature(IExecutionFeature.class);
 		
 		// Execute a step every 5000 milliseconds, start from next full 5000 milliseconds
 		exe.repeatStep(5000-System.currentTimeMillis()%5000, 5000, new IComponentStep<Void>()

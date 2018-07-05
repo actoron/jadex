@@ -63,7 +63,7 @@ public class BeliefIncrementPlan extends Plan
 			// Do atomic, to avoid being terminated before latest value is printed.
 			startAtomic();
 			getBeliefbase().getBelief(beliefname).setFact(stepcnt);
-			System.out.println(getAgent().getComponentIdentifier()+": belief "+beliefname+" changed to: " + stepcnt.intValue());
+			System.out.println(getAgent().getIdentifier()+": belief "+beliefname+" changed to: " + stepcnt.intValue());
 			getLogger().info(this+": belief "+beliefname+" changed to: " + stepcnt.intValue());
 			endAtomic();
 

@@ -83,15 +83,15 @@ public class ServicePoolTask implements ITask
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
-		IComponentManagementService cms	= process.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
-		CreationInfo ci = new CreationInfo(process.getComponentIdentifier());
+		IComponentManagementService cms	= process.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
+		CreationInfo ci = new CreationInfo(process.getIdentifier());
 		cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(IComponentIdentifier cid) 
 			{
-				process.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class, cid))
-					.addResultListener(process.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
+				process.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class, cid))
+					.addResultListener(process.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 				{
 					public void customResultAvailable(IServicePoolService sps)
 					{

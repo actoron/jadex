@@ -35,7 +35,7 @@ public abstract class BaseBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(movecapa.new WalkAround());
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(movecapa.new WalkAround());
 	}
 
 	/**

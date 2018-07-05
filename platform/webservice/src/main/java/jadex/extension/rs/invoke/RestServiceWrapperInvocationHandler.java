@@ -107,19 +107,19 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 		final Future<Object> ret = new Future<Object>();
 			
 //		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getService("cms");
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
+				CreationInfo ci = new CreationInfo(agent.getIdentifier());
 //				cms.createComponent(null, "invocation", ci, null)
 				cms.createComponent(null, "jadex/extension/rs/invoke/RestServiceInvocationAgent.class", ci, null)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+						cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 						{
 							public void customResultAvailable(IExternalAccess exta) 
 							{
@@ -340,7 +340,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 										}
 										return re;
 									}
-								}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
+								}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
 							}
 						}));
 					}

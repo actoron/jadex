@@ -51,12 +51,12 @@ public class EnvironmentService	implements IEnvironmentService
 		for(final IExtensionInfo ei: infos)
 		{
 			ei.createInstance(component.getExternalAccess(), component.getFetcher()).addResultListener(
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExtensionInstance>()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExtensionInstance>()
 			{
 				public void resultAvailable(final IExtensionInstance instance)
 				{
 					spaces.put(ei.getName(), instance);	// Make space known before init, in case initial avatars are created that create agents that want to get their spaces. (hack?)
-					instance.init().addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(lis));
+					instance.init().addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(lis));
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -81,7 +81,7 @@ public class EnvironmentService	implements IEnvironmentService
 		for(final IExtensionInstance instance: spaces.values())
 		{
 			instance.terminate().addResultListener(
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
@@ -114,7 +114,7 @@ public class EnvironmentService	implements IEnvironmentService
 	 */
 	public static IFuture<Object> getSpace(IInternalAccess component, final String name)
 	{
-		IEnvironmentService es	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IEnvironmentService.class));
+		IEnvironmentService es	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IEnvironmentService.class));
 		return es.getSpace(name);
 	}
 }

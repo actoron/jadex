@@ -56,14 +56,14 @@ public class MethodBeliefAgentBDI
 	public void	body(final IInternalAccess agent)
 	{
 		final TestReport	tr	= new TestReport("#1", "Test if method beliefs work.");
-		agent.getComponentFeature(IBDIAgentFeature.class).addBeliefListener("value", new BeliefAdapter<String>()
+		agent.getFeature(IBDIAgentFeature.class).addBeliefListener("value", new BeliefAdapter<String>()
 		{
 			public void beliefChanged(ChangeInfo<String> value)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setSucceeded(true);
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 					agent.killComponent();
 				}
 			}
@@ -71,14 +71,14 @@ public class MethodBeliefAgentBDI
 		
 		setValue("hello");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).addResultListener(new DefaultResultListener<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).addResultListener(new DefaultResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("No event occurred.");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 					agent.killComponent();
 				}
 			}

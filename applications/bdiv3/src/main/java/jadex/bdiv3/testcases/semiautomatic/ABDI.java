@@ -50,7 +50,7 @@ public class ABDI extends AABDI
 	@AgentBody
 	public IFuture<Void> body()
 	{
-		IFuture<Cnt1Goal> fut1 = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt1Goal());
+		IFuture<Cnt1Goal> fut1 = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt1Goal());
 		fut1.addResultListener(new IResultListener<ABDI.Cnt1Goal>()
 		{
 			public void resultAvailable(Cnt1Goal result)
@@ -64,7 +64,7 @@ public class ABDI extends AABDI
 			}
 		});
 		
-		IFuture<Cnt2Goal> fut2 = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt2Goal());
+		IFuture<Cnt2Goal> fut2 = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt2Goal());
 		fut2.addResultListener(new IResultListener<ABDI.Cnt2Goal>()
 		{
 			public void resultAvailable(Cnt2Goal result)
@@ -85,13 +85,13 @@ public class ABDI extends AABDI
 				incNum1();
 				incNum2();
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				
 				return IFuture.DONE;
 			}
 		};
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
 		
 		try
 		{

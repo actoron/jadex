@@ -47,14 +47,14 @@ public class StepAgent	implements	IStepService
 //		System.out.println("Perform steps called: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		final IntermediateFuture<Integer>	ret	= new IntermediateFuture<Integer>();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				for(int i=1; i<=steps; i++)
 				{
 //					System.out.println("Perform steps before wait for step "+i+": "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
-					ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
+					ia.getFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}
 				ret.setFinished();
@@ -72,13 +72,13 @@ public class StepAgent	implements	IStepService
 	{
 		final SubscriptionIntermediateFuture<Integer>	ret	= new SubscriptionIntermediateFuture<Integer>();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(0, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				for(int i=1; !ret.isDone(); i++)
 				{
-					ia.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
+					ia.getFeature(IExecutionFeature.class).waitForDelay(millis).get();
 					ret.addIntermediateResult(Integer.valueOf(i));
 				}
 				return IFuture.DONE;

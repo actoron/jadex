@@ -45,7 +45,7 @@ public class RichBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BecomeRich()).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BecomeRich()).get();
 		if(money==target)
 		{
 			System.out.println("Now I am rich as I have made "+money+" euros.");

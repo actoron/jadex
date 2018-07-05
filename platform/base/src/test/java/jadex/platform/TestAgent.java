@@ -96,13 +96,13 @@ public abstract class TestAgent
 		final Testcase tc = new Testcase();
 		tc.setTestCount(getTestCount());
 		
-		performTests(tc).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+		performTests(tc).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();				
 			}
@@ -113,7 +113,7 @@ public abstract class TestAgent
 				
 				exception.printStackTrace();
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();	
 			}
@@ -129,7 +129,7 @@ public abstract class TestAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<IComponentManagementService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -148,7 +148,7 @@ public abstract class TestAgent
 									public void customResultAvailable(IComponentIdentifier result)
 									{
 										SServiceProvider.searchService(exta, new ServiceQuery<>( IComponentManagementService.class))
-											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+											.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
 											public void customResultAvailable(IComponentManagementService cms2)
 											{
@@ -195,7 +195,7 @@ public abstract class TestAgent
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{
 //			"-libpath", url,
-			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
+			"-platformname", agent.getIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",
@@ -228,7 +228,7 @@ public abstract class TestAgent
 
 //		System.out.println("platform args: "+SUtil.arrayToString(defargs));
 		
-		Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		Starter.createPlatform(defargs).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
@@ -258,7 +258,7 @@ public abstract class TestAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -267,7 +267,7 @@ public abstract class TestAgent
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 //				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-				CreationInfo ci	= new CreationInfo(root==null? agent.getComponentIdentifier(): root, rid);
+				CreationInfo ci	= new CreationInfo(root==null? agent.getIdentifier(): root, rid);
 				ci.setArguments(args);
 				ci.setConfiguration(config);
 				cms.createComponent(null, filename, ci, reslis)
@@ -298,7 +298,7 @@ public abstract class TestAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -315,7 +315,7 @@ public abstract class TestAgent
 	 */
 	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
 	{
-		return createComponent(filename, agent.getComponentIdentifier().getRoot(), reslis);
+		return createComponent(filename, agent.getIdentifier().getRoot(), reslis);
 	}
 	
 	/**
@@ -463,7 +463,7 @@ public abstract class TestAgent
 	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
 	{
 		final Future<T>	ret	= new Future<T>();
-		IFuture<IClockService>	clockfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("clock");
+		IFuture<IClockService>	clockfut	= agent.getFeature(IRequiredServicesFeature.class).getService("clock");
 		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService clock)
@@ -472,7 +472,7 @@ public abstract class TestAgent
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+						agent.getFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}

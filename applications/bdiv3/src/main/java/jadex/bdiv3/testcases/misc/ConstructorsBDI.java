@@ -60,6 +60,6 @@ public class ConstructorsBDI	extends ConstructorsSuper
 		{
 			tr.setReason("Calls do not match: [A, B, C, D], "+calls.toString());
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

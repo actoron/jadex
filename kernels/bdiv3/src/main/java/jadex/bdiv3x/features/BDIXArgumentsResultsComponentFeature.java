@@ -38,7 +38,7 @@ public class BDIXArgumentsResultsComponentFeature extends ArgumentsResultsCompon
 	 */
 	public IFuture<Void> shutdown()
 	{
-		IBDIXAgentFeature	bdif	= getComponent().getComponentFeature(IBDIXAgentFeature.class);
+		IBDIXAgentFeature	bdif	= getComponent().getFeature(IBDIXAgentFeature.class);
 		BDIXModel	model	= (BDIXModel)bdif.getModel();
 		for(MBelief mbel: model.getCapability().getBeliefs())
 		{

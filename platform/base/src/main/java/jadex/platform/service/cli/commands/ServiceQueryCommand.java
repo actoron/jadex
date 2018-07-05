@@ -83,14 +83,14 @@ public class ServiceQueryCommand extends ACliCommand
 				final String[] tags = (String[])args.get("-tags");
 				
 				if(owner==null)
-					owner = ia.getComponentIdentifier().getRoot();
+					owner = ia.getIdentifier().getRoot();
 				
 				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, provider, owner, null);
 				if(tags!=null)
 					q.setServiceTags(tags);
 				
 				//SServiceProvider.getServices(ia, q, false);
-				ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(q)
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(q)
 					.addIntermediateResultListener(new IntermediateDelegationResultListener<IService>(ret));
 				
 				return ret;

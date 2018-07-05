@@ -189,8 +189,8 @@ public class ClassPlanBody extends AbstractPlanBody
 
 						// Pojo specific code.
 						Object pojocapa	= capaname!=null
-							? (ia.getComponentFeature0(IInternalBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
-							: (ia.getComponentFeature0(IPojoComponentFeature.class)!=null ? ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent() : null);
+							? (ia.getFeature0(IInternalBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
+							: (ia.getFeature0(IPojoComponentFeature.class)!=null ? ia.getFeature(IPojoComponentFeature.class).getPojoAgent() : null);
 
 						
 						if(f.getType().isAssignableFrom(IInternalAccess.class))

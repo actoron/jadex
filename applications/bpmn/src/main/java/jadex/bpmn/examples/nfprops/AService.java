@@ -33,7 +33,7 @@ public class AService implements IAService
 	public IFuture<String> test()
 	{
 		System.out.println("invoked service: "+sid.getProviderId()+" cnt="+(++cnt)+" wait="+wait);
-		comp.getComponentFeature(IExecutionFeature.class).waitForDelay(wait).get();
+		comp.getFeature(IExecutionFeature.class).waitForDelay(wait).get();
 		return new Future<String>(sid.toString());
 	}
 }

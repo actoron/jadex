@@ -361,7 +361,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public void customResultAvailable(Map<String, Object> settings)
 			{
 				boolean savesettings = false;
-				Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+				Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();
 				for (Object val : args.values())
 					savesettings |= val != null;
 				
@@ -421,7 +421,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (printsecret && platformsecret != null)
 				{
 					String secretstr = platformsecret.toString();
-					String pfname = agent.getComponentIdentifier().getPlatformName();
+					String pfname = agent.getIdentifier().getPlatformName();
 					
 					if (platformsecret instanceof PasswordSecret)
 						System.out.println("Platform " + pfname + " access password: "+secretstr);
@@ -433,7 +433,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						System.out.println("Platform " + pfname + " access secret: "+secretstr);
 				}
 				
-				networknames = (Set<String>)Starter.getPlatformValue(agent.getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
+				networknames = (Set<String>)Starter.getPlatformValue(agent.getIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
 				networknames.addAll(networks.keySet());
 				
 				// TODO: Make configurable
@@ -456,7 +456,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (savesettings)
 					saveSettings();
 				
-				IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
+				IMessageFeature msgfeat = agent.getFeature(IMessageFeature.class);
 				msgfeat.addMessageHandler(new SecurityMessageHandler());
 				msgfeat.addMessageHandler(new ReencryptRequestHandler());
 				
@@ -974,7 +974,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				// TODO: Refresh?
 				if (secret == null)
 				{
-					if (cid == null || agent.getComponentIdentifier().getRoot().equals(cid))
+					if (cid == null || agent.getIdentifier().getRoot().equals(cid))
 						platformsecret = null;
 					else
 						remoteplatformsecrets.remove(cid);
@@ -983,7 +983,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(secret);
 					
-					if (cid == null || agent.getComponentIdentifier().getRoot().equals(cid))
+					if (cid == null || agent.getIdentifier().getRoot().equals(cid))
 						platformsecret = authsec;
 					else
 						remoteplatformsecrets.put(cid, authsec);
@@ -1106,7 +1106,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public AbstractAuthenticationSecret getInternalPlatformSecret(IComponentIdentifier cid)
 	{
 		cid = cid.getRoot();
-		if (cid.equals(agent.getComponentIdentifier().getRoot()))
+		if (cid.equals(agent.getIdentifier().getRoot()))
 			return getInternalPlatformSecret();
 		return remoteplatformsecrets.get(cid.getRoot());
 	}
@@ -1155,7 +1155,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		return agent.getComponentIdentifier();
+		return agent.getIdentifier();
 	}
 	
 	// -------- Cleanup
@@ -1172,7 +1172,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(TIMEOUT << 1, new IComponentStep<Void>()
+							return ia.getFeature(IExecutionFeature.class).waitForDelay(TIMEOUT << 1, new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -1237,7 +1237,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (cryptoreset != null)
 				{
 					long resetdelay = TIMEOUT >>> 3;
-					cryptoreset = ia.getComponentFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
+					cryptoreset = ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
@@ -1327,7 +1327,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	protected void initializeHandshake(String cid)
 	{
-		String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
+		String convid = SUtil.createUniqueId(agent.getIdentifier().getRoot().toString());
 		HandshakeState hstate = new HandshakeState();
 		hstate.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
 		hstate.setConversationId(convid);
@@ -1336,7 +1336,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		initializingcryptosuites.put(cid.toString(), hstate);
 		
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
-		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getComponentIdentifier(), convid, csuites);
+		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getIdentifier(), convid, csuites);
 		BasicComponentIdentifier rsec = new BasicComponentIdentifier("security@" + cid);
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
@@ -1349,7 +1349,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		ISettingsService ret = null;
 		try
 		{
-			ret = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+			ret = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 		}
 		catch (Exception e)
 		{
@@ -1444,7 +1444,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		Map<String, Object> addheader = new HashMap<String, Object>();
 		addheader.put(SECURITY_MESSAGE, Boolean.TRUE);
 		
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage(message, addheader, receiver);
+		return agent.getFeature(IMessageFeature.class).sendMessage(message, addheader, receiver);
 	}
 	
 	/**
@@ -1474,7 +1474,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		try
 		{
 			BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
-			ret = (byte[]) agent.getComponentFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
+			ret = (byte[]) agent.getFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
 		}
 		catch (Exception e)
 		{
@@ -1592,7 +1592,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						else
 						{
 							state.setCryptoSuite(suite);
-							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getComponentIdentifier(), rm.getConversationId(), rm.getChosenCryptoSuite());
+							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getIdentifier(), rm.getConversationId(), rm.getChosenCryptoSuite());
 							sendSecurityHandshakeMessage(rm.getSender(), fm);
 						}
 					}
@@ -1699,7 +1699,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				}
 			}
 			
-			agent.getComponentFeature(IMessageFeature.class).sendReply(header, deccontent);
+			agent.getFeature(IMessageFeature.class).sendReply(header, deccontent);
 		}
 	}
 	

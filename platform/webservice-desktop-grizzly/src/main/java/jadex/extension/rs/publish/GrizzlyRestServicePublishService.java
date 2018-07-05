@@ -381,14 +381,14 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	public IFuture<Void> publishResources(final String uri, final String path)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IComponentManagementService	cms	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getComponentIdentifier();
+		IComponentManagementService	cms	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getIdentifier();
 		cms.getComponentDescription(cid)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)
 			{
-				ILibraryService	ls	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				ls.getClassLoader(desc.getResourceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{

@@ -42,18 +42,18 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -71,8 +71,8 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		performTest(agent.getIdentifier().getRoot(), testno)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
 			{
@@ -90,13 +90,13 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		setupRemotePlatform(false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTest(platform.getComponentIdentifier(), testno)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -156,7 +156,7 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if remote scheduling inside a service call works " + (testno == 1? "(local case)." : "(remote case)."));
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
 		
 
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)

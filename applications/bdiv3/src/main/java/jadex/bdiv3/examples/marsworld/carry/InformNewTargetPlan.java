@@ -38,7 +38,7 @@ public class InformNewTargetPlan
 	{
 		try
 		{
-			IFuture<Collection<ITargetAnnouncementService>> fut = carry.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("targetser");
+			IFuture<Collection<ITargetAnnouncementService>> fut = carry.getAgent().getFeature(IRequiredServicesFeature.class).getServices("targetser");
 			Collection<ITargetAnnouncementService> ansers = fut.get();
 			
 			for(ITargetAnnouncementService anser: ansers)

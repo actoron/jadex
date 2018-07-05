@@ -211,7 +211,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		if (started)
 			return IFuture.DONE;
 		
-		String[] blarray = (String[]) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("ignoreextensions");
+		String[] blarray = (String[]) ia.getFeature(IArgumentsResultsFeature.class).getArguments().get("ignoreextensions");
 //		System.out.println(Arrays.toString(blarray));
 		if (blarray != null)
 			baseextensionblacklist.addAll(Arrays.asList(blarray));
@@ -225,7 +225,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		};
 		
-		libservice	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 		
 		final IExternalAccess exta = ia.getExternalAccess();
 		liblistener = new ILibraryServiceListener()
@@ -262,7 +262,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 			{
 				final URI uri = rid.getLocalIdentifier().getUri();
-				String regex = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
+				String regex = (String) ia.getFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
 				if (Pattern.matches(regex!=null ? regex : "", uri.toString()))
 				{
 					exta.scheduleStep(new IComponentStep<Void>()
@@ -327,11 +327,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //			basecl = basecl.getParent();
 //		}
 		
-		libservice.getAllURLs().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		libservice.getAllURLs().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				String regexstr = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
+				String regexstr = (String) ia.getFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
 				Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
 				
 //				potentialurls.addAll();
@@ -371,8 +371,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
 					String[] dl = kerneldefaultlocations.get(null) == null? new String[0] : (String[]) ((Collection) kerneldefaultlocations.get(null)).toArray(new String[kerneldefaultlocations.size()]);
 					kerneldefaultlocations.clear();
-					IResultListener loccounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-						new CounterResultListener(dl.length, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+					IResultListener loccounter = ia.getFeature(IExecutionFeature.class).createResultListener(
+						new CounterResultListener(dl.length, ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -427,7 +427,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	@ServiceShutdown
 	public IFuture<Void> shutdownService()
 	{
-		ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 		return ls.removeLibraryServiceListener(liblistener);
 	}
 	
@@ -460,12 +460,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
-		findKernel(model, imports, rid, isrecur).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		findKernel(model, imports, rid, isrecur).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				if (result != null)
-					((IComponentFactory)result).loadModel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+					((IComponentFactory)result).loadModel(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				else
 					ret.setException(new RuntimeException("Factory not found: " + model));
 			}
@@ -498,7 +498,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //			System.out.println("isLoadable: "+model);
 //
 		final Future<Boolean> ret = new Future<Boolean>();
-		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		findKernel(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -530,12 +530,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		System.out.println("isStartable: "+model);
 
 		final Future<Boolean> ret = new Future<Boolean>();
-		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		findKernel(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				if(result != null)
-					((IComponentFactory) result).isStartable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+					((IComponentFactory) result).isStartable(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				else
 					ret.setResult(false);
 			}
@@ -559,14 +559,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //			System.out.println("model: "+model);
 
 		final Future<String> ret = new Future<String>();
-		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		findKernel(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				if(result != null)
 				{
 					((IComponentFactory)result).getComponentType(model, imports, rid)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+						.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				}
 				else
 				{
@@ -593,7 +593,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		if (icon == null)
 		{
-			Collection<IComponentFactory> facs = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION));
+			Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION));
 			if (facs != null)
 			{
 				for (IComponentFactory fac : facs)
@@ -677,7 +677,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		final Future<Collection<IComponentFeatureFactory>> res = new Future<Collection<IComponentFeatureFactory>>();
 		
-		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(res)
+		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(res)
 		{
 			public void customResultAvailable(IComponentFactory result)
 			{
@@ -718,8 +718,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		final Future ret = new Future();
 		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
-		IResultListener counter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new CounterResultListener(ls.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
+		IResultListener counter = ia.getFeature(IExecutionFeature.class).createResultListener(
+			new CounterResultListener(ls.length, true, ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
 		for (int i = 0; i < ls.length; ++i)
 			ls[i].componentTypesAdded(types).addResultListener(counter);
 		return ret;
@@ -734,8 +734,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		final Future ret = new Future();
 		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
-		IResultListener counter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new CounterResultListener(ls.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
+		IResultListener counter = ia.getFeature(IExecutionFeature.class).createResultListener(
+			new CounterResultListener(ls.length, true, ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
 		for (int i = 0; i < ls.length; ++i)
 			ls[i].componentTypesAdded(types).addResultListener(counter);
 		return ret;
@@ -783,7 +783,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 //		final ClassLoader classloader =  libservice.getClassLoader(rid);
 		
-		findActiveKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		findActiveKernel(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -794,7 +794,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				else
 				{
 					findLoadableKernel(model, imports, rid, isrecur)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+						.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -840,14 +840,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		//SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(kernelmodel, null, classloader)))
 		final Future ret = new Future();
-		Collection factories = ia.getComponentFeature(IRequiredServicesFeature.class)
+		Collection factories = ia.getFeature(IRequiredServicesFeature.class)
 			.searchLocalServices(new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION));
 
 //		if(model.indexOf("ich")!=-1)
 //			System.out.println("found factories: "+result);
 				
-		final IResultListener factorypicker = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new CollectionResultListener(factories.size(), true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+		final IResultListener factorypicker = ia.getFeature(IExecutionFeature.class).createResultListener(
+			new CollectionResultListener(factories.size(), true, ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -873,7 +873,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 			
 //					System.out.println("Trying isloadable :" + factory + " for " + model);
-			factory.isLoadable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+			factory.isLoadable(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -947,14 +947,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //				System.out.println("findKernelInCache1: "+model+", "+cachedresult);
 			final String	kernelmodel	= cachedresult;	
 			startLoadableKernel(model, imports, rid, kernelmodel)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 			{
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("remove: "+kernelsext+", "+kernelmodel);
 					kernellocationcache.removeObject(kernelsext, kernelmodel);
 					findKernelInCache(model, imports, rid, isrecur)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+						.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 				}
 			}));
 		}
@@ -979,12 +979,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //							System.out.println("findKernelInCache3: "+model+", "+potentialuris+", "+isrecur);
 						return searchPotentialUrls(rid);
 					}
-				}).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				}).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						findKernelInCache(model, imports, rid, isrecur)
-							.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+							.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 					}
 				}));
 			}
@@ -1055,20 +1055,20 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //					}
 //				});
 				
-				findActiveKernel(kernelmodel, null, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				findActiveKernel(kernelmodel, null, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 //						System.out.println("Starting kernel1: " + kernelmodel);
 						IComponentFactory	fac	= (IComponentFactory)result;
-						fac.loadModel(kernelmodel, null, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+						fac.loadModel(kernelmodel, null, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
 //								System.out.println("Starting kernel2: " + kernelmodel);
 								final IModelInfo	info	= (IModelInfo)result;
-								IComponentManagementService cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-								final CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
+								IComponentManagementService cms	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+								final CreationInfo ci = new CreationInfo(ia.getIdentifier());
 								String	name	= info.getName().toLowerCase();
 								if(name.startsWith("kernel"))
 									name	= name.substring(6);
@@ -1081,7 +1081,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 									{
 										final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, result) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, result);
 //												System.out.println("multi creates factory: "+kernelmodel);
-										cms.createComponent(fname, kernelmodel, ci, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+										cms.createComponent(fname, kernelmodel, ci, ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
@@ -1097,12 +1097,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //														exception.printStackTrace();
 												resultAvailable(null);
 											}
-										})).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+										})).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
 //														System.out.println("Starting kernel6: " + kernelmodel);
-												findActiveKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+												findActiveKernel(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object result)
 													{
@@ -1128,11 +1128,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 															
 															if(SReflect.HAS_GUI)
 															{
-																final IResultListener typecounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(types.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+																final IResultListener typecounter = ia.getFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(types.length, true, ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 																{
 																	public void customResultAvailable(Object result)
 																	{
-																		MultiFactory.this.fireTypesAdded(types).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+																		MultiFactory.this.fireTypesAdded(types).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 																		{
 																			public void customResultAvailable(Object result)
 																			{
@@ -1199,7 +1199,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		System.out.println("searchPotentialURLs: "+rid+", "+rid);//potentialurls);
 		
 		final Future ret = new Future();
-		final IResultListener reslis = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		final IResultListener reslis = ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -1218,7 +1218,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					final URI uri = potentialuris.iterator().next();
 //					if(url.toString().indexOf("bdi")!=-1)
 //						System.out.println("searchPotentialURLs2: "+url);
-					quickKernelSearch(uri, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, String>>()
+					quickKernelSearch(uri, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, String>>()
 					{
 						public void resultAvailable(Map<String, String> kernelmap)
 						{
@@ -1369,7 +1369,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			return new Future(kernellocs);
 		
 		final Future<Map<String, String>> ret = new Future<Map<String, String>>();
-		final IResultListener kernelCounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(modellocs.size(), true,
+		final IResultListener kernelCounter = ia.getFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(modellocs.size(), true,
 			new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -1389,7 +1389,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			final String kernelloc = it2.next();
 			loadModel(kernelloc, null, rid, true)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IModelInfo>()
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IModelInfo>()
 			{
 				public void resultAvailable(final IModelInfo modelinfo)
 				{

@@ -197,7 +197,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-			IComponentManagementService cms = instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			// Todo: If remote remember subprocess and kill on cancel.
 
 			final CreationInfo	info = thread.hasPropertyValue("creation info")? 
@@ -211,7 +211,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			
 			IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
 				? (IComponentIdentifier)thread.getPropertyValue("parent")
-				: instance.getComponentIdentifier();
+				: instance.getIdentifier();
 			if(info.getParent()==null && parent!=null)
 				info.setParent(parent);
 			
@@ -222,7 +222,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //					System.out.println("parent is: "+parent.getAddresses());	
 
 			cms.createComponent(info, null, file)
-				.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 				protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	
 					
@@ -269,7 +269,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				{
 					// Hack!!! Ignore exception, when component already terminated.
 					if(!(exception instanceof ComponentTerminatedException)
-						|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
+						|| !instance.getIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 					{
 //								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 //								exception.printStackTrace();
@@ -281,7 +281,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				public String toString()
 				{
-					return "lis: "+instance.getComponentIdentifier()+" "+file;
+					return "lis: "+instance.getIdentifier()+" "+file;
 				}
 			}));
 		}

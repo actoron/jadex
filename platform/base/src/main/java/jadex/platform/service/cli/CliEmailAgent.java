@@ -103,12 +103,12 @@ public class CliEmailAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cliser");
+		IFuture<ICliService> clifut = agent.getFeature(IRequiredServicesFeature.class).getService("cliser");
 		clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Void>(ret)
 		{
 			public void customResultAvailable(final ICliService cliser)
 			{
-				IFuture<IEmailService> emlfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("emailser");
+				IFuture<IEmailService> emlfut = agent.getFeature(IRequiredServicesFeature.class).getService("emailser");
 				emlfut.addResultListener(new ExceptionDelegationResultListener<IEmailService, Void>(ret)
 				{
 					public void customResultAvailable(final IEmailService emailser)
@@ -177,7 +177,7 @@ public class CliEmailAgent
 		String content = eml.getContent();
 		if(content!=null)
 		{
-			IFuture<ICliService> clifut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cliser");
+			IFuture<ICliService> clifut = agent.getFeature(IRequiredServicesFeature.class).getService("cliser");
 			clifut.addResultListener(new ExceptionDelegationResultListener<ICliService, Email>(ret)
 			{
 				public void customResultAvailable(final ICliService cliser)

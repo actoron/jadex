@@ -63,7 +63,7 @@ public class TakePlanEnv
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getComponentDescription());
+		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getDescription());
 		grid.performSpaceAction("drop", params, lis);
 		fut.get();
 		

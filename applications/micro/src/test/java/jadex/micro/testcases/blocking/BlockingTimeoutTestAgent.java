@@ -37,7 +37,7 @@ public class BlockingTimeoutTestAgent extends JunitAgentTest
 		runTests(agent, tests);
 		runTests(agent, tests);	// perform tests twice
 
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), tests.toArray(new TestReport[tests.size()])));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), tests.toArray(new TestReport[tests.size()])));
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class BlockingTimeoutTestAgent extends JunitAgentTest
 	{
 		// Test if unused timeout timer entries are ignored.
 		final Future<String>	fut	= new Future<String>();
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(250, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(250, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -57,7 +57,7 @@ public class BlockingTimeoutTestAgent extends JunitAgentTest
 		});
 		fut.get(500);
 		final Future<String>	fut2	= new Future<String>();
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(250, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(250, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -66,7 +66,7 @@ public class BlockingTimeoutTestAgent extends JunitAgentTest
 			}
 		});
 		fut2.get(500);
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		tests.add(new TestReport("#1", "Test if unused timeout timer entries are ignored.", true, null));
 
 		// Test if wake up after timeout works.

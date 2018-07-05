@@ -853,7 +853,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
-		return getRegistry(ia.getComponentIdentifier());
+		return getRegistry(ia.getIdentifier());
 	}
 	
 	/**

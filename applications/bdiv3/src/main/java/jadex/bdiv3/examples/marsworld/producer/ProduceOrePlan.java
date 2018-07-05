@@ -83,7 +83,7 @@ public class ProduceOrePlan
 
 		try
 		{
-			IFuture<Collection<ICarryService>> fut = producer.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("carryser");
+			IFuture<Collection<ICarryService>> fut = producer.getAgent().getFeature(IRequiredServicesFeature.class).getServices("carryser");
 			Collection<ICarryService> ansers = fut.get();
 			
 			for(ICarryService anser: ansers)

@@ -57,7 +57,7 @@ public class ChatD1Agent
 				for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 				{
 					IChatService cs = it.next();
-					cs.message(agent.getComponentIdentifier().getName(), "Hello");
+					cs.message(agent.getIdentifier().getName(), "Hello");
 				}
 			}
 		});

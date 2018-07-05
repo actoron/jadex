@@ -114,7 +114,7 @@ public class RElement
 	 */
 	public RCapability getCapability()
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getCapability();
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public class RElement
 	 */
 	public RuleSystem getRuleSystem()
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 	
 	/** 

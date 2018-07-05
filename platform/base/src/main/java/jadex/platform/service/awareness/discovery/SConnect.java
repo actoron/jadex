@@ -45,7 +45,7 @@ public class SConnect
 		args.put("component", remotecid);
 		CreationInfo ci = new CreationInfo(args);
 		ci.setDaemon(true);
-		IComponentManagementService	cms	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		IComponentManagementService	cms	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 	}
 }

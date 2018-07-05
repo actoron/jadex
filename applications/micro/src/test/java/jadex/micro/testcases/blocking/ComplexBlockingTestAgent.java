@@ -48,11 +48,11 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
+		IStepService	step	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
 		
 //		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		IIntermediateFuture<Integer>	first	= step.performSteps(3, 1000);
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 //		System.out.println("Calling perform steps: "+agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		IIntermediateFuture<Integer>	second	= step.performSteps(3, 1000);
 
@@ -72,12 +72,12 @@ public class ComplexBlockingTestAgent extends JunitAgentTest
 		
 		if("[1, 1, 2, 2, 3, 3]".equals(steps.toString()))
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", true, null)}));
 		}
 		else
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test interleaved blocking.", false, "Wrong steps: "+steps)}));
 		}
 	}

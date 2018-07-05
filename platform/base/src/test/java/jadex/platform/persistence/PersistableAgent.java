@@ -42,24 +42,24 @@ public class PersistableAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IPersistenceService, Void>(ret)
 		{
 			public void customResultAvailable(IPersistenceService result)
 			{
-				IFuture<IPersistInfo> fut = result.snapshot(agent.getComponentIdentifier());
+				IFuture<IPersistInfo> fut = result.snapshot(agent.getIdentifier());
 				fut.addResultListener(new IResultListener<IPersistInfo>()
 				{
 					public void resultAvailable(IPersistInfo result)
 					{
 						System.out.println("Worked");
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", true, null)}));
 						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Micro agent that tries to persist itself.", exception)}));
 						ret.setResult(null);
 					}
 				});

@@ -58,7 +58,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	{
 //		System.out.println("Remote search command triggered: " + query.toString());
 		if((""+query.getServiceType()).indexOf("IClock")!=-1)
-			System.out.println("Executing requested remote search: "+access.getComponentIdentifier()+", "+query);
+			System.out.println("Executing requested remote search: "+access.getIdentifier()+", "+query);
 		
 //		// No recursive global search -> change global scope to platform, and owner to local platform.
 //		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
@@ -69,7 +69,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 ////			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
 //		}
 		
-		return access.getComponentFeature(IRequiredServicesFeature.class).searchServices(getQuery());				
+		return access.getFeature(IRequiredServicesFeature.class).searchServices(getQuery());				
 	}
 	
 	/**

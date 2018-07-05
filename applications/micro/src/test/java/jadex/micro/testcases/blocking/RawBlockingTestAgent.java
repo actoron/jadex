@@ -28,12 +28,12 @@ public class RawBlockingTestAgent extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		
 		cms.getComponentDescriptions().get();
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));
 	}
 }

@@ -30,7 +30,7 @@ public class SimpleTestAgent extends JunitAgentTest
 	{
 		TestReport	tr	= new TestReport("#1", "Simple micro test.");
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 

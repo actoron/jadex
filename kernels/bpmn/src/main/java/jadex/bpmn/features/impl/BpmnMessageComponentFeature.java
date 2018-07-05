@@ -46,7 +46,7 @@ public class BpmnMessageComponentFeature extends MessageComponentFeature
 	{
 //		System.out.println("rec msg: "+message);
 		
-		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 
 		// Iterate through process threads and dispatch message to first
 		// waiting and fitting one (filter check).

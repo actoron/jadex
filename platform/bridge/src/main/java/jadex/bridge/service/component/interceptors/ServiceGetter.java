@@ -91,7 +91,7 @@ public class ServiceGetter<T>
 				{
 					lastsearch = System.currentTimeMillis();
 					
-					component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(type, scope))
+					component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(type, scope))
 						.addResultListener(new IResultListener<T>()
 					{
 						public void resultAvailable(T result)

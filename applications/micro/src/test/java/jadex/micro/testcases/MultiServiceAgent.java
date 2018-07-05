@@ -54,12 +54,12 @@ public class MultiServiceAgent extends JunitAgentTest implements IAddService, IS
 		final Future<Void>	ret	= new Future<Void>();
 		final Future fut = new Future();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).getService("add").addResultListener(new DelegationResultListener(fut)
+		agent.getFeature(IRequiredServicesFeature.class).getService("add").addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IAddService	add	= (IAddService)result;
-				agent.getComponentFeature(IRequiredServicesFeature.class).getService("sub").addResultListener(new DelegationResultListener(fut)
+				agent.getFeature(IRequiredServicesFeature.class).getService("sub").addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -79,12 +79,12 @@ public class MultiServiceAgent extends JunitAgentTest implements IAddService, IS
 		
 		// Check result of service execution and store test result.
 		final TestReport	tr	= new TestReport("#1", "Test if multiple services can be used.");
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				tr.setSucceeded(true);
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}
@@ -92,7 +92,7 @@ public class MultiServiceAgent extends JunitAgentTest implements IAddService, IS
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed(exception.toString());
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 //				killAgent();
 				ret.setResult(null);
 			}

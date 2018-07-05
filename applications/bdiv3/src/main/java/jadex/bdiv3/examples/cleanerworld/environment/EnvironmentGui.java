@@ -124,7 +124,7 @@ public class EnvironmentGui	extends JFrame
 //					}
 //				});
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -137,7 +137,7 @@ public class EnvironmentGui	extends JFrame
 				
 //				System.out.println(((IPojoMicroAgent)ia).getPojoAgent().getClass().getClassLoader());
 							
-				final Environment env = ((EnvironmentLocalBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
+				final Environment env = ((EnvironmentLocalBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
 				
 //				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 				SwingUtilities.invokeLater(new Runnable()
@@ -429,7 +429,7 @@ public class EnvironmentGui	extends JFrame
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										final Environment env = ((EnvironmentLocalBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
+										final Environment env = ((EnvironmentLocalBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
 //										Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 										
 										Waste[] wastes = env.getWastes();

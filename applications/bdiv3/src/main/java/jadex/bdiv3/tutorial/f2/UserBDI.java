@@ -64,7 +64,7 @@ public class UserBDI
 					public void actionPerformed(ActionEvent e)
 					{
 						// Search a translation service
-						agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new IIntermediateResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)

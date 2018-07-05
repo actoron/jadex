@@ -36,18 +36,18 @@ public class TreeStressTestAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
-				int	depth	= ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();
+				int	depth	= ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();
 				if(depth>0)
 				{
 					Map	args	= new HashMap();
 					args.put("depth", Integer.valueOf(depth-1));
-					CreationInfo	ci	= new CreationInfo(args, agent.getComponentIdentifier());
+					CreationInfo	ci	= new CreationInfo(args, agent.getIdentifier());
 					for(int i=0; i<depth; i++)
 					{
 						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null);

@@ -35,7 +35,7 @@ public class DFTestPlan extends Plan
 	public void body()
 	{
 		int num = 1;
-		num = performTests(num, getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))); // test locally
+		num = performTests(num, getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))); // test locally
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class DFTestPlan extends Plan
 		getLogger().info(tr.getDescription());
 		try
 		{
-			df.register(new DFComponentDescription(getAgent().getComponentIdentifier(), SERVICES, null, null, null, lt)).get();
+			df.register(new DFComponentDescription(getAgent().getIdentifier(), SERVICES, null, null, null, lt)).get();
 			getLogger().info(" register ok.");
 			tr.setSucceeded(true);
 		}
@@ -122,7 +122,7 @@ public class DFTestPlan extends Plan
 		getLogger().info(tr.getDescription());
 		try
 		{
-			df.deregister(new DFComponentDescription(getAgent().getComponentIdentifier())).get();
+			df.deregister(new DFComponentDescription(getAgent().getIdentifier())).get();
 			getLogger().info(" deregister ok.");
 			tr.setSucceeded(true);
 		}

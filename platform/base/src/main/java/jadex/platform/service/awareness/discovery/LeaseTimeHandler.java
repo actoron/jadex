@@ -129,7 +129,7 @@ public class LeaseTimeHandler
 	 */
 	public void startRemoveBehavior()
 	{
-		agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getMicroAgent().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -190,7 +190,7 @@ public class LeaseTimeHandler
 			{
 				try
 				{
-					agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+					agent.getMicroAgent().getFeature(IExecutionFeature.class).scheduleStep(step);
 				}
 				catch(ComponentTerminatedException e)
 				{

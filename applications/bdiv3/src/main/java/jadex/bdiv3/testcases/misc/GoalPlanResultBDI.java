@@ -66,7 +66,7 @@ public class GoalPlanResultBDI
 	@AgentBody
 	public void body()
 	{
-		String res1 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();
+		String res1 = (String)agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();
 		TestReport	tr1	= new TestReport("#1", "Test if goal result set/get works with field.");
 		if("result".equals(res1))
 		{			
@@ -76,7 +76,7 @@ public class GoalPlanResultBDI
 		{
 			tr1.setReason("Result not received "+res1);
 		}
-		String res2 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BGoal()).get();
+		String res2 = (String)agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BGoal()).get();
 		
 		
 		TestReport	tr2	= new TestReport("#1", "Test if goal result set/get works with method.");
@@ -90,7 +90,7 @@ public class GoalPlanResultBDI
 		}
 		
 		System.out.println(res1+" "+res2);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 	
 	/**

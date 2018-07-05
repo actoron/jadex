@@ -69,7 +69,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Map properties, Boolean simulation)
 	{
-		super(component.getComponentIdentifier(), IClockService.class, properties);
+		super(component.getIdentifier(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
 		this.component = component;
@@ -313,7 +313,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		final Future<Void> ret = new Future<Void>();
 
-		threadpool = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IThreadPoolService.class));
+		threadpool = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IThreadPoolService.class));
 //		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 //		System.out.println("clock: "+ServiceCall.get);
@@ -330,7 +330,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 				{
 					public void customResultAvailable(Void result)
 					{
-						ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 						settings.registerPropertiesProvider("clockservice", ClockService.this)
 							.addResultListener(new DelegationResultListener<Void>(ret));
 						
@@ -378,7 +378,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			public void customResultAvailable(Void result)
 			{
-				ISettingsService	settings	= component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 				settings.deregisterPropertiesProvider("clockservice")
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{

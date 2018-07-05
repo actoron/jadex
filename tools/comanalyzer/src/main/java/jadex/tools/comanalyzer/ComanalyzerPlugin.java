@@ -1843,7 +1843,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 								@Override
 								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
 								{
-									return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class))
+									return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getFeature(IMessageFeature.class))
 										.getMessageEvents();
 								}
 							});
@@ -1858,7 +1858,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 								@Override
 								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
 								{
-									final IRequiredServicesFeature	feat	= ia.getComponentFeature0(IRequiredServicesFeature.class);
+									final IRequiredServicesFeature	feat	= ia.getFeature0(IRequiredServicesFeature.class);
 									if(feat instanceof IInternalServiceMonitoringFeature)
 									{
 										return (ISubscriptionIntermediateFuture)((IInternalServiceMonitoringFeature)feat).getServiceEvents();

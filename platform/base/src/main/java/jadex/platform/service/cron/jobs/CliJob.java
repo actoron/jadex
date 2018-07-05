@@ -86,8 +86,8 @@ public class CliJob extends CronJob<String>
 			final SubscriptionIntermediateFuture<String> ret = new SubscriptionIntermediateFuture<String>();
 //			final Future<String> ret = new Future<String>();
 			final IInternalAccess ia = args.getFirstEntity();
-			ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICliService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<ICliService>()
+			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICliService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<ICliService>()
 			{
 				public void resultAvailable(ICliService clis)
 				{

@@ -42,7 +42,7 @@ public class FireflyAgent
 	@AgentCreated
 	public void agentCreated()
 	{
-		System.out.println("firefly created: "+agent.getComponentIdentifier());
+		System.out.println("firefly created: "+agent.getIdentifier());
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class FireflyAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		System.out.println("firefly body: "+agent.getComponentIdentifier());
+		System.out.println("firefly body: "+agent.getIdentifier());
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
@@ -69,7 +69,7 @@ public class FireflyAgent
 						if(space==null)
 							return IFuture.DONE;
 						
-						ISpaceObject avatar = space.getAvatar(agent.getComponentDescription());
+						ISpaceObject avatar = space.getAvatar(agent.getDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 						double dir = ((Number)avatar.getProperty("direction")).doubleValue();
 						int clock = ((Number)avatar.getProperty("clock")).intValue();
@@ -138,7 +138,7 @@ public class FireflyAgent
 						params.put(MoveAction.PARAMETER_CLOCK, Integer.valueOf(clock));
 						space.performSpaceAction("move", params, null);
 						
-						agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
+						agent.getFeature(IExecutionFeature.class).waitForTick(this);
 						return IFuture.DONE;
 					}
 					
@@ -148,7 +148,7 @@ public class FireflyAgent
 					}
 				};
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForTick(step);
+				agent.getFeature(IExecutionFeature.class).waitForTick(step);
 			}
 		});				
 		

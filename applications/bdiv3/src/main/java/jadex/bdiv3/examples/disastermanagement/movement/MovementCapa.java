@@ -41,7 +41,7 @@ public class MovementCapa implements IEnvAccess
 	protected ContinuousSpace2D env = (ContinuousSpace2D)EnvironmentService.getSpace(capa.getAgent(), "my2dspace").get();
 	
 	/** The environment. */
-	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
+	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getDescription(), capa.getAgent().getModel().getFullName());
 
 	/** The home position (=first position). */
 	protected IVector2 homepos = myself!=null? (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION): null;

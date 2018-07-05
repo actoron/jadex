@@ -51,7 +51,7 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IMultiplexExampleService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("ms");
+		IFuture<IMultiplexExampleService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("ms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IMultiplexExampleService, Void>(ret)
 		{
 			public void customResultAvailable(IMultiplexExampleService ser)
@@ -67,7 +67,7 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 					{
 //						System.out.println("countlis: "+agent.getComponentFeature(IExecutionFeature.class).isComponentThread());
 						
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);
 					}
 

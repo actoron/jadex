@@ -48,14 +48,14 @@ public class CapabilityPojoWrapper implements ICapability
 	public <T> void addBeliefListener(String name, final IBeliefListener<T> listener)
 	{
 		name = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name: name;
-		IBDIAgentFeature bdif = agent.getComponentFeature0(IBDIAgentFeature.class);
+		IBDIAgentFeature bdif = agent.getFeature0(IBDIAgentFeature.class);
 		if(bdif!=null)
 		{
 			bdif.addBeliefListener(name, listener);
 		}
 		else
 		{
-			IBDIXAgentFeature bdixf = agent.getComponentFeature0(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdixf = agent.getFeature0(IBDIXAgentFeature.class);
 			if(bdixf.getBeliefbase().containsBelief(name))
 			{
 				bdixf.getBeliefbase().getBelief(name).addBeliefListener(listener);
@@ -75,14 +75,14 @@ public class CapabilityPojoWrapper implements ICapability
 	public <T> void removeBeliefListener(String name, IBeliefListener<T> listener)
 	{
 		name = capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name: name;
-		IBDIAgentFeature bdif = agent.getComponentFeature0(IBDIAgentFeature.class);
+		IBDIAgentFeature bdif = agent.getFeature0(IBDIAgentFeature.class);
 		if(bdif!=null)
 		{
 			bdif.removeBeliefListener(capa!=null ? capa+MElement.CAPABILITY_SEPARATOR+name : name, listener);
 		}
 		else
 		{
-			IBDIXAgentFeature bdixf = agent.getComponentFeature0(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdixf = agent.getFeature0(IBDIXAgentFeature.class);
 			if(bdixf.getBeliefbase().containsBelief(name))
 			{
 				bdixf.getBeliefbase().getBelief(name).removeBeliefListener(listener);
@@ -103,11 +103,11 @@ public class CapabilityPojoWrapper implements ICapability
 	{
 		return new InternalAccessAdapter(agent)
 		{
-			public <T> T getComponentFeature(Class<? extends T> type)
+			public <T> T getFeature(Class<? extends T> type)
 			{
 				if(type.equals(IRequiredServicesFeature.class))
 				{
-					return (T)new RequiredServicesFeatureAdapter((IRequiredServicesFeature)super.getComponentFeature(type))
+					return (T)new RequiredServicesFeatureAdapter((IRequiredServicesFeature)super.getFeature(type))
 					{
 						public String rename(String name)
 						{
@@ -117,7 +117,7 @@ public class CapabilityPojoWrapper implements ICapability
 				}
 				else
 				{
-					return super.getComponentFeature(type);
+					return super.getFeature(type);
 				}
 			}
 		};

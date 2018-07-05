@@ -48,18 +48,18 @@ public class ThreadingTestAgent extends TestAgent
 			maxLocal /=100;
 			maxRemote /=100;
 		}
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1, maxLocal).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1, maxLocal).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test rmeote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2, maxRemote).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2, maxRemote).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -79,8 +79,8 @@ public class ThreadingTestAgent extends TestAgent
 		
 		System.out.println("Test local: "+agent.getModel().getFullName());
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno, max, true)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		performTest(agent.getIdentifier().getRoot(), testno, max, true)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
 			{
@@ -100,7 +100,7 @@ public class ThreadingTestAgent extends TestAgent
 		
 		System.out.println("Test remote: "+agent.getModel().getFullName());
 		
-		setupRemotePlatform(false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -108,7 +108,7 @@ public class ThreadingTestAgent extends TestAgent
 				System.out.println("Test remote1: "+agent.getModel().getFullName());
 				
 				performTest(platform.getComponentIdentifier(), testno, max, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -162,7 +162,7 @@ public class ThreadingTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if "+(local? "local": "remote")+" thread decoupling works.");
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
 			public void customResultAvailable(final ITestService ts)

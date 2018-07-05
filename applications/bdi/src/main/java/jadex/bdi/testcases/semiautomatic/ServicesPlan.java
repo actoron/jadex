@@ -25,12 +25,12 @@ public class ServicesPlan extends Plan
 		PublishInfo pi = new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class);
 //		ProvidedServiceInfo	psi	= new ProvidedServiceInfo();
 //		psi.setPublish(new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class));
-		getAgent().getComponentFeature(IProvidedServicesFeature.class).addService("ser", IPrintHelloService.class, new PrintHelloService(), pi, null);
+		getAgent().getFeature(IProvidedServicesFeature.class).addService("ser", IPrintHelloService.class, new PrintHelloService(), pi, null);
 		
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
+		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
 			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL));
 		phs.printHello();
 		

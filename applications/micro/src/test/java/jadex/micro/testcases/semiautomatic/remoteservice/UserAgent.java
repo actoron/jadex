@@ -52,13 +52,13 @@ public class UserAgent
 		});
 		
 		// get remote management service 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(final IComponentManagementService cms)
 			{
 				// get remote management service and fetch service via rms.getProxy()
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new IResultListener<IRemoteServiceManagementService>()
 				{
 					public void resultAvailable(IRemoteServiceManagementService rms)
@@ -67,8 +67,8 @@ public class UserAgent
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
-						IFuture<IMathService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
-						fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMathService>()
+						IFuture<IMathService> fut = rms.getServiceProxy(agent.getIdentifier(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMathService>()
 						{
 							public void resultAvailable(IMathService service)
 							{
@@ -95,7 +95,7 @@ public class UserAgent
 		});
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 			.addResultListener(new IResultListener<IMathService>()
 		{
 			public void resultAvailable(IMathService service)

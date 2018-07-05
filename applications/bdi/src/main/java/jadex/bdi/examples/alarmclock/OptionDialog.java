@@ -70,7 +70,7 @@ public class OptionDialog extends JDialog
 			@Classname("create")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				final Settings orig_sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 				final Settings sets = (Settings)orig_sets.clone();
 				
@@ -252,7 +252,7 @@ public class OptionDialog extends JDialog
 											@Classname("alarms")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+												IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 												bia.getBeliefbase().getBelief("settings").setFact(ns);
 												bia.getBeliefbase().getBeliefSet("alarms").removeFacts();
 												bia.getBeliefbase().getBeliefSet("alarms").addFacts(ns.getAlarms());

@@ -80,7 +80,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 */
 	public void	init(ITransportHandler<SocketChannel> handler)
 	{
-		tps = ((AbstractComponentFeature)handler.getAccess().getComponentFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
+		tps = ((AbstractComponentFeature)handler.getAccess().getFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
 		this.handler	= handler;
 	}
 		
@@ -395,7 +395,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		{
 			if(shutdown)
 			{
-				throw new IllegalStateException("Transport already shut down: "+this+", "+handler.getAccess().getComponentIdentifier());
+				throw new IllegalStateException("Transport already shut down: "+this+", "+handler.getAccess().getIdentifier());
 			}
 			if(!running)
 			{

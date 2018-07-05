@@ -33,7 +33,7 @@ public class SearchServiceProviderAgent implements ISearchService
 	public IFuture<ILocalService> searchService(String dummy)
 	{
 //		System.out.println("searcher");
-		IFuture<ILocalService>	ret	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("local");
+		IFuture<ILocalService>	ret	= agent.getFeature(IRequiredServicesFeature.class).getService("local");
 		return ret;
 	}
 }

@@ -50,7 +50,7 @@ public class PlanContextConditionBDI
 	{
 		TestReport tr = new TestReport("#1", "Test if context condition works.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -62,7 +62,7 @@ public class PlanContextConditionBDI
 				
 		try
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
 		}
 		catch(Exception e)
 		{
@@ -76,7 +76,7 @@ public class PlanContextConditionBDI
 			}
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 	

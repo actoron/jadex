@@ -463,7 +463,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ownerid	= new BasicComponentIdentifier((String)owner);
 					else
 //						ownerid	= ces.createComponentIdentifier((String)owner, true);
-						ownerid	= new BasicComponentIdentifier((String)owner, ia.getComponentIdentifier());
+						ownerid	= new BasicComponentIdentifier((String)owner, ia.getIdentifier());
 					
 					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
 					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
@@ -2887,7 +2887,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 
 		final Future<Void>	ret	= new Future<Void>();
 		
-		initSpace().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+		initSpace().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -2924,7 +2924,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //					}
 //				});
 				
-				final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
+				final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 				{
 					public boolean filter(IMonitoringEvent obj)
 					{

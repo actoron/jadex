@@ -26,7 +26,7 @@ public class PlayerAgent
 	{
 //		final ILotteryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		final ILotteryService ls = (ILotteryService)SFuture.getFirstResultAndTerminate(
-			agent.getComponentFeature(IRequiredServicesFeature.class).addQuery("ls"));
+			agent.getFeature(IRequiredServicesFeature.class).addQuery("ls"));
 		
 //		ILotteryService ls = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<ILotteryService>, Void>()
 //		{
@@ -54,7 +54,7 @@ public class PlayerAgent
 			{
 //				System.out.println("Item offered: "+item);
 				
-				System.out.println(agent.getComponentIdentifier()+": "+(ls.claimItem(item).get()? "I won item: ": "I did not win item: ")+item);
+				System.out.println(agent.getIdentifier()+": "+(ls.claimItem(item).get()? "I won item: ": "I did not win item: ")+item);
 			}
 			
 			public void finished()

@@ -153,14 +153,14 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //						System.out.println("execute plan: "+rplan);
 						
 			//			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-						ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addPlan(rplan);
+						ia.getFeature(IInternalBDIAgentFeature.class).getCapability().addPlan(rplan);
 						
 						IPlanBody body = rplan.getBody();
 						body.executePlan().addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-								ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().removePlan(rplan);
+								ia.getFeature(IInternalBDIAgentFeature.class).getCapability().removePlan(rplan);
 								Object reason = rplan.getReason();
 								if(reason instanceof RProcessableElement)
 								{

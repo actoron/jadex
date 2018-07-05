@@ -69,10 +69,10 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 //				System.out.println("injecting call cause: "+call.getCause());
 				event.setCause(call.getCause());
 			}
-			else if(getComponent().getComponentDescription().getCause()!=null)
+			else if(getComponent().getDescription().getCause()!=null)
 			{
 //				System.out.println("injecting root cause: "+call.getCause());
-				event.setCause(getComponent().getComponentDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
+				event.setCause(getComponent().getDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
 			}
 		}
 		
@@ -235,7 +235,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public PublishEventLevel getPublishEmitLevelMonitoring()
 	{
-		return getComponent().getComponentDescription().getMonitoring() != null ? getComponent().getComponentDescription().getMonitoring() : PublishEventLevel.OFF;
+		return getComponent().getDescription().getMonitoring() != null ? getComponent().getDescription().getMonitoring() : PublishEventLevel.OFF;
 		// return emitlevelmon;
 	}
 	
@@ -264,7 +264,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		ret.setTerminationCommand(tcom);
 
 		// Signal that subscription has been done
-		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
+		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
 			PublishEventLevel.COARSE);
 		boolean post = false;
 		try
@@ -335,7 +335,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
 		List<IMonitoringEvent> ret = null;
-		IExecutionFeature exef = getComponent().getComponentFeature0(IExecutionFeature.class);
+		IExecutionFeature exef = getComponent().getFeature0(IExecutionFeature.class);
 		if(exef instanceof ExecutionComponentFeature)
 			ret = ((ExecutionComponentFeature)exef).getCurrentStateEvents();
 		return ret;

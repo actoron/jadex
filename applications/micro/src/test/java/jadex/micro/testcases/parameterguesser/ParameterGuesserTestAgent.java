@@ -42,7 +42,7 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 	public IFuture<Void> body()
 	{
 		TestReport tr1 = test(1, ProviderAgent.class.getName()+".class");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
 		return IFuture.DONE;
 	}
 
@@ -57,11 +57,11 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, " Test if the parameter guesser works correctly when using injection annotations.");
 		try
 		{
-			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
+			IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
 //			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
-			IComponentIdentifier cid = cms.createComponent(model, new CreationInfo(agent.getComponentIdentifier())).getFirstResult();
+			IComponentIdentifier cid = cms.createComponent(model, new CreationInfo(agent.getIdentifier())).getFirstResult();
 
-			IInjectionTestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class, cid)).get();
+			IInjectionTestService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class, cid)).get();
 
 			Object[] meta = ser.getInjectionClasses();
 			Object[] injections = ser.getInjections();

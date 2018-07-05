@@ -72,7 +72,7 @@ public class ServiceCallPlan
 		final Future<Void> ret = new Future<Void>();
 
 //		IIntermediateFuture<Object> services = agent.getServiceContainer().getServices(service);
-		IIntermediateFuture<Object> services = agent.getComponentFeature(IRequiredServicesFeature.class).getServices(service);
+		IIntermediateFuture<Object> services = agent.getFeature(IRequiredServicesFeature.class).getServices(service);
 		
 		services.addResultListener(new IIntermediateResultListener<Object>()
 		{
@@ -88,7 +88,7 @@ public class ServiceCallPlan
 					Method tmp;
 					if(method==null)
 					{
-						RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getServiceInfo(service);
+						RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo(service);
 						Class<?> cl = rsi.getType().getType(agent.getClassLoader());
 						tmp = cl.getDeclaredMethods()[0];
 					}

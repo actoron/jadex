@@ -62,7 +62,7 @@ public class AmbulanceBDI implements IEnvAccess
 	{
 		if("default".equals(agent.getConfiguration()))
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new AmbulancePlan());
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new AmbulancePlan());
 		}
 	}
 	
@@ -92,7 +92,7 @@ public class AmbulanceBDI implements IEnvAccess
 		public static GoHome checkCreate(AmbulanceBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
-			if(capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
+			if(capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
 				&& capa.getEnvironment().getDistance(capa.getHomePosition(), capa.getPosition()).getAsDouble()>0.001)
 			{
 				return new GoHome(capa.getHomePosition());
@@ -111,7 +111,7 @@ public class AmbulanceBDI implements IEnvAccess
 		public boolean checkDrop(AmbulanceBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
-			boolean ret = capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals().size()>1;
+			boolean ret = capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals().size()>1;
 //			System.out.println("dropping: "+this);
 			return ret;
 		}
@@ -173,7 +173,7 @@ public class AmbulanceBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(TreatVictims.class).size()>1;
+				capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals(TreatVictims.class).size()>1;
 			if(ret)
 				System.out.println("dropping treat victim: "+disaster);
 			return ret;

@@ -69,13 +69,13 @@ public class ClientAgent
 
 	private ISubscriptionIntermediateFuture<ICountdownService> searchCdServices()
 	{
-		IIntermediateFuture<ICountdownService> searchServices = access.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+		IIntermediateFuture<ICountdownService> searchServices = access.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 		searchServices.addIntermediateResultListener(cdService -> {
 			subscription.addIntermediateResult(cdService);
 		}, () -> {
 			System.out.println("Search finished. Re-scheduling search.");
 
-			access.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
+			access.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 			{
 
 				@Override

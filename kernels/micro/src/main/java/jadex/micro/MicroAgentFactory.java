@@ -90,7 +90,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public MicroAgentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getIdentifier(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.fproperties = properties;
@@ -142,7 +142,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getIdentifier();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -530,6 +530,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 }

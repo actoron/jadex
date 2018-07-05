@@ -197,13 +197,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		// todo: also set last call in future
 		
 		// TODO: synchronized remote methods
-		if(!comp.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!comp.getFeature(IExecutionFeature.class).isComponentThread())
 		{
-			return comp.getComponentFeature(IExecutionFeature.class).scheduleStep(new ITypedComponentStep<Object>()
+			return comp.getFeature(IExecutionFeature.class).scheduleStep(new ITypedComponentStep<Object>()
 			{
 				public IFuture<Object> execute(IInternalAccess ia)
 				{
-					return ((IInternalRemoteExecutionFeature)comp.getComponentFeature(IRemoteExecutionFeature.class))
+					return ((IInternalRemoteExecutionFeature)comp.getFeature(IRemoteExecutionFeature.class))
 						.executeRemoteMethod(pr.getRemoteReference(), method, args);
 				}
 				
@@ -216,7 +216,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		}
 		else
 		{
-			return ((IInternalRemoteExecutionFeature)comp.getComponentFeature(IRemoteExecutionFeature.class))
+			return ((IInternalRemoteExecutionFeature)comp.getFeature(IRemoteExecutionFeature.class))
 				.executeRemoteMethod(pr.getRemoteReference(), method, args);
 		}
 	}

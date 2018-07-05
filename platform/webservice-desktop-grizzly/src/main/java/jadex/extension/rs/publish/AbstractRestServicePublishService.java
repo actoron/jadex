@@ -201,11 +201,11 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		final Future<Void> ret = new Future<Void>();
 		
 		ClassLoader cl = null;
-		ILibraryService ls = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, Binding.SCOPE_PLATFORM));
-		if (serviceid.getProviderId().getPlatformName().equals(component.getComponentIdentifier().getPlatformName()))
+		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, Binding.SCOPE_PLATFORM));
+		if (serviceid.getProviderId().getPlatformName().equals(component.getIdentifier().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
-			IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
+			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
 			IComponentDescription desc = cms.getComponentDescription(serviceid.getProviderId()).get();
 			cl = ls.getClassLoader(desc.getResourceIdentifier()).get();
 		}

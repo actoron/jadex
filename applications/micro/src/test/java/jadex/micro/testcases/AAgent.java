@@ -35,11 +35,11 @@ public class AAgent implements IAService
 	@AgentCreated
 	public IFuture<Void> test()
 	{
-		boolean ext = !agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		boolean ext = !agent.getFeature(IExecutionFeature.class).isComponentThread();
 		String reason = ext? "Wrong thread: "+Thread.currentThread(): null;
 		List<TestReport> tests = new ArrayList<TestReport>();
 		tests.add(new TestReport("#A1", "Test if service is called on component thread.", !ext, reason));
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testcases", tests);
 		
 //		System.out.println("called service");
 		return IFuture.DONE;

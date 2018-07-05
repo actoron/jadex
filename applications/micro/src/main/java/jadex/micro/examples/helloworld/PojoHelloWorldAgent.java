@@ -52,7 +52,7 @@ public class PojoHelloWorldAgent
 //		});
 		
 		System.out.println(text);
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000).get();
 		System.out.println("Good bye world.");
 		agent.killComponent();
 	}

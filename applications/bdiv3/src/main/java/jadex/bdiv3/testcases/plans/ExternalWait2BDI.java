@@ -49,12 +49,12 @@ public class ExternalWait2BDI
 			
 			System.out.println("before waiting");
 			
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess args)
 				{
 					System.out.println("start waiting...");
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000)
+					agent.getFeature(IExecutionFeature.class).waitForDelay(3000)
 						.addResultListener(new DelegationResultListener<Void>(fut, true));
 					return fut;
 				}
@@ -100,6 +100,6 @@ public class ExternalWait2BDI
 		
 		if(!tr.isFinished())
 				tr.setFailed("Plan not activated");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

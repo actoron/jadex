@@ -38,8 +38,8 @@ public class ShopBDI
 	
 	/** The customer capability. */
 	@Capability(beliefmapping=@Mapping("money"))
-	protected ShopCapa shopcap	= new ShopCapa((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("shopname"), 
-		(List<ItemInfo>)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("catalog"));
+	protected ShopCapa shopcap	= new ShopCapa((String)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("shopname"), 
+		(List<ItemInfo>)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("catalog"));
 	
 	/** The money. */
 	@Belief

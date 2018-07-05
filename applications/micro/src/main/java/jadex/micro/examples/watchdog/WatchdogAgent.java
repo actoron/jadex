@@ -57,9 +57,9 @@ public class WatchdogAgent	implements IWatchdogService
 		try
 		{
 			this.watchdogs	= new LinkedHashMap();
-			final long	delay	= ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
+			final long	delay	= ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 			
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -70,7 +70,7 @@ public class WatchdogAgent	implements IWatchdogService
 						public void resultAvailable(Object result)
 						{
 							// Pinging finished: Search for new watchdogs.
-							agent.getComponentFeature(IRequiredServicesFeature.class).getServices("watchdogs").addResultListener(new IResultListener()
+							agent.getFeature(IRequiredServicesFeature.class).getServices("watchdogs").addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -87,7 +87,7 @@ public class WatchdogAgent	implements IWatchdogService
 										}
 									}
 									
-									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+									agent.getFeature(IExecutionFeature.class).waitForDelay(delay, step);
 								}
 								
 								public void exceptionOccurred(Exception exception)
@@ -146,7 +146,7 @@ public class WatchdogAgent	implements IWatchdogService
 	 */
 	public String	getInfo()
 	{
-		return agent.getComponentIdentifier().getName();
+		return agent.getIdentifier().getName();
 	}
 	
 	/**

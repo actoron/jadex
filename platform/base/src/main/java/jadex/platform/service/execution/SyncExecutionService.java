@@ -73,7 +73,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public SyncExecutionService(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IExecutionService.class, properties);
+		super(provider.getIdentifier(), IExecutionService.class, properties);
 
 		this.provider = provider;
 		this.state	= State.CREATED;
@@ -183,7 +183,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		{
 			public void customResultAvailable(Void v)
 			{
-				IThreadPoolService	result	= ((AbstractComponentFeature)provider.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				IThreadPoolService	result	= ((AbstractComponentFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 				executor = new Executor(result, new IExecutable()
 				{
 					public boolean execute()

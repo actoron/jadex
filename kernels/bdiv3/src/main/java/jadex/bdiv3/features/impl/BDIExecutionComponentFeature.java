@@ -31,8 +31,8 @@ public class BDIExecutionComponentFeature extends ExecutionComponentFeature
 		
 		// Evaluate conditions in addition to executing steps.
 		boolean	again = false;
-		IInternalBDIAgentFeature bdif = getComponent().getComponentFeature(IInternalBDIAgentFeature.class);
-		boolean inited = ((IInternalBDILifecycleFeature)getComponent().getComponentFeature(ILifecycleComponentFeature.class)).isInited();
+		IInternalBDIAgentFeature bdif = getComponent().getFeature(IInternalBDIAgentFeature.class);
+		boolean inited = ((IInternalBDILifecycleFeature)getComponent().getFeature(ILifecycleComponentFeature.class)).isInited();
 		if(inited && bdif.getRuleSystem()!=null && bdif.getRuleSystem().isEventAvailable())
 		{
 //			System.out.println("executeCycle.PAE start");

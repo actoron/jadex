@@ -130,7 +130,7 @@ public class JCCAgent	implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 					.addResultListener(new TimeoutIntermediateResultListener<IComponentManagementService>(RETRY_DELAY, agent.getExternalAccess(),
 						new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
@@ -173,7 +173,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_DELAY, JCCAgent.this, true)
+							agent.getFeature(IExecutionFeature.class).waitForDelay(RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -183,7 +183,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
+							agent.getFeature(IExecutionFeature.class).waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -205,7 +205,7 @@ public class JCCAgent	implements IComponentStep<Void>
 		if(cc!=null)
 		{
 			cc.shutdown()
-				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{
@@ -257,7 +257,7 @@ public class JCCAgent	implements IComponentStep<Void>
 					RegistryComponentPlugin.class.getName()
 	//				DeployerPlugin.class.getName()
 				},
-			saveonexit).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+			saveonexit).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{

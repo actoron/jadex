@@ -34,7 +34,7 @@ public class ProServiceDetectTestAgent extends JunitAgentTest implements ITestSe
 	{
 		// test if agent has the provided service
 		TestReport tr = new TestReport("#1", "Test if provided service is present.");
-		IService iser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(ITestService.class);
+		IService iser = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(ITestService.class);
 		if(iser==null)
 		{
 			tr.setFailed("Auto provided service not found.");
@@ -43,7 +43,7 @@ public class ProServiceDetectTestAgent extends JunitAgentTest implements ITestSe
 		{
 			tr.setSucceeded(true);
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 	

@@ -63,14 +63,14 @@ public class ChatE5Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
+		IFuture<IRegistryServiceE3>	regservice	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 		{
 			public void resultAvailable(final IRegistryServiceE3 rs)
 			{
-				rs.register(agent.getComponentIdentifier(), nickname);
+				rs.register(agent.getIdentifier(), nickname);
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -86,13 +86,13 @@ public class ChatE5Agent
 								}
 								else
 								{
-									agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid))
+									agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid))
 										.addResultListener(new DefaultResultListener<IChatService>()
 									{
 										public void resultAvailable(IChatService cs)
 										{
 											System.out.println("is on: "+IComponentIdentifier.LOCAL.get());
-											cs.message(agent.getComponentIdentifier().toString(), "Private hello from: "+nickname);
+											cs.message(agent.getIdentifier().toString(), "Private hello from: "+nickname);
 										}
 									});
 								}

@@ -59,7 +59,7 @@ public class NullTagAgent extends JunitAgentTest
 		}
 		results.add(tr1);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}

@@ -51,7 +51,7 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	{
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 		for(IComponentIdentifier proxy: proxies)
 		{
 			IFuture<Map<String, Object>>	kill	= cms.destroyComponent(proxy);
@@ -86,7 +86,7 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 				
 				// inverse proxy from remote to local.
 				Starter.createProxy(remote, agent.getExternalAccess())
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{

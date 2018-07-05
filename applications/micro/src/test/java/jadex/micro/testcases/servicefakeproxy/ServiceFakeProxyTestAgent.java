@@ -60,7 +60,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		TestReport tr1 = new TestReport("#1", "Test if local service proxy can be created");
 		try 
 		{
-			IComponentManagementService cms = getServiceProxy(agent, agent.getComponentIdentifier().getRoot(), IComponentManagementService.class);
+			IComponentManagementService cms = getServiceProxy(agent, agent.getIdentifier().getRoot(), IComponentManagementService.class);
 			IComponentDescription[] descs = cms.getComponentDescriptions().get();
 			System.out.println(Arrays.toString(descs));
 			tr1.setSucceeded(true);
@@ -98,7 +98,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			tr1.setFailed(e.getMessage());
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 		return IFuture.DONE;
 	}
 	
@@ -110,10 +110,10 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 	{				
 		S ret = null;
 		
-		boolean local = component.getComponentIdentifier().getRoot().equals(providerid.getRoot());
+		boolean local = component.getIdentifier().getRoot().equals(providerid.getRoot());
 		if(local)
 		{
-			ret = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype, providerid));
+			ret = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype, providerid));
 		}
 		else
 		{

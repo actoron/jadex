@@ -33,7 +33,7 @@ public class UserAgent
     public void init() 
     {
         System.out.println("Agent created");
-        IFuture<Collection<ITestService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("testService");
+        IFuture<Collection<ITestService>> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("testService");
         Collection<ITestService> sers = fut.get();
         System.out.println("fetched all available services: "+sers.size());
     }

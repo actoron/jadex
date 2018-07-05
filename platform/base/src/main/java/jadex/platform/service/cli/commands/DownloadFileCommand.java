@@ -85,7 +85,7 @@ public class DownloadFileCommand extends ACliCommand
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				getDeploymentService(ia, p)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, String>(ret)
+					.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, String>(ret)
 //					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
 				{
 					public void customResultAvailable(final IFileTransferService ds)
@@ -144,7 +144,7 @@ public class DownloadFileCommand extends ACliCommand
 								}
 							});
 							
-							sic.writeToOutputStream(fos, comp).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							sic.writeToOutputStream(fos, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -188,8 +188,8 @@ public class DownloadFileCommand extends ACliCommand
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL))
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
+			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)
 				{
@@ -244,8 +244,8 @@ public class DownloadFileCommand extends ACliCommand
 		}
 		else
 		{
-			ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
+			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
 		}
 		
 		return ret;

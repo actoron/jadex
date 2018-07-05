@@ -58,7 +58,7 @@ public class JavaWrapperTestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IJavaWrapperService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("wrapperservice");
+		IFuture<IJavaWrapperService>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("wrapperservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IJavaWrapperService, Void>(ret)
 		{
 			public void customResultAvailable(IJavaWrapperService result)
@@ -70,7 +70,7 @@ public class JavaWrapperTestAgent
 				{
 					public void customResultAvailable(Collection<TestReport> results)
 					{
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
 						ret.setResult(null);
 					}
 				});
@@ -243,7 +243,7 @@ public class JavaWrapperTestAgent
 			
 			File	url	= new File("../jadex-platform-extension-management/src/test/testapp/testapp-0.0.1.jar").getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getComponentIdentifier().getRoot(), url.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getIdentifier().getRoot(), url.toURI().toURL()), null);
 			
 			wrapperservice.executeJava(rid, null)
 				.addResultListener(new IResultListener<Void>()
@@ -283,7 +283,7 @@ public class JavaWrapperTestAgent
 			
 			File	url	= new File("../jadex-platform-extension-management/src/test/testapp/testapp-0.0.1.jar").getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getComponentIdentifier().getRoot(), url.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getIdentifier().getRoot(), url.toURI().toURL()), null);
 			
 			wrapperservice.executeJava(rid, new String[]{"fail"})
 				.addResultListener(new IResultListener<Void>()

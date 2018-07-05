@@ -40,7 +40,7 @@ public class InformNewTargetPlan
 	{
 		try
 		{
-			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices("targetser");
+			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getFeature(IRequiredServicesFeature.class).getServices("targetser");
 			Collection<ITargetAnnouncementService> ansers = fut.get();
 			
 			for(ITargetAnnouncementService anser: ansers)

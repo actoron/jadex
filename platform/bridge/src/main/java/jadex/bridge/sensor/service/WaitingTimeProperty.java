@@ -46,7 +46,7 @@ public class WaitingTimeProperty extends TimedProperty
 		this.method = method;
 		this.sid = service.getServiceIdentifier();
 		
-		WaitingTimeProperty.this.clock = comp.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		WaitingTimeProperty.this.clock = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		
 		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
@@ -74,7 +74,7 @@ public class WaitingTimeProperty extends TimedProperty
 					}
 				}
 			});
-			comp.getComponentFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+			comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
 		}
 		else
 		{
@@ -116,7 +116,7 @@ public class WaitingTimeProperty extends TimedProperty
 	 */
 	public IFuture<Void> dispose()
 	{
-		comp.getComponentFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
+		comp.getFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

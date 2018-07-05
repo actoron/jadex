@@ -113,12 +113,12 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			if(sid.getProviderId().equals(access.getComponentIdentifier()))
+			if(sid.getProviderId().equals(access.getIdentifier()))
 			{
 				try
 				{
 					Method	m	= method.getMethod(access.getClassLoader());
-					Object	service	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+					Object	service	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 					if(service==null)
 					{
 						ret = new Future<Object>(new ServiceNotFoundException(sid.getServiceType()+" on component: "+access));
@@ -139,13 +139,13 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			}
 			else
 			{
-				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getComponentIdentifier()+", "+sid));
+				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getIdentifier()+", "+sid));
 			}
 		}
 		else if(target instanceof IComponentIdentifier)
 		{
 			IComponentIdentifier	cid	= (IComponentIdentifier)target;
-			if(cid.equals(access.getComponentIdentifier()))
+			if(cid.equals(access.getIdentifier()))
 			{
 				try
 				{
@@ -159,7 +159,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			}
 			else
 			{
-				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getComponentIdentifier()+", "+cid));
+				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getIdentifier()+", "+cid));
 			}			
 		}
 		
@@ -182,7 +182,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			Object	impl	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
+			Object	impl	= access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
 			Class<?>	implclass	= impl!=null ? impl.getClass() : null;
 			
 			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)

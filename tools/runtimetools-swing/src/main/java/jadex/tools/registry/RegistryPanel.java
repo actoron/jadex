@@ -630,7 +630,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				IFuture<Object> ret = null;
 				try
 				{
-					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getIdentifier());
 					Object res = cmd.execute(reg);
 					if(res instanceof IFuture)
 						ret = (IFuture<Object>)res;

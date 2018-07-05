@@ -202,7 +202,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		if(finished)
 		{
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 			agent.killComponent();
 		}
 	}
@@ -226,7 +226,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(LazyInjectTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(LazyInjectTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

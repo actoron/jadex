@@ -96,7 +96,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				secservice = ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<ISecurityService>)null).setServiceIdentifier(sid)).get();
+				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<ISecurityService>)null).setServiceIdentifier(sid)).get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{

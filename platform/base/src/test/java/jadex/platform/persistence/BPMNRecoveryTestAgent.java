@@ -59,7 +59,7 @@ public class BPMNRecoveryTestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				trs.add(result);
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 				ret.setResult(null);
 			}
 		});
@@ -74,9 +74,9 @@ public class BPMNRecoveryTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IPersistenceService	ps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
 		IExternalAccess	exta	= cms.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResults().get().containsKey("running"))
@@ -102,7 +102,7 @@ public class BPMNRecoveryTestAgent
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 //		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, fut.getFirstResult()).get();
+		agent.getFeature(IMessageFeature.class).sendMessage(msg, fut.getFirstResult()).get();
 		
 		cres.get();
 		

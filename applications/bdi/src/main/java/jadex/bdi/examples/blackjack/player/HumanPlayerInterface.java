@@ -79,7 +79,7 @@ public class HumanPlayerInterface extends GameStateFrame
 			@Classname("human")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

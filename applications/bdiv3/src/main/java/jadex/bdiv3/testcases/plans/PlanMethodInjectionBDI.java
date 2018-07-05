@@ -36,12 +36,12 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 	public void body()
 	{
 		items.add(2);
-		getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				tr.setReason("Plan not triggered.");
-				getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				killComponent();
 				return IFuture.DONE;
 			}
@@ -60,7 +60,7 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 		{
 			tr.setFailed("Expected event vs. "+event+" and 2 vs. "+value);
 		}
-		getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		killComponent();
 	}
 }

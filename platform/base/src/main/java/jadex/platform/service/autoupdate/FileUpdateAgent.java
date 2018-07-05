@@ -180,7 +180,7 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						foundver = Math.max(foundver, files[i].lastModified());
 					}
-					agent.getLogger().info(agent.getComponentIdentifier()+": foundver vs lastver(+safety): "+foundver+", "+(lastver+safetydelay));
+					agent.getLogger().info(agent.getIdentifier()+": foundver vs lastver(+safety): "+foundver+", "+(lastver+safetydelay));
 					boolean force = false; // force update
 					// Only update when not younger than safetydelay and difference between versions also greater than safetydelay.
 					if(foundver>lastver+safetydelay && foundver+safetydelay<System.currentTimeMillis() || force)
@@ -215,7 +215,7 @@ public class FileUpdateAgent extends UpdateAgent
 							});
 							if(decoms.length==1)
 							{
-								agent.getLogger().info(agent.getComponentIdentifier()+": Updating to version: "+sdf.format(founddate));
+								agent.getLogger().info(agent.getIdentifier()+": Updating to version: "+sdf.format(founddate));
 
 								File	target	= decoms[0];
 								UpdateInfo ui = new UpdateInfo(foundver, target.getCanonicalPath());
@@ -241,7 +241,7 @@ public class FileUpdateAgent extends UpdateAgent
 							}
 							else
 							{
-								agent.getLogger().warning(agent.getComponentIdentifier()+": Unexpectedly found not exactly one directory in decompressed distribution: "+SUtil.arrayToString(decoms));
+								agent.getLogger().warning(agent.getIdentifier()+": Unexpectedly found not exactly one directory in decompressed distribution: "+SUtil.arrayToString(decoms));
 								SUtil.deleteDirectory(dir);
 								ret.setException(new RuntimeException("Unexpectedly found not exactly one directory in decompressed distribution: "+SUtil.arrayToString(decoms)));
 							}
@@ -249,7 +249,7 @@ public class FileUpdateAgent extends UpdateAgent
 						catch(Exception e)
 						{
 //							e.printStackTrace();
-							agent.getLogger().warning(agent.getComponentIdentifier()+": Cannot update due to "+e);
+							agent.getLogger().warning(agent.getIdentifier()+": Cannot update due to "+e);
 							SUtil.deleteDirectory(dir);
 							ret.setException(e);
 						}
@@ -318,7 +318,7 @@ public class FileUpdateAgent extends UpdateAgent
 		}
 		else if(newestversion!=-1)
 		{
-			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("libservice");
+			IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Long>(ret)
 			{
 				public void customResultAvailable(ILibraryService libser)
@@ -328,7 +328,7 @@ public class FileUpdateAgent extends UpdateAgent
 					{
 						public void customResultAvailable(List<URL> result)
 						{
-							agent.getLogger().info(agent.getComponentIdentifier()+": curversion urls "+result);
+							agent.getLogger().info(agent.getIdentifier()+": curversion urls "+result);
 							// search for jadex jar file
 							for(URL url: result)
 							{
@@ -337,7 +337,7 @@ public class FileUpdateAgent extends UpdateAgent
 									File f = SUtil.getFile(url);
 									if(f.exists() && f.getName().endsWith(".jar") && f.getName().indexOf("jadex")!=-1)
 									{
-										agent.getLogger().info(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
+										agent.getLogger().info(agent.getIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 										newestversion = f.lastModified();
 										ret.setResult(Long.valueOf(newestversion));
 										break;
@@ -353,7 +353,7 @@ public class FileUpdateAgent extends UpdateAgent
 									File f = SUtil.getFile(url);
 									if(f.exists() && f.isDirectory() && f.getAbsolutePath().indexOf("jadex")!=-1)
 									{
-										agent.getLogger().info(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
+										agent.getLogger().info(agent.getIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 										newestversion = f.lastModified();
 										ret.setResult(Long.valueOf(newestversion));
 										break;
@@ -365,7 +365,7 @@ public class FileUpdateAgent extends UpdateAgent
 								if(newestversion==0)
 								{
 									newestversion = -1;
-									agent.getLogger().warning(agent.getComponentIdentifier()+": Unable to determine current version.");
+									agent.getLogger().warning(agent.getIdentifier()+": Unable to determine current version.");
 									ret.setException(new RuntimeException("Unable to determine current version."));
 								}
 							}
@@ -376,7 +376,7 @@ public class FileUpdateAgent extends UpdateAgent
 		}
 		else
 		{
-			agent.getLogger().warning(agent.getComponentIdentifier()+": Unable to determine current version.");
+			agent.getLogger().warning(agent.getIdentifier()+": Unable to determine current version.");
 			ret.setException(new RuntimeException("Unable to determine current version."));
 		}
 	

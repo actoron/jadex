@@ -51,7 +51,7 @@ public class MovementCapability
 	protected AbstractEnvironmentSpace env = (AbstractEnvironmentSpace)EnvironmentService.getSpace(capa.getAgent(), "myspace").get();
 	
 	/** The environment. */
-	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
+	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getDescription(), capa.getAgent().getModel().getFullName());
 
 	/** The mission end. */
 //	@Belief(dynamic=true, updaterate=1000) 
@@ -166,7 +166,7 @@ public class MovementCapability
 	 */
 	protected long getTime()
 	{
-		IClockService cs = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IClockService cs = capa.getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		// todo: capa.getAgent().getComponentFeature().getService() does not work in init expressions only from plans :-(
 //		IClockService cs =  (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();

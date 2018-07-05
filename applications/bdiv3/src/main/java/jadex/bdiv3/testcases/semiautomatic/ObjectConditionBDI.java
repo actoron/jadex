@@ -32,11 +32,11 @@ public class ObjectConditionBDI
 		
 		if("1".equals(agent.getConfiguration()))
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("wait");
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan("wait");
 		}
 		else if ("2".equals(agent.getConfiguration()))
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan("notify");
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan("notify");
 		}
 	}
 	

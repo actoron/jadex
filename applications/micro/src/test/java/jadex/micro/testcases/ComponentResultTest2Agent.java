@@ -49,7 +49,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 		
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1")
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -67,7 +67,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 			{
 				final TestReport	tr2	= new TestReport("#2", "Custom configuration");
 				testComponentResult("config2", "initial2")
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -83,7 +83,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 					
 					protected void next()
 					{
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 //						killAgent();
 						ret.setResult(null);
 					}
@@ -99,14 +99,14 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
 		final Future<Void>	fut	= new Future<Void>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
+		agent.getFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
 		{
 			@SuppressWarnings("deprecation")
 			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, agent.getComponentIdentifier()), null)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
+				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, agent.getIdentifier()), null)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{

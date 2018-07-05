@@ -42,7 +42,7 @@ public class ChatC4Agent
 	{
 		IAsyncFilter<IComponentFactory>	filter	= new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT);
 		Future<IComponentFactory>	factory	= new Future<>();
-		ITerminableIntermediateFuture<IComponentFactory>	search	= agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentFactory.class));
+		ITerminableIntermediateFuture<IComponentFactory>	search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentFactory.class));
 		search.addResultListener(new IntermediateExceptionDelegationResultListener<IComponentFactory, IComponentFactory>(factory)
 		{
 			@Override

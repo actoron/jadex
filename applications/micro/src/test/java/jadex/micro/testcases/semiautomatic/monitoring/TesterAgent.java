@@ -52,11 +52,11 @@ public class TesterAgent implements ITestService
 	@AgentBody
 	public void body()
 	{
-		final IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
+		final IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
 
 		if(agent.getConfiguration().equals("created"))
 		{
-			ITestService tsa = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, agent.getComponentIdentifier().getParent())).get();
+			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, agent.getIdentifier().getParent())).get();
 			tsa.test(0).get();
 		}
 		else
@@ -85,7 +85,7 @@ public class TesterAgent implements ITestService
 						ThreadSuspendable sus = new ThreadSuspendable();
 						
 						CreationInfo ci = new CreationInfo("created", null);
-						ci.setParent(agent.getComponentIdentifier());
+						ci.setParent(agent.getIdentifier());
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
@@ -116,7 +116,7 @@ public class TesterAgent implements ITestService
 //		System.out.println("invoked test on: "+agent.getComponentIdentifier()+" level="+level+" "+ServiceCall.getCurrentInvocation().getCause());
 		if(level<10)
 		{
-			Collection<ITestService> tss = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class)).get();
+			Collection<ITestService> tss = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class)).get();
 			if(tss.size()>0)
 			{
 				int num = (int)(Math.random()*tss.size());

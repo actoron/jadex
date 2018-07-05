@@ -124,7 +124,7 @@ public class EnvironmentGui	extends JFrame
 					@Classname("end")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 						IGoal goal = capa.getGoalbase().createGoal("end_agent");
 						capa.getGoalbase().dispatchTopLevelGoal(goal);
 						return IFuture.DONE;
@@ -138,7 +138,7 @@ public class EnvironmentGui	extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -182,7 +182,7 @@ public class EnvironmentGui	extends JFrame
 			@Classname("env")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				
 				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
@@ -209,7 +209,7 @@ public class EnvironmentGui	extends JFrame
 							@Classname("roundtime")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+								IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 								bia.getBeliefbase().getBelief("roundtime").setFact(val);
 								return IFuture.DONE;
 							}
@@ -275,7 +275,7 @@ public class EnvironmentGui	extends JFrame
 			@Classname("roundcnt")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				
 				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
@@ -301,7 +301,7 @@ public class EnvironmentGui	extends JFrame
 							@Classname("rt")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+								IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 								capa.getBeliefbase().getBelief("roundtime").setFact(val);
 								return IFuture.DONE;
 							}
@@ -450,7 +450,7 @@ public class EnvironmentGui	extends JFrame
 			@Classname("dummy")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				final Environment env = (Environment)capa.getBeliefbase().getBelief("environment").getFact();
 				env.addPropertyChangeListener(new PropertyChangeListener()
 				{

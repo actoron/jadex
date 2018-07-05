@@ -41,20 +41,20 @@ public class PojoDService implements IDService
 		
 		if("first".equals(agent.getConfiguration()))
 		{
-			IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+			IFuture<IComponentManagementService> cmsfut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 			cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{	
 //					IComponentManagementService cms = (IComponentManagementService)result;
 					cms.createComponent(null, "jadex.micro.testcases.ServiceParameterAgent.class", 
-						new CreationInfo("second", null, agent.getComponentIdentifier()), null)
+						new CreationInfo("second", null, agent.getIdentifier()), null)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier cid)
 						{
 //							IComponentIdentifier cid = (IComponentIdentifier)result;
-							IFuture<IDService> serfut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDService.class, cid));
+							IFuture<IDService> serfut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDService.class, cid));
 							serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
 							{
 								public void customResultAvailable(IDService otherser)
@@ -73,7 +73,7 @@ public class PojoDService implements IDService
 			ret.setResult(null);
 		}
 		
-		res.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		res.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -88,7 +88,7 @@ public class PojoDService implements IDService
 					tr.setReason("Wrong parameter value received.");
 				}
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				
 				ret.setResult(null);
 //				if(result!=null)
@@ -97,7 +97,7 @@ public class PojoDService implements IDService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(0, new TestReport[]{}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(0, new TestReport[]{}));
 				ret.setResult(null);
 				agent.killComponent();
 			}

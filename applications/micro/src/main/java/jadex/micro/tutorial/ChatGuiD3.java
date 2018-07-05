@@ -39,7 +39,7 @@ public class ChatGuiD3 extends ChatGuiD2
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IFuture<Collection<IExtendedChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+						IFuture<Collection<IExtendedChatService>>	chatservices	= ia.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 						chatservices.addResultListener(new DefaultResultListener<Collection<IExtendedChatService>>()
 						{
 							public void resultAvailable(Collection<IExtendedChatService> result)

@@ -117,13 +117,13 @@ public class ChatService implements IChatService, IChatGuiService
 			status	= STATE_AWAY;	// Changes to idle only when a gui is connected.
 			
 			final PropProvider pp = new PropProvider();
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					if(!(agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
-						|| !((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
+					if(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
+						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
 					{
 						settings.registerPropertiesProvider(getSubname(), pp)
 							.addResultListener(new DelegationResultListener<Void>(ret)
@@ -160,7 +160,7 @@ public class ChatService implements IChatService, IChatGuiService
 					transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
 					
 					// Search and post status in background for not delaying platform startup.
-					IIntermediateFuture<IChatService>	chatfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+					IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 					chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 					{
 						public void intermediateResultAvailable(IChatService chat)
@@ -213,7 +213,7 @@ public class ChatService implements IChatService, IChatGuiService
 			}
 			
 			final Future<Void> done	= new Future<Void>();
-			IIntermediateFuture<IChatService>	chatfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+			IIntermediateFuture<IChatService>	chatfut	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
 				public void intermediateResultAvailable(IChatService chat)
@@ -230,13 +230,13 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			});
 			
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener<ISettingsService>()
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					if(!(agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
-						|| !((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
+					if(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
+						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
 					{
 						settings.deregisterPropertiesProvider(getSubname())
 							.addResultListener(new DelegationResultListener<Void>(ret)
@@ -284,7 +284,7 @@ public class ChatService implements IChatService, IChatGuiService
 	protected String	getSubname()
 	{
 		String	subname	= null;
-		IComponentIdentifier	cid	= agent.getComponentIdentifier();
+		IComponentIdentifier	cid	= agent.getIdentifier();
 		while(cid.getParent()!=null)
 		{
 			subname	= subname==null ? cid.getLocalName() : subname+"."+cid.getLocalName();
@@ -467,7 +467,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IIntermediateFuture<IChatService> findUsers()
 	{
-		IIntermediateFuture<IChatService> ret	= agent.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+		IIntermediateFuture<IChatService> ret	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 //		ret.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 //		{
 //			public void resultAvailable(Collection<IChatService> result)
@@ -497,7 +497,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				for(int i=0; i<receivers.length; i++)
 				{
-					if(agent.getComponentIdentifier().equals(receivers[i]))
+					if(agent.getIdentifier().equals(receivers[i]))
 					{
 						foundself = true;
 					}
@@ -539,7 +539,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			if(self && !foundself)
 			{
-				sendTo(text, agent.getComponentIdentifier(), true).addResultListener(new IResultListener<IChatService>()
+				sendTo(text, agent.getIdentifier(), true).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -556,7 +556,7 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		else //if(receivers.length==0)
 		{
-			final IIntermediateFuture<IChatService> ifut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+			final IIntermediateFuture<IChatService> ifut = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			
 			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
 			{
@@ -608,7 +608,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, rec))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, rec))
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)
@@ -646,7 +646,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			for(int i=0; i<receivers.length; i++)
 			{
-				if(agent.getComponentIdentifier().equals(receivers[i]))
+				if(agent.getIdentifier().equals(receivers[i]))
 				{
 					foundself = true;
 				}
@@ -687,7 +687,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			if(!foundself)
 			{
-				statusTo(nick, status, image, agent.getComponentIdentifier()).addResultListener(new IResultListener<IChatService>()
+				statusTo(nick, status, image, agent.getIdentifier()).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -704,7 +704,7 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		else //if(receivers.length==0)
 		{
-			final IIntermediateFuture<IChatService> ifut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+			final IIntermediateFuture<IChatService> ifut = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
 			{
 				boolean	finished;
@@ -754,7 +754,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, rec))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, rec))
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)
@@ -985,7 +985,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		IFuture<IChatService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid));
+		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
 			public void customResultAvailable(IChatService cs)
@@ -1047,7 +1047,7 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				// Call chat service of receiver (alternative interface)
 				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length(), System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier())));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getIdentifier())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
@@ -1103,7 +1103,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		IFuture<IChatService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid));
+		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
 			public void customResultAvailable(IChatService cs)
@@ -1114,7 +1114,7 @@ public class ChatService implements IChatService, IChatGuiService
 				String filepath = fname.indexOf(".")!=-1? fname.substring(fname.lastIndexOf(".")): null;
 				String name = fname.indexOf(".")!=-1? fname.substring(0, fname.lastIndexOf(".")-1): fname;
 				final TransferInfo fi = new TransferInfo(false, null, name, filepath, cid, size, System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier())));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getIdentifier())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, name, size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));

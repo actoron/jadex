@@ -63,7 +63,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 	 */
 	public void init()
 	{	
-		Map<String, Object> args = getAgent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+		Map<String, Object> args = getAgent().getFeature(IArgumentsResultsFeature.class).getArguments();
 		
 		// Find concrete beliefs for mapped belief references used as arguments in outmost capability.
 		Map<String, Object> capargs	= null;
@@ -543,9 +543,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 				
 				// Push to result, if any.
 				String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
-				if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+				if(result!=null && getAgent().getFeature0(IArgumentsResultsFeature.class)!=null)
 				{
-					getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+					getAgent().getFeature(IArgumentsResultsFeature.class)
 						.getResults().put(result, value);
 				}
 			}
@@ -594,7 +594,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void addBeliefListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			IInternalBDIAgentFeature bdif = getAgent().getFeature(IInternalBDIAgentFeature.class);
 			bdif.addBeliefListener(getName(), listener);
 		}
 		
@@ -604,7 +604,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void removeBeliefListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			IInternalBDIAgentFeature bdif = getAgent().getFeature(IInternalBDIAgentFeature.class);
 			bdif.removeBeliefListener(getName(), listener);
 		}
 	}
@@ -716,9 +716,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			
 			// Push to result, if any.
 			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
-			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			if(result!=null && getAgent().getFeature0(IArgumentsResultsFeature.class)!=null)
 			{
-				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+				getAgent().getFeature(IArgumentsResultsFeature.class)
 					.getResults().put(result, internalGetValues());
 			}
 		}
@@ -733,9 +733,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			
 			// Push to result, if any.
 			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
-			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			if(result!=null && getAgent().getFeature0(IArgumentsResultsFeature.class)!=null)
 			{
-				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+				getAgent().getFeature(IArgumentsResultsFeature.class)
 					.getResults().put(result, internalGetValues());
 			}
 		}
@@ -763,9 +763,9 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			
 			// Push to result, if any.
 			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
-			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			if(result!=null && getAgent().getFeature0(IArgumentsResultsFeature.class)!=null)
 			{
-				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+				getAgent().getFeature(IArgumentsResultsFeature.class)
 					.getResults().put(result, internalGetValues());
 			}
 		}
@@ -860,15 +860,15 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 			}
 			else
 			{
-				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getComponentFeature(IBDIXAgentFeature.class)).getRuleSystem();
+				RuleSystem rs = ((IInternalBDIAgentFeature)getAgent().getFeature(IBDIXAgentFeature.class)).getRuleSystem();
 				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+getName(), new ChangeInfo<Object>(facts, facts, null)));
 			}
 
 			// Push to result, if any.
 			String	result	= ((BDIXModel)getAgent().getModel()).getCapability().getResultMappings().get(getName());
-			if(result!=null && getAgent().getComponentFeature0(IArgumentsResultsFeature.class)!=null)
+			if(result!=null && getAgent().getFeature0(IArgumentsResultsFeature.class)!=null)
 			{
-				getAgent().getComponentFeature(IArgumentsResultsFeature.class)
+				getAgent().getFeature(IArgumentsResultsFeature.class)
 					.getResults().put(result, internalGetValues());
 			}
 		}
@@ -879,7 +879,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void addBeliefSetListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			IInternalBDIAgentFeature bdif = getAgent().getFeature(IInternalBDIAgentFeature.class);
 			bdif.addBeliefListener(getName(), listener);
 		}
 		
@@ -889,7 +889,7 @@ public class RBeliefbase extends RElement implements IBeliefbase, IMapAccess
 		 */
 		public <T> void removeBeliefSetListener(IBeliefListener<T> listener)
 		{
-			IInternalBDIAgentFeature bdif = getAgent().getComponentFeature(IInternalBDIAgentFeature.class);
+			IInternalBDIAgentFeature bdif = getAgent().getFeature(IInternalBDIAgentFeature.class);
 			bdif.removeBeliefListener(getName(), listener);
 		}
 		

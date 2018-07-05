@@ -63,8 +63,8 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(Collection<TestReport> result)
 			{
@@ -92,8 +92,8 @@ public class LongcallTestAgent extends TestAgent
 				} 
 				else 
 				{
-					agent.getLogger().severe("Testagent test rmeote: "+agent.getComponentDescription());
-					testRemote(3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+					agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
+					testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(Collection<TestReport> result)
 						{
@@ -104,7 +104,7 @@ public class LongcallTestAgent extends TestAgent
 						
 						public void finished()
 						{
-							agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 							ret.setResult(null);
 						}
 						
@@ -127,8 +127,8 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		performTests(agent.getComponentIdentifier().getRoot(), testno, true)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
+		performTests(agent.getIdentifier().getRoot(), testno, true)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 		
 		return ret;
 	}
@@ -145,7 +145,7 @@ public class LongcallTestAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				performTests(exta.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 			}
 		});
 
@@ -212,7 +212,7 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, Collection<TestReport>>(ret)
 		{
@@ -263,7 +263,7 @@ public class LongcallTestAgent extends TestAgent
 			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 			// set timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 0.01));
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getIdentifier(), 0.01));
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);

@@ -609,7 +609,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				((BasicService)service).setPropertyMap(serprops);
 			}
 			
-			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), ia.getComponentDescription().getCause(), false);
+			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), ia.getDescription().getCause(), false);
 			
 //			if(type==null)
 //			{
@@ -644,7 +644,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			Class<?> serclass = service.getClass();
 
-			BasicService mgmntservice = new BasicService(ia.getComponentIdentifier(), type, serclass, null);
+			BasicService mgmntservice = new BasicService(ia.getIdentifier(), type, serclass, null);
 			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
 			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
@@ -702,7 +702,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
-			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), ia.getComponentDescription().getCause());
+			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), ia.getDescription().getCause());
 			
 //			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
 		}
@@ -782,7 +782,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), ia.getComponentDescription().getCause(), false);
+		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), ia.getDescription().getCause(), false);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 //		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));	// TODO
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
@@ -810,7 +810,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
 		{
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), ia.getComponentDescription().getCause(), true);
+			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), ia.getDescription().getCause(), true);
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
 			// Dropped for v4???

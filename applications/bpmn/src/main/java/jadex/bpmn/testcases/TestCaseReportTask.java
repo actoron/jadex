@@ -32,7 +32,7 @@ public class TestCaseReportTask implements ITask
 		String reason = (String) context.getParameterValue("reason");
 		TestReport report = new TestReport(name, description, succeded, reason);
 		Testcase testcase = new Testcase(1, new TestReport[] { report });
-		((IInternalBpmnComponentFeature)process.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", testcase);
+		((IInternalBpmnComponentFeature)process.getFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", testcase);
 		return IFuture.DONE;
 	}
 	

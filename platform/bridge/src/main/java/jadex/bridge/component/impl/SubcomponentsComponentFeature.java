@@ -115,7 +115,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	 */
 	public String getLocalType()
 	{
-		return getComponent().getComponentDescription().getLocalType();
+		return getComponent().getDescription().getLocalType();
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		
 		final Future<Void> res = new Future<Void>();
 		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-		IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		// NOTE: in current implementation application waits for subcomponents
 		// to be finished and cms implements a hack to get the external
 		// access of an uninited parent.
@@ -188,7 +188,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 //				System.out.println("create comp: "+components[i].getName());
 			
 			IResultListener<IComponentIdentifier> crl = new CollectionResultListener<IComponentIdentifier>(num, false, 
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IComponentIdentifier>, Void>(fut)
+				component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IComponentIdentifier>, Void>(fut)
 			{
 				public void customResultAvailable(Collection<IComponentIdentifier> result)
 				{
@@ -217,7 +217,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 //					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
-						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getComponentIdentifier(),
+						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getIdentifier(),
 						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
 //							getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
 //						{
@@ -357,10 +357,10 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	public IFuture<Void>	componentCreated(final IComponentDescription desc)
 	{
 		// Throw component events for extensions (envsupport)
-		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
+		final IMonitoringComponentFeature	mon	= getComponent().getFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
-			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+			return getComponent().getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -393,17 +393,17 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	public IFuture<Void> componentRemoved(final IComponentDescription desc)
 	{
 		// Throw component events for extensions (envsupport)
-		final IMonitoringComponentFeature	mon	= getComponent().getComponentFeature0(IMonitoringComponentFeature.class);
+		final IMonitoringComponentFeature	mon	= getComponent().getFeature0(IMonitoringComponentFeature.class);
 		if(mon!=null)
 		{
-			return getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+			return getComponent().getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					Future<Void>	ret	= new Future<Void>();
 					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 					{
-						long time = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
+						long time = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
 							MonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), time, PublishEventLevel.COARSE);
 						me.setProperty("details", desc);
@@ -430,7 +430,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	 */
 	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
-		return getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(listener);
+		return getComponent().getFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 	/**
@@ -438,6 +438,6 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	 */
 	protected boolean isExternalThread()
 	{
-		return !getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+		return !getComponent().getFeature(IExecutionFeature.class).isComponentThread();
 	}
 }

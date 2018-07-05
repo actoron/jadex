@@ -77,7 +77,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 		Future<Void> ret = new Future<Void>();
 
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
+		MCapability	mcapa = (MCapability)ia.getFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 
 		List<ICandidateInfo> cands = element.getApplicablePlanList().selectCandidates(mcapa, ia);
 		

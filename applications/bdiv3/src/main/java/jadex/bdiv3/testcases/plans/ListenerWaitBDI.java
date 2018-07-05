@@ -49,7 +49,7 @@ public class ListenerWaitBDI
 		
 //		agent.createResultListener(listener)
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 //		agent.createResultListener(listener)
 		fut.addResultListener(new IResultListener<IComponentManagementService>()
 		{
@@ -86,6 +86,6 @@ public class ListenerWaitBDI
 	{
 		if(!tr.isFinished())
 			tr.setFailed("Plan not activated");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

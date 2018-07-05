@@ -646,7 +646,7 @@ public class CleanerBDI
 		
 		// Create a representation of myself.
 		final Cleaner cl = new Cleaner(getMyLocation(),
-			getAgent().getComponentIdentifier().getLocalName(),
+			getAgent().getIdentifier().getLocalName(),
 			getCarriedWaste(), getMyVision(),
 			getMyChargestate());
 
@@ -830,10 +830,10 @@ public class CleanerBDI
 		patrolpoints.add(new Location(0.9, 0.1));
 		patrolpoints.add(new Location(0.9, 0.9));
 		
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformLookForWaste());
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformPatrol());
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MaintainBatteryLoaded());
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformMemorizePositions());
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformLookForWaste());
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformPatrol());
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MaintainBatteryLoaded());
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new PerformMemorizePositions());
 		
 //		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(100, new IComponentStep<Void>()
 //		{

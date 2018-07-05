@@ -149,7 +149,7 @@ public class TreasureHunterEnvironment	implements Closeable
 			int	steps	= Math.max(1, (int)(dist*500));	// if too close do a step anyways.
 			for(int i=0; i<steps; i++)
 			{
-				comp.getComponentFeature(IExecutionFeature.class).waitForDelay(10).get();
+				comp.getFeature(IExecutionFeature.class).waitForDelay(10).get();
 				this.location.x	+= dx/steps;
 				this.location.y	+= dy/steps;
 				

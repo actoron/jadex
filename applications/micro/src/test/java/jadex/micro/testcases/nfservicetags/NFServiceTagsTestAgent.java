@@ -57,7 +57,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if can find service withouts tags.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser1").get();
+			ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser1").get();
 			tr1.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -69,7 +69,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if can find service with tags in required service defition.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser2").get();
+			ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser2").get();
 			tr2.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -81,7 +81,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr3 = new TestReport("#3", "Test if can find service with tags in required service defition that are not defined on service.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser3").get();
+			ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser3").get();
 			tr3.setReason("Found service that does not have the tag");
 		}
 		catch(Exception e)
@@ -93,7 +93,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr4 = new TestReport("#4", "Test if can find service via SServiceProvider.getServices()");
 		try
 		{
-			Collection<ITestService> sers = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(TagProperty.PLATFORM_NAME)); 
+			Collection<ITestService> sers = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(TagProperty.PLATFORM_NAME)); 
 			tr4.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -105,7 +105,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr5 = new TestReport("#5", "Test if can find service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(TagProperty.PLATFORM_NAME)); 
+			ITestService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(TagProperty.PLATFORM_NAME)); 
 			tr5.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -117,7 +117,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{null})); 
+			ITestService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{null})); 
 			tr6.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -126,7 +126,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		}
 		results.add(tr6);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}

@@ -48,7 +48,7 @@ public class VisibilityTestAgent extends JunitAgentTest
 		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();
 		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getComponentIdentifier(), null).get();
 		
-		IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
+		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);
 		ITuple2Future<IComponentIdentifier, Map<String, Object>> ag = cms.createComponent(FirstAgent.class.getName()+".class", new CreationInfo(null, args, agent.getModel().getResourceIdentifier()));
@@ -63,7 +63,7 @@ public class VisibilityTestAgent extends JunitAgentTest
 				
 				TestReport tr1 = new TestReport("#1", "Test provided scope platform is respected.", sers.length == 2, sers.length != 2 ? "Found " + sers.length + " services" : null);
 
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
 				agent.killComponent();
 			}
 		});

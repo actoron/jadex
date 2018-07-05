@@ -71,7 +71,7 @@ public class TranslationBDI
 	public void body()
 	{
 		bdi.adoptPlan(new TranslatePlan("dog"));
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		context = false;
 		System.out.println("context set to false");
 	}

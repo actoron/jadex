@@ -79,7 +79,7 @@ public class AuthenticateTestAgent extends TestAgent
 		
 		// Use expected results for def, cus to decide platform settings
 		setupTestPlatform(tests[test][1], tests[test][2])
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			@Override
 			public void customResultAvailable(final IExternalAccess platform) throws Exception
@@ -191,7 +191,7 @@ public class AuthenticateTestAgent extends TestAgent
 		final Future<boolean[]>	ret	= new Future<boolean[]>();
 //		System.out.println("invokeServices "+IComponentIdentifier.LOCAL.get());
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, Binding.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, Binding.SCOPE_GLOBAL))
 			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
 		{
 			@Override

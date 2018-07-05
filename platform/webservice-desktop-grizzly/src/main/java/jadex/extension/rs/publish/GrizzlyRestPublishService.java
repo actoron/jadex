@@ -69,7 +69,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
     {
         try
         {
-        	final IService service = component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
+        	final IService service = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
         	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             HttpServer server = (HttpServer)getHttpServer(uri, info);

@@ -258,14 +258,14 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					}
 				};
 				
-				ia.getComponentFeature(IMessageFeature.class).addMessageHandler(handler);
+				ia.getFeature(IMessageFeature.class).addMessageHandler(handler);
 				
 				ret.setTerminationCommand(new TerminationCommand()
 				{
 					@Override
 					public void terminated(Exception reason)
 					{
-						ia.getComponentFeature(IMessageFeature.class).removeMessageHandler(handler);
+						ia.getFeature(IMessageFeature.class).removeMessageHandler(handler);
 					}
 				});
 				return ret;

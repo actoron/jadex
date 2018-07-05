@@ -53,7 +53,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 	 */
 	public IFuture<Void> body()
 	{
-		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = component.getFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
 //		inited	= true;
 		return super.body();
@@ -83,7 +83,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		setShutdown(true); 
 		
 		final Future<Void>	ret	= new Future<Void>();
-		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = component.getFeature(IInternalBDIAgentFeature.class);
 		
 //		System.out.println("shutdown start: "+component);
 		createEndBehavior().startEndBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability())
@@ -169,7 +169,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		 */
 		public IFuture<Object> dispatchTopLevelGoal(Object goal)
 		{
-			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdif = component.getFeature(IBDIXAgentFeature.class);
 			return bdif.getGoalbase().dispatchTopLevelGoal((IGoal)goal);
 		}
 		
@@ -178,7 +178,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		 */
 		public IFuture<Void> dispatchInternalEvent(IInternalEvent event)
 		{
-			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdif = component.getFeature(IBDIXAgentFeature.class);
 			bdif.getEventbase().dispatchInternalEvent(event);
 			return IFuture.DONE;
 		}
@@ -210,7 +210,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		 */
 		public IFuture<Object> dispatchTopLevelGoal(Object goal)
 		{
-			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdif = component.getFeature(IBDIXAgentFeature.class);
 			return bdif.getGoalbase().dispatchTopLevelGoal((IGoal)goal);
 		}
 		
@@ -228,7 +228,7 @@ public class BDIXLifecycleAgentFeature extends ComponentLifecycleFeature impleme
 		 */
 		public IFuture<Void> dispatchInternalEvent(IInternalEvent event)
 		{
-			IBDIXAgentFeature bdif = component.getComponentFeature(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdif = component.getFeature(IBDIXAgentFeature.class);
 			bdif.getEventbase().dispatchInternalEvent(event);
 			return IFuture.DONE;
 		}

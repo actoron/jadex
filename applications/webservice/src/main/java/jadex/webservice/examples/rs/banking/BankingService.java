@@ -88,7 +88,7 @@ public class BankingService implements IBankingService
 		final int fmax = max>0? max: 5;
 		final long fdelay = delay>0? delay: 1500;
 //		ret.addIntermediateResult(new AccountStatement(new String[]{"initial"}, null));
-		component.getComponentFeature(IExecutionFeature.class).waitForDelay(fdelay, new IComponentStep<Void>()
+		component.getFeature(IExecutionFeature.class).waitForDelay(fdelay, new IComponentStep<Void>()
 		{
 			int cnt = 0;
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -96,7 +96,7 @@ public class BankingService implements IBankingService
 				if(cnt++<fmax)
 				{
 					ret.addIntermediateResult(new AccountStatement(new String[]{""+cnt}, null));
-					component.getComponentFeature(IExecutionFeature.class).waitForDelay(fdelay, this);
+					component.getFeature(IExecutionFeature.class).waitForDelay(fdelay, this);
 				}
 				else
 				{

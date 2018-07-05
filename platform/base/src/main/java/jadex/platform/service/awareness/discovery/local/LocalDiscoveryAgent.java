@@ -112,7 +112,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 		{
 			try
 			{
-				final String old = DISCOVERY_DIR + File.separator+URLEncoder.encode(agent.getComponentIdentifier().getRoot().getLocalName(), "UTF-8");
+				final String old = DISCOVERY_DIR + File.separator+URLEncoder.encode(agent.getIdentifier().getRoot().getLocalName(), "UTF-8");
 				File[] files = DISCOVERY_DIR.listFiles(new FileFilter()
 				{
 					public boolean accept(File pathname)
@@ -134,8 +134,8 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			scan();
 			postInfo();
 			
-			final long updaterate = (long) (((Long) agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime")) * 0.9);
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, new IComponentStep<Void>()
+			final long updaterate = (long) (((Long) agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime")) * 0.9);
+			agent.getFeature(IExecutionFeature.class).waitForDelay(updaterate, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -143,7 +143,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 						scan();
 					
 					postInfo();
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(updaterate, this, true);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(updaterate, this, true);
 					return IFuture.DONE;
 				}
 			}, true);
@@ -181,7 +181,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				Method registermethod = pathclazz.getMethod("register", new Class<?>[] { wsclazz, kindsarray.getClass() });
 				registermethod.invoke(path, new Object[]{watchservice, kindsarray});
 				
-				IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("threadpool");
+				IFuture<IDaemonThreadPoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("threadpool");
 				IDaemonThreadPoolService tp = fut.get();
 				final IExternalAccess ea = agent.getExternalAccess();
 				
@@ -263,7 +263,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 			}
 		}
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).subscribeToLocalAddresses().addIntermediateResultListener(new IIntermediateResultListener<Tuple2<TransportAddress,Boolean>>()
+		agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).subscribeToLocalAddresses().addIntermediateResultListener(new IIntermediateResultListener<Tuple2<TransportAddress,Boolean>>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -363,9 +363,9 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //				IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //				IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //				ITransportComponentIdentifier root = fut2.get();
-				IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
+				IComponentIdentifier root = agent.getIdentifier().getRoot();
 //				Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
-				List<TransportAddress> addr = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
+				List<TransportAddress> addr = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
 				
 //				System.out.println("=====" + agent + "======");
 //				for (TransportAddress entry : addr)
@@ -374,7 +374,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //				}
 //				System.out.println("=====" + agent + "======");
 //				
-				long leasetime = (Long)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
+				long leasetime = (Long)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("leasetime");
 				AwarenessInfo info = new AwarenessInfo(root, addr, AwarenessInfo.STATE_ONLINE, leasetime, null, null, null, awa);
 				byte[] data = SBinarySerializer.writeObjectToByteArray(info, agent.getClassLoader());
 				long deadline = leasetime + System.currentTimeMillis();
@@ -384,7 +384,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				FileOutputStream fos = null;
 				try
 				{
-					outfilepath += URLEncoder.encode(agent.getComponentIdentifier().getRoot().getLocalName(), "UTF-8");
+					outfilepath += URLEncoder.encode(agent.getIdentifier().getRoot().getLocalName(), "UTF-8");
 					outfilepath += new String();
 					outfilepath += "_" + String.valueOf(deadline) + ".awa";
 					File outfile = new File(outfilepath);
@@ -485,7 +485,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 							{
 								byte[] awadata = SUtil.readFile(file);
 								final AwarenessInfo awainfo = (AwarenessInfo)SBinarySerializer.readObjectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
-								if(!awainfo.getSender().equals(agent.getComponentIdentifier().getRoot()))
+								if(!awainfo.getSender().equals(agent.getIdentifier().getRoot()))
 								{
 									List<Tuple2<AwarenessInfo, Long>> ls = awas.get(pname);
 									if(ls==null)
@@ -519,7 +519,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 					
 					final AwarenessInfo ai = es.get(0).getFirstEntity();
 					
-					IFuture<IAwarenessManagementService> msfut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("management");
+					IFuture<IAwarenessManagementService> msfut = agent.getFeature(IRequiredServicesFeature.class).getService("management");
 					msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 					{
 						public void resultAvailable(IAwarenessManagementService ms)

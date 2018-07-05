@@ -39,9 +39,9 @@ public class CorruptAdderAgent
 	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		IService addser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IAddService.class)[0];
+		IService addser = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IAddService.class)[0];
 		
-		agent.getComponentFeature(IProvidedServicesFeature.class).addInterceptor(new AbstractApplicableInterceptor()
+		agent.getFeature(IProvidedServicesFeature.class).addInterceptor(new AbstractApplicableInterceptor()
 		{
 			public IFuture execute(ServiceInvocationContext context)
 			{
@@ -50,7 +50,7 @@ public class CorruptAdderAgent
 				{
 					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
 					{
-						context.setResult(new Future(new ComponentTerminatedException(agent.getComponentIdentifier())));
+						context.setResult(new Future(new ComponentTerminatedException(agent.getIdentifier())));
 //						System.out.println("hello interceptor");
 //						if(calls++>0)
 						{

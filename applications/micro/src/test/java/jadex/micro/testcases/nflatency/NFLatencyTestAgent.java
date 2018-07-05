@@ -56,18 +56,18 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -85,8 +85,8 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno, true)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		performTest(agent.getIdentifier().getRoot(), testno, true)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
 			{
@@ -104,7 +104,7 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		createPlatform(null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -114,7 +114,7 @@ public class NFLatencyTestAgent extends TestAgent
 //				{
 //					public void customResultAvailable(final ITransportComponentIdentifier result) 
 //					{
-						IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+						IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 						fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
@@ -127,7 +127,7 @@ public class NFLatencyTestAgent extends TestAgent
 									public void firstResultAvailable(IComponentIdentifier result)
 									{
 										performTest(result, testno, false)
-											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+											.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 									}
 									public void secondResultAvailable(Map<String,Object> result) 
 									{
@@ -207,7 +207,7 @@ public class NFLatencyTestAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
-		IIntermediateFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
+		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
 			boolean called;

@@ -55,10 +55,10 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 		try
 		{
 			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(ServiceCallbackProviderAgent.class.getName()+".class",
-				local ? new CreationInfo(agent.getComponentIdentifier()) : null);	// Start as subcomponent in local case
+				local ? new CreationInfo(agent.getIdentifier()) : null);	// Start as subcomponent in local case
 			IComponentIdentifier	provider	= fut.getFirstResult();
-			ICallerService	service	= local ? agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
-				: agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, Binding.SCOPE_GLOBAL)).get(); // Search globally in remote case.
+			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
+				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, Binding.SCOPE_GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
 			cms.destroyComponent(provider).get();
 			ret.get().setSucceeded(true);

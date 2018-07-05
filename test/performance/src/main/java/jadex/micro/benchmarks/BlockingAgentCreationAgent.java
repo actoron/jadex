@@ -91,9 +91,9 @@ public class BlockingAgentCreationAgent
 			args.put("num", Integer.valueOf(num));
 			args.put("starttime", Long.valueOf(starttime));
 			args.put("startmem", Long.valueOf(startmem));
-			cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()),
+			cms.createComponent(createPeerName(num+1, agent.getIdentifier()),
 				BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-				new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier()), null);
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
 		}
 		else
 		{
@@ -118,8 +118,8 @@ public class BlockingAgentCreationAgent
 		
 			// Use initial component to kill others
 			IComponentManagementService cms	= getCMS(agent);
-			String	initial	= createPeerName(1, agent.getComponentIdentifier());
-			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+			String	initial	= createPeerName(1, agent.getIdentifier());
+			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getIdentifier().getRoot());
 			IExternalAccess exta	= cms.getExternalAccess(cid).get();
 			exta.scheduleStep(new IComponentStep<Void>()
 			{
@@ -131,8 +131,8 @@ public class BlockingAgentCreationAgent
 					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)
 					{
-						String name = createPeerName(i, ia.getComponentIdentifier());
-						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getComponentIdentifier().getRoot());
+						String name = createPeerName(i, ia.getIdentifier());
+						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getIdentifier().getRoot());
 						cms.destroyComponent(cid).get();
 						System.out.println("Successfully destroyed peer: "+name);
 					}
@@ -189,12 +189,12 @@ public class BlockingAgentCreationAgent
 	
 	protected static IComponentManagementService	getCMS(IInternalAccess ia)
 	{
-		return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 	}
 	
 	
 	protected static IClockService getClock(IInternalAccess ia)
 	{
-		return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 	}
 }

@@ -265,8 +265,8 @@ public class GuiPanel extends JPanel
 			@Classname("refresh")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-				ag.getAgent().getComponentFeature(IBDIAgentFeature.class).addBeliefListener("orders", new IBeliefListener<Object>()
+				INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+				ag.getAgent().getFeature(IBDIAgentFeature.class).addBeliefListener("orders", new IBeliefListener<Object>()
 				{
 					public void factRemoved(ChangeInfo<Object> info)
 					{
@@ -317,8 +317,8 @@ public class GuiPanel extends JPanel
 			@Classname("refreshDetails")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-				ag.getAgent().getComponentFeature(IBDIAgentFeature.class).addBeliefListener("reports", new IBeliefListener<Object>()
+				INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+				ag.getAgent().getFeature(IBDIAgentFeature.class).addBeliefListener("reports", new IBeliefListener<Object>()
 				{
 					public void factRemoved(ChangeInfo<Object> info)
 					{
@@ -381,7 +381,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -402,7 +402,7 @@ public class GuiPanel extends JPanel
 											@Classname("add")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+												INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 												ag.createGoal(order);
 												return IFuture.DONE;
 											}
@@ -465,7 +465,7 @@ public class GuiPanel extends JPanel
 						@Classname("remove")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+							INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 							Collection<INegotiationGoal> gs = ag.getGoals();
 							for(INegotiationGoal g: gs)
 							{
@@ -473,7 +473,7 @@ public class GuiPanel extends JPanel
 								if(order.equals(or))
 								{
 									or.setState(Order.FAILED);
-									ag.getAgent().getComponentFeature(IBDIAgentFeature.class).dropGoal(g);
+									ag.getAgent().getFeature(IBDIAgentFeature.class).dropGoal(g);
 									break;
 								}
 							}
@@ -517,7 +517,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -552,14 +552,14 @@ public class GuiPanel extends JPanel
 												@Classname("drop")
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+													INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 													Collection<INegotiationGoal> goals = ag.getGoals();
 													
 													for(INegotiationGoal goal: goals)
 													{
 														if(goal.getOrder().equals(order))
 														{
-															ag.getAgent().getComponentFeature(IBDIAgentFeature.class).dropGoal(goal);
+															ag.getAgent().getFeature(IBDIAgentFeature.class).dropGoal(goal);
 														}
 													}
 													
@@ -644,7 +644,7 @@ public class GuiPanel extends JPanel
 			@Classname("ref")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 
 				final List<Order> aorders = ag.getOrders();
 				SwingUtilities.invokeLater(new Runnable()
@@ -699,7 +699,7 @@ public class GuiPanel extends JPanel
 				@Classname("refD")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					INegotiationAgent ag = (INegotiationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+					INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 					
 					final List<NegotiationReport> reps = ag.getReports(order);
 					

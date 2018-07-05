@@ -81,7 +81,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			
 //		System.out.println("rec msg: "+body+", "+header);
 			
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getFeature(IBDIXAgentFeature.class);
 
 		// Find all matching event models for received message.
 		List<MMessageEvent>	events	= SCollection.createArrayList();
@@ -114,20 +114,20 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 
 		if(events.size()==0)
 		{
-			getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot process message, no message event matches: "+body+", "+header);
+			getComponent().getLogger().severe(getComponent().getIdentifier()+" cannot process message, no message event matches: "+body+", "+header);
 		}
 		else
 		{
 			if(events.size()>1)
 			{
 				// Multiple matches of highest degree.
-				getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot decide which event matches message, " +
+				getComponent().getLogger().severe(getComponent().getIdentifier()+" cannot decide which event matches message, " +
 					"using first: "+body+", "+header+", "+events);
 			}
 			else if(matched.size()>1)
 			{
 				// Multiple matches but different degrees.
-				getComponent().getLogger().info(getComponent().getComponentIdentifier()+" multiple events matching message, using " +
+				getComponent().getLogger().info(getComponent().getIdentifier()+" multiple events matching message, using " +
 					"message event with highest specialization degree: "+body+", "+header+" ("+degree+"), "+events.get(0)+", "+matched);
 			}
 				
@@ -138,7 +138,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 		{
 			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getComponent(), original);
 			FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+			getComponent().getFeature(IExecutionFeature.class).scheduleStep(fac);
 		}
 	}
 	

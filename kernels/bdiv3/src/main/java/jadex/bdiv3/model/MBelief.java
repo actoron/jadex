@@ -487,7 +487,7 @@ public class MBelief extends MElement
 	{
 		Object ret = null;
 		
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		
 		if(bdif instanceof BDIAgentFeature)
 		{
@@ -560,17 +560,17 @@ public class MBelief extends MElement
 		
 		
 		// Pojo
-		if(agent.getComponentFeature0(IBDIAgentFeature.class)!=null)
+		if(agent.getFeature0(IBDIAgentFeature.class)!=null)
 		{
 			String	capaname	= getName().indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 				? null : getName().substring(0, getName().lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-			return setValue(((BDIAgentFeature)agent.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
+			return setValue(((BDIAgentFeature)agent.getFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname), value, agent.getClassLoader());
 		}
 		
 		// Xml
 		else 
 		{
-			IInternalBDIAgentFeature	bdif	= (IInternalBDIAgentFeature)agent.getComponentFeature(IBDIXAgentFeature.class);
+			IInternalBDIAgentFeature	bdif	= (IInternalBDIAgentFeature)agent.getFeature(IBDIXAgentFeature.class);
 			if(multi)
 			{
 				IBeliefSet rbelset = bdif.getCapability().getBeliefbase().getBeliefSet(getName());

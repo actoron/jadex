@@ -54,7 +54,7 @@ public class ShopService implements IShopService
 	{
 		ShopCapa shop = (ShopCapa)capa.getPojoCapability();
 		SellGoal sell = shop.new SellGoal(item, price);
-		return capa.getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sell);
+		return capa.getAgent().getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sell);
 	}
 	
 	/**

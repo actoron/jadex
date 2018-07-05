@@ -51,7 +51,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	{
 		websocketfactory = new WebSocketFactory(); //.setConnectionTimeout(5000);
 		websocketfactory.setConnectionTimeout((int) connecttimeout);
-		threadpoolsrv = ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
+		threadpoolsrv = ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
 //		threadpoolsrv = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class));
 		return super.init();
 	}

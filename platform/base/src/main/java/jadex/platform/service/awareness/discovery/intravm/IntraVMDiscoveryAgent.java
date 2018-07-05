@@ -88,7 +88,7 @@ public class IntraVMDiscoveryAgent implements IDiscoveryService
 	 */
 	protected IFuture<AwarenessInfo>	infoAvailable(final AwarenessInfo info)
 	{
-		return agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<AwarenessInfo>()
+		return agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<AwarenessInfo>()
 		{
 			@Override
 			public IFuture<AwarenessInfo> execute(IInternalAccess ia)
@@ -160,7 +160,7 @@ public class IntraVMDiscoveryAgent implements IDiscoveryService
 				fubar.addFuture(done);
 //				System.out.println("sendInfo: "+agent+" to "+disco.agent+", "+info);
 				disco.infoAvailable(info).addResultListener(
-					agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(done)
+					agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(done)
 				{
 					@Override
 					public void customResultAvailable(final AwarenessInfo otherinfo) throws Exception
@@ -188,8 +188,8 @@ public class IntraVMDiscoveryAgent implements IDiscoveryService
 	 */
 	protected AwarenessInfo getAwarenessInfo()
 	{
-		IComponentIdentifier root = agent.getComponentIdentifier().getRoot();
-		List<TransportAddress> addr = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
+		IComponentIdentifier root = agent.getIdentifier().getRoot();
+		List<TransportAddress> addr = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addr, running ? AwarenessInfo.STATE_ONLINE : AwarenessInfo.STATE_OFFLINE, Timeout.NONE, null, null, null, "IntraVM");
 		return info;
 	}

@@ -74,7 +74,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscriptions = new HashMap<String, List<ReplicationSubscription>>();
-		this.id = agent.getComponentIdentifier().getName();
+		this.id = agent.getIdentifier().getName();
 	}
 
 	@AgentBody
@@ -125,12 +125,12 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				});
 
 				// repeat
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(searchinterval, this);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(searchinterval, this);
 				return IFuture.DONE;
 			}
 		};
 
-		this.agent.getComponentFeature(IExecutionFeature.class).waitForTick(searchServicesStep);
+		this.agent.getFeature(IExecutionFeature.class).waitForTick(searchServicesStep);
 	}
 
 	/**
@@ -313,7 +313,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 */
 	private IIntermediateFuture<IMessageQueueReplicationService> getOtherServices() 
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).getServices("replication");
+		return agent.getFeature(IRequiredServicesFeature.class).getServices("replication");
 	}
 
 	/**

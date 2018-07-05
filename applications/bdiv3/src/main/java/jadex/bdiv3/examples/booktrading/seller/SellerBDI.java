@@ -68,7 +68,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	@AgentBody
 	public void body()
 	{
-		Order[] ios = (Order[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
+		Order[] ios = (Order[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
 		if(ios!=null)
 		{
 			for(Order o: ios)
@@ -225,7 +225,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	public List<Order> getOrders()
 	{
 		List<Order> ret = new ArrayList<Order>();
-		Collection<SellBook> goals = agent.getComponentFeature(IBDIAgentFeature.class).getGoals(SellBook.class);
+		Collection<SellBook> goals = agent.getFeature(IBDIAgentFeature.class).getGoals(SellBook.class);
 		for(SellBook goal: goals)
 		{
 			ret.add(goal.getOrder());
@@ -239,7 +239,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	public List<Order> getOrders(String title)
 	{
 		List<Order> ret = new ArrayList<Order>();
-		Collection<SellBook> goals = agent.getComponentFeature(IBDIAgentFeature.class).getGoals(SellBook.class);
+		Collection<SellBook> goals = agent.getFeature(IBDIAgentFeature.class).getGoals(SellBook.class);
 		for(SellBook goal: goals)
 		{
 			if(title==null || title.equals(goal.getOrder().getTitle()))
@@ -280,7 +280,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 			double elapsed_time = getTime() - order.getStartTime();
 			double price_span = order.getLimit() - order.getStartPrice();
 			int acceptable_price =  (int)(price_span * elapsed_time / time_span) + order.getStartPrice();
-			agent.getLogger().info(agent.getComponentIdentifier().getName()+" proposed: " + acceptable_price);
+			agent.getLogger().info(agent.getIdentifier().getName()+" proposed: " + acceptable_price);
 			
 			// Store proposal data in plan parameters.
 			goal.setProposal(acceptable_price);
@@ -359,7 +359,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
+		IClockService cs = (IClockService)agent.getFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();
 	}
 	
@@ -372,7 +372,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	{
 		final Future<Integer>	ret	= new Future<Integer>();
 		final MakeProposal goal = new MakeProposal(title);
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).addResultListener(new IResultListener<Object>()
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -397,7 +397,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		ExecuteTask goal = new ExecuteTask(title, price);
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).addResultListener(new IResultListener<Object>()
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -427,7 +427,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	public void createGoal(Order order)
 	{
 		SellBook goal = new SellBook(order);
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 	}
 	
 	/**
@@ -435,7 +435,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	 */
 	public Collection<INegotiationGoal> getGoals()
 	{
-		return (Collection)agent.getComponentFeature(IBDIAgentFeature.class).getGoals(SellBook.class); 
+		return (Collection)agent.getFeature(IBDIAgentFeature.class).getGoals(SellBook.class); 
 	}
 	
 	/**

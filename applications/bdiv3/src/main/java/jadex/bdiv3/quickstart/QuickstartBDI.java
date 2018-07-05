@@ -64,6 +64,6 @@ public class QuickstartBDI
 	@AgentCreated
 	public void start(IInternalAccess self)
 	{
-		self.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new InUpperLeftCorner());
+		self.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new InUpperLeftCorner());
 	}
 }

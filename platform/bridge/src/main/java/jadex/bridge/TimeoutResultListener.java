@@ -199,8 +199,8 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				IClockService clock	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
-				clock.isValid().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
+				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+				clock.isValid().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
 				{
 					public void resultAvailable(Boolean valid)
 					{

@@ -93,7 +93,7 @@ public class Main
 
 	private IFuture<IComponentManagementService> getCMS(IExternalAccess access)
 	{
-		return access.scheduleStep(ia -> ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)));
+		return access.scheduleStep(ia -> ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)));
 
 		// return access.scheduleStep(ia -> SServiceProvider.getService(ia,
 		// IComponentManagementService.class,

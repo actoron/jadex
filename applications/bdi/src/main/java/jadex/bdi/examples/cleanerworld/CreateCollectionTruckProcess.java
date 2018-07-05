@@ -125,7 +125,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 //													}
 //												});
 												
-												ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+												ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 													.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 												{
 													public void intermediateResultAvailable(IMonitoringEvent result)

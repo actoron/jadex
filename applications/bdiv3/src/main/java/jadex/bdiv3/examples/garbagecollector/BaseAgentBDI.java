@@ -29,7 +29,7 @@ public abstract class BaseAgentBDI
 	protected Grid2D env = (Grid2D)EnvironmentService.getSpace(agent, "mygc2dspace").get();
 	
 	/** The environment. */
-	protected ISpaceObject myself = env.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
+	protected ISpaceObject myself = env.getAvatar(agent.getDescription(), agent.getModel().getFullName());
 
 	/** The garbages. */
 	@Belief

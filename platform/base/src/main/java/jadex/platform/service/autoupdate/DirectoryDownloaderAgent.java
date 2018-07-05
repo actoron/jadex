@@ -127,7 +127,7 @@ public class DirectoryDownloaderAgent
 		{
 			public void resultAvailable(Void result)
 			{
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(interval, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(interval, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

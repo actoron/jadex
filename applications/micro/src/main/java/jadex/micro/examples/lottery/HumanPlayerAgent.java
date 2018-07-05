@@ -26,7 +26,7 @@ public class HumanPlayerAgent
 	{
 //		final ILotteryService ls = SServiceProvider.searchService(agent.getExternalAccess(), new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		final ILotteryService ls = (ILotteryService)SFuture.getFirstResultAndTerminate(
-			agent.getComponentFeature(IRequiredServicesFeature.class).addQuery("ls"));
+			agent.getFeature(IRequiredServicesFeature.class).addQuery("ls"));
 		
 		ITerminableIntermediateFuture<String> sub = ls.subscribeToLottery();
 		

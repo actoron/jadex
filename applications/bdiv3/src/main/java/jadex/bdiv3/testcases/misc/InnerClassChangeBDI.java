@@ -98,7 +98,7 @@ public class InnerClassChangeBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -119,7 +119,7 @@ public class InnerClassChangeBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**

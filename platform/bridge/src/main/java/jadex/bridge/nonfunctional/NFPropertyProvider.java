@@ -74,7 +74,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		
 		if(getParentId()!=null)
 		{
-			IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess component) 
@@ -178,7 +178,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-				IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 				{
 					public void customResultAvailable(IExternalAccess component) 
@@ -223,7 +223,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-				IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getParentId()).addResultListener(new ComponentResultListener<IExternalAccess>(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess pacomponent) 
@@ -271,7 +271,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		{
 			if(getParentId()!=null)
 			{
-				IComponentManagementService cms = getInternalAccess().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				IComponentManagementService cms = getInternalAccess().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.getExternalAccess(getParentId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
 					public void customResultAvailable(IExternalAccess component) 
@@ -301,12 +301,12 @@ public class NFPropertyProvider implements INFPropertyProvider
 			nfproperties = new HashMap<String, INFProperty<?,?>>();
 		nfproperties.put(nfprop.getName(), nfprop);
 		
-		if(getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+		if(getInternalAccess().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 		{
-			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
+			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getIdentifier(), getInternalAccess().getDescription().getCreationTime(), 
 				MonitoringEvent.TYPE_PROPERTY_ADDED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 			me.setProperty("propname", nfprop.getName());
-			getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+			getInternalAccess().getFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -331,12 +331,12 @@ public class NFPropertyProvider implements INFPropertyProvider
 				{
 					public void customResultAvailable(Void result)
 					{
-						if(getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+						if(getInternalAccess().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
-							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
+							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getIdentifier(), getInternalAccess().getDescription().getCreationTime(), 
 								MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							me.setProperty("propname", name);
-							getInternalAccess().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+							getInternalAccess().getFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 						else
 						{

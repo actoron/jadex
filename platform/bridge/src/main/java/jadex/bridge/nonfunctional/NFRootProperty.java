@@ -54,8 +54,8 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 			this.injected = true;
 			
 			// Add property to root component
-			IComponentManagementService cms = comp.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
+			IComponentManagementService cms = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			cms.getExternalAccess(comp.getIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess root)
 				{

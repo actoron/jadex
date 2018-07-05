@@ -130,13 +130,13 @@ public class GlobalPoolServiceManager
 		
 		// Check if service is available in global pool itself
 		@SuppressWarnings("unchecked")
-		Collection<IService> ownsers = (Collection<IService>) component.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(servicetype));
+		Collection<IService> ownsers = (Collection<IService>) component.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(servicetype));
 //		Collection<IService> ownsers = (Collection<IService>)SServiceProvider.getLocalServices(component, servicetype);
 		if(ownsers!=null)
 		{
 			for(IService ser: ownsers)
 			{
-				if(!ser.getServiceIdentifier().getProviderId().equals(component.getComponentIdentifier()))
+				if(!ser.getServiceIdentifier().getProviderId().equals(component.getIdentifier()))
 				{
 //					System.out.println("Added own global service pool worker: "+ser);
 					services.put(ser.getServiceIdentifier(), ser);
@@ -306,7 +306,7 @@ public class GlobalPoolServiceManager
 //		{
 			
 			//SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			component.getComponentFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(Binding.SCOPE_GLOBAL)))
+			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(Binding.SCOPE_GLOBAL)))
 				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
 			{
 				public void customIntermediateResultAvailable(IComponentManagementService cms) 
@@ -350,7 +350,7 @@ public class GlobalPoolServiceManager
 				public void intermediateResultAvailable(IComponentManagementService cms) 
 				{
 					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
-					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getComponentIdentifier().getRoot())
+					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getIdentifier().getRoot())
 						&& platforms.get(cid).getWorker()==null)
 					{
 //						System.out.println("found free platform2: "+cid+" "+platforms);
@@ -424,18 +424,18 @@ public class GlobalPoolServiceManager
 					
 					cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
 //					cms.createComponent(null, componentname, ci, null)
-						.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
+						.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 					{
 						public void resultAvailable(IComponentIdentifier result)
 						{
 //							System.out.println("created: "+result);
 							cms.getExternalAccess(result)
-								.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
+								.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess ea)
 								{
 									Future<IService> fut = (Future<IService>)SServiceProvider.searchService(ea, new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
-									fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
+									fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
 									{
 										public void resultAvailable(final IService ser)
 										{
@@ -540,7 +540,7 @@ public class GlobalPoolServiceManager
 	 */
 	protected IFuture<Void> updateWorkerTimer(final IServiceIdentifier sid)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		final IInternalAccess inta = component;
 		
 		final Future<Void> ret = new Future<Void>();
@@ -608,7 +608,7 @@ public class GlobalPoolServiceManager
 	 */
 	protected IFuture<Void> removeService(final IServiceIdentifier sid)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 
 		final Future<Void> ret = new Future<Void>();
 		
@@ -618,10 +618,10 @@ public class GlobalPoolServiceManager
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
-		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		
 		cms.destroyComponent(workercid).addResultListener(
-			inta.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 
 			{
@@ -671,13 +671,13 @@ public class GlobalPoolServiceManager
 	 */
 	protected IFuture<ITimer> createTimer(final long delay, final ITimedObject to)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 
 //		System.out.println("create timer");
 		
 		final Future<ITimer> ret = new Future<ITimer>();
 		
-		IClockService cs = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IClockService cs = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		ret.setResult(cs.createTimer(delay, to));
 		
 		return ret;

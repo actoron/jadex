@@ -35,7 +35,7 @@ public class SNFPropertyProvider
 			@Classname("getNFPropertyNames0")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().getNFPropertyNames();
 			}
 		});
@@ -52,7 +52,7 @@ public class SNFPropertyProvider
 			@Classname("getNFAllPropertyName1")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp==null? new Future<String[]>(SUtil.EMPTY_STRING_ARRAY): nfp.getComponentPropertyProvider().getNFAllPropertyNames();
 			}
 		});
@@ -70,7 +70,7 @@ public class SNFPropertyProvider
 			@Classname("getNFPropertyMetaInfos2")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp==null? new Future<Map<String, INFPropertyMetaInfo>>((Map<String, INFPropertyMetaInfo>)null) :nfp.getComponentPropertyProvider().getNFPropertyMetaInfos();
 			}
 		});
@@ -88,7 +88,7 @@ public class SNFPropertyProvider
 			@Classname("getNFPropertyMetaInfo3")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().getNFPropertyMetaInfo(name);
 			}
 		});
@@ -107,7 +107,7 @@ public class SNFPropertyProvider
 			@Classname("getNFPropertyValue4")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().getNFPropertyValue(name);
 			}
 		});
@@ -128,7 +128,7 @@ public class SNFPropertyProvider
 			@Classname("getNFPropertyValue5")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().getNFPropertyValue(name, unit);
 			}
 		});
@@ -145,7 +145,7 @@ public class SNFPropertyProvider
 			@Classname("addNFProperty6")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().addNFProperty(nfprop);
 			}
 		});
@@ -162,7 +162,7 @@ public class SNFPropertyProvider
 			@Classname("removeNFProperty7")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().removeNFProperty(name);
 			}
 		});
@@ -178,7 +178,7 @@ public class SNFPropertyProvider
 			@Classname("shutdownNFPropertyProvider8")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getComponentPropertyProvider().shutdownNFPropertyProvider();
 			}
 		});
@@ -208,7 +208,7 @@ public class SNFPropertyProvider
 							@Classname("getNFPropertyNames9")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyNames();
 							}
 						}).addResultListener(new DelegationResultListener<String[]>(ret));
@@ -240,7 +240,7 @@ public class SNFPropertyProvider
 							@Classname("getNFAllPropertyNames10")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getNFAllPropertyNames();
 							}
 						}).addResultListener(new DelegationResultListener<String[]>(ret));
@@ -273,7 +273,7 @@ public class SNFPropertyProvider
 							@Classname("getNFPropertyMetaInfos11")
 							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								if (nfp != null)
 								{
 									INFMixedPropertyProvider prov = nfp.getProvidedServicePropertyProvider(sid);
@@ -318,7 +318,7 @@ public class SNFPropertyProvider
 							@Classname("getNFPropertyMetaInfo12")
 							public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
 							}
 						}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
@@ -352,7 +352,7 @@ public class SNFPropertyProvider
 							@Classname("getNFPropertyValue13")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name);
 							}
 						}).addResultListener(new DelegationResultListener<T>(ret));
@@ -388,7 +388,7 @@ public class SNFPropertyProvider
 							@Classname("getNFPropertyValue14")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name, unit);
 							}
 						}).addResultListener(new DelegationResultListener<T>(ret));
@@ -420,7 +420,7 @@ public class SNFPropertyProvider
 							@Classname("addNFProperty15")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).addNFProperty(nfprop);
 							}
 						}).addResultListener(new DelegationResultListener<Void>(ret));
@@ -452,7 +452,7 @@ public class SNFPropertyProvider
 							@Classname("removeNFProperty16")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).removeNFProperty(name);
 							}
 						}).addResultListener(new DelegationResultListener<Void>(ret));
@@ -483,7 +483,7 @@ public class SNFPropertyProvider
 							@Classname("shutdownNFPropertyProvider17")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).shutdownNFPropertyProvider();
 							}
 						}).addResultListener(new DelegationResultListener<Void>(ret));
@@ -517,7 +517,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFPropertyMetaInfos18")
 							public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
 							}
 						}).addResultListener(new DelegationResultListener<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret));
@@ -550,7 +550,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFPropertyNames19")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyNames(method);
 							}
 						}).addResultListener(new DelegationResultListener<String[]>(ret));
@@ -583,7 +583,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFAllPropertyNames20")
 							public IFuture<String[]> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFAllPropertyNames(method);
 							}
 						}).addResultListener(new DelegationResultListener<String[]>(ret));
@@ -615,7 +615,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFPropertyMetaInfos21")
 							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
 							}
 						}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
@@ -649,7 +649,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFPropertyMetaInfo22")
 							public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
 							}
 						}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
@@ -684,7 +684,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFPropertyValue23")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
 							}
 						}).addResultListener(new DelegationResultListener<T>(ret));
@@ -735,7 +735,7 @@ public class SNFPropertyProvider
 							@Classname("getMethodNFPropertyValue24")
 							public IFuture<T> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
 							}
 						}).addResultListener(new DelegationResultListener<T>(ret));
@@ -768,7 +768,7 @@ public class SNFPropertyProvider
 							@Classname("addMethodNFProperty25")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
 							}
 						}).addResultListener(new DelegationResultListener<Void>(ret));
@@ -801,7 +801,7 @@ public class SNFPropertyProvider
 							@Classname("removeMethodNFProperty26")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 								return nfp.getProvidedServicePropertyProvider(sid).removeMethodNFProperty(method, name);
 							}
 						}).addResultListener(new DelegationResultListener<Void>(ret));
@@ -825,7 +825,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredNFPropertyNames27")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getNFPropertyNames();
 			}
 		});
@@ -842,7 +842,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredNFAllPropertyNames28")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getNFAllPropertyNames();
 			}
 		});
@@ -860,7 +860,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredNFPropertyMetaInfos29")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getNFPropertyMetaInfos();
 			}
 		});
@@ -878,7 +878,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredNFPropertyMetaInfo30")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
 			}
 		});
@@ -897,7 +897,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredNFPropertyValue31")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getNFPropertyValue(name);
 			}
 		});
@@ -918,7 +918,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredNFPropertyValue32")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getNFPropertyValue(name, unit);
 			}
 		});
@@ -935,7 +935,7 @@ public class SNFPropertyProvider
 			@Classname("addRequiredNFProperty33")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).addNFProperty(nfprop);
 			}
 		});
@@ -952,7 +952,7 @@ public class SNFPropertyProvider
 			@Classname("removeRequiredNFProperty34")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).removeNFProperty(name);
 			}
 		});
@@ -968,7 +968,7 @@ public class SNFPropertyProvider
 			@Classname("shutdownRequiredNFPropertyProvider35")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).shutdownNFPropertyProvider();
 			}
 		});
@@ -985,7 +985,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFPropertyMetaInfos36")
 			public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
 			}
 		});
@@ -1003,7 +1003,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFPropertyNames37")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFPropertyNames(method);
 			}
 		});
@@ -1021,7 +1021,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFAllPropertyNames38")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFAllPropertyNames(method);
 			}
 		});
@@ -1038,7 +1038,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFPropertyMetaInfos39")
 			public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
 			}
 		});
@@ -1057,7 +1057,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFPropertyMetaInfo40")
 			public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
 			}
 		});
@@ -1077,7 +1077,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFPropertyValue41")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
 			}
 		});
@@ -1099,7 +1099,7 @@ public class SNFPropertyProvider
 			@Classname("getRequiredMethodNFPropertyValue42")
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
 			}
 		});
@@ -1117,7 +1117,7 @@ public class SNFPropertyProvider
 			@Classname("addRequiredMethodNFProperty43")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
 			}
 		});
@@ -1135,7 +1135,7 @@ public class SNFPropertyProvider
 			@Classname("removeRequiredMethodNFProperty44")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				INFPropertyComponentFeature nfp = ia.getComponentFeature(INFPropertyComponentFeature.class);
+				INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
 				return nfp.getRequiredServicePropertyProvider(sid).removeMethodNFProperty(method, name);
 			}
 		});

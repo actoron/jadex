@@ -47,16 +47,16 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		final Testcase tc = new Testcase();
 		tc.setTestCount(2);
 		
-		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
+		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
 		
 		// Create user as subcomponent -> should be able to find the service with publication scope application
 		IComponentIdentifier cid = null;
 		TestReport tr = new TestReport("#1", "Test if service with scope application can be found when provider is child of user");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getComponentIdentifier()));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getIdentifier()));
 			cid = fut.getFirstResult();
-			IExampleService ser = (IExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("exaser").get();
+			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 			tr.setSucceeded(true);
 		}
@@ -86,7 +86,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		{
 			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getModel().getResourceIdentifier()));
 			cid = fut.getFirstResult();
-			IExampleService ser = (IExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("exaser").get();
+			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());
 			tr.setFailed("Problem: could find hidden service");
 		}
@@ -109,6 +109,6 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		}
 		tc.addReport(tr);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 	}
 }

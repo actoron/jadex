@@ -51,7 +51,7 @@ public class PainterBDI
 			
 			painter = this;
 
-			System.out.println("painting start: "+agent.getComponentIdentifier()+" "+goal);//this.getRPlan());
+			System.out.println("painting start: "+agent.getIdentifier()+" "+goal);//this.getRPlan());
 			
 			plan.waitFor(2000).get();
 	//		if(Math.random()>0.7)
@@ -60,11 +60,11 @@ public class PainterBDI
 	//			throw new RuntimeException("end painting: painted euro not good enough");
 	//		}
 	//		System.out.println("end painting: ok, "+this);
-			System.out.println("painting end: "+agent.getComponentIdentifier());
+			System.out.println("painting end: "+agent.getIdentifier());
 			
 			painter = null;
 			
-			return agent.getComponentIdentifier().getName();
+			return agent.getIdentifier().getName();
 		}
 		
 		@PlanAborted

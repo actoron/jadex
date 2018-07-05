@@ -78,9 +78,9 @@ public class EventPublisher implements IEventPublisher
 				final Future<Void> ret = new Future<Void>();
 				try
 				{
-					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+					if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 					{
-						IFuture<Void> fut = agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						IFuture<Void> fut = agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -144,7 +144,7 @@ public class EventPublisher implements IEventPublisher
 	 */
 	public RuleSystem getRuleSystem()
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 
 	/**

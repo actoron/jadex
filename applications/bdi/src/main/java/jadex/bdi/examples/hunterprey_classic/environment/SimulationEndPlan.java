@@ -22,7 +22,7 @@ public class SimulationEndPlan extends Plan
 
 	public void body()
 	{
-		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
 			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		Environment en = (Environment)getBeliefbase().getBelief("environment").getFact();

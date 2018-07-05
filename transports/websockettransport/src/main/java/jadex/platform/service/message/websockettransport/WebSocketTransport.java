@@ -100,7 +100,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 		{
 			try
 			{
-				WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getFeature(IPojoComponentFeature.class).getPojoAgent();
 		 		int idletimeout = pojo.getIdleTimeout();
 				server = new WebSocketServer(port, handler);
 				server.start(idletimeout, true);

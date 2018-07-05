@@ -54,14 +54,14 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = (SubscriptionIntermediateDelegationFuture<CMSStatusEvent>)
 			SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, ia);
 		
-		ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
+		ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
 				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, name, model);
 				TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
-				fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(lis));
+				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(lis));
 			}
 			
 			public void exceptionOccurred(Exception exception)

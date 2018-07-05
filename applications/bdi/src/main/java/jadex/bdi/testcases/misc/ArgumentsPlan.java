@@ -26,7 +26,7 @@ public class ArgumentsPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test if a worker agent can be started and supplied with arguments.");
 		try
 		{
-			IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+			IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
 				.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			Map<String, Object> args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());

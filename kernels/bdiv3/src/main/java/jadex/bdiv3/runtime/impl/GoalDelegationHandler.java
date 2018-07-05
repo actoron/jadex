@@ -87,7 +87,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 			if(goalname==null)
 				throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 			
-			final IInternalBDIAgentFeature	bdif	= agent.getComponentFeature(IInternalBDIAgentFeature.class);
+			final IInternalBDIAgentFeature	bdif	= agent.getFeature(IInternalBDIAgentFeature.class);
 			MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 			final MGoal mgoal = mcapa.getGoal(goalname);
 			
@@ -107,7 +107,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 				{
 					Class<?>[] mptypes2 = new Class<?>[mptypes.length+1];
 					System.arraycopy(mptypes, 0, mptypes2, 1, mptypes.length);
-					Object pojo = agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+					Object pojo = agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 					mptypes2[0] = pojo.getClass();
 					Constructor<?> c = goalcl.getConstructor(mptypes2);
 					Object[] args2 = new Object[args.length+1];
@@ -198,7 +198,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 				public void handleTerminated(Exception reason)
 				{
 	//				System.out.println("terminated call: "+fgoal);
-					IBDIAgentFeature bf = agent.getComponentFeature0(IBDIAgentFeature.class);
+					IBDIAgentFeature bf = agent.getFeature0(IBDIAgentFeature.class);
 					if(bf!=null)
 					{
 						bf.dropGoal(fgoal);
@@ -237,14 +237,14 @@ public class GoalDelegationHandler  implements InvocationHandler
 				}
 			};
 			
-			IBDIAgentFeature bf = agent.getComponentFeature0(IBDIAgentFeature.class);
+			IBDIAgentFeature bf = agent.getFeature0(IBDIAgentFeature.class);
 			if(bf!=null)
 			{
 				bf.dispatchTopLevelGoal(goal).addResultListener(lis);
 			}
 			else
 			{
-				IBDIXAgentFeature bfx = agent.getComponentFeature0(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bfx = agent.getFeature0(IBDIXAgentFeature.class);
 				bfx.getGoalbase().dispatchTopLevelGoal((IGoal)goal).addResultListener(lis);
 			}
 		}

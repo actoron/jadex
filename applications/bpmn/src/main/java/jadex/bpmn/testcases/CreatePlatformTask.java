@@ -32,14 +32,14 @@ public class CreatePlatformTask implements ITask
 		final Future<Void>	ret	= new Future<Void>();
 		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUri().toString();
 		
-		Starter.createPlatform(new String[]{"-platformname", process.getComponentIdentifier().getPlatformPrefix()+"_*",
+		Starter.createPlatform(new String[]{"-platformname", process.getIdentifier().getPlatformPrefix()+"_*",
 //			"-logging", "true",
 			"-libpath", "new String[]{\""+url+"\"}",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 			"-gui", "false"
 //			"-usepass", "false"//, "-simulation", "false"
 			})
-			.addResultListener(process.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			.addResultListener(process.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{

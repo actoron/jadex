@@ -45,7 +45,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 	{
 		Object[] ret = null;
 		
-		IBDIModel model = (IBDIModel)agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
+		IBDIModel model = (IBDIModel)agent.getFeature(IInternalBDIAgentFeature.class).getBDIModel();
 		
 		boolean done = false;
 		
@@ -159,7 +159,7 @@ public class DefaultAnnotationMapper<T> implements IServiceParameterMapper<T>
 		}
 		else
 		{
-			rgoal = agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getRGoal(goal);
+			rgoal = agent.getFeature(IInternalBDIAgentFeature.class).getCapability().getRGoal(goal);
 			MGoal mgoal = rgoal.getMGoal();
 			MethodInfo mi = mgoal.getServiceParameterMapping(sername==null? "": sername);
 			

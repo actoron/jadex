@@ -56,7 +56,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 		
 		// Find fitting MServiceCall
 		String mn = method.toString();
-		MServiceCall msc = agent.getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getService(mn);
+		MServiceCall msc = agent.getFeature(IInternalBDIAgentFeature.class).getBDIModel().getCapability().getService(mn);
 		final RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args), agent, null);
 		sc.addListener(new ExceptionDelegationResultListener<Void, Object>(ret)
 		{
@@ -70,7 +70,7 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 			}
 		});
 		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(sc);
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+		agent.getFeature(IExecutionFeature.class).scheduleStep(fac);
 		
 		return ret;
 	}

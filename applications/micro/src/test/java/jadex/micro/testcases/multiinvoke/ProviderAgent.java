@@ -32,7 +32,7 @@ public class ProviderAgent implements IExampleService
 	 */
 	public IFuture<String> getItem()
 	{
-		return new Future<String>("item: "+agent.getComponentIdentifier().getName());
+		return new Future<String>("item: "+agent.getIdentifier().getName());
 	}
 	
 	/**
@@ -50,8 +50,8 @@ public class ProviderAgent implements IExampleService
 			{
 				if(cnt[0]++<num)
 				{
-					ret.addIntermediateResult("item: "+agent.getComponentIdentifier().getName()+" "+cnt[0]);
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);	
+					ret.addIntermediateResult("item: "+agent.getIdentifier().getName()+" "+cnt[0]);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(delay, this);	
 				}
 				else
 				{
@@ -60,7 +60,7 @@ public class ProviderAgent implements IExampleService
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, step);
 		
 		return ret;
 	}

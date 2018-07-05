@@ -185,15 +185,15 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		this.cms = ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
-		intmsgfeat = (IInternalMessageFeature) agent.getComponentFeature(IMessageFeature.class);
+		this.cms = ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if (debug)
 			System.out.println("Started relay transport");
-		Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+		Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();
 		
 		maxhops = SConfigParser.getIntValue(args.get(PROPERTY_MAX_HOPS), maxhops);
 		
-		secservice = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
+		secservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
 		
 		int cachesize = SConfigParser.getIntValue(PROPERTY_ROUTING_CACHE_SIZE, 5000);
 		routes = new LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>>(cachesize, null, true);
@@ -227,7 +227,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //					System.out.println("Relay: " + prot + " " + name + " " + addr);
 					
 					IComponentIdentifier relayid = new BasicComponentIdentifier(name);
-					if (!agent.getComponentIdentifier().getRoot().equals(relayid))
+					if (!agent.getIdentifier().getRoot().equals(relayid))
 					{
 						relays.add(relayid);
 						TransportAddress ta = new TransportAddress(new BasicComponentIdentifier(name), prot, addr);
@@ -242,7 +242,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			}
 			if (relayaddrs.size() > 0)
 			{
-				ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
+				ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 				tas.addManualAddresses(relayaddrs).get();
 			}
 		}
@@ -250,7 +250,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		// Shuffle relays to even out load.
 		Collections.shuffle(relays);
 		
-		IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
+		IMessageFeature msgfeat = agent.getFeature(IMessageFeature.class);
 //		forwarding = SConfigParser.getBoolValue(args.get(PROPERTY_FORWARDING));
 		if (forwarding)
 		{
@@ -281,7 +281,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //						System.out.println("Got ping, dc size: " + directconnections.size());
 						
 						Ack ack = new Ack();
-						agent.getComponentFeature(IMessageFeature.class).sendReply(header, ack);
+						agent.getFeature(IMessageFeature.class).sendReply(header, ack);
 					}
 					else
 					{
@@ -307,7 +307,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
 				{
 					IComponentIdentifier fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
-					if (fwdest != null && agent.getComponentIdentifier().getRoot().equals(fwdest))
+					if (fwdest != null && agent.getIdentifier().getRoot().equals(fwdest))
 						sendMessage(header, (byte[]) msg);
 				}
 			});
@@ -315,11 +315,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			startupfut = new Future<Void>();
 			if (relays.size() > 0 && keepalivecount > 0)
 			{
-				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IMessageFeature msgfeat = ia.getComponentFeature(IMessageFeature.class);
+						IMessageFeature msgfeat = ia.getFeature(IMessageFeature.class);
 						if (keepaliveconnections.size() < keepalivecount)
 						{
 							final CounterResultListener<Void> crl = startupfut != null ? new CounterResultListener<Void>(relays.size(), new IResultListener<Void>()
@@ -393,7 +393,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								});
 							}
 						}
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
 						return IFuture.DONE;
 					}
 				});
@@ -483,7 +483,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			fwdest = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
 			
 			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
-			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			byte[] bheader = serserv.encode(header, agent, header);
 			bheader = secservice.encryptAndSign(header, bheader).get();
 			
@@ -509,11 +509,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			}
 		}
 		
-		if (agent.getComponentIdentifier().getRoot().equals(fwdest))
+		if (agent.getIdentifier().getRoot().equals(fwdest))
 		{
 			final List<byte[]> unpacked = SUtil.splitData(body);
 			final IComponentIdentifier source = (IComponentIdentifier) header.getProperty(FORWARD_SENDER);
-			final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getComponentIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+			final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getIdentifier().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			
 //			System.out.println("Final receiver, delivering to component: " + body);
 			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
@@ -544,7 +544,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			return ret;
 		}
 		
-		header.addProperty(IMsgHeader.SENDER, agent.getComponentIdentifier());
+		header.addProperty(IMsgHeader.SENDER, agent.getIdentifier());
 		
 		Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(fwdest);
 		if (route != null)
@@ -614,18 +614,18 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	public IIntermediateFuture<Integer> discoverRoute(final IComponentIdentifier dest, final LinkedHashSet<IComponentIdentifier> hops)
 	{
 		if (debug)
-			System.out.println("Discover route on " + agent.getComponentIdentifier() + " for " + dest);
+			System.out.println("Discover route on " + agent.getIdentifier() + " for " + dest);
 		
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
-		if (hops.contains(agent.getComponentIdentifier().getRoot()) || hops.size() + 1 > maxhops)
+		if (hops.contains(agent.getIdentifier().getRoot()) || hops.size() + 1 > maxhops)
 		{
-			ret.setException(new IllegalStateException("Loop detected or TTL exceeded: " + agent.getComponentIdentifier() + " " + Arrays.toString(hops.toArray())));
+			ret.setException(new IllegalStateException("Loop detected or TTL exceeded: " + agent.getIdentifier() + " " + Arrays.toString(hops.toArray())));
 			return ret;
 		}
 		
-		if (hasDirectConnection(destination) || agent.getComponentIdentifier().getRoot().equals(destination))
+		if (hasDirectConnection(destination) || agent.getIdentifier().getRoot().equals(destination))
 		{
 			ret.addIntermediateResult(0);
 			ret.setFinished();
@@ -652,7 +652,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		}
 		
 		final LinkedHashSet<IComponentIdentifier> newhops = new LinkedHashSet<IComponentIdentifier>(hops);
-		newhops.add(agent.getComponentIdentifier().getRoot());
+		newhops.add(agent.getIdentifier().getRoot());
 		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -771,11 +771,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						try
 						{
 //							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
-							Collection<IRoutingService> addrs = agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, Binding.SCOPE_GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
+							Collection<IRoutingService> addrs = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, Binding.SCOPE_GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
 							for (IRoutingService rs : addrs)
 							{
 								IComponentIdentifier rsprov = ((IService) rs).getServiceIdentifier().getProviderId();
-								if (!routingservices.containsKey(rsprov) && !agent.getComponentIdentifier().equals(rsprov))
+								if (!routingservices.containsKey(rsprov) && !agent.getIdentifier().equals(rsprov))
 								{
 									filteredaddrs.add(rs);
 								}

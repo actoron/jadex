@@ -81,7 +81,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 				superinfos.add(new ClassInfo(sin));
 			}
 		}
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getIdentifier();
 		this.type	= new ClassInfo(type);
 		this.supertypes = superinfos.toArray(new ClassInfo[superinfos.size()]);
 		this.servicename = servicename;

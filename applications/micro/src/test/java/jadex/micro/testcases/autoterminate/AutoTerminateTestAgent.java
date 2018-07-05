@@ -113,7 +113,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 		
 //		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getScaledRemoteDefaultTimeout(agent.getComponentIdentifier(), 1.25),
+		waitForRealtimeDelay(Starter.getScaledRemoteDefaultTimeout(agent.getIdentifier(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -200,7 +200,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(AutoTerminateTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(AutoTerminateTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

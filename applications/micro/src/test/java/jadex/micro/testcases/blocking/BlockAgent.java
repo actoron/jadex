@@ -33,7 +33,7 @@ public class BlockAgent	implements	IBlockService
 		Future<Void> ret = new Future<Void>();
 		if(millis>0)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(millis).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(millis).get();
 			ret.setResult(null);
 		}
 		else
