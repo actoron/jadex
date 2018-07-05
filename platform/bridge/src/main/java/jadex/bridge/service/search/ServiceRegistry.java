@@ -113,7 +113,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public Set<IServiceIdentifier> searchServices(ServiceQuery<?> query)
 	{
-		Set<IServiceIdentifier> ret = Collections.emptySet();
+		Set<IServiceIdentifier> ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
 			ret = getServices(query);
@@ -142,6 +142,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				}
 			}
 		}
+		
+		if (ret == null)
+			ret = Collections.emptySet();
 		
 		return ret;
 	}

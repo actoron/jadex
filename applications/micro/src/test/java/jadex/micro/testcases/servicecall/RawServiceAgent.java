@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Arguments(@Argument(name=TagProperty.NAME, clazz=String.class, defaultvalue="\"raw\""))
 @ProvidedServices(@ProvidedService(type=IServiceCallService.class,
-	implementation=@Implementation(expression="new RawServiceCallService($component.getComponentIdentifier())",
+	implementation=@Implementation(expression="new RawServiceCallService($component.getIdentifier())",
 		proxytype=Implementation.PROXYTYPE_RAW)))
 @Agent
 public class RawServiceAgent

@@ -38,7 +38,7 @@ import jadex.micro.testcases.TestAgent;
 @Service
 @Agent
 @ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
 public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateService
 {
 	//-------- attributes --------
