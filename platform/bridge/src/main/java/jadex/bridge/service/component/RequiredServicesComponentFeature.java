@@ -39,7 +39,6 @@ import jadex.commons.future.TerminationCommand;
 /**
  *  Feature for provided services.
  */
-// Todo: synchronous or asynchronous (for search)?
 public class RequiredServicesComponentFeature	extends AbstractComponentFeature implements IRequiredServicesFeature, IInternalServiceMonitoringFeature
 {
 	/** Marker for duplicate declarations of same type. */
@@ -664,11 +663,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			return new Future<T>(new ComponentTerminatedException(id));
 //		}
 
-		// Set owner if not yet set
-		if(query.getOwner()==null)
+		// Check if owner set to wrong component
+		if(query.getOwner()!=null && !getComponent().getComponentIdentifier().equals(query.getOwner()))
 		{
-			query.setOwner(getComponent().getComponentIdentifier());
+			throw new IllegalArgumentException("Query owner must be local component: "+query);
 		}
+		query.setOwner(getComponent().getComponentIdentifier());
 		
 		// Set networks if not set for remote queries
 		// TODO: more extensible way of checking for remote query

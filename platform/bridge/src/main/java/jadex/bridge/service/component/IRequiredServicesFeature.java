@@ -10,7 +10,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 /**
  *  Component feature for required services.
  */
-public interface IRequiredServicesFeature 
+public interface IRequiredServicesFeature
 {
 	//-------- accessors for declared services --------
 	
