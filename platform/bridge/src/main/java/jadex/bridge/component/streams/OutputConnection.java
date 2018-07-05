@@ -8,7 +8,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.ExceptionDelegationResultListener;

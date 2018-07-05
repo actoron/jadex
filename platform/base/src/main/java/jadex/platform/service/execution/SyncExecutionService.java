@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -183,7 +183,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		{
 			public void customResultAvailable(Void v)
 			{
-				IThreadPoolService	result	= ((AbstractComponentFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				IThreadPoolService	result	= ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 				executor = new Executor(result, new IExecutable()
 				{
 					public boolean execute()

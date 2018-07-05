@@ -39,7 +39,7 @@ import jadex.commons.future.TerminationCommand;
 /**
  *  Feature for provided services.
  */
-public class RequiredServicesComponentFeature	extends AbstractComponentFeature implements IRequiredServicesFeature, IInternalServiceMonitoringFeature
+public class RequiredServicesComponentFeature	extends AbstractComponentFeature implements IRequiredServicesFeature, IInternalServiceMonitoringFeature, IInternalRequiredServicesFeature
 {
 	/** Marker for duplicate declarations of same type. */
 	private static final RequiredServiceInfo	ISS_MEHR_WURST	= new RequiredServiceInfo();
@@ -414,7 +414,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServiceInfos()
+	public RequiredServiceInfo[] getServiceInfos()
 	{
 //		if(shutdowned)
 //			throw new ComponentTerminatedException(id);
@@ -475,6 +475,44 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		return subscriptions!=null;
 	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get a service raw (i.e. w/o required proxy).
+	 */
+	// Hack???
+	public <T>	T	getRawService(Class<T> type)
+	{
+		ServiceQuery<T>	query	= new ServiceQuery<>(type);
+		enhanceQuery(query, false);
+		
+		@SuppressWarnings("unchecked")
+		T	ret	= (T)ServiceRegistry.getRegistry(getComponent())
+			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
+		return ret;
+	}
+
+	/**
+	 *  Get a service raw (i.e. w/o required proxy).
+	 */
+	// Hack???
+	public <T>	Collection<T>	getRawServices(Class<T> type)
+	{
+		ServiceQuery<T>	query	= new ServiceQuery<>(type);
+		enhanceQuery(query, true);
+		
+		Collection<IServiceIdentifier>	ids	= ServiceRegistry.getRegistry(getComponent()).searchServices(query);
+		Collection<T>	ret	= new ArrayList<>();
+		for(IServiceIdentifier id: ids)
+		{
+			@SuppressWarnings("unchecked")
+			T	t	= (T)ServiceRegistry.getRegistry(getComponent()).getLocalService(id);
+			ret.add(t);
+		}
+		return ret;
+	}
+
 	
 	//-------- impl methods --------
 	

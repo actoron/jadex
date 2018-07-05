@@ -1,6 +1,5 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
@@ -8,21 +7,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  */
 public interface IInternalServiceMonitoringFeature
 {
-	/**
-	 *  Get the required service info for a name.
-	 *  @param name	The required service name.
-	 */
-	// Hack!!! used by multi invoker?
-	public RequiredServiceInfo	getServiceInfo(String name);
-
-	//-------- all declared services (e.g. JCC component details) --------
-	
-	/**
-	 *  Get the required services.
-	 *  @return The required services.
-	 */
-	public RequiredServiceInfo[] getRequiredServiceInfos();
-	
 	//-------- listening to events (e.g. ComAnalyzer) --------
 	
 	/**

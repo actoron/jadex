@@ -11,7 +11,6 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
-import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
@@ -20,6 +19,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -428,7 +428,7 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		cms	= ((AbstractComponentFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+		cms	= ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		boolean	setresult;
 		synchronized(services)
 		{
@@ -439,7 +439,7 @@ public class DirectoryFacilitatorService	implements IDF
 			ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
 		
-		clockservice	= ((AbstractComponentFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		clockservice	= ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		synchronized(services)
 		{
 			services[1]	= true;

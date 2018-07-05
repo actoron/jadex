@@ -39,6 +39,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -397,7 +398,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(delay>=0)
 		{
 			// OK to fetch sync even from external access because everything thread safe.
-			IClockService	cs	= getRawService(IClockService.class);
+			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 			ITimedObject	to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -445,7 +446,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		try
 		{
-			IClockService	cs	= getRawService(IClockService.class);
+			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 			ITimedObject	to	=  	new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -539,7 +540,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getRawService(IClockService.class);
+		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -571,7 +572,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= getRawService(IClockService.class);
+		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -643,7 +644,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			IExecutionService exe = getRawService(IExecutionService.class);
+			IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			// Hack!!! service is foudn before it is started, grrr.
 			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
@@ -1201,7 +1202,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(breakpoint_triggered)
 		{
-			IComponentManagementService	cms	= getRawService(IComponentManagementService.class);
+			IComponentManagementService	cms	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 			cms.suspendComponent(getComponent().getDescription().getName());
 		}
 		
@@ -1386,7 +1387,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
-											IExecutionService	exe	= getRawService(IExecutionService.class);
+											IExecutionService	exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 											// Hack!!! service is foudn before it is started, grrr.
 											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 											{

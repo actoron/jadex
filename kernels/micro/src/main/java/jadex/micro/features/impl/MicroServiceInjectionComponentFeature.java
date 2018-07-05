@@ -18,7 +18,7 @@ import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -148,7 +148,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								else if(!(info.isMultiple() || ft.isArray() || SReflect.isSupertype(Collection.class, ft) 
 									|| !infos[j].isLazy()))
 								{
-									RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
+									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
 									Class<?> clz = rsi.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
 									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(new IResultCommand<IFuture<Object>, Void>()
 									{

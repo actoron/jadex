@@ -6,7 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
@@ -42,7 +42,7 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 	public IFuture<Void> agentCreated()
 	{
 //		BasicServiceContainer con = (BasicServiceContainer)agent.getServiceContainer();
-		RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
+		RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
 		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_COMPONENT_ONLY))

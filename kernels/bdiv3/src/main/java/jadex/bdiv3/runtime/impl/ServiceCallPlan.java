@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
@@ -88,7 +89,7 @@ public class ServiceCallPlan
 					Method tmp;
 					if(method==null)
 					{
-						RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo(service);
+						RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo(service);
 						Class<?> cl = rsi.getType().getType(agent.getClassLoader());
 						tmp = cl.getDeclaredMethods()[0];
 					}

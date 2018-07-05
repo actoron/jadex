@@ -2,22 +2,16 @@ package jadex.platform.service.registry;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registry.ARegistryEvent;
 import jadex.bridge.service.types.registry.RegistryEvent;
-import jadex.commons.IAsyncFilter;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;

@@ -45,7 +45,7 @@ import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -175,7 +175,7 @@ public class ServiceCallTask implements ITask
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
 		
-		Class<?> servicetype = ((IInternalServiceMonitoringFeature)process.getFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
+		Class<?> servicetype = ((IInternalRequiredServicesFeature)process.getFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
 		Method[] methods = servicetype.getMethods();
 		Method met = null;
 		for(Method meth : methods)

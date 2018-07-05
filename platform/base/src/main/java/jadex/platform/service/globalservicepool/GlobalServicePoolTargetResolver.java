@@ -12,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;

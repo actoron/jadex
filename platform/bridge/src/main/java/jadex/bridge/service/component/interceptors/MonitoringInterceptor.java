@@ -4,7 +4,7 @@ import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
@@ -103,7 +103,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 			
 	//		if(context.getMethod().getName().indexOf("log")!=-1)
 	//			System.out.println("log");
-			IMonitoringService monser = ((AbstractComponentFeature)feat).getRawService(IMonitoringService.class);
+			IMonitoringService monser = ((IInternalRequiredServicesFeature)feat).getRawService(IMonitoringService.class);
 			if(monser!=null)
 			{
 				long start = System.currentTimeMillis();
@@ -230,7 +230,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 //				sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
 //				CallAccess.setCurrentInvocation(sc); 
 	
-				IMonitoringService monser = ((AbstractComponentFeature)feat).getRawService(IMonitoringService.class);
+				IMonitoringService monser = ((IInternalRequiredServicesFeature)feat).getRawService(IMonitoringService.class);
 				if(monser!=null)
 				{
 					long end = System.currentTimeMillis();

@@ -1,15 +1,10 @@
 package jadex.bridge.component.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SimpleParameterGuesser;
@@ -143,36 +138,5 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 			guesser	= new SimpleParameterGuesser(Collections.singleton(this));
 		}
 		return guesser;
-	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Get a service raw (i.e. w/o required proxy).
-	 */
-	// Hack???
-	public <T>	T	getRawService(Class<T> type)
-	{
-		@SuppressWarnings("unchecked")
-		T	ret	= (T)ServiceRegistry.getRegistry(getComponent())
-			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(new ServiceQuery<>(type)));
-		return ret;
-	}
-
-	/**
-	 *  Get a service raw (i.e. w/o required proxy).
-	 */
-	// Hack???
-	public <T>	Collection<T>	getRawServices(Class<T> type)
-	{
-		Collection<IServiceIdentifier>	ids	= ServiceRegistry.getRegistry(getComponent()).searchServices(new ServiceQuery<>(type));
-		Collection<T>	ret	= new ArrayList<>();
-		for(IServiceIdentifier id: ids)
-		{
-			@SuppressWarnings("unchecked")
-			T	t	= (T)ServiceRegistry.getRegistry(getComponent()).getLocalService(id);
-			ret.add(t);
-		}
-		return ret;
-	}
+	}	
 }

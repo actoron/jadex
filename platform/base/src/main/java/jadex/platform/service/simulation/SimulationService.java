@@ -6,12 +6,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
@@ -146,43 +146,20 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		
 		ISettingsService	settings	= access.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 		settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				final boolean[]	services	= new boolean[2];
-
-				exeservice	= ((AbstractComponentFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
-				services[0]	= true;
-				if(services[0] && services[1])
+				exeservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+				clockservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+				if(startoninit)
 				{
-					if(startoninit)
-					{
-						startoninit	= false;
-						start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-					}
-					else
-					{
-						ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-					}
+					startoninit	= false;
+					start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 				}
-						
-				clockservice	= ((AbstractComponentFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
-				clockservice = (IClockService)result;
-				services[1]	= true;
-				if(services[0] && services[1])
+				else
 				{
-					if(startoninit)
-					{
-						startoninit	= false;
-						start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-					}
-					else
-					{
-						ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-					}
+					ret.setResult(null);
 				}
 			}
 		}));
@@ -350,7 +327,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				IThreadPoolService	tps	= ((AbstractComponentFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				IThreadPoolService	tps	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 				clockservice.setClock(type, tps);
 				notifyListeners(new ChangeEvent(this, "clock_type", type));
 				fut.setResult(null);

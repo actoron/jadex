@@ -20,7 +20,6 @@ import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.impl.MsgHeader;
@@ -28,6 +27,7 @@ import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -212,8 +212,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IFuture<Void>	init()
 	{
 		this.codec = MessageComponentFeature.getSerializationServices(agent.getIdentifier().getRoot());
-		this.secser	= ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
-		this.cms	= ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+		this.secser	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
+		this.cms	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		this.impl = createTransportImpl();
 		impl.init(this);
 
@@ -255,7 +255,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 
 //						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 //						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
-						ITransportAddressService tas = ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+						ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 						
 //						System.out.println("Transport addresses: "+agent+", "+saddresses);
 						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
@@ -735,7 +735,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IIntermediateFuture<String> getAddresses(IMsgHeader header)
 	{
 		IComponentIdentifier target = getTarget(header).getRoot();
-		ITransportAddressService tas = ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+		ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 		
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Collection<String>>(ret)

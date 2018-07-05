@@ -35,7 +35,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
@@ -155,7 +155,7 @@ public class MethodCallTask implements ITask
 		{
 			public void customResultAvailable(Object result)
 			{
-				Class<?> servicetype = ((IInternalServiceMonitoringFeature)process.getFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
+				Class<?> servicetype = ((IInternalRequiredServicesFeature)process.getFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
 				//Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
 				
 				Method[] methods = servicetype.getMethods();

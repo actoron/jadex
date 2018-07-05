@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.MultiplexCollector;
 import jadex.bridge.service.annotation.MultiplexDistributor;
 import jadex.bridge.service.annotation.TargetMethod;
 import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.IFilter;
@@ -53,7 +54,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 	{
 		this.agent = agent;
 		this.reqname = reqname;
-		RequiredServiceInfo reqs = ((IInternalServiceMonitoringFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo(reqname);
+		RequiredServiceInfo reqs = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo(reqname);
 		if(reqs==null)
 			throw new RuntimeException("Required service not found: "+reqname);
 		this.servicetype = reqs.getType().getType(agent.getClassLoader(), agent.getModel().getAllImports());

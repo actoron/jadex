@@ -31,7 +31,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -104,7 +104,7 @@ public class SRemoteGui
 				final Future<Object[]>	ret	= new Future<Object[]>();
 				try
 				{
-					final RequiredServiceInfo[]	ris	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: ((IInternalServiceMonitoringFeature)ia.getFeature(IRequiredServicesFeature.class)).getRequiredServiceInfos();
+					final RequiredServiceInfo[]	ris	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getServiceInfos();
 					ProvidedServiceInfo[]	pis	= null;
 					IServiceIdentifier[]	sis	= null;
 					
