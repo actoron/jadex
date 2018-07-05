@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -118,7 +119,7 @@ public class PojoAgentCreationAgent
 					args.put("startmem", Long.valueOf(startmem));
 					cms.createComponent(createPeerName(num+1, agent.getIdentifier()),
 						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier()), null);
+						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
 				}
 			});
 		}
@@ -165,7 +166,7 @@ public class PojoAgentCreationAgent
 										public IFuture<Void> execute(final IInternalAccess ia)
 										{
 											final Future<Void> ret = new Future<Void>();
-											ia.getFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class))
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
@@ -277,12 +278,12 @@ public class PojoAgentCreationAgent
 	
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).getService(IComponentManagementService.class);
 	}
 	
 	
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).getService(IClockService.class);
 	}
 }

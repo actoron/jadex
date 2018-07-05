@@ -528,8 +528,12 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// When service not declared (i.e. search) -> create matching info from query.
 		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
 		
+		@SuppressWarnings("unchecked")
+		T ret	=  (T)ServiceRegistry.getRegistry(getComponent())
+			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
+		
 		// TODO: global registry search.
-		IFuture<T>	search	= new Future<>(new UnsupportedOperationException("TODO"));
+		IFuture<T>	search	= ret!=null ? new Future<T>(ret) : new Future<>(new UnsupportedOperationException("TODO"));
 		
 		// Schedule result on component thread and wrap result in proxy, if required
 		return FutureFunctionality.getDelegationFuture(search,
@@ -582,8 +586,19 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// When service not declared (i.e. search) -> create matching info from query.
 		RequiredServiceInfo	finfo	= info!=null ? info : createServiceInfo(query);
 		
+		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
+		Collection<IServiceIdentifier> results	=  registry.searchServices(query);
+		
 		// TODO: global registry search.
-		ITerminableIntermediateFuture<T>	search	= new TerminableIntermediateFuture<>(new UnsupportedOperationException("TODO"));
+		TerminableIntermediateFuture<T>	search	= new TerminableIntermediateFuture<>();//new UnsupportedOperationException("TODO"));
+		
+		// Wraps result in proxy, if required. 
+		for(IServiceIdentifier result: results)
+		{
+			@SuppressWarnings("unchecked")
+			T	service	= (T)createServiceProxy(registry.getLocalService(result), info);
+			search.addIntermediateResult(service);
+		}
 		
 		// Schedule result on component thread and wrap result in proxy, if required
 		@SuppressWarnings("unchecked")
@@ -612,8 +627,8 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		
 		// When service not declared (i.e. search) -> create matching info from query.
 		info	= info!=null ? info : createServiceInfo(query);
+
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
-		
 		Collection<IServiceIdentifier> results	=  registry.searchServices(query);
 		
 		// Wraps result in proxy, if required. 
