@@ -90,7 +90,7 @@ public class RestInvocationHelper
 										 			  final Class<?> resttype,
 										 			  final boolean inurlparams)
 	{
-		IDaemonThreadPoolService tp = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
 		Runnable runnable = new Runnable()
@@ -115,7 +115,7 @@ public class RestInvocationHelper
 			restargs.put("inurlparams", inurlparams);
 			CreationInfo info = new CreationInfo();
 			info.addArgument("restargs", restargs);
-			IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
+			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
 			cms.createComponent(null, "jadex.extension.rs.invoke.RestInvocationAgent.class", info, new IResultListener<Collection<Tuple2<String,Object>>>()
 			{
 				public void resultAvailable(Collection<Tuple2<String, Object>> result)

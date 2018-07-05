@@ -42,27 +42,27 @@ public class ResultAgent
 		
 		if(Math.random()<0.3)
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getComponentIdentifier()+": "+Math.random());
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getIdentifier()+": "+Math.random());
 //			killAgent();
 			ret.setResult(null);
 		}
 		else
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getComponentIdentifier()+": "+Math.random());
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getIdentifier()+": "+Math.random());
 			
 //			getServiceContainer().searchService(IComponentManagementService.class)
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 				
-					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(agent.getComponentIdentifier()), agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(agent.getIdentifier()), agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							System.out.println(agent.getComponentIdentifier()+" got result: "+result);
+							System.out.println(agent.getIdentifier()+" got result: "+result);
 							ret.setResult(null);
 //							killAgent();
 						}

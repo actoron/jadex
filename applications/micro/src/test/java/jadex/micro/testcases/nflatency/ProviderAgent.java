@@ -27,7 +27,7 @@ public class ProviderAgent implements ITestService
 	public IFuture<Void> methodA(long wait)
 	{
 //		System.out.println("methodA impl called: "+wait);
-		return agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
+		return agent.getFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

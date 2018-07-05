@@ -60,7 +60,7 @@ public class IntervalBehavior<T>
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final String id = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+		final String id = SUtil.createUniqueId(component.getIdentifier().getLocalName());
 		this.id = id;	
 		
 		component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
@@ -85,7 +85,7 @@ public class IntervalBehavior<T>
 						}
 						else if(id.equals(getId()) && getDelay()>0)
 						{
-							component.getComponentFeature(IExecutionFeature.class).waitForDelay(getDelay(), self, realtime)
+							component.getFeature(IExecutionFeature.class).waitForDelay(getDelay(), self, realtime)
 								.addResultListener(new StepResultListener<Void, Void>(ret)
 							{
 								public void customResultAvailable(Void result) 

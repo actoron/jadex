@@ -22,7 +22,7 @@ public class UserAgent
 	{
 		try
 		{
-			PojoMicroservice ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+			PojoMicroservice ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( PojoMicroservice.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			System.out.println(ser.sayHello("Lars"));
 		}
 		catch(Exception e)

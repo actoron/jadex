@@ -410,7 +410,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		
 //		executePlan(rplan, ia, null);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
-		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(action);
+		ia.getFeature(IExecutionFeature.class).scheduleStep(action);
 		
 		rplan.addListener(new DelegationResultListener<Object>(ret));
 		
@@ -846,7 +846,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setFinishing()
 	{
 		assert finished==null;
-		assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
 		finished	= new Future<Void>();
 	}
 	
@@ -1097,7 +1097,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		setResumeCommand(rescom);
 		addResumeCommand(rescom);
 
-		getAgent().getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		getAgent().getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1139,7 +1139,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 
 		final Future<E> ret = new BDIFuture<E>();
 		
-		IBDIModel bdim = getAgent().getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
+		IBDIModel bdim = getAgent().getFeature(IInternalBDIAgentFeature.class).getBDIModel();
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
@@ -1517,7 +1517,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
 		{
-			IClockService	cs	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 			ITimedObject to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -1797,7 +1797,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		 */
 		public void execute(ResumeCommandArgs args)
 		{
-			assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+			assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
 
 //			System.out.println("exe: "+this+" "+RPlan.this.getId()+" "+this);
 
@@ -1971,12 +1971,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public void publishToolPlanEvent(String evtype)
 	{
-		if(getAgent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getAgent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(getAgent().getFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getAgent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(getAgent().getComponentIdentifier());
+			mev.setSourceIdentifier(getAgent().getIdentifier());
 			mev.setTime(time);
 			
 			PlanInfo info = PlanInfo.createPlanInfo(this);
@@ -1986,7 +1986,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			getAgent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			getAgent().getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	
@@ -2022,7 +2022,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 		});
 		rule.setEvents(events);
-		getAgent().getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
+		getAgent().getFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
 	}
 	
 //	/**

@@ -105,7 +105,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public BpmnFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getIdentifier(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.loader = new BpmnModelLoader();
@@ -134,7 +134,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getIdentifier();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -144,7 +144,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice = provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice = provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BpmnFactory.super.startService();
 	}

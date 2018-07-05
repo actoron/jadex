@@ -51,10 +51,10 @@ public abstract class SendHandler
 	 */
 	public void startSendBehavior()
 	{
-		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getComponentIdentifier().getLocalName());
+		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getIdentifier().getLocalName());
 		this.sendid = sendid;	
 		
-		agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getMicroAgent().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("send")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -63,7 +63,7 @@ public abstract class SendHandler
 				final Future<Void> ret = new Future<Void>();
 				if(!agent.isKilled() && sendid.equals(getSendId()))
 				{
-					createAwarenessInfo().addResultListener(agent.getMicroAgent().getComponentFeature(IExecutionFeature.class)
+					createAwarenessInfo().addResultListener(agent.getMicroAgent().getFeature(IExecutionFeature.class)
 						.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 					{
 						public void customResultAvailable(AwarenessInfo info)

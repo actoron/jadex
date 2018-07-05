@@ -63,7 +63,7 @@ public class HelplineAgent	implements IHelpline
 	public IFuture<Void>	addInformation(String info)
 	{
 		// Create and store information record.
-		InformationEntry	entry	= new InformationEntry(person, info, agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+		InformationEntry	entry	= new InformationEntry(person, info, agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		infos.add(entry);
 
 		// forward information to other interested services.
@@ -104,7 +104,7 @@ public class HelplineAgent	implements IHelpline
 			ret.addIntermediateResult(entry);
 		}
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
 			addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 		{
 			boolean finished	= false;
@@ -176,12 +176,12 @@ public class HelplineAgent	implements IHelpline
 	protected void	postInformation(final InformationEntry entry)
 	{
 		// Todo: use queue for forwarding, if information frequency is high?
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
 					addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 				{
 					@Override

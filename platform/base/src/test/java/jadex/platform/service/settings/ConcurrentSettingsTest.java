@@ -66,7 +66,7 @@ public class ConcurrentSettingsTest
 				@Override
 				public IFuture<String> execute(IInternalAccess ia)
 				{
-					ISettingsService	seser	=	ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+					ISettingsService	seser	=	ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 					String	ret	= seser.getProperties("securityservice").get().getStringProperty("platformsecret");
 					return new Future<String>(ret);
 				}

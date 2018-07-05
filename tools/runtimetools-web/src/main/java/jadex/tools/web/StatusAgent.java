@@ -59,7 +59,7 @@ public class StatusAgent implements IStatusService
 	@AgentCreated
 	protected IFuture<Void>	setup()
 	{
-		IWebPublishService	wps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IWebPublishService.class));
+		IWebPublishService	wps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IWebPublishService.class));
 		return wps.publishResources("[http://localhost:8081/]", "META-INF/resources");
 	}
 	
@@ -68,7 +68,7 @@ public class StatusAgent implements IStatusService
 	{
 		final IntermediateFuture<PlatformData>	ret	= new IntermediateFuture<PlatformData>();
 		FutureBarrier<Collection<PlatformData>>	fubar	= new FutureBarrier<Collection<PlatformData>>();
-		for(ITransportInfoService tis: agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
+		for(ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			IIntermediateFuture<PlatformData>	fut	= tis.getConnections();
 			fut.addIntermediateResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
@@ -125,7 +125,7 @@ public class StatusAgent implements IStatusService
 		});
 		
 		// TODO: Use query for dynamically added platforms
-		for(final ITransportInfoService tis: agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
+		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();
 			fut.addResultListener(new IIntermediateResultListener<PlatformData>()	// Do not use delegation listener (ignore forward commands like update timer)
@@ -172,7 +172,7 @@ public class StatusAgent implements IStatusService
 	{
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
 		IntermediateFuture<ServiceQuery<?>>	ret	= new IntermediateFuture<ServiceQuery<?>>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getComponentIdentifier());
+		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getIdentifier());
 		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
 		{
 			if(scopes==null || scopes.contains(sqi.getQuery().getScope()))
@@ -195,7 +195,7 @@ public class StatusAgent implements IStatusService
 	{
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
 		IntermediateFuture<IServiceIdentifier>	ret	= new IntermediateFuture<IServiceIdentifier>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getComponentIdentifier());
+		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getIdentifier());
 		for(IServiceIdentifier ser: reg.getAllServices())
 		{
 			if(scopes==null || scopes.contains(ser.getScope()))
@@ -214,7 +214,7 @@ public class StatusAgent implements IStatusService
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
 	{
-		Collection<IMemstatService>	stats	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, Binding.SCOPE_PLATFORM));
+		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, Binding.SCOPE_PLATFORM));
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		for(IMemstatService stat: stats)
 		{

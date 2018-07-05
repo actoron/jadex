@@ -176,7 +176,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 		this.receiver = createReceiveHandler();
 		if(receiver!=null)
 		{
-			receiver.startReceiving().addResultListener(getMicroAgent().getComponentFeature(IExecutionFeature.class)
+			receiver.startReceiving().addResultListener(getMicroAgent().getFeature(IExecutionFeature.class)
 				.createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
@@ -229,7 +229,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 		if(sender!=null)
 		{
 			createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId())
-				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 			{
 				public void customResultAvailable(AwarenessInfo info)
 				{
@@ -346,7 +346,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	public IComponentIdentifier getRoot()
 	{
 		if(root==null)
-			this.root = agent.getComponentIdentifier().getRoot();
+			this.root = agent.getIdentifier().getRoot();
 		return root;
 	}
 	
@@ -450,7 +450,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 			{
 				try
 				{
-					agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+					agent.getFeature(IExecutionFeature.class).scheduleStep(step);
 				}
 				catch(ComponentTerminatedException e)
 				{
@@ -538,7 +538,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
+		ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 		List<TransportAddress> addresses = tas.getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addresses, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
 				getExcludes(), null, awa);
@@ -571,7 +571,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
 		final String awa = SReflect.getInnerClassName(this.getClass());
-		ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
+		ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 		List<TransportAddress> addresses = tas.getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addresses, state, getDelay(), getIncludes(), 
 				getExcludes(), masterid, awa);

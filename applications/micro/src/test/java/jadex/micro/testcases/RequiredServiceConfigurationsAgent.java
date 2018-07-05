@@ -42,7 +42,7 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 	public IFuture<Void> agentCreated()
 	{
 //		BasicServiceContainer con = (BasicServiceContainer)agent.getServiceContainer();
-		RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
+		RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
 		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_LOCAL))
@@ -53,7 +53,7 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 		{
 			tr.setFailed("Wrong service implementation: "+rsi.getDefaultBinding().getScope());
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		return IFuture.DONE;
 	}	
 }

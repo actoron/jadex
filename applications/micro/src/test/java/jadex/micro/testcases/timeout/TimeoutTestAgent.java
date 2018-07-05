@@ -48,18 +48,18 @@ public class TimeoutTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -77,8 +77,8 @@ public class TimeoutTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno, true)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		performTest(agent.getIdentifier().getRoot(), testno, true)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
 			{
@@ -96,14 +96,14 @@ public class TimeoutTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		System.out.println("SETUP PLATFORM");
-		setupRemotePlatform(false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				System.out.println("PLATFORM DONE< PERFORM TEST");
 				performTest(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -164,7 +164,7 @@ public class TimeoutTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if timeout works "+(to==-1? "without ": "with "+to)+" timeout.");
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
 		
 //		fut.addResultListener(new IResultListener()
 //		{
@@ -221,7 +221,7 @@ public class TimeoutTestAgent extends TestAgent
 						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
-							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getComponentIdentifier(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
+							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getIdentifier(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{
 								tr.setSucceeded(true);
 							}

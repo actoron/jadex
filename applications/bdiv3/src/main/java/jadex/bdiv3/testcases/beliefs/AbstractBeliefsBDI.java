@@ -64,6 +64,6 @@ public class AbstractBeliefsBDI
 	public void	destroy(IInternalAccess agent)
 	{
 		TestReport[]	trs	= capa.results.values().toArray(new TestReport[capa.results.size()]);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
 	}
 }

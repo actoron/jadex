@@ -60,7 +60,7 @@ public class ShopService implements IShopService
 	 */
 	public IFuture<ItemInfo> buyItem(final String item, final double price)
 	{
-		IBDIXAgentFeature capa = comp.getComponentFeature(IBDIXAgentFeature.class);
+		IBDIXAgentFeature capa = comp.getFeature(IBDIXAgentFeature.class);
 		
 		final IGoal sell = capa.getGoalbase().createGoal("sell");
 		sell.getParameter("name").setValue(item);
@@ -74,7 +74,7 @@ public class ShopService implements IShopService
 	 */	
 	public IFuture<ItemInfo[]> getCatalog()
 	{
-		IBDIXAgentFeature capa = comp.getComponentFeature(IBDIXAgentFeature.class);
+		IBDIXAgentFeature capa = comp.getFeature(IBDIXAgentFeature.class);
 		
 		final Future<ItemInfo[]> ret = new Future<ItemInfo[]>();
 		ret.setResult((ItemInfo[])capa.getBeliefbase().getBeliefSet("catalog").getFacts());

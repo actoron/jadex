@@ -69,7 +69,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	{
 		if("default".equals(agent.getConfiguration()))
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new FireBrigadePlan());
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new FireBrigadePlan());
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class FireBrigadeBDI implements IEnvAccess
 			MovementCapa capa = ag.getMoveCapa();
 //			System.out.println("check create go home: "+capa.getCapability().getAgent().getGoals().size()+" "+capa.getCapability().getAgent().getAgentName());
 			
-			if(capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
+			if(capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
 				&& capa.getEnvironment().getDistance(capa.getHomePosition(), capa.getPosition()).getAsDouble()>0.001)
 			{
 				return new GoHome(capa.getHomePosition());
@@ -117,7 +117,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		public boolean checkDrop(FireBrigadeBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
-			boolean ret = capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals().size()>1;
+			boolean ret = capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals().size()>1;
 //			System.out.println("check drop fire brigade: "+this+" "+capa.getCapability().getAgent().getGoals());
 			return ret;
 		}
@@ -180,7 +180,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(ExtinguishFire.class).size()>1;
+				capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals(ExtinguishFire.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping ext fire: "+disaster);
 			return ret;
@@ -242,7 +242,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
-				capa.getCapability().getAgent().getComponentFeature(IBDIAgentFeature.class).getGoals(ClearChemicals.class).size()>1;
+				capa.getCapability().getAgent().getFeature(IBDIAgentFeature.class).getGoals(ClearChemicals.class).size()>1;
 //			if(ret)
 //				System.out.println("dropping clear chemicals: "+disaster);
 			return ret;

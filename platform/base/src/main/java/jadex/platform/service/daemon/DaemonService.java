@@ -116,7 +116,7 @@ public class DaemonService implements IDaemonService
 					// Wait for process
 					if(wait>0)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -172,7 +172,7 @@ public class DaemonService implements IDaemonService
 				// Change arguments to include responder agent for handshake.
 				final String	pid	= UUID.randomUUID().toString();
 				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("cid", agent.getComponentIdentifier());
+				args.put("cid", agent.getIdentifier());
 				args.put("content", pid);
 				String	argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 				argsstr	= SUtil.escapeString(argsstr);	// First: escape string
@@ -248,7 +248,7 @@ public class DaemonService implements IDaemonService
 		// Clone current classpath if not set. 
 		if(options.getClassPath()==null || options.getClassPath().length()==0)
 		{
-			IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("libservice");
+			IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("libservice");
 			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, StartOptions>(ret)
 			{
 				public void customResultAvailable(ILibraryService result)
@@ -440,7 +440,7 @@ public class DaemonService implements IDaemonService
 			for(int i = 0; i < alisteners.length; i++)
 			{
 				final IRemoteChangeListener<IComponentIdentifier> lis = alisteners[i];
-				alisteners[i].changeOccurred(event).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+				alisteners[i].changeOccurred(event).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{

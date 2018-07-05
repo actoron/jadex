@@ -109,7 +109,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public MessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		platformid = component.getComponentIdentifier().getRoot();
+		platformid = component.getIdentifier().getRoot();
 	}
 	
 	/**
@@ -164,7 +164,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if (addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
 				header.addProperty(entry.getKey(), entry.getValue());
-		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProperty(IMsgHeader.SENDER, component.getIdentifier());
 		header.addProperty(IMsgHeader.RECEIVER, receiver!=null && receiver.length==1 ? receiver[0] : receiver);	// optimize send to one
 		
 		return sendMessage(header, message);
@@ -196,13 +196,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message, Long timeout)
 	{
 		final Future<Object> ret = new Future<Object>();
-		final String convid = SUtil.createUniqueId(component.getComponentIdentifier().toString());
+		final String convid = SUtil.createUniqueId(component.getIdentifier().toString());
 		if (awaitingmessages == null)
 			awaitingmessages = new HashMap<String, Future<Object>>();
 		awaitingmessages.put(convid, ret);
 		
 		final MsgHeader header = new MsgHeader();
-		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProperty(IMsgHeader.SENDER, component.getIdentifier());
 		header.addProperty(IMsgHeader.RECEIVER, receiver);
 		header.addProperty(IMsgHeader.CONVERSATION_ID, convid);
 		header.addProperty(SENDREPLY, Boolean.TRUE);
@@ -222,7 +222,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			}
 		});
 		timeout = timeout == null ? Starter.getLocalDefaultTimeout(platformid) : timeout;
-		component.getComponentFeature0(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
+		component.getFeature0(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -257,7 +257,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		MsgHeader header = new MsgHeader();
 		header.addProperty(IMsgHeader.RECEIVER, rplyrec);
-		header.addProperty(IMsgHeader.SENDER, component.getComponentIdentifier());
+		header.addProperty(IMsgHeader.SENDER, component.getIdentifier());
 		header.addProperty(IMsgHeader.CONVERSATION_ID, convid);
 		header.addProperty(SENDREPLY, Boolean.TRUE);
 		
@@ -275,7 +275,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Transport service is platform-level shared / no required proxy: manual decoupling
-		getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportService, Void>(ret)
+		getTransportService(header).addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ITransportService, Void>(ret)
 		{
 			public void customResultAvailable(ITransportService transser) throws Exception
 			{
@@ -292,7 +292,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						IComponentIdentifier rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
 						getTransportCache(platformid).remove(rplat);
 						
-						getTransportService(header).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<ITransportService>()
+						getTransportService(header).addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<ITransportService>()
 						{
 							public void resultAvailable(ITransportService result)
 							{
@@ -354,7 +354,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //			System.out.println("Received message: "+header);
 			
 			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
 			{
 				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
 				{
@@ -575,7 +575,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IMessageFeature imf = ia.getComponentFeature0(IMessageFeature.class);
+						IMessageFeature imf = ia.getFeature0(IMessageFeature.class);
 						
 						if (imf instanceof IInternalMessageFeature)
 						{
@@ -583,7 +583,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							return IFuture.DONE;
 						}
 						
-						return new Future<Void>(new RuntimeException("Receiver " + ia.getComponentIdentifier() + " has no messaging."));
+						return new Future<Void>(new RuntimeException("Receiver " + ia.getIdentifier() + " has no messaging."));
 					}
 				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
@@ -600,7 +600,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				ISerializationServices serialserv = getSerializationServices(platformid);
 				byte[] body = serialserv.encode(header, component, message);
 				getSecurityService().encryptAndSign(header, body).addResultListener(
-					component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
+					component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<byte[], Void>((Future<Void>) ret)
 				{
 					public void customResultAvailable(final byte[] body) throws Exception
 					{
@@ -751,7 +751,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							--counter[0];
 							if(counter[0] == 0)
 							{
-								String error = component.getComponentIdentifier()+" could not find working transport for receiver " + receiverplatform + ", tried:";
+								String error = component.getIdentifier()+" could not find working transport for receiver " + receiverplatform + ", tried:";
 								for (ITransportService tp : coll)
 								{
 									error += " " + tp.toString();
@@ -1162,7 +1162,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void startStreamCheckAliveBehavior()
 	{
-		final long lt = getMinLeaseTime(getComponent().getComponentIdentifier());
+		final long lt = getMinLeaseTime(getComponent().getIdentifier());
 //		System.out.println("to is: "+lt);
 		if(lt==Timeout.NONE)
 			return;
@@ -1221,13 +1221,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						}
 					}
 					
-					getComponent().getComponentFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
+					getComponent().getFeature(IExecutionFeature.class).waitForDelay(lt, this, true);
 					
 					return IFuture.DONE;
 				}
 			};
 			
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(checker);
+			getComponent().getFeature(IExecutionFeature.class).scheduleStep(checker);
 		}
 	}
 	
@@ -1571,7 +1571,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				}
 				else
 				{
-					System.out.println("InputStream not found (dai): "+conid+" "+getParticipantConnections()+" "+getComponent().getComponentIdentifier());
+					System.out.println("InputStream not found (dai): "+conid+" "+getParticipantConnections()+" "+getComponent().getIdentifier());
 				}
 			}
 			else if(type==AbstractConnectionHandler.CLOSE_OUTPUT_INITIATOR)

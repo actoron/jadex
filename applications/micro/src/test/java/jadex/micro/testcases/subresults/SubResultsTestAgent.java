@@ -42,13 +42,13 @@ public class SubResultsTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
-		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getComponentIdentifier())).getFirstResult();
+		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
+		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getIdentifier())).getFirstResult();
 		IExternalAccess ea = cms.getExternalAccess(cid).get();
 		
 		final TestReport tr = new TestReport("#1", "Test if intermediate results are retrieved.");
 		
-		ea.subscribeToResults().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		ea.subscribeToResults().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new IIntermediateResultListener<Tuple2<String, Object>>()
 		{
 			boolean ok = false;
@@ -76,7 +76,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 				{
 					tr.setFailed("No intermediate results have been retrieved.");
 				}
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 			}
 			
@@ -84,7 +84,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 			{
 				System.out.println("ra: "+result);
 				tr.setFailed("No intermediate results have been retrieved: "+result);
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 			}
 			
@@ -92,7 +92,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 			{
 				System.out.println("ex: "+exception);
 				tr.setFailed("Exception occrred: "+exception);
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 			}
 		}));

@@ -28,7 +28,7 @@ public class InitExpressionsBDI
 	protected IInternalAccess	agent;
 	
 	/** The agent name. */
-	protected String	name1	= agent.getComponentIdentifier().getName();
+	protected String	name1	= agent.getIdentifier().getName();
 	
 	/** The agent name. */
 	protected String	name2;
@@ -40,7 +40,7 @@ public class InitExpressionsBDI
 	 */
 	public InitExpressionsBDI()
 	{
-		this.name2	= agent.getComponentIdentifier().getName();
+		this.name2	= agent.getIdentifier().getName();
 	}
 	 
 	
@@ -53,25 +53,25 @@ public class InitExpressionsBDI
 	public void	body()
 	{
 		TestReport	tr1	= new TestReport("#1", "Test if field expression works.");
-		if(agent.getComponentIdentifier().getName().equals(name1))
+		if(agent.getIdentifier().getName().equals(name1))
 		{			
 			tr1.setSucceeded(true);
 		}
 		else
 		{
-			tr1.setReason("Values do not match: "+agent.getComponentIdentifier().getName()+", "+name1);
+			tr1.setReason("Values do not match: "+agent.getIdentifier().getName()+", "+name1);
 		}
 		
 		TestReport	tr2	= new TestReport("#2", "Test if field expression works.");
-		if(agent.getComponentIdentifier().getName().equals(name2))
+		if(agent.getIdentifier().getName().equals(name2))
 		{			
 			tr2.setSucceeded(true);
 		}
 		else
 		{
-			tr2.setReason("Values do not match: "+agent.getComponentIdentifier().getName()+", "+name2);
+			tr2.setReason("Values do not match: "+agent.getIdentifier().getName()+", "+name2);
 		}
 
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 }

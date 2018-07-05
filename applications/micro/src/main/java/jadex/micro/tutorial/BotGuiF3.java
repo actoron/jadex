@@ -55,7 +55,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 		{
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
-				ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				return new Future<String[]>(new String[]{chatbot.getKeyword(), chatbot.getReply()});
 			}
 		}).addResultListener(new SwingDefaultResultListener<String[]>()
@@ -77,7 +77,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 						chatbot.setKeyword(keyword);
 						return IFuture.DONE;
 					}
@@ -95,7 +95,7 @@ public class BotGuiF3 extends AbstractComponentViewerPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+						ChatBotF3Agent	chatbot	= (ChatBotF3Agent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 						chatbot.setReply(reply);
 						return IFuture.DONE;
 					}

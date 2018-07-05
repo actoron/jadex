@@ -78,7 +78,7 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						IFuture<String> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
+						IFuture<String> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
 						fut.addResultListener(new IResultListener<String>()
 						{
 							public void resultAvailable(String res) 

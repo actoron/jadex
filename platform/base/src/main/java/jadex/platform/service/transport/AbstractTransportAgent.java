@@ -169,7 +169,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 		else
 		{
-			if (IComponentDescription.STATE_ACTIVE.equals(agent.getComponentDescription().getState()))
+			if (IComponentDescription.STATE_ACTIVE.equals(agent.getDescription().getState()))
 				deliverRemoteMessage(agent, secser, cms, codec, source, header, body);
 		}
 	}
@@ -211,9 +211,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentCreated
 	protected IFuture<Void>	init()
 	{
-		this.codec = MessageComponentFeature.getSerializationServices(agent.getComponentIdentifier().getRoot());
-		this.secser	= ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
-		this.cms	= ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+		this.codec = MessageComponentFeature.getSerializationServices(agent.getIdentifier().getRoot());
+		this.secser	= ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
+		this.cms	= ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		this.impl = createTransportImpl();
 		impl.init(this);
 
@@ -223,7 +223,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		{
 			final Future<Void>	ret	= new Future<Void>();
 			impl.openPort(port)
-				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 			{
 				@Override
 				public void customResultAvailable(Integer port)
@@ -233,7 +233,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						// Announce connection addresses.
 						InetAddress[] addresses = SUtil.getNetworkAddresses();
 //						String[] saddresses = new String[addresses.length];
-						IComponentIdentifier platformid = agent.getComponentIdentifier().getRoot();
+						IComponentIdentifier platformid = agent.getIdentifier().getRoot();
 						List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
 						for(int i = 0; i < addresses.length; i++)
 						{
@@ -251,11 +251,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
 						
-						agent.getLogger().info("Platform "+agent.getComponentIdentifier().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
+						agent.getLogger().info("Platform "+agent.getIdentifier().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
 
 //						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 //						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
-						ITransportAddressService tas = ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+						ITransportAddressService tas = ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 						
 //						System.out.println("Transport addresses: "+agent+", "+saddresses);
 						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
@@ -589,7 +589,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if (created)
 		{
 			agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
-			impl.sendMessage(con, new byte[0], agent.getComponentIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+			impl.sendMessage(con, new byte[0], agent.getIdentifier().getPlatformName().getBytes(SUtil.UTF8));
 		}
 		
 		return cand;
@@ -735,7 +735,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IIntermediateFuture<String> getAddresses(IMsgHeader header)
 	{
 		IComponentIdentifier target = getTarget(header).getRoot();
-		ITransportAddressService tas = ((AbstractComponentFeature)agent.getComponentFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+		ITransportAddressService tas = ((AbstractComponentFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 		
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Collection<String>>(ret)
@@ -794,7 +794,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 								@Override
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									IMessageFeature mf = ia.getComponentFeature0(IMessageFeature.class);
+									IMessageFeature mf = ia.getFeature0(IMessageFeature.class);
 									if(mf instanceof IInternalMessageFeature)
 									{
 										((IInternalMessageFeature)mf).messageArrived(header, body);
@@ -833,7 +833,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 									{
 										Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
 										addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
-										ia.getComponentFeature(IMessageFeature.class)
+										ia.getFeature(IMessageFeature.class)
 											.sendMessage(null, addheaderfields, (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER))
 											.addResultListener(new IResultListener<Void>()
 											{
@@ -986,7 +986,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			return clientcon == o.clientcon ? 0 :
 			// the current is client then name<target or the current is server
 			// then name>target
-				(clientcon ? 1 : -1) * agent.getComponentIdentifier().getPlatformName().compareTo(target.getName());
+				(clientcon ? 1 : -1) * agent.getIdentifier().getPlatformName().compareTo(target.getName());
 		}
 	}
 

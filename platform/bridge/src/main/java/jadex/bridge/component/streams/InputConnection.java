@@ -416,7 +416,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 				{
 					final ISubscriptionIntermediateFuture<byte[]> fut = aread();
 
-					fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
+					fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
 					{
 						public void resultAvailable(Collection<byte[]> result)
 						{

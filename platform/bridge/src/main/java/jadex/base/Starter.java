@@ -656,7 +656,7 @@ public class Starter
 		
 		if(components!=null && i<components.size())
 		{
-			IComponentManagementService cms = instance.getComponentFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
+			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 			String name	= null;
 			String config	= null;
 			String args = null;

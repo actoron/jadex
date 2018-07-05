@@ -67,7 +67,7 @@ public class InnerClassBeliefChangeBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -83,7 +83,7 @@ public class InnerClassBeliefChangeBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 //	@Belief

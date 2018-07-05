@@ -257,7 +257,7 @@ public class RHardConstraints
 	{
 		if(hardconstraints == null)
 		{
-			return ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(type, scope));
+			return ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(type, scope));
 		}
 		else
 		{

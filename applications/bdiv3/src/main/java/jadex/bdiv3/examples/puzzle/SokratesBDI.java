@@ -78,7 +78,7 @@ public class SokratesBDI
 		
 		System.out.println("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
-		IFuture<MoveGoal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MoveGoal());
+		IFuture<MoveGoal> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MoveGoal());
 		fut.addResultListener(new IResultListener<MoveGoal>()
 		{
 			public void resultAvailable(MoveGoal movegoal)

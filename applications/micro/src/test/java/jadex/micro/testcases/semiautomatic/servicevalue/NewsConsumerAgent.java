@@ -53,7 +53,7 @@ public class NewsConsumerAgent
 		{
 			System.out.println("headline is: "+headline);
 			System.out.println("news are: "+news);
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		}
 	}
 }

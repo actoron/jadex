@@ -26,6 +26,6 @@ public class ComponentUptimeProperty extends NFRootProperty<Long, TimeUnit>//ext
 	 */
 	public Long measureValue()
 	{
-		return System.currentTimeMillis()-comp.getComponentDescription().getCreationTime();
+		return System.currentTimeMillis()-comp.getDescription().getCreationTime();
 	}
 }

@@ -36,7 +36,7 @@ public class CountBDI
 	@AgentBody
 	public void body()
 	{
-		IFuture<CountGoal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CountGoal(10, 5));
+		IFuture<CountGoal> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CountGoal(10, 5));
 		fut.addResultListener(new A());
 		
 //		agent.dispatchGoalAndWait(new CountGoal(10, 5))

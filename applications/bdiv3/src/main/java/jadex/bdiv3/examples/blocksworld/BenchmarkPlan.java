@@ -139,7 +139,7 @@ public class BenchmarkPlan
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("clock").get();
+		IClockService cs = (IClockService)capa.getAgent().getFeature(IRequiredServicesFeature.class).getService("clock").get();
 		return cs.getTime();
 	}
 }

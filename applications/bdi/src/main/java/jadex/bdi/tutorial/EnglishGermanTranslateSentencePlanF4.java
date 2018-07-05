@@ -65,7 +65,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 			// Search a translation agent.
 			while(ta==null)
 			{
-				IDF	dfservice	= (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				IDF	dfservice	= (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				
 				// Create a service description to search for.
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);

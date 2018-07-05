@@ -88,7 +88,7 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("poolser");
+		IFuture<IServicePoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)
@@ -118,12 +118,12 @@ public class UserAgent
 	{
 		final Future<Tuple2<IAService, IBService>> ret = new Future<Tuple2<IAService, IBService>>();
 		
-		IFuture<IAService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("aser");
+		IFuture<IAService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("aser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IAService, Tuple2<IAService, IBService>>(ret)
 		{
 			public void customResultAvailable(final IAService aser)
 			{				
-				IFuture<IBService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("bser");
+				IFuture<IBService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("bser");
 				fut.addResultListener(new ExceptionDelegationResultListener<IBService, Tuple2<IAService, IBService>>(ret)
 				{
 					public void customResultAvailable(final IBService bser)
@@ -164,7 +164,7 @@ public class UserAgent
 						
 						final TestReport rep3 = new TestReport("#3", "Test if no A services besides proxy can be found");
 						// Ensure that only 
-						agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAService.class))
+						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAService.class))
 							.addResultListener(new ExceptionDelegationResultListener<Collection<IAService>, Void>(ret)
 						{
 							public void customResultAvailable(Collection<IAService> result)
@@ -197,7 +197,7 @@ public class UserAgent
 											public void resultAvailable(TestReport rep5)
 											{
 //												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
-												agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 											
@@ -205,7 +205,7 @@ public class UserAgent
 											{
 												TestReport rep5 = new TestReport("#5", "Test non-func props");
 												rep5.setFailed(exception);
-												agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 										});

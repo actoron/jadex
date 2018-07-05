@@ -47,7 +47,7 @@ public class AlarmPlan
 		while(true)
 		{
 			// Check if there is an alarm to do.
-			long	time	= scope.getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+			long	time	= scope.getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 			long alarmtime = goal.getAlarm().getAlarmtime(time);
 //			System.out.println("Alarm plan alarmtime: "+alarmtime);
 			if(alarmtime==Alarm.NO_ALARM)
@@ -61,7 +61,7 @@ public class AlarmPlan
 			if(wait>0)
 			{
 				scope.getAgent().getLogger().info("Waiting for: "+wait/1000+" secs");
-				scope.getAgent().getComponentFeature(IExecutionFeature.class).waitForDelay(wait).get();
+				scope.getAgent().getFeature(IExecutionFeature.class).waitForDelay(wait).get();
 			}
 			// Play the designated alarm song.
 			if(wait>-1000) // todo: what is the limit?
@@ -78,7 +78,7 @@ public class AlarmPlan
 			}
 
 			// Avoid triggering more than once for the same alarm time.
-			scope.getAgent().getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+			scope.getAgent().getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 			
 			// Indicate that alarm has triggered.
 			goal.getAlarm().triggerd();

@@ -102,7 +102,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public BDIAgentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
+		super(provider.getIdentifier(), IComponentFactory.class, properties);
 
 		this.provider = provider;
 //		this.properties = properties;
@@ -143,7 +143,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = component.getComponentIdentifier();
+		this.providerid = component.getIdentifier();
 		setServiceIdentifier(createServiceIdentifier(provider, "Bootstrap Factory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -153,7 +153,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Void> startService()
 	{
-		libservice	= provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 		return BDIAgentFactory.super.startService();
 	}

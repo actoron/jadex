@@ -18,11 +18,11 @@ public class EndStepTestStep implements IComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		return ia.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+				ia.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 					new TestReport[]{new TestReport("#1", "Test if end step is executed", true, null)}));
 				return IFuture.DONE;
 			}

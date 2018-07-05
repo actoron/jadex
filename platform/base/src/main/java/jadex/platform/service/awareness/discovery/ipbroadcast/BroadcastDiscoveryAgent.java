@@ -192,7 +192,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						socket.setBroadcast(true);
 						
 						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<AwarenessInfo>(agent.getLogger())
+							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<AwarenessInfo>(agent.getLogger())
 						{
 							public void resultAvailable(AwarenessInfo info)
 							{

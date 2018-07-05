@@ -50,13 +50,13 @@ public class PrePostConditionTestAgent extends JunitAgentTest implements IContra
 		final List<TestReport> results = new ArrayList<TestReport>();
 		
 //		IContractService ts = (IContractService)agent.getServiceContainer().getProvidedServices(IContractService.class)[0];
-		IContractService ts = (IContractService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IContractService.class)[0];
+		IContractService ts = (IContractService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IContractService.class)[0];
 		
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(12, new DefaultResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 					(TestReport[])results.toArray(new TestReport[results.size()])));
 				ret.setResult(null);
 			}

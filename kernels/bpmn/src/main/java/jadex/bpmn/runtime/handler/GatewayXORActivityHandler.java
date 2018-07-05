@@ -30,9 +30,9 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	public void execute(MActivity activity, IInternalAccess instance, ProcessThread thread)
 	{
 		// Notify listeners as gateways are not followed by step handler execution
-		if(instance.getComponentFeature0(IMonitoringComponentFeature.class)!=null && instance.getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(instance.getFeature0(IMonitoringComponentFeature.class)!=null && instance.getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			instance.getComponentFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
+			instance.getFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
 		}
 		
 		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();

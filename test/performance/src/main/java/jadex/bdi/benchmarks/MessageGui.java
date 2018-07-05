@@ -38,7 +38,7 @@ public class MessageGui extends JFrame
 			@Classname("addListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 //				bia.getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
 //				((BDIAgentFeature)bdif).getCapability().getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
 				bdif.getBeliefbase().getBelief("sent").addBeliefListener(new BeliefAdapter<Object>()
@@ -71,7 +71,7 @@ public class MessageGui extends JFrame
 //					}
 //				});
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

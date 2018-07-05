@@ -87,7 +87,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			// get values from component args under name specified in ARGUMENT
 			if(params.containsKey(ARGUMENT))
 			{
-				Map<String, Object> args = component.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+				Map<String, Object> args = component.getFeature(IArgumentsResultsFeature.class).getArguments();
 				Collection<String> tags2 = convertToCollection(args.get((String)params.get(ARGUMENT)));
 				if(tags==null)
 				{
@@ -107,7 +107,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 		// directly search argument "tag"
 		if(!found)
 		{
-			Map<String, Object> args = component.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+			Map<String, Object> args = component.getFeature(IArgumentsResultsFeature.class).getArguments();
 			if(args.containsKey(NAME))
 			{
 				Collection<String> tags = createRuntimeTags(args.get(NAME), component.getExternalAccess());

@@ -94,7 +94,7 @@ public class FeatureInjectionTestAgent extends JunitAgentTest
 		System.out.println("args is: "+args);
 		System.out.println("reqs is: "+reqs);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.length, trs));
 		agent.killComponent();
 	}
 }

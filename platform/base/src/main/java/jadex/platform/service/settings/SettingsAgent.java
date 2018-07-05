@@ -83,7 +83,7 @@ public class SettingsAgent	implements ISettingsService
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
 		this.filename	= "properties.json";
-		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getComponentIdentifier().getPlatformPrefix());
+		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getIdentifier().getPlatformPrefix());
 		if (settingsdir.exists() && !settingsdir.isDirectory())
 		{
 			access.getLogger().log(Level.WARNING, "Invalid settings directory '" + settingsdir.getName() + "', switching to read-only.");
@@ -143,7 +143,7 @@ public class SettingsAgent	implements ISettingsService
 			Properties	sub	= props.getSubproperty(id);
 			if(sub!=null)
 			{
-				provider.setProperties(sub).addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				provider.setProperties(sub).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 			}
 			else
 			{
@@ -174,7 +174,7 @@ public class SettingsAgent	implements ISettingsService
 			if(saveonexit)
 			{
 //				provider.getProperties().addResultListener(new DelegationResultListener(ret)
-				provider.getProperties().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				provider.getProperties().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -211,7 +211,7 @@ public class SettingsAgent	implements ISettingsService
 		if(providers.containsKey(id))
 		{
 			((IPropertiesProvider)providers.get(id)).setProperties(props)
-				.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 		}
 		else
 		{
@@ -247,7 +247,7 @@ public class SettingsAgent	implements ISettingsService
 				props = mprops;
 				
 				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(),
-					access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 				
 				for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
 				{
@@ -257,7 +257,7 @@ public class SettingsAgent	implements ISettingsService
 					Properties	sub	= props.getSubproperty(id);
 					if(sub!=null)
 					{
-						provider.setProperties(sub).addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(crl));
+						provider.setProperties(sub).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(crl));
 					}
 					else
 					{
@@ -355,7 +355,7 @@ public class SettingsAgent	implements ISettingsService
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		};
-		rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
+		rl	= shutdown ? rl : access.getFeature(IExecutionFeature.class).createResultListener(rl); 
 		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(), rl);
 		
 		for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
@@ -371,7 +371,7 @@ public class SettingsAgent	implements ISettingsService
 					crl.resultAvailable(null);
 				}
 			};
-			rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
+			rl	= shutdown ? rl : access.getFeature(IExecutionFeature.class).createResultListener(rl); 
 			provider.getProperties().addResultListener(rlp);
 		}
 		

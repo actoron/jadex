@@ -213,7 +213,7 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 				}
 			}
 			
-			agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().addGoal(goal);
+			agent.getFeature(IInternalBDIAgentFeature.class).getCapability().addGoal(goal);
 			goal.setLifecycleState(agent, RGoal.GoalLifecycleState.ADOPTED);
 			ret.setResult(null);
 		}

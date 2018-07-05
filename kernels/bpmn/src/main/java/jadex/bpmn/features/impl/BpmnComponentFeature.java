@@ -220,7 +220,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		
 		if(!evtsubstarts.isEmpty())
 		{
-			IInternalProcessEngineService	ipes	= getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+			IInternalProcessEngineService	ipes	= getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 			final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
@@ -268,7 +268,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 								public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 								{
 //											BpmnInterpreter ip = (BpmnInterpreter)ia;
-									IInternalBpmnComponentFeature feat = (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
+									IInternalBpmnComponentFeature feat = (IInternalBpmnComponentFeature)ia.getFeature(IBpmnComponentFeature.class);
 									ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), feat.getTopLevelThread(), ia, true);
 									feat.getTopLevelThread().addThread(thread);
 									ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ia);
@@ -331,9 +331,9 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
 		
-		if(getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments()!=null)
+		if(getComponent().getFeature(IArgumentsResultsFeature.class).getArguments()!=null)
 		{
-			for(Map.Entry<String, Object> entry: getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments().entrySet())
+			for(Map.Entry<String, Object> entry: getComponent().getFeature(IArgumentsResultsFeature.class).getArguments().entrySet())
 			{
 				topthread.setParameterValue(entry.getKey(), entry.getValue());
 			}
@@ -409,11 +409,11 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		}
 		else if(getComponent().getModel().getArgument(name)!=null)
 		{
-			ret = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(name);
+			ret = getComponent().getFeature(IArgumentsResultsFeature.class).getArguments().get(name);
 		}
 		else if(getComponent().getModel().getResult(name)!=null)
 		{
-			ret	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().get(name);
+			ret	= getComponent().getFeature(IArgumentsResultsFeature.class).getResults().get(name);
 		}
 		else
 		{
@@ -459,7 +459,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		{
 			if(isres)
 			{
-				getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, value);
+				getComponent().getFeature(IArgumentsResultsFeature.class).getResults().put(name, value);
 			}
 			else
 			{
@@ -472,7 +472,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			Object coll;
 			if(isres)
 			{
-				coll = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().get(name);
+				coll = getComponent().getFeature(IArgumentsResultsFeature.class).getResults().get(name);
 			}
 			else
 			{
@@ -504,7 +504,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			if(isres)
 			{
 				// Trigger event notification
-				getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, coll);
+				getComponent().getFeature(IArgumentsResultsFeature.class).getResults().put(name, coll);
 			}
 //				else
 //				{
@@ -518,7 +518,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	 */
 	public IMonitoringEvent createThreadEvent(String type, ProcessThread thread)
 	{
-		MonitoringEvent event = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis(), PublishEventLevel.FINE);
+		MonitoringEvent event = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
 //		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 		event.setProperty("details", createProcessThreadInfo(thread));
@@ -530,7 +530,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	 */
 	public IMonitoringEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
 	{
-		MonitoringEvent event = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis(), PublishEventLevel.FINE);
+		MonitoringEvent event = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
 		event.setProperty("activity", activity.getName());
 		event.setProperty("details", createProcessThreadInfo(thread));
@@ -584,10 +584,10 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	{
 //		System.out.println("step: "+activity.getName());
 //		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
-		if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
+			getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
 		}
 		
 		IStepHandler ret = (IStepHandler)stephandlers.get(activity.getActivityType());
@@ -606,11 +606,11 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	 */
 	public void	notify(final MActivity activity, final ProcessThread thread, final Object event)
 	{
-		if(!getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!getComponent().getFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+				getComponent().getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -626,10 +626,10 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 							
 							step(activity, getComponent(), thread, event);
 							thread.setNonWaiting();
-							if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-								&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							if(getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
+								&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 							{
-								getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+								getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 							}
 						}
 						else

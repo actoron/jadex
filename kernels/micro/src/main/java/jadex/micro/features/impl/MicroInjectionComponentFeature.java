@@ -63,10 +63,10 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 //		if(getComponent().toString().indexOf("rt")!=-1)
 //			System.out.println("relayinti");
 				
-		Map<String, Object>	args = getComponent().getComponentFeature(IArgumentsResultsFeature.class).getArguments();
-		Map<String, Object>	results	= getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults();
+		Map<String, Object>	args = getComponent().getFeature(IArgumentsResultsFeature.class).getArguments();
+		Map<String, Object>	results	= getComponent().getFeature(IArgumentsResultsFeature.class).getResults();
 		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-		final Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		final Object agent = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 
 		try
 		{
@@ -133,7 +133,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			for(int i=0; i<fields.length; i++)
 			{
 				Class<?> iface = getComponent().getClassLoader().loadClass(fields[i].getTypeName());
-				Object feat = getComponent().getComponentFeature(iface);
+				Object feat = getComponent().getFeature(iface);
 				Field f = fields[i].getField(getComponent().getClassLoader());
 				f.setAccessible(true);
 				f.set(agent, feat);
@@ -143,8 +143,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			final FieldInfo[]	pis	= model.getParentInjections();
 			if(pis.length>0)
 			{
-				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
+				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				cms.getExternalAccess(getComponent().getIdentifier().getParent())
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
 					public void customResultAvailable(IExternalAccess exta)
@@ -167,13 +167,13 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 									exceptionOccurred(e);
 								}
 							}
-							else if(getComponent().getComponentDescription().isSynchronous())
+							else if(getComponent().getDescription().isSynchronous())
 							{
 								exta.scheduleStep(new IComponentStep<Void>()
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										Object pagent = ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										Object pagent = ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										if(SReflect.isSupertype(f.getType(), pagent.getClass()))
 										{
 											try
@@ -238,7 +238,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 		{
 			try
 			{
-				Object agent = getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				Object agent = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 				if(convert!=null)
 				{
 					SimpleValueFetcher fetcher = new SimpleValueFetcher(getComponent().getFetcher());

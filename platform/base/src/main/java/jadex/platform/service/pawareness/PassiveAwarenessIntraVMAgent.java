@@ -58,7 +58,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	@ServiceStart
 	public void	start() throws Exception
 	{
-		IComponentIdentifier pfid = agent.getComponentIdentifier().getRoot();
+		IComponentIdentifier pfid = agent.getIdentifier().getRoot();
 		disclock.writeLock().lock();
 //		for(PassiveAwarenessIntraVMAgent otheragent: discoveries.values())
 //			otheragent.announceNewPlatform(pfid);
@@ -73,7 +73,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	public void shutdown()	throws Exception
 	{
 		disclock.writeLock().lock();
-		discoveries.remove(agent.getComponentIdentifier().getRoot());
+		discoveries.remove(agent.getIdentifier().getRoot());
 		disclock.writeLock().unlock();
 	}
 	
@@ -98,7 +98,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 			{
 				public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
 				{
-					ITransportAddressService tas = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
+					ITransportAddressService tas = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 					return tas.getAddresses();
 				}
 			});
@@ -118,7 +118,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 		disclock.readLock().lock();
 		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
 		disclock.readLock().unlock();
-		result.remove(agent.getComponentIdentifier().getRoot());
+		result.remove(agent.getIdentifier().getRoot());
 		return new IntermediateFuture<IComponentIdentifier>(result);
 	}
 

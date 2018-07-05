@@ -39,7 +39,7 @@ public class DestroyComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IComponentManagementService cms	= instance.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
 		
@@ -51,7 +51,7 @@ public class DestroyComponentTask implements ITask
 			if(name.indexOf("@")==-1)
 				cid = new BasicComponentIdentifier(name);
 			else
-				cid = new BasicComponentIdentifier(name, instance.getComponentIdentifier().getParent());
+				cid = new BasicComponentIdentifier(name, instance.getIdentifier().getParent());
 		}
 		
 		IFuture<Map<String, Object>> tmp = cms.destroyComponent(cid);

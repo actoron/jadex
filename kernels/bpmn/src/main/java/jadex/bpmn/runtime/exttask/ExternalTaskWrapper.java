@@ -41,7 +41,7 @@ public class ExternalTaskWrapper implements ITask
 	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess process)
 	{
 		// todo: scope
-		ITaskExecutionService tes	= process.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITaskExecutionService.class));
+		ITaskExecutionService tes	= process.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITaskExecutionService.class));
 		// todo: results
 		return tes.execute(task, new ExternalTaskContext((ProcessThread)context));
 	}

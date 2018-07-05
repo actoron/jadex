@@ -114,7 +114,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	 */
 	public BDIXComponentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
+		super(provider.getIdentifier(), IComponentFactory.class, properties);
 		this.provider = provider;
 		this.features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
@@ -125,7 +125,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getIdentifier();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -140,7 +140,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 				loader = new BDIXModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()

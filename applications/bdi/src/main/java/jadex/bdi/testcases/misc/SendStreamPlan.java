@@ -14,7 +14,7 @@ public class SendStreamPlan extends Plan
 	  */
 	public void body()
 	{
-		IMessageFeature mf = getAgent().getComponentFeature(IMessageFeature.class);
+		IMessageFeature mf = getAgent().getFeature(IMessageFeature.class);
 		IOutputConnection con = mf.createOutputConnection(getComponentIdentifier(), getComponentIdentifier(), null).get();
 
 		for(int i=0; i<5; i++)

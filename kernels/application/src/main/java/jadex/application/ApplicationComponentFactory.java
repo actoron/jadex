@@ -114,7 +114,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public ApplicationComponentFactory(IInternalAccess provider)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getIdentifier(), IComponentFactory.class, null);
 		this.provider = provider;
 		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
@@ -125,7 +125,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getIdentifier();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -140,7 +140,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= provider.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 						
 				// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
 				String[]	extensions	= new String[]

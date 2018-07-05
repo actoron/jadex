@@ -208,7 +208,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 					final IntermediateFuture<INFPropertyMetaInfo> ret = new IntermediateFuture<INFPropertyMetaInfo>();
 					if(fmi!=null)
 					{
-						INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(null);
+						INFMixedPropertyProvider pp = ia.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(null);
 						pp.getMethodNFPropertyMetaInfos(fmi).addResultListener(
 							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{
@@ -228,7 +228,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 					}
 					else
 					{
-						INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(null);
+						INFMixedPropertyProvider pp = ia.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(null);
 						pp.getNFPropertyMetaInfos().addResultListener(
 							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{

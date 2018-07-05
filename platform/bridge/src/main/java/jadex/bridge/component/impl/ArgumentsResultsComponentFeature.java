@@ -84,7 +84,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		}
 		
 		// Get the reverse name (agent1@app1.plat1 -> app1.agent1.<argname>)
-		IComponentIdentifier cid = getComponent().getComponentIdentifier();
+		IComponentIdentifier cid = getComponent().getIdentifier();
 		String dotname = cid.getDotName();
 		int idx = dotname.lastIndexOf(".");
 		if(idx!=-1)
@@ -93,7 +93,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			dotname = getReverseName(dotname);
 		}
 		
-		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getComponentIdentifier().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
+		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getIdentifier().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
 		if(platformargs!=null)
 		{
 			IArgument[] margs = component.getModel().getArguments();
@@ -165,7 +165,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				postEvent(key, newvalue);
 			}
 		};
-		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
+		results.put(IComponentIdentifier.RESULTCID, getComponent().getIdentifier());
 		
 		initDefaultResults();
 
@@ -417,13 +417,13 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		{
 			public void terminated(Exception reason)
 			{
-				if(getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread())
+				if(getComponent().getFeature(IExecutionFeature.class).isComponentThread())
 				{
 					resfuts.remove(ret);
 				}
 				else
 				{
-					getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+					getComponent().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{

@@ -20,7 +20,7 @@ public class RequestMasterPlan extends Plan
 		args.put("max", getBeliefbase().getBelief("max").getFact());
 		args.put("receiver", getComponentIdentifier());
 		
-		IComponentManagementService	ces	= (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
+		IComponentManagementService	ces	= (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).getService("cms").get();
 		ces.createComponent("jadex/bdi/benchmarks/RequestPerformance.agent.xml", new CreationInfo("default", args, getComponentIdentifier()));
 	}	
 }

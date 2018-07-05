@@ -76,7 +76,7 @@ public class CreateComponentCommand extends ACliCommand
 			{
 				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 				
-				ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(final IComponentManagementService cms)

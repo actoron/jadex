@@ -53,7 +53,7 @@ public class ChoosePlatformTask implements ITask
 		
 		final IExternalAccess exta	= process.getExternalAccess();
 		
-		process.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+		process.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 			.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, Void>(ret)
 		{
 			public void customResultAvailable(final Collection<IComponentManagementService> result)

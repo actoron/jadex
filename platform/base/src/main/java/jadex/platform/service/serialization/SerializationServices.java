@@ -318,7 +318,7 @@ public class SerializationServices implements ISerializationServices
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
 					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
-					IInputConnection icon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getComponentFeature(IMessageFeature.class)).getParticipantInputConnection(icp.getConnectionId(), 
+					IInputConnection icon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getFeature(IMessageFeature.class)).getParticipantInputConnection(icp.getConnectionId(), 
 						icp.getInitiator(), icp.getParticipant(), icp.getNonFunctionalProperties());
 					return icon;
 				}
@@ -343,7 +343,7 @@ public class SerializationServices implements ISerializationServices
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
 					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
-					IOutputConnection ocon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getComponentFeature(IMessageFeature.class)).getParticipantOutputConnection(ocp.getConnectionId(), 
+					IOutputConnection ocon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getFeature(IMessageFeature.class)).getParticipantOutputConnection(ocp.getConnectionId(), 
 						ocp.getInitiator(), ocp.getParticipant(), ocp.getNonFunctionalProperties());
 					return ocon;
 				}
@@ -468,7 +468,7 @@ public class SerializationServices implements ISerializationServices
 					MsgHeader header = (MsgHeader)ctx.get("header");
 //					AbstractRemoteCommand com = getRCFromContext(context);
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-					OutputConnection ocon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getComponentFeature(IMessageFeature.class)).internalCreateOutputConnection(
+					OutputConnection ocon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getFeature(IMessageFeature.class)).internalCreateOutputConnection(
 						(IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER), null); // todo: nonfunc
 					con.setOutputConnection(ocon);
 					con.setConnectionId(ocon.getConnectionId());
@@ -498,7 +498,7 @@ public class SerializationServices implements ISerializationServices
 					Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
 					MsgHeader header = (MsgHeader)ctx.get("header");
 					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-					InputConnection icon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getComponentFeature(IMessageFeature.class)).internalCreateInputConnection(
+					InputConnection icon = ((IInternalMessageFeature)((IInternalAccess)ctx.get("component")).getFeature(IMessageFeature.class)).internalCreateInputConnection(
 						(IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER), null);//com.getNonFunctionalProperties());
 					con.setConnectionId(icon.getConnectionId());
 					con.setInputConnection(icon);

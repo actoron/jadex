@@ -101,7 +101,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	@Override
 	public IFuture<Void> init()
 	{
-		getComponent().getComponentFeature(IMessageFeature.class).addMessageHandler(new RxHandler());
+		getComponent().getFeature(IMessageFeature.class).addMessageHandler(new RxHandler());
 		return super.init();
 	}
 	
@@ -126,7 +126,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		final String rxid = SUtil.createUniqueId("");
 //		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
-		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getComponentIdentifier());
+		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getIdentifier());
 		
 		// TODO: Merge with DecouplingInterceptor code.
 		@SuppressWarnings("unchecked")
@@ -274,7 +274,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		Map<String, Object> header = new HashMap<String, Object>();
 		header.put(RX_ID, rxid);
 		
-		IFuture<Void> ret = component.getComponentFeature(IMessageFeature.class).sendMessage(msg, header, receiver);
+		IFuture<Void> ret = component.getFeature(IMessageFeature.class).sendMessage(msg, header, receiver);
 //		ret.addResultListener(new IResultListener<Void>()
 //		{
 //			public void exceptionOccurred(Exception exception)
@@ -342,7 +342,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						// Local is used to set the caller in the new service call context
 						sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
 						// After call creation it can be reset
-						IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
+						IComponentIdentifier.LOCAL.set(getComponent().getIdentifier());
 					}
 					final ServiceCall	fsc	= sc;
 					
@@ -374,7 +374,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						term	= null;
 					}
 					
-					retfut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener()
+					retfut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener()
 					{
 						/** Result counter. */
 						int counter = Integer.MIN_VALUE;

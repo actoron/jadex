@@ -107,7 +107,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 //		}
 
 		// Start listening thread.
-		IDaemonThreadPoolService	dtps	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
+		IDaemonThreadPoolService	dtps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
 		dtps.executeForever(new Receiver(recvsocket, true));
 		// Also listen for single-cast response messages -> TODO: use NIO to spare one thread
 		dtps.executeForever(new Receiver(sendsocket, false));
@@ -156,8 +156,8 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 				public void resultAvailable(Void result)
 				{
 					// TODO: timeout from service call
-					agent.getComponentFeature(IExecutionFeature.class)
-						.waitForDelay(Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier()), true)
+					agent.getFeature(IExecutionFeature.class)
+						.waitForDelay(Starter.getRemoteDefaultTimeout(agent.getIdentifier()), true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override
@@ -214,7 +214,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 	protected IFuture<Void> sendInfo(final String address, final int port)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ITransportAddressService tas = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
+		ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override
@@ -266,7 +266,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 					if(addresses!=null && !addresses.isEmpty())
 					{
 						IComponentIdentifier	sender	= addresses.iterator().next().getPlatformId();
-						if(!agent.getComponentIdentifier().getRoot().equals(sender))
+						if(!agent.getIdentifier().getRoot().equals(sender))
 						{
 							agent.getLogger().info("discovered: " + addresses);
 							agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()

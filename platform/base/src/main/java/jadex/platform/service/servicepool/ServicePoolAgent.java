@@ -60,7 +60,7 @@ public class ServicePoolAgent implements IServicePoolService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
+		PoolServiceInfo[] psis = (PoolServiceInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("serviceinfos");
 		
 		if(psis!=null)
 		{
@@ -167,7 +167,7 @@ public class ServicePoolAgent implements IServicePoolService
 		try
 		{
 			Object service = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class<?>[]{servicetype}, handler);
-			return agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi, scope);
+			return agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, pi, scope);
 		}
 		catch(Exception e)
 		{
@@ -190,10 +190,10 @@ public class ServicePoolAgent implements IServicePoolService
 		{
 			servicetypes.remove(servicetype);
 			// remove service proxy
-			ser = (IService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
+			ser = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
 			if(ser!=null)
 			{
-				agent.getComponentFeature(IProvidedServicesFeature.class).removeService(ser.getServiceIdentifier());
+				agent.getFeature(IProvidedServicesFeature.class).removeService(ser.getServiceIdentifier());
 				ret.setResult(null);
 			}
 		}

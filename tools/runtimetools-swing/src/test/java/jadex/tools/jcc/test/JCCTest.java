@@ -56,7 +56,7 @@ public class JCCTest //extends TestCase
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final JCCAgent	jcca	= (JCCAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				final JCCAgent	jcca	= (JCCAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				final ControlCenter	cc	= jcca.getControlCenter();
 				
 				final Future<Void>	ret	= new Future<Void>();

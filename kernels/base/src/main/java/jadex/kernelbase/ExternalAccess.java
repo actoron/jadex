@@ -74,7 +74,7 @@ public class ExternalAccess implements IExternalAccess
 	{
 		this.valid	= true;
 		this.ia = ia;
-		this.cid	= ia.getComponentIdentifier();
+		this.cid	= ia.getIdentifier();
 		this.tostring = cid.getLocalName();
 	}
 
@@ -233,7 +233,7 @@ public class ExternalAccess implements IExternalAccess
 			{
 				killfut.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
 			}
-			else if(!ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
+			else if(!ia.getFeature(IExecutionFeature.class).isComponentThread())
 			{
 				try
 				{
@@ -243,7 +243,7 @@ public class ExternalAccess implements IExternalAccess
 	//					Thread.dumpStack();
 	//				}
 	//				System.out.println("ext kill: "+cid);
-					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+					ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
@@ -330,7 +330,7 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -374,11 +374,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(ISubcomponentsFeature.class).createChild(component)
+						ia.getFeature(ISubcomponentsFeature.class).createChild(component)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 						return IFuture.DONE;
 					}
@@ -397,7 +397,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ia.getComponentFeature(ISubcomponentsFeature.class).createChild(component)
+			ia.getFeature(ISubcomponentsFeature.class).createChild(component)
 				.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 		}
 		
@@ -422,11 +422,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						String fn = ia.getComponentFeature(ISubcomponentsFeature.class).getComponentFilename(ctype);
+						String fn = ia.getFeature(ISubcomponentsFeature.class).getComponentFilename(ctype);
 						if(fn!=null)
 						{
 							ret.setResult(fn);
@@ -452,7 +452,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			String fn = ia.getComponentFeature(ISubcomponentsFeature.class).getComponentFilename(ctype);
+			String fn = ia.getFeature(ISubcomponentsFeature.class).getComponentFilename(ctype);
 			if(fn!=null)
 			{
 				ret.setResult(fn);
@@ -482,7 +482,7 @@ public class ExternalAccess implements IExternalAccess
 //		}
 //		else
 //		{
-			return ia.getComponentFeature(ISubcomponentsFeature.class).getLocalType();
+			return ia.getFeature(ISubcomponentsFeature.class).getLocalType();
 //		}
 	}
 	
@@ -494,7 +494,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+		return ia.getFeature(IExecutionFeature.class).scheduleStep(step);
 	}
 	
 	/**
@@ -505,7 +505,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IFuture<T> scheduleStep(int priority, IComponentStep<T> step)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).scheduleStep(priority, step);
+		return ia.getFeature(IExecutionFeature.class).scheduleStep(priority, step);
 	}
 	
 	/**
@@ -513,7 +513,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime);
+		return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime);
 
 	}
 
@@ -522,7 +522,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+		return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, step);
 	}
 	
 	// todo: move to external feature!?
@@ -543,11 +543,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
 						return IFuture.DONE;
@@ -573,7 +573,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -598,11 +598,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(IArgumentsResultsFeature.class).subscribeToResults(); 
+						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getFeature(IArgumentsResultsFeature.class).subscribeToResults(); 
 						TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 						fut.addResultListener(lis);
 						return IFuture.DONE;
@@ -622,7 +622,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getComponentFeature(IArgumentsResultsFeature.class).subscribeToResults(); 
+			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = ia.getFeature(IArgumentsResultsFeature.class).subscribeToResults(); 
 			TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 			fut.addResultListener(lis);
 		}
@@ -646,11 +646,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments());
+						ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getArguments());
 						return IFuture.DONE;
 					}
 				});
@@ -668,7 +668,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments());
+			ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getArguments());
 		}
 		
 		return ret;
@@ -690,11 +690,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getResults());
+						ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
 						return IFuture.DONE;
 					}
 				});
@@ -706,7 +706,7 @@ public class ExternalAccess implements IExternalAccess
 					public void run()
 					{
 						// Should be possible to get the results even if component is already terminated?!
-						ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getResults());
+						ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
 //						ret.setException(e);
 					}
 				});
@@ -714,7 +714,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(ia.getComponentFeature(IArgumentsResultsFeature.class).getResults());
+			ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
 		}
 		
 		return ret;
@@ -1257,7 +1257,7 @@ public class ExternalAccess implements IExternalAccess
 			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
 		}
 
-		return !ia.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		return !ia.getFeature(IExecutionFeature.class).isComponentThread();
 	}
 	
 	/**
@@ -1302,7 +1302,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
-		return ia.getComponentFeature(IExecutionFeature.class).createResultListener(listener);
+		return ia.getFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 //	/**

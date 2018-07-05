@@ -45,7 +45,7 @@ public class PlaySongPlan extends Plan
 		final Future<Void>	play	= new Future<Void>();
 		
 //		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.searchService(getScope().getServiceProvider(), new ServiceQuery<>( IThreadPoolService.class)).get();
-		IThreadPoolService tp = (IThreadPoolService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("tpservice").get();
+		IThreadPoolService tp = (IThreadPoolService)getAgent().getFeature(IRequiredServicesFeature.class).getService("tpservice").get();
 		final ClassLoader cl = getScope().getClassLoader();
 		tp.execute(new Runnable()
 		{

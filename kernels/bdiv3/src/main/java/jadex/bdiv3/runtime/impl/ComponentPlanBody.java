@@ -66,8 +66,8 @@ public class ComponentPlanBody implements IPlanBody
 		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 		// Todo: should also set processing state and RPLANS thread local?
 		
-		IComponentManagementService cms = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-		cms.createComponent(null, component, new CreationInfo(ia.getComponentIdentifier()))
+		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		cms.createComponent(null, component, new CreationInfo(ia.getIdentifier()))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
@@ -102,7 +102,7 @@ public class ComponentPlanBody implements IPlanBody
 		if(cid!=null)
 		{
 			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
-			IComponentManagementService cms = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			cms.destroyComponent(cid);
 		}
 	}

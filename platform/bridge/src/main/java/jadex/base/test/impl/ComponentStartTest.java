@@ -118,7 +118,7 @@ public class ComponentStartTest extends	ComponentTest
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("waiting false for "+cid);
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, false);
+					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, false);
 				}
 			}).addResultListener(lis);
 			ea.scheduleStep(new IComponentStep<Void>()
@@ -127,7 +127,7 @@ public class ComponentStartTest extends	ComponentTest
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("waiting true for "+cid);
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true);
+					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, true);
 				}
 			}).addResultListener(lis);
 		}

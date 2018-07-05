@@ -73,16 +73,16 @@ public class DFTestAgent extends JunitAgentTest
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		// Store test results.
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 
 		// Deregister agent.
 		// Todo: use fix component service container
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDF, Void>(ret)
 		{
 			public void customResultAvailable(IDF df)
 			{
-				IDFComponentDescription ad = df.createDFComponentDescription(agent.getComponentIdentifier(), null);
+				IDFComponentDescription ad = df.createDFComponentDescription(agent.getIdentifier(), null);
 				df.deregister(ad).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
@@ -100,22 +100,22 @@ public class DFTestAgent extends JunitAgentTest
 		reports.add(tr);
 
 		//agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))  
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))  
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
 		{
 			public void resultAvailable(IDF df)
 			{
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
-				IDFComponentDescription ad = df.createDFComponentDescription(agent.getComponentIdentifier(), sd);
+				IDFComponentDescription ad = df.createDFComponentDescription(agent.getIdentifier(), sd);
 
 				IFuture<IDFComponentDescription> re = df.register(ad); 
-				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription>()
+				re.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription>()
 				{
 					public void resultAvailable(IDFComponentDescription result)
 					{
 						// Set test success and continue test.
 						tr.setSucceeded(true);
-						searchDF().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+						searchDF().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 					}
 					
 					public void exceptionOccurred(Exception e)
@@ -142,8 +142,8 @@ public class DFTestAgent extends JunitAgentTest
 		reports.add(tr);
 
 		// Create a service description to search for.
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))  
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))  
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IDF>()
 		{
 			public void resultAvailable(IDF df)
 			{
@@ -152,7 +152,7 @@ public class DFTestAgent extends JunitAgentTest
 				ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 				
 				IFuture<IDFComponentDescription[]> re = df.search(ad, cons); 
-				re.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription[]>() 
+				re.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription[]>() 
 				{
 					public void resultAvailable(IDFComponentDescription[] agentDesc)
 					{
@@ -193,11 +193,11 @@ public class DFTestAgent extends JunitAgentTest
 
 		Map<String, Object> hlefMessage = new HashMap<String, Object>();
 		hlefMessage.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-		hlefMessage.put(SFipa.SENDER, agent.getComponentIdentifier());
+		hlefMessage.put(SFipa.SENDER, agent.getIdentifier());
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		agent.getComponentFeature(IMessageFeature.class).sendMessage(hlefMessage, agent.getComponentIdentifier())
+		agent.getFeature(IMessageFeature.class).sendMessage(hlefMessage, agent.getIdentifier())
 			.addResultListener(new IResultListener<Void>()
 		{
 			@Override

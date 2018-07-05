@@ -85,7 +85,7 @@ public class GoPlanEnv
 			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getComponentDescription()).getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getDescription()).getId());
 			action	= env.performSpaceAction("go", params, lis); 
 			fut.get();
 			action	= -1;

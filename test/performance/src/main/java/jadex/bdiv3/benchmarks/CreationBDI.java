@@ -151,13 +151,13 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new DefaultResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), "jadex.bdiv3.benchmarks.CreationBDI.class",
-						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
+					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getIdentifier()), "jadex.bdiv3.benchmarks.CreationBDI.class",
+						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
 				}
 			});
 		}
@@ -191,8 +191,8 @@ public class CreationBDI
 					{
 						public void resultAvailable(IComponentManagementService cms)
 						{
-							String	initial	= createPeerName(0, agent.getComponentIdentifier());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+							String	initial	= createPeerName(0, agent.getIdentifier());
+							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getIdentifier().getRoot());
 							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
@@ -203,7 +203,7 @@ public class CreationBDI
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 //											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
-											final CreationBDI cbdi = (CreationBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+											final CreationBDI cbdi = (CreationBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 											cbdi.getClock().addResultListener(new IResultListener<IClockService>()
 											{
 												public void resultAvailable(IClockService clock)
@@ -235,12 +235,12 @@ public class CreationBDI
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera)
 	{
-		final String name = createPeerName(cnt, agent.getComponentIdentifier());
+		final String name = createPeerName(cnt, agent.getIdentifier());
 		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
 				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
@@ -290,9 +290,9 @@ public class CreationBDI
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
@@ -303,7 +303,7 @@ public class CreationBDI
 	 */
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 
 	/**
@@ -311,6 +311,6 @@ public class CreationBDI
 	 */
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 }

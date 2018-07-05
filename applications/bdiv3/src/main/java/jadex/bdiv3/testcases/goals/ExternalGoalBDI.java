@@ -54,14 +54,14 @@ public class ExternalGoalBDI
 
 		final TestReport tr = new TestReport("#1", "Test if rebuild works with.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did not return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				ret.setResultIfUndone(null);
@@ -70,9 +70,9 @@ public class ExternalGoalBDI
 		});
 		
 		ExternalGoal eg = new ExternalGoal(3);
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(eg).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(eg).get();
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		ret.setResultIfUndone(null);
 		
 		return ret;

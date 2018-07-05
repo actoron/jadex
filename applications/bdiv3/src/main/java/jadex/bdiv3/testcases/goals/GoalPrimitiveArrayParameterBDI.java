@@ -56,14 +56,14 @@ public class GoalPrimitiveArrayParameterBDI
 
 		final TestReport tr = new TestReport("#1", "Test if a goal condition can be triggered by injected primitive array goal parameter.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				ret.setResultIfUndone(null);
@@ -72,7 +72,7 @@ public class GoalPrimitiveArrayParameterBDI
 		});
 		
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		ret.setResultIfUndone(null);
 		
 		return ret;

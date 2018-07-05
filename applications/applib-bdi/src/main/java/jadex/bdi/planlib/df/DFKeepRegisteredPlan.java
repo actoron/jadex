@@ -23,7 +23,7 @@ public class DFKeepRegisteredPlan	extends Plan
 			lease	= desc.getLeaseTime().getTime()-getTime();
 		}
 		
-		IDF	df = getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IDF	df = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		df.register(desc).get();
 		while(lease!=-1)
 		{

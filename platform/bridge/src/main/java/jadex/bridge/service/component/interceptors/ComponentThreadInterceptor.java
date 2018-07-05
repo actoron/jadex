@@ -30,7 +30,7 @@ public abstract class ComponentThreadInterceptor extends AbstractApplicableInter
 //			System.out.println("not on comp: "+context.getMethod().toString());
 //			throw new RuntimeException("Must be called on component thread: "+Thread.currentThread());
 
-		return getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+		return getComponent().getFeature(IExecutionFeature.class).isComponentThread();
 	}
 	
 	/**

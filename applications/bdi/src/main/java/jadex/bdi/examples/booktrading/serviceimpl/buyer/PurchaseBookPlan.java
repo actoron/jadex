@@ -50,7 +50,7 @@ public class PurchaseBookPlan extends Plan
 		
 		// Find available seller agents.
 		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
-		IRequiredServicesFeature rsf = getAgent().getComponentFeature(IRequiredServicesFeature.class);
+		IRequiredServicesFeature rsf = getAgent().getFeature(IRequiredServicesFeature.class);
 		ITerminableIntermediateFuture<IBuyBookService>  fut = rsf.getServices("buyservice");
 		fut.addIntermediateResultListener(new TimeoutIntermediateResultListener<IBuyBookService>(5000, getExternalAccess(),
 			new IIntermediateResultListener<IBuyBookService>()

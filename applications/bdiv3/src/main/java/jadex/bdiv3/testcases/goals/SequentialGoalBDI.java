@@ -85,14 +85,14 @@ public class SequentialGoalBDI
 	{
 		final TestReport tr = new TestReport("#1", "Test if a goal with AND success for plans work.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				agent.killComponent();
@@ -100,10 +100,10 @@ public class SequentialGoalBDI
 			}
 		});
 		
-		Object res = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal()).get();
+		Object res = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal()).get();
 		System.out.println("Goal success: "+res);
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 }

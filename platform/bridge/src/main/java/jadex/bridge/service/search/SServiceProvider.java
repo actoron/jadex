@@ -48,7 +48,7 @@ public class SServiceProvider
 			@Override
 			public IFuture<T> execute(IInternalAccess ia)
 			{
-				return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(query);
+				return ia.getFeature(IRequiredServicesFeature.class).searchService(query);
 			}
 		});
 	}
@@ -66,7 +66,7 @@ public class SServiceProvider
 			@Override
 			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
 			{
-				return ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(query);
+				return ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
 			}
 		});
 	}
@@ -87,7 +87,7 @@ public class SServiceProvider
 			@Override
 			public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
 			{
-				return ia.getComponentFeature(IRequiredServicesFeature.class).addQuery(query);
+				return ia.getFeature(IRequiredServicesFeature.class).addQuery(query);
 			}
 		});
 	}
@@ -1637,7 +1637,7 @@ public class SServiceProvider
 				
 				if(access==null)
 				{
-					IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 
 					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 					{

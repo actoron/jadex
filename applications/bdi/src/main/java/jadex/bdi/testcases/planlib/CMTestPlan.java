@@ -35,7 +35,7 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
 			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IComponentIdentifier	receiver	= cms.createComponent(agenttype, new CreationInfo(getComponentIdentifier())).getFirstResult();
 		
@@ -78,7 +78,7 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
 			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IComponentIdentifier	receiver	= cms.createComponent(agenttype, new CreationInfo(getComponentIdentifier())).getFirstResult();
 		

@@ -77,7 +77,7 @@ public class UserAgent
 	{
 		registerServices().get();
 		
-		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser").get();
+		ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
 		final long wa = 500;
@@ -145,7 +145,7 @@ public class UserAgent
 			e.printStackTrace();
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}
@@ -156,7 +156,7 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("poolser");
+		IFuture<IServicePoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)

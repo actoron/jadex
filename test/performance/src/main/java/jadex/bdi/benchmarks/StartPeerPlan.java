@@ -149,7 +149,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map<String, Object> args)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
+		final IComponentManagementService ces = (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).getService("cms").get();
 //		IComponentManagementService ces = getInterpreter().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		SyncResultListener lis = new SyncResultListener();
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
@@ -171,7 +171,7 @@ public class StartPeerPlan extends Plan
 //		IComponentManagementService ces = getInterpreter().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 		final IComponentManagementService ces = (IComponentManagementService)getAgent()
-			.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
+			.getFeature(IRequiredServicesFeature.class).getService("cms").get();
 //		SyncResultListener lis = new SyncResultListener();
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 //		ces.destroyComponent(aid, lis);

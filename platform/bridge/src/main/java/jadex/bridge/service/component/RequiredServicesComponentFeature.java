@@ -158,7 +158,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public IFuture<Void> shutdown()
 	{
 		// Remove the persistent queries
-		ServiceRegistry.getRegistry(component).removeQueries(getComponent().getComponentIdentifier());
+		ServiceRegistry.getRegistry(component).removeQueries(getComponent().getIdentifier());
 		return IFuture.DONE;
 	}
 	
@@ -597,7 +597,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> ServiceQuery<T>	getServiceQuery(RequiredServiceInfo info)
 	{
-		return new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), null, getComponent().getComponentIdentifier());
+		return new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), null, getComponent().getIdentifier());
 	}
 	
 	/**
@@ -644,7 +644,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		@SuppressWarnings("unchecked")
 		T ret	= (T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-			(IService)service, null, info, null, Starter.isRealtimeTimeout(getComponent().getComponentIdentifier()));
+			(IService)service, null, info, null, Starter.isRealtimeTimeout(getComponent().getIdentifier()));
 		return ret;
 	}
 	
@@ -664,11 +664,11 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //		}
 
 		// Check if owner set to wrong component
-		if(query.getOwner()!=null && !getComponent().getComponentIdentifier().equals(query.getOwner()))
+		if(query.getOwner()!=null && !getComponent().getIdentifier().equals(query.getOwner()))
 		{
 			throw new IllegalArgumentException("Query owner must be local component: "+query);
 		}
-		query.setOwner(getComponent().getComponentIdentifier());
+		query.setOwner(getComponent().getIdentifier());
 		
 		// Set networks if not set for remote queries
 		// TODO: more extensible way of checking for remote query
@@ -698,7 +698,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 				{
 					// Not unrestricted -> only find services from my local networks
 					@SuppressWarnings("unchecked")
-					Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
+					Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
 					query.setNetworkNames(nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY);
 				}
 			}

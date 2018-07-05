@@ -61,7 +61,7 @@ public class NFRequiredServicePropertyProviderInterceptor extends ComponentThrea
 	public IFuture<Void> execute(ServiceInvocationContext sic)
 	{
 //		INFMixedPropertyProvider res = component.getRequiredServicePropertyProvider((IServiceIdentifier)sic.getArgumentArray()[0]);
-		INFMixedPropertyProvider res = getComponent().getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(sid);
+		INFMixedPropertyProvider res = getComponent().getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(sid);
 		sic.setResult(new Future<INFMixedPropertyProvider>(res));
 		return IFuture.DONE;
 	}

@@ -40,7 +40,7 @@ public class ServiceImplTestAgent extends JunitAgentTest
 	{
 		TestReport tr1 = test(1, PojoProviderAgent.class.getName()+".class");
 		TestReport tr2 = test(2, MicroProviderAgent.class.getName()+".class");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 		return IFuture.DONE;
 	}
 	
@@ -55,9 +55,9 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, "Test if creating service without explicit implementation works.");
 		try
 		{
-			IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
-			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
-			IInfoService ser = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class, cid)).get();
+			IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
+			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getIdentifier()), null).get();
+			IInfoService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class, cid)).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);
 		}

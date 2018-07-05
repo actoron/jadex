@@ -42,7 +42,7 @@ public class ClockBDI
 	public IFuture<Void> body(IInternalAccess agent)
 	{
 		// Stop the agent after 5 seconds.
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(5000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(5000).get();
 		return IFuture.DONE;
 	}
 }

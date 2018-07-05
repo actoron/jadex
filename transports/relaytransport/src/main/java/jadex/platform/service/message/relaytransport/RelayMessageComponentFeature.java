@@ -82,13 +82,13 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 	protected Collection<ITransportService> getAllTransports()
 	{
 		List<ITransportService> ret = new ArrayList<ITransportService>();
-		Collection<ITransportService> all = ((AbstractComponentFeature)component.getComponentFeature(IRequiredServicesFeature.class)).getRawServices(ITransportService.class);
+		Collection<ITransportService> all = ((AbstractComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getRawServices(ITransportService.class);
 		if (all != null)
 		{
 			for (Iterator<ITransportService> it = all.iterator(); it.hasNext(); )
 			{
 				IService serv = (IService) it.next();
-				if (!component.getComponentIdentifier().equals(serv.getServiceIdentifier().getProviderId()))
+				if (!component.getIdentifier().equals(serv.getServiceIdentifier().getProviderId()))
 					ret.add((ITransportService) serv);
 			}
 		}

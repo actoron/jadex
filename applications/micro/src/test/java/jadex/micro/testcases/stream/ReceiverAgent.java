@@ -45,7 +45,7 @@ public class ReceiverAgent
 	@AgentCreated
 	public void created()
 	{
-		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class ReceiverAgent
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
+			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
 			{
 				public void resultAvailable(Collection<byte[]> result)
 				{
@@ -109,7 +109,7 @@ public class ReceiverAgent
 					{
 //						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
 						agent.killComponent();
 					}
 					catch(Exception e)

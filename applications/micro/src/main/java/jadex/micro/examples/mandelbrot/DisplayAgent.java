@@ -71,7 +71,7 @@ public class DisplayAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<IMandelbrotService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("mandelservice");
+		IFuture<IMandelbrotService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("mandelservice");
 		fut.addResultListener(new SwingExceptionDelegationResultListener<IMandelbrotService, Void>(ret)
 		{
 			public void customResultAvailable(IMandelbrotService result)
@@ -81,7 +81,7 @@ public class DisplayAgent
 //				addService(new DisplayService(this));
 				
 				final IExternalAccess	access	= agent.getExternalAccess();
-				final JFrame	frame	= new JFrame(agent.getComponentIdentifier().getName());
+				final JFrame	frame	= new JFrame(agent.getIdentifier().getName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 
 				JTextPane helptext = new JTextPane();
@@ -127,7 +127,7 @@ public class DisplayAgent
 //							}
 //						});
 						
-						ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+						ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 							.addResultListener(/*new SwingIntermediateResultListener<IMonitoringEvent>(*/new IntermediateDefaultResultListener<IMonitoringEvent>()
 						{
 							public void intermediateResultAvailable(IMonitoringEvent result)

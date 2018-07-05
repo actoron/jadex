@@ -410,7 +410,7 @@ public class SRemoteClock
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Code in component thread as clock runs on its own thread.
-			instance.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			instance.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -494,7 +494,7 @@ public class SRemoteClock
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Code in component thread as clock runs on its own thread.
-			instance.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			instance.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

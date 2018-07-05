@@ -41,7 +41,7 @@ public class UpdaterateGetterSetterBDI
 	@AgentBody
 	public void	body(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		tr.setFailed("Plan was not triggered.");
 		agent.killComponent();
 	}
@@ -63,7 +63,7 @@ public class UpdaterateGetterSetterBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	//-------- plans --------

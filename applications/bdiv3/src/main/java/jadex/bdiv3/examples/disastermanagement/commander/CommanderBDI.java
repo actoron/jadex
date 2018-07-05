@@ -85,7 +85,7 @@ public class CommanderBDI
 	{
 		while(true)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 			ISpaceObject[] dis = movecapa.getEnvironment().getSpaceObjectsByType("disaster");
 			for(ISpaceObject di: dis)
 			{
@@ -95,7 +95,7 @@ public class CommanderBDI
 				}
 			}
 			
-			IBDIAgentFeature bdif = agent.getComponentFeature(IBDIAgentFeature.class);
+			IBDIAgentFeature bdif = agent.getFeature(IBDIAgentFeature.class);
 			Collection<HandleDisaster> goals = bdif.getGoals(HandleDisaster.class);
 			Set<ISpaceObject> done = new HashSet<ISpaceObject>();
 			if(goals!=null)

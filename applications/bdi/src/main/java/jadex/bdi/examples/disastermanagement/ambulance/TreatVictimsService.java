@@ -34,7 +34,7 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public ITerminableFuture<Void> treatVictims(final Object disasterId)
 	{
-		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
+		final IBDIXAgentFeature capa = agent.getFeature(IBDIXAgentFeature.class);
 		
 		final IGoal tv = (IGoal)capa.getGoalbase().createGoal("treat_victims");
 		
@@ -103,7 +103,7 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public String toString()
 	{
-		return "TreatVictimsService, "+agent.getComponentIdentifier();
+		return "TreatVictimsService, "+agent.getIdentifier();
 	}
 }
 

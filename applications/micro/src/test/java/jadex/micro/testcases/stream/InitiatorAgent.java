@@ -40,8 +40,8 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -53,12 +53,12 @@ public class InitiatorAgent extends TestAgent
 				} 
 				else 
 				{
-					agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
-					testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+					agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
+					testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(TestReport result)
 						{
-							agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 							tc.addReport(result);
 							ret.setResult(null);
 						}
@@ -75,7 +75,7 @@ public class InitiatorAgent extends TestAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno)
 	{
-		return performTest(agent.getComponentIdentifier().getRoot(), testno);
+		return performTest(agent.getIdentifier().getRoot(), testno);
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 	        	performTest(exta.getComponentIdentifier(), testno)
-	        		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+	        		.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -124,26 +124,26 @@ public class InitiatorAgent extends TestAgent
 			@Override
 			public void customResultAvailable(Map<String, Object> result)
 			{
-				agent.getLogger().severe("Testagent receiver finished: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent receiver finished: "+agent.getDescription());
 				super.customResultAvailable(result);
 			}
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getLogger().severe("Testagent receiver failed: "+agent.getComponentDescription()+", "+exception);
+				agent.getLogger().severe("Testagent receiver failed: "+agent.getDescription()+", "+exception);
 				super.exceptionOccurred(exception);
 			}
 		};
 		
-		agent.getLogger().severe("Testagent setup receiver: "+agent.getComponentDescription());
+		agent.getLogger().severe("Testagent setup receiver: "+agent.getDescription());
 		createComponent("jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getLogger().severe("Testagent setup receiver done: "+agent.getComponentDescription());
-				IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
-				mf.createOutputConnection(agent.getComponentIdentifier(), cid, null)
+				agent.getLogger().severe("Testagent setup receiver done: "+agent.getDescription());
+				IMessageFeature mf = agent.getFeature(IMessageFeature.class);
+				mf.createOutputConnection(agent.getIdentifier(), cid, null)
 					.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)
 				{
 					public void customResultAvailable(final IOutputConnection ocon) 
@@ -169,7 +169,7 @@ public class InitiatorAgent extends TestAgent
 		
 		try
 		{
-			final InputStream is = SUtil.getResource((String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("filename"), agent.getClassLoader());
+			final InputStream is = SUtil.getResource((String)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("filename"), agent.getClassLoader());
 			
 			final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
 			
@@ -228,7 +228,7 @@ public class InitiatorAgent extends TestAgent
 							{
 								public void resultAvailable(Integer result)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(self);
+									agent.getFeature(IExecutionFeature.class).scheduleStep(self);
 //									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10, self);
 								}
 								public void exceptionOccurred(Exception exception)
@@ -252,7 +252,7 @@ public class InitiatorAgent extends TestAgent
 					return IFuture.DONE;
 				}
 			};
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+			agent.getFeature(IExecutionFeature.class).scheduleStep(step);
 //			con.close();
 		}
 		catch(Exception e)

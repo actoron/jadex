@@ -38,9 +38,9 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	@Override
 	public <T> void scheduleForward(final ICommand<T> command, final T args)
 	{
-		if(!access.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!access.getFeature(IExecutionFeature.class).isComponentThread())
 		{
-			access.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			access.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

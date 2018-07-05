@@ -831,12 +831,12 @@ public class RemoteReferenceModule
 			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
 			}
-			if(!access.getComponentIdentifier().equals(sid.getProviderId()))
+			if(!access.getIdentifier().equals(sid.getProviderId()))
 			{
 				throw new IllegalStateException("Must be request for service of component that received remote execution message.");				
 			}
 			
-			ret	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+			ret	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 		}
 		else if(rr.getTargetIdentifier() instanceof IComponentIdentifier)
 		{
@@ -869,7 +869,7 @@ public class RemoteReferenceModule
 			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
 			}
-			if(!access.getComponentIdentifier().equals(cid))
+			if(!access.getIdentifier().equals(cid))
 			{
 				throw new IllegalStateException("Must be request for access of component that received remote execution message.");				
 			}

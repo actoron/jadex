@@ -37,7 +37,7 @@ public class NoServiceAgent extends JunitAgentTest
 		
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(INoService.class)).addResultListener(new IResultListener<Collection<INoService>>()
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(INoService.class)).addResultListener(new IResultListener<Collection<INoService>>()
 		{
 			public void resultAvailable(Collection<INoService> result)
 			{
@@ -49,14 +49,14 @@ public class NoServiceAgent extends JunitAgentTest
 				{
 					tr.setFailed("Expected empty collection but was: "+result);
 				}
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				ret.setResult(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed("Exception during test: "+exception);
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				ret.setResult(null);
 			}
 		});

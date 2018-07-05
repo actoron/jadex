@@ -150,12 +150,12 @@ public class MethodCallTask implements ITask
 		final String	fservice	= service;
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
-		process.getComponentFeature(IRequiredServicesFeature.class).getService(service)
+		process.getFeature(IRequiredServicesFeature.class).getService(service)
 			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				Class<?> servicetype = ((IInternalServiceMonitoringFeature)process.getComponentFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
+				Class<?> servicetype = ((IInternalServiceMonitoringFeature)process.getFeature(IRequiredServicesFeature.class)).getServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
 				//Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
 				
 				Method[] methods = servicetype.getMethods();

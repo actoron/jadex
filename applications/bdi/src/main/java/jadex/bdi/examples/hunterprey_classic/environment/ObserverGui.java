@@ -102,7 +102,7 @@ public class ObserverGui	extends EnvironmentGui
 			@Classname("highscore")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				String hs = (String)capa.getBeliefbase().getBelief("highscore").getFact();
 				BufferedReader reader = null;
 				try
@@ -193,7 +193,7 @@ public class ObserverGui	extends EnvironmentGui
 			@Classname("update")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				final IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				capa.getBeliefbase().getBelief("vision").addBeliefListener(new BeliefAdapter<Object>()
 				{
 					public void beliefChanged(ChangeEvent ae)

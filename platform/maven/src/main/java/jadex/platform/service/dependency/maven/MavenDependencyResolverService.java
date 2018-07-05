@@ -118,7 +118,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	public IFuture<Void> startService()
 	{
 		IFuture<Void>	ret	= IFuture.DONE;
-		this.cid	= component.getComponentIdentifier().getRoot();
+		this.cid	= component.getIdentifier().getRoot();
 		this.logger	= component.getLogger();
 		try
 		{

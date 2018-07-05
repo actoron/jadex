@@ -42,7 +42,7 @@ public class REventbase extends RElement implements IEventbase
 	 */
 	public IFuture<Void> sendMessage(IMessageEvent<?> me)
 	{
-		return getAgent().getComponentFeature(IMessageFeature.class).sendMessage(me.getMessage());
+		return getAgent().getFeature(IMessageFeature.class).sendMessage(me.getMessage());
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class REventbase extends RElement implements IEventbase
 	public void dispatchInternalEvent(IInternalEvent event)
 	{
 		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction((RProcessableElement)event);
-		getAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+		getAgent().getFeature(IExecutionFeature.class).scheduleStep(fac);
 	}
 
 	/**

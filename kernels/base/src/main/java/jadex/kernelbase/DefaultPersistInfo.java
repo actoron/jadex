@@ -52,7 +52,7 @@ public class DefaultPersistInfo	implements IPersistInfo
 	public DefaultPersistInfo(IInternalAccess interpreter)
 	{
 		modelfilename	= interpreter.getModel().getFilename();
-		desc = interpreter.getComponentDescription();
+		desc = interpreter.getDescription();
 		config = interpreter.getConfiguration();
 //		arguments = interpreter.getArguments();
 //		results = interpreter.getResults();

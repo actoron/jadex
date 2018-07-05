@@ -151,7 +151,7 @@ public abstract class RProcessableElement extends RParameterElement
 		// start MR when state gets to unprocessed
 		if(State.UNPROCESSED.equals(state))
 		{
-			ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new FindApplicableCandidatesAction(this));
+			ia.getFeature(IExecutionFeature.class).scheduleStep(new FindApplicableCandidatesAction(this));
 		}
 //		else if(PROCESSABLEELEMENT_APLAVAILABLE.equals(state))
 //		{

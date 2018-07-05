@@ -104,12 +104,12 @@ public class SRemoteGui
 				final Future<Object[]>	ret	= new Future<Object[]>();
 				try
 				{
-					final RequiredServiceInfo[]	ris	= ia.getComponentFeature0(IRequiredServicesFeature.class)==null? null: ((IInternalServiceMonitoringFeature)ia.getComponentFeature(IRequiredServicesFeature.class)).getRequiredServiceInfos();
+					final RequiredServiceInfo[]	ris	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: ((IInternalServiceMonitoringFeature)ia.getFeature(IRequiredServicesFeature.class)).getRequiredServiceInfos();
 					ProvidedServiceInfo[]	pis	= null;
 					IServiceIdentifier[]	sis	= null;
 					
-					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null, ia.getComponentIdentifier());
-					Collection<IService>	result	= ia.getComponentFeature0(IRequiredServicesFeature.class)==null? null: (ia.getComponentFeature(IRequiredServicesFeature.class)).searchLocalServices(query);
+					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null, ia.getIdentifier());
+					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).searchLocalServices(query);
 					if(result!=null)
 					{
 						pis	= new ProvidedServiceInfo[result.size()];
@@ -318,7 +318,7 @@ public class SRemoteGui
 				{
 					// Test, if model can be loaded.
 					SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
+						.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
 					{
 						public void customResultAvailable(IModelInfo result)
 						{
@@ -368,7 +368,7 @@ public class SRemoteGui
 					else
 					{
 						URL	url	= SUtil.toURL(ridurl);
-						LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url);
+						LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getIdentifier().getRoot(), url);
 						ret.setResult(new ResourceIdentifier(lid, globalrid!=null? new GlobalResourceIdentifier(globalrid, null, null): null));
 					}
 				}
@@ -425,7 +425,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(List<IResourceIdentifier> rids)
@@ -535,7 +535,7 @@ public class SRemoteGui
 				final Future<Void>	ret	= new Future<Void>();
 				try
 				{
-					ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 					try
 					{
 						ls.removeURL(null, SUtil.toURL(path));
@@ -1086,7 +1086,7 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+														ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 														ls.getClassLoader(model.getResourceIdentifier())
 															.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
 														{
@@ -1155,7 +1155,7 @@ public class SRemoteGui
 				final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 				try
 				{
-					ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getClassLoader(modelrid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Map<String, Object>>(ret)
 					{
 						public void customResultAvailable(ClassLoader cl)
@@ -1220,7 +1220,7 @@ public class SRemoteGui
 				try
 				{
 					final URL	url	= SUtil.toURL(filename);
-					ILibraryService	ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService	ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 					if(!tl)
 					{
 						// todo: workspace=true?

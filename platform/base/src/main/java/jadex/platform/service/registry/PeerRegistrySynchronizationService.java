@@ -375,14 +375,14 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
-					if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+					if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 						throw new RuntimeException("wrooong4");
 //					spcid = new ComponentIdentifier("registrysuperpeer@"+spcid.getPlatformName());
 //					System.out.println("Found superpeer: "+spcid);
 					ServiceQuery<ISuperpeerRegistrySynchronizationService>	query
-						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, spcid, component.getComponentIdentifier(), null);
+						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, spcid, component.getIdentifier(), null);
 					query.setUnrestricted(true);
-					component.getComponentFeature(IRequiredServicesFeature.class).searchService(query).addResultListener(
+					component.getFeature(IRequiredServicesFeature.class).searchService(query).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
 					{
 						public void customResultAvailable(final ISuperpeerRegistrySynchronizationService spser)
@@ -412,7 +412,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	 */
 	protected IServiceRegistry getRegistry()
 	{
-		return ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		return ServiceRegistry.getRegistry(component.getIdentifier());
 	}
 	
 //	/**

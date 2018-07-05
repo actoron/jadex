@@ -28,7 +28,7 @@ public class ArrayListBDI
     public void body()
     {
         System.out.println("BDI Agent started");
-        agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal());
+        agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal());
     }
 
     @Goal

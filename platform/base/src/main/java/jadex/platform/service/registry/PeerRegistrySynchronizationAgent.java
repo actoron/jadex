@@ -36,11 +36,11 @@ public class PeerRegistrySynchronizationAgent
 		try
 		{
 			// Kill superpeer agent
-			ISuperpeerRegistrySynchronizationService spser = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			ISuperpeerRegistrySynchronizationService spser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			
 			if(spser!=null)
 			{
-				IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				cms.destroyComponent(((IService)spser).getServiceIdentifier().getProviderId());
 			}
 		}

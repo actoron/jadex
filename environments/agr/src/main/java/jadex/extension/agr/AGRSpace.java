@@ -161,7 +161,7 @@ public class AGRSpace	implements IExtensionInstance
 //						}
 //					});
 					
-					final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
+					final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 					{
 						public boolean filter(IMonitoringEvent obj)
 						{

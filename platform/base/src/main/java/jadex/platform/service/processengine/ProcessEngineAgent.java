@@ -145,7 +145,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Tuple2<String, IResourceIdentifier> key = new Tuple2<String, IResourceIdentifier>(model, urid);
 
 		// find classloader for rid
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
 			public void resultAvailable(ILibraryService libs)
@@ -159,7 +159,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						{
 							// load the bpmn model
 							BpmnModelLoader loader = new BpmnModelLoader();
-							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
+							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getIdentifier().getRoot()});
 							
 							// Find all instance wait activities
 							// register waitqueue events
@@ -515,12 +515,12 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), det.getRid());
+				CreationInfo info = new CreationInfo(agent.getIdentifier(), det.getRid());
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
 				info.setArguments(args);
@@ -591,10 +591,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Set<Object>	fwq	= wq;
 		final String	ftype	= type;
 		
-		long to = Starter.getLocalDefaultTimeout(agent.getComponentIdentifier());
+		long to = Starter.getLocalDefaultTimeout(agent.getIdentifier());
 		if(to>0)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -709,7 +709,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		}
 		else
 		{
-			IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("crons");
+			IFuture<ICronService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("crons");
 			fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Collection<CMSStatusEvent>>(ret2)
 			{
 				public void customResultAvailable(final ICronService crons)

@@ -261,7 +261,7 @@ public class GuiPanel extends JPanel
 			@Classname("refresh")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				bia.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefListener<Object>()
 				{
 					public void beliefChanged(ChangeInfo<Object> info)
@@ -293,7 +293,7 @@ public class GuiPanel extends JPanel
 			@Classname("refreshDetails")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				bia.getBeliefbase().getBeliefSet("negotiation_reports").addBeliefSetListener(new IBeliefListener<Object>()
 				{
 					public void beliefChanged(ChangeInfo<Object> info)
@@ -357,7 +357,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -378,7 +378,7 @@ public class GuiPanel extends JPanel
 											@Classname("add")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+												IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 												IGoal purchase = bia.getGoalbase().createGoal(goalname);
 												purchase.getParameter("order").setValue(order);
 												bia.getGoalbase().dispatchTopLevelGoal(purchase);
@@ -443,7 +443,7 @@ public class GuiPanel extends JPanel
 						@Classname("remove")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+							IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 							IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 							for(int i=0; i<goals.length; i++)
 							{
@@ -495,7 +495,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, Binding.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -530,7 +530,7 @@ public class GuiPanel extends JPanel
 												@Classname("drop")
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+													IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 													IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 													for(int i=0; i<goals.length; i++)
 													{
@@ -623,7 +623,7 @@ public class GuiPanel extends JPanel
 			@Classname("ref")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				final Object[] aorders = bia.getBeliefbase().getBeliefSet("orders").getFacts();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -677,7 +677,7 @@ public class GuiPanel extends JPanel
 				@Classname("refD")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+					IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 					IExpression exp = bia.getExpressionbase().getExpression("search_reports");
 					final List res = (List)exp.execute("$order", order);
 					

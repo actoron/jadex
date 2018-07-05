@@ -72,7 +72,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		exta	= agent.getExternalAccess();
 		entries	= new HashMap<Integer, SortedSet<HighscoreEntry>>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -145,12 +145,12 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		final Future<Move>	ret	= new Future<Move>();
 		final int depth	= board.getMoves().size();
 		
-		final IGoal	goal	= agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().createGoal("makemove");
+		final IGoal	goal	= agent.getFeature(IBDIXAgentFeature.class).getGoalbase().createGoal("makemove");
 		goal.getParameter("board").setValue(board);	// It is safe to use the board object, as it is passed as a copy to the service automatically.
-		long time = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+		long time = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 		goal.getParameter("deadline").setValue(timeout!=-1 ? time+timeout : -1);
 		
-		agent.getComponentFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
+		agent.getFeature(IBDIXAgentFeature.class).getGoalbase().dispatchTopLevelGoal(goal)
 			.addResultListener(new ExceptionDelegationResultListener<Object, Move>(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -223,7 +223,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)

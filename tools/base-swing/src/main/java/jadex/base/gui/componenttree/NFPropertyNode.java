@@ -231,7 +231,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							final Future<Void> ret = new Future<Void>();
-							INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(fsid);
+							INFMixedPropertyProvider pp = ia.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(fsid);
 							if(fmi==null)
 							{
 								pp.removeNFProperty(fname).addResultListener(new DelegationResultListener<Void>(ret));

@@ -144,7 +144,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
 						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getComponentIdentifier()));
+						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getIdentifier()));
 					
 					addService(service, info);
 				}
@@ -174,7 +174,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						}
 						
 						final Class<?> type = info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-						PublishEventLevel elm = component.getComponentDescription().getMonitoring()!=null? component.getComponentDescription().getMonitoring(): null;
+						PublishEventLevel elm = component.getDescription().getMonitoring()!=null? component.getDescription().getMonitoring(): null;
 //						 todo: remove this? currently the level cannot be turned on due to missing interceptor
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
@@ -283,7 +283,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
 		
-		ServiceRegistry.getRegistry(component.getComponentIdentifier()).addLocalService(service);
+		ServiceRegistry.getRegistry(component.getIdentifier()).addLocalService(service);
 //		return bar.waitFor();
 	}
 	
@@ -304,7 +304,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	protected void	removeService(IInternalService service)
 	{
-		IServiceRegistry	registry	= ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry	registry	= ServiceRegistry.getRegistry(component.getIdentifier());
 		
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
@@ -433,7 +433,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	protected IFuture<Void> initService(final IInternalService is)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.getLogger().info("Starting service: "+is.getServiceIdentifier()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+		component.getLogger().info("Starting service: "+is.getServiceIdentifier()+" "+component.getFeature(IExecutionFeature.class).isComponentThread());
 		is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -478,7 +478,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			
 			if (pi.isMulti())
 			{
-				getComponent().getComponentFeature(IRequiredServicesFeature.class)
+				getComponent().getFeature(IRequiredServicesFeature.class)
 					.searchServices(new ServiceQuery<>(IPublishService.class, pi.getPublishScope()))
 					.addResultListener(new IIntermediateResultListener<IPublishService>()
 				{
@@ -557,14 +557,14 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			else
 			{
 				getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
-					.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
+					.addResultListener(getComponent().getFeature(IExecutionFeature.class)
 					.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 				{
 					public void customResultAvailable(IPublishService ps)
 					{
 						//System.out.println("Got publish service " + ps);
 						ps.publishService(service.getServiceIdentifier(), pi)
-							.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+							.addResultListener(getComponent().getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 					}
 					public void exceptionOccurred(Exception exception)
 					{
@@ -637,8 +637,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = instance.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IPublishService.class, scope));
-			fut.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
+			IFuture<Collection<IPublishService>> fut = instance.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IPublishService.class, scope));
+			fut.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
 				@Override
 				public void exceptionOccurred(Exception exception) {
@@ -657,7 +657,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			if(services.hasNext())
 			{
 				final IPublishService ps = (IPublishService)services.next();
-				ps.isSupported(type).addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
+				ps.isSupported(type).addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
 				{
 					public void customResultAvailable(Boolean supported)
 					{
@@ -1120,7 +1120,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		}
 		else
 		{
-			ILibraryService ls = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+			ILibraryService ls = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 			ls.getClassLoader(sid.getResourceIdentifier())
 				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class<?>>(ret)
 			{
@@ -1147,7 +1147,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 //		System.out.println("addS:"+service);
 
-		PublishEventLevel elm = getComponent().getComponentDescription().getMonitoring()!=null? getComponent().getComponentDescription().getMonitoring(): null;
+		PublishEventLevel elm = getComponent().getDescription().getMonitoring()!=null? getComponent().getDescription().getMonitoring(): null;
 		// todo: remove this? currently the level cannot be turned on due to missing interceptor
 //		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 		

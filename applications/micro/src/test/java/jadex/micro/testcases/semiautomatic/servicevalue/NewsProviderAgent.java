@@ -34,7 +34,7 @@ public class NewsProviderAgent implements INewsService
 	{
 		for(int i=0; i<100; i++)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(10).get();
 			for(SubscriptionIntermediateFuture<String> sub: subscriptions)
 			{
 				if(!sub.addIntermediateResultIfUndone("News "+i))

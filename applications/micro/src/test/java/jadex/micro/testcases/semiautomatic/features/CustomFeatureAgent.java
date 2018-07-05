@@ -20,7 +20,7 @@ public class CustomFeatureAgent
 	@AgentCreated
 	public void hello()
 	{
-		System.out.println(agent+" "+agent.getComponentFeature(ICustomFeature.class).someMethod());
+		System.out.println(agent+" "+agent.getFeature(ICustomFeature.class).someMethod());
 	}
 }
 

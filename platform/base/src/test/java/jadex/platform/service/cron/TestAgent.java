@@ -115,7 +115,7 @@ public class TestAgent
 			
 			public void finished()
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 				ret.setResult(null);
 			}
 			
@@ -141,7 +141,7 @@ public class TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("crons");
+		IFuture<ICronService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("crons");
 		fut.addResultListener(new IResultListener<ICronService>()
 		{
 			public void resultAvailable(final ICronService crons)

@@ -50,13 +50,13 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 
 		final TestReport tr	= new TestReport("#1", "Test if injected results work.");
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(InjectedResultsAgent.class.getName()+".class", 
-					new CreationInfo(agent.getComponentIdentifier()));
+					new CreationInfo(agent.getIdentifier()));
 				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					public void firstResultAvailable(IComponentIdentifier result)
@@ -77,14 +77,14 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 							tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
 						}
 						
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						tr.setFailed("Exception occurred: "+exception);
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 						ret.setResult(null);
 					}
 				});

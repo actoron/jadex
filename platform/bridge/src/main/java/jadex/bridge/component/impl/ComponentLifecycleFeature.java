@@ -107,7 +107,7 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 					});
 				for(IComponentStep step: steps)
 				{
-					getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(step)
+					getComponent().getFeature(IExecutionFeature.class).scheduleStep(step)
 						.addResultListener(crl);
 				}
 			}
@@ -175,7 +175,7 @@ public class ComponentLifecycleFeature extends	AbstractComponentFeature implemen
 					IResultListener	crl	= new CounterResultListener(steps.size(), new DelegationResultListener<Void>(fut));
 					for(IComponentStep step: steps)
 					{
-						getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(step)
+						getComponent().getFeature(IExecutionFeature.class).scheduleStep(step)
 							.addResultListener(crl);
 					}
 				}

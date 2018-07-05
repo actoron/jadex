@@ -32,7 +32,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 		
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1", ia)
-			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -50,7 +50,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 			{
 				final TestReport	tr2	= new TestReport("#2", "Custom configuration");
 				testComponentResult("config2", "initial2", ia)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+					.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -66,7 +66,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 					
 					protected void next()
 					{
-						ia.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+						ia.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 						ret.setResult(null);
 					}
 				}));
@@ -83,14 +83,14 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	{
 		final Future<Void>	fut	= new Future<Void>();
 
-		ia.getComponentFeature(IRequiredServicesFeature.class).getService("cms")
+		ia.getFeature(IRequiredServicesFeature.class).getService("cms")
 			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, ia.getComponentIdentifier()), null)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
+				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, ia.getIdentifier()), null)
+					.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{

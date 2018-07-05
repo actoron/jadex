@@ -210,7 +210,7 @@ public class InitEventPublisher implements IEventPublisher
 	 */
 	public RuleSystem getRuleSystem(IInternalAccess agent)
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 	
 	/**

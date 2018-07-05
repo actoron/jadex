@@ -51,7 +51,7 @@ public class BeliefListBDI
 		names.set(0, "c");
 		names.remove("c");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -72,7 +72,7 @@ public class BeliefListBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	// todo: plan creation condition?!

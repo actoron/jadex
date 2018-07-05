@@ -72,7 +72,7 @@ public class BuyerBDI implements INegotiationAgent
 	@AgentBody
 	public void body()
 	{
-		Order[] ios = (Order[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
+		Order[] ios = (Order[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
 		if(ios!=null)
 		{
 			for(Order o: ios)
@@ -153,7 +153,7 @@ public class BuyerBDI implements INegotiationAgent
 	{
 //		System.out.println("getOrders belief called");
 		List<Order> ret = new ArrayList<Order>();
-		Collection<PurchaseBook> goals = agent.getComponentFeature(IBDIAgentFeature.class).getGoals(PurchaseBook.class);
+		Collection<PurchaseBook> goals = agent.getFeature(IBDIAgentFeature.class).getGoals(PurchaseBook.class);
 		for(PurchaseBook goal: goals)
 		{
 			ret.add(goal.getOrder());
@@ -166,7 +166,7 @@ public class BuyerBDI implements INegotiationAgent
 	 */
 	protected long getTime()
 	{
-		IClockService cs = (IClockService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
+		IClockService cs = (IClockService)agent.getFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();
 	}
 	
@@ -184,7 +184,7 @@ public class BuyerBDI implements INegotiationAgent
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-		IBuyBookService[]	services = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("buyservice").get().toArray(new IBuyBookService[0]);
+		IBuyBookService[]	services = agent.getFeature(IRequiredServicesFeature.class).getServices("buyservice").get().toArray(new IBuyBookService[0]);
 		if(services.length == 0)
 		{
 //			System.out.println("No seller found, purchase failed.");
@@ -282,7 +282,7 @@ public class BuyerBDI implements INegotiationAgent
 	public void createGoal(Order order)
 	{
 		PurchaseBook goal = new PurchaseBook(order);
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 	}
 	
 	/**
@@ -290,7 +290,7 @@ public class BuyerBDI implements INegotiationAgent
 	 */
 	public Collection<INegotiationGoal> getGoals()
 	{
-		return (Collection)agent.getComponentFeature(IBDIAgentFeature.class).getGoals(PurchaseBook.class);
+		return (Collection)agent.getFeature(IBDIAgentFeature.class).getGoals(PurchaseBook.class);
 	}
 	
 	/**

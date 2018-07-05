@@ -57,7 +57,7 @@ public class StreamUserAgent extends TestAgent
 //			public void customResultAvailable(Integer testcnt)
 //			{
 //				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-				testRemote(1, tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(1, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
@@ -81,7 +81,7 @@ public class StreamUserAgent extends TestAgent
 	 */
 	protected IFuture<Integer> testLocal(int testno, Testcase tc)
 	{
-		return performTests(testno, agent.getComponentIdentifier().getRoot(), tc);
+		return performTests(testno, agent.getIdentifier().getRoot(), tc);
 	}
 	
 	/**
@@ -91,7 +91,7 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -103,7 +103,7 @@ public class StreamUserAgent extends TestAgent
 //						if(!sec)
 //						{
 							performTests(testno, platform.getComponentIdentifier(), tc)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 							{
 								public void customResultAvailable(final Integer result)
 								{
@@ -160,27 +160,27 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStreamService.class, cid))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStreamService.class, cid))
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)
 					{
-						testGetInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+						testGetInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 						{
 							public void customResultAvailable(TestReport result)
 							{
 								tc.addReport(result);
-								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
 										tc.addReport(result);
-										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
 												tc.addReport(result);
-												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{

@@ -50,16 +50,16 @@ public class ParallelAgentCreationAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();			
+		Map arguments = agent.getFeature(IArgumentsResultsFeature.class).getArguments();			
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class)).addResultListener(new DefaultResultListener()
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class)).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
+					agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -74,7 +74,7 @@ public class ParallelAgentCreationAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("destroy1")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -94,7 +94,7 @@ public class ParallelAgentCreationAgent
 											{
 												String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-												final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+												final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
 												cms.destroyComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
 												{
 													public void resultAvailable(Map<String, Object> result)
@@ -115,7 +115,7 @@ public class ParallelAgentCreationAgent
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("destroy2")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -140,7 +140,7 @@ public class ParallelAgentCreationAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("last")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -170,7 +170,7 @@ public class ParallelAgentCreationAgent
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("destroyMe")
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -186,7 +186,7 @@ public class ParallelAgentCreationAgent
 							
 							Map	args	= new HashMap();
 							args.put("num", Integer.valueOf(0));
-							CreationInfo	cinfo	= new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier());
+							CreationInfo	cinfo	= new CreationInfo(null, args, agent.getDescription().getResourceIdentifier());
 							for(int i=1; i<=num; i++)
 							{
 								cms.createComponent(createPeerName(i), ParallelAgentCreationAgent.this.getClass().getName()+".class", cinfo, killlis)
@@ -206,7 +206,7 @@ public class ParallelAgentCreationAgent
 	 */
 	protected String createPeerName(int num)
 	{
-		return agent.getComponentIdentifier().getLocalName() + "Peer_#" + num;
+		return agent.getIdentifier().getLocalName() + "Peer_#" + num;
 	}
 	
 //	/**

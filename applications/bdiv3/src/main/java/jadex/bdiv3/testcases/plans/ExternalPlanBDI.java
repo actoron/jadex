@@ -38,7 +38,7 @@ public class ExternalPlanBDI
 	{
 		try
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MyGoal()).get();
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MyGoal()).get();
 			tr.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -54,6 +54,6 @@ public class ExternalPlanBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

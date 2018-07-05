@@ -157,8 +157,8 @@ public class UserAgent
 			}
 		};
 		
-		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
-		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
+		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(agent.getFeature(IExecutionFeature.class)
 			.createResultListener(new IResultListener<Collection<Tuple2<ICryptoService, Double>>>()
 		{
 			public void resultAvailable(Collection<Tuple2<ICryptoService, Double>> res)
@@ -177,7 +177,7 @@ public class UserAgent
 					{
 //						if(wgui)
 //							exception.printStackTrace();
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(2000, step);
 					}
 				}, agent.getExternalAccess()));
 			}
@@ -186,7 +186,7 @@ public class UserAgent
 			{
 //				if(wgui)
 //					exception.printStackTrace();
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(2000, step);
 			}	
 		}));
 	}

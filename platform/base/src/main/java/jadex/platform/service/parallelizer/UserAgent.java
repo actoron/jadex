@@ -55,7 +55,7 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IParallelService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("paser");
+		IFuture<IParallelService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("paser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IParallelService, Void>(ret)
 		{
 			public void customResultAvailable(IParallelService paser)
@@ -108,7 +108,7 @@ public class UserAgent
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults()
+				agent.getFeature(IArgumentsResultsFeature.class).getResults()
 					.put("testresults", new Testcase(1, new TestReport[]{
 						new TestReport("#1", "Test paralellizer", exception)
 					}));
@@ -117,7 +117,7 @@ public class UserAgent
 			@Override
 			public void resultAvailable(Void result)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults()
+				agent.getFeature(IArgumentsResultsFeature.class).getResults()
 				.put("testresults", new Testcase(1, new TestReport[]{
 					new TestReport("#1", "Test paralellizer", true, null)
 				}));

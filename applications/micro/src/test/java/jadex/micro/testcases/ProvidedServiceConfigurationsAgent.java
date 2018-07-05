@@ -45,7 +45,7 @@ public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implement
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IAService as = (IAService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IAService.class)[0];
+		IAService as = (IAService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IAService.class)[0];
 		as.test().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -60,7 +60,7 @@ public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implement
 		        {
 		        	tr.setFailed("Wrong service implementation: "+result);
 		        }
-		        agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		        agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		        ret.setResult(null);
 			}
 		});

@@ -77,7 +77,7 @@ public class CarryBDI extends BaseBDI implements ICarryService
 	 */
 	public IFuture<Void> doCarry(@Reference ISpaceObject target)
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CarryOre(target));
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CarryOre(target));
 		return IFuture.DONE;
 	}
 }

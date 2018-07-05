@@ -67,7 +67,7 @@ public class ChatGuiD5 extends JFrame
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IIntermediateFuture<IChatService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+						IIntermediateFuture<IChatService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 						fut.addResultListener(new IIntermediateResultListener<IChatService>()
 						{
 							public void resultAvailable(Collection<IChatService> result)

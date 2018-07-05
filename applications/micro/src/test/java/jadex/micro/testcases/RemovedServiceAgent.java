@@ -94,14 +94,14 @@ public class RemovedServiceAgent extends JunitAgentTest
 		{
 			public void resultAvailable(Collection<TestReport> results)
 			{				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
 				ret.setResult(null);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				final TestReport	tr	= new TestReport("#1", "Exception during test.");
 				tr.setFailed(exception.toString());
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				ret.setResult(null);
 			}
 		});
@@ -117,13 +117,13 @@ public class RemovedServiceAgent extends JunitAgentTest
 		final IntermediateFuture<TestReport>	testfut	= new IntermediateFuture<TestReport>();
 		
 		// Create agent to call service on.
-		cms.createComponent(null, agentname, new CreationInfo(agent.getComponentIdentifier()), null)
+		cms.createComponent(null, agentname, new CreationInfo(agent.getIdentifier()), null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(testfut)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				// Get service reference of created agent.
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, Binding.SCOPE_PLATFORM))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, Binding.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Collection<TestReport>>(testfut)
 				{
 					public void customResultAvailable(final IServiceCallService scs)
@@ -143,7 +143,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 									{
 										final TestReport	tr2	= new TestReport("#"+(++cnt), "Test if service of destroyed "+agentname+" can be found.");
 										testfut.addIntermediateResult(tr2);
-										agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, Binding.SCOPE_PLATFORM))
+										agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, Binding.SCOPE_PLATFORM))
 											.addResultListener(new IResultListener<IServiceCallService>()
 										{
 											public void resultAvailable(IServiceCallService result)
@@ -214,7 +214,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 															}
 														}
 														
-														agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
+														agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
 														testfut.setFinished();														
 													}
 												});

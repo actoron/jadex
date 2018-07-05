@@ -32,7 +32,7 @@ public class WriteContextTask extends AbstractTask
 			String name = (String)context.getParameterValue("name");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
-			((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
+			((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
 		}
 		
 		for(int i=0; ; i++)
@@ -42,7 +42,7 @@ public class WriteContextTask extends AbstractTask
 				String name = (String)context.getParameterValue("name"+i);
 				Object val = context.getParameterValue("value"+i);
 				Object key = context.getParameterValue("key"+i);
-				((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
+				((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).setContextVariable(name, key, val);
 			}
 			else
 			{

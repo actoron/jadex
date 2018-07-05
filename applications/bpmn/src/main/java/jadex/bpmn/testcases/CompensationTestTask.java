@@ -28,7 +28,7 @@ public class CompensationTestTask implements ITask
 	 */
 	public IFuture<Void> execute(ITaskContext context, IInternalAccess process)
 	{
-		((IInternalBpmnComponentFeature)process.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
+		((IInternalBpmnComponentFeature)process.getFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
 		exefut = new Future<Void>();
 		process.killComponent();
 		return exefut;
@@ -43,7 +43,7 @@ public class CompensationTestTask implements ITask
 	 */
 	public IFuture<Void> cancel(IInternalAccess instance)
 	{
-		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
+		((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
 		exefut.setResult(null);
 		return IFuture.DONE;
 	}

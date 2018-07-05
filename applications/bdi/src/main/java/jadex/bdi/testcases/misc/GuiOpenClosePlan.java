@@ -55,7 +55,7 @@ public class GuiOpenClosePlan extends Plan
 						@Classname("closed")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+							IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 							IInternalEvent	event	= bia.getEventbase().createInternalEvent("gui_closed");
 							bia.getEventbase().dispatchInternalEvent(event);
 							dispatched	= true;

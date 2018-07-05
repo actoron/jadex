@@ -72,7 +72,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 			{
 				public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 				{
-					ILibraryService ls	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+					ILibraryService ls	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 					ls.getClassLoader(sid.getResourceIdentifier())
 						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 					{

@@ -22,8 +22,8 @@ public class UserMicroservice
 	@ServiceStart
 	public void start(IInternalAccess component)
 	{
-		ISyncService sser = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISyncService.class));
-		IAsyncService aser = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IAsyncService.class));
+		ISyncService sser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISyncService.class));
+		IAsyncService aser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IAsyncService.class));
 		System.out.println(sser.sayHello("A")+" "+aser.sayMeHello("B").get());
 		System.out.println(sser.sayHello("C")+" "+aser.sayMeHello("D").get());
 	}

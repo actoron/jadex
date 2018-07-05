@@ -87,7 +87,7 @@ public class ManagerGuiUpdatePlan extends Plan
 			@Classname("guidispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				final JFrame gui = (JFrame)bia.getBeliefbase().getBelief("GUI").getFact();
 				if(gui!=null)
 				{

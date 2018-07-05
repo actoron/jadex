@@ -239,17 +239,17 @@ public class BlocksworldBDI
 		else if("benchmark(runs=10/goals=10)".equals(agent.getConfiguration()))
 		{
 			quiet = true;
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 10));
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 10));
 		}
 		else if("benchmark(runs=10/goals=50)".equals(agent.getConfiguration()))
 		{
 			quiet = true;
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 50));
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 50));
 		}
 		else if("benchmark(runs=10/goals=500)".equals(agent.getConfiguration()))
 		{
 			quiet = true;
-			agent.getComponentFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 500));
+			agent.getFeature(IBDIAgentFeature.class).adoptPlan(new BenchmarkPlan(10, 500));
 		}
 	}
 	

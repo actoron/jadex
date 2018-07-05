@@ -394,7 +394,7 @@ public class DisplayPanel extends JComponent
 									{
 										// do not depend on hosting component!
 //										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getService("cmsservice");
-										IFuture<IComponentManagementService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+										IFuture<IComponentManagementService>	fut	= ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
 										{
 											public void resultAvailable(IComponentManagementService cms)
@@ -1017,7 +1017,7 @@ public class DisplayPanel extends JComponent
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getComponentFeature(IRequiredServicesFeature.class).getService("generateservice")
+					ia.getFeature(IRequiredServicesFeature.class).getService("generateservice")
 						.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)

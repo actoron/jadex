@@ -49,11 +49,11 @@ public class CountingAgent
 				cnt++;
 
 				// Hack!!! Blocks jcc without wait, why?
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(10, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+						agent.getFeature(IExecutionFeature.class).scheduleStep(step);
 						return IFuture.DONE;
 					}
 				});
@@ -69,7 +69,7 @@ public class CountingAgent
 			}			
 		};
 		
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+		agent.getFeature(IExecutionFeature.class).scheduleStep(step);
 		
 		return new Future<Void>(); //never kill?!
 	}

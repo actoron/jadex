@@ -70,7 +70,7 @@ public class OptionDialog extends JDialog
 			@Classname("create")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				final AlarmclockBDI agent = (AlarmclockBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				final Settings orig_sets = agent.getSettings();
 				final Settings sets = (Settings)orig_sets.clone();
 				

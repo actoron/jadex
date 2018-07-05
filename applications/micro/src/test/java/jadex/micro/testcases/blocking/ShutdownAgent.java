@@ -48,20 +48,20 @@ public class ShutdownAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 //				cms.createComponent("block", new CreationInfo(agent.getComponentIdentifier()))
-				cms.createComponent(BlockAgent.class.getName()+".class", new CreationInfo(agent.getComponentIdentifier()))
+				cms.createComponent(BlockAgent.class.getName()+".class", new CreationInfo(agent.getIdentifier()))
 					.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					public void firstResultAvailable(final IComponentIdentifier cid)
 					{
 						// call several times a blocking method on the agent and then terminate it
 						
-						agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class, cid))
+						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class, cid))
 							.addResultListener(new ExceptionDelegationResultListener<IBlockService, Void>(ret)
 						{
 							public void customResultAvailable(IBlockService bs)
@@ -74,7 +74,7 @@ public class ShutdownAgent
 									bs.block(-1);
 								}
 								
-								agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
+								agent.getFeature(IExecutionFeature.class).waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
 								{
 									public void customResultAvailable(Void result)
 									{

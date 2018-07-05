@@ -55,11 +55,11 @@ public class SuperpeerRegistrySynchronizationAgent
 		try
 		{
 			// Kill peer agent
-			IPeerRegistrySynchronizationService pser = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
+			IPeerRegistrySynchronizationService pser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class));
 			
 			if(pser!=null)
 			{
-				IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				cms.destroyComponent(((IService)pser).getServiceIdentifier().getProviderId());
 			}
 		}
@@ -73,7 +73,7 @@ public class SuperpeerRegistrySynchronizationAgent
 	 */
 	public boolean isSupersuperpeer()
 	{
-		return ((Boolean)component.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("supersuperpeer")).booleanValue();
+		return ((Boolean)component.getFeature(IArgumentsResultsFeature.class).getArguments().get("supersuperpeer")).booleanValue();
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class SuperpeerRegistrySynchronizationAgent
 	@AgentKilled
 	public void terminate()
 	{
-		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getIdentifier());
 		
 		// Remove all remote services handled by the registry 
 		//TODO

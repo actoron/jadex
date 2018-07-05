@@ -60,7 +60,7 @@ public class HelplineAgent
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
 		this.infos = new MultiCollection<String, InformationEntry>();
-		Object ini = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("infos");
+		Object ini = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("infos");
 		if(ini!=null && SReflect.isIterable(ini))
 		{
 			for(Iterator it=SReflect.getIterator(ini); it.hasNext(); )
@@ -88,7 +88,7 @@ public class HelplineAgent
 	public void addInformation(final String name, final String info)
 	{
 //		SServiceProvider.searchService(getServiceProvider(), new ServiceQuery<>( IClockService.class))
-		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
+		IFuture<IClockService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 //			.addResultListener(createResultListener(new DefaultResultListener()
 		fut.addResultListener(new DefaultResultListener<IClockService>() // not needed as decoupled service
 		{

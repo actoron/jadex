@@ -169,9 +169,9 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 		}
 		else
 		{
-			if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+			if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 			{
-				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -195,7 +195,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						if(exception instanceof ComponentTerminatedException)
 						{
-							Starter.scheduleRescueStep(component.getComponentIdentifier(), new Runnable()
+							Starter.scheduleRescueStep(component.getIdentifier(), new Runnable()
 							{
 								public void run()
 								{
@@ -277,9 +277,9 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 		}
 		else
 		{
-			if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+			if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 			{
-				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -303,7 +303,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						if(e instanceof ComponentTerminatedException)
 						{
-							Starter.scheduleRescueStep(component.getComponentIdentifier(), new Runnable()
+							Starter.scheduleRescueStep(component.getIdentifier(), new Runnable()
 							{
 								public void run()
 								{

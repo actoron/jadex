@@ -50,7 +50,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	 */
 	public LocalRegistryObserver(final IInternalAccess component, final IDelayRunner timer, int eventslimit, final long timelimit, final boolean globalscope)
 	{
-		super(component.getComponentIdentifier().getRoot(), timer, eventslimit, timelimit);
+		super(component.getIdentifier().getRoot(), timer, eventslimit, timelimit);
 		this.globalscope = globalscope;
 		this.component = component;
 		
@@ -61,7 +61,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>((Class<ServiceEvent<IService>>)null, cid).setReturnType(ServiceEvent.CLASSINFO);
 		
 //		localregsub = ServiceRegistry.getRegistry(cid).addQuery(query);
-		localregsub = component.getComponentFeature(IRequiredServicesFeature.class).addQuery(query);
+		localregsub = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
 		localregsub.addIntermediateResultListener(new IIntermediateResultListener<ServiceEvent<IService>>()
 		{
 //			AtomicInteger c = new AtomicInteger();
@@ -143,7 +143,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
 		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_GLOBAL, null, owner==null? cid: owner, null);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
-		Collection<IService> added = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalServices(query);
+		Collection<IService> added = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(query);
 		
 		// Remove only non-globally-scoped services
 //		Set<IComponentIdentifier> clients = new HashSet<IComponentIdentifier>();

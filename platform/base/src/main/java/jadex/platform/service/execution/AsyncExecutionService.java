@@ -66,7 +66,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public AsyncExecutionService(IInternalAccess component, Map<String, Object> properties)//, int max)
 	{
-		super(component.getComponentIdentifier(), IExecutionService.class, properties);
+		super(component.getIdentifier(), IExecutionService.class, properties);
 
 		this.component = component;
 		this.executors	= SCollection.createHashMap();
@@ -154,7 +154,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				// Hack!!! Skip shutdown of platform executor for "boot unstrapping" -> executor will finish after no more steps
 				public IFuture<Void> shutdown()
 				{
-					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getComponentIdentifier().equals(getServiceIdentifier().getProviderId()))
+					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getIdentifier().equals(getServiceIdentifier().getProviderId()))
 					{
 						return IFuture.DONE;
 					}
@@ -262,7 +262,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					threadpool	= ((AbstractComponentFeature)component.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+					threadpool	= ((AbstractComponentFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 					try
 					{
 						state	= State.RUNNING;

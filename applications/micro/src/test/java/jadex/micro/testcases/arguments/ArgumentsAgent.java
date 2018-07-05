@@ -65,7 +65,7 @@ public class ArgumentsAgent extends JunitAgentTest
 			tr2.setFailed("Wrong number of results");
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, 
 			new TestReport[]{tr1, tr2}));
 		agent.killComponent();
 	}

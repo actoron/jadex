@@ -100,7 +100,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public static void adoptGoal(RGoal rgoal, final IInternalAccess ia)
 	{
-		assert ia.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert ia.getFeature(IExecutionFeature.class).isComponentThread();
 		
 		AdoptGoalAction.adoptGoal(ia, rgoal);
 		
@@ -468,7 +468,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				@Override
 				public void resultAvailable(Void result)
 				{
-					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new DropGoalAction(RGoal.this));
+					ia.getFeature(IExecutionFeature.class).scheduleStep(new DropGoalAction(RGoal.this));
 				}
 				
 				@Override
@@ -690,8 +690,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	{
 		// Atomic block to avoid goal conditions being triggered in between
 		// Required, e.g. for writing back parameter set values into query goal -> first add value would trigger goal target, other values would not be set.
-		boolean	queue	= ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().isQueueEvents();
-		ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(true);
+		boolean	queue	= ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().isQueueEvents();
+		ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(true);
 		
 //		if(this.toString().indexOf("da_initiate")!=-1)
 //			System.out.println("planfin: "+this+" "+getLifecycleState()+" "+getProcessingState());
@@ -791,22 +791,22 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						{
 							if(getMGoal().isRebuild())
 							{
-								ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new FindApplicableCandidatesAction(this));
+								ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new FindApplicableCandidatesAction(this));
 							}
 							else
 							{
-								ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new SelectCandidatesAction(this));
+								ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new SelectCandidatesAction(this));
 							}
 						}
 						else
 						{
 							if(getMGoal().isRebuild())
 							{
-								ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new FindApplicableCandidatesAction(this));
+								ia.getFeature(IExecutionFeature.class).scheduleStep(new FindApplicableCandidatesAction(this));
 							}
 							else
 							{
-								ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(this));
+								ia.getFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(this));
 							}
 						}
 					}
@@ -830,7 +830,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 						setProcessingState(ia, GoalProcessingState.PAUSED);
 						if(getMGoal().getRecurDelay()>-1)
 						{
-							ia.getComponentFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(),
+							ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(),
 								new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
@@ -859,7 +859,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			}
 		}
 		
-		ia.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(queue);
+		ia.getFeature(IInternalBDIAgentFeature.class).getRuleSystem().setQueueEvents(queue);
 	}
 	
 //	/**
@@ -1415,12 +1415,12 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void publishToolGoalEvent(String evtype)
 	{
-		if(getAgent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getAgent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(getAgent().getFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getAgent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(getAgent().getComponentIdentifier());
+			mev.setSourceIdentifier(getAgent().getIdentifier());
 			mev.setTime(time);
 			
 			GoalInfo info = GoalInfo.createGoalInfo(this);
@@ -1430,7 +1430,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			getAgent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			getAgent().getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

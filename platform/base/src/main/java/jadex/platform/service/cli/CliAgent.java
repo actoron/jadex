@@ -157,11 +157,11 @@ public class CliAgent implements ICliService, IInternalCliService
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								ICliService clis = (ICliService)ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(ICliService.class)[0];
+								ICliService clis = (ICliService)ia.getFeature(IProvidedServicesFeature.class).getProvidedServices(ICliService.class)[0];
 								String txt = tf.getText();
 								ta.append(txt+SUtil.LF);
 								tf.setText("");
@@ -199,7 +199,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	 */
 	protected void createConsole()
 	{
-		IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("dtp");
+		IFuture<IDaemonThreadPoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("dtp");
 		fut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
 			public void resultAvailable(IDaemonThreadPoolService tp)
@@ -248,7 +248,7 @@ public class CliAgent implements ICliService, IInternalCliService
 										break;
 									}
 									
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 										{

@@ -40,7 +40,7 @@ public class EnvironmentGui	extends JFrame
 			@Classname("start")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				final Environment env = (Environment)bia.getBeliefbase().getBelief("env").getFact();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -100,7 +100,7 @@ public class EnvironmentGui	extends JFrame
 //						});
 //					}
 //				});		
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

@@ -56,7 +56,7 @@ public class HelloWorldGoalBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new HelloGoal("Hello BDI agent V3.")).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new HelloGoal("Hello BDI agent V3.")).get();
 //		System.out.println("body end: "+getClass().getName());
 	}
 	

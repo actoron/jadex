@@ -45,7 +45,7 @@ public class SyncServicesTestAgent extends JunitAgentTest
 	{
 		final List<TestReport> results = new ArrayList<TestReport>();
 		
-		ISynchronousExampleService ser = (ISynchronousExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("syncser").get();
+		ISynchronousExampleService ser = (ISynchronousExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("syncser").get();
 		
 		TestReport tr1 = new TestReport("#1", "Test if can use synchronous get with int value.");
 		try
@@ -87,7 +87,7 @@ public class SyncServicesTestAgent extends JunitAgentTest
 		}
 		results.add(tr3);
 
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}

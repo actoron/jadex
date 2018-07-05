@@ -97,7 +97,7 @@ public class CMInitiatorPlan extends Plan
 //							System.out.println("cancel retry checking if exists: "+arec);
 							try
 							{
-								getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM))
+								getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM))
 									.getComponentDescription((IComponentIdentifier)it.next()).get(10000);
 //								System.out.println("cancel retry not removed: "+arec);
 							}

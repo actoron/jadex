@@ -38,7 +38,7 @@ public class GoalsWithCapabilityBDI
 		final TestReport tr	= new TestReport("#1", "Test if capability goals work.");
 		
 		TestGoal goal = testcap.new TestGoal();
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).get(3000);
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).get(3000);
 		
 		if(goal.getCnt()==2)
 		{
@@ -49,7 +49,7 @@ public class GoalsWithCapabilityBDI
 			tr.setReason("Wrong number of plans executed: "+goal.getCnt());
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

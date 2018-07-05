@@ -60,7 +60,7 @@ public class CalculateAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final long delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
+		final long delay = ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -72,12 +72,12 @@ public class CalculateAgent
 					ret.setResult(null);
 				}
 				setHadJob(false);
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				return IFuture.DONE;
 			}
 		};
 		if(delay>0)
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+			agent.getFeature(IExecutionFeature.class).waitForDelay(delay, step);
 		
 		return ret;
 	}

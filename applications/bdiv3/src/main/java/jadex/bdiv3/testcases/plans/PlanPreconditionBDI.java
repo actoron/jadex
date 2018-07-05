@@ -40,7 +40,7 @@ public class PlanPreconditionBDI
 	public void body()
 	{
 		TestReport tr = new TestReport("#1", "Test if plan precondition works.");
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
 		if("ABD".equals(res))
 		{
 			tr.setSucceeded(true);
@@ -49,7 +49,7 @@ public class PlanPreconditionBDI
 		{
 			tr.setFailed("Wrong plans executed: "+res);
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 	

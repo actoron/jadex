@@ -39,7 +39,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		Future<Void> fut	= new Future<Void>();
 		
 		final IInternalAccess	caller	= IInternalExecutionFeature.LOCAL.get();
-		final IRequiredServicesFeature	feat	= caller!=null ? caller.getComponentFeature0(IRequiredServicesFeature.class) : null;
+		final IRequiredServicesFeature	feat	= caller!=null ? caller.getFeature0(IRequiredServicesFeature.class) : null;
 		if(feat instanceof IInternalServiceMonitoringFeature && ((IInternalServiceMonitoringFeature)feat).isMonitoring())
 		{
 			if(!ServiceIdentifier.isSystemService(sic.getServiceIdentifier().getServiceType().getType(caller.getClassLoader())))
@@ -66,13 +66,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						public <T> void scheduleForward(final ICommand<T> com, final T args)
 						{
 							// Don't reschedule if already on correct thread.
-							if(caller==null || caller.getComponentFeature(IExecutionFeature.class).isComponentThread())
+							if(caller==null || caller.getFeature(IExecutionFeature.class).isComponentThread())
 							{
 								com.execute(args);
 							}
-							else if (caller.getComponentDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
+							else if (caller.getDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
 									&& sic.getMethod().getName().equals("destroyComponent")
-									&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0))) 
+									&& sic.getArguments().size()==1 && caller!=null && caller.getIdentifier().equals(sic.getArguments().get(0))) 
 							{
 								// do not try to reschedule if component killed itself and is already terminated to allow passing results to the original caller.
 								com.execute(args);
@@ -81,7 +81,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								try
 								{
-									caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+									caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{

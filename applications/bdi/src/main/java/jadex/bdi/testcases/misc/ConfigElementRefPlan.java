@@ -27,7 +27,7 @@ public class ConfigElementRefPlan extends Plan
 		getWaitqueue().addMessageEvent("inform_reports");
 		
 		// Create worker agent (kills itself automatically).
-		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
+		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
 			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());

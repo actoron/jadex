@@ -93,7 +93,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 					public IFuture<Object> execute(IInternalAccess ia)
 					{
 						//TODO lastrequiredservice???
-						Object res = fmultiple? ia.getComponentFeature(IRequiredServicesFeature.class).getServices(fname): ia.getComponentFeature(IRequiredServicesFeature.class).getService(fname);
+						Object res = fmultiple? ia.getFeature(IRequiredServicesFeature.class).getServices(fname): ia.getFeature(IRequiredServicesFeature.class).getService(fname);
 						return new Future<Object>(res);
 					}
 				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
@@ -168,7 +168,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 							public IFuture<Object> execute(IInternalAccess ia)
 							{
 								Future<Object> ret = new Future<Object>();
-								INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(sid);
+								INFMixedPropertyProvider pp = ia.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(sid);
 								if(fmi!=null)
 								{
 									pp.getMethodNFPropertyValue(fmi, fname, u).addResultListener(new DelegationResultListener<Object>(ret));

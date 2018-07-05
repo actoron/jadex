@@ -113,13 +113,13 @@ public class CustomerPanel extends JPanel
 						if(remote.isSelected())
 						{
 							// Hack!!! Todo: add executing capability as thread local in all capability steps 
-							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getServices("customercap/remoteshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getFeature(IRequiredServicesFeature.class).getServices("customercap/remoteshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						else
 						{
 							// Hack!!! Todo: add executing capability as thread local in all capability steps 
-							IFuture<Collection<IShopService>> fut = ia.getComponentFeature(IRequiredServicesFeature.class).getServices("customercap/localshopservices");
+							IFuture<Collection<IShopService>> fut = ia.getFeature(IRequiredServicesFeature.class).getServices("customercap/localshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						return ret;
@@ -169,7 +169,7 @@ public class CustomerPanel extends JPanel
 			@Classname("initialMoney")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				final Object mon = capa.getBeliefbase().getBelief("money").getFact();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -188,7 +188,7 @@ public class CustomerPanel extends JPanel
 			@Classname("money")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				capa.getBeliefbase().getBelief("money").addBeliefListener(new BeliefAdapter<Object>()
 				{
 					public void beliefChanged(final jadex.rules.eca.ChangeInfo<Object> info) 
@@ -246,7 +246,7 @@ public class CustomerPanel extends JPanel
 			@Classname("inventory")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				try
 				{
 					// Hack, as long as we do not have a specific XML feature interface
@@ -321,7 +321,7 @@ public class CustomerPanel extends JPanel
 						@Classname("buy")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+							IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 							final IGoal buy = capa.getGoalbase().createGoal("buy");
 							buy.getParameter("name").setValue(name);
 							buy.getParameter("shop").setValue(shop);

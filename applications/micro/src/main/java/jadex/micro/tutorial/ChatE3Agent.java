@@ -60,7 +60,7 @@ public class ChatE3Agent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
+		IFuture<IRegistryServiceE3>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IRegistryServiceE3, Void>(ret)
 		{
 			public void customResultAvailable(final IRegistryServiceE3 rs)
@@ -73,7 +73,7 @@ public class ChatE3Agent
 			{
 				System.out.println("exception, could not find appreg service: "+exception);
 //				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
-				IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
+				IFuture<IRegistryServiceE3>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 				super.exceptionOccurred(exception);
 			}
 		});
@@ -92,9 +92,9 @@ public class ChatE3Agent
 //		{
 //			public void resultAvailable(final IRegistryServiceE3 rs)
 //			{
-				regservice.register(agent.getComponentIdentifier(), nickname);
+				regservice.register(agent.getIdentifier(), nickname);
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

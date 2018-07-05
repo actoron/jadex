@@ -49,7 +49,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 		final TestReport	tr1	= new TestReport("#1", "Direct subcomponent.");
 		
 		testBrokenComponent(BrokenInitAgent.class.getName()+".class")
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -67,7 +67,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 			{
 				final TestReport	tr2	= new TestReport("#2", "Nested subcomponent.");
 				testBrokenComponent("jadex/micro/testcases/BrokenInit.component.xml")
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -85,7 +85,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 					{
 						final TestReport	tr3	= new TestReport("#3", "Exception in agent created.");
 						testBrokenComponent(PojoBrokenInitAgent.class.getName()+".class")
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
@@ -101,7 +101,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 							
 							protected void next()
 							{
-								agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
+								agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
 								ret.setResult(null);
 								//killAgent();
 							}
@@ -121,13 +121,13 @@ public class BrokenInitTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	fut1	= new Future<Void>();
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut1)
 		{
 			@SuppressWarnings("deprecation")
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), new IResultListener<Collection<Tuple2<String,Object>>>()
+				cms.createComponent(null, model, new CreationInfo(agent.getIdentifier()), new IResultListener<Collection<Tuple2<String,Object>>>()
 				{
 					// Dummy listener to avoid fatal error being printed.
 					@Override
@@ -135,7 +135,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 					@Override					
 					public void resultAvailable(Collection<Tuple2<String,Object>> result) {};
 				})
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier result)
 					{

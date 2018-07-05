@@ -231,7 +231,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		if(sic.getMethod().getName().indexOf("getChildren")!=-1)
 //			System.out.println("huhuhu");
 		
-		if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
+		if(ia.getFeature(IExecutionFeature.class).isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 			// Not possible to use if it complains this way
 			// E.g. you have prov service and need to reschedule on the component then first getProviderId(), getExtAccess(), scheduleStep
@@ -464,7 +464,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					@Override
 					public void scheduleBackward(final ICommand<Void> code)
 					{
-						if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
+						if(ia.getFeature(IExecutionFeature.class).isComponentThread())
 						{
 							code.execute(null);
 						}
@@ -643,7 +643,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 */
 	public final ISerializationServices getSerializationServices()
 	{
-		return (ISerializationServices)Starter.getPlatformValue(ia.getComponentIdentifier(), Starter.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices)Starter.getPlatformValue(ia.getIdentifier(), Starter.DATA_SERIALIZATIONSERVICES);
 	}
 	
 	/**

@@ -39,7 +39,7 @@ public class ServiceQueryAgent
 			{
 				final long start = System.currentTimeMillis();
 				
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK))
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK))
 					.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
 				{
 					Set<IComponentIdentifier> plats = new HashSet<IComponentIdentifier>();
@@ -66,7 +66,7 @@ public class ServiceQueryAgent
 					public void finished()
 					{
 						long end = System.currentTimeMillis();
-						System.out.println(agent.getComponentIdentifier()+" found services: "+cnt+" took ms: "+(end-start)+" "+plats);
+						System.out.println(agent.getIdentifier()+" found services: "+cnt+" took ms: "+(end-start)+" "+plats);
 						cnt = 0;
 					}
 				});
@@ -74,6 +74,6 @@ public class ServiceQueryAgent
 			}
 		};
 		
-		agent.getComponentFeature(IExecutionFeature.class).repeatStep(0, 4000, step);
+		agent.getFeature(IExecutionFeature.class).repeatStep(0, 4000, step);
 	}
 }

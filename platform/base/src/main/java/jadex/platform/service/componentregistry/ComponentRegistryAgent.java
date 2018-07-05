@@ -117,7 +117,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 		
         final Future<Void> ret = new Future<Void>();
 
-        CreationInfo[] cis = (CreationInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("componentinfos");
+        CreationInfo[] cis = (CreationInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("componentinfos");
         if(cis!=null)
         {
             CounterResultListener<Void> lis = new CounterResultListener<Void>(cis.length, false, new DelegationResultListener<Void>(ret));
@@ -143,7 +143,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
         final Future<Void> ret = new Future<Void>();
 
-        ILibraryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+        ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
         ls.getClassLoader(info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
         	public void customResultAvailable(ClassLoader cl) throws Exception
@@ -173,7 +173,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                    {
 	        	                        public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	        	                        {
-	        	                            assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+	        	                            assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 	
 	//        	                            if(servicetype.getName().indexOf("Settings")!=-1)
 	//        	                            	System.out.println("settings called: "+method.getName());
@@ -212,13 +212,13 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype, exta.getComponentIdentifier()));
+	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype, exta.getComponentIdentifier()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
 	        	                    });
 	        	                    
-	        	        			agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, serviceproxy, null, null).addResultListener(lis);
+	        	        			agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, serviceproxy, null, null).addResultListener(lis);
 	        	        			sids.add(fsid);
 	        	                }
 	        	                if(componenttypes==null)
@@ -268,9 +268,9 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-            final IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+            final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
-            	info.setParent(agent.getComponentIdentifier());
+            	info.setParent(agent.getIdentifier());
             cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)
@@ -352,7 +352,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 		{
 			for(IServiceIdentifier sid: ci.getSids())
 			{
-				 agent.getComponentFeature(IProvidedServicesFeature.class).removeService(sid).addResultListener(lis);
+				 agent.getFeature(IProvidedServicesFeature.class).removeService(sid).addResultListener(lis);
 			}
 		}
 		

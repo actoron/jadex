@@ -107,7 +107,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 //		});
 		
 //		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-		getAgent().getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+		getAgent().getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)
@@ -139,7 +139,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 					@Classname("translate")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						IGoal goal = bia.getGoalbase().createGoal("translate");
 						goal.getParameter("client").setValue(client);
 						bia.getGoalbase().dispatchTopLevelGoal(goal);

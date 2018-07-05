@@ -60,7 +60,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-				IComponentManagementService ces = (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				IComponentManagementService ces = (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentIdentifier()));
 				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
 				agents.add(aid);
@@ -87,7 +87,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
-				IComponentManagementService ces = (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				IComponentManagementService ces = (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				IFuture<Map<String, Object>> ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get();
 			}

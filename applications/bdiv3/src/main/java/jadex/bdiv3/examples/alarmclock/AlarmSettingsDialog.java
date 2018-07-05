@@ -188,7 +188,7 @@ public class AlarmSettingsDialog extends JDialog
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						BDIAgent bia = (BDIAgent)ia;
-						long cur = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+						long cur = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 						Date now = new Date(cur);
 						date.setDate(now);
 						time.setValue(now);								
@@ -233,7 +233,7 @@ public class AlarmSettingsDialog extends JDialog
 							{
 //								BDIAgent bia = (BDIAgent)ia;
 								playing = new PlaySongGoal(song);
-								ia.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(playing)
+								ia.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(playing)
 									.addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
@@ -348,7 +348,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					long cur = ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+					long cur = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
 					al.setTime(new Time(new Date(cur)));
 					setAlarm(al);
 					return IFuture.DONE;
@@ -477,7 +477,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				if(playing!=null)
 				{
-					ia.getComponentFeature(IBDIAgentFeature.class).dropGoal(playing);
+					ia.getFeature(IBDIAgentFeature.class).dropGoal(playing);
 				}
 				playing = null;
 				return IFuture.DONE;

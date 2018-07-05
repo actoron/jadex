@@ -73,7 +73,7 @@ public class CompositeCalculatorAgent
 	protected IFuture add(final double a, final double b)
 	{
 		final Future ret = new Future();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getService("addservice").addResultListener(new IResultListener()
+		agent.getFeature(IRequiredServicesFeature.class).getService("addservice").addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

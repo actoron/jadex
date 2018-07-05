@@ -35,7 +35,7 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 		
 		int	max	= 3;
 		final ITerminableIntermediateFuture<String> fut = service.getResults(delay, max);
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
 		{
 			public void resultAvailable(Collection<String> result)
 			{
@@ -62,7 +62,7 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 			}
 		}));
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay*(max-1)+delay/2, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay*(max-1)+delay/2, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

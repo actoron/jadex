@@ -89,7 +89,7 @@ public class UpdateEnvironmentPlan extends Plan
 	{
 		try
 		{
-			IDF df = (IDF)getAgent().getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
 			IDFComponentDescription ad = new DFComponentDescription(null, sd);
 			IDFComponentDescription[] tas = df.search(ad, null).get();

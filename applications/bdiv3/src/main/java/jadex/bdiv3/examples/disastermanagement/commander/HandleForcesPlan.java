@@ -48,7 +48,7 @@ public abstract class HandleForcesPlan
 			
 //			disaster.setProperty("active", true);
 			
-			IIntermediateFuture<IService> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getServices(servicename);
+			IIntermediateFuture<IService> fut = capa.getAgent().getFeature(IRequiredServicesFeature.class).getServices(servicename);
 			Collection<IService> forces = (Collection<IService>)fut.get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			

@@ -54,7 +54,7 @@ public class SubscriberAgent
 	{
 //		agent.getLogger().severe("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 			.addResultListener(new IResultListener<IAutoTerminateService>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -73,7 +73,7 @@ public class SubscriberAgent
 						if("platform".equals(agent.getConfiguration()))
 						{
 //							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
-							cms.destroyComponent(agent.getComponentIdentifier().getRoot());
+							cms.destroyComponent(agent.getIdentifier().getRoot());
 						}
 						else
 						{

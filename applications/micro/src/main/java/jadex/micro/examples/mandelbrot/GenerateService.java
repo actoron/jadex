@@ -85,7 +85,7 @@ public class GenerateService implements IGenerateService
 				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
 				
 //				System.out.println("invoke: "+service);
-				agent.getComponentFeature(IRequiredServicesFeature.class).getService("displayservice").addResultListener(new DefaultResultListener()
+				agent.getFeature(IRequiredServicesFeature.class).getService("displayservice").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -149,30 +149,30 @@ public class GenerateService implements IGenerateService
 			public IFuture createService()
 			{
 				final Future	ret	= new Future();
-				agent.getComponentFeature(IRequiredServicesFeature.class).getService("cmsservice").addResultListener(new DelegationResultListener(ret)
+				agent.getFeature(IRequiredServicesFeature.class).getService("cmsservice").addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService)result;
-						Object delay = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
+						Object delay = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
 						if(delay==null)
 							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
 							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-							agent.getComponentIdentifier().getParent()), null)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+							agent.getIdentifier().getParent()), null)
+							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 						{
 							// Component created, now get the calculation service.
 							public void customResultAvailable(Object result)
 							{
 								cms.getExternalAccess((IComponentIdentifier)result).addResultListener(
-									agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+									agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
 										SServiceProvider.searchService((IExternalAccess)result,
 											new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL)).addResultListener(
-											agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+											agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)
 											{
@@ -288,7 +288,7 @@ public class GenerateService implements IGenerateService
 		// Assign tasks to service pool.
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
-		manager.performTasks(areas, true, data).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		manager.performTasks(areas, true, data).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new IIntermediateResultListener<Object>()
 		{
 			int	cnt	= 0;

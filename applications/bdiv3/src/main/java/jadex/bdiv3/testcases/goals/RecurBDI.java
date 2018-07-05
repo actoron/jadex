@@ -123,7 +123,7 @@ public class RecurBDI
 	
 		BuyItemsGoal goal = new BuyItemsGoal(5);
 		
-		IFuture<BuyItemsGoal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
+		IFuture<BuyItemsGoal> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
 		fut.addResultListener(new IResultListener<RecurBDI.BuyItemsGoal>()
 		{
 			public void resultAvailable(BuyItemsGoal result)
@@ -148,7 +148,7 @@ public class RecurBDI
 //			}
 //		});
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -206,7 +206,7 @@ public class RecurBDI
 	{
 		if(!tr.isFinished())
 			tr.setFailed("Recur did not occur");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

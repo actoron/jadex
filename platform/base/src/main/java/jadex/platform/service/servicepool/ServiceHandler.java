@@ -137,7 +137,7 @@ public class ServiceHandler implements InvocationHandler
 //			System.out.println("sc: "+ServiceCall.getCurrentInvocation().hashCode());
 		
 //		System.out.println("called: "+method);
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 //		final IInternalAccess inta = component;
 		
 		if(!SReflect.isSupertype(IFuture.class, method.getReturnType()))
@@ -173,29 +173,29 @@ public class ServiceHandler implements InvocationHandler
 	{
 		final Future<IService> ret = new Future<IService>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IService>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-				ci.setParent(component.getComponentIdentifier());
+				ci.setParent(component.getIdentifier());
 				ci.setImports(component.getModel().getAllImports());
 				// Worker services are exposed with scope parent only to hinder others finding directly the worker services
 				ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
 				cms.createComponent(null, componentname, ci, null)
-					.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)
+					.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
 					{
 	//					System.out.println("created: "+result);
 						cms.getExternalAccess(result)
-							.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
+							.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
 								Future<IService> fut = (Future<IService>)SServiceProvider.searchService(ea, new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
-								fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
+								fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
 								{
 									public void customResultAvailable(IService ser)
 									{
@@ -231,7 +231,7 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected void	addFreeService(IService service)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 
 		// Invoke a service if there is a task and a free worker
 		if(!queue.isEmpty())
@@ -278,7 +278,7 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected IFuture<Void> updateWorkerTimer(final IService service)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		final IInternalAccess inta = component;
 		
 		final Future<Void> ret = new Future<Void>();
@@ -351,7 +351,7 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected void invokeService(final IService service, final Method method, Object[] args, Future<?> ret, ServiceCall call)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		
 //		System.out.println("Using worker: "+service.getServiceIdentifier());
 		
@@ -388,7 +388,7 @@ public class ServiceHandler implements InvocationHandler
 			// Must reschedule on component thread as it has no required service proxy
 			if(res instanceof IIntermediateFuture)
 			{
-				IIntermediateResultListener lis = component.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Object>()
+				IIntermediateResultListener lis = component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Object>()
 				{
 					public void intermediateResultAvailable(Object result)
 					{
@@ -447,7 +447,7 @@ public class ServiceHandler implements InvocationHandler
 			}
 			else
 			{
-				res.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Object>()
+				res.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Object>()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -497,7 +497,7 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected IFuture<Void> removeService(final IService service)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		final IInternalAccess inta = component;
 		
 		final IComponentIdentifier workercid = service.getServiceIdentifier().getProviderId();
@@ -506,14 +506,14 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
+		IFuture<IComponentManagementService> fut = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		fut.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				cms.destroyComponent(workercid).addResultListener(
-					inta.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+					inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result) 
 					{
@@ -542,13 +542,13 @@ public class ServiceHandler implements InvocationHandler
 		}
 		else
 		{
-			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
+			component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
 				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new DelegationResultListener<IClockService>(ret)
 			{
 				public void customResultAvailable(IClockService cs)
 				{
-					assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+					assert component.getFeature(IExecutionFeature.class).isComponentThread();
 
 					clock = cs;
 					ret.setResult(clock);
@@ -564,7 +564,7 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected IFuture<ITimer> createTimer(final long delay, final ITimedObject to)
 	{
-		assert component.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 
 //		System.out.println("create timer");
 		

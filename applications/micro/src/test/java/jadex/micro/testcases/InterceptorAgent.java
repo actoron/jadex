@@ -59,17 +59,17 @@ public class InterceptorAgent extends JunitAgentTest implements IAService
 		final Future<Void> ret = new Future<Void>();
 		
 		final List<TestReport> testresults = new ArrayList<TestReport>();
-		performProvidedServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+		performProvidedServiceTest(testresults).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				performRequiredServiceTest(testresults).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+				performRequiredServiceTest(testresults).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
 //						System.out.println("testresults: "+testresults);
 						TestReport[] tr = (TestReport[])testresults.toArray(new TestReport[testresults.size()]);
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 //						killAgent();
 						ret.setResult(null);
 					}
@@ -86,7 +86,7 @@ public class InterceptorAgent extends JunitAgentTest implements IAService
 	public IFuture<Void> performProvidedServiceTest(final List<TestReport> testresults)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IAService ser = (IAService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedService("aservice");
+		IAService ser = (IAService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService("aservice");
 		ser.test().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -113,7 +113,7 @@ public class InterceptorAgent extends JunitAgentTest implements IAService
 	public IFuture<Void> performRequiredServiceTest(final List<TestReport> testresults)
 	{
 		final Future<Void> ret = new Future<Void>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getService("aservice").addResultListener(new DefaultResultListener<Object>()
+		agent.getFeature(IRequiredServicesFeature.class).getService("aservice").addResultListener(new DefaultResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{

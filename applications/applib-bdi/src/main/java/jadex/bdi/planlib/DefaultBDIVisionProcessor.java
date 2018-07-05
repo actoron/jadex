@@ -134,7 +134,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("add")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
@@ -155,7 +155,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("remove")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);
@@ -176,7 +176,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("set")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 											Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
@@ -197,7 +197,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("unset")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 											Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
 											if(cond!=null)
 												fetcher.setValue("$fact", fact);
@@ -218,7 +218,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 										@Classname("removeoutdated")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
 											if(cond!=null)
 												fetcher.setValue("$facts", facts);

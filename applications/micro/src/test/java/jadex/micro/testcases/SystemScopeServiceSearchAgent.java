@@ -39,7 +39,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");
 		try
 		{
-			IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
+			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 			System.out.println("Found: "+cms);
 			tr1.setSucceeded(true);
 		}
@@ -52,7 +52,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if system service can be found without scope with required service def");
 		try
 		{
-			IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+			IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 			System.out.println("Found: "+fut.get());
 			tr2.setSucceeded(true);
 		}
@@ -71,7 +71,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 			tr3.setFailed("Not injected");
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, 
 			new TestReport[]{tr1, tr2, tr3}));
 		
 		agent.killComponent();

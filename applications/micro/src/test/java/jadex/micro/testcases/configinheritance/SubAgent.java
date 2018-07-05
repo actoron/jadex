@@ -56,8 +56,8 @@ public class SubAgent extends MainAgent
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms").get();
-		IComponentDescription[] descs = cms.getChildrenDescriptions(agent.getComponentIdentifier()).get();
+		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
+		IComponentDescription[] descs = cms.getChildrenDescriptions(agent.getIdentifier()).get();
 		
 		TestReport tr = new TestReport("#1", "Test if inheritance of a configuration works");
 		if(descs.length==4)
@@ -68,6 +68,6 @@ public class SubAgent extends MainAgent
 		{
 			tr.setFailed("Wrong number of subcomponents, expected 4 (1xa, 2xb, 1xc"+" but was: "+Arrays.toString(descs));
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

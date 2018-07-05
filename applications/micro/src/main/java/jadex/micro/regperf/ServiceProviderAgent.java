@@ -31,7 +31,7 @@ public class ServiceProviderAgent implements IExampleService
 		long start = System.currentTimeMillis();
 //		System.out.println("started: "+agent.getComponentIdentifier());
 		for(int i=0; i<count; i++)
-			agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, IExampleService.class, this, null, RequiredServiceInfo.SCOPE_NETWORK);
+			agent.getFeature(IProvidedServicesFeature.class).addService(null, IExampleService.class, this, null, RequiredServiceInfo.SCOPE_NETWORK);
 //		System.out.println("start finished: "+agent.getComponentIdentifier()+" "+(System.currentTimeMillis()-start));
 	}
 	

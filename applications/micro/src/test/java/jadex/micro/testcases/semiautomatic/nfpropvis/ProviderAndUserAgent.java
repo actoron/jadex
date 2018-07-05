@@ -64,7 +64,7 @@ public class ProviderAndUserAgent extends UserAgent implements ICryptoService
 			fut.get();
 		}
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(wait).get();
 		
 		if(!callqueue.isEmpty())
 		{

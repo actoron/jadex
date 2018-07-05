@@ -19,7 +19,7 @@ public class Receiver2Agent
 	@AgentCreated
 	public void created()
 	{
-		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class Receiver2Agent
 					{
 						if(cnt[0]++<max)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(50, self);
+							agent.getFeature(IExecutionFeature.class).waitForDelay(50, self);
 						}
 						else
 						{
@@ -66,7 +66,7 @@ public class Receiver2Agent
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(200, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(200, step);
 	}
 	
 	/**

@@ -113,7 +113,7 @@ public class EventMapper
 			try
 			{
 				IResultCommand<IFuture<Void>, Object> cmd = (IResultCommand<IFuture<Void>, Object>)mi.getInfo();
-				cmd.execute(event).addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+				cmd.execute(event).addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{

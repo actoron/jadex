@@ -59,7 +59,7 @@ public abstract class ReceiveHandler
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Start the receiver thread.
-		IFuture<IDaemonThreadPoolService>	tpfut	= agent.getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getService("threadpool");
+		IFuture<IDaemonThreadPoolService>	tpfut	= agent.getMicroAgent().getFeature(IRequiredServicesFeature.class).getService("threadpool");
 		tpfut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
 			public void resultAvailable(final IDaemonThreadPoolService tp)
@@ -91,7 +91,7 @@ public abstract class ReceiveHandler
 									final Object[] packet = receive();
 									if(packet!=null)
 									{
-										agent.getMicroAgent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IConditionalComponentStep<Void>()
+										agent.getMicroAgent().getFeature(IExecutionFeature.class).scheduleStep(new IConditionalComponentStep<Void>()
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
@@ -130,7 +130,7 @@ public abstract class ReceiveHandler
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												agent.getMicroAgent().getLogger().warning("Could not execute receive step: "+agent.getMicroAgent().getComponentIdentifier());
+												agent.getMicroAgent().getLogger().warning("Could not execute receive step: "+agent.getMicroAgent().getIdentifier());
 											}
 										});
 									}
@@ -217,7 +217,7 @@ public abstract class ReceiveHandler
 			
 //			System.out.println(System.currentTimeMillis()+" "+agent.getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 			
-			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getComponentFeature(IRequiredServicesFeature.class).getService("management");
+			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getFeature(IRequiredServicesFeature.class).getService("management");
 			msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 			{
 				public void resultAvailable(IAwarenessManagementService ms)
@@ -244,7 +244,7 @@ public abstract class ReceiveHandler
 										{
 											cnt++;
 //											System.out.println("CSMACD try #"+(++cnt));
-											agent.createAwarenessInfo().addResultListener(agent.getMicroAgent().getComponentFeature(IExecutionFeature.class)
+											agent.createAwarenessInfo().addResultListener(agent.getMicroAgent().getFeature(IExecutionFeature.class)
 												.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 											{
 												public void customResultAvailable(AwarenessInfo info)

@@ -118,7 +118,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					@Classname("singleStep")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						bia.getBeliefbase().getBelief("singleStepMode").setFact(b);
 						return IFuture.DONE;
 					}
@@ -136,7 +136,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					@Classname("statistics")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						final GameStatistics stats = (GameStatistics)bia.getBeliefbase().getBelief("statistics").getFact();
 				
 						if(stats!=null)
@@ -194,7 +194,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					@Classname("step")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
 						bia.getEventbase().dispatchInternalEvent(ie);
 						return IFuture.DONE;
@@ -230,7 +230,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					@Classname("stepDelay")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						bia.getBeliefbase().getBelief("stepdelay").setFact(value);
 						return IFuture.DONE;
 					}
@@ -253,7 +253,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					@Classname("restartDelay")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						bia.getBeliefbase().getBelief("restartdelay").setFact(Integer.valueOf(value));
 						return IFuture.DONE;
 					}
@@ -300,7 +300,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 			@Classname("ref")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				Boolean sel = (Boolean)bia.getBeliefbase().getBelief("singleStepMode").getFact();
 				Object sd = bia.getBeliefbase().getBelief("stepdelay").getFact();
 				Object rd = bia.getBeliefbase().getBelief("restartdelay").getFact();

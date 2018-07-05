@@ -75,7 +75,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 			tr.setReason("Exception occurred: "+e.getMessage());
 		}
 		
-		getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		
 		killComponent();
 		

@@ -190,7 +190,7 @@ public class StreamProviderAgent implements IStreamService
 				size[0]++;
 				if(cnt[0]++<50)
 				{
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(50, this);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(50, this);
 				}
 				else
 				{
@@ -200,7 +200,7 @@ public class StreamProviderAgent implements IStreamService
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
 		
 		return ret;
 	}

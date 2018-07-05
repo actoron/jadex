@@ -211,7 +211,7 @@ public class DirectoryFacilitatorService	implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			provider.getComponentFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IDF.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(new IResultListener()
+			provider.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IDF.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -428,7 +428,7 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		cms	= ((AbstractComponentFeature)provider.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+		cms	= ((AbstractComponentFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		boolean	setresult;
 		synchronized(services)
 		{
@@ -439,7 +439,7 @@ public class DirectoryFacilitatorService	implements IDF
 			ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
 		
-		clockservice	= ((AbstractComponentFeature)provider.getComponentFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		clockservice	= ((AbstractComponentFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		synchronized(services)
 		{
 			services[1]	= true;

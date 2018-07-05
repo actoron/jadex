@@ -34,7 +34,7 @@ public class EmailFetcherAgent implements IEmailFetcherService
 		List<Email> emails = sub.getNewEmails();
 		
 		// Hack, needed because pool cannot be used (pro)
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

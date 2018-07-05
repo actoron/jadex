@@ -190,7 +190,7 @@ public class AlarmSettingsDialog extends JDialog
 					@Classname("setTime")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IClockService	cs	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+						IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 						final Date now = new Date(cs.getTime());
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -251,7 +251,7 @@ public class AlarmSettingsDialog extends JDialog
 							@Classname("play")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+								IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 								playing = bia.getGoalbase().createGoal("play_song");
 								playing.getParameter("song").setValue(song);
 								bia.getGoalbase().dispatchTopLevelGoal(playing)
@@ -412,7 +412,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
+					IFuture<IClockService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 					fut.addResultListener(new SwingDefaultResultListener<IClockService>(AlarmSettingsDialog.this)
 					{
 						public void customResultAvailable(IClockService cs)

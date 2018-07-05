@@ -183,7 +183,7 @@ public class ClockFrame extends JFrame
 					@Classname("settings")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 						
 						if(sets.isAutosave())
@@ -350,7 +350,7 @@ public class ClockFrame extends JFrame
 			@Classname("tray")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -378,9 +378,9 @@ public class ClockFrame extends JFrame
 				@Classname("refresh")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+					IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
-					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getService("clockservice");
+					IFuture<IClockService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 					fut.addResultListener(new SwingDefaultResultListener<IClockService>(ClockFrame.this)
 					{
 						public void customResultAvailable(final IClockService cs)

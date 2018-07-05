@@ -37,13 +37,13 @@ public class KillAgent
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(null, "jadex.micro.MicroAgent.class", new CreationInfo(agent.getComponentIdentifier()), null)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
+				cms.createComponent(null, "jadex.micro.MicroAgent.class", new CreationInfo(agent.getIdentifier()), null)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier result) 
 					{

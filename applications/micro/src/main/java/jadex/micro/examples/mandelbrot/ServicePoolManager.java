@@ -153,7 +153,7 @@ public class ServicePoolManager
 		// Start timer to be triggered when search is not finished after 1 second.
 		if(timer==null)
 		{
-			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -199,7 +199,7 @@ public class ServicePoolManager
 			searching	= true;
 			
 //			System.out.println("wurksn0");
-			component.getComponentFeature(IRequiredServicesFeature.class).getServices(name).addResultListener(
+			component.getFeature(IRequiredServicesFeature.class).getServices(name).addResultListener(
 				new IIntermediateResultListener<Object>()
 			{
 				/**
@@ -252,7 +252,7 @@ public class ServicePoolManager
 					// If component still active, create new services when there are remaining tasks.
 					// Has to ensure that ComponentTerminatedException does not belong to underlying component.
 					if(!(exception instanceof ComponentTerminatedException && 
-						((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getComponentIdentifier())))
+						((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getIdentifier())))
 					{
 						createServices();
 					}
@@ -293,7 +293,7 @@ public class ServicePoolManager
 //			System.out.println("started service: "+service.getServiceIdentifier()+", "+task);
 			
 			handler.invokeService(service, task, ad.getUserData()).addResultListener(
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -339,7 +339,7 @@ public class ServicePoolManager
 		if(timer==null && !creating && !tasks.isEmpty() && (max==-1 || free.size()+busy.size()<max))
 		{
 			creating	= true;
-			handler.createService().addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+			handler.createService().addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

@@ -87,7 +87,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public ComponentComponentFactory(IInternalAccess provider)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getIdentifier(), IComponentFactory.class, null);
 		this.provider = provider;
 		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
@@ -98,7 +98,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getIdentifier();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -322,6 +322,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: internalaccess.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 }

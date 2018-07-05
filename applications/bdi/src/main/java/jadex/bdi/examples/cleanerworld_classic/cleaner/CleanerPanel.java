@@ -214,7 +214,7 @@ class CleanerPanel extends JPanel
 	{
 		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
-			IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 			
 			DrawData	drawdata	= new DrawData();
 			drawdata.daytime = ((Boolean)bdif.getBeliefbase().getBelief("daytime").getFact()).booleanValue();

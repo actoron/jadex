@@ -103,7 +103,7 @@ public class IntermediateTestAgent
 									{
 										trs.add(tr);
 										
-										agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 										ret.setResult(null);
 									}
 								});
@@ -227,7 +227,7 @@ public class IntermediateTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		try
 		{
@@ -254,8 +254,8 @@ public class IntermediateTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
@@ -263,9 +263,9 @@ public class IntermediateTestAgent
 		event.put("value", 7);
 		pes.processEvent(event, eventtype).get();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
 		
 		try
 		{
@@ -298,12 +298,12 @@ public class IntermediateTestAgent
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
 		fut.getFirstResult();
 		
 //		// For debugging to receive error messages, when thread hangs before fut.get().
@@ -319,7 +319,7 @@ public class IntermediateTestAgent
 //			}
 //		});
 
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
 		event.put("value", 7);
@@ -356,15 +356,15 @@ public class IntermediateTestAgent
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
 		fut.getFirstResult();
 
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
 		event.put("value", 8);
@@ -401,15 +401,15 @@ public class IntermediateTestAgent
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
 		fut.getFirstResult();
 
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
 		event.put("wrong", 7);
@@ -447,14 +447,14 @@ public class IntermediateTestAgent
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
 		
 		try
 		{

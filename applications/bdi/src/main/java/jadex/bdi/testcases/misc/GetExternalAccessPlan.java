@@ -39,7 +39,7 @@ public class GetExternalAccessPlan extends Plan
 		Future	wait	= new Future();
 
 		// Create component.
-		IComponentManagementService ces = getAgent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		IComponentManagementService ces = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
 		Map	args	= new HashMap();
 		args.put("future", wait);
@@ -61,7 +61,7 @@ public class GetExternalAccessPlan extends Plan
 					@Classname("test")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						Object fact = bia.getBeliefbase().getBelief("test").getFact();
 						gotexta[1]	= "testfact".equals(fact);
 						return IFuture.DONE;

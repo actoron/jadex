@@ -31,7 +31,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public ITerminableFuture<Void> extinguishFire(final Object disasterId)
 	{
-		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
+		final IBDIXAgentFeature capa = agent.getFeature(IBDIXAgentFeature.class);
 
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
@@ -103,6 +103,6 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public String toString()
 	{
-		return "ExtinguishFireService, "+agent.getComponentIdentifier();
+		return "ExtinguishFireService, "+agent.getIdentifier();
 	}
 }

@@ -134,10 +134,10 @@ public class GoalGoalBDI
 //			}
 //		});
 		
-		Object res = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal1()).get();
+		Object res = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal1()).get();
 		System.out.println("Goal success: "+res);
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 }

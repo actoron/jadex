@@ -140,7 +140,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Check());
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Check());
 	}
 	
 	/**

@@ -61,7 +61,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		if(rec instanceof String)
 		{
 			// Special case -> string converted to sibling cid.
-			receiver	= new BasicComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent());
+			receiver	= new BasicComponentIdentifier((String)rec, instance.getIdentifier().getParent());
 		}
 		else
 		{
@@ -71,7 +71,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		thread.setWaiting(true);
 //		System.out.println("sending message: "+msg.get(ri));
 		
-		instance.getComponentFeature(IMessageFeature.class).sendMessage(message, receiver)
+		instance.getFeature(IMessageFeature.class).sendMessage(message, receiver)
 			.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)

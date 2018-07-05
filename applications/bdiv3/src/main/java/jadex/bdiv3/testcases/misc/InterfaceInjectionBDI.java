@@ -26,7 +26,7 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 	public void	body(IInternalAccess ia)
 	{
 		TestReport tr1 = new TestReport("#1", "Test if interface injection works.");
-		if(getComponentIdentifier()!=null)
+		if(getIdentifier()!=null)
 		{
 			tr1.setSucceeded(true);
 		}
@@ -34,12 +34,12 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 		{
 			tr1.setFailed("Problem with agent api.");
 		}
-		System.out.println("my name is: "+getComponentIdentifier());
+		System.out.println("my name is: "+getIdentifier());
 
 		TestReport tr2 = new TestReport("#2", "Test if platform access interface injection works.");
 		try
 		{
-			IComponentManagementService	cms	= this.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			IComponentManagementService	cms	= this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			if(cms!=null)
 			{
 				tr2.setSucceeded(true);
@@ -54,6 +54,6 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 			tr2.setFailed(e);			
 		}
 		
-		getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 }

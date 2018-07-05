@@ -42,7 +42,7 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+		IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 		final IGoal g = capa.getGoalbase().createGoal("reasoncall");
 //		g.addGoalListener(new IGoalListener()
 //		{

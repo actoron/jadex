@@ -59,8 +59,8 @@ public class SuperpeerClientAgent
 	protected IFuture<Void>	init()
 	{
 		Future<Void>	ret	= new Future<>();
-		ISecurityService	secser	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
-		secser.getNetworkNames().addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+		ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
+		secser.getNetworkNames().addResultListener(agent.getFeature(IExecutionFeature.class)
 			.createResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
 		{
 			@Override
@@ -91,14 +91,14 @@ public class SuperpeerClientAgent
 		stopSuperpeerSubscription(networkname);
 		stopSuperpeerSearch(networkname);
 		
-		ServiceQuery<ISuperpeerService>	query	= new ServiceQuery<>(ISuperpeerService.class, Binding.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null);
+		ServiceQuery<ISuperpeerService>	query	= new ServiceQuery<>(ISuperpeerService.class, Binding.SCOPE_GLOBAL, null, agent.getIdentifier(), null);
 		query.setNetworkNames(networkname);
 		
 		try
 		{
 			// Platform already super peer for network?
 //			ISuperpeerService	sp	= 
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(query));	// TODO: getLocalService0()?
+			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(query));	// TODO: getLocalService0()?
 			
 			// no need to store own platform?
 //			superpeers.put(network, new Tuple2<ISuperpeerService, SubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>>(sp, null));
@@ -109,7 +109,7 @@ public class SuperpeerClientAgent
 			
 			// Not found locally -> Need to choose remote super peer
 			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut;
-			queryfut	= agent.getComponentFeature(IRequiredServicesFeature.class).addQuery(query);
+			queryfut	= agent.getFeature(IRequiredServicesFeature.class).addQuery(query);
 			queries.put(networkname, queryfut);
 			queryfut.addResultListener(new IntermediateDefaultResultListener<ISuperpeerService>()
 			{
@@ -172,7 +172,7 @@ public class SuperpeerClientAgent
 							if(superpeers.get(networkname)!=null && superpeers.get(networkname).getFirstEntity()==sp)
 							{
 								// On error -> restart search after e.g. 300 millis (realtime) (very small delay to prevent busy loop on persistent immediate error)
-								agent.getComponentFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getComponentIdentifier(), 0.01), new IComponentStep<Void>()
+								agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getIdentifier(), 0.01), new IComponentStep<Void>()
 								{
 									@Override
 									public IFuture<Void> execute(IInternalAccess ia)
@@ -212,7 +212,7 @@ public class SuperpeerClientAgent
 					if(queries.get(networkname)==queryfut)
 					{
 						// On error -> restart search after e.g. 3 secs (realtime) (small delay to prevent busy loop on persistent immediate error)
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getComponentIdentifier(), 0.1), new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getIdentifier(), 0.1), new IComponentStep<Void>()
 						{
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -231,7 +231,7 @@ public class SuperpeerClientAgent
 			
 			
 			// For robustness: restart search every e.g. 30 seconds (realtime) until connected (e.g. SP found but initial connection failed -> requires restarting running search to be found again!?)
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(Starter.getRemoteDefaultTimeout(agent.getComponentIdentifier()), new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getRemoteDefaultTimeout(agent.getIdentifier()), new IComponentStep<Void>()
 			{
 				@Override
 				public IFuture<Void> execute(IInternalAccess ia)

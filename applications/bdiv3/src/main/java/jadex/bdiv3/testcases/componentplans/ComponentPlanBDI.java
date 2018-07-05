@@ -53,7 +53,7 @@ public class ComponentPlanBDI
 		TestReport	tr	= new TestReport("#1", "Test if goal can be achieved by component plan.");
 		try
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AchieveSuccess()).get(5000);
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AchieveSuccess()).get(5000);
 			tr.setSucceeded(true);
 		}
 		catch(Exception e)
