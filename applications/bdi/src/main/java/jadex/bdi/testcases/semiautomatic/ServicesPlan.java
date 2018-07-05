@@ -31,7 +31,7 @@ public class ServicesPlan extends Plan
 		
 		// Call service internally
 		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
-			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL));
+			IPrintHelloService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
 		phs.printHello();
 		
 		// Call service via REST

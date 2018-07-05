@@ -25,7 +25,7 @@ import jadex.micro.annotation.Results;
  */
 @RequiredServices(@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Configurations({
-	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL))),
+	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY))),
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
@@ -45,7 +45,7 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 		RequiredServiceInfo rsi = ((IInternalServiceMonitoringFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
-		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_LOCAL))
+		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 		{
 			tr.setSucceeded(true);
 		}

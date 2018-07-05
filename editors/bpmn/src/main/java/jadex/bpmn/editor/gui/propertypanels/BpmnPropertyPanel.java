@@ -112,7 +112,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] SCOPE_TYPES = { RequiredServiceInfo.SCOPE_APPLICATION,
 									   RequiredServiceInfo.SCOPE_COMPONENT,
 									   RequiredServiceInfo.SCOPE_PARENT,
-									   RequiredServiceInfo.SCOPE_LOCAL,
+									   RequiredServiceInfo.SCOPE_COMPONENT_ONLY,
 									   RequiredServiceInfo.SCOPE_PLATFORM,
 									   RequiredServiceInfo.SCOPE_GLOBAL};
 //									   RequiredServiceInfo.SCOPE_UPWARDS };

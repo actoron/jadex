@@ -36,7 +36,7 @@ import jadex.micro.annotation.Results;
  *  Simple test agent with one service for testing parameter and result copying.
  */
 @ProvidedServices(@ProvidedService(type=ICService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
+@RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
 @Agent

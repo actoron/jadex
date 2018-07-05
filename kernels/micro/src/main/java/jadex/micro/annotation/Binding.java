@@ -26,7 +26,7 @@ public @interface Binding
 	
 	// todo: rename (COMPONENT_LOCAL)
 	/** Local component scope. */
-	public static final String SCOPE_LOCAL = RequiredServiceInfo.SCOPE_LOCAL;
+	public static final String SCOPE_COMPONENT_ONLY = RequiredServiceInfo.SCOPE_COMPONENT_ONLY;
 	
 	/** Component scope (component and subcomponents). */
 	public static final String SCOPE_COMPONENT = RequiredServiceInfo.SCOPE_COMPONENT;

@@ -24,7 +24,7 @@ public class RequiredServiceInfo
 	
 	// todo: rename (COMPONENT_LOCAL)
 	/** Local component scope (component only). */
-	public static final String SCOPE_LOCAL = "local";
+	public static final String SCOPE_COMPONENT_ONLY = "component_only";
 	
 	/** Component scope (component and subcomponents). */
 	public static final String SCOPE_COMPONENT = "component";
@@ -300,7 +300,7 @@ public class RequiredServiceInfo
 	 */
 	public static boolean isScopeOnLocalPlatform(String scope)
 	{
-		return SCOPE_NONE.equals(scope) || SCOPE_LOCAL.equals(scope) || SCOPE_COMPONENT.equals(scope)
+		return SCOPE_NONE.equals(scope) || SCOPE_COMPONENT_ONLY.equals(scope) || SCOPE_COMPONENT.equals(scope)
 			|| SCOPE_APPLICATION.equals(scope) || SCOPE_PLATFORM.equals(scope) || SCOPE_PARENT.equals(scope);
 	}
 }

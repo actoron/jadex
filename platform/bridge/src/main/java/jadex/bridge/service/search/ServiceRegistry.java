@@ -726,7 +726,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(sercid).endsWith(getDotName(query.getOwner()));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(query.getOwner());
@@ -787,7 +787,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(query.getOwner()).endsWith(getDotName(sercid));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(query.getOwner());

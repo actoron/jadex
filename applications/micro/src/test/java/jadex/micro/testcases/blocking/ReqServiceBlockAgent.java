@@ -29,7 +29,7 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(type=IBlockService.class))
 @RequiredServices(
 {
-	@RequiredService(name="myser", type=IBlockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)),
+	@RequiredService(name="myser", type=IBlockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)),
 	@RequiredService(name="stepser", type=IStepService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
 public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockService

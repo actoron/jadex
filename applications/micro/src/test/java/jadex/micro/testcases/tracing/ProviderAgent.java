@@ -45,7 +45,7 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		System.out.println("Called method1: "+msg+" "+sc+" "+Thread.currentThread());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, RequiredServiceInfo.SCOPE_LOCAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 			.addResultListener(new ExceptionDelegationResultListener<ITestService, Void>(ret)
 		{
 			public void customResultAvailable(ITestService ts)

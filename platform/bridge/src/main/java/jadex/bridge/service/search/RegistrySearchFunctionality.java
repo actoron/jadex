@@ -673,7 +673,7 @@ public class RegistrySearchFunctionality
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			ret = getDotName(sercid).endsWith(getDotName(cid));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
@@ -742,7 +742,7 @@ public class RegistrySearchFunctionality
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			ret = getDotName(cid).endsWith(getDotName(sercid));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getServiceIdentifier().getProviderId().equals(cid);

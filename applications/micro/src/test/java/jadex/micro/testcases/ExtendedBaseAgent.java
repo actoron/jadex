@@ -44,7 +44,7 @@ import jadex.micro.testcases.ProvidedServiceConfigurationsAgent.MyAService;
 @Description("Extended base description")
 @Imports({"eb1", "eb2"})
 @Properties({@NameValue(name="a", value="\"eba\""), @NameValue(name="b", value="\"ebb\"")})
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)))
 @ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(MyAService.class)))
 @Arguments(@Argument(name="arg1", defaultvalue="\"ebval\"", clazz=String.class))
 @Results({@Result(name="res1", defaultvalue="\"ebres\"", clazz=String.class), @Result(name="testresults", clazz=Testcase.class)})
@@ -107,7 +107,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#4", "Required services");
 		RequiredServiceInfo[] reqs = agent.getModel().getServices();
 //		System.out.println("req sers: "+SUtil.arrayToString(reqs));
-		if(reqs[0].getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_LOCAL))
+		if(reqs[0].getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 		{
 			tr.setSucceeded(true);
 		}

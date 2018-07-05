@@ -170,7 +170,7 @@ public class GenerateService implements IGenerateService
 									public void customResultAvailable(IExternalAccess result)
 									{
 										result.searchService(
-											new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL)).addResultListener(
+											new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY)).addResultListener(
 											agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)

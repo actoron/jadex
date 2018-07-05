@@ -80,7 +80,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 		
-		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, Binding.SCOPE_LOCAL)).get();
+		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, Binding.SCOPE_COMPONENT_ONLY)).get();
 		ts.method(agent.getExternalAccess()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote callback: "+ServiceCall.getCurrentInvocation()+", "+sc));
