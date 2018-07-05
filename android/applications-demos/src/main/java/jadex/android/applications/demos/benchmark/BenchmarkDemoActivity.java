@@ -178,7 +178,7 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 			public IFuture<Collection<Tuple2<String, Object>>> execute(IInternalAccess ia)
 			{
 				final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
-				ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				ia.getFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<Tuple2<String, Object>>>(fut)
 				{
 					public void customResultAvailable(IComponentManagementService cms)

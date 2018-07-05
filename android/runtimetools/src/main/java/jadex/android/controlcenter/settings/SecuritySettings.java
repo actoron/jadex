@@ -120,7 +120,7 @@ public class SecuritySettings extends AServiceSettings
 
 							for (DiscoveryInfo dis : platforms)
 							{
-								String platformPrefix = dis.getComponentIdentifier().getPlatformPrefix();
+								String platformPrefix = dis.getIdentifier().getPlatformPrefix();
 								if (!platformPasswords.containsKey(platformPrefix) && !items.contains(platformPrefix))
 								{
 									platformList.add(dis);
@@ -144,7 +144,7 @@ public class SecuritySettings extends AServiceSettings
 								{
 									public void onClick(DialogInterface dialog, final int item)
 									{
-										final IComponentIdentifier cid = platformList.get(item).getComponentIdentifier();
+										final IComponentIdentifier cid = platformList.get(item).getIdentifier();
 										String platformPrefix = cid.getPlatformPrefix();
 										final EditTextDialog pwDialog = new EditTextDialog(platformPasswordsCat.getContext());
 										pwDialog.setTitle("Enter platformSecret for platform " + platformPrefix);

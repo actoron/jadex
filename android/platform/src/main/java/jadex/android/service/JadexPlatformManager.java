@@ -138,7 +138,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	private IFuture<Void> addLibServiceUrl(IExternalAccess platformAccess, final String appPath)
 	{
 		final Future<Void> result = new Future<Void>();
-		IFuture<ILibraryService> libService = getService(platformAccess.getComponentIdentifier(), ILibraryService.class);
+		IFuture<ILibraryService> libService = getService(platformAccess.getIdentifier(), ILibraryService.class);
 		Logger.d("Getting LibraryService...");
 		libService.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
@@ -232,7 +232,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>() {
 			@Classname("create-component")
 			public IFuture<S> execute(IInternalAccess ia) {
-				return ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceClazz, scope));
+				return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceClazz, scope));
 			}
 		});
 	}
@@ -296,7 +296,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 				{
 					public void resultAvailable(final IExternalAccess platformAccess)
 					{
-						runningPlatforms.put(platformAccess.getComponentIdentifier(), platformAccess);
+						runningPlatforms.put(platformAccess.getIdentifier(), platformAccess);
 						if (defaultAppPath != null) {
 							Logger.d("Platform started in multi-app mode, now adding lib url...");
 							addLibServiceUrl(platformAccess, defaultAppPath).addResultListener(new DefaultResultListener<Void>()

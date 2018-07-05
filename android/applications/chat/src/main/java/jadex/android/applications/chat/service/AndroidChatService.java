@@ -370,7 +370,7 @@ public class AndroidChatService extends JadexPlatformService
 
 		} else if (ce.getType().equals(ChatEvent.TYPE_STATECHANGE)) 
 		{
-			userModel.refreshUser(ce.getComponentIdentifier(), ce);
+			userModel.refreshUser(ce.getIdentifier(), ce);
 			
 		}
 	}

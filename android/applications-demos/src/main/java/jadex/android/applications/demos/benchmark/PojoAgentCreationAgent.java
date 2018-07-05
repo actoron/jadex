@@ -116,7 +116,7 @@ public class PojoAgentCreationAgent
 					args.put("num", Integer.valueOf(num));
 					args.put("starttime", Long.valueOf(starttime));
 					args.put("startmem", Long.valueOf(startmem));
-					cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()),
+					cms.createComponent(createPeerName(num+1, agent.getIdentifier()),
 						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 						new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier()), null);
 				}
@@ -153,8 +153,8 @@ public class PojoAgentCreationAgent
 					{
 						public void resultAvailable(IComponentManagementService cms)
 						{
-							String	initial	= createPeerName(1, agent.getComponentIdentifier());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
+							String	initial	= createPeerName(1, agent.getIdentifier());
+							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getIdentifier().getRoot());
 							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
@@ -165,12 +165,12 @@ public class PojoAgentCreationAgent
 										public IFuture<Void> execute(final IInternalAccess ia)
 										{
 											final Future<Void> ret = new Future<Void>();
-											ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											ia.getFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
 												{
-													((PojoAgentCreationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent())
+													((PojoAgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent())
 														.deletePeers(max, result.getTime(), dur, pera, omem, upera);
 													ret.setResult(null);
 												}
@@ -212,12 +212,12 @@ public class PojoAgentCreationAgent
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera)
 	{
-		final String name = createPeerName(cnt, agent.getComponentIdentifier());
+		final String name = createPeerName(cnt, agent.getIdentifier());
 		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
 				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
@@ -267,9 +267,9 @@ public class PojoAgentCreationAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
@@ -277,12 +277,12 @@ public class PojoAgentCreationAgent
 	
 	protected IFuture<IComponentManagementService>	getCMS()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 	
 	
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 }

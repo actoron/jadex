@@ -13,7 +13,7 @@ public class DiscoveryPreference extends LongClickablePreference {
 	public DiscoveryPreference(Context context, DiscoveryInfo info) {
 		super(context);
 		this.info = info;
-		setTitle(info.getComponentIdentifier().getName());
+		setTitle(info.getIdentifier().getName());
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		StringBuilder summaryString = new StringBuilder("Last info: ");
 		summaryString.append(dateFormat.format(info.getTime()));

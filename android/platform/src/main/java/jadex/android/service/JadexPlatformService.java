@@ -233,7 +233,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	@Override
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
-		this.platformId = platform.getComponentIdentifier();
+		this.platformId = platform.getIdentifier();
 	}
 	
 
@@ -275,7 +275,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
+				return ia.getFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
 

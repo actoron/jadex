@@ -418,7 +418,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						{
 							// setting changed -> create or
 							// delete proxy
-							helper.createOrDeleteProxy(info.getComponentIdentifier(), create).addResultListener(new DefaultResultListener<Void>()
+							helper.createOrDeleteProxy(info.getIdentifier(), create).addResultListener(new DefaultResultListener<Void>()
 							{
 								public void exceptionOccurred(Exception exception)
 								{
@@ -427,7 +427,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 									{
 										public void run()
 										{
-											Toast.makeText(screen.getContext(), "Could not start/stop Proxy for " + info.getComponentIdentifier(),
+											Toast.makeText(screen.getContext(), "Could not start/stop Proxy for " + info.getIdentifier(),
 													Toast.LENGTH_LONG).show();
 										}
 									});
@@ -441,11 +441,11 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 						}
 						break;
 					case 1: // add to excludes
-						addInOrExclude(info.getComponentIdentifier().getPlatformPrefix(), false);
+						addInOrExclude(info.getIdentifier().getPlatformPrefix(), false);
 						onPreferenceChange(inexcludeCat, null);
 						break;
 					case 2: // add to includes
-						addInOrExclude(info.getComponentIdentifier().getPlatformPrefix(), true);
+						addInOrExclude(info.getIdentifier().getPlatformPrefix(), true);
 						onPreferenceChange(inexcludeCat, null);
 						break;
 					default:

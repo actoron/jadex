@@ -292,7 +292,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
+				return ia.getFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
 
@@ -342,7 +342,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 */
 	protected void onPlatformStarted(IExternalAccess result)
 	{
-		this.platformId = result.getComponentIdentifier();
+		this.platformId = result.getIdentifier();
 		runOnUiThread(new Runnable()
 		{
 			

@@ -165,7 +165,7 @@ public class SokratesService extends JadexPlatformService
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
 		super.onPlatformStarted(platform);
-		this.platformId = platform.getComponentIdentifier();
+		this.platformId = platform.getIdentifier();
 		listener.platformStarted();
 	}
 

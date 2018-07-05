@@ -392,7 +392,7 @@ public class SimulationSettings extends AServiceSettings {
 			// Code in component result listener as clock runs on its own
 			// thread.
 			
-			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Boolean>() {
+			simservice.isExecuting().addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Boolean>() {
 				public void resultAvailable(Boolean result) {
 					try {
 						boolean executing = result.booleanValue();

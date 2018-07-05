@@ -25,7 +25,7 @@ public class ShowActivityTask extends AbstractTask
 		System.out.println("ShowActivityTask: activityClass=" + ((Class)taskContext.getParameterValue("activityClass")).getName());
 		
 		// retrieve service that is set as required in workflow definition
-		IFuture<Object> requiredService = process.getComponentFeature(IRequiredServicesFeature.class).getService("androidcontext");
+		IFuture<Object> requiredService = process.getFeature(IRequiredServicesFeature.class).getService("androidcontext");
 		IContextService contextService = (IContextService) requiredService.get();
 		
 		// get task attributes
