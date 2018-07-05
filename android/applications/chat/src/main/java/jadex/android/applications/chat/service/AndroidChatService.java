@@ -15,6 +15,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -370,7 +371,7 @@ public class AndroidChatService extends JadexPlatformService
 
 		} else if (ce.getType().equals(ChatEvent.TYPE_STATECHANGE)) 
 		{
-			userModel.refreshUser(ce.getIdentifier(), ce);
+			userModel.refreshUser(ce.getComponentIdentifier(), ce);
 			
 		}
 	}
