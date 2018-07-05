@@ -194,7 +194,7 @@ public class ServiceHandler implements InvocationHandler
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
-								Future<IService> fut = (Future<IService>)SServiceProvider.searchService(ea, new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
+								Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
 								fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
 								{
 									public void customResultAvailable(IService ser)

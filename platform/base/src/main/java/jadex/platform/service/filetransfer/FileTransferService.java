@@ -162,7 +162,7 @@ public class FileTransferService implements IFileTransferService
 	public IFuture<Void> openFile(final String path)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.searchService(agent, new ServiceQuery<>( IContextService.class))
+		agent.searchService( new ServiceQuery<>( IContextService.class))
 			.addResultListener(new DefaultResultListener<IContextService>()
 		{
 			public void resultAvailable(IContextService cs)

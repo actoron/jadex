@@ -67,7 +67,7 @@ public class AddResourceCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		SServiceProvider.searchService(comp, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(final ILibraryService ls)

@@ -58,7 +58,7 @@ public class DirectConnectionDemo
 		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", remote_cid);
 		CreationInfo ci = new CreationInfo(args);
-		IComponentManagementService	cms	= SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
+		IComponentManagementService	cms	= platform.searchService( new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
 		cms.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 	}
 	

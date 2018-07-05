@@ -5,12 +5,14 @@ import java.util.Map;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  *  The interface for accessing components from the outside.
@@ -209,4 +211,29 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 //	 */
 //	public <T> T getExternalComponentFeature(Class<T> type);
 
+	//-------- methods for searching --------
+	
+	/**
+	 *  Search for matching services and provide first result.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> IFuture<T> searchService(ServiceQuery<T> query);
+	
+	/**
+	 *  Search for all matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
+	 */
+	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query);
+	
+	//-------- query methods --------
+
+	/**
+	 *  Add a service query.
+	 *  Continuously searches for matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
 }

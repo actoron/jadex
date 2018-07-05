@@ -113,7 +113,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 		
 		// Does not work, because capability service container no longer available after component cleanup. 
 //		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-		SServiceProvider.searchService(exta, new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		exta.searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)

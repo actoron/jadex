@@ -46,8 +46,7 @@ public class JCCTest //extends TestCase
 		IExternalAccess	platform	= fut.get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 		
-		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.searchService(platform, new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
+		IComponentManagementService	cms	= (IComponentManagementService)platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
 
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
 			new BasicComponentIdentifier("jcc", platform.getComponentIdentifier())).get(timeout);

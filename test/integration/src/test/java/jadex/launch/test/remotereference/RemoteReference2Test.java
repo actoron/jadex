@@ -43,26 +43,24 @@ public class RemoteReference2Test //extends TestCase
 		
 		// Find local service with direct remote search.
 		System.out.println("searching local");
-		ILocalService	service1	= SServiceProvider
-			.searchService(platform1, new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 //		ILocalService	service1 = SServiceProvider.waitForService(platform1, new IResultCommand<IFuture<ILocalService>, Void>()
 //		{
 //			public IFuture<ILocalService> execute(Void args)
 //			{
-//				return SServiceProvider.searchService(platform1, new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+//				return platform1.searchService( new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 //			}
 //		}, 7, 1500).get();
 		
 		// Search for remote search service from local platform
 		System.out.println("searching global");
-		ISearchService	search	= SServiceProvider
-			.searchService(platform1, new ServiceQuery<>(ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ISearchService	search	= platform1.searchService( new ServiceQuery<>(ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 		// Search for remote search service from local platform
 //		ISearchService	search = SServiceProvider.waitForService(platform1, new IResultCommand<IFuture<ISearchService>, Void>()
 //		{
 //			public IFuture<ISearchService> execute(Void args)
 //			{
-//				return SServiceProvider.searchService(platform1, new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+//				return platform1.searchService( new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 //			}
 //		}, 7, 1500).get();
 		

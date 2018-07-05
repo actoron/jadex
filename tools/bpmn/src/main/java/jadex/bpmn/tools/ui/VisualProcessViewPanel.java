@@ -1070,7 +1070,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void doStep()
 	{
-		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(this)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
@@ -1118,7 +1118,7 @@ public class VisualProcessViewPanel extends JPanel
 						abps.add(bp);
 					}
 					
-					SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
 						public void customResultAvailable(final IComponentManagementService cms)
@@ -1141,7 +1141,7 @@ public class VisualProcessViewPanel extends JPanel
 	{
 		final Future<List<String>> ret = new Future<List<String>>();
 		
-		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, List<String>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)

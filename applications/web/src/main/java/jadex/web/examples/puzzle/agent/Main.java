@@ -32,7 +32,7 @@ public class Main
 		int	timeout	= 300000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		IExternalAccess	platform	= Starter.createPlatform(args).get(timeout);
-		IPuzzleService	puzzle	= SServiceProvider.searchService(platform, new ServiceQuery<>( IPuzzleService.class)).get(timeout);
+		IPuzzleService	puzzle	= platform.searchService( new ServiceQuery<>( IPuzzleService.class)).get(timeout);
 		
 		Board	board	= new Board(11);
 		int	hints	= 0;

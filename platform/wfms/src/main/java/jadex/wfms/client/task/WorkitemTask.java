@@ -41,7 +41,7 @@ public class WorkitemTask implements ITask
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = process.getServiceContainer();
-		SServiceProvider.searchService(wfms, new ServiceQuery<>( IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_APPLICATION)).addResultListener(new DefaultResultListener()
+		wfms.searchService( new ServiceQuery<>( IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_APPLICATION)).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
@@ -62,7 +62,7 @@ public class WorkitemTask implements ITask
 	{
 		final Future ret = new Future();
 		IServiceContainer wfms = instance.getServiceContainer();
-		SServiceProvider.searchService(wfms, new ServiceQuery<>( IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_APPLICATION)).addResultListener(new DefaultResultListener()
+		wfms.searchService( new ServiceQuery<>( IWorkitemHandlerService.class, RequiredServiceInfo.SCOPE_APPLICATION)).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)

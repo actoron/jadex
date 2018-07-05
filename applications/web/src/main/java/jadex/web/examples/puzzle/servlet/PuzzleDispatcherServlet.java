@@ -64,7 +64,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		};
 		int	timeout	= 30000;
 		platform	= Starter.createPlatform(args).get(timeout);
-		puzzle	= SServiceProvider.searchService(platform, new ServiceQuery<>( IPuzzleService.class, Binding.SCOPE_PLATFORM)).get(timeout);
+		puzzle	= platform.searchService( new ServiceQuery<>( IPuzzleService.class, Binding.SCOPE_PLATFORM)).get(timeout);
 	}
 	
 	/**
@@ -213,7 +213,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			}
 			
 			// Save platform settings in case of server crash
-			ISettingsService	settings	= SServiceProvider.searchService(platform, new ServiceQuery<>( ISettingsService.class, Binding.SCOPE_PLATFORM)).get(timeout);
+			ISettingsService	settings	= platform.searchService( new ServiceQuery<>( ISettingsService.class, Binding.SCOPE_PLATFORM)).get(timeout);
 			settings.saveProperties().get(timeout);
 			
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";

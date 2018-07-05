@@ -1246,7 +1246,7 @@ public class TestCenterPanel extends JSplitPanel
 					
 					plugin.getJCC().setStatusText("Performing test "+name);
 					final Future	ret	= new Future();
-					SServiceProvider.searchService(plugin.getJCC().getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					plugin.getJCC().getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new SwingDelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
@@ -1295,7 +1295,7 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			final Future<Void>	ret	= new Future<Void>();
 			
-			SServiceProvider.searchService(plugin.getJCC().getJCCAccess(),
+			plugin.getJCC().getJCCAccess().searchService(
 				new ServiceQuery<>(IComponentManagementService.class))
 				.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{

@@ -152,7 +152,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	public IFuture<Set<String>> getSupportedComponentTypes()
 	{
 		final Future<Set<String>> ret = new Future<Set<String>>();
-		SServiceProvider.searchServices(exta, new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		exta.searchServices( new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingExceptionDelegationResultListener<Collection<IComponentFactory>, Set<String>>(ret)
 		{
 			public void customResultAvailable(Collection<IComponentFactory> facts)
@@ -226,7 +226,7 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	{
 		if(isEnabled())
 		{
-			SServiceProvider.searchServices(exta, new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			exta.searchServices( new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
 				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
 			{

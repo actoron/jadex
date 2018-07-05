@@ -63,7 +63,7 @@ public class ExecuteFileCommand extends ACliCommand
 		final String dir = (String)args.get(null);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-		SServiceProvider.searchService(comp, new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, String>(ret)
 		{
 			public void customResultAvailable(IDaemonThreadPoolService tp)

@@ -109,7 +109,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	{
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.searchService(component, new ServiceQuery<>(IComponentManagementService.class))
+		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

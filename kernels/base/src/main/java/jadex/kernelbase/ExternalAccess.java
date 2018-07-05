@@ -19,6 +19,8 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -29,6 +31,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
@@ -1192,8 +1195,8 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture<Void> shutdownNFPropertyProvider()
 	{
-		final Future<Void> ret = new Future<Void>();
-		
+//		final Future<Void> ret = new Future<Void>();
+//		
 //		if(!valid)
 //		{
 //			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
@@ -1354,5 +1357,61 @@ public class ExternalAccess implements IExternalAccess
 	public String toString()
 	{
 		return "ExternalAccess(comp=" + tostring + ")";
+	}
+	
+	//-------- methods for searching --------
+	
+	/**
+	 *  Search for matching services and provide first result.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> IFuture<T> searchService(ServiceQuery<T> query)
+	{
+		return scheduleStep(new IComponentStep<T>()
+		{
+			@Override
+			public IFuture<T> execute(IInternalAccess ia)
+			{
+				return ia.getFeature(IRequiredServicesFeature.class).searchService(query);
+			}
+		});
+	}
+	
+	/**
+	 *  Search for all matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
+	 */
+	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
+	{
+		return (ITerminableIntermediateFuture<T>)scheduleStep(new IComponentStep<Collection<T>>()
+		{
+			@Override
+			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
+			{
+				return ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
+			}
+		});
+	}
+	
+	//-------- query methods --------
+
+	/**
+	 *  Add a service query.
+	 *  Continuously searches for matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
+	{
+		return (ISubscriptionIntermediateFuture<T>)scheduleStep(new IComponentStep<Collection<T>>()
+		{
+			@Override
+			public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
+			{
+				return ia.getFeature(IRequiredServicesFeature.class).addQuery(query);
+			}
+		});
 	}
 }

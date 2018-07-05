@@ -42,7 +42,7 @@ public class UserAgent
 	{
 //    	ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get();
-		IComponentManagementService cms = SServiceProvider.searchService(plat, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IComponentManagementService cms = plat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		final Future<Void> fut = new Future<Void>();
 		

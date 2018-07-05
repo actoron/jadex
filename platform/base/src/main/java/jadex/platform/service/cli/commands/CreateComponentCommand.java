@@ -90,7 +90,7 @@ public class CreateComponentCommand extends ACliCommand
 						
 						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
 				
-						SServiceProvider.searchService(comp, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ILibraryService  libs)

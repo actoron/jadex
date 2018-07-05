@@ -256,7 +256,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 				final Map args = new HashMap();
 				args.put("component", cid);
 				
-				SServiceProvider.searchService(getJCC().getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				getJCC().getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener()		
 				{
 					public void resultAvailable(Object result)

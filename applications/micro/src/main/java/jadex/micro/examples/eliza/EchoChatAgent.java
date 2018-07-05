@@ -104,7 +104,7 @@ public class EchoChatAgent
 	public static void main(String[] args)
 	{
 		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
-		IComponentManagementService cms = SServiceProvider.searchService(pl, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IComponentManagementService cms = pl.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		for(int i=0; i<10000; i++)
 		{

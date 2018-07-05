@@ -66,9 +66,9 @@ public class JadexGatewayServlet extends HttpServlet
 	    this.platform = startPlatform();
 	    ServletCallAccess.purgeServiceCalls();
 	    
-		IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //		cms.createComponent(ExternalRSPublishAgent.class.getName()+".class", null).getFirstResult();
-		this.handler = SServiceProvider.searchService(platform, new ServiceQuery<>( IRequestHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		this.handler = platform.searchService( new ServiceQuery<>( IRequestHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 
 		// create components
 		Enumeration<String> pnames = config.getInitParameterNames();

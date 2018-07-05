@@ -150,7 +150,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 							// Hack for speed
 							if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
 							{
-								SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
+								access.searchService( new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
 									.addResultListener(new IResultListener<IProxyAgentService>()
 								{
 									public void resultAvailable(IProxyAgentService ser)
@@ -184,7 +184,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 				valmap.put(null, self);
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
-				SServiceProvider.searchServices(access, new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)

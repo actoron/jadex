@@ -87,7 +87,7 @@ public class AlarmsGui extends JFrame
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				SServiceProvider.searchService(agent.getServiceProvider(), new ServiceQuery<>( IClockService.class))
+//				agent.getServiceProvider().searchService( new ServiceQuery<>( IClockService.class))
 				IFuture<IClockService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 				fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 				{

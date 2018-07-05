@@ -145,7 +145,7 @@ public class ControlCenter
 		final Future<Void>	ret	= new Future<Void>();
 		
 		// Read project properties
-//		SServiceProvider.searchService(jccaccess.getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		jccaccess.getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new SwingDelegationResultListener(ret)
 //		{
 //			public void customResultAvailable(Object result)

@@ -239,7 +239,7 @@ public class ModelIconCache implements IIconCache
 ////		}
 //		
 //		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-//		SServiceProvider.searchService(exta.getServiceProvider(), new ServiceQuery<>( IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		exta.getServiceProvider().searchService( new ServiceQuery<>( IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 //		{
 //			public void customResultAvailable(IDependencyService deps)

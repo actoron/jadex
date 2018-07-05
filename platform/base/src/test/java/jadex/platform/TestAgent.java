@@ -147,7 +147,7 @@ public abstract class TestAgent
 								{
 									public void customResultAvailable(IComponentIdentifier result)
 									{
-										SServiceProvider.searchService(exta, new ServiceQuery<>( IComponentManagementService.class))
+										exta.searchService( new ServiceQuery<>( IComponentManagementService.class))
 											.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
 											public void customResultAvailable(IComponentManagementService cms2)
@@ -331,7 +331,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				
-//				SServiceProvider.searchService(exta.getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)

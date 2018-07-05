@@ -61,7 +61,7 @@ public class STest {
 
     public static IComponentManagementService getCMS(IExternalAccess platform) 
     {
-        return SServiceProvider.searchService(platform, new ServiceQuery<>(IComponentManagementService.class)).get();
+        return platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get();
     }
 
     public static void terminatePlatform(IExternalAccess platform) 

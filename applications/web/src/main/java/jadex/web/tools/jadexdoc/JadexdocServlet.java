@@ -223,7 +223,7 @@ public class JadexdocServlet extends HttpServlet
 		{
 			public void customResultAvailable(final IExternalAccess ea)
 			{
-				SServiceProvider.searchService(ea, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				ea.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Collection<IModelInfo>>(ret)
 				{
 					public void customResultAvailable(ILibraryService ls)

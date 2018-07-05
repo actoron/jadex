@@ -62,12 +62,12 @@ public class StartScenario
 				{
 					public void resultAvailable(final IExternalAccess rplat)
 					{
-						SServiceProvider.searchService(lplat, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						lplat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new DefaultResultListener<IComponentManagementService>()
 						{
 							public void resultAvailable(final IComponentManagementService lcms)
 							{
-								SServiceProvider.searchService(rplat, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								rplat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 									.addResultListener(new DefaultResultListener<IComponentManagementService>()
 								{
 									public void resultAvailable(final IComponentManagementService rcms)

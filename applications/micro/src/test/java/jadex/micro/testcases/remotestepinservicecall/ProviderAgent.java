@@ -74,13 +74,13 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule external local has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		cms	= SServiceProvider.searchService(exta, new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
+		cms	= exta.searchService( new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
 		cms.getComponentDescription(exta.getComponentIdentifier()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 		
-		ITestService	ts	= SServiceProvider.searchService(exta, new ServiceQuery<>( ITestService.class, Binding.SCOPE_LOCAL)).get();
+		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, Binding.SCOPE_LOCAL)).get();
 		ts.method(agent.getExternalAccess()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote callback: "+ServiceCall.getCurrentInvocation()+", "+sc));

@@ -981,7 +981,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		final Future<Void>	ret	= new Future<Void>();
 		final IComponentIdentifier	remote	= rid.getLocalIdentifier().getComponentIdentifier();
-		SServiceProvider.searchService(component.getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		component.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
@@ -990,7 +990,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				{
 					public void customResultAvailable(IExternalAccess exta)
 					{
-						SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 						{
 							public void customResultAvailable(ILibraryService ls)
@@ -1079,7 +1079,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final PipedOutputStream	pos	= new PipedOutputStream();
 				is	= new PipedInputStream(pos, 8192*4);
 				
-				SServiceProvider.searchService(component.getExternalAccess(), new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				component.getExternalAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 				{
 					public void resultAvailable(IDaemonThreadPoolService tps)

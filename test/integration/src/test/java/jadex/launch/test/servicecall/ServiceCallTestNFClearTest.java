@@ -103,7 +103,7 @@ public class ServiceCallTestNFClearTest
 	public void testMain_toProvidedRaw()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, RawServiceAgent.class);
-		IServiceCallService service = SServiceProvider.searchService(exta, new ServiceQuery<>( IServiceCallService.class)).get(timeout);
+		IServiceCallService service = exta.searchService( new ServiceQuery<>( IServiceCallService.class)).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 
@@ -114,7 +114,7 @@ public class ServiceCallTestNFClearTest
 	public void testMain_toProvidedDirect()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, DirectServiceAgent.class);
-		IServiceCallService service = SServiceProvider.searchService(exta, new ServiceQuery<>( IServiceCallService.class)).get(timeout);
+		IServiceCallService service = exta.searchService( new ServiceQuery<>( IServiceCallService.class)).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 
@@ -125,7 +125,7 @@ public class ServiceCallTestNFClearTest
 	public void testMain_toProvidedDecoupled()
 	{
 		IExternalAccess exta = createServiceAgent(platform1, DecoupledServiceAgent.class);
-		IServiceCallService service = SServiceProvider.searchService(exta, new ServiceQuery<>( IServiceCallService.class)).get(timeout);
+		IServiceCallService service = exta.searchService( new ServiceQuery<>( IServiceCallService.class)).get(timeout);
 		assertServiceCallResetsServiceInvocation(service);
 	}
 
@@ -301,7 +301,7 @@ public class ServiceCallTestNFClearTest
 
 	private IExternalAccess createServiceAgent(IExternalAccess platform, Class< ? > clazz)
 	{
-		IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
 		cms.createComponent(clazz.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()

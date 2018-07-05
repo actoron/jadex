@@ -871,7 +871,7 @@ public class Starter
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		SServiceProvider.searchService(remote, new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		remote.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
@@ -879,7 +879,7 @@ public class Starter
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						SServiceProvider.searchService(local, new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						local.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
@@ -887,7 +887,7 @@ public class Starter
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										SServiceProvider.searchService(local, new ServiceQuery<>(IComponentManagementService.class))
+										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
 											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)
@@ -906,7 +906,7 @@ public class Starter
 				});
 			}
 		});
-		/*SServiceProvider.searchService(remote, new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		/*remote.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
@@ -914,7 +914,7 @@ public class Starter
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						SServiceProvider.searchService(local, new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						local.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
@@ -922,7 +922,7 @@ public class Starter
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										SServiceProvider.searchService(local, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+										local.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)

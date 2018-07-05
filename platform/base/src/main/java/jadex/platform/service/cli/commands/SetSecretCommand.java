@@ -79,7 +79,7 @@ public class SetSecretCommand extends ACliCommand
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 			
-			SServiceProvider.searchService(comp, new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			comp.searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 			{
 				public void customResultAvailable(final ISecurityService ss)

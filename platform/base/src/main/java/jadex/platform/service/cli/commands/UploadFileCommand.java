@@ -206,7 +206,7 @@ public class UploadFileCommand extends ACliCommand
 			}));
 			
 			// does not work due to cid has no address
-//			SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IDeploymentService>(ret)
 //			{
 //				public void customResultAvailable(final IComponentManagementService cms)

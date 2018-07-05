@@ -271,7 +271,7 @@ public class ModelTreePanel extends FileTreePanel
 		});
 		
 		final String lid = exta.getComponentIdentifier().toString() + localexta.getComponentIdentifier().toString() + "_" + LISTENER_COUNTER++;
-		SServiceProvider.searchService(exta, new ServiceQuery<>( IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		exta.searchService( new ServiceQuery<>( IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -286,7 +286,7 @@ public class ModelTreePanel extends FileTreePanel
 			}
 		});
 		
-		SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -401,7 +401,7 @@ public class ModelTreePanel extends FileTreePanel
 			{
 				final IResourceIdentifier rid = ((RIDNode)node).getResourceIdentifier();
 				
-				SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 				{
 					public void customResultAvailable(final ILibraryService ls)
@@ -500,7 +500,7 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(kernellistener!=null)
 		{
-			SServiceProvider.searchService(exta, new ServiceQuery<>( IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new IResultListener()
+			exta.searchService( new ServiceQuery<>( IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -515,7 +515,7 @@ public class ModelTreePanel extends FileTreePanel
 		}
 		if(libservicelistener!=null)
 		{
-			SServiceProvider.searchService(exta, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)

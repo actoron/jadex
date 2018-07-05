@@ -33,8 +33,7 @@ public class RemoteReferenceTest //extends TestCase
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getComponentIdentifier());
 		
 		// Find local service (as local provided service proxy).
-		ILocalService	service1	= SServiceProvider
-			.searchService(platform1, new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 		
 		// Start platform2 with (remote) search service.
 		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
@@ -46,7 +45,7 @@ public class RemoteReferenceTest //extends TestCase
 //		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
-		ISearchService	search = SServiceProvider.searchService(platform1, new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ISearchService	search = platform1.searchService( new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
 
 		// Invoke service to obtain reference to local service.
 		ILocalService	service2	= search.searchService("dummy").get(timeout);

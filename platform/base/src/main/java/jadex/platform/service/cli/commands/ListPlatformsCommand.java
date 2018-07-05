@@ -71,7 +71,7 @@ public class ListPlatformsCommand extends ACliCommand
 		
 		final boolean state = args.containsKey("-s");
 		
-		SServiceProvider.searchServices(comp, new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchServices( new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 		{
 			protected int ongoing = 0;

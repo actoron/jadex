@@ -200,7 +200,7 @@ public class SecurityEvaluation
 		long start	= System.nanoTime();
 		for(int i=0; i<platforms.length; i++)
 		{
-			IComponentManagementService	cms	= SServiceProvider.searchService(platforms[i], new ServiceQuery<>( IComponentManagementService.class)).get();
+			IComponentManagementService	cms	= platforms[i].searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 			for(int j=0; j<cnt; j++)
 			{
 				fubar.addFuture(cms.createComponent(null, ServiceProviderAgent.class.getName()+".class", null, null));

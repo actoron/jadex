@@ -241,7 +241,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 					{
 						if(dtps==null)
 						{
-							SServiceProvider.searchService(component, new ServiceQuery<>(IDaemonThreadPoolService.class))
+							component.searchService( new ServiceQuery<>(IDaemonThreadPoolService.class))
 								.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Integer>(read)
 							{
 								public void customResultAvailable(IDaemonThreadPoolService result)

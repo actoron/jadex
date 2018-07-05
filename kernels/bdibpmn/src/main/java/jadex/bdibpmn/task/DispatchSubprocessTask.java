@@ -128,7 +128,7 @@ public class DispatchSubprocessTask	implements ITask
 			{
 				public void firstResultAvailable(final IComponentIdentifier cid)
 				{
-					SServiceProvider.searchService((IServiceProvider)instance.getServiceContainer(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					(IServiceProvider)instance.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(instance.createResultListener(new IResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService cms)

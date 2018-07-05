@@ -29,7 +29,7 @@ public class LocalMessagingTest
 //		Starter.createPlatform(config).get();
 		
 		final IExternalAccess	access	= Starter.createPlatform(config).get();
-		IComponentManagementService	cms	= SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class)).get();
+		IComponentManagementService	cms	= access.searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 		//cms.createComponent(SenderAgent.class.getName()+".class",
 		cms.createComponent(BenchmarkAgent.class.getName()+".class",
 			new CreationInfo(new HashMap<String, Object>(){{

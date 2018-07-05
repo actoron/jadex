@@ -59,7 +59,7 @@ public class ListComponentsCommand extends ACliCommand
 		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		SServiceProvider.searchService(comp, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription[]>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

@@ -278,9 +278,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		ServiceQuery<IComponentManagementService> cmsquery = new ServiceQuery<>(IComponentManagementService.class);
-		IComponentManagementService cms = SServiceProvider.searchService(platform, cmsquery).get();
+		IComponentManagementService cms = platform.searchService( cmsquery).get();
 		ServiceQuery<ILibraryService> lsquery = new ServiceQuery<>(ILibraryService.class);
-		ILibraryService libsrv	= SServiceProvider.searchService(platform, lsquery).get();
+		ILibraryService libsrv	= platform.searchService( lsquery).get();
 
 		// Only works with x-rids hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;

@@ -327,7 +327,7 @@
 //	protected IFuture<Void> installLocalCMSListener(final ICMSComponentListener listener)
 //	{
 //		final Future<Void> ret = new Future<Void>();
-//		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
+//		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 //				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -351,7 +351,7 @@
 //	protected IFuture<Void> removeLocalCMSListener(final ICMSComponentListener listener)
 //	{
 //		final Future<Void> ret = new Future<Void>();
-//		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
+//		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 //				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)

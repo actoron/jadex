@@ -466,7 +466,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 //						Object obj = ((ProvidedServiceInfoNode)node).getService();
 						IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
-						IFuture<Object> fut = SServiceProvider.searchService(access, new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(sid));
+						IFuture<Object> fut = access.searchService( new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(sid));
 						fut.addResultListener(new SwingDefaultResultListener<Object>()
 						{
 							public void customResultAvailable(Object obj)
@@ -519,7 +519,7 @@ public class ComponentTreePanel extends JSplitPane
 					final IComponentIdentifier	cid	= pctn.getComponentIdentifier();
 					if(cid!=null)
 					{
-						SServiceProvider.searchService(access, new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						access.searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new SwingDefaultResultListener<ISecurityService>(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(final ISecurityService sec)
@@ -639,7 +639,7 @@ public class ComponentTreePanel extends JSplitPane
 //					{
 ////						Object obj = ((ProvidedServiceInfoNode)node).getService();
 //						IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
-//						IFuture<Object> fut = SServiceProvider.searchService(access.getServiceProvider(), new ServiceQuery<>( sid));
+//						IFuture<Object> fut = access.getServiceProvider().searchService( new ServiceQuery<>( sid));
 //						fut.addResultListener(new SwingDefaultResultListener<Object>()
 //						{
 //							public void customResultAvailable(Object obj)
@@ -925,7 +925,7 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		});
 
-		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService result)
@@ -1094,7 +1094,7 @@ public class ComponentTreePanel extends JSplitPane
 				final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
 	//					final IService service = node.getService();
 				
-				SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(node.getServiceIdentifier()))
+				jcc.getJCCAccess().searchService( new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(node.getServiceIdentifier()))
 					.addResultListener(new ExceptionDelegationResultListener<Object, JComponent>(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -1149,7 +1149,7 @@ public class ComponentTreePanel extends JSplitPane
 				final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 				final IComponentIdentifier cid = node.getComponentIdentifier();
 				
-				SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				jcc.getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, JComponent>(ret)
 				{
 					public void customResultAvailable(final IComponentManagementService cms)
@@ -1233,7 +1233,7 @@ public class ComponentTreePanel extends JSplitPane
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(sid))
+					jcc.getJCCAccess().searchService( new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(sid))
 						.addResultListener(new SwingDefaultResultListener<Object>()
 					{
 						public void customResultAvailable(Object result)
@@ -1270,7 +1270,7 @@ public class ComponentTreePanel extends JSplitPane
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					IFuture<IComponentManagementService> fut = SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+					IFuture<IComponentManagementService> fut = jcc.getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 					fut.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService result)
@@ -1315,7 +1315,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected static IFuture<Void>	killComponent(IExternalAccess access, final IComponentIdentifier cid)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

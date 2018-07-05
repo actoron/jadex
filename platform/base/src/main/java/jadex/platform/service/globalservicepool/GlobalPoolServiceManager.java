@@ -434,7 +434,7 @@ public class GlobalPoolServiceManager
 							{
 								public void resultAvailable(IExternalAccess ea)
 								{
-									Future<IService> fut = (Future<IService>)SServiceProvider.searchService(ea, new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
+									Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_LOCAL));
 									fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
 									{
 										public void resultAvailable(final IService ser)

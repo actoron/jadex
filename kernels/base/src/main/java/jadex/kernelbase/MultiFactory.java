@@ -838,7 +838,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findActiveKernel(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		//SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(kernelmodel, null, classloader)))
+		//ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(kernelmodel, null, classloader)))
 		final Future ret = new Future();
 		Collection factories = ia.getFeature(IRequiredServicesFeature.class)
 			.searchLocalServices(new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION));

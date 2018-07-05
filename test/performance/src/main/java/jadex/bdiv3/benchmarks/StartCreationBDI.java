@@ -25,7 +25,7 @@ public class StartCreationBDI
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		IComponentManagementService cms = SServiceProvider.searchService(ea, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IComponentManagementService cms = ea.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		cms.createComponent("CreationBDI.class", null).get();
 	}
 }

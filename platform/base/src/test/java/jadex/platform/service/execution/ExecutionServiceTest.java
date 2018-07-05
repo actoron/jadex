@@ -26,7 +26,7 @@ public class ExecutionServiceTest
 		minimal.getExtendedPlatformConfiguration().setWsTransport(false);
 		minimal.setValue("settings.readonly", true);
 		IExternalAccess	platform	= Starter.createPlatform(minimal).get();
-		IExecutionService	exe	= SServiceProvider.searchService(platform, new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IExecutionService	exe	= platform.searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		final List<String>	list	= new ArrayList<String>();		
 		exe.execute(new IExecutable()

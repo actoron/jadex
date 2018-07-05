@@ -18,7 +18,6 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -169,7 +168,7 @@ public class HelplineEvaluation
 					try
 					{
 						// search for person 1 (single: only present on second platform, multi: present once on each platform)
-						found	= SServiceProvider.searchServices(firstplatform, new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags("person1")).get();
+						found	= firstplatform.searchServices( new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags("person1")).get();
 					}
 					catch(Exception e)
 					{
@@ -330,7 +329,7 @@ public class HelplineEvaluation
 			long start	= System.nanoTime();
 			for(int i=0; i<platforms.length; i++)
 			{
-				IComponentManagementService	cms	= SServiceProvider.searchService(platforms[i], new ServiceQuery<>( IComponentManagementService.class)).get();
+				IComponentManagementService	cms	= platforms[i].searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 				for(int j=0; j<cnt/measurecnt; j++)
 				{
 					int num	= multi

@@ -23,7 +23,7 @@ public class HelloWorldAgentCreator
 //				{
 //					public void resultAvailable(Boolean result)
 //					{
-//						SServiceProvider.searchService(plat, new ServiceQuery<>( IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//						plat.searchService( new ServiceQuery<>( IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //							.addResultListener(new DefaultResultListener<IDynamicBDIFactory>()
 //						{
 //							public void resultAvailable(final IDynamicBDIFactory fac)
@@ -43,7 +43,7 @@ public class HelloWorldAgentCreator
 //										
 //										fac.registerAgentModel(agent, "helloagent.agent.xml");
 //										
-//										SServiceProvider.searchService(plat, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//										plat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //											.addResultListener(new DefaultResultListener<IComponentManagementService>()
 //										{
 //											public void resultAvailable(IComponentManagementService cms)

@@ -2,10 +2,8 @@ package jadex.bridge.service.search;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
@@ -22,7 +20,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 
@@ -33,65 +30,6 @@ import jadex.commons.future.TerminableIntermediateDelegationFuture;
  */
 public class SServiceProvider
 {
-	//-------- methods for searching --------
-	
-	/**
-	 *  Search for matching services and provide first result.
-	 *  @param ea	The external access.
-	 *  @param query	The search query.
-	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
-	 */
-	public static <T> IFuture<T> searchService(IExternalAccess ea, ServiceQuery<T> query)
-	{
-		return ea.scheduleStep(new IComponentStep<T>()
-		{
-			@Override
-			public IFuture<T> execute(IInternalAccess ia)
-			{
-				return ia.getFeature(IRequiredServicesFeature.class).searchService(query);
-			}
-		});
-	}
-	
-	/**
-	 *  Search for all matching services.
-	 *  @param ea	The external access.
-	 *  @param query	The search query.
-	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
-	 */
-	public static <T>  ITerminableIntermediateFuture<T> searchServices(IExternalAccess ea, ServiceQuery<T> query)
-	{
-		return (ITerminableIntermediateFuture<T>)ea.scheduleStep(new IComponentStep<Collection<T>>()
-		{
-			@Override
-			public ITerminableIntermediateFuture<T> execute(IInternalAccess ia)
-			{
-				return ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
-			}
-		});
-	}
-	
-	//-------- query methods --------
-
-	/**
-	 *  Add a service query.
-	 *  Continuously searches for matching services.
-	 *  @param ea	The external access.
-	 *  @param query	The search query.
-	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
-	 */
-	public static <T> ISubscriptionIntermediateFuture<T> addQuery(IExternalAccess ea, ServiceQuery<T> query)
-	{
-		return (ISubscriptionIntermediateFuture<T>)ea.scheduleStep(new IComponentStep<Collection<T>>()
-		{
-			@Override
-			public ISubscriptionIntermediateFuture<T> execute(IInternalAccess ia)
-			{
-				return ia.getFeature(IRequiredServicesFeature.class).addQuery(query);
-			}
-		});
-	}
-	
 	//-------- old --------
 	
 //	/** The reference method cache (method -> boolean[] (is reference)). */

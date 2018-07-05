@@ -38,7 +38,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDilation(final double dilation, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.searchService(exta, new ServiceQuery<>(IClockService.class))
+		exta.searchService( new ServiceQuery<>(IClockService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -46,7 +46,7 @@ public class SRemoteClock
 				cs.setDilation(dilation);
 				ret.setResult(null);
 				
-//				SServiceProvider.searchService(exta.getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -82,7 +82,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDelta(final long delta, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.searchService(exta, new ServiceQuery<>(IClockService.class))
+		exta.searchService( new ServiceQuery<>(IClockService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -90,7 +90,7 @@ public class SRemoteClock
 				cs.setDelta(delta);
 				ret.setResult(null);
 				
-//				SServiceProvider.searchService(exta.getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)

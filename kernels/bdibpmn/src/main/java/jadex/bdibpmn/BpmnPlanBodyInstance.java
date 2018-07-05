@@ -222,7 +222,7 @@ public class BpmnPlanBodyInstance extends BpmnComponentFeature
 		Long ret = Long.valueOf(clock.getTime()+duration);
 		waittimes.put(thread, ret);
 		
-//		SServiceProvider.searchService(interpreter.getServiceProvider(), new ServiceQuery<>( IClockService.class))
+//		interpreter.getServiceProvider().searchService( new ServiceQuery<>( IClockService.class))
 //			.addResultListener(interpreter.createResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object source, Object result)

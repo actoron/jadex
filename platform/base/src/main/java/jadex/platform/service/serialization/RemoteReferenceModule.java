@@ -875,7 +875,7 @@ public class RemoteReferenceModule
 			}
 			ret	= access.getExternalAccess();
 			
-//			SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms) 

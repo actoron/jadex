@@ -61,7 +61,7 @@ public class ServiceGetter<T>
 		
 //		final Future<T> ret = new Future<T>();
 
-//		SServiceProvider.searchService(component.getServiceContainer(), new ServiceQuery<>( type, scope))
+//		component.getServiceContainer().searchService( new ServiceQuery<>( type, scope))
 //			.addResultListener(component.createResultListener(new IResultListener<T>()
 //		{
 //			public void resultAvailable(T result)

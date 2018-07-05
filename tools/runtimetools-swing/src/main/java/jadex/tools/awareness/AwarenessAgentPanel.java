@@ -152,7 +152,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 	public IFuture<Void> init(final IControlCenter jcc, final IService service)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		jcc.getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

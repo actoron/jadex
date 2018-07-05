@@ -46,7 +46,7 @@ public class ExternalAccessInvokerAgent
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					SServiceProvider.searchService(agent.getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					agent.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
 						public void resultAvailable(IComponentManagementService cms)

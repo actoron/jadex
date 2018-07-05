@@ -141,7 +141,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		IFuture<IService> fut = SServiceProvider.searchService(ea, new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sid));
+		IFuture<IService> fut = ea.searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sid));
 		fut.addResultListener(new IResultListener<IService>()
 		{
 			public void resultAvailable(final IService ser)
@@ -249,7 +249,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		
 		if(service.getType().getType0()==null)
 		{
-			SServiceProvider.searchService(platformea, new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			platformea.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 			{
 				public void customResultAvailable(ILibraryService ls)

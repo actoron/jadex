@@ -760,7 +760,7 @@ public class GuiPanel extends JPanel
 			// These orders are not added to the agent (see manager.agent.xml).
 			try
 			{
-				IClockService clock	= SServiceProvider.searchService(agent, new ServiceQuery<>( IClockService.class, Binding.SCOPE_PLATFORM)).get();
+				IClockService clock	= agent.searchService( new ServiceQuery<>( IClockService.class, Binding.SCOPE_PLATFORM)).get();
 				if(buy)
 				{
 					orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));

@@ -112,7 +112,7 @@ public class RSHelloTest //extends TestCase
 		{
 //		ThreadSuspendable sus = new ThreadSuspendable();
 
-		IFuture<IHelloService> fut = SServiceProvider.searchService(extAcc, new ServiceQuery<>( IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IFuture<IHelloService> fut = extAcc.searchService( new ServiceQuery<>( IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 		IHelloService hs = fut.get();
 

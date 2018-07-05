@@ -291,7 +291,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					SServiceProvider.searchService(access, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new SwingDefaultResultListener(BreakpointPanel.this)
 					{
 						public void customResultAvailable(Object result)

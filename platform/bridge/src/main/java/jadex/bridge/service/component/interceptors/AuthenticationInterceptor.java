@@ -109,7 +109,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{context.getCaller().getPlatformPrefix(), classname, methodname, args};
 		final byte[] content = SBinarySerializer.writeObjectToByteArray(t, null);
 		
-		SServiceProvider.searchService(getComponent(), new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getComponent().searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)

@@ -132,7 +132,7 @@ public class AddRIDAction extends ToolTipAction
 		if(tp==null)
 		{
 //			SServiceProvider.getServiceUpwards(treepanel.localexta.getServiceProvider(), IDaemonThreadPoolService.class)
-			SServiceProvider.searchService(treepanel.getGUIExternalAccess(), new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			treepanel.getGUIExternalAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

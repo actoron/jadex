@@ -36,7 +36,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	 */
 	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentDescription agent, final ISpaceObject avatar)
 	{
-		SServiceProvider.searchService(space.getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService ces)

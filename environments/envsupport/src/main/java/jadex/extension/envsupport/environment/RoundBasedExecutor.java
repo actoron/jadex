@@ -93,12 +93,12 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		
-		SServiceProvider.searchService(space.getExternalAccess(), new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		space.getExternalAccess().searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				SServiceProvider.searchService(space.getExternalAccess(), new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)

@@ -231,7 +231,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			public void customResultAvailable(Void result)
 			{
 				// Todo: use remote access for clock !?
-				SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 				{
 					public void customResultAvailable(IClockService result)
@@ -600,7 +600,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 
 //		jcc.addAgentListListener(this);
 		
-//		SServiceProvider.searchService(getJCC().getExternalAccess().getServiceProvider(), new ServiceQuery<>( IComponentManagementService.class)).addResultListener(new DefaultResultListener()
+//		getJCC().getExternalAccess().getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class)).addResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object result)
 //			{
@@ -1553,7 +1553,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-//				SServiceProvider.searchService(jcc.getJCCAccess().getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
+//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1664,7 +1664,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-//				SServiceProvider.searchService(jcc.getJCCAccess().getServiceProvider(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
+//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1799,7 +1799,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */	
 	protected void addMessageListener(final List<Component> added)
 	{
-		SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		jcc.getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 		{
 			public void customResultAvailable(IComponentManagementService cms)

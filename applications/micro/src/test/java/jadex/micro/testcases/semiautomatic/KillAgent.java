@@ -70,7 +70,7 @@ public class KillAgent
 	{
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
-		IComponentManagementService cms = SServiceProvider.searchService(pl, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		IComponentManagementService cms = pl.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		for(int i=0; i<1000; i++)
 		{

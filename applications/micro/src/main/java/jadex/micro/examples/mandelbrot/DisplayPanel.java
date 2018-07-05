@@ -414,7 +414,7 @@ public class DisplayPanel extends JComponent
 																{
 																	// It is not really possible to define the progress services as required service.
 																	// Needs component specific progress service.
-																	SServiceProvider.searchService(ea, new ServiceQuery<>( IProgressService.class))
+																	ea.searchService( new ServiceQuery<>( IProgressService.class))
 																		.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
 																	{
 																		public void resultAvailable(IProgressService	ps)

@@ -34,7 +34,7 @@ public class RemoteBlockingTestAgent	extends TestAgent
 		// timeout none due to remote call and simulation mode
 		IExternalAccess	exta	= createPlatform(null).get(Timeout.NONE);
 		
-		IComponentManagementService	cms	= SServiceProvider.searchService(exta,
+		IComponentManagementService	cms	= exta.searchService(
 			new ServiceQuery<>(IComponentManagementService.class)).get(Timeout.NONE);
 		
 		cms.getComponentDescriptions().get(Timeout.NONE);

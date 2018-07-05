@@ -217,15 +217,15 @@ public class SComponentFactory
 			{
 				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
-//				SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-//						SServiceProvider.searchService((IServiceProvider)ia.getServiceContainer(), new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
-//						SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
+//						(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
+//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
 						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 						{
@@ -270,15 +270,15 @@ public class SComponentFactory
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future<Boolean> ret = new Future<Boolean>();
-//				SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
 //						final ILibraryService ls = (ILibraryService)result;
 						
-//						SServiceProvider.searchService((IServiceProvider)ia.getServiceContainer(), new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
-//						SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
+//						(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
+//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
 						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
 						{
@@ -368,7 +368,7 @@ public class SComponentFactory
 		
 //				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
-				SServiceProvider.searchServices(ea, new ServiceQuery<>(IComponentFactory.class))
+				ea.searchServices( new ServiceQuery<>(IComponentFactory.class))
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
@@ -464,7 +464,7 @@ public class SComponentFactory
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future<Boolean> ret = new Future<Boolean>();
-//				SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 //				{
 //					public void customResultAvailable(Object result)
@@ -473,7 +473,7 @@ public class SComponentFactory
 						
 //						SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
 //							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid))
-//						SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
+//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 						getFactory(new FactoryFilter(model, null, rid), ia)
 							.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
 						{
@@ -519,7 +519,7 @@ public class SComponentFactory
 				final Future<byte[]> ret = new Future<byte[]>();
 //				IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices((IServiceProvider)ia.getServiceContainer(), 
 //					IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(type));
-//				SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(type)))
+//				ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(type)))
 				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(type), ia);
 				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, byte[]>(ret)
 				{
@@ -637,7 +637,7 @@ public class SComponentFactory
 				ILibraryService ls = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 //						IFuture<IComponentFactory> fut = SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
 //							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid));
-//						SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
+//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
 				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 				{

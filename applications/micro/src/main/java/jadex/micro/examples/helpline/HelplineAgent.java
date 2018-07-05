@@ -87,7 +87,7 @@ public class HelplineAgent
 	 */
 	public void addInformation(final String name, final String info)
 	{
-//		SServiceProvider.searchService(getServiceProvider(), new ServiceQuery<>( IClockService.class))
+//		getServiceProvider().searchService( new ServiceQuery<>( IClockService.class))
 		IFuture<IClockService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 //			.addResultListener(createResultListener(new DefaultResultListener()
 		fut.addResultListener(new DefaultResultListener<IClockService>() // not needed as decoupled service

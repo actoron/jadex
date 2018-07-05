@@ -182,7 +182,7 @@ public class InitiatorAgent extends TestAgent
 //		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
 		// Add awarenessinfo for remote platform
-//		IAwarenessManagementService awa = SServiceProvider.searchService(agent.getServiceProvider(), new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IAwarenessManagementService awa = agent.getServiceProvider().searchService( new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, -1, 
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();

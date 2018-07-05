@@ -126,7 +126,7 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();
-			IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+			IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 			cms.listenToComponent(platform.getComponentIdentifier()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 			{
 				@Override

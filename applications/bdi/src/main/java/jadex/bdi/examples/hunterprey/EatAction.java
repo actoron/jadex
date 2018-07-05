@@ -74,7 +74,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER) != null)
 		{
 			// System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			SServiceProvider.searchService(space.getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
+			space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 					new IResultListener()
 					{
 						public void resultAvailable(Object result)

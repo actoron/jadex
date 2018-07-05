@@ -163,7 +163,7 @@ public class ControlCenterWindow extends JFrame
 			{
 				final boolean sel = soe.isSelected();
 				controlcenter.setSaveOnExit(sel);
-				SServiceProvider.searchService(controlcenter.getPCC().getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				controlcenter.getPCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new IResultListener<ISettingsService>()
 				{
 					public void resultAvailable(ISettingsService setser)

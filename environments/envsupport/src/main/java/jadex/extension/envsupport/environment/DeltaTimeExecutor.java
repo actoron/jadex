@@ -82,12 +82,12 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		this.container	= space.getExternalAccess();
 
-		SServiceProvider.searchService(container, new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		container.searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				SServiceProvider.searchService(container, new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				container.searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)
@@ -229,7 +229,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	public void terminate()
 	{
 		terminated = true;
-		SServiceProvider.searchService(container, new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
+		container.searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

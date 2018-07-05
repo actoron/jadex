@@ -136,7 +136,7 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		SServiceProvider.searchService(access, new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ITransportAddressService>()
 		{
 			public void resultAvailable(ITransportAddressService tas)

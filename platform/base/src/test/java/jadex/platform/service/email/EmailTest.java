@@ -19,11 +19,11 @@ public class EmailTest
 		
 //		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 		IExternalAccess	exta	= Starter.createPlatform(args).get();
-		IComponentManagementService	cms	= SServiceProvider.searchService(exta,
+		IComponentManagementService	cms	= exta.searchService(
 			new ServiceQuery<>(IComponentManagementService.class)).get();
 		cms.createComponent(null, "jadex/platform/service/email/EmailAgent.class", null, null).get();
 		
-		IEmailService	ems	= SServiceProvider.searchService(exta,
+		IEmailService	ems	= exta.searchService(
 			new ServiceQuery<>(IEmailService.class)).get();
 		
 		try

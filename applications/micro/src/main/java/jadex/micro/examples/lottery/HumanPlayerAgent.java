@@ -24,7 +24,7 @@ public class HumanPlayerAgent
 	@AgentBody
 	public void body()
 	{
-//		final ILotteryService ls = SServiceProvider.searchService(agent.getExternalAccess(), new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+//		final ILotteryService ls = agent.getExternalAccess().searchService( new ServiceQuery<>( ILotteryService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		final ILotteryService ls = (ILotteryService)SFuture.getFirstResultAndTerminate(
 			agent.getFeature(IRequiredServicesFeature.class).addQuery("ls"));
 		

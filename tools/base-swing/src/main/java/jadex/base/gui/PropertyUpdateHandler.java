@@ -44,7 +44,7 @@ public class PropertyUpdateHandler
 	{
 		this.access	= access;
 	
-		SServiceProvider.searchService(access, new ServiceQuery<>( IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IMonitoringService>()
 		{
 			public void resultAvailable(IMonitoringService monser)

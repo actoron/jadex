@@ -187,8 +187,8 @@ public class ComponentTest extends TestCase
 		if(conf!=null)
 		{
 			IExternalAccess	exta	= Starter.createPlatform(conf, args).get(timeout, true);
-			cms	= SServiceProvider.searchService(exta, new ServiceQuery<>(IComponentManagementService.class)).get(timeout, true);
-			ILibraryService	libsrv	= SServiceProvider.searchService(exta, new ServiceQuery<>(ILibraryService.class)).get(timeout, true);
+			cms	= exta.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout, true);
+			ILibraryService	libsrv	= exta.searchService( new ServiceQuery<>(ILibraryService.class)).get(timeout, true);
 			
 			for (int projectIndex=0; projectIndex < dirs.length; projectIndex++) {
 				File[] project = dirs[projectIndex];

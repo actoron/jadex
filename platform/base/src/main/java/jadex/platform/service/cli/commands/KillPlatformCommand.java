@@ -62,7 +62,7 @@ public class KillPlatformCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		SServiceProvider.searchService(comp, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

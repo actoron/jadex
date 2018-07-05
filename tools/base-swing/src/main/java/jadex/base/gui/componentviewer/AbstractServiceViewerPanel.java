@@ -120,7 +120,7 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	public IFuture<IExternalAccess>	getServiceAccess()
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
-		SServiceProvider.searchService(getJCC().getJCCAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getJCC().getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)

@@ -103,7 +103,7 @@ public class GeneratePanel extends JPanel
 										{
 											final AreaData res = (AreaData)result;
 											
-//											SServiceProvider.searchService(agent.getServiceProvider(), new ServiceQuery<>( IDisplayService.class))
+//											agent.getServiceProvider().searchService( new ServiceQuery<>( IDisplayService.class))
 											ia.getFeature(IRequiredServicesFeature.class).getService("displayservice")	
 												.addResultListener(new DefaultResultListener()
 											{

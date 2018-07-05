@@ -154,7 +154,7 @@ public class AuthenticateTestAgent extends TestAgent
 						// Access with custom roles should work -> add roles to new platform.
 						if(cus)
 						{
-							SServiceProvider.searchService(exta, new ServiceQuery<>( ISecurityService.class))
+							exta.searchService( new ServiceQuery<>( ISecurityService.class))
 								.addResultListener(new ExceptionDelegationResultListener<ISecurityService, IExternalAccess>(ret)
 							{
 								@Override

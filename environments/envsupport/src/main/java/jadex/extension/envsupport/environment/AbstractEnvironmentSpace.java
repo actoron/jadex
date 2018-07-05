@@ -643,7 +643,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ia.getClassLoader(), killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					SServiceProvider.searchService(getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(final Object result)
@@ -1705,7 +1705,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						{
 							final String filename = (String)result;
 							
-							SServiceProvider.searchService(exta, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
+							exta.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -1866,7 +1866,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					SServiceProvider.searchService(getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_COMPONENT))
+					getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_COMPONENT))
 						.addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -2606,7 +2606,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		SServiceProvider.searchService(getExternalAccess(), new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

@@ -52,7 +52,7 @@ public class RemoteMessagingTest
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
-		IComponentManagementService	cms	= SServiceProvider.searchService(access2, new ServiceQuery<>( IComponentManagementService.class)).get();
+		IComponentManagementService	cms	= access2.searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 
 		// Add addresses of first platform to second
 //		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());

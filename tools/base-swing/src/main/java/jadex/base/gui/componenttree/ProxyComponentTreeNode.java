@@ -239,7 +239,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		
 		if(cid==null)
 		{
-			SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
+			access.searchService( new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)
@@ -269,7 +269,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	protected IFuture<State> getConnectionState()
 	{
 		final Future<State> ret = new Future<State>();
-		SServiceProvider.searchService(access, new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
+		access.searchService( new ServiceQuery<>(IProxyAgentService.class, desc.getName()))
 			.addResultListener(new IResultListener<IProxyAgentService>()
 //			.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 		{

@@ -144,7 +144,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 						{
 							public void customResultAvailable(final IExternalAccess exta)
 							{
-								SServiceProvider.searchService(exta, new ServiceQuery<>( IComponentManagementService.class))
+								exta.searchService( new ServiceQuery<>( IComponentManagementService.class))
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 								{
 									public void customResultAvailable(IComponentManagementService cms2)

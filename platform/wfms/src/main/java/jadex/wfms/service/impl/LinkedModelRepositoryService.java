@@ -385,7 +385,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	/*public IFuture getLoadableModels()
 	{
 		final Future ret = new Future();
-		SServiceProvider.searchService(ia.getServiceContainer(), new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

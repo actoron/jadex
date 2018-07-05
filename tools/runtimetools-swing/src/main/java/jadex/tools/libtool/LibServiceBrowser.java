@@ -744,7 +744,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		if(tp==null)
 		{
-			SServiceProvider.searchService(jcc.getJCCAccess(), new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			jcc.getJCCAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

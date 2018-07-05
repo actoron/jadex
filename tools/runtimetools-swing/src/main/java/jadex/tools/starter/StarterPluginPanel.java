@@ -573,7 +573,7 @@ public class StarterPluginPanel extends JPanel
 	public IFuture loadPlatformProperties()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		jcc.getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -622,7 +622,7 @@ public class StarterPluginPanel extends JPanel
 	{
 		final Future	ret	= new Future();
 //		System.out.println("fetching settings service");
-		SServiceProvider.searchService(jcc.getPlatformAccess(), new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		jcc.getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

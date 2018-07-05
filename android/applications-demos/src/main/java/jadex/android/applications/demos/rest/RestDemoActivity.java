@@ -155,7 +155,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 					}
 				});
 				final Future<byte[]> fut = new Future<byte[]>();
-				SServiceProvider.searchService(getPlatformAccess(), new ServiceQuery<>( IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
+				getPlatformAccess().searchService( new ServiceQuery<>( IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 						new DefaultResultListener<IChartService>()
 						{
 
