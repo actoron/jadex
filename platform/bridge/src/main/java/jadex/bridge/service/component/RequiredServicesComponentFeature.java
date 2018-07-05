@@ -3,6 +3,7 @@ package jadex.bridge.service.component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -193,8 +194,6 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			}
 		}
 	}
-	
-	//-------- IComponentFeature interface / instance level --------
 	
 	//-------- accessors for declared services --------
 	
@@ -476,45 +475,34 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return subscriptions!=null;
 	}
 	
-	//-------- helper methods --------
+	//-------- convenience methods --------
 	
 	/**
 	 *  Get a service raw (i.e. w/o required proxy).
+	 *  @return null when not found.
 	 */
-	// Hack???
 	public <T>	T	getRawService(Class<T> type)
 	{
-		ServiceQuery<T>	query	= new ServiceQuery<>(type);
-		enhanceQuery(query, false);
-		
-		@SuppressWarnings("unchecked")
-		T	ret	= (T)ServiceRegistry.getRegistry(getComponent())
-			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
-		return ret;
+		try
+		{
+			return resolveLocalService(new ServiceQuery<>(type), null);
+		}
+		catch(ServiceNotFoundException snfe)
+		{
+			return null;
+		}
 	}
 
 	/**
 	 *  Get a service raw (i.e. w/o required proxy).
 	 */
-	// Hack???
 	public <T>	Collection<T>	getRawServices(Class<T> type)
 	{
-		ServiceQuery<T>	query	= new ServiceQuery<>(type);
-		enhanceQuery(query, true);
-		
-		Collection<IServiceIdentifier>	ids	= ServiceRegistry.getRegistry(getComponent()).searchServices(query);
-		Collection<T>	ret	= new ArrayList<>();
-		for(IServiceIdentifier id: ids)
-		{
-			@SuppressWarnings("unchecked")
-			T	t	= (T)ServiceRegistry.getRegistry(getComponent()).getLocalService(id);
-			ret.add(t);
-		}
-		return ret;
+		return resolveLocalServices(new ServiceQuery<>(type), null);
 	}
 
 	
-	//-------- impl methods --------
+	//-------- impl/raw methods --------
 	
 	/**
 	 *  Search for matching services and provide first result.
