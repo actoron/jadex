@@ -8,6 +8,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -106,8 +107,8 @@ public class SecuritySettings extends AServiceSettings
 		case OPTIONS_ADD_REMOTE_PW:
 
 			final AlertDialog.Builder builder = new AlertDialog.Builder(platformPasswordsCat.getContext());
-			SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId),
-					IAwarenessManagementService.class).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
+			JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).searchService(
+				new ServiceQuery<>(IAwarenessManagementService.class)).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
 			{
 				public void resultAvailable(IAwarenessManagementService result)
 				{
@@ -120,7 +121,7 @@ public class SecuritySettings extends AServiceSettings
 
 							for (DiscoveryInfo dis : platforms)
 							{
-								String platformPrefix = dis.getIdentifier().getPlatformPrefix();
+								String platformPrefix = dis.getComponentIdentifier().getPlatformPrefix();
 								if (!platformPasswords.containsKey(platformPrefix) && !items.contains(platformPrefix))
 								{
 									platformList.add(dis);
@@ -144,7 +145,7 @@ public class SecuritySettings extends AServiceSettings
 								{
 									public void onClick(DialogInterface dialog, final int item)
 									{
-										final IComponentIdentifier cid = platformList.get(item).getIdentifier();
+										final IComponentIdentifier cid = platformList.get(item).getComponentIdentifier();
 										String platformPrefix = cid.getPlatformPrefix();
 										final EditTextDialog pwDialog = new EditTextDialog(platformPasswordsCat.getContext());
 										pwDialog.setTitle("Enter platformSecret for platform " + platformPrefix);

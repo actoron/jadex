@@ -14,6 +14,8 @@ import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.platform.IJadexPlatformManager;
 import jadex.commons.SReflect;

@@ -16,6 +16,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.SReflect;
@@ -24,6 +25,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -240,9 +242,8 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
 				final Future<Void> ret = new Future<>();
-				IServiceRegistry registry = ServiceRegistry.getRegistry(ia);
-				ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, null,	ViewableFilter.VIEWABLE_FILTER);
-				ISubscriptionIntermediateFuture<IService> services = registry.searchServicesAsync(query);
+				ServiceQuery<IService> query = new ServiceQuery<>((Class<IService>)null);//, Binding.SCOPE_PLATFORM, null, null,	ViewableFilter.VIEWABLE_FILTER);
+				ITerminableIntermediateFuture<IService> services = ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
 //				ISubscriptionIntermediateFuture services = registry.searchServicesAsync(null, extAcc.getIdentifier(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
 
 				services.addResultListener(new IntermediateExceptionDelegationResultListener<IService, Void>(ret) {

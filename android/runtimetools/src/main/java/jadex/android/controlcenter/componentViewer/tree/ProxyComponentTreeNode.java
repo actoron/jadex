@@ -6,6 +6,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -188,7 +190,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 		
 		if(cid==null)
 		{
-			access.searchService( new ServiceQuery<>( desc.getName()), IProxyAgentService.class)
+			access.searchService( new ServiceQuery<>(IProxyAgentService.class,  desc.getName()))
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)

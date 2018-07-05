@@ -117,9 +117,9 @@ public class RequiredServiceNode extends AbstractTreeNode implements IAndroidTre
 		RequiredServiceBinding bind = info.getDefaultBinding();
 		StringBuffer buf = new StringBuffer();
 		buf.append("scope="+bind.getScope());
-		buf.append(" dynamic="+bind.isDynamic());
-		buf.append(" create="+bind.isCreate());
-		buf.append(" recover="+bind.isRecover());
+//		buf.append(" dynamic="+bind.isDynamic());
+//		buf.append(" create="+bind.isCreate());
+//		buf.append(" recover="+bind.isRecover());
 		if(bind.getComponentName()!=null)
 			buf.append(" component name="+bind.getComponentName());
 		if(bind.getComponentType()!=null)

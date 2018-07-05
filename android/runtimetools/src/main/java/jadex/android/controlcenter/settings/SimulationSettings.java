@@ -13,6 +13,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -327,8 +328,8 @@ public class SimulationSettings extends AServiceSettings {
 	public IFuture<IExternalAccess> getComponentForService() {
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 
-		SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId),
-				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+		JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).searchService(new ServiceQuery<>(
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 				new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret) {
 					public void customResultAvailable(IComponentManagementService cms) {
 						// IComponentManagementService cms =

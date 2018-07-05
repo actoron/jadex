@@ -13,6 +13,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IResultCommand;
@@ -243,8 +244,7 @@ public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeL
 
 	protected void receiveMessage(final String remoteAddress, final byte[] data) {
 		final Future<IThreadPoolService> fut = new Future<IThreadPoolService>();
-		SServiceProvider.getService(container, IThreadPoolService.class,
-				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+		container.getFeature(IRequiredServicesFeature.class).getService(IThreadPoolService.class).addResultListener(
 				new DelegationResultListener<IThreadPoolService>(fut) {
 					public void customResultAvailable(IThreadPoolService result) {
 						fut.setResult(null);
@@ -360,8 +360,7 @@ public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeL
 			Log.d(Helper.LOG_TAG,
 					"(BTTransport) Service bound! Retrieving Classloader...");
 
-			SServiceProvider.getService(container, ILibraryService.class,
-					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+			container.getFeature(IRequiredServicesFeature.class).getService(ILibraryService.class).addResultListener(
 					new DelegationResultListener<ILibraryService>(
 							new Future<ILibraryService>()) {
 						public void customResultAvailable(ILibraryService result) {
