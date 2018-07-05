@@ -98,7 +98,7 @@ public class NFCallReturnTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				performTests(exta.getComponentIdentifier(), testno, false)
+				performTests(exta.getIdentifier(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class)
 						.createResultListener(new DelegationResultListener<TestReport[]>(ret)));
 			}

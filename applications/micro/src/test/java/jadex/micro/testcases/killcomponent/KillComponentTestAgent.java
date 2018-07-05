@@ -92,7 +92,7 @@ public class KillComponentTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, false)
+				performTest(platform.getIdentifier(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

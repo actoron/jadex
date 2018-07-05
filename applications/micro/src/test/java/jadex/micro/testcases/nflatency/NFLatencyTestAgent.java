@@ -119,7 +119,7 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
 							{
-								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier()}));
+								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getIdentifier()}));
 								cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
 									new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
 		//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()

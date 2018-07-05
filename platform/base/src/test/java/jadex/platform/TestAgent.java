@@ -369,7 +369,7 @@ public abstract class TestAgent
 							{
 								if(filename!=null)
 								{
-									createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+									createComponent(filename, null, config, exta.getIdentifier(), reslis)
 										.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 								}
 								else

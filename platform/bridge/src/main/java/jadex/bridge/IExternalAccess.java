@@ -46,27 +46,13 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getComponentIdentifier();
+	public IComponentIdentifier	getIdentifier();
 	
 //	/**
 //	 *  Get the id of the component including addresses.
 //	 *  @return	The component id.
 //	 */
 //	public IFuture<ITransportComponentIdentifier> getTransportComponentIdentifier();
-	
-	/**
-	 *  @deprecated From version 3.0 - replaced with external access.
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IExternalAccess getServiceProvider();
-	
-	/**
-	 *  @deprecated From version 3.0 - replaced with external access.
-	 *  Get the service container.
-	 *  @return The service container.
-	 */
-	public IExternalAccess getServiceContainer();
 	
 	/**
 	 *  Schedule a step of the component.

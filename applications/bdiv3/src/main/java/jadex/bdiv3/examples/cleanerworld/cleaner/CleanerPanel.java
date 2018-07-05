@@ -146,7 +146,7 @@ class CleanerPanel extends JPanel
 			g.fillOval(p.x-w, p.y-h, w*2, h*2);
 			g.setColor(Color.black);	// Agent
 			g.fillOval(p.x-3, p.y-3, 7, 7);
-			g.drawString(agent.getComponentIdentifier().getLocalName(),
+			g.drawString(agent.getIdentifier().getLocalName(),
 				p.x+5, p.y-5);
 			g.drawString("battery: " + (int)(drawdata.my_chargestate*100.0) + "%",
 				p.x+5, p.y+5);

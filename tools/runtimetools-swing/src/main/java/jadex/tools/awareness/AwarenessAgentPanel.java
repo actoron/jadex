@@ -395,7 +395,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
 		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(jcc.getJCCAccess().getComponentIdentifier().getRoot()));
+		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(jcc.getJCCAccess().getIdentifier().getRoot()));
 		updateDiscoveryInfos(jtdis);
 		jtdis.addMouseListener(new MouseAdapter()
 		{

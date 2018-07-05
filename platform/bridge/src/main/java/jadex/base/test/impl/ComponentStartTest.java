@@ -189,7 +189,7 @@ public class ComponentStartTest extends	ComponentTest
 			System.exit(0);
 		}
 		
-		IResourceIdentifier	rid	= new ResourceIdentifier(new LocalResourceIdentifier(platform.getComponentIdentifier(), new File(ridname).getCanonicalFile().toURI()), null);
+		IResourceIdentifier	rid	= new ResourceIdentifier(new LocalResourceIdentifier(platform.getIdentifier(), new File(ridname).getCanonicalFile().toURI()), null);
 		IModelInfo	model	= cms.loadComponentModel(filename, rid).get();
 		
 		ComponentStartTest	test	= new ComponentStartTest(cms, model, null);

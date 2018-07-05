@@ -717,7 +717,7 @@ public class RemoteReferenceModule
 			}
 			else if(target instanceof IExternalAccess)
 			{
-				ret = new RemoteReference(((IExternalAccess)target).getComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
+				ret = new RemoteReference(((IExternalAccess)target).getIdentifier(), ((IExternalAccess)target).getIdentifier());
 //				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)

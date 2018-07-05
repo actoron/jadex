@@ -92,7 +92,7 @@ public class ControlCenterWindow extends JFrame
 		this.controlcenter = main;
 		this.setTitle("Jadex Control Center "
 			+ VersionInfo.getInstance().getVersion() + " (" + VersionInfo.getInstance().getTextDateString() + "): "
-			+ controlcenter.getJCCAccess().getComponentIdentifier().getName());
+			+ controlcenter.getJCCAccess().getIdentifier().getName());
 	
 		getContentPane().setLayout(new BorderLayout());
 	

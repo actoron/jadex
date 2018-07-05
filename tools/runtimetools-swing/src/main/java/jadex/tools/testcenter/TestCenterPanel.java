@@ -1255,7 +1255,7 @@ public class TestCenterPanel extends JSplitPanel
 							Map	args	= new HashMap();
 							args.put("timeout", timeout);
 							// Todo: Use remote component for parent if any
-							CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getComponentIdentifier());
+							CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getIdentifier());
 							ci.setResourceIdentifier(name.getSecondEntity());
 							cms.createComponent(null, name.getFirstEntity(), ci, res)
 								.addResultListener(new SwingDelegationResultListener(ret));

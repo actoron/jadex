@@ -95,7 +95,7 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno)
+				performTest(platform.getIdentifier(), testno)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

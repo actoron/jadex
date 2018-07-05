@@ -254,7 +254,7 @@ public class ConsolePanel extends JPanel
 	 */
 	public void setConsoleEnabled(boolean enable)
 	{
-		final String id = jccaccess.getComponentIdentifier().getPlatformName()+"#console@"+hashCode();
+		final String id = jccaccess.getIdentifier().getPlatformName()+"#console@"+hashCode();
 		if(!enable)
 		{
 //			in.setEnabled(false);

@@ -32,7 +32,7 @@ public class Gui extends JFrame
 	 */
 	public Gui(final IExternalAccess agent)//, final boolean buy)
 	{
-		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentIdentifier().getName());
+		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getIdentifier().getName());
 		
 //			System.out.println("booktrading0: "+agent.getComponentIdentifier());
 		GuiPanel gp = new GuiPanel(agent);

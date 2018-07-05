@@ -102,7 +102,7 @@ public class TimeoutTestAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				System.out.println("PLATFORM DONE< PERFORM TEST");
-				performTest(platform.getComponentIdentifier(), testno, false)
+				performTest(platform.getIdentifier(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

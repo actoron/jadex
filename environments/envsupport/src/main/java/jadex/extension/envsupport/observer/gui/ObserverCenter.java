@@ -920,7 +920,7 @@ public class ObserverCenter implements IObserverCenter
 					public void customResultAvailable(Object result)
 					{
 						IComponentManagementService	cms = (IComponentManagementService)result;
-						cms.destroyComponent(space.getExternalAccess().getComponentIdentifier());
+						cms.destroyComponent(space.getExternalAccess().getIdentifier());
 					}
 				});
 			}

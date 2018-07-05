@@ -217,7 +217,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		pserinfos.add(BorderLayout.CENTER, new JScrollPane(jtservices));
 		jtservices.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtservices.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
 		jtservices.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtservices.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
 		jtservices.setDefaultRenderer(Set.class, new DefaultTableCellRenderer());
@@ -244,7 +244,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		pqueryinfos.add(BorderLayout.CENTER, new JScrollPane(jtqueries));
 		jtqueries.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtqueries.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
 		jtqueries.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtqueries.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
 		jtqueries.setDefaultRenderer(String[].class, new DefaultTableCellRenderer()
@@ -273,7 +273,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtpartners.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ppartners.add(BorderLayout.CENTER, new JScrollPane(jtpartners));
 		jtpartners.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
 		
 		// create panel with partner table
 		JPanel pclients = new JPanel(new BorderLayout());
@@ -286,7 +286,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtclients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pclients.add(BorderLayout.CENTER, new JScrollPane(jtclients));
 		jtclients.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
 		
 		tpane.addTab("Services", pserinfos);
 		tpane.addTab("Queries", pqueryinfos);
@@ -800,7 +800,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 3);
 				
-				if(!cid.getRoot().equals(getActiveComponent().getComponentIdentifier()))
+				if(!cid.getRoot().equals(getActiveComponent().getIdentifier()))
 				{
 					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;
@@ -974,7 +974,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 2);
 				
-				if(cid!=null && !cid.getRoot().equals(getActiveComponent().getComponentIdentifier()))
+				if(cid!=null && !cid.getRoot().equals(getActiveComponent().getIdentifier()))
 				{
 					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;

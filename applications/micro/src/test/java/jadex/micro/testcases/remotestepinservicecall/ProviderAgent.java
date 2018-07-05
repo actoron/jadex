@@ -75,7 +75,7 @@ public class ProviderAgent implements ITestService
 		}
 
 		cms	= exta.searchService( new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
-		cms.getComponentDescription(exta.getComponentIdentifier()).get();
+		cms.getComponentDescription(exta.getIdentifier()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}

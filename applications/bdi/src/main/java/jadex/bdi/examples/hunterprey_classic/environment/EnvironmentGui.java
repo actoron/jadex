@@ -75,7 +75,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	public EnvironmentGui(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getName());
+		super(agent.getIdentifier().getName());
 		
 		// Map panel.
 		this.map	= new MapPanel();

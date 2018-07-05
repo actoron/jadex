@@ -106,7 +106,7 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *  Get the component identifier.
 	 */
-	public IComponentIdentifier	getComponentIdentifier()
+	public IComponentIdentifier	getIdentifier()
 	{
 		return cid;
 	}
@@ -1346,7 +1346,7 @@ public class ExternalAccess implements IExternalAccess
 		boolean ret = false;
 		
 		if(obj instanceof IExternalAccess)
-			ret = ((IExternalAccess)obj).getComponentIdentifier().equals(cid);
+			ret = ((IExternalAccess)obj).getIdentifier().equals(cid);
 		
 		return ret;
 	}

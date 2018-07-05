@@ -69,7 +69,7 @@ public class AwarenessManagementAgentHelper
 							IExternalAccess exta = it.next();
 							if(type.equals(exta.getLocalType()))
 							{
-								found = exta.getComponentIdentifier();
+								found = exta.getIdentifier();
 								break;
 							}
 						}

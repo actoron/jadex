@@ -44,12 +44,12 @@ public class JCCTest //extends TestCase
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		IExternalAccess	platform	= fut.get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
+		timeout	= Starter.getLocalDefaultTimeout(platform.getIdentifier());
 		
 		IComponentManagementService	cms	= (IComponentManagementService)platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
 
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
-			new BasicComponentIdentifier("jcc", platform.getComponentIdentifier())).get(timeout);
+			new BasicComponentIdentifier("jcc", platform.getIdentifier())).get(timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{

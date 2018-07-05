@@ -33,7 +33,7 @@ public class LocalMessagingTest
 		//cms.createComponent(SenderAgent.class.getName()+".class",
 		cms.createComponent(BenchmarkAgent.class.getName()+".class",
 			new CreationInfo(new HashMap<String, Object>(){{
-				put("receiver", (Object)new BasicComponentIdentifier("Receiver", access.getComponentIdentifier()));
+				put("receiver", (Object)new BasicComponentIdentifier("Receiver", access.getIdentifier()));
 				put("count", 100000);
 			}})).get();
 	}

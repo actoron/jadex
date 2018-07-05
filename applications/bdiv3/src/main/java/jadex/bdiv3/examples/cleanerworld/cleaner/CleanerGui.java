@@ -38,7 +38,7 @@ public class CleanerGui	extends JFrame
 	 */
 	public CleanerGui(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getName());
+		super(agent.getIdentifier().getName());
 		final JPanel map = new CleanerPanel(agent);
 
 		getContentPane().add(BorderLayout.CENTER, map);

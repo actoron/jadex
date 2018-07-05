@@ -81,7 +81,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
+		AbstractJCCPlugin.getClassLoader(exta.getIdentifier(), jcc)
 			.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 		{
 			public void customResultAvailable(final ClassLoader cl)

@@ -319,7 +319,7 @@ public class SComponentFactory
 //		return new Future<Boolean>(Boolean.TRUE);
 		
 		IFuture<Boolean> ret = null;
-		if(!isComponentStepNecessary(exta.getComponentIdentifier()))
+		if(!isComponentStepNecessary(exta.getIdentifier()))
 		{
 //			System.out.println("direct isModelType");
 			ret = isModelType(model, allowedtypes, rid, exta);

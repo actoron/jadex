@@ -1067,7 +1067,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 								IExternalAccess subcomp = it.next();
 								if(modelname.equals(subcomp.getModel().getFullName()))
 								{
-									res.add(subcomp.getComponentIdentifier());
+									res.add(subcomp.getIdentifier());
 								}
 							}
 							ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));

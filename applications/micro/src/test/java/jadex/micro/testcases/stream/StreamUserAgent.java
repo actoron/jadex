@@ -102,7 +102,7 @@ public class StreamUserAgent extends TestAgent
 //					{
 //						if(!sec)
 //						{
-							performTests(testno, platform.getComponentIdentifier(), tc)
+							performTests(testno, platform.getIdentifier(), tc)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 							{
 								public void customResultAvailable(final Integer result)

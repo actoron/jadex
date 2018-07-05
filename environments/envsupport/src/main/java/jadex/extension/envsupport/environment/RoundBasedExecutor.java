@@ -269,11 +269,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 			{
 				IComponentIdentifier	cid	= ((ExecutionComponentFeature)task).getComponent().getIdentifier();
 				IComponentIdentifier	test	= cid;
-				while(test!=null && !test.equals(ea.getComponentIdentifier()))
+				while(test!=null && !test.equals(ea.getIdentifier()))
 				{
 					test	= test.getParent();
 				}
-				if(test!=null && !cid.equals(ea.getComponentIdentifier()))
+				if(test!=null && !cid.equals(ea.getIdentifier()))
 				{
 					System.out.println("Non-idle component at time switch: "+cid);
 				}

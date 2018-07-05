@@ -339,7 +339,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 //                {
 //                    public void customResultAvailable(ITransportComponentIdentifier cid)
 //                    {
-						createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+						createComponent(filename, null, config, exta.getIdentifier(), reslis)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 //                    }
 //                });

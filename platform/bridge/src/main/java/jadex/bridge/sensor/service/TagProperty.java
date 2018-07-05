@@ -168,7 +168,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			String tag = it.next();
 			if(PLATFORM_NAME_INTERNAL.equals(tag) || PLATFORM_NAME.equals(tag))
 			{
-				tag = component.getComponentIdentifier().getPlatformPrefix();
+				tag = component.getIdentifier().getPlatformPrefix();
 			}
 			else if(JADEX_VERSION_INTERNAL.equals(tag) || JADEX_VERSION.equals(tag))
 			{

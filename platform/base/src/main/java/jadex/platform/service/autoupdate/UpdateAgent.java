@@ -468,7 +468,7 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				IComponentIdentifier cid = result.getComponentIdentifier();
+				IComponentIdentifier cid = result.getIdentifier();
 				ret.setResult(cid);
 //				acknowledgeUpdate(cid.getRoot());
 			}

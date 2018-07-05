@@ -92,7 +92,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	public EnvironmentGui(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getLocalName());
+		super(agent.getIdentifier().getLocalName());
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{

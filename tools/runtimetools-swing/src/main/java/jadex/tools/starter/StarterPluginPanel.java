@@ -102,8 +102,8 @@ public class StarterPluginPanel extends JPanel
 		lsplit.setResizeWeight(0.7);
 
 		mpanel = new ModelTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), 
-			!SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), 
-			jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
+			!SUtil.equals(jcc.getPlatformAccess().getIdentifier().getPlatformName(), 
+			jcc.getJCCAccess().getIdentifier().getPlatformName()))
 		{
 			public void removeTopLevelNode(ISwingTreeNode node)
 			{
