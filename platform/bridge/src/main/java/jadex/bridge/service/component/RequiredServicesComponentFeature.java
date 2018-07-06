@@ -833,7 +833,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 				@Override
 				public void intermediateResultAvailable(final IComponentIdentifier platform)
 				{
-//					System.out.println(cid + " searching remote platform: "+platform+", "+query);
+//					System.out.println(getComponent() + " searching remote platform: "+platform+", "+query);
 					
 					// Only (continue to) search remote when future not yet finished or cancelled.
 					if(!ret.isDone())

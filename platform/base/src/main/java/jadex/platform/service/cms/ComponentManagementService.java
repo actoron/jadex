@@ -1464,7 +1464,7 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
+			getRemoteCMS(cid.getParent()).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService rcms)
 				{
@@ -3292,8 +3292,8 @@ public class ComponentManagementService implements IComponentManagementService
 //		});
 //		return ret;
 
-		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL, null, agent.getIdentifier(), null);
-		sq.setPlatform(cid.getRoot()).setProvider(cid);
+		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL);
+		sq.setPlatform(cid.getRoot());
 		return agent.getFeature(IRequiredServicesFeature.class).searchService(sq);
 	}
 	
