@@ -897,7 +897,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 						{
 							public void resultAvailable(Collection<T> result)
 							{
-//								System.out.println(cid + " searched remote platform: "+platform+", "+result);
+//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+result);
 								if(result != null)
 								{
 									for(Iterator<T> it = result.iterator(); it.hasNext(); )
@@ -911,7 +911,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println(cid + " searched remote platform: "+platform+", "+exception);
+//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+exception);
 								doFinished();
 							}
 						});
