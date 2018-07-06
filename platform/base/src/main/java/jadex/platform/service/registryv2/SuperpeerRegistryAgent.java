@@ -1,11 +1,20 @@
 package jadex.platform.service.registryv2;
 
+import java.util.logging.Level;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.commons.ICommand;
+import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -25,6 +34,10 @@ import jadex.micro.annotation.ProvidedServices;
 	value=@ProvidedService(type=ISuperpeerService.class, scope=Binding.SCOPE_GLOBAL))
 public class SuperpeerRegistryAgent	extends RemoteRegistryAgent	implements ISuperpeerService
 {
+	
+	/** The superpeer service registry */
+	protected IServiceRegistry serviceregistry = new ServiceRegistry();
+	
 	/**
 	 *  Initiates the client registration procedure
 	 *  (super peer will answer initially with an empty intermediate result,
@@ -56,6 +69,39 @@ public class SuperpeerRegistryAgent	extends RemoteRegistryAgent	implements ISupe
 		ret.addIntermediateResult(null);
 		
 		// TODO: listen for changes and add new services locally.
+		ret.addBackwardCommand(new IFilter<Object>()
+		{
+			public boolean filter(Object obj)
+			{
+				return obj instanceof ServiceEvent;
+			}
+		}, new ICommand<Object>()
+		{
+			@SuppressWarnings("unchecked")
+			public void execute(Object obj)
+			{
+				ServiceEvent<IServiceIdentifier> event = (ServiceEvent<IServiceIdentifier>) obj;
+				switch(event.getType())
+				{
+					case ServiceEvent.SERVICE_ADDED:
+						System.out.println("ADDING SERVICE: " + event.getService());
+						serviceregistry.addService(event.getService());
+						break;
+						
+					case ServiceEvent.SERVICE_CHANGED:
+						serviceregistry.updateService(event.getService());
+						break;
+						
+					case ServiceEvent.SERVICE_REMOVED:
+						serviceregistry.removeService(event.getService());
+						break;
+						
+					default:
+						ia.getLogger().log(Level.SEVERE, "Unknown ServiceEvent: " + event.getType());
+				}
+				
+			}
+		});
 
 		// TODO: when connection is lost, remove all services and queries from client.
 		

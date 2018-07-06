@@ -273,8 +273,8 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		
 		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0"),
 		
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1: $args.getArguments().get(\"superpeerclient\")==null && !$args.superpeer && !$args.supersuperpeer? 1 : 0"),
+		//@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
+		//@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1: $args.getArguments().get(\"superpeerclient\")==null && !$args.superpeer && !$args.supersuperpeer? 1 : 0"),
 		
 		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0"),
