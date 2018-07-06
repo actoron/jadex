@@ -38,11 +38,17 @@ import static jadex.base.IPlatformConfiguration.WSPORT;
 import static jadex.base.IPlatformConfiguration.WSPUBLISH;
 import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
 
+import java.io.File;
 import java.util.logging.Level;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import jadex.base.IPlatformConfiguration;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -53,6 +59,8 @@ import jadex.micro.KernelComponentAgent;
 import jadex.micro.KernelMicroAgent;
 import jadex.micro.KernelMultiAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -294,10 +302,63 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 @Agent
 public class PlatformAgent
 {
+	@Agent
+	protected IInternalAccess agent;
+	
 	// where should the defaults be defined (here or in the config)
 //	@Arguments
 //	public static jadex.bridge.modelinfo.Argument[] getArguments()
 //	{
 //		return PlatformConfigurationHandler.getArguments();
+//	}
+	
+//	/**
+//	 *  Called when platform startup finished.
+//	 */
+//	@AgentCreated
+//	public void init()
+//	{
+//		System.out.println("Start scanning...");
+//		long start = System.currentTimeMillis();
+//		FastClasspathScanner scanner = new FastClasspathScanner() 
+//			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
+//			.matchClassesWithAnnotation(Agent.class, c -> 
+//			{
+//				try
+//				{
+//					System.out.println("Found Agent annotation on class: "+ c.getName());
+//					Boolean3 autostart = c.getAnnotation(Agent.class).autostart();
+//					if(autostart.toBoolean()!=null && autostart.toBoolean().booleanValue())
+//					{					
+//						IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class);
+//						cms.createComponent(c.getName()+".class", (CreationInfo)null);
+//					}
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			});
+//		ScanResult res = scanner.scan(); 
+//		long end = System.currentTimeMillis();
+//		System.out.println("Needed: "+(end-start)/1000);
+////		System.out.println(res.getNamesOfClassesWithAnnotation(Agent.class));
+//	}
+	
+	/**
+	 *  Called when platform startup finished.
+	 */
+	// BUG: currently not called because CMS calls it and platform is not created via cms
+//	@AgentBody
+//	public void body()
+//	{
+//		System.out.println("Start scanning...");
+//		long start = System.currentTimeMillis();
+//		FastClasspathScanner scanner = new FastClasspathScanner() 
+//			.matchClassesWithAnnotation(Agent.class, c -> System.out.println("Found RestHandler annotation on class: "+ c.getName()));
+//		ScanResult res = scanner.scan(); 
+//		long end = System.currentTimeMillis();
+//		System.out.println("Needed: "+(end-start)/1000);
+//		System.out.println(res.getNamesOfClassesWithAnnotation(Agent.class));
 //	}
 }

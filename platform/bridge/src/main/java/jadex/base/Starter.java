@@ -1,17 +1,24 @@
 package jadex.base;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
@@ -346,7 +353,35 @@ public class Starter
 		ExecutionComponentFeature.DEBUG = config.getExtendedPlatformConfiguration().getDebugSteps();
 //		Future.NO_STACK_COMPACTION	= true;
 		Future.NO_STACK_COMPACTION	= config.getExtendedPlatformConfiguration().getNoStackCompaction();
-		Future.DEBUG = config.getExtendedPlatformConfiguration().getDebugFutures();
+		Future.DEBUG = config.getExtendedPlatformConfiguration().getDebugFutures(); 
+		
+//		new FastClasspathScanner(new String[]
+//		      {"com.xyz.widget", "com.xyz.gizmo" })  // Whitelisted package prefixes
+//		  .matchSubclassesOf(DBModel.class,
+//		      // c is a subclass of DBModel
+//		      c -> System.out.println("Found subclass of DBModel: " + c.getName()))
+//		  .matchClassesImplementing(Runnable.class,
+//		      // c is a class that implements Runnable
+//		      c -> System.out.println("Found Runnable: " + c.getName()))
+//		  .matchClassesWithAnnotation(RestHandler.class,
+//		      // c is a class annotated with @RestHandler
+//		      c -> System.out.println("Found RestHandler annotation on class: "
+//		              + c.getName()))
+//		  .matchFilenamePattern("^template/.*\\.html",
+//		      // templatePath is a path on the classpath that matches the above pattern;
+//		      // inputStream is a stream opened on the file or zipfile entry.
+//		      // No need to close inputStream before exiting, it is closed by caller.
+//		      (templatePath, inputStream) -> {
+//		          try {
+//		              String template = IOUtils.toString(inputStream, "UTF-8");
+//		              System.out.println("Found template: " + absolutePath
+//		                      + " (size " + template.length() + ")");
+//		          } catch (IOException e) {
+//		              throw new RuntimeException(e);
+//		          }
+//		      })
+//		  .scan();  
+		
 		
 //		final Object args, final Map<String, Object> cmdargs, final Map<String, Object> compargs, final List<String> components
 		
