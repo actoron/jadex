@@ -20,4 +20,9 @@ public interface IAutoConfigRegistryService
 	 *  Make this platform registry client.
 	 */
 	public IFuture<Void> makeRegistryClient();
+	
+	/**
+	 *  Activate the config service.
+	 */
+	public IFuture<Void> activate();
 }
