@@ -16,7 +16,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -692,6 +691,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 		String scope = query.getScope();
 		
+		IComponentIdentifier	searchstart	= query.getProvider()!=null ? query.getProvider()
+			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
+		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
 			ret = true;
@@ -714,29 +716,29 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
-			ret = query.getOwner().getPlatformName().equals(ser.getProviderId().getPlatformName());
+			ret = searchstart.getPlatformName().equals(ser.getProviderId().getPlatformName());
 		}
 		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
-			ret = sercid.getPlatformName().equals(query.getOwner().getPlatformName())
-				&& getApplicationName(sercid).equals(getApplicationName(query.getOwner()));
+			ret = sercid.getPlatformName().equals(searchstart.getPlatformName())
+				&& getApplicationName(sercid).equals(getApplicationName(searchstart));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
-			ret = getDotName(sercid).endsWith(getDotName(query.getOwner()));
+			ret = getDotName(sercid).endsWith(getDotName(searchstart));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
-			ret = ser.getProviderId().equals(query.getOwner());
+			ret = ser.getProviderId().equals(searchstart);
 		}
 		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
 		{
 			// check if parent of searcher reaches the service
 			IComponentIdentifier sercid = ser.getProviderId();
-			String subname = getSubcomponentName(query.getOwner());
+			String subname = getSubcomponentName(searchstart);
 			ret = sercid.getName().endsWith(subname);
 		}
 		

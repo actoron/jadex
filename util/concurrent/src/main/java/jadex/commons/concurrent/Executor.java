@@ -91,7 +91,7 @@ public class Executor implements Runnable
 		this.threadpool = threadpool;
 		this.executable = executable;
 		this.shutdownfutures = new ArrayList<Future<Void>>();
-//		System.out.println("create: "+executable);
+//		System.out.println("create: "+executable+" "+threadpool.getClass());
 	}
 		
 	//-------- methods --------

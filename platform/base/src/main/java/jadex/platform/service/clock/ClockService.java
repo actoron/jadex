@@ -8,6 +8,7 @@ import java.util.TimerTask;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
@@ -313,7 +314,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		final Future<Void> ret = new Future<Void>();
 
-		threadpool = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IThreadPoolService.class));
+		threadpool = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 //		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 //		System.out.println("clock: "+ServiceCall.get);
