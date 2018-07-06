@@ -398,7 +398,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// TODO: global registry query.
 		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
 		ITerminableIntermediateFuture<T>	fut	= getServices(name);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		{
+			@Override
+			public void finished()
+			{
+				// NOP
+			}
+		});
 		return ret;
 	}
 
@@ -413,7 +420,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// TODO: global registry query.
 		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
 		ITerminableIntermediateFuture<T>	fut	= getServices(type);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		{
+			@Override
+			public void finished()
+			{
+				// NOP
+			}
+		});
 		return ret;
 	}
 
@@ -428,7 +442,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// TODO: global registry query.
 		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
 		ITerminableIntermediateFuture<T>	fut	= searchServices(query);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		{
+			@Override
+			public void finished()
+			{
+				// NOP
+			}
+		});
 		return ret;
 	}
 	
