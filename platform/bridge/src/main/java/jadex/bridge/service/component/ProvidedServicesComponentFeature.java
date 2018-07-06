@@ -3,6 +3,7 @@ package jadex.bridge.service.component;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -955,6 +957,63 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	{
 		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
 		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, scope);
+	}
+	
+	/**
+	 *  Sets the tags of a service.
+	 *  
+	 *  @param sid The Service identifier.
+	 *  @param tags The tags.
+	 *  @return New service identifier.
+	 */
+	public void setTags(IServiceIdentifier sid, String... tags)
+	{
+		if (sid instanceof ServiceIdentifier)
+		{
+			ServiceIdentifier ssid = (ServiceIdentifier) sid;
+			ssid.setTags(new HashSet<String>(Arrays.asList(tags)));
+			
+			Collection<IInternalService> coll = services.get(ssid.getServiceType().getType(component.getClassLoader()));
+			if (coll != null)
+			{
+				synchronized(coll)
+				{
+					for (Iterator<IInternalService> it = coll.iterator(); it.hasNext(); )
+					{
+						IInternalService ser = it.next();
+						if (ser.getServiceIdentifier().equals(ssid))
+						{
+							ser.setServiceIdentifier(ssid);
+							break;
+						}
+					}
+				}
+			}
+			
+			synchronized(servicelisteners)
+			{
+				if (servicelisteners.containsKey(sid))
+				{
+					MethodListenerHandler hndlr = servicelisteners.get(sid);
+					servicelisteners.put(ssid, hndlr);
+				}
+			}
+			
+			synchronized(serviceinfos)
+			{
+				if (serviceinfos.containsKey(sid))
+				{
+					ProvidedServiceInfo info = serviceinfos.get(sid);
+					serviceinfos.put(ssid, info);
+				}
+			}
+			
+			ServiceRegistry.getRegistry(component.getIdentifier().getRoot()).updateService(ssid);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Unsupported service identifier type: " + sid);
+		}
 	}
 
 	/**

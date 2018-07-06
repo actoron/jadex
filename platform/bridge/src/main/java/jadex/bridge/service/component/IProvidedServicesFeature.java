@@ -45,6 +45,15 @@ public interface IProvidedServicesFeature
 	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, String scope);
 	
 	/**
+	 *  Sets the tags of a service.
+	 *  
+	 *  @param sid The Service identifier.
+	 *  @param tags The tags.
+	 *  @return New service identifier.
+	 */
+	public void setTags(IServiceIdentifier sid, String... tags);
+	
+	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
 	 *  @param service The service identifier.
 	 *  @return A future that is done when the service has completed its shutdown.  
