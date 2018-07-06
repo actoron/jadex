@@ -637,7 +637,9 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		{
 			@SuppressWarnings("unchecked")
 			T	service	= (T)registry.getLocalService(result);
-			search.addIntermediateResult(service);
+			
+			//TODO: Adding additional service, future can be finished, correct??!?
+			search.addIntermediateResultIfUndone(service);
 		}
 		
 		// Schedule result on component thread and wrap result in proxy, if required
