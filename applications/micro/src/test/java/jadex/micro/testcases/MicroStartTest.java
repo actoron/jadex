@@ -104,7 +104,7 @@ public class MicroStartTest extends ComponentTestSuite
 			"-df", "true"	// Required for df test, when run in eclipse
 		},
 			new File[][]{SUtil.findOutputDirs("applications"+File.separator+"micro", false)},// tests are already real tests in micro, exclude them here (ignored by eclipse, grrr)
-			null, EXCLUDES, true, true, true);
+			null, EXCLUDES, false, true, true);
 	}
 	
 //	/**
