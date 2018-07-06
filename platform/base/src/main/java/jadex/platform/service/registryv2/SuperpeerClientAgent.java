@@ -51,6 +51,9 @@ public class SuperpeerClientAgent
 	/** The local platform registry. */
 	protected IServiceRegistry localregistry;
 	
+	/** Queries on the local registry used to transmit services to superpeer. */
+	protected Map<String, ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>> localqueries;
+	
 	/** The current query future for super peers for a given network (only set while searching for the network). */
 	protected Map<String, ISubscriptionIntermediateFuture<ISuperpeerService>>	queries
 		= new LinkedHashMap<>();
@@ -139,24 +142,45 @@ public class SuperpeerClientAgent
 							// Stop ongoing search, if any
 							stopSuperpeerSearch(networkname);
 							
-							// Add initial services,
-							// locking the local registry to enforce
-							// consistency.
-							localregistry.getLock().writeLock().lock();
-							// Try/catch to ensure proper unlocking.
-							try
+							superpeers.put(networkname, new Tuple2<ISuperpeerService, ISubscriptionIntermediateFuture<Void>>(sp, regfut));
+							
+							ServiceQuery<ServiceEvent<IServiceIdentifier>> localquery = new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM).setOwner(agent.getIdentifier());
+							localquery.setNetworkNames(networkname);
+							ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> localquerysub = localregistry.addQuery(localquery);
+							localqueries.put(networkname, localquerysub);
+							localquerysub.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 							{
-								//Acquire state, then register superpeer for updates.
-								//ServiceQuery<IServiceIdentifier> searchquery = new ServiceQuery<>((Class<IServiceIdentifier>)null, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getIdentifier());
+								public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
+								{
+								}
 								
-								superpeers.put(networkname, new Tuple2<ISuperpeerService, ISubscriptionIntermediateFuture<Void>>(sp, regfut));
-							}
-							finally
-							{
-								localregistry.getLock().writeLock().unlock();
-							}
+								public void exceptionOccurred(Exception exception)
+								{
+								}
 
-							// TODO: send updates from registry
+								public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
+								{
+									agent.scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											try
+											{
+												regfut.sendBackwardCommand(event);
+											}
+											catch (Exception e)
+											{
+												startSuperpeerSearch(networkname);
+											}
+											return IFuture.DONE;
+										};
+									});
+								}
+
+								public void finished()
+								{
+								}
+							});
 						}
 					}	
 					
@@ -283,6 +307,9 @@ public class SuperpeerClientAgent
 			if(!superpeers.get(networkname).getSecondEntity().isDone())
 				superpeers.get(networkname).getSecondEntity().terminate();
 			superpeers.remove(networkname);
+			ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> lq = localqueries.remove(networkname);
+			if (lq != null)
+				lq.terminate();
 		}
 	}
 	
