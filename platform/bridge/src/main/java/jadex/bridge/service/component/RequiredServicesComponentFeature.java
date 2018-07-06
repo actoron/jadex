@@ -40,6 +40,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
@@ -388,7 +389,10 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(String name)
 	{
 		// TODO: global registry query.
-		return new SubscriptionIntermediateFuture<>(new UnsupportedOperationException("TODO"));
+		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
+		ITerminableIntermediateFuture<T>	fut	= getServices(name);
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		return ret;
 	}
 
 	/**
@@ -400,7 +404,10 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type)
 	{
 		// TODO: global registry query.
-		return new SubscriptionIntermediateFuture<>(new UnsupportedOperationException("TODO"));		
+		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
+		ITerminableIntermediateFuture<T>	fut	= getServices(type);
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		return ret;
 	}
 
 	/**
@@ -412,7 +419,10 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
 		// TODO: global registry query.
-		return new SubscriptionIntermediateFuture<>(new UnsupportedOperationException("TODO"));
+		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
+		ITerminableIntermediateFuture<T>	fut	= searchServices(query);
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		return ret;
 	}
 	
 	//-------- event interface --------
@@ -537,8 +547,16 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			if(query.toString().indexOf("IComponentManagementService")!=-1)
 //				System.out.println("dumdidadi");
 			
-			TerminableFuture<T>	fut	= new TerminableFuture<>();
+			
 			ITerminableIntermediateFuture<T>	search	= searchRemoteServices(query);
+			TerminableFuture<T>	fut	= new TerminableFuture<>(new TerminationCommand()
+			{
+				@Override
+				public void terminated(Exception reason)
+				{
+					search.terminate(reason);
+				}
+			});
 			search.addResultListener(new IntermediateDefaultResultListener<T>()
 			{
 				@Override
@@ -798,6 +816,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> TerminableIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
 	{
+		// TODO: termination
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
 		// Check for awareness service
