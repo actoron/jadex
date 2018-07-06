@@ -709,7 +709,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 //		IComponentIdentifier searchstart	= query.getProvider()!=null ? query.getProvider()
 //			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
-		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner(); 
+		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner();
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
