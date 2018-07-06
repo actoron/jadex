@@ -1,0 +1,38 @@
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+
+repositories
+{
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies
+{
+	compile project(':platform:holepunch-server')
+	
+	compile 'javax.servlet:servlet-api:2.4'
+}
+
+/*task copyIncludes(type: Copy) {
+	//baseName = project.name
+	from
+    {
+        configurations.include.collect
+        {
+        	it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    into '${buildDir}/WEB-INF/classes'*/
+//    exclude '**/MANIFEST.MF'
+//}
+
+war
+{
+	manifest
+	{
+		attributes 'Main-Class': 'org.activecomponents.udp.holepunching.server.Server'
+	}
+}
+
+

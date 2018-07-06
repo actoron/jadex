@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,11 +17,16 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
+import jadex.bridge.nonfunctional.AbstractNFProperty;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -32,6 +38,7 @@ import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -747,10 +754,41 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T>	T	createServiceProxy(T service, RequiredServiceInfo info)
 	{
-		@SuppressWarnings("unchecked")
-		T ret	= info==null ? service : (T)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-			(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getIdentifier()));
-		return ret;
+		if(info!=null)
+		{
+			IService	iservice	= (IService)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getIdentifier()));
+			
+			// Check if no property provider has been created before and then create and init properties
+			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(iservice.getServiceIdentifier()))
+			{
+				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(iservice.getServiceIdentifier());
+				
+				List<NFRPropertyInfo> nfprops = info.getNFRProperties();
+				if(nfprops!=null && nfprops.size()>0)
+				{
+					for(NFRPropertyInfo nfprop: nfprops)
+					{
+						MethodInfo mi = nfprop.getMethodInfo();
+						Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
+						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), iservice, nfprop.getMethodInfo(), nfprop.getParameters());
+						if(mi==null)
+						{
+							nfpp.addNFProperty(nfp);
+						}
+						else
+						{
+							nfpp.addMethodNFProperty(mi, nfp);
+						}
+					}
+				}
+			}
+			
+			@SuppressWarnings("unchecked")
+			T	ret	= (T)iservice;
+			service	= ret;
+		}
+		return service;
 	}
 	
 

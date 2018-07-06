@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=UTF-8>
+        <script src="wswebapi/jadex.js"></script>
+        <script src="app.js"></script> 
+    </head>
+    
+    <body>
+        <h1>Short Message Service</h1>
+        
+        <div class="loggedin">
+        	<h2>Received messages</h2>
+        	<div id="messages"></div>
+        
+        	<h2>My followers</h2>
+        	<div id="followers"></div>
+        
+        	<h2>I follow</h2>
+        	<div id="followeds"></div>
+        
+        	<h2>Add to follow</h2>
+        	<select id="addtofollow" name="addtofollow">
+			</select>
+        	<button onclick="addFollowed(document.getElementById('addtofollow').value)">Add</button>
+        
+        	<h2>Send message to followers</h2>
+        	<input type="text" id="text" value="hello"></input>
+        	<button onclick="sendMessage(document.getElementById('text').value)">Send</button>
+        	
+        	<button onclick="logout(token)">Logout</button>
+        
+        	<button onclick="refreshAll()">Refresh</button>
+        </div>
+        
+        <div class="loggedout">
+        	<input type="text" id="email" value="lars@lars.com"></input>
+        	<input type="text" id="pass" value="1234"></input>
+        	<button onclick="login(document.getElementById('email').value,
+        		document.getElementById('pass').value)">Login</button>
+        
+        	<h2>Register</h2>
+        	<input type="text" id="rname" value="Fips"></input>
+        	<input type="email" id="remail" value="fips@fips.com"></input>
+        	<input type="password" id="rpass" value="1234"></input>
+        	<button onclick="registerUser(document.getElementById('rname').value,
+        		document.getElementById('remail').value,
+        		document.getElementById('rpass').value)">Register</button>
+        	<div id="rresult"></div>
+        </div>
+    </body>
+</html>

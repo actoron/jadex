@@ -1,0 +1,11 @@
+apply plugin: 'maven-publish' // PublishToMavenLocal
+apply plugin: 'java' 
+apply plugin: 'maven'
+apply plugin: 'war'
+apply plugin: "eclipse"
+apply plugin: 'eclipse-wtp'
+
+dependencies 
+{
+	api project(':platform:webservice-websocket')
+}

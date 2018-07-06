@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=UTF-8>
+        <script src="wswebapi/jadex.js"></script>
+        
+        <script type="text/javascript">
+        	//var serclazz = "jadex.bridge.service.types.chat.IChatService";
+        	var serclazz = "jadex.bridge.service.types.chat.IChatGuiService";
+        	
+        	function message(text)
+        	{
+        		// each user gets his own chat agent
+        		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+	   			{
+	       			service.message(text, null, false).then(function()
+			  		{
+			  			alert("posted message");	
+			  		})
+			  		.catch(function(err) 
+	       	       	{
+	       				alert(JSON.stringify(err));
+	       	       	});
+	   			})
+       			.catch(function(err) 
+       			{
+       				console.log(err);
+       		  		//alert('Error', JSON.stringify(err));
+       			});
+        	}
+        	
+        	// Subscribe for chat events (messages, user state changes, etc.) 
+       		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+   			{
+   				var prom = service.subscribeToEvents(function(event)
+ 	       		{
+ 	       			if(event.type=="message")
+ 	       			{
+ 	       				var div = document.getElementById('messages');
+						div.innerHTML = div.innerHTML + '</br><b>' + event.nick + ":</b> " + event.value;	
+ 	       			}
+ 	       			console.log(event);
+ 	       		});
+ 	       	       	
+ 	       		prom.then(function(res)
+    			{
+    				//alert(res);	
+    			  	console.log(res);
+    			})
+    				.catch(function(err) 
+    	       	{
+    				console.log(err);
+    	       		//alert(JSON.stringify(err));
+    	       	});
+   	   		});
+   	   		
+   	   		// Search the current users 
+   	   		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+   			{
+   	   			window.setInterval(function()
+   	   			{
+   	   				var div = document.getElementById('users');
+   	   				div.innerHTML = "";
+	   				var prom = service.findUsers(function(ser)
+	 	       		{
+	 	       			console.log(ser);
+	 	       			ser.getNickName().then(function(res)
+	 	           		{
+	 	    			  	console.log(res);
+							div.innerHTML = div.innerHTML + '</br>' + res;	
+	 	    			})
+	 	    			.catch(function(err) 
+	 	    	       	{
+	 	    				console.log(err);
+	 	    	       	});
+	 	       		});
+ 	       	       	
+	 	       		prom.then(function(res)
+	    			{
+	    				//alert(res);	
+	    			  	console.log(res);
+	    			})
+	    			.catch(function(err) 
+	    	       	{
+	    				console.log(err);
+	    	       		//alert(JSON.stringify(err));
+	    	       	});
+   	   			}, 10000);
+   	   		});
+        </script>
+    </head>
+    
+    <body>
+        <h1>Web Chat</h1>
+        
+        <div id="messages"></div>
+        
+        <div id="users"></div>
+        
+        <input type="text" id="text" value="Hello"></input>
+        <button onclick="message(document.getElementById('text').value)">Send message</button>
+        <br/><br/>
+    </body>
+</html>

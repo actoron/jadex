@@ -1,0 +1,40 @@
+apply plugin: 'java'
+//apply plugin: 'war'
+apply plugin: "eclipse"
+
+sourceSets.main.resources.srcDirs = ['src/main/java'];
+
+dependencies
+{
+	def jetty_version = "9.3.9.v20160517"
+
+	api project(':platform:webservice-websocket')
+	api project(':applications:webservice-websocket')
+
+
+	api 'org.eclipse.jetty:jetty-server:' + jetty_version
+	api 'org.eclipse.jetty:jetty-webapp:' + jetty_version
+	api 'org.eclipse.jetty:jetty-rewrite:' + jetty_version
+
+	api 'org.eclipse.jetty.websocket:websocket-server:' + jetty_version
+	api 'org.eclipse.jetty.websocket:websocket-api:' + jetty_version
+	api 'org.eclipse.jetty.websocket:websocket-client:' + jetty_version
+
+	api 'org.eclipse.jetty.websocket:javax-websocket-server-impl:' + jetty_version
+}
+
+//war
+//{
+//	from('src/main/java') {
+//		//archiveName project.name.substring(0, project.name.length()-4)+".war"
+//		archiveName project.name+".war"
+//		//archiveName "actoron-webapi-web.war"
+//		include '**/*.html'
+//		include '**/*.properties'
+//		into 'WEB-INF/classes'
+//	}
+//}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+

@@ -1,0 +1,4 @@
+Initiator									Remote
+SYN+PVersion+Cipher+RANDPUBKEY_I	--->	
+									<---	SYNACK+RANDPUBKEY_I+RANDPUBKEY_R
+RDY+RANDPUBKEY_I+RANDPUBKEY_R		--->

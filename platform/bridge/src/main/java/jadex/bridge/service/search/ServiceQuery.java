@@ -13,7 +13,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 
@@ -245,6 +244,7 @@ public class ServiceQuery<T>
 		this.networknames = original.networknames;
 		this.matchingmodes = original.matchingmodes;
 		this.platform	= original.platform;
+		this.searchstart	= original.searchstart;
 		this.unrestricted = original.unrestricted;
 	}
 

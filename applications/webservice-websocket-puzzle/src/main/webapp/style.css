@@ -1,0 +1,152 @@
+body {
+	font-family: Sans-Serif;
+	font-size: 2.4vw;
+}
+
+.board {
+    width: 70%;
+    margin-left:	15%;
+    margin-right:	15%;
+    border-collapse: collapse;
+	font-size: 1.8vw;
+}
+
+.board tr td:first-child, .board tr td:last-child 
+	.board tr th:first-child, .board tr th:last-child {
+	width:	5%;
+}
+
+.cell3 {
+	width:	30%;
+    padding-bottom: 30%;
+}
+.cell5 {
+	width:	18%;
+    padding-bottom: 18%;
+}
+.cell7 {
+	width:	12.857%;
+    padding-bottom: 12.857%;
+}
+.cell9 {
+	width:	10%;
+    padding-bottom: 10%;
+}
+.cell11 {
+	width:	8.182%;
+    padding-bottom: 8.182%;
+}
+
+.cell {
+	position:	relative;
+	background-size:	100% 100%;
+	padding-top: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+.red::before {
+	content:	"";
+	position:	absolute;
+
+	width:	70%;
+	top:	15%;
+	right:	15%;
+	bottom:	15%;
+	left:	15%;
+	
+	border-radius: 50%;
+	background: #ce2121;
+	background-image: url(images/actoron.png), linear-gradient(to bottom right, #e76b6b, #ce2121);
+	background-size: cover;
+	
+	box-shadow:	1px 1px 3px rgba(105,17,18,0.9);
+}
+.white::before {
+	content:	"";
+	position:	absolute;
+
+	width:	70%;
+	top:	15%;
+	right:	15%;
+	bottom:	15%;
+	left:	15%;
+	
+	border-radius: 50%;
+	background: #ccaa99;
+	background-image: url(images/actoron.png), linear-gradient(to bottom right, #ffffff, #dfcabf);
+	background-size: cover;
+	
+	box-shadow:	1px 1px 3px rgba(139,92,69,0.9);
+}
+.red, .white, .empty {
+	/* border-radius: 10%; */
+	background:	linear-gradient(to bottom right, #8699c2, #9eaece);
+	box-shadow: 0 0 20px rgba(134, 153, 194, 1);
+}
+.red span, .white span, .empty span {
+	display: none; /* span for making game appaer without css. */
+}
+
+
+.moveable:hover {
+	cursor: pointer;
+	box-shadow: inset 0 0 10px rgba(255, 255, 0, 1);
+}
+
+/* ::after allows additonal background on top of existing  */
+.moveable::after {
+	content:	"";
+	position:	absolute;
+
+	width:	18%;
+	top:	41%;
+	right:	41%;
+	bottom:	41%;
+	left:	41%;
+
+	border-radius: 50%;
+	background: #ffff00;
+	background:	linear-gradient(to bottom right, #ffffff, #ffff00);
+	box-shadow: 0 0 10px #bdbe40;
+}
+
+.button {
+	width: 10vw;
+	padding: .5vw .5vw .5vw .5vw;
+	margin: 5px 2px 2px 2px;
+	text-align: center;
+	border-radius: 5px;
+	background: #ce2121;
+	background:	linear-gradient(to bottom right, #e76b6b, #ce2121);
+	box-shadow:	1px 1px 3px rgba(105,17,18,0.9);
+	color: white;
+}
+
+.controls {
+	width:	50%;
+	float: left;
+}
+
+.button:hover {
+	color: black;
+	cursor: pointer;
+}
+
+.button:active {
+	box-shadow:	inset 1px 1px 3px rgba(105,17,18,0.9);
+	padding: .6vw .4vw .4vw .6vw;
+}
+
+.controls span.label {
+	display:	block;
+	width:	90%;
+	margin:	5%;
+	text-align: center;
+}
+
+
+.controls ol {
+	width: 90%;
+	margin: 5%;
+}
