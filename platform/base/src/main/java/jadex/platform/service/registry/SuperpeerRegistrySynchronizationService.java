@@ -1189,7 +1189,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// If I am a level 0 superpeer, I inform others about all known level 1 registries
 		if(level==0)
 		{
-			ServiceQuery<IService> query = new ServiceQuery<IService>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, null, component.getIdentifier(), null);
+			ServiceQuery<IService> query = new ServiceQuery<IService>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, component.getIdentifier(), null);
 //			IMsgSecurityInfos secinfo = (IMsgSecurityInfos)ServiceCall.getCurrentInvocation().getProperty("securityinfo");
 			query.setNetworkNames(networknames);
 			

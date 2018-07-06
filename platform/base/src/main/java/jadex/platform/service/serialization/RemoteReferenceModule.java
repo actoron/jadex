@@ -947,7 +947,7 @@ public class RemoteReferenceModule
 				IServiceIdentifier	sid	= (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier();
 				// Hack???
 				ret	= ServiceRegistry.getRegistry(platform).getLocalService(ServiceRegistry.getRegistry(platform)
-					.searchService(new ServiceQuery<>(sid.getServiceType().getType(classloader), sid.getProviderId()).setNetworkNames(null)));
+					.searchService(new ServiceQuery<>(sid.getServiceType().getType(classloader)).setProvider(sid.getProviderId()).setNetworkNames((String[]) null)));
 			}
 			else if(pr.getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
 			{

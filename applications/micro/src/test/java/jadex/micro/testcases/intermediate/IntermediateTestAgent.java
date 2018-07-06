@@ -225,7 +225,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			{
 //				System.out.println("root is: "+root)
 				// Hack!!! use remote platform as search owner
-				ServiceQuery<IClockService>	query	= new ServiceQuery<IClockService>(IClockService.class, null, new BasicComponentIdentifier("clock", root), root, null);
+				ServiceQuery<IClockService>	query	= new ServiceQuery<IClockService>(IClockService.class, null, root, null).setProvider(new BasicComponentIdentifier("clock", root));
 //				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( new BasicComponentIdentifier("clock", root)), IClockService.class)
 				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( query))
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
@@ -244,7 +244,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
 //								System.out.println("cid is: "+cid);
-								agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IIntermediateResultService.class, cid))
+								agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IIntermediateResultService.class).setProvider(cid))
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
 								{
 									public void customResultAvailable(IIntermediateResultService service)

@@ -377,7 +377,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //					spcid = new ComponentIdentifier("registrysuperpeer@"+spcid.getPlatformName());
 //					System.out.println("Found superpeer: "+spcid);
 					ServiceQuery<ISuperpeerRegistrySynchronizationService>	query
-						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, spcid, component.getIdentifier(), null);
+						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, null, component.getIdentifier(), null);
+					query.setProvider(spcid);
 					query.setUnrestricted(true);
 					component.getFeature(IRequiredServicesFeature.class).searchService(query).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)

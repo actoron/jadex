@@ -480,7 +480,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 				{
 					public void resultAvailable(IComponentIdentifier cid)
 					{
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IProxyAgentService.class, cid))
+						agent.getFeature(IRequiredServicesFeature.class).searchService((new ServiceQuery<>(IProxyAgentService.class)).setProvider(cid))
 							.addResultListener(new IResultListener<IProxyAgentService>()
 						{
 							public void resultAvailable(IProxyAgentService pas)

@@ -156,7 +156,7 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if remote scheduling inside a service call works " + (testno == 1? "(local case)." : "(remote case)."));
 		
-		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		
 
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)

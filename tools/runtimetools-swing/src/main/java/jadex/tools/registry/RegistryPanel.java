@@ -867,7 +867,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				case 2:
 					return "Owner";
 				case 3:
-					return "Provider";
+					return "Search Start";
 				case 4:
 					return "Platform";
 				case 5:
@@ -904,7 +904,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			else if(column == 3)
 			{
-				value = query.getQuery().getProvider();
+				value = query.getQuery().getSearchStart();
 			}
 			else if(column == 4)
 			{

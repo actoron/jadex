@@ -45,7 +45,7 @@ public class SubscriptionListenerTestAgent extends TestAgent
 				{
 					public void customResultAvailable(final IComponentIdentifier provider)
 					{
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, provider))
+						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(provider))
 							.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 						{
 							public void customResultAvailable(ITestService ts)

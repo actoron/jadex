@@ -90,7 +90,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	protected void searchForSuperpeers(final List<Integer> foundless, final List<Integer> foundmore)
 	{
 		ITerminableIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
-			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getIdentifier(), null));
+			ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, agent.getIdentifier(), null));
 		
 		search.addIntermediateResultListener(new IIntermediateResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
@@ -313,7 +313,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 				
 		ITerminableIntermediateFuture<IPeerRegistrySynchronizationService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(
-			new ServiceQuery<IPeerRegistrySynchronizationService>(IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getIdentifier(), null));
+			new ServiceQuery<IPeerRegistrySynchronizationService>(IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, agent.getIdentifier(), null));
 
 		search.addIntermediateResultListener(new IIntermediateResultListener<IPeerRegistrySynchronizationService>()
 		{
@@ -385,7 +385,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IFuture<Void> makeSuperpeer(IComponentIdentifier cid)
 	{
-		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getIdentifier(), null);
+		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, agent.getIdentifier(), null);
 		q.setPlatform(cid.getRoot());
 		IAutoConfigRegistryService	auser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
 		return auser.makeRegistrySuperpeer();
@@ -397,7 +397,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IFuture<Void> makeClient(IComponentIdentifier cid)
 	{
-		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, agent.getIdentifier(), null);
+		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM, agent.getIdentifier(), null);
 		q.setPlatform(cid.getRoot());
 		IAutoConfigRegistryService	auser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
 		return auser.makeRegistryClient();

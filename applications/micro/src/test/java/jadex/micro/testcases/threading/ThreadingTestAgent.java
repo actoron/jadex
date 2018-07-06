@@ -162,7 +162,7 @@ public class ThreadingTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if "+(local? "local": "remote")+" thread decoupling works.");
 		
-		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
 			public void customResultAvailable(final ITestService ts)

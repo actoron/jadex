@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 
 /**
@@ -118,18 +119,18 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		}
 		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
-			if(query.getProvider()!=null)
-				ret = new SetWrapper<String>(query.getProvider().toString());
+			if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+				ret = new SetWrapper<String>(query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString());
 		}
 		else if(KEY_TYPE_PLATFORM.equals(keytype))
 		{
-			if(query.getProvider()!=null)
+			//if(query.getProvider()!=null)
 //				ret = new SetWrapper<String>(query.getProvider().getRoot().toString());
 				ret = new SetWrapper<String>(query.getPlatform().toString());
 		}
 		else if(KEY_TYPE_SCOPE.equals(keytype))
 		{
-			if(query.getProvider()!=null)
+			//if(query.getProvider()!=null)
 				ret = new SetWrapper<String>(query.getScope());
 		}
 		else if(KEY_TYPE_OWNER_PLATORM.equals(keytype))

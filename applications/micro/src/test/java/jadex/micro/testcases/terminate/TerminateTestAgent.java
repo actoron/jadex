@@ -224,7 +224,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 						});
 						
 //						System.out.println("cid is: "+cid);
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class, cid))
+						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(cid))
 							.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
 						{
 							public void customResultAvailable(final ITerminableService service)

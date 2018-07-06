@@ -160,7 +160,7 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStreamService.class, cid))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStreamService.class).setProvider(cid))
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)

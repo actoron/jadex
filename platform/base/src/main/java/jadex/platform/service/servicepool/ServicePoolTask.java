@@ -90,7 +90,7 @@ public class ServicePoolTask implements ITask
 		{
 			public void customResultAvailable(IComponentIdentifier cid) 
 			{
-				process.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class, cid))
+				process.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class).setProvider(cid))
 					.addResultListener(process.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 				{
 					public void customResultAvailable(IServicePoolService sps)

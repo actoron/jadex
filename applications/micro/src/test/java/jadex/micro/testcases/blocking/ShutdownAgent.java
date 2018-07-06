@@ -61,7 +61,7 @@ public class ShutdownAgent
 					{
 						// call several times a blocking method on the agent and then terminate it
 						
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class, cid))
+						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class).setProvider(cid))
 							.addResultListener(new ExceptionDelegationResultListener<IBlockService, Void>(ret)
 						{
 							public void customResultAvailable(IBlockService bs)

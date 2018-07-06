@@ -71,7 +71,7 @@ public class ProxyAgent	implements IProxyAgentService
 //	@AgentCreated
 	public IFuture<Void> agentCreated()
 	{
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, rcid.getRoot()))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class).setProvider(rcid.getRoot()))
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms) 

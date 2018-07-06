@@ -264,7 +264,7 @@ public class ComponentSelectorDialog
 					if(selected!=null)
 					{
 						final IComponentIdentifier fselected = selected;
-						access.searchService( new ServiceQuery<>(IProxyAgentService.class, selected))
+						access.searchService( new ServiceQuery<>(IProxyAgentService.class).setProvider(selected))
 							.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 						{
 							public void resultAvailable(IProxyAgentService ps)

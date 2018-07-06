@@ -86,7 +86,7 @@ public class ChatE5Agent
 								}
 								else
 								{
-									agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid))
+									agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(cid))
 										.addResultListener(new DefaultResultListener<IChatService>()
 									{
 										public void resultAvailable(IChatService cs)

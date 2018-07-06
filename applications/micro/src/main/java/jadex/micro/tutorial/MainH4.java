@@ -49,7 +49,7 @@ public class MainH4
 		System.out.println("Started chat component: "+cid);
 		
 		// Fetch the chat service
-		IChatService	chat	= platform.searchService( new ServiceQuery<>(IChatService.class, cid)).get();
+		IChatService	chat	= platform.searchService( new ServiceQuery<>(IChatService.class).setProvider(cid)).get();
 		chat.message("Main", "Chat started.");
 
 	}

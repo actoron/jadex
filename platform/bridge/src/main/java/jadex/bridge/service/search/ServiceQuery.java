@@ -35,7 +35,10 @@ public class ServiceQuery<T>
 	protected String[] servicetags;
 	
 	/** The service provider. (rename serviceowner?) */
-	protected IComponentIdentifier provider;
+	//protected IComponentIdentifier provider;
+	
+	/** Starting point for the search scoping. */
+	protected IComponentIdentifier searchstart;
 	
 	/** The service platform. (Find a service from another known platform, e.g. cms) */
 	protected IComponentIdentifier platform;
@@ -119,13 +122,6 @@ public class ServiceQuery<T>
 		this(servicetype, scope, null, null);
 	}
 	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(Class<T> servicetype, IComponentIdentifier provider)
-	{
-		this(servicetype, null, provider, null);
-	}
 //	
 //	/**
 //	 *  Create a new service query.
@@ -195,39 +191,38 @@ public class ServiceQuery<T>
 	 *  Create a new service query.
 	 *  owner = startpoint
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, provider, owner, null);
-	}
+//	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, provider, owner, null);
+//	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Class<?> returntype)
+	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier owner, Class<?> returntype)
 	{
 		this(servicetype!=null? new ClassInfo(servicetype): null, scope,
-			provider, owner, returntype!=null? new ClassInfo(returntype): null);
+			owner, returntype!=null? new ClassInfo(returntype): null);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(servicetype, scope, provider, owner, servicetype);
+		this(servicetype, scope, owner, servicetype);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, ClassInfo returntype)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner, ClassInfo returntype)
 	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
 		
 		this.servicetype = servicetype;
 		this.scope = scope;
-		this.provider = provider;
 		this.owner = owner;
 		this.returntype = returntype;
 		
@@ -250,7 +245,6 @@ public class ServiceQuery<T>
 		this.networknames = original.networknames;
 		this.matchingmodes = original.matchingmodes;
 		this.platform	= original.platform;
-		this.provider	= original.provider;
 		this.unrestricted = original.unrestricted;
 	}
 
@@ -343,15 +337,6 @@ public class ServiceQuery<T>
 		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags!=null ? servicetags.length : 0]);
 		return this;
 	}
-	
-	/**
-	 *  Get the provider.
-	 *  @return The provider
-	 */
-	public IComponentIdentifier getProvider()
-	{
-		return provider;
-	}
 
 	/**
 	 *  Set the provider.
@@ -359,7 +344,27 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery<T> setProvider(IComponentIdentifier provider)
 	{
-		this.provider = provider;
+		this.searchstart = provider;
+		this.scope = RequiredServiceInfo.SCOPE_COMPONENT_ONLY;
+		return this;
+	}
+	
+	/**
+	 *  Get the provider.
+	 *  @return The provider
+	 */
+	public IComponentIdentifier getSearchStart()
+	{
+		return searchstart;
+	}
+
+	/**
+	 *  Set the provider.
+	 *  @param provider The provider to set
+	 */
+	public ServiceQuery<T> setSearchStart(IComponentIdentifier searchstart)
+	{
+		this.searchstart = searchstart;
 		return this;
 	}
 	
@@ -494,8 +499,13 @@ public class ServiceQuery<T>
 		if(platform != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
-		if(provider != null)
-			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{provider.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
+		if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		{
+			if (searchstart != null)
+				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{searchstart.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
+			else
+				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{owner.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
+		}
 		
 		if(servicetype != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{servicetype.getGenericTypeName()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_INTERFACE)));
@@ -595,8 +605,13 @@ public class ServiceQuery<T>
 			}
 		}
 		
-		if (provider != null && !provider.equals(service.getProviderId()))
+		if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope) &&
+			!((searchstart != null && service.getProviderId().equals(searchstart)) ||
+			service.getProviderId().equals(owner)))
 			return false;
+		
+//		if (provider != null && !provider.equals(service.getProviderId()))
+//			return false;
 		
 		if (platform != null && !platform.equals(service.getProviderId().getRoot()))
 			return false;
@@ -682,7 +697,13 @@ public class ServiceQuery<T>
 	 */
 	public IComponentIdentifier getTargetPlatform()
 	{
-		return getPlatform()!=null? getPlatform().getRoot(): getProvider()!=null? getProvider().getRoot(): null;
+		if (getPlatform()!=null)
+			return getPlatform().getRoot();
+		
+		if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+			return searchstart != null ? searchstart.getRoot() : owner.getRoot();
+			
+		return null;
 	}
 
 	/**
@@ -690,7 +711,7 @@ public class ServiceQuery<T>
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", provider=" + provider + ", platform=" + platform 
+		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", searchstart=" + searchstart + ", platform=" + platform 
 			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", scope=" + scope + ", owner=" + owner
 			+ ", id=" + id + ")";
 	}

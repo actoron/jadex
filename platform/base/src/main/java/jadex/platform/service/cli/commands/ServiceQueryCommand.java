@@ -84,7 +84,7 @@ public class ServiceQueryCommand extends ACliCommand
 				if(owner==null)
 					owner = ia.getIdentifier().getRoot();
 				
-				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, provider, owner, null);
+				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, owner, null).setProvider(provider);
 				if(tags!=null)
 					q.setServiceTags(tags);
 				

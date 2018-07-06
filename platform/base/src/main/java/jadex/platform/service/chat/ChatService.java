@@ -608,7 +608,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, rec))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(rec))
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)
@@ -754,7 +754,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, rec))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(rec))
 			.addResultListener(new DelegationResultListener<IChatService>(ret)
 		{
 			public void customResultAvailable(final IChatService chat)
@@ -985,7 +985,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid));
+		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
 			public void customResultAvailable(IChatService cs)
@@ -1103,7 +1103,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class, cid));
+		IFuture<IChatService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
 			public void customResultAvailable(IChatService cs)

@@ -291,7 +291,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class, cid))
+						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class).setProvider(cid))
 							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
 						{
 							public void customResultAvailable(IAService service)

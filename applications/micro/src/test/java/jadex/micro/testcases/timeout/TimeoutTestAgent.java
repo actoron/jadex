@@ -164,7 +164,7 @@ public class TimeoutTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if timeout works "+(to==-1? "without ": "with "+to)+" timeout.");
 		
-		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		
 //		fut.addResultListener(new IResultListener()
 //		{

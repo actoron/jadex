@@ -1,6 +1,7 @@
 package jadex.bridge.service.search;
 
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
@@ -129,4 +130,15 @@ public interface IServiceRegistry
 	 *  @return All queries (copy).
 	 */
 	public Set<ServiceQueryInfo<?>> getAllQueries();
+	
+	/**
+	 *  Returns the lock on the registry.
+	 *  Care must be taken to perform proper unlocking
+	 *  to avoid permanently blocking the registry.
+	 *  Note that the lock is reentrant, so operations
+	 *  can be performed while the lock is held.
+	 *  
+	 *  @return The registry lock.
+	 */
+	public ReadWriteLock getLock();
 }

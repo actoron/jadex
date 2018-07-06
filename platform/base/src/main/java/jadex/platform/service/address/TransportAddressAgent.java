@@ -424,7 +424,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		try
 		{
-			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, Binding.SCOPE_COMPONENT, null, platformid, null);
+			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, Binding.SCOPE_COMPONENT, platformid, null);
 			
 			ITransportAddressService rtas = agent.getFeature(IRequiredServicesFeature.class).searchService(query).get();
 			if (rtas != null)

@@ -61,7 +61,7 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 //			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
 			IComponentIdentifier cid = cms.createComponent(model, new CreationInfo(agent.getIdentifier())).getFirstResult();
 
-			IInjectionTestService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class, cid)).get();
+			IInjectionTestService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class).setProvider(cid)).get();
 
 			Object[] meta = ser.getInjectionClasses();
 			Object[] injections = ser.getInjections();

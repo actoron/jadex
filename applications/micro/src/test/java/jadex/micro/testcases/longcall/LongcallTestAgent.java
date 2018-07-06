@@ -212,7 +212,7 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, cid));
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, Collection<TestReport>>(ret)
 		{

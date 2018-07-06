@@ -423,6 +423,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Returns the lock on the registry.
+	 *  Care must be taken to perform proper unlocking
+	 *  to avoid permanently blocking the registry.
+	 *  Note that the lock is reentrant, so operations
+	 *  can be performed while the lock is held.
+	 *  
+	 *  @return The registry lock.
+	 */
+	public ReadWriteLock getLock()
+	{
+		return rwlock;
+	}
+	
+	/**
 	 *  Add a service query to the registry.
 	 *  @param query ServiceQuery.
 	 */
@@ -693,8 +707,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 		String scope = query.getScope();
 		
-		IComponentIdentifier	searchstart	= query.getProvider()!=null ? query.getProvider()
-			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
+//		IComponentIdentifier searchstart	= query.getProvider()!=null ? query.getProvider()
+//			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
+		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner(); 
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{

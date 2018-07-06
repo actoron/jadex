@@ -56,7 +56,7 @@ public class TesterAgent implements ITestService
 
 		if(agent.getConfiguration().equals("created"))
 		{
-			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class, agent.getIdentifier().getParent())).get();
+			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(agent.getIdentifier().getParent())).get();
 			tsa.test(0).get();
 		}
 		else

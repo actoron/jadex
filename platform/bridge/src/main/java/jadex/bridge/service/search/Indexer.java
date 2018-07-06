@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
@@ -553,13 +554,13 @@ public class Indexer<T>
 				}
 				else if(QueryInfoExtractor.KEY_TYPE_PROVIDER.equals(keytype))
 				{
-					if(query.getProvider()!=null)
-						ret = new SetWrapper<String>(query.getProvider().toString());
+					if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+						ret = new SetWrapper<String>(query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString());
 				}
 				else if(QueryInfoExtractor.KEY_TYPE_PLATFORM.equals(keytype))
 				{
-					if(query.getProvider()!=null)
-						ret = new SetWrapper<String>(query.getProvider().getRoot().toString());
+					//if(query.getProvider()!=null)
+						ret = new SetWrapper<String>(query.getPlatform().toString());
 				}
 				else if("owner".equals(keytype))
 				{
@@ -595,15 +596,15 @@ public class Indexer<T>
 		
 		}, true, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
 		
-		ServiceQuery<IService> q0 = new ServiceQuery<IService>((Class<?>)null, null, null, null, null);
+		ServiceQuery<IService> q0 = new ServiceQuery<IService>((Class<?>)null, null, null, null);
 		idx.addValue(q0);
-		ServiceQuery<IService> q1 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
+		ServiceQuery<IService> q1 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
 		idx.addValue(q1);
-		ServiceQuery<IService> q2 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
+		ServiceQuery<IService> q2 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null);
 		q2.setServiceTags(new String[]{"a", "b"});
 		idx.addValue(q2);
-		ServiceQuery<IService> q3 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null, null);
+		ServiceQuery<IService> q3 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null);
 		q3.setServiceTags(new String[]{"a"});
 		idx.addValue(q3);
 		
