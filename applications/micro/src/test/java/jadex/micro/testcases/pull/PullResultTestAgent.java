@@ -236,10 +236,10 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				// TODO: use some internal/external access for fetching service???
+				// Hack!!! TODO: use some internal/external access for fetching service???
 				@SuppressWarnings("unchecked")
 				IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
-					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class)));
+					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
@@ -345,10 +345,10 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				// TODO: use some internal/external access for fetching service???
+				// Hack!!! TODO: use some internal/external access for fetching service???
 				@SuppressWarnings("unchecked")
 				IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
-					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class)));
+					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);

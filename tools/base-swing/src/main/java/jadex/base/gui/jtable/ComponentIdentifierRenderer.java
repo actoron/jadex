@@ -73,10 +73,10 @@ public class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 			// Try fetching each time to also receive updates
 			try
 			{
-				// TODO: use some internal/external access for fetching service???
+				// Hack!!! TODO: use some internal/external access for fetching service???
 				@SuppressWarnings("unchecked")
 				ITransportAddressService	tas	= (ITransportAddressService)ServiceRegistry.getRegistry(platform)
-					.getLocalService(ServiceRegistry.getRegistry(platform).searchService(new ServiceQuery<>(ITransportAddressService.class)));
+					.getLocalService(ServiceRegistry.getRegistry(platform).searchService(new ServiceQuery<>(ITransportAddressService.class).setNetworkNames(null)));
 				tas.getAddresses(cid.getRoot()).addResultListener(new IResultListener<List<TransportAddress>>()
 				{
 					@Override
