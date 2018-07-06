@@ -69,7 +69,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 		try
 		{
 			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(new ServiceQuery<>(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL));
-			queryfut.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
+			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
 			{
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
@@ -84,6 +84,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 					{
 						intermediateResultAvailable(res);
 					}
+					finished();
 				}
 				
 				public void intermediateResultAvailable(IExampleService result)

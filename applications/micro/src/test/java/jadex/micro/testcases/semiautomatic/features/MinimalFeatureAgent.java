@@ -7,6 +7,8 @@ import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Feature;
@@ -23,6 +25,7 @@ import jadex.micro.features.impl.MicroPojoComponentFeature;
 @Features(
 {	
 	@Feature(type=IExecutionFeature.class, clazz=ExecutionComponentFeature.class),
+	@Feature(type=IRequiredServicesFeature.class, clazz=RequiredServicesComponentFeature.class),
 	@Feature(type=IArgumentsResultsFeature.class, clazz=ArgumentsResultsComponentFeature.class),
 	@Feature(type=IPojoComponentFeature.class, clazz=MicroPojoComponentFeature.class),
 	@Feature(type=IMicroInjectionFeature.class, clazz=MicroInjectionComponentFeature.class,

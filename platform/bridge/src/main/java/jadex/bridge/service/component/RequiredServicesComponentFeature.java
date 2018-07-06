@@ -688,7 +688,19 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T> ServiceQuery<T>	getServiceQuery(RequiredServiceInfo info)
 	{
-		return new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), getComponent().getIdentifier());
+		// TODO???
+//		info.getNFRProperties();
+//		info.getDefaultBinding().getComponentName();
+//		info.getDefaultBinding().getComponentType();
+		
+		ServiceQuery<T>	ret	= new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), getComponent().getIdentifier());
+		ret.setMultiple(info.isMultiple());
+		if(info.getTags()!=null)
+		{
+			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), getComponent().getExternalAccess());
+		}
+		
+		return ret;
 	}
 	
 	/**

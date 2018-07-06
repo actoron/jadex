@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Ignore;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -38,6 +40,7 @@ import jadex.micro.annotation.Results;
 @Agent
 @ComponentTypes(@ComponentType(name="provider", filename="ProviderAgent.class"))
 @Configurations(@Configuration(name="def", components=@Component(type="provider", number="5")))
+@Ignore	// Ignore until feature reimplemented?
 public class MultiinvokeTestAgent extends JunitAgentTest
 {
 	@Agent
