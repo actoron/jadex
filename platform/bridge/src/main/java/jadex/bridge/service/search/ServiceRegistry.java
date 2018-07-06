@@ -231,6 +231,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			rwlock.writeLock().unlock();
 		}
+		
+		checkQueries(service, ServiceEvent.SERVICE_CHANGED);
 	}
 	
 	/**

@@ -32,7 +32,7 @@ public class HumanPlayerAgent
 		
 		final PlayerPanel pp = PlayerPanel.createGui(ls).get();
 		
-		sub.addIntermediateResultListener(new IIntermediateResultListener<String>()
+		sub.addResultListener(new IIntermediateResultListener<String>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
