@@ -1,0 +1,148 @@
+buildscript {
+
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "com.moowork.gradle:gradle-node-plugin:0.13"
+	}
+}
+
+plugins {
+	id "maven-publish" // PublishToMavenLocal
+	id "java"
+	id "maven"
+	id "eclipse"
+	id "eclipse-wtp"
+//	id 'idea'
+	id "com.moowork.node" version "0.13"
+	id "de.richsource.gradle.plugins.typescript" version "1.8.0"
+}
+
+// Does not work well in Eclipse
+//sourceSets.main.resources { srcDirs = ["src/main/java"]; include "**/*.properties"; include "**/*.html" }
+// This seems to work but perhaps not ideal.
+sourceSets.main.resources.srcDirs = ['src/main/java'];
+
+sourceSets {
+	main {
+		output.dir("$buildDir/resources/main/", buildBy: 'buildTypescript')
+	}
+}
+
+dependencies
+{
+	api project(':distributions:minimal')
+	api project(':serialization:json')
+	
+//	providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+	api 'javax.servlet:javax.servlet-api:3.1.0'
+	api 'javax.websocket:javax.websocket-api:1.1'
+	
+	
+//	compile "org.activecomponents.jadex:jadex-distribution-minimal:${jadexVersion}"
+//	compile "org.activecomponents.jadex:jadex-distribution-standard:${jadexVersion}"
+//	compile "org.activecomponents.jadex:jadex-json:${jadexVersion}"
+	
+}
+
+
+
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.variant.VariantBuilder
+
+import java.nio.file.Files
+
+node {
+	download = true
+}
+
+task createOutputDir << {
+	file("$buildDir/js").mkdir();
+}
+
+task browserify(type:NpmTask, dependsOn:createOutputDir) {
+	args = ['run', 'build-js']
+}
+
+String nodeExecutable() {
+	NodeExtension nodeExt = NodeExtension.get(project)
+	return new VariantBuilder(nodeExt).build().nodeExec
+}
+
+compileTypeScript {
+	compilerExecutable "${nodeExecutable()} node_modules/typescript/lib/tsc.js"
+	dependsOn "npmInstall"
+	projectFile = file("src/main/ts/tsconfig.json")
+	declaration = true
+//	outFile = file("$buildDir/ts/jadex.js")
+}
+
+task mergeTypings(dependsOn: compileTypeScript) << {
+	File tsDir = file("$buildDir/ts");
+	File typingsOutfile = file("$buildDir/js/jadex.d.ts");
+	def typeFiles = tsDir.listFiles(new FilenameFilter() {
+		@Override
+		boolean accept(File dir, String name) {
+			if (name.endsWith('.d.ts')) return true;
+			return false;
+		}
+	})
+	def writer = typingsOutfile.newPrintWriter()
+	typeFiles.each { f ->
+		f.readLines().each { l ->
+			writer.println(l);
+		}
+	}
+	writer.close();
+}
+
+
+task buildTypescript(type:Copy, dependsOn: [compileTypeScript, browserify, mergeTypings]) {
+	// workaround: copy js to resources
+//	file("$buildDir/resources").mkdir();
+//	java.nio.file.Files.copy(file("$buildDir/js/jadex.js").toPath(), file("$buildDir/resources/jadex.js").toPath());
+//	java.nio.file.Files.copy(file("$buildDir/js/jadex.d.ts").toPath(), file("$buildDir/resources/jadex.d.ts").toPath());
+//  from("$buildDir/js/") {
+//		include '**/*.js'
+//		include '**/*.d.ts'
+//	}
+//	into "$buildDir/resources/main"
+}
+
+browserify.dependsOn += compileTypeScript
+jar.dependsOn += buildTypescript
+
+//jar {
+//	into ("js") {
+//		from buildTypescript.output
+//		from sourceSets.main.output
+//		from file("$project.buildDir/js/jadex.js")
+//		from file("$project.buildDir/js/jadex.d.js")
+//	}
+//}
+
+//war
+//{
+//	from('src/main/java') {
+//		//archiveName project.name.substring(0, project.name.length()-4)+".war"
+//		archiveName project.name+".war"
+//		include '**/*.html'
+//		include '**/*.properties'
+//		into 'WEB-INF/classes'
+//	}
+//}
+
+//jar 
+//{
+//	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//
+//	// http://stackoverflow.com/questions/10986244/building-a-uberjar-with-gradle
+//	from(configurations.runtime.collect {
+//		it.isDirectory()? it: zipTree(it)
+//	})
+//}
+
+

@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+dependencies
+{
+	api project(':util:udp') 
+	api project(':platform:base')
+	api project(':util:security')
+}
+
+jar
+{
+	baseName = project.name
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html ng-app="app" style="height: 100%">
+    <head>
+        <meta charset=UTF-8>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <script src="wswebapi/jadex.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="app.js"></script>
+        
+        <style>
+        	#circle {
+            	width: 20px;
+            	height: 20px;
+            	-webkit-border-radius: 10px;
+            	-moz-border-radius: 10px;
+            	border-radius: 10px;
+            	background: black;
+			}
+		</style>
+        
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://www.activecomponents.org/conf.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    </head>
+    
+    <body ng-controller="ChatController" style="height: 100%">
+        <h1>Web Chat</h1>
+        
+        <div class="container-fluid" style="height: 90%">
+	        <div class="row flex-row" style="height: 80%">
+	        	<div class="col-xs-8" style="background-color:lavender; height: 100%">
+		       		<div class="panel panel-default" style="height: 100%;">
+		       			<div class="panel-heading">Messages
+		       				<div id="circle" ng-style="connected==ConnectionState.CONNECTED? {background: 'green'}: 
+		       				connected==ConnectionState.CONNECTING? {background: 'yellow'}: {background: 'red'}"></div>
+		       			</div>
+		       			<div class="panel-body" style="height: 90%; overflow: scroll; padding: 0px;">
+							<div id="messages">
+				        		<div ng-repeat="msg in messages track by $index">
+				  					<p>{{msg.nick+":"+msg.value}}</p>
+								</div>
+							</div>
+						</div> 
+					</div>
+				</div>
+				
+				<div class="col-xs-4" style="background-color:lavenderblush; height: 100%">
+					<div class="panel panel-default" style="height: 100%;">
+		       			<div class="panel-heading">Users</div>
+		       			<div class="panel-body" style="height: 90%; padding: 0px;">
+							<div id="users" style="height: 100%;">
+								<!-- <select name="users" multiple ng-options="user as user.name for user in users | orderBy:'name' track by $index"  -->
+								<!-- <select name="users" multiple ng-options="idx as user.name for (idx, user) in users | orderBy:'name'"  -->
+								<select name="users" multiple ng-options="(user.name + ' [' + user.sid.providerId.name + ']') for user in users | orderBy:'name'"
+								 ng-model="selected_users" style="width: 100%; height: 100%; Border: none; padding: 0px;">
+									<option></option>
+								</select>
+								<!-- {{selected_users}} -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	       
+			<div class="row flex-row">
+				<div class="col-xs-12">
+					<div>
+						<input type="text" id="text" ng-model="text"></input>
+	        			<button ng-click="postMessage(text)">Send message</button>
+	        		</div>
+	        	</div>
+			</div>
+	        
+	        <div class="row flex-row">
+	        	<div class="col-xs-12">
+	        		<div>
+						Nickname:
+			        	<input type="text" id="nick" ng-model="nick" ng-model-options="{debounce: 750}"></input>
+			        <div>
+		        </div>
+			</div>
+	       
+			<div class="row flex-row">
+				<div class="col-xs-12">				
+					<div>
+						Avatar picture: 
+						<img ng-src="{{avatar}}" alt="Avatar Image"/>
+						<input type="file" id="avafile" name="file" style="display: none;"/> 
+						<button onclick="document.getElementById('avafile').click();">Choose File</button>
+						<button ng-click="setImage()">Set Avatar Image</button>
+					<div>
+				</div>
+			</div>
+			
+			<div class="row flex-row">
+				<div class="col-xs-12">				
+					<div>
+						<input type="file" id="upfile" name="file" style="display: none;"/> 
+						<button ng-click="document.getElementById('upfile').click(); sendFile();">Choose File</button>
+					<div>
+				</div>
+			</div>
+		</div>
+    </body>
+</html>

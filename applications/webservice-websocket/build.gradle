@@ -1,0 +1,31 @@
+apply plugin: 'maven-publish' // PublishToMavenLocal
+apply plugin: 'java' 
+apply plugin: 'maven'
+apply plugin: 'war'
+apply plugin: "eclipse"
+apply plugin: 'eclipse-wtp'
+
+// Does not work well in Eclipse
+//sourceSets.main.resources { srcDirs = ["src/main/java"]; include "**/*.properties"; include "**/*.html" }
+// This seems to work but perhaps not ideal.
+sourceSets.main.resources.srcDirs = ['src/main/java', 'src/main/webapp'];
+
+dependencies 
+{
+	compile project(':platform:webservice-websocket')
+	
+}
+
+war
+{
+	from('src/main/java') {
+		//archiveName project.name.substring(0, project.name.length()-4)+".war"
+		archiveName project.name+".war"
+		//archiveName "actoron-webapi-web.war"
+		include '**/*.html'
+		include '**/*.properties'
+		into 'WEB-INF/classes'
+	}
+}
+
+
