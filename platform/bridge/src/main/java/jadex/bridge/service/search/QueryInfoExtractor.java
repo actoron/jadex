@@ -126,6 +126,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		{
 			//if(query.getProvider()!=null)
 //				ret = new SetWrapper<String>(query.getProvider().getRoot().toString());
+			if(query.getPlatform()!=null)
 				ret = new SetWrapper<String>(query.getPlatform().toString());
 		}
 		else if(KEY_TYPE_SCOPE.equals(keytype))
