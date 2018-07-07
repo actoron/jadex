@@ -1,17 +1,14 @@
 package org.activecomponents.webservice.json.read;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -51,7 +48,7 @@ public class JsonServiceProcessor implements ITraverseProcessor
 		// todo: fetch platform via context
 		// a) via search or b) via map
 		IExternalAccess platform = null;
-		IService service = (IService)SServiceProvider.getService(platform, sid).get();
+		IService service = platform.searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sid)).get();
 		
 		return service;
 	}

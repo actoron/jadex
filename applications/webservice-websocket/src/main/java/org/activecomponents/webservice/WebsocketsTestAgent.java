@@ -35,8 +35,8 @@ public class WebsocketsTestAgent implements IWebsocketTestService
 	 */
 	public IFuture<String> sayHelloTo(String name)
 	{
-		System.out.println("Say hello called on: "+agent.getComponentIdentifier());
-		return new Future<String>("Hello "+name+" from "+agent.getComponentIdentifier());
+		System.out.println("Say hello called on: "+agent.getIdentifier());
+		return new Future<String>("Hello "+name+" from "+agent.getIdentifier());
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class WebsocketsTestAgent implements IWebsocketTestService
 	 */
 	public IFuture<String> sayHelloTo(String name, String name2)
 	{
-		System.out.println("Say hello 2 called on: "+agent.getComponentIdentifier());
+		System.out.println("Say hello 2 called on: "+agent.getIdentifier());
 		return new Future<String>("Hello "+name+" "+name2);
 	}
 	
@@ -81,7 +81,7 @@ public class WebsocketsTestAgent implements IWebsocketTestService
 		
 		final int[] cnt = new int[1];
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay).addResultListener(new IResultListener<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void arg0)
 			{
@@ -91,7 +91,7 @@ public class WebsocketsTestAgent implements IWebsocketTestService
 					if(cnt[0]<max)
 					{
 						ret.addIntermediateResult(Integer.valueOf(cnt[0]++));
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay).addResultListener(this);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(delay).addResultListener(this);
 					}
 					else
 					{

@@ -39,7 +39,7 @@ public class ShortMessageService implements IShortMessageService
 	@ServiceStart
 	public void init()
 	{
-		IUserService us = component.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
+		IUserService us = component.getFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
 		User lars = us.getUserByEmail("lars@example.com").get();
 		User hans = us.getUserByEmail("hans@example.com").get();
 		User dirk = us.getUserByEmail("dirk@example.com").get();
@@ -56,7 +56,7 @@ public class ShortMessageService implements IShortMessageService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final IUserService us = component.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
+		final IUserService us = component.getFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
 		
 		User sender = us.getUser(usertoken).get();
 		
@@ -97,7 +97,7 @@ public class ShortMessageService implements IShortMessageService
 	 */
 	public IFuture<Collection<ShortMessage>> getMessages(String usertoken)
 	{
-		IUserService us = component.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
+		IUserService us = component.getFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
 		User user = us.getUser(usertoken).get();
 		Collection<ShortMessage> box = postboxes.get(user);
 		return new Future<Collection<ShortMessage>>(box!=null? box: Collections.EMPTY_LIST);
@@ -110,7 +110,7 @@ public class ShortMessageService implements IShortMessageService
 	 */
 	protected void addMessageToPostbox(User user, ShortMessage message)
 	{
-		IUserService us = component.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
+		IUserService us = component.getFeature(IProvidedServicesFeature.class).getProvidedService(IUserService.class);
 		
 		// Exchange user objects with correct ones from the database
 		User fuser = us.getUserByEmail(user.getEmail()).get();

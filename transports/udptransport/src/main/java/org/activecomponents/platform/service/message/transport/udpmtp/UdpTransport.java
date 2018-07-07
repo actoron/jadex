@@ -17,8 +17,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
 import org.activecomponents.platform.service.message.transport.udpmtp.holepunching.AddressSolution;
 import org.activecomponents.platform.service.message.transport.udpmtp.holepunching.IFirewallSolution;
@@ -35,9 +33,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -45,9 +41,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.security.SSecUtils;
-import jadex.platform.service.message.ISendTask;
-import jadex.platform.service.message.transport.ITransport;
+import jadex.platform.service.transport.ITransport;
 
 public class UdpTransport implements ITransport	
 {

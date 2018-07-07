@@ -6,7 +6,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason;
@@ -36,7 +45,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
@@ -241,7 +250,7 @@ public class RestWebSocket extends Endpoint
 					}				
 					else if(val instanceof IExternalAccess)
 					{
-						cid = ((IExternalAccess)val).getComponentIdentifier();
+						cid = ((IExternalAccess)val).getIdentifier();
 					}
 					else if(val instanceof IComponentIdentifier)
 					{
@@ -254,7 +263,7 @@ public class RestWebSocket extends Endpoint
 
 					if(cid!=null)
 					{
-						IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+						IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 						cms.destroyComponent(cid);
 						System.out.println("Killing session component: "+((IService)val).getServiceIdentifier().getProviderId());
 					}
@@ -362,7 +371,7 @@ public class RestWebSocket extends Endpoint
 							{
 								public void customResultAvailable(IExternalAccess access) throws Exception
 								{
-									IFuture<IService> res = (IFuture<IService>)SServiceProvider.getService(access, access.getComponentIdentifier(), type);
+									IFuture<IService> res = (IFuture<IService>)access.searchService(new ServiceQuery<>((Class<IService>)type, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
 									res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 									{
 										public void customResultAvailable(IService service)
@@ -376,7 +385,7 @@ public class RestWebSocket extends Endpoint
 					}
 					else
 					{
-						IFuture<IService> res = (IFuture<IService>)SServiceProvider.getService(platform, type, scope);
+						IFuture<IService> res = (IFuture<IService>)platform.searchService(new ServiceQuery<>(type, scope));
 						res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 						{
 							public void customResultAvailable(IService service)
@@ -391,7 +400,7 @@ public class RestWebSocket extends Endpoint
 				}
 				else
 				{
-					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)SServiceProvider.getServices(platform, type, scope);
+					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchService(new ServiceQuery<>( type, scope));
 					res.addResultListener(new IIntermediateResultListener<IService>()
 					{
 						public void intermediateResultAvailable(IService service)
@@ -471,7 +480,7 @@ public class RestWebSocket extends Endpoint
 		{
 			public void customResultAvailable(IExternalAccess platform)
 			{
-				IFuture<IService> fut = SServiceProvider.getService(platform, sim.getServiceId());
+				IFuture<IService> fut = platform.searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sim.getServiceId()));
 				fut.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 				{
 					public void customResultAvailable(IService service) throws Exception
@@ -788,12 +797,12 @@ public class RestWebSocket extends Endpoint
 							}
 						});
 						
-						ia.getComponentFeature(IProvidedServicesFeature.class).addService(null, sertype, service)
+						ia.getFeature(IProvidedServicesFeature.class).addService(null, sertype, service)
 							.addResultListener(new ExceptionDelegationResultListener<Void, String>(ret)
 						{
 							public void customResultAvailable(Void result) throws Exception
 							{
-								IService ser = (IService)ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sertype);
+								IService ser = (IService)ia.getFeature(IProvidedServicesFeature.class).getProvidedService(sertype);
 								final IServiceIdentifier sid = ser.getServiceIdentifier();
 								mysid[0] = sid;
 
@@ -858,7 +867,7 @@ public class RestWebSocket extends Endpoint
 				{
 					public IFuture<Void> execute(final IInternalAccess ia)
 					{
-						ia.getComponentFeature(IProvidedServicesFeature.class).removeService(sum.getServiceId())
+						ia.getFeature(IProvidedServicesFeature.class).removeService(sum.getServiceId())
 							.addResultListener(new ExceptionDelegationResultListener<Void, String>(ret)
 						{
 							public void customResultAvailable(Void result) throws Exception
@@ -1227,7 +1236,7 @@ public class RestWebSocket extends Endpoint
 					{
 						session.getUserProperties().put(key, ret);
 
-						SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						platform.searchService(new ServiceQuery<>(IComponentManagementService.class))
 							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(final IComponentManagementService cms)

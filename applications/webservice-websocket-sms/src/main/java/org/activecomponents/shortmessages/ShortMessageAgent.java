@@ -4,14 +4,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -63,9 +63,9 @@ public class ShortMessageAgent
 		
 		final Collection<User> receivers = new HashSet<User>(recs);
 		
-		final IUserService us = SServiceProvider.getDeclaredService(component, IUserService.class).get();
+		final IUserService us = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IUserService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
 		
-		SServiceProvider.getServices(component, IClientService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IClientService.class))
 			.addResultListener(new IIntermediateResultListener<IClientService>()
 		{
 			public void intermediateResultAvailable(IClientService service)
