@@ -2,7 +2,6 @@ package jadex.bridge.service.types.registryv2;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
@@ -32,12 +31,4 @@ public interface ISuperpeerService extends IRemoteRegistryService
 	 *  @return Subscription to matching services.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
-	
-	/**
-	 *  Removes a service query from the registry.
-	 *  
-	 *  @param query The service query.
-	 *  @return Null, when done.
-	 */
-	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query);
 }

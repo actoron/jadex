@@ -9,6 +9,10 @@ import jadex.commons.future.IFuture;
 
 /**
  *  Service access to a remote registry.
+ *  Plain mode does not support queries.
+ *  Instead each client is expected to periodically search remotely to handle its queries.
+ *  
+ *  For remote queries use the extended ISuperpeerService, if available.
  */
 @Service(system=true)
 public interface IRemoteRegistryService

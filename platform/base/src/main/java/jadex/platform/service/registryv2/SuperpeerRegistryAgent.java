@@ -3,7 +3,6 @@ package jadex.platform.service.registryv2;
 import java.util.logging.Level;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
@@ -15,7 +14,6 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -115,18 +113,6 @@ public class SuperpeerRegistryAgent	extends RemoteRegistryAgent	implements ISupe
 	 *  @return Subscription to matching services.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
-	{
-		// TODO
-		throw new UnsupportedOperationException("Not yet implemented...");
-	}
-	
-	/**
-	 *  Removes a service query from the registry.
-	 *  
-	 *  @param query The service query.
-	 *  @return Null, when done.
-	 */
-	public <T> IFuture<Void> removeQuery(ServiceQuery<T> query)
 	{
 		// TODO
 		throw new UnsupportedOperationException("Not yet implemented...");

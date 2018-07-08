@@ -16,7 +16,8 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 
 /**
- *  Service access to a remote registry.
+ *  Plain service access to a remote registry.
+ *  See SuperpeerRegistryAgent for extended implementation supporting also persistent queries.
  */
 @Agent
 public class RemoteRegistryAgent implements IRemoteRegistryService
