@@ -162,7 +162,8 @@ public class SuperpeerClientAgent
 								
 								// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
 								localquery = ServiceRegistry.getRegistry(agent.getIdentifier())
-									.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM).setNetworkNames(networkname));
+									.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM)
+										.setNetworkNames(networkname).setReturnType(ServiceEvent.CLASSINFO));
 								localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 								{
 									public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
@@ -264,7 +265,7 @@ public class SuperpeerClientAgent
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										// Still no connection?
-										if(superpeerquery==queryfut)
+										if(superpeer==null)
 										{
 											startSuperpeerSearch();
 										}

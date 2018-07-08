@@ -5,6 +5,7 @@ import java.util.Collection;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
@@ -64,6 +65,14 @@ public interface IInternalRequiredServicesFeature
 	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
 	 */
 	public <T> Collection<T> resolveLocalServices(ServiceQuery<T> query, RequiredServiceInfo info);
+	
+	/**
+	 *  Query for all matching services.
+	 *  @param query	The search query.
+	 *  @param info	Used for required service proxy configuration -> null for no proxy.
+	 *  @return Future providing the corresponding services.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> resolveQuery(ServiceQuery<T> query, RequiredServiceInfo info);
 	
 	//-------- all declared services (e.g. JCC component details) --------
 	

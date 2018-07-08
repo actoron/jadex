@@ -41,13 +41,14 @@ import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFunctionalIntermediateResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
@@ -395,18 +396,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(String name)
 	{
-		// TODO: global registry query.
-		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
-		ITerminableIntermediateFuture<T>	fut	= getServices(name);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
-		{
-			@Override
-			public void finished()
-			{
-				// NOP
-			}
-		});
-		return ret;
+		return resolveQuery(getServiceQuery(getServiceInfo(name)), getServiceInfo(name));
 	}
 
 	/**
@@ -417,18 +407,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type)
 	{
-		// TODO: global registry query.
-		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
-		ITerminableIntermediateFuture<T>	fut	= getServices(type);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
-		{
-			@Override
-			public void finished()
-			{
-				// NOP
-			}
-		});
-		return ret;
+		return resolveQuery(getServiceQuery(getServiceInfo(type)), getServiceInfo(type));
 	}
 
 	/**
@@ -439,18 +418,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
-		// TODO: global registry query.
-		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
-		ITerminableIntermediateFuture<T>	fut	= searchServices(query);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
-		{
-			@Override
-			public void finished()
-			{
-				// NOP
-			}
-		});
-		return ret;
+		return resolveQuery(query, createServiceInfo(query));
 	}
 	
 	//-------- event interface --------
@@ -711,6 +679,67 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		return ret;
 	}
 	
+	/**
+	 *  Query for all matching services.
+	 *  @param query	The search query.
+	 *  @param info	Used for required service proxy configuration -> null for no proxy.
+	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
+	 */
+	public <T>  ISubscriptionIntermediateFuture<T> resolveQuery(ServiceQuery<T> query, RequiredServiceInfo info)
+	{
+		enhanceQuery(query, true);
+		
+		// Query local registry
+		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
+		ISubscriptionIntermediateFuture<?> localresults	=  (ISubscriptionIntermediateFuture<?>)registry.addQuery(query);
+		
+		// Query remote (TODO: query instead of dumb search)
+		TerminableIntermediateFuture<T>	search	= searchRemoteServices(query);
+		
+		// Schedule result on component thread and wrap result in proxy, if required
+		@SuppressWarnings({"unchecked", "rawtypes"})
+		ISubscriptionIntermediateFuture<T>	ret	= (ISubscriptionIntermediateFuture)FutureFunctionality
+			.getDelegationFuture(localresults, new ComponentFutureFunctionality(getComponent())
+		{
+			@Override
+			public Object handleIntermediateResult(Object result) throws Exception
+			{
+				// If service identifier -> fetch service and create proxy (TODO: proxy for remote service???)
+				if(result instanceof IServiceIdentifier)
+				{
+					T	service	= (T)registry.getLocalService((IServiceIdentifier)result);
+					result	= createServiceProxy(service, info);
+				}
+				
+				// else service event -> just return event, as desired by user (specified in query return type)
+				
+				return result;
+			}
+			
+			@Override
+			public void handleTerminated(Exception reason)
+			{
+				// Hack!!! TODO: multi delegation future with multiple sources but one target?
+				search.terminate(reason);
+				
+				super.handleTerminated(reason);
+			}
+		});
+		
+		search.addIntermediateResultListener(new IFunctionalIntermediateResultListener<T>()
+		{
+			@SuppressWarnings("unchecked")
+			@Override
+			public void intermediateResultAvailable(T result)
+			{
+				// Hack!!!
+				((IntermediateFuture<T>)ret).addIntermediateResult(result);
+			}
+		});
+		
+		return ret;
+	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -748,7 +777,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	// Hack!!! used by multi invoker?
 	public RequiredServiceInfo	getServiceInfo(String name)
 	{
-		RequiredServiceInfo	info	= requiredserviceinfos.get(name);
+		RequiredServiceInfo	info	= requiredserviceinfos==null ? null : requiredserviceinfos.get(name);
 		if(info==null)
 		{
 			throw new IllegalArgumentException("No such required service: "+name);
@@ -762,7 +791,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected RequiredServiceInfo	getServiceInfo(Class<?> type)
 	{
-		RequiredServiceInfo	info	= requiredserviceinfos.get(SReflect.getClassName(type));
+		RequiredServiceInfo	info	= requiredserviceinfos==null ? null : requiredserviceinfos.get(SReflect.getClassName(type));
 		if(info==ISS_MEHR_WURST)
 		{
 			throw new IllegalArgumentException("Multiple required service declarations found for type: "+type);

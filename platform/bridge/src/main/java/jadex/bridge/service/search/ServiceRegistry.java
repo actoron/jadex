@@ -16,6 +16,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -471,9 +472,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.writeLock().unlock();
 		}
 		
-		for (Iterator<IServiceIdentifier> it = sers.iterator(); it.hasNext(); )
+		for(IServiceIdentifier ser: SUtil.safeSet(sers))
 		{
-			IServiceIdentifier ser = it.next();
 			dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
 		}
 		
@@ -674,12 +674,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected void dispatchQueryEvent(ServiceQueryInfo<?> queryinfo, IServiceIdentifier ser, int eventtype)
 	{
 		ServiceQuery<?> query = queryinfo.getQuery();
-		if (ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
+		if(query.getReturnType()!=null &&  ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
 			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResult(event);
 		}
-		else if (ServiceEvent.SERVICE_ADDED==eventtype)
+		else if(ServiceEvent.SERVICE_ADDED==eventtype)
 		{
 			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResult(ser);
 		}

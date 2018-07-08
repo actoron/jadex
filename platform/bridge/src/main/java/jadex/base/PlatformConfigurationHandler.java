@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -238,6 +239,19 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			PlatformConfigurationHandler h = new PlatformConfigurationHandler();
 			h.values = new HashMap<String, Object>(values);
+			
+			// Copy collections (todo: even deeper copy?)
+			for(String key: h.values.keySet())
+			{
+				if(h.values.get(key) instanceof Collection)
+				{
+					// assume array list is ok.
+					assert h.values.get(key) instanceof List;
+					@SuppressWarnings({"rawtypes", "unchecked"})
+					List	newval	= new ArrayList<>((Collection)h.values.get(key));
+					h.values.put(key, newval);
+				}
+			}
 			ret = getPlatformConfiguration(null, h);
 		}
 //		else if(mname.equals("getComponentFactory"))
@@ -882,7 +896,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		config.setValue("rtdebug", true);
 
 		// Registry & Awareness
-		config.setSuperpeerClient(true);
+//		config.setSuperpeerClient(true);
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 		config.setAwareness(false);	// disable old awareness
