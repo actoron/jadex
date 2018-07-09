@@ -135,6 +135,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 //		state = ComponentLifecycleState.INIT;
 		
+//		if(getComponentIdentifier().getName().indexOf("VSIS")!=-1)
+//			System.out.println("init of: "+getComponentIdentifier());
+		
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
 		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
@@ -157,6 +160,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //		state = ComponentLifecycleState.BODY;
 		
 		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
+
 		return exe.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

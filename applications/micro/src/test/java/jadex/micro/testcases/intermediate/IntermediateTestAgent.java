@@ -225,7 +225,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			{
 //				System.out.println("root is: "+root)
 				// Hack!!! use remote platform as search owner
-				ServiceQuery<IClockService>	query	= new ServiceQuery<IClockService>(IClockService.class).setProvider(new BasicComponentIdentifier("clock", root));
+				ServiceQuery<IClockService>	query	= new ServiceQuery<IClockService>(IClockService.class).setProvider(new BasicComponentIdentifier("clock", root)).setOwner(root);	// Hack!!! fetch remote clock service despite platform publication scope
 //				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( new BasicComponentIdentifier("clock", root)), IClockService.class)
 				agent.getFeature(IRequiredServicesFeature.class).searchService(query)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)

@@ -75,6 +75,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> body()
 	{
+		//System.out.println("body on: "+getComponent().getComponentIdentifier());
 		// Invoke initial service calls.
 		invokeServices();
 		

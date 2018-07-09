@@ -398,7 +398,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// TODO: global registry query.
 		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
 		ITerminableIntermediateFuture<T>	fut	= getServices(name);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		{
+			@Override
+			public void finished()
+			{
+				// NOP
+			}
+		});
 		return ret;
 	}
 
@@ -413,7 +420,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// TODO: global registry query.
 		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
 		ITerminableIntermediateFuture<T>	fut	= getServices(type);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		{
+			@Override
+			public void finished()
+			{
+				// NOP
+			}
+		});
 		return ret;
 	}
 
@@ -428,7 +442,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// TODO: global registry query.
 		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
 		ITerminableIntermediateFuture<T>	fut	= searchServices(query);
-		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret));
+		fut.addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		{
+			@Override
+			public void finished()
+			{
+				// NOP
+			}
+		});
 		return ret;
 	}
 	
@@ -899,7 +920,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 						{
 							public void resultAvailable(Collection<T> result)
 							{
-//								System.out.println(cid + " searched remote platform: "+platform+", "+result);
+//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+result);
 								if(result != null)
 								{
 									for(Iterator<T> it = result.iterator(); it.hasNext(); )
@@ -913,7 +934,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println(cid + " searched remote platform: "+platform+", "+exception);
+//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+exception);
 								doFinished();
 							}
 						});
