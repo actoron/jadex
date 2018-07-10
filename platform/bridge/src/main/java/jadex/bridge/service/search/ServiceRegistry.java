@@ -16,6 +16,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -476,9 +477,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.writeLock().unlock();
 		}
 		
-		for (Iterator<IServiceIdentifier> it = sers.iterator(); it.hasNext(); )
+		for (IServiceIdentifier ser : SUtil.safeSet(sers))
 		{
-			IServiceIdentifier ser = it.next();
 			dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
 		}
 		
