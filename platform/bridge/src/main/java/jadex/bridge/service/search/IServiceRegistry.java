@@ -56,7 +56,7 @@ public interface IServiceRegistry
 	
 	/**
 	 *  Remove services of a platform from the registry.
-	 *  @param platform The platform.
+	 *  @param platform The platform, null for everything.
 	 */
 	// write
 	public void removeServices(IComponentIdentifier platform);
@@ -74,6 +74,13 @@ public interface IServiceRegistry
 	 */
 	// write
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
+	
+	/**
+	 *  Remove a service query from the registry.
+	 *  @param query ServiceQuery.
+	 */
+	// write
+	public void removeQuery(final ServiceQuery<?> query);
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
