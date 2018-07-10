@@ -343,8 +343,8 @@ public class Indexer<T>
 	 */
 	public void removeValue(T value)
 	{
-		if(!values.remove(value))
-			System.out.println("Could not remove value from indexer: "+value+", "+value.toString());
+//		if(!values.remove(value))
+//			System.out.println("Could not remove value from indexer: "+value+", "+value.toString());
 		
 		if(indexedvalues != null)
 		{

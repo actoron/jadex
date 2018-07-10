@@ -1,6 +1,7 @@
 package jadex.platform.service.registryv2;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,7 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
+import jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
@@ -71,6 +73,7 @@ public class SuperpeerClientAgent
 		Future<Void>	ret	= new Future<>();
 		
 		localregistry = ServiceRegistry.getRegistry(agent.getIdentifier().getRoot());
+		localqueries = new HashMap<>();
 		
 		ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
 		secser.getNetworkNames().addResultListener(agent.getFeature(IExecutionFeature.class)
@@ -106,6 +109,7 @@ public class SuperpeerClientAgent
 		
 		ServiceQuery<ISuperpeerService>	query	= new ServiceQuery<>(ISuperpeerService.class, Binding.SCOPE_GLOBAL, agent.getIdentifier(), null);
 		query.setNetworkNames(networkname);
+
 		
 		System.out.println(agent+" searching for super peers for network "+networkname);
 		
@@ -143,7 +147,7 @@ public class SuperpeerClientAgent
 							superpeers.put(networkname, new Tuple2<ISuperpeerService, ISubscriptionIntermediateFuture<Void>>(sp, regfut));
 							
 							ServiceQuery<ServiceEvent<IServiceIdentifier>> localquery = new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM).setOwner(agent.getIdentifier());
-							localquery.setNetworkNames(networkname);
+							localquery.setReturnType(ServiceEvent.CLASSINFO).setNetworkNames(networkname);
 							ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> localquerysub = localregistry.addQuery(localquery);
 							localqueries.put(networkname, localquerysub);
 							localquerysub.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
@@ -158,21 +162,24 @@ public class SuperpeerClientAgent
 
 								public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
 								{
-									agent.scheduleStep(new IComponentStep<Void>()
+									if (!RequiredServiceInfo.isScopeOnLocalPlatform(event.getService().getScope()))
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										agent.scheduleStep(new IComponentStep<Void>()
 										{
-											try
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												regfut.sendBackwardCommand(event);
-											}
-											catch (Exception e)
-											{
-												startSuperpeerSearch(networkname);
-											}
-											return IFuture.DONE;
-										};
-									});
+												try
+												{
+													regfut.sendBackwardCommand(event);
+												}
+												catch (Exception e)
+												{
+													startSuperpeerSearch(networkname);
+												}
+												return IFuture.DONE;
+											};
+										});
+									}
 								}
 
 								public void finished()
@@ -318,6 +325,7 @@ public class SuperpeerClientAgent
 	{
 		// Common base configuration
 		IPlatformConfiguration	baseconfig	= PlatformConfigurationHandler.getMinimalComm();
+		baseconfig.addComponent(PassiveAwarenessIntraVMAgent.class);
 //		baseconfig.setGui(true);
 //		baseconfig.setLogging(true);
 		
