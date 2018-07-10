@@ -890,7 +890,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 			@Override
 			public boolean filter(IResultListener<E> obj)
 			{
-				return listener instanceof IFutureCommandResultListener;
+				return obj instanceof IFutureCommandResultListener;
 			}
 		}, new ICommand<IResultListener<E>>()
 		{
