@@ -464,7 +464,7 @@ public class SuperpeerClientAgent
 		}
 		
 		// Add queries for each relevant superpeer
-		for(ISuperpeerService superpeer: networkspersuperpeer.keySet())
+		for(ISuperpeerService superpeer: newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet())
 		{
 			ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
 			futures.add(fut);	// Remember future for later termination
