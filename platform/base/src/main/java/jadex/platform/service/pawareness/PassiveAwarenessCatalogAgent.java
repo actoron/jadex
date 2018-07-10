@@ -19,6 +19,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
 
 /**
  *  Passive awareness based on a pre-defined catalog of platforms + addresses.
@@ -39,6 +41,9 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	/** The internal catalog. */
 	protected MultiCollection<IComponentIdentifier, TransportAddress> catalog = new MultiCollection<>();
 	
+	@AgentArgument
+	protected String platformurls;
+	
 	/**
 	 *  Creates the catalog agent empty.
 	 */
@@ -48,22 +53,19 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	}
 	
 	/**
-	 *  Creates the catalog agent with a comma-separated list of URLs.
+	 *  Agent start.
+	 *  
+	 *  @return Null, when done.
 	 */
-	public PassiveAwarenessCatalogAgent(String platformurls)
+	@AgentCreated
+	public IFuture<Void> start()
 	{
-		this(platformurls.split(","));
-	}
-	
-	/**
-	 *  Creates the catalog agent with a list of URLs.
-	 */
-	public PassiveAwarenessCatalogAgent(String... platformurls)
-	{
-		for (int i = 0; i < platformurls.length; ++i)
+		String[] spliturls = platformurls.split(",");
+		for (int i = 0; i < spliturls.length; ++i)
 		{
-			addPlatform(platformurls[i].trim());
+			addPlatform(spliturls[i].trim());
 		}
+		return IFuture.DONE;
 	}
 	
 	/**

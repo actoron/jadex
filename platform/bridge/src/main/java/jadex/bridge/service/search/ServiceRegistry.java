@@ -16,7 +16,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -160,6 +159,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		lock.lock();
 		try
 		{
+			indexer.removeValue(service);
+			
 			indexer.addValue(service);
 			
 			// If services belongs to excluded component cache them
@@ -274,7 +275,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	
 	/**
 	 *  Remove services of a platform from the registry.
-	 *  @param platform The platform.
+	 *  @param platform The platform, null for everything.
 	 */
 	// write
 	public void removeServices(IComponentIdentifier platform)
@@ -285,7 +286,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		lock.lock();
 		try
 		{
-			pservs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
+			if (platform == null)
+				pservs = indexer.getAllValues();
+			else
+				pservs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
 			if(pservs != null)
 			{
 				for(IServiceIdentifier serv : pservs)
@@ -472,8 +476,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			rwlock.writeLock().unlock();
 		}
 		
-		for(IServiceIdentifier ser: SUtil.safeSet(sers))
+		for (Iterator<IServiceIdentifier> it = sers.iterator(); it.hasNext(); )
 		{
+			IServiceIdentifier ser = it.next();
 			dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
 		}
 		
@@ -485,7 +490,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param query ServiceQuery.
 	 */
 	// write
-	protected void removeQuery(final ServiceQuery<?> query)
+	public void removeQuery(final ServiceQuery<?> query)
 	{
 		
 		rwlock.writeLock().lock();
@@ -674,12 +679,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected void dispatchQueryEvent(ServiceQueryInfo<?> queryinfo, IServiceIdentifier ser, int eventtype)
 	{
 		ServiceQuery<?> query = queryinfo.getQuery();
-		if(query.getReturnType()!=null &&  ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
+		if (query.getReturnType() != null && ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
 			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResult(event);
 		}
-		else if(ServiceEvent.SERVICE_ADDED==eventtype)
+		else if (ServiceEvent.SERVICE_ADDED==eventtype)
 		{
 			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResult(ser);
 		}
