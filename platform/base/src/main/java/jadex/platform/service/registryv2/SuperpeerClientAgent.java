@@ -1,6 +1,9 @@
 package jadex.platform.service.registryv2;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.base.IPlatformConfiguration;
@@ -20,15 +23,21 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Binding;
 
 /**
@@ -44,6 +53,9 @@ public class SuperpeerClientAgent
 	@Agent
 	protected IInternalAccess	agent;
 	
+	/** The managed connections for each network. */
+	protected Map<String, NetworkManager>	connections;
+	
 	//-------- agent life cycle --------
 	
 	/**
@@ -53,26 +65,38 @@ public class SuperpeerClientAgent
 	protected IFuture<Void>	init()
 	{
 		Future<Void>	ret	= new Future<>();
+		connections	= new LinkedHashMap<>();
 		
 		ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class));
-		secser.getNetworkNames().addResultListener(agent.getFeature(IExecutionFeature.class)
-			.createResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
+		secser.getNetworkNames().addResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
 		{
 			@Override
 			public void customResultAvailable(Set<String> networks) throws Exception
 			{
+				assert agent.getFeature(IExecutionFeature.class).isComponentThread();
+				
 				for(String network: networks)
 				{
-					// Todo: remember and allow dynamic changes to networks?
-					// TODO: remember for shutdown...
-					new NetworkManager(network);
+					connections.put(network, new NetworkManager(network));
 				}
 					
 				ret.setResult(null);
 			}
-		}));
+		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Close all connections on shutdown.
+	 */
+	@AgentKilled
+	protected void	shutdown()
+	{
+		for(NetworkManager manager: connections.values())
+		{
+			manager.stop();
+		}
 	}
 	
 	//-------- helper classes --------
@@ -86,6 +110,9 @@ public class SuperpeerClientAgent
 		
 		/** The managed network (i.e. network name). */
 		protected String	networkname;
+		
+		/** The flag to indicate the manager should be active. */
+		protected boolean	running;
 		
 		/** The current query future for available super peers for a given network (only set while searching for the network). */
 		protected ISubscriptionIntermediateFuture<ISuperpeerService>	superpeerquery;
@@ -111,6 +138,16 @@ public class SuperpeerClientAgent
 		}
 		
 		//------- helper methods ---------
+		
+		/**
+		 *  Disconnect and stop all activity, if any.
+		 */
+		protected void	stop()
+		{
+			running	= false;
+			stopSuperpeerSearch();
+			stopSuperpeerSubscription();
+		}
 	
 		/**
 		 *  Find a super peer for a given network.
@@ -120,8 +157,8 @@ public class SuperpeerClientAgent
 		protected void startSuperpeerSearch()
 		{
 			// Clean start for new search (e.g. failure recovery).
-			stopSuperpeerSubscription();
-			stopSuperpeerSearch();
+			stop();
+			running	= true;
 			
 			assert superpeerquery==null;
 			assert superpeer==null;
@@ -141,140 +178,142 @@ public class SuperpeerClientAgent
 				@Override
 				public void intermediateResultAvailable(ISuperpeerService sp)
 				{
-					System.out.println(agent+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
-					ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
-					regfut.addResultListener(new IIntermediateResultListener<Void>()
+					if(running)
 					{
-						@Override
-						public void intermediateResultAvailable(Void result)
+						System.out.println(agent+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
+						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
+						regfut.addResultListener(new IIntermediateResultListener<Void>()
 						{
-							// First command -> connected (shouldn't be any other commands).
-							
-							// First connected super peer -> remember connection and stop search
-							if(superpeer==null)
+							@Override
+							public void intermediateResultAvailable(Void result)
 							{
-								System.out.println(agent+" accepting super peer connection for network "+networkname+" from super peer: "+sp);
+								// First command -> connected (shouldn't be any other commands).
 								
-								// Stop ongoing search, if any
-								stopSuperpeerSearch();
-								superpeer	= sp;
-								connection	= regfut;
-								
-								// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
-								localquery = ServiceRegistry.getRegistry(agent.getIdentifier())
-									.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM)
-										.setNetworkNames(networkname).setReturnType(ServiceEvent.CLASSINFO));
-								localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
+								// First connected super peer -> remember connection and stop search
+								if(running && superpeer==null)
 								{
-									public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
-									{
-										// Should not happen?
-										assert false;
-									}
+									System.out.println(agent+" accepting super peer connection for network "+networkname+" from super peer: "+sp);
 									
-									public void exceptionOccurred(Exception exception)
+									// Stop ongoing search, if any
+									stopSuperpeerSearch();
+									superpeer	= sp;
+									connection	= regfut;
+									
+									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
+									localquery = ServiceRegistry.getRegistry(agent.getIdentifier())
+										.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM)
+											.setNetworkNames(networkname).setReturnType(ServiceEvent.CLASSINFO));
+									localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 									{
-										// Should only happen on termination?
-										assert exception instanceof FutureTerminatedException : exception;
-									}
-	
-									public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
-									{
-										agent.scheduleStep(new IComponentStep<Void>()
+										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
 										{
-											public IFuture<Void> execute(IInternalAccess ia)
+											// Should not happen?
+											assert false;
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											// Should only happen on termination?
+											assert exception instanceof FutureTerminatedException : exception;
+										}
+		
+										public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
+										{
+											agent.scheduleStep(new IComponentStep<Void>()
 											{
-												try
+												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													regfut.sendBackwardCommand(event);
-												}
-												catch (Exception e)
-												{
-													startSuperpeerSearch();
-												}
-												return IFuture.DONE;
-											};
-										});
-									}
-	
-									public void finished()
-									{
-										// Should not happen?
-										assert false;
-									}
-								});
+													try
+													{
+														regfut.sendBackwardCommand(event);
+													}
+													catch (Exception e)
+													{
+														startSuperpeerSearch();
+													}
+													return IFuture.DONE;
+												};
+											});
+										}
+		
+										public void finished()
+										{
+											// Should not happen?
+											assert false;
+										}
+									});
+								}
+								
+								// Stopped or additional connection -> terminate connection. 
+								else
+								{
+									regfut.terminate();
+								}
+							}	
+							
+							@Override
+							public void resultAvailable(Collection<Void> result)
+							{
+								checkConnectionRetry(null);
 							}
 							
-							// Already connected to other super peer -> terminate additional connection. 
-							else
+							@Override
+							public void finished()
 							{
-								System.out.println(agent+" ignoring additional super peer connection for network "+networkname+" from super peer: "+sp);
-								regfut.terminate(new IllegalStateException("Already connected to other super peer."));
-							}
-						}	
-						
-						@Override
-						public void resultAvailable(Collection<Void> result)
-						{
-							checkConnectionRetry(null);
-						}
-						
-						@Override
-						public void finished()
-						{
-							checkConnectionRetry(null);
-						}
-						
-						@Override
-						public void exceptionOccurred(Exception exception)
-						{
-							checkConnectionRetry(exception);
-						}
-						
-						/**
-						 *  When some connection finishes or fails -> check if current connection and restart query.
-						 */
-						protected void	checkConnectionRetry(Exception reason)
-						{
-							// Connection still current but ended?
-							if(superpeer==sp)
-							{
-								// On error -> restart search after e.g. 300 millis (realtime) (very small delay to prevent busy loop on persistent immediate error)
-								agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getIdentifier(), 0.01), new IComponentStep<Void>()
-								{
-									@Override
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										// Still no other connection in between?
-										if(superpeer==sp)
-										{
-											// Restart connection attempt
-											lis.intermediateResultAvailable(sp);
-										}
-										return IFuture.DONE;
-									}
-								}, true);
+								checkConnectionRetry(null);
 							}
 							
-							// Connection immediately failed but no other connection -> retry this super peer after some timeout
-							if(superpeer==null && !(reason instanceof ComponentTerminatedException))
+							@Override
+							public void exceptionOccurred(Exception exception)
 							{
-								agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getRemoteDefaultTimeout(agent.getIdentifier()), new IComponentStep<Void>()
-								{
-									@Override
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										// Still no connection?
-										if(superpeer==null)
-										{
-											startSuperpeerSearch();
-										}
-										return IFuture.DONE;
-									}
-								}, true);
+								checkConnectionRetry(exception);
 							}
-						}
-					});
+							
+							/**
+							 *  When some connection finishes or fails -> check if current connection and restart query.
+							 */
+							protected void	checkConnectionRetry(Exception reason)
+							{
+								// Connection still current but ended?
+								if(running && superpeer==sp)
+								{
+									// On error -> restart search after e.g. 300 millis (realtime) (very small delay to prevent busy loop on persistent immediate error)
+									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getIdentifier(), 0.01), new IComponentStep<Void>()
+									{
+										@Override
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											// Still no other connection in between?
+											if(running && superpeer==sp)
+											{
+												// Restart connection attempt
+												lis.intermediateResultAvailable(sp);
+											}
+											return IFuture.DONE;
+										}
+									}, true);
+								}
+								
+								// Connection immediately failed but no other connection -> retry this super peer after some timeout
+								if(superpeer==null && !(reason instanceof ComponentTerminatedException))
+								{
+									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getRemoteDefaultTimeout(agent.getIdentifier()), new IComponentStep<Void>()
+									{
+										@Override
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											// Still no connection?
+											if(superpeer==null)
+											{
+												startSuperpeerSearch();
+											}
+											return IFuture.DONE;
+										}
+									}, true);
+								}
+							}
+						});
+					}
 				}
 				
 				@Override
@@ -297,7 +336,7 @@ public class SuperpeerClientAgent
 					 assert queryfut.isDone();
 					 
 					// Search still valid but ended?
-					if(superpeerquery==queryfut)
+					if(running && superpeerquery==queryfut)
 					{
 						// On error -> restart search after e.g. 3 secs (realtime) (small delay to prevent busy loop on persistent immediate error)
 						agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getIdentifier(), 0.1), new IComponentStep<Void>()
@@ -306,7 +345,7 @@ public class SuperpeerClientAgent
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								// Still no other search started in between?
-								if(superpeerquery==queryfut)
+								if(running && superpeerquery==queryfut)
 								{
 									startSuperpeerSearch();
 								}
@@ -352,6 +391,114 @@ public class SuperpeerClientAgent
 				connection	= null;
 				superpeer	= null;
 			}
+		}
+
+		protected <T>	void	addQueryForAddLater(ServiceQuery<T> query, SubscriptionIntermediateFuture<T> ret,
+			MultiCollection<ISuperpeerService, String> networkspersuperpeer, Collection<ITerminableIntermediateFuture<T>> futures)
+		{
+			// TODO Auto-generated method stub
+		}
+	}
+	
+	//-------- query handling --------
+	
+	/**
+	 *  Add a query to relevant super peers.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T>	addQuery(ServiceQuery<T> query)
+	{
+		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
+		MultiCollection<ISuperpeerService, String>	networkspersuperpeer	= new MultiCollection<>();
+		Set<ITerminableIntermediateFuture<T>>	futures	= new LinkedHashSet<>();
+		doAddQuery(query, query.getNetworkNames(), ret, networkspersuperpeer, futures);
+		
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				for(ITerminableFuture<?> fut: futures.toArray(new ITerminableFuture[futures.size()]))
+				{
+					fut.terminate();
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add/update query connections to relevant super peers for given networks.
+	 */
+	protected <T> void	doAddQuery(ServiceQuery<T> query, String[] networknames,
+		SubscriptionIntermediateFuture<T> ret, MultiCollection<ISuperpeerService, String> networkspersuperpeer,
+		Collection<ITerminableIntermediateFuture<T>> futures)
+	{
+		// Remember new superpeers, unless initial invocation with empty multicollection.
+		Set<ISuperpeerService>	newsuperpeers	= networkspersuperpeer.isEmpty() ? null : new LinkedHashSet<>();
+		
+		// Fill multicollection with relevant superpeers for networks
+		for(String networkname: networknames)
+		{
+			NetworkManager	manager	= connections.get(networkname);
+			if(manager!=null)
+			{
+				if(manager.superpeer!=null)
+				{
+					Collection<String>	col	= networkspersuperpeer.add(manager.superpeer, networkname);
+					if(newsuperpeers!=null && col.size()==1)
+						newsuperpeers.add(manager.superpeer);
+				}
+				
+				// Not yet connected to superpeer for network -> remember for later
+				else
+				{
+					manager.addQueryForAddLater(query, ret, networkspersuperpeer, futures);
+				}
+			}
+			
+			// else ignore unknown network
+		}
+		
+		// Add queries for each relevant superpeer
+		for(ISuperpeerService superpeer: networkspersuperpeer.keySet())
+		{
+			ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
+			futures.add(fut);
+			fut.addResultListener(new IIntermediateResultListener<T>()
+			{
+				@Override
+				public void intermediateResultAvailable(T result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// Reconnect query on error, if user query still active
+					if(!ret.isDone())
+					{
+						futures.remove(fut);
+						Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
+						doAddQuery(query, failed_networks.toArray(new String[failed_networks.size()]), ret, networkspersuperpeer, futures);
+					}
+				}
+				
+				@Override
+				public void finished()
+				{
+					// shouldn't happen?
+					exceptionOccurred(null);
+				}
+				
+				@Override
+				public void resultAvailable(Collection<T> result)
+				{
+					// shouldn't happen?
+					exceptionOccurred(null);
+				}
+			});
 		}
 	}
 	
