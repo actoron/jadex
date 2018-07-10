@@ -155,7 +155,7 @@ public class BeanProperty
 		this.getter = getter;
 		try
 		{
-			this.getterhandle = MethodHandles.lookup().unreflect(getter);
+			this.getterhandle = MethodHandles.lookup().unreflect(getter).asFixedArity();
 		}
 		catch (Exception e)
 		{
@@ -188,7 +188,7 @@ public class BeanProperty
 		this.setter = setter;
 		try
 		{
-			this.setterhandle = MethodHandles.lookup().unreflect(setter);
+			this.setterhandle = MethodHandles.lookup().unreflect(setter).asFixedArity();
 		}
 		catch (Exception e)
 		{
@@ -260,7 +260,7 @@ public class BeanProperty
 		
 		try
 		{
-			MethodHandle mh = MethodHandles.lookup().unreflectGetter(field);
+			MethodHandle mh = MethodHandles.lookup().unreflectGetter(field).asFixedArity();
 			if (Modifier.isStatic(field.getModifiers()))
 				staticgetterhandle = mh;
 			else
@@ -272,7 +272,7 @@ public class BeanProperty
 		
 		try
 		{
-			MethodHandle mh = MethodHandles.lookup().unreflectSetter(field);
+			MethodHandle mh = MethodHandles.lookup().unreflectSetter(field).asFixedArity();
 			if (Modifier.isStatic(field.getModifiers()))
 				staticsetterhandle = mh;
 			else
