@@ -380,19 +380,7 @@ public class BeanProperty
 			}
 			catch (Throwable e)
 			{
-				// Doesn't work for varargs method !???
-				if (setter != null)
-				{
-					try
-					{
-						setter.invoke(object, new Object[] { value });
-					}
-					catch(Exception e2)
-					{
-						throw SUtil.throwUnchecked(e);
-					}
-				}
-//				SUtil.throwUnchecked(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 		else if (staticsetterhandle != null)
