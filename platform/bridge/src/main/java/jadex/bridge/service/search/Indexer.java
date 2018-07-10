@@ -16,6 +16,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 
@@ -319,19 +320,16 @@ public class Indexer<T>
 					keys.add("null");
 				}	
 				
-				if(keys!=null)
+				for(String key: SUtil.safeSet(keys))
 				{
-					for(String key: keys)
+					// Fetch the set of indexed elements for this key value and add the value
+					Set<T> valset = entry.getValue().get(key);
+					if(valset == null)
 					{
-						// Fetch the set of indexed elements for this key value and add the value
-						Set<T> valset = entry.getValue().get(key);
-						if(valset == null)
-						{
-							valset = new HashSet<T>();
-							entry.getValue().put(key, valset);
-						}
-						valset.add(value);
+						valset = new HashSet<T>();
+						entry.getValue().put(key, valset);
 					}
+					valset.add(value);
 				}
 			}
 		}
