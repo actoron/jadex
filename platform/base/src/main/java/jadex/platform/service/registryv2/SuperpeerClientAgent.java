@@ -219,21 +219,24 @@ public class SuperpeerClientAgent
 		
 										public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
 										{
-											agent.scheduleStep(new IComponentStep<Void>()
+											if (!RequiredServiceInfo.isScopeOnLocalPlatform(event.getService().getScope()))
 											{
-												public IFuture<Void> execute(IInternalAccess ia)
+												agent.scheduleStep(new IComponentStep<Void>()
 												{
-													try
+													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														regfut.sendBackwardCommand(event);
-													}
-													catch (Exception e)
-													{
-														startSuperpeerSearch();
-													}
-													return IFuture.DONE;
-												};
-											});
+														try
+														{
+															regfut.sendBackwardCommand(event);
+														}
+														catch (Exception e)
+														{
+															startSuperpeerSearch();
+														}
+														return IFuture.DONE;
+													};
+												});
+											}
 										}
 		
 										public void finished()
@@ -464,12 +467,13 @@ public class SuperpeerClientAgent
 		for(ISuperpeerService superpeer: networkspersuperpeer.keySet())
 		{
 			ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
-			futures.add(fut);
+			futures.add(fut);	// Remember future for later termination
 			fut.addResultListener(new IIntermediateResultListener<T>()
 			{
 				@Override
 				public void intermediateResultAvailable(T result)
 				{
+					// Forward result to user query
 					ret.addIntermediateResult(result);
 				}
 				
@@ -479,6 +483,7 @@ public class SuperpeerClientAgent
 					// Reconnect query on error, if user query still active
 					if(!ret.isDone())
 					{
+						// Just remove from lists and try again
 						futures.remove(fut);
 						Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
 						doAddQuery(query, failed_networks.toArray(new String[failed_networks.size()]), ret, networkspersuperpeer, futures);
