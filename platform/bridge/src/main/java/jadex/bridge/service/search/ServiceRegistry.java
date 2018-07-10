@@ -224,18 +224,41 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public void updateService(IServiceIdentifier service)
 	{
-		rwlock.writeLock().lock();
-		try
+		if (service == null)
 		{
-			indexer.removeValue(service);
-			indexer.addValue(service);
+			rwlock.writeLock().lock();
+			Set<IServiceIdentifier> services = indexer.getAllValues();
+			try
+			{
+				for (IServiceIdentifier ser : services)
+				{
+					indexer.removeValue(ser);
+					indexer.addValue(ser);
+				}
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			for (IServiceIdentifier ser : services)
+				checkQueries(ser, ServiceEvent.SERVICE_CHANGED);
 		}
-		finally
+		else
 		{
-			rwlock.writeLock().unlock();
+			rwlock.writeLock().lock();
+			try
+			{
+				indexer.removeValue(service);
+				indexer.addValue(service);
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			checkQueries(service, ServiceEvent.SERVICE_CHANGED);
 		}
-		
-		checkQueries(service, ServiceEvent.SERVICE_CHANGED);
 	}
 	
 	/**

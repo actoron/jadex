@@ -30,6 +30,7 @@ import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -461,6 +462,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				msgfeat.addMessageHandler(new ReencryptRequestHandler());
 				
 				ret.setResult(null);
+			}
+		});
+		
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// Reindex services since networks are now available.
+				ServiceRegistry.getRegistry(agent.getIdentifier().getRoot()).updateService(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
 			}
 		});
 		
