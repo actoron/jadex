@@ -180,21 +180,24 @@ public class SuperpeerClientAgent
 	
 									public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
 									{
-										agent.scheduleStep(new IComponentStep<Void>()
+										if (!RequiredServiceInfo.isScopeOnLocalPlatform(event.getService().getScope()))
 										{
-											public IFuture<Void> execute(IInternalAccess ia)
+											agent.scheduleStep(new IComponentStep<Void>()
 											{
-												try
+												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													regfut.sendBackwardCommand(event);
-												}
-												catch (Exception e)
-												{
-													startSuperpeerSearch();
-												}
-												return IFuture.DONE;
-											};
-										});
+													try
+													{
+														regfut.sendBackwardCommand(event);
+													}
+													catch (Exception e)
+													{
+														startSuperpeerSearch();
+													}
+													return IFuture.DONE;
+												};
+											});
+										}
 									}
 	
 									public void finished()
