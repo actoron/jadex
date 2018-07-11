@@ -466,7 +466,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 				}
 			}
 		}
-		Logger.getLogger("security").info("Remote networks verified: " + Arrays.toString(ret.toArray()));
+		Logger.getLogger("security").fine("Remote networks verified: " + Arrays.toString(ret.toArray()));
 		return ret;
 	}
 	

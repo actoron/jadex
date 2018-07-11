@@ -1,7 +1,5 @@
 package jadex.platform.service.security.auth;
 
-import java.util.logging.Logger;
-
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Pack;
@@ -15,11 +13,11 @@ import jadex.commons.security.SSecurity;
  */
 public class PasswordSecret extends SharedSecret
 {
+	/** Password length weakness threshold. */
+	public static final int MIN_GOOD_PASSWORD_LENGTH = 12;
+	
 	/** Prefix used to encode secret type as strings.*/
 	public static final String PREFIX = "pw";
-	
-	/** Password length warning threshold. */
-	protected static final int WARN_PASSWORD_LENGTH = 10;
 	
 	/** SCrypt work factor / hardness for password strengthening. */
 	protected static final int SCRYPT_N = 16384;
@@ -66,9 +64,6 @@ public class PasswordSecret extends SharedSecret
 		{
 			this.password = password;
 		}
-		
-		if (this.password.length() < WARN_PASSWORD_LENGTH)
-			Logger.getLogger("sharedsecret").warning("Weak password detected: + " + this.password + ", please use at least " + WARN_PASSWORD_LENGTH + " random characters.");
 	}
 	
 	/**
@@ -136,6 +131,16 @@ public class PasswordSecret extends SharedSecret
 		int p = Pack.littleEndianToInt(dfparams, 12);
 		
 		return SCryptParallel.generate(password.getBytes(SUtil.UTF8), salt, n, r, p, keysize);
+	}
+	
+	/**
+	 *  Returns if the password is weak.
+	 *  
+	 *  @return True, if weak.
+	 */
+	public boolean isWeak()
+	{
+		return password.length() < MIN_GOOD_PASSWORD_LENGTH;
 	}
 	
 	/** 
