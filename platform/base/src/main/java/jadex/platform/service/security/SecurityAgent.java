@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -469,6 +470,33 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void resultAvailable(Void result)
 			{
+				// Warn about weak passwords.
+				Map<PasswordSecret, String> pwsecrets = new HashMap<>();
+				if (platformsecret instanceof PasswordSecret)
+					pwsecrets.put((PasswordSecret) platformsecret, "local platform");
+				
+				for (Map.Entry<IComponentIdentifier, AbstractAuthenticationSecret> entry : remoteplatformsecrets.entrySet())
+				{
+					if (entry.getValue() instanceof PasswordSecret)
+						pwsecrets.put((PasswordSecret) entry.getValue(), "for remote platform '" + entry.getKey().toString() + "'");
+				}
+
+				for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> nwentry : networks.entrySet())
+				{
+					for (AbstractAuthenticationSecret secret : nwentry.getValue())
+					{
+						if (secret instanceof PasswordSecret)
+							pwsecrets.put((PasswordSecret) secret, "network '" + nwentry.getKey() + "'");
+					}
+				}
+				
+				for (Map.Entry<PasswordSecret, String> entry : pwsecrets.entrySet())
+				{
+//					System.out.println("CHECKING " + secret + " " + secret.isWeak());
+					if (entry.getKey().isWeak())
+						agent.getLogger().severe(agent.getIdentifier().getName() + ": Weak password detected for " + entry.getValue() + ", password '" + entry.getKey().getPassword() + "' is too short, please use at least " + PasswordSecret.MIN_GOOD_PASSWORD_LENGTH + " random characters.");
+				}
+				
 				// Reindex services since networks are now available.
 				ServiceRegistry.getRegistry(agent.getIdentifier().getRoot()).updateService(null);
 			}
