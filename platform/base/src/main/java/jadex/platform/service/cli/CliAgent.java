@@ -23,6 +23,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -50,7 +51,7 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent
+@Agent(autostart=Boolean3.TRUE)
 @Service
 @Arguments(
 {

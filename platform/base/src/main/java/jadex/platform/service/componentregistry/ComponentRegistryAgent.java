@@ -30,6 +30,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
@@ -52,7 +53,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The component registry is a component for creating proxy services.
  *  Real services/components are created on demand on service call.
  */
-@Agent
+@Agent(autostart=Boolean3.FALSE, autostartname="serviceproxy")
 @Service
 @Imports("jadex.bridge.service.types.cms.*")
 @Arguments(

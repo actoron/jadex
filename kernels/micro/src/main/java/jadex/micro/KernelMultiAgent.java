@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -43,7 +44,7 @@ import jadex.micro.annotation.ProvidedServices;
 		@Component(name="kernel_micro", type="KernelMicro")
 	})
 })
-@Agent
+@Agent(autostart=Boolean3.TRUE, autostartname="kernel_multi")
 @Properties(@NameValue(name="system", value="true"))
 public class KernelMultiAgent
 {

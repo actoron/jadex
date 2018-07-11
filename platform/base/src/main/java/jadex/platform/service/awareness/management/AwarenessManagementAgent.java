@@ -34,6 +34,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.Boolean3;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
 import jadex.commons.Tuple2;
@@ -113,7 +114,7 @@ import jadex.micro.annotation.RequiredServices;
 //	@GuiClassName("jadex.android.controlcenter.settings.AwarenessSettingsScreen"),
 //	@GuiClassName("jadex.tools.awareness.AwarenessAgentPanel") 
 //})
-@Agent
+@Agent(autostart=Boolean3.TRUE, autostartname="awa")
 public class AwarenessManagementAgent	implements IPropertiesProvider, IAwarenessManagementService
 {
 	//-------- attributes --------

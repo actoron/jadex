@@ -45,6 +45,7 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
+import jadex.commons.Boolean3;
 import jadex.commons.SConfigParser;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -74,7 +75,8 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 /**
  *  Agent implementing relay routing.
  */
-@Agent//(autoprovide=Boolean3.TRUE)
+//@Agent(autoprovide=Boolean3.TRUE)
+@Agent(autostart=Boolean3.TRUE, autostartname="rt")
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),

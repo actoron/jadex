@@ -14,6 +14,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -47,7 +48,7 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent
+@Agent(autostart=Boolean3.TRUE, autostartname="jcc")
 @Properties(@NameValue(name="system", value="true"))
 public class JCCAgent	implements IComponentStep<Void>
 {
