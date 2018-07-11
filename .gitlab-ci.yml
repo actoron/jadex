@@ -6,7 +6,7 @@ quicktest:
     GIT_STRATEGY: fetch
     GIT_DEPTH: "1"
   script:
-    - gradlew -Pdist=publishdists clean test -x javadoc --info --stacktrace --no-daemon
+    - gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas --info --stacktrace --no-daemon
   tags:
     - win
   cache:

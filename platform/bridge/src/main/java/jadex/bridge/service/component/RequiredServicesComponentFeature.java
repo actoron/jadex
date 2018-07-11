@@ -863,7 +863,8 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// Set scope if not set
 		if(query.getScope()==null)
 		{
-			query.setScope(ServiceIdentifier.isSystemService(query.getServiceType().getType(getComponent().getClassLoader()))
+			// Default to application if service type not set or not system service
+			query.setScope(query.getServiceType()!=null && ServiceIdentifier.isSystemService(query.getServiceType().getType(getComponent().getClassLoader()))
 				? RequiredServiceInfo.SCOPE_PLATFORM : RequiredServiceInfo.SCOPE_APPLICATION);
 		}
 		

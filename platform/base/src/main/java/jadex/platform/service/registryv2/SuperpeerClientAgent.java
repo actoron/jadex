@@ -1,5 +1,6 @@
 package jadex.platform.service.registryv2;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -99,6 +100,18 @@ public class SuperpeerClientAgent
 		}
 	}
 	
+	//-------- query handling --------
+	
+	/**
+	 *  Add a query to relevant super peers.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T>	addQuery(ServiceQuery<T> query)
+	{
+		// todo: remember and terminate managed queries on shutdown?
+		QueryManager<T>	qinfo	= new QueryManager<>(query);
+		return qinfo.getReturnFuture();
+	}
+	
 	//-------- helper classes --------
 	
 	/**
@@ -125,6 +138,9 @@ public class SuperpeerClientAgent
 		
 		/** Query on the local registry used to transmit changes to super peer. */
 		protected ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> localquery;
+		
+		/** User queries waiting for a connection to superpeer. */
+		Collection<QueryManager<?>>	waitingqueries	= new ArrayList<>();
 		
 		//-------- constructors --------
 		
@@ -198,6 +214,13 @@ public class SuperpeerClientAgent
 									stopSuperpeerSearch();
 									superpeer	= sp;
 									connection	= regfut;
+									
+									// Activate waiting queries if any.
+									for(QueryManager<?> qmanager: waitingqueries)
+									{
+										qmanager.updateQuery(new String[]{networkname});
+									}
+									waitingqueries.clear();
 									
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
 									localquery = ServiceRegistry.getRegistry(agent.getIdentifier())
@@ -396,114 +419,149 @@ public class SuperpeerClientAgent
 			}
 		}
 
-		protected <T>	void	addQueryForAddLater(ServiceQuery<T> query, SubscriptionIntermediateFuture<T> ret,
-			MultiCollection<ISuperpeerService, String> networkspersuperpeer, Collection<ITerminableIntermediateFuture<T>> futures)
+		/**
+		 *  When no connection to network -> remember query until connection etsablished. 
+		 */
+		protected <T>	void	addWaitingQuery(QueryManager<T> qmanager)
 		{
-			// TODO Auto-generated method stub
+			assert superpeer==null : "Should only be called when no connection.";
+			waitingqueries.add(qmanager);
 		}
 	}
 	
-	//-------- query handling --------
-	
 	/**
-	 *  Add a query to relevant super peers.
+	 *  Internal handler for each user query.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T>	addQuery(ServiceQuery<T> query)
+	protected class QueryManager<T>
 	{
-		SubscriptionIntermediateFuture<T>	ret	= new SubscriptionIntermediateFuture<>();
-		MultiCollection<ISuperpeerService, String>	networkspersuperpeer	= new MultiCollection<>();
-		Set<ITerminableIntermediateFuture<T>>	futures	= new LinkedHashSet<>();
-		doAddQuery(query, query.getNetworkNames(), ret, networkspersuperpeer, futures);
+		//-------- attributes --------
 		
-		ret.setTerminationCommand(new TerminationCommand()
+		/** The query itself. */
+		protected ServiceQuery<T>	query;
+		
+		/** The return future to the user. */
+		protected SubscriptionIntermediateFuture<T> retfut;
+		
+		/** The map of handled networks by each superpeer. */
+		protected MultiCollection<ISuperpeerService, String> networkspersuperpeer;
+		
+		/** The auxiliary futures as received from superpeers. */
+		protected Collection<ITerminableIntermediateFuture<T>> futures;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a query manager and start query handling.
+		 */
+		protected QueryManager(ServiceQuery<T> query)
 		{
-			@Override
-			public void terminated(Exception reason)
-			{
-				for(ITerminableFuture<?> fut: futures.toArray(new ITerminableFuture[futures.size()]))
-				{
-					fut.terminate();
-				}
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Add/update query connections to relevant super peers for given networks.
-	 */
-	protected <T> void	doAddQuery(ServiceQuery<T> query, String[] networknames,
-		SubscriptionIntermediateFuture<T> ret, MultiCollection<ISuperpeerService, String> networkspersuperpeer,
-		Collection<ITerminableIntermediateFuture<T>> futures)
-	{
-		// Remember new superpeers, unless initial invocation with empty multicollection.
-		Set<ISuperpeerService>	newsuperpeers	= networkspersuperpeer.isEmpty() ? null : new LinkedHashSet<>();
-		
-		// Fill multicollection with relevant superpeers for networks
-		for(String networkname: networknames)
-		{
-			NetworkManager	manager	= connections.get(networkname);
-			if(manager!=null)
-			{
-				if(manager.superpeer!=null)
-				{
-					Collection<String>	col	= networkspersuperpeer.add(manager.superpeer, networkname);
-					if(newsuperpeers!=null && col.size()==1)
-						newsuperpeers.add(manager.superpeer);
-				}
-				
-				// Not yet connected to superpeer for network -> remember for later
-				else
-				{
-					manager.addQueryForAddLater(query, ret, networkspersuperpeer, futures);
-				}
-			}
+			this.query	= query;
+			this.retfut	= new SubscriptionIntermediateFuture<>();
+			this.networkspersuperpeer	= new MultiCollection<>();
+			this.futures	= new LinkedHashSet<>();
 			
-			// else ignore unknown network
-		}
-		
-		// Add queries for each relevant superpeer
-		for(ISuperpeerService superpeer: newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet())
-		{
-			ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
-			futures.add(fut);	// Remember future for later termination
-			fut.addResultListener(new IIntermediateResultListener<T>()
+			retfut.setTerminationCommand(new TerminationCommand()
 			{
 				@Override
-				public void intermediateResultAvailable(T result)
+				public void terminated(Exception reason)
 				{
-					// Forward result to user query
-					ret.addIntermediateResult(result);
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					// Reconnect query on error, if user query still active
-					if(!ret.isDone())
+					for(ITerminableFuture<?> fut: futures.toArray(new ITerminableFuture[futures.size()]))
 					{
-						// Just remove from lists and try again
-						futures.remove(fut);
-						Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
-						doAddQuery(query, failed_networks.toArray(new String[failed_networks.size()]), ret, networkspersuperpeer, futures);
+						fut.terminate();
+					}
+				}
+			});
+			
+			// Start handling
+			updateQuery(query.getNetworkNames());
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  The return future for the user containing all the collected results from the internal queries.
+		 */
+		public ISubscriptionIntermediateFuture<T> getReturnFuture()
+		{
+			return retfut;
+		}
+		
+		//-------- internal methods --------
+		
+		
+		/**
+		 *  Add/update query connections to relevant super peers for given networks.
+		 */
+		protected void	updateQuery(String[] networknames)
+		{
+			// Remember new superpeers, unless initial invocation with empty multicollection.
+			Set<ISuperpeerService>	newsuperpeers	= networkspersuperpeer.isEmpty() ? null : new LinkedHashSet<>();
+			
+			// Fill multicollection with relevant superpeers for networks
+			for(String networkname: networknames)
+			{
+				NetworkManager	manager	= connections.get(networkname);
+				if(manager!=null)
+				{
+					if(manager.superpeer!=null)
+					{
+						Collection<String>	col	= networkspersuperpeer.add(manager.superpeer, networkname);
+						if(newsuperpeers!=null && col.size()==1)
+							newsuperpeers.add(manager.superpeer);
+					}
+					
+					// Not yet connected to superpeer for network -> remember for later
+					else
+					{
+						manager.addWaitingQuery(this);
 					}
 				}
 				
-				@Override
-				public void finished()
+				// else ignore unknown network
+			}
+			
+			// Add queries for each relevant superpeer
+			for(ISuperpeerService superpeer: newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet())
+			{
+				ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
+				futures.add(fut);	// Remember future for later termination
+				fut.addResultListener(new IIntermediateResultListener<T>()
 				{
-					// shouldn't happen?
-					exceptionOccurred(null);
-				}
-				
-				@Override
-				public void resultAvailable(Collection<T> result)
-				{
-					// shouldn't happen?
-					exceptionOccurred(null);
-				}
-			});
+					@Override
+					public void intermediateResultAvailable(T result)
+					{
+						// Forward result to user query
+						retfut.addIntermediateResult(result);
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// Reconnect query on error, if user query still active
+						if(!retfut.isDone())
+						{
+							// Just remove from lists and try again
+							futures.remove(fut);
+							Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
+							updateQuery(failed_networks.toArray(new String[failed_networks.size()]));
+						}
+					}
+					
+					@Override
+					public void finished()
+					{
+						// shouldn't happen?
+						exceptionOccurred(null);
+					}
+					
+					@Override
+					public void resultAvailable(Collection<T> result)
+					{
+						// shouldn't happen?
+						exceptionOccurred(null);
+					}
+				});
+			}
 		}
 	}
 	
