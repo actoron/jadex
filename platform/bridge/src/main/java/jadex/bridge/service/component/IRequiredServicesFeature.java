@@ -98,7 +98,7 @@ public interface IRequiredServicesFeature
 	/**
 	 *  Search for all matching services.
 	 *  @param query	The search query.
-	 *  @return Future providing the corresponding services or ServiceNotFoundException when not found.
+	 *  @return Each service as an intermediate result or a collection of services as final result.
 	 */
 	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query);
 	
@@ -106,7 +106,7 @@ public interface IRequiredServicesFeature
 	 *  Search for all matching services.
 	 *  Synchronous method only for locally available services.
 	 *  @param query	The search query.
-	 *  @return The corresponding services or ServiceNotFoundException when not found.
+	 *  @return A collection of services.
 	 */
 	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query);
 	

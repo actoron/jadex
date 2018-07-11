@@ -50,8 +50,8 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
@@ -1019,10 +1019,10 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		final Future<Tuple2<String, ClassLoader>> ret = new Future<Tuple2<String, ClassLoader>>();
 		
-		try
+		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		// Hack!!! May be null on platform init
+		if(libservice!=null)
 		{
-			// Hack for platform init
-			ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			libservice.getClassLoader(rid).addResultListener(createResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
 			{
 				public void customResultAvailable(ClassLoader cl)
@@ -1087,7 +1087,7 @@ public class ComponentManagementService implements IComponentManagementService
 				}
 			}));
 		}
-		catch(ServiceNotFoundException s)
+		else
 		{
 			// Hack for platform init
 			String	filename	= modelname;
@@ -3318,17 +3318,8 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IClockService getClockService0()
 	{
-		IClockService ret = null;
-		
-		try
-		{
-			ret = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		}
-		catch(ServiceNotFoundException e)
-		{
-		}
-		
-		return ret;
+		return agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
+			new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 	}
 	
 //	/**

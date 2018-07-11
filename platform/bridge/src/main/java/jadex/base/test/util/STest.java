@@ -46,6 +46,7 @@ public class STest {
 		// Enable new awareness
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
+		config.addComponent("jadex.platform.service.registryv2.SuperpeerClientAgent.class");
 		config.setAwareness(false);	// disable old awareness
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);
