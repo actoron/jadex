@@ -37,6 +37,7 @@ import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalIntermediateResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -521,7 +522,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ITerminableFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, false);
-		TerminableFuture<T>	ret;
+		Future<T>	ret;
 		
 		// Try to find locally
 		@SuppressWarnings("unchecked")
@@ -540,7 +541,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			if(sqms!=null)
 			{
 				ITerminableFuture<T>	fut	= sqms.searchService(query);
-				ret	= (TerminableFuture<T>)FutureFunctionality.getDelegationFuture(fut, new FutureFunctionality(getComponent().getLogger())
+				ret	= FutureFunctionality.getDelegationFuture(fut, new FutureFunctionality(getComponent().getLogger())
 				{
 					@Override
 					public Object handleResult(Object result) throws Exception
@@ -556,7 +557,9 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 				ret.setException(new ServiceNotFoundException(query.toString()));
 			}
 		}
-		return ret;
+		@SuppressWarnings("unchecked")
+		ITerminableFuture<T>	iret	= (ITerminableFuture<T>)ret;
+		return iret;
 	}
 	
 	/**
@@ -781,6 +784,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 */
 	protected <T>	T	createServiceProxy(T service, RequiredServiceInfo info)
 	{
+//		// If service identifier -> fetch service and create proxy (TODO: proxy for remote service???)
+//		if(service instanceof IServiceIdentifier)
+//		{
+//			T	service	= (T)ServiceRegistry.getRegistry(getComponent()).getLocalService((IServiceIdentifier)service);
+//			result	= createServiceProxy(service, info);
+//		}
+//		
+//		// else service event -> just return event, as desired by user (specified in query return type)
+		
+
+		
 		if(info!=null)
 		{
 			IService	iservice	= (IService)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
