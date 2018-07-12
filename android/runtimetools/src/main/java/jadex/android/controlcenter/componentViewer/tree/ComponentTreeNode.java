@@ -205,7 +205,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName())
 			// Only create proxy nodes for local proxy components to avoid
 			// infinite nesting.
-					&& ((IActiveComponentTreeNode) getModel().getRoot()).getIdentifier().getName().equals(desc.getName().getPlatformName());
+					&& ((IActiveComponentTreeNode) getModel().getRoot()).getId().getName().equals(desc.getName().getPlatformName());
 			if (proxy)
 			{
 				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, access);
