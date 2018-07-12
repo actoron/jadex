@@ -252,8 +252,8 @@ public class PlatformAgent
 					boolean ok = autostart.toBoolean().booleanValue();
 					if(name!=null)
 					{
-						if(argsmap.containsKey("-"+name))
-							ok = (boolean)argsmap.get("-"+name);
+						if(argsmap.containsKey(name))
+							ok = (boolean)argsmap.get(name);
 					}
 					else
 					{
