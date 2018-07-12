@@ -202,7 +202,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		
 		ClassLoader cl = null;
 		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, Binding.SCOPE_PLATFORM));
-		if (serviceid.getProviderId().getPlatformName().equals(component.getIdentifier().getPlatformName()))
+		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
 			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
@@ -1344,7 +1344,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			ret.append("<div class=\"header\">");
 			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
-			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
+			String ifacename = ((IService)service).getId().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
 			ret.append("\n");

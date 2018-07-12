@@ -32,7 +32,7 @@ public class ProviderAgent implements IExampleService
 	 */
 	public IFuture<String> getItem()
 	{
-		return new Future<String>("item: "+agent.getIdentifier().getName());
+		return new Future<String>("item: "+agent.getId().getName());
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class ProviderAgent implements IExampleService
 			{
 				if(cnt[0]++<num)
 				{
-					ret.addIntermediateResult("item: "+agent.getIdentifier().getName()+" "+cnt[0]);
+					ret.addIntermediateResult("item: "+agent.getId().getName()+" "+cnt[0]);
 					agent.getFeature(IExecutionFeature.class).waitForDelay(delay, this);	
 				}
 				else

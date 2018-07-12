@@ -270,7 +270,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Get the service id.
 	 *  @return The service id.
 	 */
-	public IServiceIdentifier getServiceIdentifier()
+	public IServiceIdentifier getId()
 	{
 		if(sid==null)
 			throw new RuntimeException("No service identifier: "+this);
@@ -323,7 +323,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			final INFPropertyComponentFeature nfcf = getInternalAccess().getFeature(INFPropertyComponentFeature.class);
 			IProvidedServicesFeature psf = getInternalAccess().getFeature(IProvidedServicesFeature.class);
 			IInternalService ser = (IInternalService)getInternalAccess().getFeature(IProvidedServicesFeature.class).getProvidedService(type);
-			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
+			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getId())!=null? psf.getProvidedServiceRawImpl(ser.getId()).getClass(): null;
 			// todo: make internal interface for initProperties
 //			if(type!=null && type.getName().indexOf("ITest")!=-1)
 //				System.out.println("sdfsdf");
@@ -561,7 +561,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	{
 		if(obj instanceof IService)
 		{
-			return getServiceIdentifier().equals(((IService) obj).getServiceIdentifier());
+			return getId().equals(((IService) obj).getId());
 		}
 		return false;
 	}
@@ -571,7 +571,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public int hashCode()
 	{
-		return 31 + getServiceIdentifier().hashCode();
+		return 31 + getId().hashCode();
 	}
 	
 	/**

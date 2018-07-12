@@ -112,7 +112,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 		{
 			try
 			{
-				final String old = DISCOVERY_DIR + File.separator+URLEncoder.encode(agent.getIdentifier().getRoot().getLocalName(), "UTF-8");
+				final String old = DISCOVERY_DIR + File.separator+URLEncoder.encode(agent.getId().getRoot().getLocalName(), "UTF-8");
 				File[] files = DISCOVERY_DIR.listFiles(new FileFilter()
 				{
 					public boolean accept(File pathname)
@@ -363,7 +363,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 //				IFuture<IComponentIdentifier> fut2 = cms.updateComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //				IFuture<ITransportComponentIdentifier> fut2 = tas.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
 //				ITransportComponentIdentifier root = fut2.get();
-				IComponentIdentifier root = agent.getIdentifier().getRoot();
+				IComponentIdentifier root = agent.getId().getRoot();
 //				Map<String, String[]> addr = TransportAddressBook.getAddressBook(root).getAllPlatformAddresses(root);
 				List<TransportAddress> addr = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
 				
@@ -384,7 +384,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 				FileOutputStream fos = null;
 				try
 				{
-					outfilepath += URLEncoder.encode(agent.getIdentifier().getRoot().getLocalName(), "UTF-8");
+					outfilepath += URLEncoder.encode(agent.getId().getRoot().getLocalName(), "UTF-8");
 					outfilepath += new String();
 					outfilepath += "_" + String.valueOf(deadline) + ".awa";
 					File outfile = new File(outfilepath);
@@ -485,7 +485,7 @@ public class LocalDiscoveryAgent implements IDiscoveryService
 							{
 								byte[] awadata = SUtil.readFile(file);
 								final AwarenessInfo awainfo = (AwarenessInfo)SBinarySerializer.readObjectFromByteArray(awadata, null, null, agent.getClassLoader(), null);
-								if(!awainfo.getSender().equals(agent.getIdentifier().getRoot()))
+								if(!awainfo.getSender().equals(agent.getId().getRoot()))
 								{
 									List<Tuple2<AwarenessInfo, Long>> ls = awas.get(pname);
 									if(ls==null)

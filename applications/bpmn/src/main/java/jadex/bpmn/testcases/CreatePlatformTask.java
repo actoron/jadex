@@ -32,7 +32,7 @@ public class CreatePlatformTask implements ITask
 		final Future<Void>	ret	= new Future<Void>();
 		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUri().toString();
 		
-		Starter.createPlatform(new String[]{"-platformname", process.getIdentifier().getPlatformPrefix()+"_*",
+		Starter.createPlatform(new String[]{"-platformname", process.getId().getPlatformPrefix()+"_*",
 //			"-logging", "true",
 			"-libpath", "new String[]{\""+url+"\"}",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
@@ -43,7 +43,7 @@ public class CreatePlatformTask implements ITask
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{
-				context.setParameterValue("cid", exta.getIdentifier());
+				context.setParameterValue("cid", exta.getId());
 //				System.out.println("cid: "+exta.getComponentIdentifier().getAddresses());
 				ret.setResult(null);
 			}

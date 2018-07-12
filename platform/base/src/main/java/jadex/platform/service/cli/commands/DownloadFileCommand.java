@@ -194,7 +194,7 @@ public class DownloadFileCommand extends ACliCommand
 				public void intermediateResultAvailable(IFileTransferService result)
 				{
 //					System.out.println("found: "+((IService)result).getServiceIdentifier().getProviderId().getRoot()+" - "+cid);
-					if(((IService)result).getServiceIdentifier().getProviderId().getRoot().equals(cid))
+					if(((IService)result).getId().getProviderId().getRoot().equals(cid))
 					{
 						ret.setResult(result);
 					}

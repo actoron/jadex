@@ -86,7 +86,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getIdentifier());
+				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getId());
 				
 				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();	
@@ -126,12 +126,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	protected IFuture<TestReport[]> testLocal(final int testno, final long delay, final int max)
 	{
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
-		performTestA(agent.getIdentifier().getRoot(), testno, delay, max)
+		performTestA(agent.getId().getRoot(), testno, delay, max)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 		{
 			public void customResultAvailable(final TestReport result1)
 			{
-				performTestB(agent.getIdentifier().getRoot(), testno+1, delay, max)
+				performTestB(agent.getId().getRoot(), testno+1, delay, max)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result2)
@@ -157,7 +157,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getIdentifier().getPlatformPrefix()+"_*",
+			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
 				"-gui", "false", "-simulation", "false", "-printpass", "false",
@@ -172,12 +172,12 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTestA(platform.getIdentifier(), testno, delay, max)
+							performTestA(platform.getId(), testno, delay, max)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 							{
 								public void customResultAvailable(final TestReport result1)
 								{
-									performTestB(platform.getIdentifier(), testno+1, delay, max)
+									performTestB(platform.getId(), testno+1, delay, max)
 										.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 									{
 										public void customResultAvailable(final TestReport result2)
@@ -243,8 +243,8 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
-				final boolean	local	= root.equals(agent.getIdentifier().getRoot());
-				CreationInfo	ci	= new CreationInfo(local ? agent.getIdentifier() : root, rid);
+				final boolean	local	= root.equals(agent.getId().getRoot());
+				CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid);
 				cms.createComponent(null, PullResultProviderAgent.class.getName()+".class", ci, null)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 				{	
@@ -352,8 +352,8 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
-				final boolean	local	= root.equals(agent.getIdentifier().getRoot());
-				CreationInfo	ci	= new CreationInfo(local ? agent.getIdentifier() : root, rid);
+				final boolean	local	= root.equals(agent.getId().getRoot());
+				CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid);
 				cms.createComponent(null, PullResultProviderAgent.class.getName()+".class", ci, null)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 				{	

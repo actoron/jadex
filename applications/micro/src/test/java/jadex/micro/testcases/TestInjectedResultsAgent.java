@@ -56,7 +56,7 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(InjectedResultsAgent.class.getName()+".class", 
-					new CreationInfo(agent.getIdentifier()));
+					new CreationInfo(agent.getId()));
 				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					public void firstResultAvailable(IComponentIdentifier result)

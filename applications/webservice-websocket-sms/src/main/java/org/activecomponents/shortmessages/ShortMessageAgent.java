@@ -72,7 +72,7 @@ public class ShortMessageAgent
 			{
 				try
 				{
-					Collection<String> tags = (Collection<String>)SNFPropertyProvider.getNFPropertyValue(component.getExternalAccess(), ((IService)service).getServiceIdentifier(), TagProperty.NAME).get();
+					Collection<String> tags = (Collection<String>)SNFPropertyProvider.getNFPropertyValue(component.getExternalAccess(), ((IService)service).getId(), TagProperty.NAME).get();
 					if(tags!=null)
 					{
 //						final User user = us.getUser(tags.iterator().next()).get();
@@ -103,7 +103,7 @@ public class ShortMessageAgent
 				}
 				catch(Exception e)
 				{
-					IServiceIdentifier sid = ((IService)service).getServiceIdentifier();
+					IServiceIdentifier sid = ((IService)service).getId();
 					System.out.println("service has no tags: "+sid+" "+sid.getServiceType().getTypeName());
 					e.printStackTrace();
 					// service has no tags

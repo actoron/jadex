@@ -26,7 +26,7 @@ public class WorkpieceBDI
 	@AgentBody
 	public void body(IInternalAccess agent) 
 	{
-		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new StampGoal(agent.getIdentifier(), 
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new StampGoal(agent.getId(), 
 			"date: "+System.currentTimeMillis())).get();
 	}
 }

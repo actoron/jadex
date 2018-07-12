@@ -82,7 +82,7 @@ public class DFTestAgent extends JunitAgentTest
 		{
 			public void customResultAvailable(IDF df)
 			{
-				IDFComponentDescription ad = df.createDFComponentDescription(agent.getIdentifier(), null);
+				IDFComponentDescription ad = df.createDFComponentDescription(agent.getId(), null);
 				df.deregister(ad).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
@@ -106,7 +106,7 @@ public class DFTestAgent extends JunitAgentTest
 			public void resultAvailable(IDF df)
 			{
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
-				IDFComponentDescription ad = df.createDFComponentDescription(agent.getIdentifier(), sd);
+				IDFComponentDescription ad = df.createDFComponentDescription(agent.getId(), sd);
 
 				IFuture<IDFComponentDescription> re = df.register(ad); 
 				re.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IDFComponentDescription>()
@@ -193,11 +193,11 @@ public class DFTestAgent extends JunitAgentTest
 
 		Map<String, Object> hlefMessage = new HashMap<String, Object>();
 		hlefMessage.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-		hlefMessage.put(SFipa.SENDER, agent.getIdentifier());
+		hlefMessage.put(SFipa.SENDER, agent.getId());
 		hlefMessage.put(SFipa.RECEIVERS, cid);
 		hlefMessage.put(SFipa.CONTENT, "testMessage");
 		
-		agent.getFeature(IMessageFeature.class).sendMessage(hlefMessage, agent.getIdentifier())
+		agent.getFeature(IMessageFeature.class).sendMessage(hlefMessage, agent.getId())
 			.addResultListener(new IResultListener<Void>()
 		{
 			@Override

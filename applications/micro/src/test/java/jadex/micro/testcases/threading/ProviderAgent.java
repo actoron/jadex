@@ -30,7 +30,7 @@ public class ProviderAgent implements ITestService
 		
 		Future<Void> ret = new Future<Void>();
 		
-		if(agent.getIdentifier().equals(IComponentIdentifier.LOCAL.get()))
+		if(agent.getId().equals(IComponentIdentifier.LOCAL.get()))
 		{
 			ret.setResult(null);
 		}

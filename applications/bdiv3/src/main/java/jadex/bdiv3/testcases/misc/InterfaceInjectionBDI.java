@@ -26,7 +26,7 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 	public void	body(IInternalAccess ia)
 	{
 		TestReport tr1 = new TestReport("#1", "Test if interface injection works.");
-		if(getIdentifier()!=null)
+		if(getId()!=null)
 		{
 			tr1.setSucceeded(true);
 		}
@@ -34,7 +34,7 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 		{
 			tr1.setFailed("Problem with agent api.");
 		}
-		System.out.println("my name is: "+getIdentifier());
+		System.out.println("my name is: "+getId());
 
 		TestReport tr2 = new TestReport("#2", "Test if platform access interface injection works.");
 		try

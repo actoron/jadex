@@ -104,6 +104,6 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public String toString()
 	{
-		return "ClearChemicalsService, "+agent.getIdentifier();
+		return "ClearChemicalsService, "+agent.getId();
 	}
 }

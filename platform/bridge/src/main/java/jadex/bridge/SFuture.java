@@ -53,7 +53,7 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia, boolean realtime)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ia.getIdentifier()); // Hack!!! find out in which cases service call can null
+		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ia.getId()); // Hack!!! find out in which cases service call can null
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
@@ -71,7 +71,7 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IExternalAccess ea)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ea.getIdentifier()); // Hack!!! find out in which cases service call can null
+		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ea.getId()); // Hack!!! find out in which cases service call can null
 		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);

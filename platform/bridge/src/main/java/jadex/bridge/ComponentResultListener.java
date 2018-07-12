@@ -150,7 +150,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				
 				public void exceptionOccurred(final Exception exception)
 				{
-					Starter.scheduleRescueStep(access.getIdentifier(), new Runnable()
+					Starter.scheduleRescueStep(access.getId(), new Runnable()
 					{
 						public void run()
 						{
@@ -195,7 +195,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						if(exception instanceof ComponentTerminatedException)
 						{
-							Starter.scheduleRescueStep(component.getIdentifier(), new Runnable()
+							Starter.scheduleRescueStep(component.getId(), new Runnable()
 							{
 								public void run()
 								{
@@ -303,7 +303,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						if(e instanceof ComponentTerminatedException)
 						{
-							Starter.scheduleRescueStep(component.getIdentifier(), new Runnable()
+							Starter.scheduleRescueStep(component.getId(), new Runnable()
 							{
 								public void run()
 								{

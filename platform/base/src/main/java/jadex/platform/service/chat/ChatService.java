@@ -284,7 +284,7 @@ public class ChatService implements IChatService, IChatGuiService
 	protected String	getSubname()
 	{
 		String	subname	= null;
-		IComponentIdentifier	cid	= agent.getIdentifier();
+		IComponentIdentifier	cid	= agent.getId();
 		while(cid.getParent()!=null)
 		{
 			subname	= subname==null ? cid.getLocalName() : subname+"."+cid.getLocalName();
@@ -497,7 +497,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				for(int i=0; i<receivers.length; i++)
 				{
-					if(agent.getIdentifier().equals(receivers[i]))
+					if(agent.getId().equals(receivers[i]))
 					{
 						foundself = true;
 					}
@@ -539,7 +539,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			if(self && !foundself)
 			{
-				sendTo(text, agent.getIdentifier(), true).addResultListener(new IResultListener<IChatService>()
+				sendTo(text, agent.getId(), true).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -646,7 +646,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			for(int i=0; i<receivers.length; i++)
 			{
-				if(agent.getIdentifier().equals(receivers[i]))
+				if(agent.getId().equals(receivers[i]))
 				{
 					foundself = true;
 				}
@@ -687,7 +687,7 @@ public class ChatService implements IChatService, IChatGuiService
 			
 			if(!foundself)
 			{
-				statusTo(nick, status, image, agent.getIdentifier()).addResultListener(new IResultListener<IChatService>()
+				statusTo(nick, status, image, agent.getId()).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -1047,7 +1047,7 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				// Call chat service of receiver (alternative interface)
 				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length(), System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getIdentifier())));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getId().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getId()) : Starter.getRemoteDefaultTimeout(agent.getId())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
@@ -1114,7 +1114,7 @@ public class ChatService implements IChatService, IChatGuiService
 				String filepath = fname.indexOf(".")!=-1? fname.substring(fname.lastIndexOf(".")): null;
 				String name = fname.indexOf(".")!=-1? fname.substring(0, fname.lastIndexOf(".")-1): fname;
 				final TransferInfo fi = new TransferInfo(false, null, name, filepath, cid, size, System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getIdentifier().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getIdentifier()) : Starter.getRemoteDefaultTimeout(agent.getIdentifier())));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getId().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getId()) : Starter.getRemoteDefaultTimeout(agent.getId())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, name, size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));

@@ -180,14 +180,14 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		
 //		AwarenessManagementAgent.this.addresses = addresses;
 //		AwarenessManagementAgent.this.root	= addresses.getTransportComponentIdentifier(agent.getComponentIdentifier().getRoot());
-		AwarenessManagementAgent.this.root = agent.getIdentifier().getRoot();
+		AwarenessManagementAgent.this.root = agent.getId().getRoot();
 		
 		IFuture<ISettingsService>	setfut	= agent.getFeature(IRequiredServicesFeature.class).getService("settings");
 		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
 			{
-				settings.registerPropertiesProvider(agent.getIdentifier().getName(), AwarenessManagementAgent.this)
+				settings.registerPropertiesProvider(agent.getId().getName(), AwarenessManagementAgent.this)
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
@@ -237,7 +237,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 								}
 							});
 							
-							CreationInfo info = new CreationInfo(agent.getIdentifier());
+							CreationInfo info = new CreationInfo(agent.getId());
 							info.setConfiguration(agent.getConfiguration());
 							Map<String, Object> args = new HashMap<String, Object>();
 							args.put("delay", Long.valueOf(getDelay()));
@@ -329,7 +329,7 @@ public class AwarenessManagementAgent	implements IPropertiesProvider, IAwareness
 		{
 			public void resultAvailable(ISettingsService settings)
 			{
-				settings.deregisterPropertiesProvider(agent.getIdentifier().getName())
+				settings.deregisterPropertiesProvider(agent.getId().getName())
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			

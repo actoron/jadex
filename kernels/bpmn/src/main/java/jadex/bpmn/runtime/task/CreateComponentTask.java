@@ -229,7 +229,7 @@ public class CreateComponentTask implements ITask
 		// todo: monitoring
 		PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
 		cms.createComponent(name, model,
-			new CreationInfo(config, args, sub? instance.getIdentifier() : null, 
+			new CreationInfo(config, args, sub? instance.getId() : null, 
 				suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
 				instance.getModel().getAllImports(), bindings,
 				instance.getModel().getResourceIdentifier()), lis)

@@ -35,8 +35,8 @@ public class WebsocketsTestAgent implements IWebsocketTestService
 	 */
 	public IFuture<String> sayHelloTo(String name)
 	{
-		System.out.println("Say hello called on: "+agent.getIdentifier());
-		return new Future<String>("Hello "+name+" from "+agent.getIdentifier());
+		System.out.println("Say hello called on: "+agent.getId());
+		return new Future<String>("Hello "+name+" from "+agent.getId());
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class WebsocketsTestAgent implements IWebsocketTestService
 	 */
 	public IFuture<String> sayHelloTo(String name, String name2)
 	{
-		System.out.println("Say hello 2 called on: "+agent.getIdentifier());
+		System.out.println("Say hello 2 called on: "+agent.getId());
 		return new Future<String>("Hello "+name+" "+name2);
 	}
 	

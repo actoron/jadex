@@ -40,7 +40,7 @@ public class PingAgent
 			
 			reply.put(SFipa.CONTENT, "alive");
 			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			reply.put(SFipa.SENDER, agent.getIdentifier());
+			reply.put(SFipa.SENDER, agent.getId());
 			agent.getFeature(IMessageFeature.class).sendMessage(reply, (IComponentIdentifier)reply.get(SFipa.RECEIVERS));
 		}
 		else

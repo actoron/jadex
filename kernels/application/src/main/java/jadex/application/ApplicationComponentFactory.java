@@ -114,7 +114,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public ApplicationComponentFactory(IInternalAccess provider)
 	{
-		super(provider.getIdentifier(), IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, null);
 		this.provider = provider;
 		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
@@ -125,7 +125,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getIdentifier();
+		this.providerid = provider.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}

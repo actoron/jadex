@@ -135,10 +135,10 @@ public class GlobalPoolServiceManager
 		{
 			for(IService ser: ownsers)
 			{
-				if(!ser.getServiceIdentifier().getProviderId().equals(component.getIdentifier()))
+				if(!ser.getId().getProviderId().equals(component.getId()))
 				{
 //					System.out.println("Added own global service pool worker: "+ser);
-					services.put(ser.getServiceIdentifier(), ser);
+					services.put(ser.getId(), ser);
 					// currently no timer for own service pool?!
 				}
 //				else
@@ -179,8 +179,8 @@ public class GlobalPoolServiceManager
 		{
 			public int compare(IService s1, IService s2) 
 			{
-				UsageInfo ui1 = usages.get(s1.getServiceIdentifier());
-				UsageInfo ui2 = usages.get(s1.getServiceIdentifier());
+				UsageInfo ui1 = usages.get(s1.getId());
+				UsageInfo ui2 = usages.get(s1.getId());
 				return ui1==null && ui2==null? (int)(s1.hashCode()-s2.hashCode()): ui1==null? -1: ui2==null? 1: (int)Math.round(ui1.usages-ui2.usages);
 			}
 		});
@@ -310,7 +310,7 @@ public class GlobalPoolServiceManager
 			{
 				public void customIntermediateResultAvailable(IComponentManagementService cms) 
 				{
-					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
 					if(!platforms.containsKey(cid))
 					{
 						platforms.put(cid, new PlatformInfo(cms, null));
@@ -348,8 +348,8 @@ public class GlobalPoolServiceManager
 			{
 				public void intermediateResultAvailable(IComponentManagementService cms) 
 				{
-					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
-					if(!((IService)cms).getServiceIdentifier().getProviderId().getRoot().equals(component.getIdentifier().getRoot())
+					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
+					if(!((IService)cms).getId().getProviderId().getRoot().equals(component.getId().getRoot())
 						&& platforms.get(cid).getWorker()==null)
 					{
 //						System.out.println("found free platform2: "+cid+" "+platforms);
@@ -403,10 +403,10 @@ public class GlobalPoolServiceManager
 			{
 //				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
 			
-				if(strategy.isCreateWorkerOn(((IService)cms).getServiceIdentifier().getProviderId().getRoot()) 
+				if(strategy.isCreateWorkerOn(((IService)cms).getId().getProviderId().getRoot()) 
 					&& creating[0]++<n)
 				{
-					IComponentIdentifier cid = ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
 					freeplatforms.remove(cid);
 //					System.out.println("free are: "+freeplatforms+" "+cid);
 					
@@ -446,7 +446,7 @@ public class GlobalPoolServiceManager
 //											pi.setWorker(ser);
 //											strategy.workersAdded(cid);
 											
-											updateWorkerTimer(ser.getServiceIdentifier()).addResultListener(new IResultListener<Void>() 
+											updateWorkerTimer(ser.getId()).addResultListener(new IResultListener<Void>() 
 											{
 												public void resultAvailable(Void result) 
 												{
@@ -645,8 +645,8 @@ public class GlobalPoolServiceManager
 	 */
 	protected void updateServiceAdded(IService ser)
 	{
-		services.put(ser.getServiceIdentifier(), ser);
-		IComponentIdentifier cid = ser.getServiceIdentifier().getProviderId().getRoot();
+		services.put(ser.getId(), ser);
+		IComponentIdentifier cid = ser.getId().getProviderId().getRoot();
 		PlatformInfo pi = platforms.get(cid);
 		pi.setWorker(ser);
 		strategy.workersAdded(cid);

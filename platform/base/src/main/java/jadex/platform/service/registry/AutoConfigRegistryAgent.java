@@ -139,8 +139,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 							
 							System.out.println("new superpeer: "+winner);
 							
-							makeSuperpeer(winner.getFirstEntity()==null? agent.getIdentifier(): 
-								((IService)winner.getFirstEntity()).getServiceIdentifier().getProviderId())
+							makeSuperpeer(winner.getFirstEntity()==null? agent.getId(): 
+								((IService)winner.getFirstEntity()).getId().getProviderId())
 								.addResultListener(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
@@ -180,7 +180,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					FutureBarrier<Double> fb = new FutureBarrier<Double>();
 					for(ISuperpeerRegistrySynchronizationService sp: sps)
 					{
-						Future<Double> fut = computePower(((IService)sp).getServiceIdentifier());
+						Future<Double> fut = computePower(((IService)sp).getId());
 						fb.addFuture(fut);
 					}
 					
@@ -228,8 +228,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 								// make the loser to normal peer
 								Tuple2<ISuperpeerRegistrySynchronizationService, Double> loser = ((TreeSet<Tuple2<ISuperpeerRegistrySynchronizationService, Double>>)superpeers).last();
 								System.out.println("new downgraded peer (from sp): "+loser);
-								makeClient(loser.getFirstEntity()==null? agent.getIdentifier(): 
-									((IService)loser.getFirstEntity()).getServiceIdentifier().getProviderId())
+								makeClient(loser.getFirstEntity()==null? agent.getId(): 
+									((IService)loser.getFirstEntity()).getId().getProviderId())
 									.addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
@@ -321,7 +321,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 				FutureBarrier<Double> bar = new FutureBarrier<Double>();
 				for(IAutoConfigRegistryService peer: result)
 				{
-					IServiceIdentifier sid = ((IService)peer).getServiceIdentifier();
+					IServiceIdentifier sid = ((IService)peer).getId();
 					// .getProviderId().getRoot()
 					Future<Double> fut = computePower(sid);
 					bar.addFuture(fut);
@@ -389,7 +389,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IServiceIdentifier getSid()
 	{
-		return ((IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(IAutoConfigRegistryService.class)).getServiceIdentifier();
+		return ((IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(IAutoConfigRegistryService.class)).getId();
 	}
 	
 	/**
@@ -562,7 +562,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IServiceRegistry getRegistry()
 	{
-		return ServiceRegistry.getRegistry(agent.getIdentifier());
+		return ServiceRegistry.getRegistry(agent.getId());
 	}
 	
 	/**

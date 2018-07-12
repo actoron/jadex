@@ -41,7 +41,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		platform1 = Starter.createPlatform(
 			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 				"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform1.getIdentifier());
+		timeout	= Starter.getLocalDefaultTimeout(platform1.getId());
 		
 		// Find local service (as local provided service proxy).
 		ILocalService service1 = platform1.searchService( new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);

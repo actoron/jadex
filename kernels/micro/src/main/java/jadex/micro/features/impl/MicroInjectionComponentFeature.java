@@ -144,7 +144,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			if(pis.length>0)
 			{
 				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				cms.getExternalAccess(getComponent().getIdentifier().getParent())
+				cms.getExternalAccess(getComponent().getId().getParent())
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
 					public void customResultAvailable(IExternalAccess exta)

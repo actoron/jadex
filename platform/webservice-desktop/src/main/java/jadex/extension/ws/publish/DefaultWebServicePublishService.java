@@ -79,7 +79,7 @@ public class DefaultWebServicePublishService implements IPublishService
 		
 		ClassLoader cl = null;
 		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, Binding.SCOPE_PLATFORM));
-		if (serviceid.getProviderId().getPlatformName().equals(component.getIdentifier().getPlatformName()))
+		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
 			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
@@ -102,7 +102,7 @@ public class DefaultWebServicePublishService implements IPublishService
 		
 		if(endpoints==null)
 			endpoints = new HashMap<IServiceIdentifier, Endpoint>();
-		endpoints.put(service.getServiceIdentifier(), endpoint);
+		endpoints.put(service.getId(), endpoint);
 		return IFuture.DONE;
 		
 //		try

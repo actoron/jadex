@@ -178,7 +178,7 @@ public class ComponentManagementService implements IComponentManagementService
 		
 //		this.components = SCollection.createHashMap();
 		components = Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>());
-		Starter.putPlatformValue(access.getInternalAccess().getIdentifier(), Starter.DATA_COMPONENTMAP, components);
+		Starter.putPlatformValue(access.getInternalAccess().getId(), Starter.DATA_COMPONENTMAP, components);
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
@@ -189,7 +189,7 @@ public class ComponentManagementService implements IComponentManagementService
 		this.lockentries = SCollection.createHashMap();
 		this.cidcounts = new HashMap<String, Integer>();
 		
-		putInitInfo(access.getInternalAccess().getIdentifier(), new InitInfo(access, null, null));
+		putInitInfo(access.getInternalAccess().getId(), new InitInfo(access, null, null));
 	}
     
     //-------- IComponentManagementService interface --------
@@ -688,7 +688,7 @@ public class ComponentManagementService implements IComponentManagementService
 
 																	final IInternalAccess pad = getParentComponent(cinfo);
 																	IExternalAccess parent = pad.getExternalAccess();
-																	pacid = parent.getIdentifier();
+																	pacid = parent.getId();
 
 																	String paname = pacid.getName().replace('@', '.');
 																	
@@ -1211,7 +1211,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected boolean isMultiFactory(IComponentFactory fac)
 	{
 //		if(fac.toString().toLowerCase().indexOf("multi")!=-1)
-		return ((IService)fac).getServiceIdentifier().getProviderId().getLocalName().indexOf("multi")!=-1;
+		return ((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1;
 	}
 	
 	/**
@@ -1360,7 +1360,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected boolean isRemoteComponent(IComponentIdentifier cid)
 	{
-		return !cid.getPlatformName().equals(agent.getIdentifier().getName());
+		return !cid.getPlatformName().equals(agent.getId().getName());
 	}
 	
 	/**
@@ -1798,7 +1798,7 @@ public class ComponentManagementService implements IComponentManagementService
 										public void exceptionOccurred(Exception exception)
 										{
 											if(!(exception instanceof ComponentTerminatedException)
-												|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(adapter.getInternalAccess().getIdentifier()))
+												|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(adapter.getInternalAccess().getId()))
 											{
 												adapter.getInternalAccess().killComponent(exception);
 											}
@@ -2152,7 +2152,7 @@ public class ComponentManagementService implements IComponentManagementService
 			else if(pad!=null && killparent)
 			{
 //				System.out.println("killparent: "+pad.getComponentIdentifier());
-				destroyComponent(pad.getIdentifier());
+				destroyComponent(pad.getId());
 			}
 			
 			if(cid.getRoot().equals(cid))
@@ -2327,7 +2327,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent()==null? agent.getIdentifier(): ci.getParent(), true)
+			getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IExternalAccess ea)
@@ -2404,7 +2404,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IComponentIdentifier getParentIdentifier(CreationInfo ci)
 	{
-		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getIdentifier(); 
+		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId(); 
 //		System.out.println("parent id: "+ret);
 		return ret;
 	}
@@ -2747,7 +2747,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<IComponentIdentifier> getRootIdentifier()
 	{
-		return new Future<IComponentIdentifier>(agent.getIdentifier());
+		return new Future<IComponentIdentifier>(agent.getId());
 	}
 	
 	/**
@@ -2922,7 +2922,7 @@ public class ComponentManagementService implements IComponentManagementService
 		BasicComponentIdentifier ret = null;
 
 		if(platformname==null)
-			platformname = agent.getIdentifier().getName();
+			platformname = agent.getId().getName();
 		ret = new BasicComponentIdentifier(localname+"@"+platformname);
 		
 		if(uniqueids || components.containsKey(ret) || getInitInfo(ret)!=null)
@@ -2986,8 +2986,8 @@ public class ComponentManagementService implements IComponentManagementService
 			{
 				public void customResultAvailable(Void result)
 				{
-					removeInitInfo(agent.getIdentifier());
-					components.put(agent.getIdentifier(), access);
+					removeInitInfo(agent.getId());
+					components.put(agent.getId(), access);
 					
 					ret.setResult(null);
 //					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM))

@@ -74,7 +74,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 */
 	public MicroserviceFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getIdentifier(), IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.fproperties = properties;
@@ -125,7 +125,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getIdentifier();
+		this.providerid = provider.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}

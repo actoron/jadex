@@ -185,7 +185,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 						Method method = null;
 						if(mi==null)
 						{
-							Class<?> iface = service.getServiceIdentifier().getServiceType().getType(getComponent().getClassLoader());
+							Class<?> iface = service.getId().getServiceType().getType(getComponent().getClassLoader());
 							Method[] methods = iface.getMethods();
 							if(methods!=null)
 							{

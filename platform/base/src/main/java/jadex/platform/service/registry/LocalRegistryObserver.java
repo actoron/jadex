@@ -44,7 +44,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	 */
 	public LocalRegistryObserver(final IInternalAccess component, final IDelayRunner timer, int eventslimit, final long timelimit, final boolean globalscope)
 	{
-		super(component.getIdentifier().getRoot(), timer, eventslimit, timelimit);
+		super(component.getId().getRoot(), timer, eventslimit, timelimit);
 		this.globalscope = globalscope;
 		this.component = component;
 		
@@ -73,7 +73,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 //				{
 //				System.out.println("Local registry changed: "+event);
 				
-				String pubscope = event.getService().getServiceIdentifier().getScope();
+				String pubscope = event.getService().getId().getScope();
 				if(!globalscope || !RequiredServiceInfo.isScopeOnLocalPlatform(pubscope))
 				{
 					if(event.getType() == ServiceEvent.SERVICE_ADDED 
@@ -148,7 +148,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 				IService ser = it.next();
 //				clients.add(ser.getServiceIdentifier().getProviderId().getRoot());
 				// Remove locally (platform) scoped events
-				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getServiceIdentifier().getScope()))
+				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getId().getScope()))
 					it.remove();
 			}
 		}

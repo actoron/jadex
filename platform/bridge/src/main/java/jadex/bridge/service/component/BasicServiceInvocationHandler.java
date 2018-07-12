@@ -403,8 +403,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			ServiceCall	sc	= CallAccess.getNextInvocation();
 			CallAccess.resetNextInvocation();
 			
-			sid = service instanceof ServiceInfo? ((ServiceInfo)service).getManagementService().getServiceIdentifier():
-				((IService)service).getServiceIdentifier();
+			sid = service instanceof ServiceInfo? ((ServiceInfo)service).getManagementService().getId():
+				((IService)service).getId();
 			
 			CallAccess.setNextInvocation(sc);
 		}
@@ -549,7 +549,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				e.printStackTrace();
 //			}
 			
-			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, ret.getServiceIdentifier());
+			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, ret.getId());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
@@ -644,7 +644,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			Class<?> serclass = service.getClass();
 
-			BasicService mgmntservice = new BasicService(ia.getIdentifier(), type, serclass, null);
+			BasicService mgmntservice = new BasicService(ia.getId(), type, serclass, null);
 			mgmntservice.setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
 			serprops.putAll(mgmntservice.getPropertyMap());
 			mgmntservice.setPropertyMap(serprops);
@@ -668,7 +668,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 									try
 									{
 										fields[i].setAccessible(true);
-										fields[i].set(service, mgmntservice.getServiceIdentifier());
+										fields[i].set(service, mgmntservice.getId());
 									}
 									catch(Exception e)
 									{
@@ -818,8 +818,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
-			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getServiceIdentifier()));
-			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getServiceIdentifier()));
+			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getId()));
+			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{
@@ -888,7 +888,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			for(Iterator<IService> it=pojoproxies.values().iterator(); it.hasNext(); )
 			{
 				IService proxy = it.next();
-				if(sid.equals(proxy.getServiceIdentifier()))
+				if(sid.equals(proxy.getId()))
 				{
 					it.remove();
 //					System.out.println("rem: "+pojosids.size());	

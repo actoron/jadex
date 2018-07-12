@@ -126,7 +126,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		final String rxid = SUtil.createUniqueId("");
 //		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
-		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getIdentifier());
+		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getId());
 		
 		// TODO: Merge with DecouplingInterceptor code.
 		@SuppressWarnings("unchecked")
@@ -343,7 +343,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						// Local is used to set the caller in the new service call context
 						sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
 						// After call creation it can be reset
-						IComponentIdentifier.LOCAL.set(getComponent().getIdentifier());
+						IComponentIdentifier.LOCAL.set(getComponent().getId());
 					}
 					final ServiceCall	fsc	= sc;
 					

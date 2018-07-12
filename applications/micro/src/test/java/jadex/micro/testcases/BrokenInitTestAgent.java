@@ -127,7 +127,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 			@SuppressWarnings("deprecation")
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.createComponent(null, model, new CreationInfo(agent.getIdentifier()), new IResultListener<Collection<Tuple2<String,Object>>>()
+				cms.createComponent(null, model, new CreationInfo(agent.getId()), new IResultListener<Collection<Tuple2<String,Object>>>()
 				{
 					// Dummy listener to avoid fatal error being printed.
 					@Override

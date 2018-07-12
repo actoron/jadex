@@ -502,7 +502,7 @@ public class RegistrySearchFunctionality
 		
 //		if(queries!=null)
 //		{
-			Set<ServiceQueryInfo<?>> sqis = (Set)getQueries(ser.getServiceIdentifier().getServiceType());
+			Set<ServiceQueryInfo<?>> sqis = (Set)getQueries(ser.getId().getServiceType());
 			
 			if(sqis!=null)
 			{
@@ -660,28 +660,28 @@ public class RegistrySearchFunctionality
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
-			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
+			ret = cid.getPlatformName().equals(ser.getId().getProviderId().getPlatformName());
 		}
 		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 		{
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			IComponentIdentifier sercid = ser.getId().getProviderId();
 			ret = sercid.getPlatformName().equals(cid.getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(cid));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 		{
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			IComponentIdentifier sercid = ser.getId().getProviderId();
 			ret = getDotName(sercid).endsWith(getDotName(cid));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
-			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
+			ret = ser.getId().getProviderId().equals(cid);
 		}
 		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
 		{
 			// check if parent of searcher reaches the service
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			IComponentIdentifier sercid = ser.getId().getProviderId();
 			String subname = getSubcomponentName(cid);
 			ret = sercid.getName().endsWith(subname);
 		}
@@ -719,7 +719,7 @@ public class RegistrySearchFunctionality
 	{
 		boolean ret = false;
 		
-		String scope = ser.getServiceIdentifier().getScope()!=null? ser.getServiceIdentifier().getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
+		String scope = ser.getId().getScope()!=null? ser.getId().getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
@@ -728,29 +728,29 @@ public class RegistrySearchFunctionality
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
-			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
+			ret = cid.getPlatformName().equals(ser.getId().getProviderId().getPlatformName());
 		}
 		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 		{
 			// todo: special case platform service with app scope
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			IComponentIdentifier sercid = ser.getId().getProviderId();
 			ret = sercid.getPlatformName().equals(cid.getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(cid));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 		{
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			IComponentIdentifier sercid = ser.getId().getProviderId();
 			ret = getDotName(cid).endsWith(getDotName(sercid));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
-			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
+			ret = ser.getId().getProviderId().equals(cid);
 		}
 		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
 		{
 			// check if parent of service reaches the searcher
-			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+			IComponentIdentifier sercid = ser.getId().getProviderId();
 			String subname = getSubcomponentName(sercid);
 			ret = getDotName(cid).endsWith(subname);
 		}

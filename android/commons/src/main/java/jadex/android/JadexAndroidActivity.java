@@ -342,7 +342,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 */
 	protected void onPlatformStarted(IExternalAccess result)
 	{
-		this.platformId = result.getIdentifier();
+		this.platformId = result.getId();
 		runOnUiThread(new Runnable()
 		{
 			

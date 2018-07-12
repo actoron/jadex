@@ -47,7 +47,7 @@ public class TreeStressTestAgent
 				{
 					Map	args	= new HashMap();
 					args.put("depth", Integer.valueOf(depth-1));
-					CreationInfo	ci	= new CreationInfo(args, agent.getIdentifier());
+					CreationInfo	ci	= new CreationInfo(args, agent.getId());
 					for(int i=0; i<depth; i++)
 					{
 						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null);

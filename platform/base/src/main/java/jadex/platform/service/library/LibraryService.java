@@ -430,7 +430,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Set<URI> nonmans = getInternalNonManagedURLs();
 			for(URI uri: nonmans)
 			{
-				mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getIdentifier().getRoot(), SUtil.toURL(uri)), null));
+				mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getId().getRoot(), SUtil.toURL(uri)), null));
 			}
 			deps.put(SYSTEMCPRID, mydeps);
 			
@@ -540,7 +540,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		baseloader.addURL(url);
 		nonmanaged = null;
-		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getIdentifier().getRoot(), url), null);
+		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getId().getRoot(), url), null);
 		addLink(SYSTEMCPRID, rid);
 		notifyAdditionListeners(SYSTEMCPRID, rid);
 		return IFuture.DONE;
@@ -558,7 +558,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		baseloader.removeURL(url);
 		nonmanaged = null;
-		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getIdentifier().getRoot(), url), null);
+		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getId().getRoot(), url), null);
 		removeLink(SYSTEMCPRID, rid);
 		notifyRemovalListeners(SYSTEMCPRID, rid);
 		return IFuture.DONE;
@@ -670,7 +670,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
 		}
-		else if(ResourceIdentifier.isLocal(rid, component.getIdentifier().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
+		else if(ResourceIdentifier.isLocal(rid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret.setResult(baseloader);
 //			System.out.println("base classloader: "+rid);
@@ -754,7 +754,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// full=(global, local) calls followed by any other call are ok, because global and local can be cached
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
-		if(ResourceIdentifier.isLocal(rid, component.getIdentifier().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
+		if(ResourceIdentifier.isLocal(rid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
 			notifyAdditionListeners(support, rid);
@@ -845,7 +845,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		checkLocalRid(rid);
 		
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
-		assert rid.getLocalIdentifier()==null || !ResourceIdentifier.isLocal(rid, component.getIdentifier().getRoot()) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
+		assert rid.getLocalIdentifier()==null || !ResourceIdentifier.isLocal(rid, component.getId().getRoot()) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 		
@@ -919,7 +919,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected URL getRidUrl(final IResourceIdentifier rid)
 	{
 		URL	url;
-		if(ResourceIdentifier.isLocal(rid, component.getIdentifier().getRoot()))
+		if(ResourceIdentifier.isLocal(rid, component.getId().getRoot()))
 		{
 			url	= rid!=null && rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getUri()!=null? SUtil.toURL(rid.getLocalIdentifier().getUri()): null;
 		}
@@ -951,7 +951,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected boolean	isAvailable(IResourceIdentifier rid)	
 	{
 		// Do not check existence of manually added (local) resources
-		return ResourceIdentifier.isLocal(rid, component.getIdentifier().getRoot())
+		return ResourceIdentifier.isLocal(rid, component.getId().getRoot())
 			|| getHashRidFile(rid).exists();
 	}
 
@@ -1181,7 +1181,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getIdentifier().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
+		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -1216,7 +1216,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getIdentifier().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
+		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -1321,7 +1321,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		try
 		{
-			this.rootrid = new ResourceIdentifier(new LocalResourceIdentifier(component.getIdentifier(), new URL("http://ROOTRID")), null);
+			this.rootrid = new ResourceIdentifier(new LocalResourceIdentifier(component.getId(), new URL("http://ROOTRID")), null);
 			this.rootloader.setResourceIdentifier(rootrid);
 //			this.classloaders.put(rootrid, rootloader);
 		}
@@ -1607,8 +1607,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Properties pa = links[i].getSubproperty("a");
 			Properties pb = links[i].getSubproperty("b");
 			
-			IResourceIdentifier a = ResourceIdentifier.ridFromProperties(pa, component.getIdentifier().getRoot());
-			IResourceIdentifier b = ResourceIdentifier.ridFromProperties(pb, component.getIdentifier().getRoot());
+			IResourceIdentifier a = ResourceIdentifier.ridFromProperties(pa, component.getId().getRoot());
+			IResourceIdentifier b = ResourceIdentifier.ridFromProperties(pb, component.getId().getRoot());
 			
 			if(SYSTEMCPRID.equals(a))
 			{
@@ -1649,8 +1649,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
 		{
 			Properties plink = new Properties();
-			Properties a = ResourceIdentifier.ridToProperties(link.getFirstEntity(), component.getIdentifier().getRoot());
-			Properties b = ResourceIdentifier.ridToProperties(link.getSecondEntity(), component.getIdentifier().getRoot());
+			Properties a = ResourceIdentifier.ridToProperties(link.getFirstEntity(), component.getId().getRoot());
+			Properties b = ResourceIdentifier.ridToProperties(link.getSecondEntity(), component.getId().getRoot());
 			plink.addSubproperties("a", a);
 			plink.addSubproperties("b", b);
 			props.addSubproperties("link", plink);

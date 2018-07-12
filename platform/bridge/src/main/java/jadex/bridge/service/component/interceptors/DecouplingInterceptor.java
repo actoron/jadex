@@ -124,9 +124,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		if(required)
 		{
 			IComponentIdentifier	caller	= IComponentIdentifier.LOCAL.get();
-			if(caller!=null && !caller.equals(ea.getIdentifier()))
+			if(caller!=null && !caller.equals(ea.getId()))
 			{
-				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getIdentifier()+"' from component '"+caller+"'. Service method: "+sic.getMethod());
+				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getId()+"' from component '"+caller+"'. Service method: "+sic.getMethod());
 			}
 		}
 		
@@ -643,7 +643,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 */
 	public final ISerializationServices getSerializationServices()
 	{
-		return (ISerializationServices)Starter.getPlatformValue(ia.getIdentifier(), Starter.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices)Starter.getPlatformValue(ia.getId(), Starter.DATA_SERIALIZATIONSERVICES);
 	}
 	
 	/**

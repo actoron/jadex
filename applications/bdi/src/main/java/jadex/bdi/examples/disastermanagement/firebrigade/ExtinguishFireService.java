@@ -103,6 +103,6 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public String toString()
 	{
-		return "ExtinguishFireService, "+agent.getIdentifier();
+		return "ExtinguishFireService, "+agent.getId();
 	}
 }

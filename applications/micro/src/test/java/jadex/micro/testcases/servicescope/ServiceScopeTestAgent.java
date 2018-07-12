@@ -54,7 +54,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport("#1", "Test if service with scope application can be found when provider is child of user");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getIdentifier()));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getId()));
 			cid = fut.getFirstResult();
 			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());

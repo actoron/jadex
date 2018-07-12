@@ -264,7 +264,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		ret.setTerminationCommand(tcom);
 
 		// Signal that subscription has been done
-		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
+		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
 			PublishEventLevel.COARSE);
 		boolean post = false;
 		try

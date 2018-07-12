@@ -53,7 +53,7 @@ public class AndroidAgent
 	public IFuture<Void> executeBody()
 	{
 
-		showAndroidMessage("This is Agent <<" + agent.getIdentifier().getLocalName() + ">> saying hello!");
+		showAndroidMessage("This is Agent <<" + agent.getId().getLocalName() + ">> saying hello!");
 		return new Future<Void>();
 	}
 
@@ -61,7 +61,7 @@ public class AndroidAgent
 	@AgentMessageArrived
 	public void handleMessage(Map<String, Object> msg) {
 		if (msg.get(SFipa.CONTENT).equals("ping")) {
-			showAndroidMessage(agent.getIdentifier().getLocalName()  + ": pong");
+			showAndroidMessage(agent.getId().getLocalName()  + ": pong");
 		}
 	}
 	
@@ -71,7 +71,7 @@ public class AndroidAgent
 	 */
 	public IFuture<Void> agentKilled()
 	{
-		showAndroidMessage("This is Agent <<" + agent.getIdentifier().getLocalName() + ">> saying goodbye!");
+		showAndroidMessage("This is Agent <<" + agent.getId().getLocalName() + ">> saying goodbye!");
 		return IFuture.DONE;
 	}
 

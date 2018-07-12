@@ -108,7 +108,7 @@ public class SRemoteGui
 					ProvidedServiceInfo[]	pis	= null;
 					IServiceIdentifier[]	sis	= null;
 					
-					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null).setProvider(ia.getIdentifier());
+					ServiceQuery<IService>	query	= new ServiceQuery<IService>((Class<IService>)null).setProvider(ia.getId());
 					Collection<IService>	result	= ia.getFeature0(IRequiredServicesFeature.class)==null? null: (ia.getFeature(IRequiredServicesFeature.class)).searchLocalServices(query);
 					if(result!=null)
 					{
@@ -120,8 +120,8 @@ public class SRemoteGui
 						{
 							IService	service	= it.next();
 							// todo: implementation?
-							sis[i] = service.getServiceIdentifier();
-							pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), 
+							sis[i] = service.getId();
+							pis[i]	= new ProvidedServiceInfo(service.getId().getServiceName(), 
 //								service.getServiceIdentifier().getServiceType(), null, null);
 								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null);
 						}
@@ -368,7 +368,7 @@ public class SRemoteGui
 					else
 					{
 						URL	url	= SUtil.toURL(ridurl);
-						LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getIdentifier().getRoot(), url);
+						LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getId().getRoot(), url);
 						ret.setResult(new ResourceIdentifier(lid, globalrid!=null? new GlobalResourceIdentifier(globalrid, null, null): null));
 					}
 				}
@@ -664,7 +664,7 @@ public class SRemoteGui
 	public static IIntermediateFuture<FileData>	listFiles(final FileData dir, final IAsyncFilter filter, IExternalAccess exta)
 	{
 		IIntermediateFuture<FileData> ret = null;
-		if(!isComponentStepNecessary(exta.getIdentifier()))
+		if(!isComponentStepNecessary(exta.getId()))
 		{
 //			System.out.println("direct listFiles");
 			ret = listFiles(dir, filter);
@@ -846,7 +846,7 @@ public class SRemoteGui
 	public static ISubscriptionIntermediateFuture<FileData>	listJarFileEntries(final FileData file, final IAsyncFilter filter, IExternalAccess exta)
 	{
 		ISubscriptionIntermediateFuture<FileData> ret = null;
-		if(!isComponentStepNecessary(exta.getIdentifier()))
+		if(!isComponentStepNecessary(exta.getId()))
 		{
 //			System.out.println("direct listJarFileEntries");
 			ret = listJarFileEntries(file, filter);

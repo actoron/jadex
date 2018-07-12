@@ -79,7 +79,7 @@ public class ThreadingTestAgent extends TestAgent
 		
 		System.out.println("Test local: "+agent.getModel().getFullName());
 		
-		performTest(agent.getIdentifier().getRoot(), testno, max, true)
+		performTest(agent.getId().getRoot(), testno, max, true)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
@@ -107,7 +107,7 @@ public class ThreadingTestAgent extends TestAgent
 			{
 				System.out.println("Test remote1: "+agent.getModel().getFullName());
 				
-				performTest(platform.getIdentifier(), testno, max, false)
+				performTest(platform.getId(), testno, max, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

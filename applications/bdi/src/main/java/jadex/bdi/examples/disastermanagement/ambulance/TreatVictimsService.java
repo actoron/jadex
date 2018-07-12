@@ -103,7 +103,7 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public String toString()
 	{
-		return "TreatVictimsService, "+agent.getIdentifier();
+		return "TreatVictimsService, "+agent.getId();
 	}
 }
 

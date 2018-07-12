@@ -346,7 +346,7 @@ public abstract class DiscoveryAgent	implements IDiscoveryService
 	public IComponentIdentifier getRoot()
 	{
 		if(root==null)
-			this.root = agent.getIdentifier().getRoot();
+			this.root = agent.getId().getRoot();
 		return root;
 	}
 	

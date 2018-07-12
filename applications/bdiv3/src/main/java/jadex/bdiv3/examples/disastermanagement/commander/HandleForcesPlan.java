@@ -62,7 +62,7 @@ public abstract class HandleForcesPlan
 				while(number>goal.getUnits().size() && it.hasNext())
 				{
 					final IService force = (IService)it.next();
-					final Object provid = force.getServiceIdentifier().getProviderId();
+					final Object provid = force.getId().getProviderId();
 					if(!capa.getBusyEntities().contains(provid))
 					{
 //						as++;

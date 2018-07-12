@@ -291,7 +291,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		Future<Void> ret = new Future<Void>();
 		if (addresses != null)
 		{
-			IComponentIdentifier local = agent.getIdentifier().getRoot();
+			IComponentIdentifier local = agent.getId().getRoot();
 			boolean ok = true;
 			for (TransportAddress addr : addresses)
 			{
@@ -575,7 +575,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	protected List<TransportAddress> getAddressesFromCache(IComponentIdentifier platformid)
 	{
 		List<TransportAddress> ret = null;
-		if (platformid == null || agent.getIdentifier().getRoot().equals(platformid))
+		if (platformid == null || agent.getId().getRoot().equals(platformid))
 		{
 			ret = new ArrayList<TransportAddress>(localaddresses);
 		}
@@ -630,7 +630,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		{
 			for (TransportAddress addr : addrs)
 			{
-				if (agent.getIdentifier().getRoot().equals(addr.getPlatformId()))
+				if (agent.getId().getRoot().equals(addr.getPlatformId()))
 				{
 					if (!localaddresses.contains(addr))
 					{

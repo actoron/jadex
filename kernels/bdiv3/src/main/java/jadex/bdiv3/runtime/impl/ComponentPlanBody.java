@@ -67,7 +67,7 @@ public class ComponentPlanBody implements IPlanBody
 		// Todo: should also set processing state and RPLANS thread local?
 		
 		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-		cms.createComponent(null, component, new CreationInfo(ia.getIdentifier()))
+		cms.createComponent(null, component, new CreationInfo(ia.getId()))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override

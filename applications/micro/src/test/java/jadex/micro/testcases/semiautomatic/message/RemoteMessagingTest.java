@@ -67,6 +67,6 @@ public class RemoteMessagingTest
 //		cms.createComponent(SenderAgent.class.getName()+".class",
 		cms.createComponent(BenchmarkAgent.class.getName()+".class",
 			new CreationInfo(Collections.singletonMap("receiver",
-				(Object)new BasicComponentIdentifier("Receiver", access1.getIdentifier())))).get();
+				(Object)new BasicComponentIdentifier("Receiver", access1.getId())))).get();
 	}
 }

@@ -78,7 +78,7 @@ public class ExternalAccess implements IExternalAccess
 	{
 		this.valid	= true;
 		this.ia = ia;
-		this.cid	= ia.getIdentifier();
+		this.cid	= ia.getId();
 		this.tostring = cid.getLocalName();
 	}
 
@@ -107,7 +107,7 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *  Get the component identifier.
 	 */
-	public IComponentIdentifier	getIdentifier()
+	public IComponentIdentifier	getId()
 	{
 		return cid;
 	}
@@ -1347,7 +1347,7 @@ public class ExternalAccess implements IExternalAccess
 		boolean ret = false;
 		
 		if(obj instanceof IExternalAccess)
-			ret = ((IExternalAccess)obj).getIdentifier().equals(cid);
+			ret = ((IExternalAccess)obj).getId().equals(cid);
 		
 		return ret;
 	}

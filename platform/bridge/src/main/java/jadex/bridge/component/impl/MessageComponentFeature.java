@@ -111,7 +111,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public MessageComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		platformid = component.getIdentifier().getRoot();
+		platformid = component.getId().getRoot();
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		if (addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
 				header.addProperty(entry.getKey(), entry.getValue());
-		header.addProperty(IMsgHeader.SENDER, component.getIdentifier());
+		header.addProperty(IMsgHeader.SENDER, component.getId());
 		header.addProperty(IMsgHeader.RECEIVER, receiver!=null && receiver.length==1 ? receiver[0] : receiver);	// optimize send to one
 		
 		return sendMessage(header, message);
@@ -198,13 +198,13 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public IFuture<Object> sendMessageAndWait(IComponentIdentifier receiver, Object message, Long timeout)
 	{
 		final Future<Object> ret = new Future<Object>();
-		final String convid = SUtil.createUniqueId(component.getIdentifier().toString());
+		final String convid = SUtil.createUniqueId(component.getId().toString());
 		if (awaitingmessages == null)
 			awaitingmessages = new HashMap<String, Future<Object>>();
 		awaitingmessages.put(convid, ret);
 		
 		final MsgHeader header = new MsgHeader();
-		header.addProperty(IMsgHeader.SENDER, component.getIdentifier());
+		header.addProperty(IMsgHeader.SENDER, component.getId());
 		header.addProperty(IMsgHeader.RECEIVER, receiver);
 		header.addProperty(IMsgHeader.CONVERSATION_ID, convid);
 		header.addProperty(SENDREPLY, Boolean.TRUE);
@@ -259,7 +259,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		MsgHeader header = new MsgHeader();
 		header.addProperty(IMsgHeader.RECEIVER, rplyrec);
-		header.addProperty(IMsgHeader.SENDER, component.getIdentifier());
+		header.addProperty(IMsgHeader.SENDER, component.getId());
 		header.addProperty(IMsgHeader.CONVERSATION_ID, convid);
 		header.addProperty(SENDREPLY, Boolean.TRUE);
 		
@@ -585,7 +585,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							return IFuture.DONE;
 						}
 						
-						return new Future<Void>(new RuntimeException("Receiver " + ia.getIdentifier() + " has no messaging."));
+						return new Future<Void>(new RuntimeException("Receiver " + ia.getId() + " has no messaging."));
 					}
 				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
@@ -753,7 +753,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							--counter[0];
 							if(counter[0] == 0)
 							{
-								String error = component.getIdentifier()+" could not find working transport for receiver " + receiverplatform + ", tried:";
+								String error = component.getId()+" could not find working transport for receiver " + receiverplatform + ", tried:";
 								for (ITransportService tp : coll)
 								{
 									error += " " + tp.toString();
@@ -1164,7 +1164,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public void startStreamCheckAliveBehavior()
 	{
-		final long lt = getMinLeaseTime(getComponent().getIdentifier());
+		final long lt = getMinLeaseTime(getComponent().getId());
 //		System.out.println("to is: "+lt);
 		if(lt==Timeout.NONE)
 			return;
@@ -1573,7 +1573,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 				}
 				else
 				{
-					System.out.println("InputStream not found (dai): "+conid+" "+getParticipantConnections()+" "+getComponent().getIdentifier());
+					System.out.println("InputStream not found (dai): "+conid+" "+getParticipantConnections()+" "+getComponent().getId());
 				}
 			}
 			else if(type==AbstractConnectionHandler.CLOSE_OUTPUT_INITIATOR)

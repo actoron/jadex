@@ -57,7 +57,7 @@ public class MicroCreationTest //extends TestCase
 //			"-conf", "jadex.standalone.Platform.component.xml",
 //			"-deftimeout", "-1",
 			"-printpass", "false"}).get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform.getIdentifier());
+		timeout	= Starter.getLocalDefaultTimeout(platform.getId());
 		IComponentManagementService cms = (IComponentManagementService)platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();

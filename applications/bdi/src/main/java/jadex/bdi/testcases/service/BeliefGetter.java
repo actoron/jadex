@@ -26,7 +26,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 	 */
 	public BeliefGetter(IExternalAccess agent)
 	{
-		super(agent.getIdentifier(), IBeliefGetter.class, null);
+		super(agent.getId(), IBeliefGetter.class, null);
 		this.agent = agent;
 	}
 	

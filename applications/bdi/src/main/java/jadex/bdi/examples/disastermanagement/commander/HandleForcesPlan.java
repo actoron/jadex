@@ -41,7 +41,7 @@ public abstract class HandleForcesPlan extends Plan
 				while(number>getParameterSet("units").size() && it.hasNext())
 				{
 					final IService force = (IService)it.next();
-					final Object provid = force.getServiceIdentifier().getProviderId();
+					final Object provid = force.getId().getProviderId();
 					if(!busy.containsFact(provid))
 					{
 //						as++;

@@ -67,7 +67,7 @@ public class DFTestPlan extends Plan
 		getLogger().info(tr.getDescription());
 		try
 		{
-			df.register(new DFComponentDescription(getAgent().getIdentifier(), SERVICES, null, null, null, lt)).get();
+			df.register(new DFComponentDescription(getAgent().getId(), SERVICES, null, null, null, lt)).get();
 			getLogger().info(" register ok.");
 			tr.setSucceeded(true);
 		}
@@ -122,7 +122,7 @@ public class DFTestPlan extends Plan
 		getLogger().info(tr.getDescription());
 		try
 		{
-			df.deregister(new DFComponentDescription(getAgent().getIdentifier())).get();
+			df.deregister(new DFComponentDescription(getAgent().getId())).get();
 			getLogger().info(" deregister ok.");
 			tr.setSucceeded(true);
 		}

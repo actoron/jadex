@@ -60,11 +60,11 @@ public class ShowPlatformArgumentsCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		Map<String, Object> params = (Map<String, Object>)Starter.getPlatformValue(comp.getIdentifier().getRoot(), IPlatformConfiguration.PLATFORMARGS);
+		Map<String, Object> params = (Map<String, Object>)Starter.getPlatformValue(comp.getId().getRoot(), IPlatformConfiguration.PLATFORMARGS);
 
-		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(comp.getIdentifier().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
+		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(comp.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
 		
-		IModelInfo model = (IModelInfo)Starter.getPlatformValue(comp.getIdentifier().getRoot(), IPlatformConfiguration.PLATFORMMODEL);
+		IModelInfo model = (IModelInfo)Starter.getPlatformValue(comp.getId().getRoot(), IPlatformConfiguration.PLATFORMMODEL);
 		
 		Map<String, Object> res = new HashMap<String, Object>();
 		

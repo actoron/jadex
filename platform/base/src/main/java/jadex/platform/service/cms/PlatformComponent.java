@@ -171,7 +171,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			@Override
 			public String toString()
 			{
-				return "PlatformComponent.body("+getIdentifier()+")";
+				return "PlatformComponent.body("+getId()+")";
 			}
 		});
 	}
@@ -259,7 +259,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				{
 					if(getFeature0(IExecutionFeature.class)!=null)
 					{
-						getFeature(IExecutionFeature.class).waitForDelay(timeout!=null ? timeout.longValue() : Starter.getLocalDefaultTimeout(getIdentifier()), true)
+						getFeature(IExecutionFeature.class).waitForDelay(timeout!=null ? timeout.longValue() : Starter.getLocalDefaultTimeout(getId()), true)
 							.addResultListener(new IResultListener<Void>()
 						{
 							@Override
@@ -279,7 +279,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					}
 					else
 					{
-						System.err.println("No execution feature for timeout: "+getIdentifier());
+						System.err.println("No execution feature for timeout: "+getId());
 					}
 				}
 
@@ -458,7 +458,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			{
 				StringWriter	sw	= new StringWriter();
 				fut.getException().printStackTrace(new PrintWriter(sw));
-				getLogger().warning("Exception during component cleanup of "+getIdentifier()+": "+fut.getException());
+				getLogger().warning("Exception during component cleanup of "+getId()+": "+fut.getException());
 				getLogger().info(sw.toString());
 			}
 //			if(getComponentIdentifier().getName().indexOf("Leaker")!=-1)
@@ -487,7 +487,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				{
 					StringWriter	sw	= new StringWriter();
 					exception.printStackTrace(new PrintWriter(sw));
-					getLogger().warning("Exception during component cleanup of "+getIdentifier()+": "+exception);
+					getLogger().warning("Exception during component cleanup of "+getId()+": "+exception);
 					getLogger().info(sw.toString());
 
 					proceed();
@@ -653,7 +653,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getIdentifier()
+	public IComponentIdentifier	getId()
 	{
 		return info!=null && info.getComponentDescription()!=null? info.getComponentDescription().getName(): null;
 	}
@@ -715,7 +715,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			this.exception	= e;
 		}
 		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		IFuture<Map<String, Object>> ret = cms.destroyComponent(getIdentifier());
+		IFuture<Map<String, Object>> ret = cms.destroyComponent(getId());
 		return ret;
 //		if(getComponentIdentifier().getParent()==null)
 //		{
@@ -754,7 +754,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		{
 			// todo: problem: loggers can cause memory leaks
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
-			String name = getLoggerName(getIdentifier());
+			String name = getLoggerName(getId());
 			logger = LogManager.getLogManager().getLogger(name);
 			
 			// if logger does not already exist, create it
@@ -1049,7 +1049,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 					final String modelname = model.getFullName();
 				
 					final Future<Collection<IExternalAccess>>	childaccesses	= new Future<Collection<IExternalAccess>>();
-					cms.getChildren(getIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
+					cms.getChildren(getId()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier[] children)
 						{
@@ -1071,7 +1071,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 								IExternalAccess subcomp = it.next();
 								if(modelname.equals(subcomp.getModel().getFullName()))
 								{
-									res.add(subcomp.getIdentifier());
+									res.add(subcomp.getId());
 								}
 							}
 							ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
@@ -1123,6 +1123,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public String	toString()
 	{
-		return getIdentifier()!=null? getIdentifier().getName(): "n/a";
+		return getId()!=null? getId().getName(): "n/a";
 	}
 }

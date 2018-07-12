@@ -46,7 +46,7 @@ import jadex.micro.testcases.TestAgent;
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Todo: long timeouts really necessary?
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)")}) // cannot use $component.getId() because is extracted from test suite :-(
 @Ignore	// TODO implement new query model
 public class ServiceQueriesTestAgent extends TestAgent
 {
@@ -103,9 +103,9 @@ public class ServiceQueriesTestAgent extends TestAgent
 				
 				public void intermediateResultAvailable(IExampleService result)
 				{
-					System.out.println("received: "+result+" "+cms.getRootIdentifier().get()+" "+((IService)result).getServiceIdentifier().getProviderId().getRoot());
+					System.out.println("received: "+result+" "+cms.getRootIdentifier().get()+" "+((IService)result).getId().getProviderId().getRoot());
 					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
-					if(cms.getRootIdentifier().get().equals(((IService)result).getServiceIdentifier().getProviderId().getRoot()))
+					if(cms.getRootIdentifier().get().equals(((IService)result).getId().getProviderId().getRoot()))
 					{
 						num++;
 					}
@@ -122,13 +122,13 @@ public class ServiceQueriesTestAgent extends TestAgent
 			});
 
 			// The creation info is important to be able to resolve the class/model
-			CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getIdentifier().getPlatformName())
-				? new CreationInfo(agent.getIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+			CreationInfo ci = ((IService)cms).getId().getProviderId().getPlatformName().equals(agent.getId().getPlatformName())
+				? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 
 			for(int i=0; i<cnt; i++)
 			{
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", ci);
-				cids[i] = fut.getFirstResult(Starter.getRemoteDefaultTimeout(agent.getIdentifier()), true);
+				cids[i] = fut.getFirstResult(Starter.getRemoteDefaultTimeout(agent.getId()), true);
 			}
 			
 			// Wait some time and then terminate query

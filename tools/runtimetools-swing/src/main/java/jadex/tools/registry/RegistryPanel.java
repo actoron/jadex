@@ -150,7 +150,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 						{
 							public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
 							{
-								cms.destroyComponent(((IService)sps).getServiceIdentifier().getProviderId());
+								cms.destroyComponent(((IService)sps).getId().getProviderId());
 								cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
 							}
 							
@@ -161,7 +161,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 								{
 									public void resultAvailable(IPeerRegistrySynchronizationService ps)
 									{
-										cms.destroyComponent(((IService)ps).getServiceIdentifier().getProviderId());
+										cms.destroyComponent(((IService)ps).getId().getProviderId());
 										cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
 									}
 									
@@ -217,7 +217,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		pserinfos.add(BorderLayout.CENTER, new JScrollPane(jtservices));
 		jtservices.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtservices.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
+		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		jtservices.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtservices.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
 		jtservices.setDefaultRenderer(Set.class, new DefaultTableCellRenderer());
@@ -244,7 +244,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		pqueryinfos.add(BorderLayout.CENTER, new JScrollPane(jtqueries));
 		jtqueries.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtqueries.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
+		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		jtqueries.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtqueries.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
 		jtqueries.setDefaultRenderer(String[].class, new DefaultTableCellRenderer()
@@ -273,7 +273,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtpartners.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ppartners.add(BorderLayout.CENTER, new JScrollPane(jtpartners));
 		jtpartners.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
+		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		
 		// create panel with partner table
 		JPanel pclients = new JPanel(new BorderLayout());
@@ -286,7 +286,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtclients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pclients.add(BorderLayout.CENTER, new JScrollPane(jtclients));
 		jtclients.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getIdentifier().getRoot()));
+		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		
 		tpane.addTab("Services", pserinfos);
 		tpane.addTab("Queries", pqueryinfos);
@@ -630,7 +630,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				IFuture<Object> ret = null;
 				try
 				{
-					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getIdentifier());
+					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getId());
 					Object res = cmd.execute(reg);
 					if(res instanceof IFuture)
 						ret = (IFuture<Object>)res;
@@ -719,34 +719,34 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			else if(column == 1)
 			{
-				value = ser.getServiceIdentifier().getServiceType();
+				value = ser.getId().getServiceType();
 			}
 			else if(column == 2)
 			{
-				value = ser.getServiceIdentifier().getProviderId();
+				value = ser.getId().getProviderId();
 			}
 			else if(column == 3)
 			{
-				value = ser.getServiceIdentifier().getProviderId().getRoot();
+				value = ser.getId().getProviderId().getRoot();
 			}
 			else if(column == 4)
 			{
-				value = ser.getServiceIdentifier();
+				value = ser.getId();
 			}
 			else if(column == 5)
 			{
 //				Map<String, Object> sprops = ser.getPropertyMap();
 //				if(sprops != null)
 //					value = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
-				value = ser.getServiceIdentifier().getTags();
+				value = ser.getId().getTags();
 			}
 			else if(column == 6)
 			{
-				value = ser.getServiceIdentifier().getNetworkNames();
+				value = ser.getId().getNetworkNames();
 			}
 			else if(column == 7)
 			{
-				value = ser.getServiceIdentifier().isUnrestricted();
+				value = ser.getId().isUnrestricted();
 			}
 			return value;
 		}
@@ -800,7 +800,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 3);
 				
-				if(!cid.getRoot().equals(getActiveComponent().getIdentifier()))
+				if(!cid.getRoot().equals(getActiveComponent().getId()))
 				{
 					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;
@@ -974,7 +974,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 2);
 				
-				if(cid!=null && !cid.getRoot().equals(getActiveComponent().getIdentifier()))
+				if(cid!=null && !cid.getRoot().equals(getActiveComponent().getId()))
 				{
 					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;

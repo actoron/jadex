@@ -66,7 +66,7 @@ public class MegaParallelStarterAgent
 			arguments = new HashMap();
 		final Map args = arguments;	
 
-		System.out.println("Created starter: "+agent.getIdentifier());
+		System.out.println("Created starter: "+agent.getId());
 		this.subname = "peer";
 		
 		getClock().addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
@@ -84,7 +84,7 @@ public class MegaParallelStarterAgent
 				{
 					args.put("num", Integer.valueOf(i));
 //							System.out.println("Created agent: "+i);
-					cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), agent.getIdentifier()), 
+					cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), agent.getId()), 
 						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -168,7 +168,7 @@ public class MegaParallelStarterAgent
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
 		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getIdentifier());
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId());
 		IResultListener lis = new IResultListener()
 		{
 			public void resultAvailable(Object result)

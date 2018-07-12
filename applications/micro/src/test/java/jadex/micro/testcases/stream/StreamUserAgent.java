@@ -81,7 +81,7 @@ public class StreamUserAgent extends TestAgent
 	 */
 	protected IFuture<Integer> testLocal(int testno, Testcase tc)
 	{
-		return performTests(testno, agent.getIdentifier().getRoot(), tc);
+		return performTests(testno, agent.getId().getRoot(), tc);
 	}
 	
 	/**
@@ -102,7 +102,7 @@ public class StreamUserAgent extends TestAgent
 //					{
 //						if(!sec)
 //						{
-							performTests(testno, platform.getIdentifier(), tc)
+							performTests(testno, platform.getId(), tc)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 							{
 								public void customResultAvailable(final Integer result)

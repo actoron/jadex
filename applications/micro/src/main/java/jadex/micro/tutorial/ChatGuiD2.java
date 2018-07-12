@@ -40,7 +40,7 @@ public class ChatGuiD2 extends JFrame
 	 */
 	public ChatGuiD2(final IExternalAccess agent)
 	{
-		super(agent.getIdentifier().getName());
+		super(agent.getId().getName());
 		this.setLayout(new BorderLayout());
 		
 		received = new JTextArea(10, 20);
@@ -71,7 +71,7 @@ public class ChatGuiD2 extends JFrame
 								for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 								{
 									IChatService cs = it.next();
-									cs.message(agent.getIdentifier().getName(), text);
+									cs.message(agent.getId().getName(), text);
 								}
 							}
 						});

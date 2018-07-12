@@ -81,7 +81,7 @@ public class GenerateService implements IGenerateService
 				
 				final AreaData	ad	= (AreaData)task;	// single cutout of area
 				final AreaData	data	= (AreaData)user;	// global area
-				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
+				ad.setCalculatorId((IComponentIdentifier)service.getId().getProviderId());
 				
 //				System.out.println("invoke: "+service);
 				agent.getFeature(IRequiredServicesFeature.class).getService("displayservice").addResultListener(new DefaultResultListener()
@@ -158,7 +158,7 @@ public class GenerateService implements IGenerateService
 							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
 							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-							agent.getIdentifier().getParent()), null)
+							agent.getId().getParent()), null)
 							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 						{
 							// Component created, now get the calculation service.

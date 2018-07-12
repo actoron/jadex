@@ -17,5 +17,5 @@ public interface IActiveComponentTreeNode extends IAndroidTreeNode
 	/**
 	 *  Get the component id.
 	 */
-	public IComponentIdentifier getIdentifier();
+	public IComponentIdentifier getId();
 }

@@ -84,7 +84,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getIdentifier());
+				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getId());
 				
 				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();			
@@ -137,7 +137,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getIdentifier().getRoot(), testno, delay, max);
+		return performTest(agent.getId().getRoot(), testno, delay, max);
 	}
 	
 	/**
@@ -173,7 +173,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getIdentifier(), testno, delay, max)
+							performTest(platform.getId(), testno, delay, max)
 							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 						{
 							public void customResultAvailable(final TestReport result)
@@ -236,8 +236,8 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 						IResourceIdentifier	rid	= new ResourceIdentifier(
 							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
-						final boolean	local	= root.equals(agent.getIdentifier().getRoot());
-						CreationInfo	ci	= new CreationInfo(local ? agent.getIdentifier() : root, rid);
+						final boolean	local	= root.equals(agent.getId().getRoot());
+						CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid);
 						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", ci, null)
 							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 						{	

@@ -50,7 +50,7 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 			return IFuture.TRUE;
 		
 		final Future<Boolean> ret = new Future<Boolean>();
-		SNFPropertyProvider.getNFPropertyValue(component, ((IService)service).getServiceIdentifier(), propname)
+		SNFPropertyProvider.getNFPropertyValue(component, ((IService)service).getId(), propname)
 			.addResultListener(new ExceptionDelegationResultListener<Object, Boolean>(ret)
 		{
 			public void customResultAvailable(Object result)

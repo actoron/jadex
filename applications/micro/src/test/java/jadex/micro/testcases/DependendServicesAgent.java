@@ -114,7 +114,7 @@ public class DependendServicesAgent extends JunitAgentTest
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
-                                  System.out.println("del: "+child.getIdentifier()+" "+res);
+                                  System.out.println("del: "+child.getId()+" "+res);
 //                                    Map res = (Map)result;
                                     List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);
@@ -175,7 +175,7 @@ public class DependendServicesAgent extends JunitAgentTest
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
-				cms.getChildren(agent.getIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				cms.getChildren(agent.getId()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier[] children)
 					{

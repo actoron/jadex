@@ -42,13 +42,13 @@ public class ResultAgent
 		
 		if(Math.random()<0.3)
 		{
-			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getIdentifier()+": "+Math.random());
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getId()+": "+Math.random());
 //			killAgent();
 			ret.setResult(null);
 		}
 		else
 		{
-			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getIdentifier()+": "+Math.random());
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getId()+": "+Math.random());
 			
 //			getServiceContainer().searchService(IComponentManagementService.class)
 			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
@@ -58,11 +58,11 @@ public class ResultAgent
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 				
-					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(agent.getIdentifier()), agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(agent.getId()), agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							System.out.println(agent.getIdentifier()+" got result: "+result);
+							System.out.println(agent.getId()+" got result: "+result);
 							ret.setResult(null);
 //							killAgent();
 						}
