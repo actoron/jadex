@@ -419,7 +419,11 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 					for (AbstractAuthenticationSecret secret : secrets)
 					{
 						if (secret.canSign())
-							networksigs.add(entry.getKey(), signKey(challenge, key, secret));
+						{
+							byte[] sig = signKey(challenge, key, secret);
+							if (sig != null)
+								networksigs.add(entry.getKey(), sig);
+						}
 					}
 				}
 			}

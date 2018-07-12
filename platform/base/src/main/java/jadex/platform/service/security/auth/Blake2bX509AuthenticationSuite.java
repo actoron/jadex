@@ -402,7 +402,8 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				if (jpake != null)
 					dk = jpake.getDerivedKey();
 				else
-					throw new SecurityException("J-PAKE key not found for password " + secret);
+					return null;
+					//throw new SecurityException("J-PAKE key not found for password " + secret);
 			}
 			else
 			{
