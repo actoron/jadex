@@ -16,6 +16,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
@@ -59,6 +60,11 @@ import jadex.micro.annotation.Binding;
 @Service
 public class SuperpeerClientAgent	implements ISearchQueryManagerService
 {
+	//-------- constants --------
+	
+	/** The fallback polling search rate as factor of the default remote timeout. */
+	public static final double	POLLING_RATE	= 0.33333333;	// 30 secs / 3 -> 10 secs.
+	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -90,6 +96,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				for(String network: networks)
 				{
 					connections.put(network, new NetworkManager(network));
+					connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
 				}
 					
 				ret.setResult(null);
@@ -166,7 +173,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			// TODO: allow selective/hybrid polling fallback for unknown/unconnected networks?			
 		}
 		
-		// polling fallback when no superpeers
+		// awa fallback when no superpeers
 		if(!foundsuperpeer)
 		{
 			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<T>()
@@ -181,7 +188,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setException(exception);
+					ret.setExceptionIfUndone(exception);
 				}
 				
 				@Override
@@ -296,7 +303,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	 */
 	protected <T> TerminableIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
 	{
-		// TODO: termination
+		// TODO: termination? currently not used
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		
 		// Check for awareness service
@@ -314,7 +321,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				@Override
 				public void intermediateResultAvailable(final IComponentIdentifier platform)
 				{
-//					System.out.println(getComponent() + " searching remote platform: "+platform+", "+query);
+//					System.out.println(agent + " searching remote platform: "+platform+", "+query);
 					
 					// Only (continue to) search remote when future not yet finished or cancelled.
 					if(!ret.isDone())
@@ -324,12 +331,12 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
 								.executeRemoteSearch(platform, query);
 						
-//						System.out.println(cid + " searching remote platform3: "+platform+", "+query);
+//						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
 						remotesearch.addResultListener(new IResultListener<Collection<T>>()
 						{
 							public void resultAvailable(Collection<T> result)
 							{
-//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+result);
+//								System.out.println(agent + " searched remote platform: "+platform+", "+result);
 								if(result != null)
 								{
 									for(Iterator<T> it = result.iterator(); it.hasNext(); )
@@ -343,7 +350,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+exception);
+//								System.out.println(agent + " searched remote platform: "+platform+", "+exception);
 								doFinished();
 							}
 						});
@@ -419,7 +426,6 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		protected NetworkManager(String networkname)
 		{
 			this.networkname	= networkname;
-			startSuperpeerSearch();
 		}
 		
 		//------- helper methods ---------
@@ -726,6 +732,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		{
 			this.query	= query;
 			this.retfut	= new SubscriptionIntermediateFuture<>();
+			SFuture.avoidCallTimeouts(retfut, agent);	// Should be not need for timeouts on local platform???
 			this.networkspersuperpeer	= new MultiCollection<>();
 			this.futures	= new LinkedHashSet<>();
 			
@@ -789,48 +796,108 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				
 				// else ignore unknown network
 			}
+			newsuperpeers	= newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet();
 			
 			// Add queries for each relevant superpeer
-			for(ISuperpeerService superpeer: newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet())
+			if(!newsuperpeers.isEmpty())
 			{
-				ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
-				futures.add(fut);	// Remember future for later termination
-				fut.addResultListener(new IIntermediateResultListener<T>()
+				for(ISuperpeerService superpeer: newsuperpeers)
 				{
-					@Override
-					public void intermediateResultAvailable(T result)
+					ITerminableIntermediateFuture<T>	fut	= superpeer.addQuery(query);
+					futures.add(fut);	// Remember future for later termination
+					fut.addResultListener(new IIntermediateResultListener<T>()
 					{
-						// Forward result to user query
-						retfut.addIntermediateResult(result);
-					}
-					
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						// Reconnect query on error, if user query still active
-						if(!retfut.isDone())
+						@Override
+						public void intermediateResultAvailable(T result)
 						{
-							// Just remove from lists and try again
-							futures.remove(fut);
-							Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
-							updateQuery(failed_networks.toArray(new String[failed_networks.size()]));
+							// Forward result to user query
+							retfut.addIntermediateResult(result);
 						}
-					}
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							// Reconnect query on error, if user query still active
+							if(!retfut.isDone())
+							{
+								// Just remove from lists and try again
+								futures.remove(fut);
+								Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
+								updateQuery(failed_networks.toArray(new String[failed_networks.size()]));
+							}
+						}
+						
+						@Override
+						public void finished()
+						{
+							// shouldn't happen?
+							exceptionOccurred(null);
+						}
+						
+						@Override
+						public void resultAvailable(Collection<T> result)
+						{
+							// shouldn't happen?
+							exceptionOccurred(null);
+						}
+					});
+				}
+			}
+			
+			// polling fallback, when no superpeers at all
+			else
+			{
+				new IComponentStep<Void>()
+				{
+					IComponentStep<Void>	step	= this;
 					
 					@Override
-					public void finished()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						// shouldn't happen?
-						exceptionOccurred(null);
+						// Search and also restart after delay, if user query still active and still no superpeers
+						if(!retfut.isDone() && futures.isEmpty())
+						{
+							// Schedule next search
+							agent.getFeature(IExecutionFeature.class)
+								.waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), POLLING_RATE), step, true);
+							
+							// Start current search
+							searchRemoteServices(query)
+								.addResultListener(new IIntermediateResultListener<T>()
+							{
+								@Override
+								public void intermediateResultAvailable(T result)
+								{
+									// Forward result to user query
+									retfut.addIntermediateResultIfUndone(result);
+								}
+								
+								@Override
+								public void exceptionOccurred(Exception exception)
+								{
+									// Ignore
+								}
+								
+								@Override
+								public void finished()
+								{
+									// Ignore
+								}
+								
+								@Override
+								public void resultAvailable(Collection<T> result)
+								{
+									// Ignore
+								}
+							});
+						}
+						
+						// else if superpeer found or future finished -> silently drop polling by not rescheduling
+						// todo: terminate ongoing searches, but may be more overhead than just letting them run out. 
+						
+						return IFuture.DONE;
 					}
-					
-					@Override
-					public void resultAvailable(Collection<T> result)
-					{
-						// shouldn't happen?
-						exceptionOccurred(null);
-					}
-				});
+				}.execute(agent);	// First execution is immediate
 			}
 		}
 	}
@@ -847,6 +914,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		baseconfig.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 //		baseconfig.setGui(true);
 //		baseconfig.setLogging(true);
+		baseconfig.setValue("awa", false);
 		
 		// Super peer base configuration
 		IPlatformConfiguration	spbaseconfig	= baseconfig.clone();
