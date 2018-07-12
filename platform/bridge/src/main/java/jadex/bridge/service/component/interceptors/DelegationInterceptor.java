@@ -94,7 +94,7 @@ public class DelegationInterceptor //extends AbstractMultiInterceptor
 //					{
 //						public IFuture<Boolean> filter(IService ser)
 //						{
-//							return new Future<Boolean>(!sid.equals(ser.getServiceIdentifier()));
+//							return new Future<Boolean>(!sid.equals(ser.getId()));
 //						}
 //					});
 //					
@@ -187,7 +187,7 @@ public class DelegationInterceptor //extends AbstractMultiInterceptor
 //		Map ret = new HashMap();
 //		try
 //		{
-//			ret.put(IInternalService.class.getMethod("getServiceIdentifier", new Class[0]), new AbstractApplicableInterceptor()
+//			ret.put(IInternalService.class.getMethod("getId", new Class[0]), new AbstractApplicableInterceptor()
 //			{
 //				public IFuture execute(ServiceInvocationContext context)
 //				{

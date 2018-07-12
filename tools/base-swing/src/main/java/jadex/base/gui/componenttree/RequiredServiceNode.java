@@ -65,7 +65,7 @@ public class RequiredServiceNode extends AbstractSwingTreeNode
 		this.info = info;
 		this.nid = nid;
 		this.ea = ea;
-//		if(service==null || service.getServiceIdentifier()==null)
+//		if(service==null || service.getId()==null)
 //			System.out.println("service node: "+this);
 		model.registerNode(this);
 	}
@@ -208,10 +208,10 @@ public class RequiredServiceNode extends AbstractSwingTreeNode
 //				{
 //					final Future<ReqInfo> ret = new Future<ReqInfo>();
 //					final IService res = ia.getServiceContainer().getLastRequiredService(fname);
-//					if(res!=null && ia.getServiceContainer().hasRequiredServicePropertyProvider(res.getServiceIdentifier()))
+//					if(res!=null && ia.getServiceContainer().hasRequiredServicePropertyProvider(res.getId()))
 //					{
-//						final IServiceIdentifier sid = res.getServiceIdentifier();
-//						final INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(res.getServiceIdentifier());
+//						final IServiceIdentifier sid = res.getId();
+//						final INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(res.getId());
 //						pp.getNFPropertyMetaInfos().addResultListener(new ExceptionDelegationResultListener<Map<String,INFPropertyMetaInfo>, ReqInfo>(ret)
 //						{
 //							public void customResultAvailable(final Map<String,INFPropertyMetaInfo> result1)

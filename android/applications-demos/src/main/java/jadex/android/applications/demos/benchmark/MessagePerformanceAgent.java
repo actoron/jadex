@@ -235,7 +235,7 @@ public class MessagePerformanceAgent
 //			{
 //				public void resultAvailable(IEchoService result)
 //				{
-//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//					ret.setResult(((IService)result).getId().getProviderId());
 //				}
 //				
 //				public void exceptionOccurred(Exception exception)

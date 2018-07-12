@@ -192,8 +192,8 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 												for (Iterator it = modelSet.iterator(); it.hasNext(); )
 												{
 													String modelpath = (String) it.next();
-													IServiceIdentifier repid = ia.getServiceContainer().getProvidedService("repository_service").getServiceIdentifier();
-													IServiceIdentifier exid = ia.getServiceContainer().getProvidedService("execution_service").getServiceIdentifier();
+													IServiceIdentifier repid = ia.getServiceContainer().getProvidedService("repository_service").getId();
+													IServiceIdentifier exid = ia.getServiceContainer().getProvidedService("execution_service").getId();
 													ProcessResourceInfo info = new ProcessResourceInfo(repid, exid, rid, modelpath);
 													resources.put(rid, info);
 													fireModelAddedEvent(info);

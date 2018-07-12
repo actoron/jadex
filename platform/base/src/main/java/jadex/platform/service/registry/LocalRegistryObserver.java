@@ -146,7 +146,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 			for(Iterator<IService> it=added.iterator(); it.hasNext(); )
 			{
 				IService ser = it.next();
-//				clients.add(ser.getServiceIdentifier().getProviderId().getRoot());
+//				clients.add(ser.getId().getProviderId().getRoot());
 				// Remove locally (platform) scoped events
 				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getId().getScope()))
 					it.remove();

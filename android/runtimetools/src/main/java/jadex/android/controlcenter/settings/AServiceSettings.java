@@ -14,7 +14,7 @@ public abstract class AServiceSettings implements ISettings {
 
 	public AServiceSettings(IService service) {
 		this.service = service;
-		title = SReflect.getUnqualifiedTypeName(service.getServiceIdentifier().getServiceType().getTypeName());
+		title = SReflect.getUnqualifiedTypeName(service.getId().getServiceType().getTypeName());
 	}
 
 	/**

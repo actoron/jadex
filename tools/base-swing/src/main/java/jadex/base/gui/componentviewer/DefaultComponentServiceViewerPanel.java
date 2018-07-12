@@ -151,7 +151,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							{
 								IServiceViewerPanel panel = (IServiceViewerPanel)classes[j].newInstance();
 								found	= true;
-//								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
+//								panels.add(new Object[]{SReflect.getInnerClassName(ser.getId().getServiceType()), panel});
 								panels.add(new Object[]{SReflect.getUnqualifiedTypeName(ser.getId()
 									.getServiceType().getTypeName()), panel});
 								panel.init(jcc, ser).addResultListener(lis);

@@ -601,7 +601,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					ret.setException(exception);
 				}
 			});
-//				cms.destroyComponent(((IService)pser).getServiceIdentifier().getProviderId());
+//				cms.destroyComponent(((IService)pser).getId().getProviderId());
 		}
 		else
 		{

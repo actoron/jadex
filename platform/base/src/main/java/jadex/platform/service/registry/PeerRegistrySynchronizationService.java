@@ -312,7 +312,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								if(spevent.isUnknown())
 								{
 									spser.updateClientData(lrobs.getCurrentStateEvent(null)).addResultListener(this);
-//									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+//									System.out.println("Send full client update to superpeer: "+((IService)spregser).getId().getProviderId());
 								}
 							}
 							
@@ -333,7 +333,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						spser.updateClientData(event).addResultListener(lis);
 //						if(event.size()>0)
 //						{
-//							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
+//							System.out.println("Send client delta update to superpeer: "+((IService)spser).getId().getProviderId());
 //							System.out.println("Event is: "+event);
 //						}
 					}
@@ -526,7 +526,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
 //				{
 ////					System.out.println("found: "+result);
-//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//					ret.setResult(((IService)result).getId().getProviderId());
 //				}
 //			});
 ////		}

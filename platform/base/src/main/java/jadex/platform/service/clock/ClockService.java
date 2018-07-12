@@ -348,7 +348,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 //							{
 //								// No settings service: ignore.
 //								ret.setResult(null);
-////								ret.setResult(getServiceIdentifier());
+////								ret.setResult(getId());
 //							}
 //						});
 					}

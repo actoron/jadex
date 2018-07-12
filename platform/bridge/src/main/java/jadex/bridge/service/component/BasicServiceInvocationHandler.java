@@ -136,7 +136,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
-//		this.sid = service.getServiceIdentifier();
+//		this.sid = service.getId();
 		this.logger	= logger;
 //		this.realtime	= realtime;
 		this.cause = cause;
@@ -153,7 +153,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
-//		this.sid = service.getManagementService().getServiceIdentifier();
+//		this.sid = service.getManagementService().getId();
 		this.logger	= logger;
 //		this.realtime	= realtime;
 		this.cause = cause;
@@ -169,7 +169,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //		assert cause!=null;
 //		this.comp = comp;
 //		this.searchcmd = searchcmd;
-////		this.sid = service.getManagementService().getServiceIdentifier();
+////		this.sid = service.getManagementService().getId();
 //		this.logger	= logger;
 ////		this.realtime	= realtime;
 //		this.cause = cause;
@@ -196,7 +196,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 //		ServiceInvocationContext sicon = null;
 		
-		if((args==null || args.length==0) && "getServiceIdentifier".equals(method.getName()))
+		if((args==null || args.length==0) && "getId".equals(method.getName()))
 		{
 			ret	= getServiceIdentifier();
 		}

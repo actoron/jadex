@@ -187,8 +187,8 @@ public class GlobalPoolServiceManager
 		
 //		for(IService ser: sers)
 //		{
-//			UsageInfo ui = usages.get(ser.getServiceIdentifier());
-//			System.out.println(ser.getServiceIdentifier()+ ": "+ui!=null? ui.getUsages(): "");
+//			UsageInfo ui = usages.get(ser.getId());
+//			System.out.println(ser.getId()+ ": "+ui!=null? ui.getUsages(): "");
 //		}
 		
 		final int[] cnt = new int[1];
@@ -440,8 +440,8 @@ public class GlobalPoolServiceManager
 										{
 											// update worker infos
 											updateServiceAdded(ser);
-//											services.put(ser.getServiceIdentifier(), ser);
-//											IComponentIdentifier cid = ser.getServiceIdentifier().getProviderId().getRoot();
+//											services.put(ser.getId(), ser);
+//											IComponentIdentifier cid = ser.getId().getProviderId().getRoot();
 //											PlatformInfo pi = platforms.get(cid);
 //											pi.setWorker(ser);
 //											strategy.workersAdded(cid);

@@ -502,7 +502,7 @@ public class ServiceInvocationContext
 		}
 		else
 		{
-			System.out.println("No interceptor: "+method.getName());
+			System.out.println("No interceptor: "+method.getName() + " " + method);
 			ret	= new Future<Void>(new RuntimeException("No interceptor found: "+method.getName()));
 		}
 

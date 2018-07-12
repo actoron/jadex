@@ -460,7 +460,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					requestClientFullState();
 				SuperpeerRegistrySynchronizationService.this.ssp = ssp;
 				
-//				System.out.println("Send update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
+//				System.out.println("Send update to ssp: "+((IService)ssp).getId().getProviderId()+" "+event);
 				ssp.updateClientData(event).addResultListener(new IResultListener<ARegistryResponseEvent>()
 				{
 					public void resultAvailable(ARegistryResponseEvent revent)
@@ -502,7 +502,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 							event.setClientType(ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
 //							event.addAddedService((IService)component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class)));
 							ssp.updateClientData(event).addResultListener(this);
-//							System.out.println("Send full update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
+//							System.out.println("Send full update to ssp: "+((IService)ssp).getId().getProviderId()+" "+event);
 						}
 						
 						// Tell client (not only superpeer!) to send full update

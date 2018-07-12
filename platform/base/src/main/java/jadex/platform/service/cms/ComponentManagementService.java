@@ -1152,7 +1152,7 @@ public class ComponentManagementService implements IComponentManagementService
 					{
 //						if(fac.toString().toLowerCase().indexOf("multi")!=-1)
 						if(isMultiFactory(fac))
-//						if(((IService)fac).getServiceIdentifier().getProviderId().getLocalName().indexOf("multi")!=-1)
+//						if(((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1)
 						{
 							multies.add(fac);
 						}
@@ -2501,7 +2501,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
 		tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
 			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-//			System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
+//			System.out.println(getId()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
 		return tmp;
 	}
 	
@@ -2537,7 +2537,7 @@ public class ComponentManagementService implements IComponentManagementService
 ////			System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
 //			tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
 //			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-////			System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
+////			System.out.println(getId()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
 //			ret.setResult(tmp);
 //			
 //			// Nice style to check for valid?

@@ -400,7 +400,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
-//			component.getLogger().info("Starting service: "+is.getServiceIdentifier());
+//			component.getLogger().info("Starting service: "+is.getId());
 //			is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
 //			{
 //				public void customResultAvailable(Void result)
@@ -409,7 +409,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //					{
 //						public void resultAvailable(Void result)
 //						{
-//							component.getLogger().info("Started service: "+is.getServiceIdentifier());
+//							component.getLogger().info("Started service: "+is.getId());
 //							
 //							
 //						}
@@ -440,7 +440,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("Starting service: "+is.getServiceIdentifier()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+//				System.out.println("Starting service: "+is.getId()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 				is.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
@@ -533,7 +533,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				{
 //					public void exceptionOccurred(Exception exception)
 //					{
-//						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+//						getComponent().getLogger().severe("Could not publish: "+service.getId()+" "+exception.getMessage());
 //						ret.setResult(null);
 //					}
 //					
@@ -541,7 +541,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //					{
 //						for (final IPublishService pubserv : result)
 //						{
-//							pubserv.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+//							pubserv.publishService(service.getId(), pi).addResultListener(new IResultListener<Void>()
 //							{
 //								public void resultAvailable(Void result)
 //								{
@@ -549,7 +549,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //								
 //								public void exceptionOccurred(Exception exception)
 //								{
-//									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getServiceIdentifier()+" "+exception.getMessage());
+//									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getId()+" "+exception.getMessage());
 //								}
 //							});
 //						}
@@ -596,7 +596,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //			{
 				ProvidedServiceInfo info = getProvidedServiceInfo(service.getId());
 				final PublishInfo pi = info==null? null: info.getPublish();
-//				System.out.println("shutdown ser: "+service.getServiceIdentifier());
+//				System.out.println("shutdown ser: "+service.getId());
 				if(pi!=null)
 				{
 					final IServiceIdentifier sid = service.getId();
@@ -1091,7 +1091,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //							{
 //								public void customResultAvailable(Void result)
 //								{
-////									if(fservice.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
+////									if(fservice.getId().toString().indexOf("ContextSer")!=-1)
 ////										System.out.println("hierda");
 //									
 //									fservice.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)

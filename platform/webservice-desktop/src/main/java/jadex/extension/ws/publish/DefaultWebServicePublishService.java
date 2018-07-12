@@ -72,7 +72,7 @@ public class DefaultWebServicePublishService implements IPublishService
 	{
 		// Java dynamic proxy cannot be used as @WebService annotation cannot be added.
 		
-//		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
+//		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getId().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
 		IService service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(serviceid.getServiceType(), pi.getPublishScope(), null, null)).get();
@@ -147,7 +147,7 @@ public class DefaultWebServicePublishService implements IPublishService
 	 */
 	protected Object createProxy(IService service, ClassLoader classloader, Class<?> type)
 	{
-//		System.out.println("createProxy: "+service.getServiceIdentifier());
+//		System.out.println("createProxy: "+service.getId());
 		Object ret = null;
 		try
 		{

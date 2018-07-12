@@ -282,7 +282,7 @@ public class ServicePoolManager
 		
 		if(tasks.isEmpty())
 		{
-//			System.out.println("service free: "+service.getServiceIdentifier());
+//			System.out.println("service free: "+service.getId());
 			free.put(service.getId(), service);
 		}
 		else
@@ -290,14 +290,14 @@ public class ServicePoolManager
 			busy.put(service.getId(), service);
 			final Object task	=	this.tasks.keySet().iterator().next();
 			final AllocationData	ad	= (AllocationData)this.tasks.remove(task);
-//			System.out.println("started service: "+service.getServiceIdentifier()+", "+task);
+//			System.out.println("started service: "+service.getId()+", "+task);
 			
 			handler.invokeService(service, task, ad.getUserData()).addResultListener(
 				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-//					System.out.println("service finished: "+service.getServiceIdentifier()+", "+task);
+//					System.out.println("service finished: "+service.getId()+", "+task);
 					
 					// Add result of task execution.
 					ad.taskFinished(result);
@@ -309,7 +309,7 @@ public class ServicePoolManager
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("service failed: "+service.getServiceIdentifier()+", "+task);
+//					System.out.println("service failed: "+service.getId()+", "+task);
 					
 					if(ad.isRetry())
 					{
@@ -344,7 +344,7 @@ public class ServicePoolManager
 				public void resultAvailable(Object result)
 				{
 					creating	= false;
-//					System.out.println("created service: "+((IService)result).getServiceIdentifier());
+//					System.out.println("created service: "+((IService)result).getId());
 					
 					// Add if not already found by concurrent search.
 					IService	service	= (IService)result;

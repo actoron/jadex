@@ -498,7 +498,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		// - only same implclass name + same props => same generated classname
 		
 		StringBuilder builder = new StringBuilder();
-//		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+//		Class<?> iface = service.getId().getServiceType().getType(classloader);
 		Class<?> nameclazz = baseclass!=null? baseclass: iface;
 		if(nameclazz.getPackage()!=null)
 			builder.append(nameclazz.getPackage().getName());

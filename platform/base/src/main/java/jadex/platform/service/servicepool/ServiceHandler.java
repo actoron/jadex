@@ -352,11 +352,11 @@ public class ServiceHandler implements InvocationHandler
 	{
 		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		
-//		System.out.println("Using worker: "+service.getServiceIdentifier());
+//		System.out.println("Using worker: "+service.getId());
 		
 //		System.out.println("non-func in pool: "+method.getName()+" "+(call!=null? call.getProperties(): "null"));
 //		if(call!=null && call.getProperties()!=null)
-//			System.out.println("call: "+call.hashCode()+" "+System.identityHashCode(call.getProperties())+" "+service.getServiceIdentifier());
+//			System.out.println("call: "+call.hashCode()+" "+System.identityHashCode(call.getProperties())+" "+service.getId());
 		
 		try
 		{

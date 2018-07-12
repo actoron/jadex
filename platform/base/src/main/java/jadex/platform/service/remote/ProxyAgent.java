@@ -145,7 +145,7 @@ public class ProxyAgent	implements IProxyAgentService
 //	public IFuture<Void> agentKilled()
 //	{
 //		Future<Void> ret = new Future<Void>();
-//			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+//			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getId());
 //			nfpp.removeNFProperty(LatencyProperty.NAME).addResultListener(new DelegationResultListener<Void>(ret));
 //		return ret;
 //	}

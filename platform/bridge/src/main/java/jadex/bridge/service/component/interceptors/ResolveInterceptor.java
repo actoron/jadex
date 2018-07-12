@@ -55,7 +55,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			START_METHOD = IInternalService.class.getMethod("startService", new Class[0]);
 			SHUTDOWN_METHOD = IInternalService.class.getMethod("shutdownService", new Class[0]);
 			SERVICEMETHODS = new HashSet<Method>();
-			SERVICEMETHODS.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
+			SERVICEMETHODS.add(IService.class.getMethod("getId", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 			// internal methods???

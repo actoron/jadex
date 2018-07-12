@@ -122,7 +122,7 @@ public class SRemoteGui
 							// todo: implementation?
 							sis[i] = service.getId();
 							pis[i]	= new ProvidedServiceInfo(service.getId().getServiceName(), 
-//								service.getServiceIdentifier().getServiceType(), null, null);
+//								service.getId().getServiceType(), null, null);
 								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null);
 						}
 						

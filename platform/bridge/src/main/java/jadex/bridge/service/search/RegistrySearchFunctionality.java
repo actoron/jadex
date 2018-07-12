@@ -108,7 +108,7 @@ public class RegistrySearchFunctionality
 				if(checkSearchScope(cid, ser, scope, excluded) && checkPublicationScope(cid, ser))
 				{
 //					if(ret!=null)
-//						System.out.println("found another: "+ser.getServiceIdentifier());
+//						System.out.println("found another: "+ser.getId());
 					
 					ret = (T)ser;
 					break;
@@ -167,7 +167,7 @@ public class RegistrySearchFunctionality
 						if(filter==null || filter.filter(ser))
 						{
 //							if(ret!=null)
-//								System.out.println("found another: "+((IService)ser).getServiceIdentifier());
+//								System.out.println("found another: "+((IService)ser).getId());
 							
 							ret = ser;
 							break;
@@ -688,10 +688,10 @@ public class RegistrySearchFunctionality
 //		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
 //		{
 //			// Test if service id is part of searcher id, service is upwards from searcher
-//			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+//			IComponentIdentifier sercid = ser.getId().getProviderId();
 //			ret = getDotName(cid).endsWith(getDotName(sercid));
 //			
-////			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+////			IComponentIdentifier sercid = ser.getId().getProviderId();
 ////			String subname = getSubcomponentName(cid);
 ////			ret = sercid.getName().endsWith(subname);
 ////			
@@ -757,7 +757,7 @@ public class RegistrySearchFunctionality
 //		else if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
 //		{
 //			// check if searcher is upwards from service (part of name)
-//			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
+//			IComponentIdentifier sercid = ser.getId().getProviderId();
 //			ret = getDotName(sercid).endsWith(getDotName(cid));
 //		}
 		

@@ -175,7 +175,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		if(state==State.SHUTDOWN)
 		{
 			ret.setResult(null);
-//			ret.setResult(getServiceIdentifier());
+//			ret.setResult(getId());
 			return ret;
 		}
 		

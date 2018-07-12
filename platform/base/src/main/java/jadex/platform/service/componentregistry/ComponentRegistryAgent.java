@@ -200,7 +200,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            
 	        		                            return ret;
 	        	                            }
-	        	                            else if(method.getName().equals("getServiceIdentifier"))
+	        	                            else if(method.getName().equals("getId"))
 	        	                            {
 	        	                            	return fsid;
 	        	                            }

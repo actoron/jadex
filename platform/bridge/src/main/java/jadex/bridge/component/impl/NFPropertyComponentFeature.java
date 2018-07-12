@@ -121,7 +121,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 //					for(IInternalService ser: sers.get(type))
 //					{
 //						cnt++;
-//						Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
+//						Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getId())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
 //						initNFProperties(ser, impltype).addResultListener(lis);
 //					}
 //				}

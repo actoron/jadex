@@ -124,7 +124,7 @@ public class SimCenterPanel extends JPanel
 //			public void customResultAvailable(IComponentManagementService cms)
 //			{
 ////				IComponentManagementService	cms	= (IComponentManagementService)result;
-//				cms.getExternalAccess((IComponentIdentifier)((IService)simservice).getServiceIdentifier().getProviderId())
+//				cms.getExternalAccess((IComponentIdentifier)((IService)simservice).getId().getProviderId())
 //					.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 //			}
 //		});

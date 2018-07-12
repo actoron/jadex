@@ -252,7 +252,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //			{
 //				if(sic.getObject() instanceof ServiceInfo)
 //				{
-//					IComponentIdentifier	provider	= ((ServiceInfo)sic.getObject()).getManagementService().getServiceIdentifier().getProviderId();
+//					IComponentIdentifier	provider	= ((ServiceInfo)sic.getObject()).getManagementService().getId().getProviderId();
 //					System.out.println("getExternalAccess: "+provider+", "+sic.getArguments());
 //				}
 //			}				

@@ -104,7 +104,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 		{
 			public void customResultAvailable(final IService ser) 
 			{
-//				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
+//				System.out.println("invoking on: "+ser.getId()+" "+cnt);
 				try
 				{
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
@@ -256,7 +256,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 				ser = (IService)service;
 			}
 			
-//			if(ser.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITestService")!=-1)
+//			if(ser.getId().getServiceType().getTypeName().indexOf("ITestService")!=-1)
 //				System.out.println("reached");
 			
 			Class<ITargetResolver> cl = (Class<ITargetResolver>)ser.getPropertyMap().get(ITargetResolver.TARGETRESOLVER);

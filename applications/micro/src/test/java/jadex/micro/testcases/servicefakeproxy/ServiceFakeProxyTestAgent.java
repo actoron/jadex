@@ -145,7 +145,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 						return "Fake proxy for service("+sid+")";
 					}
 				});
-				pi.addMethodReplacement(new MethodInfo("getServiceIdentifier", new Class[0]), new IMethodReplacement()
+				pi.addMethodReplacement(new MethodInfo("getId", new Class[0]), new IMethodReplacement()
 				{
 					public Object invoke(Object obj, Object[] args)
 					{

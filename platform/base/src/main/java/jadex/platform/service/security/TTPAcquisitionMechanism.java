@@ -144,7 +144,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 //					
 //					public void intermediateResultAvailable(final ISecurityService ss)
 //					{
-//						if(!found && ((IService)ss).getServiceIdentifier().getProviderId().getPlatformPrefix().equals(ttpcid.getName()))
+//						if(!found && ((IService)ss).getId().getProviderId().getPlatformPrefix().equals(ttpcid.getName()))
 //						{
 //							found = true;
 //							verifyTTP(ss).addResultListener(new ExceptionDelegationResultListener<Void, ISecurityService>(ret)
