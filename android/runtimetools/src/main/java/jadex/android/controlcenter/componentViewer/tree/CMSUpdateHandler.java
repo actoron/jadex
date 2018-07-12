@@ -120,13 +120,13 @@
 //		// System.out.println("platformname: "+cid.getPlatformName());
 //		// if(access==null)
 //		// System.out.println("access: "+access);
-//		// if(access.getIdentifier()==null)
-//		// System.out.println("accesscid"+access.getIdentifier());
-//		// if(access.getIdentifier().getPlatformName()==null)
-//		// System.out.println("accesscidpfname: "+access.getIdentifier().getPlatformName());
+//		// if(access.getId()==null)
+//		// System.out.println("accesscid"+access.getId());
+//		// if(access.getId().getPlatformName()==null)
+//		// System.out.println("accesscidpfname: "+access.getId().getPlatformName());
 //
 //		// For local component use direct listener.
-//		if (cid.getPlatformName().equals(access.getIdentifier().getPlatformName()))
+//		if (cid.getPlatformName().equals(access.getId().getPlatformName()))
 //		{
 //			return installLocalCMSListener(listener);
 //		}
@@ -215,7 +215,7 @@
 //		IFuture<Void> ret = IFuture.DONE;
 //
 //		// For local component use direct listener.
-//		if (cid.getPlatformName().equals(access.getIdentifier().getPlatformName()))
+//		if (cid.getPlatformName().equals(access.getId().getPlatformName()))
 //		{
 //			ret = removeLocalCMSListener(listener);
 //		}
@@ -374,6 +374,6 @@
 //	 */
 //	protected String buildId(final IComponentIdentifier cid)
 //	{
-//		return "cmslistener_" + hashCode() + "_" + access.getIdentifier().toString() + "_" + cid;
+//		return "cmslistener_" + hashCode() + "_" + access.getId().toString() + "_" + cid;
 //	}
 //}

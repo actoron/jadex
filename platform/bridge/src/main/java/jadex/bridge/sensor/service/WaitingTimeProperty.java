@@ -44,7 +44,7 @@ public class WaitingTimeProperty extends TimedProperty
 	{
 		super(NAME, comp, true);
 		this.method = method;
-		this.sid = service.getServiceIdentifier();
+		this.sid = service.getId();
 		
 		WaitingTimeProperty.this.clock = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		
@@ -74,7 +74,7 @@ public class WaitingTimeProperty extends TimedProperty
 					}
 				}
 			});
-			comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+			comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getId(), method, listener);
 		}
 		else
 		{

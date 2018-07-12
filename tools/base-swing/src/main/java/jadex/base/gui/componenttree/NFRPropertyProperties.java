@@ -104,7 +104,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 						{
 							IService ser = (IService)result;
 							serboxm.removeAllElements();
-							serboxm.addElement(ser.getServiceIdentifier());
+							serboxm.addElement(ser.getId());
 						}
 						else if(result instanceof Collection)
 						{
@@ -112,7 +112,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 							serboxm.removeAllElements();
 							for(IService ser: sers)
 							{
-								serboxm.addElement(ser.getServiceIdentifier());
+								serboxm.addElement(ser.getId());
 							}
 						}
 					}

@@ -59,7 +59,7 @@ public class ProviderAgent implements ITestService
 		}
 
 		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
-		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getIdentifier().getRoot()).get();
+		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getId().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override
 			@Classname("myuniquestepname")
@@ -75,7 +75,7 @@ public class ProviderAgent implements ITestService
 		}
 
 		cms	= exta.searchService( new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
-		cms.getComponentDescription(exta.getIdentifier()).get();
+		cms.getComponentDescription(exta.getId()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}

@@ -700,7 +700,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	public String	getName()
 	{
 		// GTK look and feel calls this already in constructor. grrr
-		return controlcenter==null ? null : controlcenter.getPlatformAccess().getIdentifier().getName();
+		return controlcenter==null ? null : controlcenter.getPlatformAccess().getId().getName();
 	}
 	
 	//-------- IPropertiesProvider interface --------
@@ -757,8 +757,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		setPerspective(currentperspective);
 		
 		// Only enable console automatically when on local platform.
-		if(controlcenter.getJCCAccess().getIdentifier().getPlatformName()
-			.equals(controlcenter.getPlatformAccess().getIdentifier().getPlatformName()))
+		if(controlcenter.getJCCAccess().getId().getPlatformName()
+			.equals(controlcenter.getPlatformAccess().getId().getPlatformName()))
 		{
 			consoleenabled	= props.getBooleanProperty("consoleenabled");
 			console.setConsoleEnabled(consoleenabled);

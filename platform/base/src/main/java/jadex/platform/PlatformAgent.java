@@ -56,9 +56,9 @@ import jadex.platform.service.security.SecurityAgent;
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
-	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
@@ -124,7 +124,7 @@ public class PlatformAgent
 				Autostart autostart = aan.autostart();
 				if(autostart.value().toBoolean()!=null)
 				{		
-					Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getIdentifier(), IPlatformConfiguration.PLATFORMARGS);
+					Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
 					
 					String name = autostart.name().length()==0? null: autostart.name();
 					

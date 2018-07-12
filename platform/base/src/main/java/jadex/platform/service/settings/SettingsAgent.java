@@ -85,7 +85,7 @@ public class SettingsAgent	implements ISettingsService
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
 		this.filename	= "properties.json";
-		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getIdentifier().getPlatformPrefix());
+		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getId().getPlatformPrefix());
 		if (settingsdir.exists() && !settingsdir.isDirectory())
 		{
 			access.getLogger().log(Level.WARNING, "Invalid settings directory '" + settingsdir.getName() + "', switching to read-only.");

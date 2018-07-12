@@ -60,7 +60,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		TestReport tr1 = new TestReport("#1", "Test if local service proxy can be created");
 		try 
 		{
-			IComponentManagementService cms = getServiceProxy(agent, agent.getIdentifier().getRoot(), IComponentManagementService.class);
+			IComponentManagementService cms = getServiceProxy(agent, agent.getId().getRoot(), IComponentManagementService.class);
 			IComponentDescription[] descs = cms.getComponentDescriptions().get();
 			System.out.println(Arrays.toString(descs));
 			tr1.setSucceeded(true);
@@ -87,7 +87,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			// awareness is disabled in testsuite
 //			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
 			
-			IComponentManagementService cms = getServiceProxy(agent, plat.getIdentifier(), IComponentManagementService.class);
+			IComponentManagementService cms = getServiceProxy(agent, plat.getId(), IComponentManagementService.class);
 			IComponentDescription[] descs = cms.getComponentDescriptions().get();
 			System.out.println(Arrays.toString(descs));
 			tr2.setSucceeded(true);
@@ -110,7 +110,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 	{				
 		S ret = null;
 		
-		boolean local = component.getIdentifier().getRoot().equals(providerid.getRoot());
+		boolean local = component.getId().getRoot().equals(providerid.getRoot());
 		if(local)
 		{
 			ret = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( servicetype).setProvider(providerid));
@@ -145,7 +145,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 						return "Fake proxy for service("+sid+")";
 					}
 				});
-				pi.addMethodReplacement(new MethodInfo("getServiceIdentifier", new Class[0]), new IMethodReplacement()
+				pi.addMethodReplacement(new MethodInfo("getId", new Class[0]), new IMethodReplacement()
 				{
 					public Object invoke(Object obj, Object[] args)
 					{

@@ -37,7 +37,7 @@ public class EchoAgent implements IEchoService
 	{
 		Map<String, Object> reply = new HashMap<String, Object>(msg);
 		IComponentIdentifier sender = (IComponentIdentifier)msg.get(SFipa.SENDER);
-		reply.put(SFipa.SENDER, agent.getIdentifier());
+		reply.put(SFipa.SENDER, agent.getId());
 		reply.put(SFipa.RECEIVERS, new IComponentIdentifier[]{sender});
 		
 		agent.getFeature(IMessageFeature.class).sendMessage(reply, sender);

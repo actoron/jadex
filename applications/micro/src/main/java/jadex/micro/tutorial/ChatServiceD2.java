@@ -91,7 +91,7 @@ public class ChatServiceD2 implements IChatService
 	 */
 	public void message(final String sender, final String text)
 	{
-		gui.addMessage(agent.getIdentifier().getLocalName()+" received at "
+		gui.addMessage(agent.getId().getLocalName()+" received at "
 			+format.format(new Date(clock.getTime()))+" from: "+sender+" message: "+text);
 	}
 	

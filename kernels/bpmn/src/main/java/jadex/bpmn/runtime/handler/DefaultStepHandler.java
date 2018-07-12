@@ -231,7 +231,7 @@ public class DefaultStepHandler implements IStepHandler
 		if(ex!=null && next==null)
 		{
 			// Hack! Special case of terminated exception of itself e.g. during killing.
-			if(ex instanceof ComponentTerminatedException && instance.getIdentifier().equals(((ComponentTerminatedException)ex).getComponentIdentifier()))
+			if(ex instanceof ComponentTerminatedException && instance.getId().equals(((ComponentTerminatedException)ex).getComponentIdentifier()))
 			{
 				instance.getLogger().warning("Component terminated exception: "+ex);
 			}

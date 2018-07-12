@@ -84,15 +84,15 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		}
 	}
 	
-	/**
-	 * Sets the Kernels.
-	 * See {@link JadexPlatformManager} constants for available Kernels.
-	 * @param kernels
-	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
-	 */
-	protected void setPlatformKernels(String ... kernels) {
-		this.platformConfiguration.setKernels(kernels);
-	}
+//	/**
+//	 * Sets the Kernels.
+//	 * See {@link JadexPlatformManager} constants for available Kernels.
+//	 * @param kernels
+//	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
+//	 */
+//	protected void setPlatformKernels(String ... kernels) {
+//		this.platformConfiguration.setKernels(kernels);
+//	}
 	
 	/**
 	 * Returns the platform options of newly created platforms.
@@ -162,7 +162,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
-		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getKernels()));
+//		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getKernels()));
 		return startJadexPlatform(platformConfiguration);
 	}
 	
@@ -233,7 +233,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	@Override
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
-		this.platformId = platform.getIdentifier();
+		this.platformId = platform.getId();
 	}
 	
 

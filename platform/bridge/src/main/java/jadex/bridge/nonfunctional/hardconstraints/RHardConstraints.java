@@ -184,7 +184,7 @@ public class RHardConstraints
 					{
 						final ConstantValueFilter filter = unboundconstantfilters.get(i);
 						
-						SNFPropertyProvider.getMethodNFPropertyValue(component, ((IService)service).getServiceIdentifier(), method, filter.getValueName())
+						SNFPropertyProvider.getMethodNFPropertyValue(component, ((IService)service).getId(), method, filter.getValueName())
 							.addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)

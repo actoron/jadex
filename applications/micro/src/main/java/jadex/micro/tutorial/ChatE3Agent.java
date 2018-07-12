@@ -92,7 +92,7 @@ public class ChatE3Agent
 //		{
 //			public void resultAvailable(final IRegistryServiceE3 rs)
 //			{
-				regservice.register(agent.getIdentifier(), nickname);
+				regservice.register(agent.getId(), nickname);
 				
 				agent.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{

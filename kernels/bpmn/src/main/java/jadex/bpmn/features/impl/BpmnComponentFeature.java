@@ -518,7 +518,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	 */
 	public IMonitoringEvent createThreadEvent(String type, ProcessThread thread)
 	{
-		MonitoringEvent event = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis(), PublishEventLevel.FINE);
+		MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
 //		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 		event.setProperty("details", createProcessThreadInfo(thread));
@@ -530,7 +530,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 	 */
 	public IMonitoringEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
 	{
-		MonitoringEvent event = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis(), PublishEventLevel.FINE);
+		MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
 		event.setProperty("activity", activity.getName());
 		event.setProperty("details", createProcessThreadInfo(thread));

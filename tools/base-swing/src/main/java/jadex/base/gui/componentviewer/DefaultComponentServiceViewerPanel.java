@@ -81,7 +81,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		AbstractJCCPlugin.getClassLoader(exta.getIdentifier(), jcc)
+		AbstractJCCPlugin.getClassLoader(exta.getId(), jcc)
 			.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 		{
 			public void customResultAvailable(final ClassLoader cl)
@@ -151,8 +151,8 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							{
 								IServiceViewerPanel panel = (IServiceViewerPanel)classes[j].newInstance();
 								found	= true;
-//								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
-								panels.add(new Object[]{SReflect.getUnqualifiedTypeName(ser.getServiceIdentifier()
+//								panels.add(new Object[]{SReflect.getInnerClassName(ser.getId().getServiceType()), panel});
+								panels.add(new Object[]{SReflect.getUnqualifiedTypeName(ser.getId()
 									.getServiceType().getTypeName()), panel});
 								panel.init(jcc, ser).addResultListener(lis);
 							}

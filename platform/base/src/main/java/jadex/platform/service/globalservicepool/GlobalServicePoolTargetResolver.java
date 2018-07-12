@@ -107,7 +107,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				boolean first=true;
 				public void intermediateResultAvailable(IService result) 
 				{
-					services.put(result.getServiceIdentifier(), result);
+					services.put(result.getId(), result);
 					if(first)
 					{
 						reportUsage(result, agent, sid);
@@ -219,12 +219,12 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		UsageInfo ui = usageinfos.get(ser.getServiceIdentifier());
+		UsageInfo ui = usageinfos.get(ser.getId());
 		if(ui==null)
 		{
 			ui = new UsageInfo();
-			usageinfos.put(ser.getServiceIdentifier(), ui);
-			ui.setServiceIdentifier(ser.getServiceIdentifier());
+			usageinfos.put(ser.getId(), ui);
+			ui.setServiceIdentifier(ser.getId());
 			ui.setStartTime(System.currentTimeMillis());
 			ui.setUsages(1);
 			ret.setResult(null);

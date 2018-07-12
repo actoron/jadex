@@ -395,7 +395,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		{
 			if(shutdown)
 			{
-				throw new IllegalStateException("Transport already shut down: "+this+", "+handler.getAccess().getIdentifier());
+				throw new IllegalStateException("Transport already shut down: "+this+", "+handler.getAccess().getId());
 			}
 			if(!running)
 			{

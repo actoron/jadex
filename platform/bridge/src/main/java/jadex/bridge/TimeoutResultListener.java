@@ -7,6 +7,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -200,9 +201,9 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				try
+				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+				if(clock!=null)
 				{
-					IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 					clock.isValid().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
 					{
 						public void resultAvailable(Boolean valid)
@@ -317,9 +318,6 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 							}
 						}
 					}));
-				}
-				catch (ServiceNotFoundException e)
-				{
 				}
 				
 				return IFuture.DONE;

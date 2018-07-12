@@ -54,7 +54,7 @@ public class ShutdownAgent
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 //				cms.createComponent("block", new CreationInfo(agent.getComponentIdentifier()))
-				cms.createComponent(BlockAgent.class.getName()+".class", new CreationInfo(agent.getIdentifier()))
+				cms.createComponent(BlockAgent.class.getName()+".class", new CreationInfo(agent.getId()))
 					.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					public void firstResultAvailable(final IComponentIdentifier cid)

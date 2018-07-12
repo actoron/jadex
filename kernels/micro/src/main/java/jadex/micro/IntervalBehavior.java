@@ -60,7 +60,7 @@ public class IntervalBehavior<T>
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final String id = SUtil.createUniqueId(component.getIdentifier().getLocalName());
+		final String id = SUtil.createUniqueId(component.getId().getLocalName());
 		this.id = id;	
 		
 		component.getExternalAccess().scheduleStep(new IComponentStep<Void>()

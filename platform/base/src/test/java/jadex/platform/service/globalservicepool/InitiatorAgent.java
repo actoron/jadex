@@ -96,7 +96,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(agent.getIdentifier(), testno, true)
+				performTest(agent.getId(), testno, true)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
@@ -117,7 +117,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(pls.get(1).getIdentifier(), testno, false)
+				performTest(pls.get(1).getId(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
@@ -193,9 +193,9 @@ public class InitiatorAgent extends TestAgent
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)
 			{
-				System.out.println("found: "+((IService)result).getServiceIdentifier());
+				System.out.println("found: "+((IService)result).getId());
 //				System.err.println("-------------+++++++++++++--------------- found #"+testno+", "+result);
-				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
+				if(cid.equals(((IService)result).getId().getProviderId()))
 				{
 					called = true;
 					callService(result);

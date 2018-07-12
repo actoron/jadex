@@ -72,7 +72,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							}
 							else if (caller.getDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
 									&& sic.getMethod().getName().equals("destroyComponent")
-									&& sic.getArguments().size()==1 && caller!=null && caller.getIdentifier().equals(sic.getArguments().get(0))) 
+									&& sic.getArguments().size()==1 && caller!=null && caller.getId().equals(sic.getArguments().get(0))) 
 							{
 								// do not try to reschedule if component killed itself and is already terminated to allow passing results to the original caller.
 								com.execute(args);

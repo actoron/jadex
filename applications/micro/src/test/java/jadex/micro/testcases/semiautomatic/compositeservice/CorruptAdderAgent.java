@@ -50,7 +50,7 @@ public class CorruptAdderAgent
 				{
 					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
 					{
-						context.setResult(new Future(new ComponentTerminatedException(agent.getIdentifier())));
+						context.setResult(new Future(new ComponentTerminatedException(agent.getId())));
 //						System.out.println("hello interceptor");
 //						if(calls++>0)
 						{

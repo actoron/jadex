@@ -102,7 +102,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			}
 		});
 		
-		cmslistener	= cmshandler.addCMSListener(access.getIdentifier().getRoot());
+		cmslistener	= cmshandler.addCMSListener(access.getId().getRoot());
 		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
 			@Override
@@ -180,7 +180,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			{
 				((DefaultListModel)pllist.getModel()).removeAllElements();
 				
-				IComponentIdentifier self = access.getIdentifier().getRoot();
+				IComponentIdentifier self = access.getId().getRoot();
 				valmap.put(null, self);
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
@@ -232,7 +232,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		{
 			public void resultAvailable(IComponentIdentifier cid)
 			{
-				IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
+				IComponentIdentifier key = ((IService)ser).getId().getProviderId();
 				if(!valmap.containsKey(key))
 				{
 					valmap.put(key, cid);

@@ -46,7 +46,7 @@ public class Main
 		
 		try
 		{
-			puzzle.addHighscore(new HighscoreEntry(platform.getIdentifier().getLocalName(), board.getSize(), hints)).get(timeout);
+			puzzle.addHighscore(new HighscoreEntry(platform.getId().getLocalName(), board.getSize(), hints)).get(timeout);
 			System.out.println("New highscore entry!");
 		}
 		catch(RuntimeException e)

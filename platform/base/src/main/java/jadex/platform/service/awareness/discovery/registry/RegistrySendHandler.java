@@ -39,7 +39,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 		if(getAgent().isStarted())
 		{
 			final String sendid = SUtil.createUniqueId(getAgent().getMicroAgent()
-				.getIdentifier().getLocalName());
+				.getId().getLocalName());
 			this.sendid = sendid;	
 			
 			getAgent().getMicroAgent().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()

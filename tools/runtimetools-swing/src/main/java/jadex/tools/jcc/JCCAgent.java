@@ -138,7 +138,7 @@ public class JCCAgent	implements IComponentStep<Void>
 				{
 					public void intermediateResultAvailable(IComponentManagementService cms)
 					{
-						IComponentIdentifier	cid	= ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+						IComponentIdentifier	cid	= ((IService)cms).getId().getProviderId().getRoot();
 						if(cid.getName().startsWith(platforms))
 						{
 							connected	= true;

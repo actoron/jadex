@@ -45,7 +45,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 10)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 10)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class LongcallTestAgent extends TestAgent
 {
 	/**
@@ -127,7 +127,7 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		performTests(agent.getIdentifier().getRoot(), testno, true)
+		performTests(agent.getId().getRoot(), testno, true)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 		
 		return ret;
@@ -144,7 +144,7 @@ public class LongcallTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				performTests(exta.getIdentifier(), testno, false)
+				performTests(exta.getId(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 			}
 		});
@@ -263,7 +263,7 @@ public class LongcallTestAgent extends TestAgent
 			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 			// set timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getIdentifier(), 0.01));
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledLocalDefaultTimeout(agent.getId(), 0.01));
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);

@@ -38,7 +38,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TimeoutTestAgent extends TestAgent
 {
 	/**
@@ -77,7 +77,7 @@ public class TimeoutTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getIdentifier().getRoot(), testno, true)
+		performTest(agent.getId().getRoot(), testno, true)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
@@ -102,7 +102,7 @@ public class TimeoutTestAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				System.out.println("PLATFORM DONE< PERFORM TEST");
-				performTest(platform.getIdentifier(), testno, false)
+				performTest(platform.getId(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
@@ -221,7 +221,7 @@ public class TimeoutTestAgent extends TestAgent
 						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
-							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getIdentifier(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
+							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{
 								tr.setSucceeded(true);
 							}

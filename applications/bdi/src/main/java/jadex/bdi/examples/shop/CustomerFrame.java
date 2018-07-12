@@ -28,7 +28,7 @@ public class CustomerFrame extends JFrame
 	 */
 	public CustomerFrame(final IExternalAccess agent)
 	{
-		super(agent.getIdentifier().getName());
+		super(agent.getId().getName());
 		
 		add(new CustomerPanel(agent));
 		pack();

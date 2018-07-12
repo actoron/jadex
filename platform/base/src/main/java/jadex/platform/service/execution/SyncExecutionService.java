@@ -73,7 +73,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public SyncExecutionService(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getIdentifier(), IExecutionService.class, properties);
+		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
 		this.state	= State.CREATED;
@@ -175,7 +175,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		if(state==State.SHUTDOWN)
 		{
 			ret.setResult(null);
-//			ret.setResult(getServiceIdentifier());
+//			ret.setResult(getId());
 			return ret;
 		}
 		

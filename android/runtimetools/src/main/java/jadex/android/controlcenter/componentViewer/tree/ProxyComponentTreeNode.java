@@ -88,7 +88,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 	 *  Get the cid.
 	 *  @return the cid.
 	 */
-	public IComponentIdentifier getIdentifier()
+	public IComponentIdentifier getId()
 	{
 		if(cid==null)
 			getRemoteComponentIdentifier();

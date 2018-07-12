@@ -35,7 +35,7 @@ public class RequiredServiceNode extends AbstractTreeNode implements IAndroidTre
 		super(parent, model);
 		this.info = info;
 		this.nid = nid;
-		// if(service==null || service.getServiceIdentifier()==null)
+		// if(service==null || service.getId()==null)
 		// System.out.println("service node: "+this);
 		model.registerNode(this);
 	}

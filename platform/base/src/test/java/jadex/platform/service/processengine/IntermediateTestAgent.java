@@ -265,7 +265,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
 		
 		try
 		{
@@ -303,7 +303,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
 		fut.getFirstResult();
 		
 //		// For debugging to receive error messages, when thread hangs before fut.get().
@@ -361,7 +361,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
 		fut.getFirstResult();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -406,7 +406,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
 		fut.getFirstResult();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -454,7 +454,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
 		
 		try
 		{

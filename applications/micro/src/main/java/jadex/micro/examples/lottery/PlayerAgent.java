@@ -54,7 +54,7 @@ public class PlayerAgent
 			{
 //				System.out.println("Item offered: "+item);
 				
-				System.out.println(agent.getIdentifier()+": "+(ls.claimItem(item).get()? "I won item: ": "I did not win item: ")+item);
+				System.out.println(agent.getId()+": "+(ls.claimItem(item).get()? "I won item: ": "I did not win item: ")+item);
 			}
 			
 			public void finished()

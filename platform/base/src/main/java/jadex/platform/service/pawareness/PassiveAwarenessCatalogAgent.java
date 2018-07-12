@@ -159,7 +159,7 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 			String addr = url.substring(nameend + 1);
 			
 			IComponentIdentifier relayid = new BasicComponentIdentifier(name);
-			if (!agent.getIdentifier().getRoot().equals(relayid))
+			if (!agent.getId().getRoot().equals(relayid))
 			{
 				ret = new TransportAddress(new BasicComponentIdentifier(name), prot, addr);
 			}

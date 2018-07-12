@@ -280,7 +280,7 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 			double elapsed_time = getTime() - order.getStartTime();
 			double price_span = order.getLimit() - order.getStartPrice();
 			int acceptable_price =  (int)(price_span * elapsed_time / time_span) + order.getStartPrice();
-			agent.getLogger().info(agent.getIdentifier().getName()+" proposed: " + acceptable_price);
+			agent.getLogger().info(agent.getId().getName()+" proposed: " + acceptable_price);
 			
 			// Store proposal data in plan parameters.
 			goal.setProposal(acceptable_price);

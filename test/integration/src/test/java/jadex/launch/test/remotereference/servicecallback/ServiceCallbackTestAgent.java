@@ -28,7 +28,7 @@ import jadex.micro.testcases.TestAgent;
 @Ignore	// TODO: implement (de)referencing of services as arguments
 @Agent(autoprovide=Boolean3.TRUE)
 // Larger timeout to capture service search/call timeout
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 1.5)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 1.5)")}) // cannot use $component.getId() because is extracted from test suite :-(
 @Service
 public class ServiceCallbackTestAgent extends TestAgent	implements ICalledService
 {
@@ -55,7 +55,7 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 		try
 		{
 			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(ServiceCallbackProviderAgent.class.getName()+".class",
-				local ? new CreationInfo(agent.getIdentifier()) : null);	// Start as subcomponent in local case
+				local ? new CreationInfo(agent.getId()) : null);	// Start as subcomponent in local case
 			IComponentIdentifier	provider	= fut.getFirstResult();
 			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
 				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, Binding.SCOPE_GLOBAL)).get(); // Search globally in remote case.

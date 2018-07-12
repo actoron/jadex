@@ -42,7 +42,7 @@ public class KillAgent
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(null, "jadex.micro.MicroAgent.class", new CreationInfo(agent.getIdentifier()), null)
+				cms.createComponent(null, "jadex.micro.MicroAgent.class", new CreationInfo(agent.getId()), null)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
 				{
 					public void resultAvailable(IComponentIdentifier result) 

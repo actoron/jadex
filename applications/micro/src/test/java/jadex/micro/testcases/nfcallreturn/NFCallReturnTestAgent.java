@@ -81,7 +81,7 @@ public class NFCallReturnTestAgent extends TestAgent
 	{
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		
-		performTests(agent.getIdentifier().getRoot(), testno, true)
+		performTests(agent.getId().getRoot(), testno, true)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport[]>(ret)));
 		
 		return ret;
@@ -98,7 +98,7 @@ public class NFCallReturnTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				performTests(exta.getIdentifier(), testno, false)
+				performTests(exta.getId(), testno, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class)
 						.createResultListener(new DelegationResultListener<TestReport[]>(ret)));
 			}

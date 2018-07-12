@@ -40,7 +40,7 @@ import jadex.micro.testcases.TestAgent;
 })
 @Agent
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class ServiceCallTestAgent extends TestAgent
 {
 	//-------- constants --------
@@ -102,8 +102,8 @@ public class ServiceCallTestAgent extends TestAgent
 	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int rawfactor, final int directfactor, final int decoupledfactor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		CreationInfo ci = ((IService)cms).getServiceIdentifier().getProviderId().getPlatformName().equals(agent.getIdentifier().getPlatformName())
-			? new CreationInfo(agent.getIdentifier(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+		CreationInfo ci = ((IService)cms).getId().getProviderId().getPlatformName().equals(agent.getId().getPlatformName())
+			? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 		
 		String an = agentname.toLowerCase();
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	

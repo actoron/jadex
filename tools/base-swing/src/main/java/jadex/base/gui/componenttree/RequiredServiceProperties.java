@@ -50,7 +50,7 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 	 */
 	public void	setService(RequiredServiceInfo info)
 	{
-//		IServiceIdentifier	sid	= service.getServiceIdentifier();
+//		IServiceIdentifier	sid	= service.getId();
 		
 		getTextField("Name").setText(info.getName());
 		getTextField("Type").setText(info.getType().getTypeName());

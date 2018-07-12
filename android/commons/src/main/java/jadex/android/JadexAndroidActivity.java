@@ -114,15 +114,15 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		return platformConfiguration;
 	}
 	
-	/**
-	 * Sets the Kernels.
-	 * See {@link jadex.base.IRootComponentConfiguration.KERNELS} Constants for available Kernels.
-	 * @param kernels
-	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
-	 */
-	protected void setPlatformKernels(String ... kernels) {
-		this.platformConfiguration.setKernels(kernels);
-	}
+//	/**
+//	 * Sets the Kernels.
+//	 * See {@link jadex.base.IRootComponentConfiguration.KERNELS} Constants for available Kernels.
+//	 * @param kernels
+//	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
+//	 */
+//	protected void setPlatformKernels(String ... kernels) {
+//		this.platformConfiguration.setKernels(kernels);
+//	}
 //	
 //	/**
 //	 * Sets platform options.
@@ -342,7 +342,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 */
 	protected void onPlatformStarted(IExternalAccess result)
 	{
-		this.platformId = result.getIdentifier();
+		this.platformId = result.getId();
 		runOnUiThread(new Runnable()
 		{
 			

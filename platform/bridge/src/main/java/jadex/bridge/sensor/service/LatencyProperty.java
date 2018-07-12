@@ -47,7 +47,7 @@ public class LatencyProperty extends TimedProperty
 		// Necessary for unbound required service property to fetch meta info :-(
 		if(service!=null)
 		{
-			this.sid = service.getServiceIdentifier();
+			this.sid = service.getId();
 		
 			if(ProxyFactory.isProxyClass(service.getClass()))
 			{
@@ -87,7 +87,7 @@ public class LatencyProperty extends TimedProperty
 						}
 					}
 				});
-				comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+				comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getId(), method, listener);
 			}
 			else
 			{

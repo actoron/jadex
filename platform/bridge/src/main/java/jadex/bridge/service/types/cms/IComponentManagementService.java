@@ -173,15 +173,7 @@ public interface IComponentManagementService
 	 */
 	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
 
-	//-------- parent/child component accessors --------
-	
-	/**
-	 *  Get the parent component of a component.
-	 *  @param cid The component identifier.
-	 *  @return The parent component identifier.
-	 *  @deprecated Use cid.getParent() instead
-	 */
-	public IFuture<IComponentIdentifier> getParent(IComponentIdentifier cid);
+	//-------- child component accessors --------
 	
 	/**
 	 *  Get the children components of a component.

@@ -275,7 +275,7 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 		
 		if(getInternalAccess().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 		{
-			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getIdentifier(), getInternalAccess().getDescription().getCreationTime(), 
+			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getId(), getInternalAccess().getDescription().getCreationTime(), 
 				MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 			me.setProperty("propname", nfprop.getName());
 			getInternalAccess().getFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
@@ -308,7 +308,7 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 					{
 						if(getInternalAccess().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
-							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getIdentifier(), getInternalAccess().getDescription().getCreationTime(), 
+							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getId(), getInternalAccess().getDescription().getCreationTime(), 
 								MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							me.setProperty("propname", name);
 							getInternalAccess().getFeature(IMonitoringComponentFeature.class).publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));

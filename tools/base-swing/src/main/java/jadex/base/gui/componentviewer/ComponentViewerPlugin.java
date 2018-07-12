@@ -499,8 +499,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					JComponent comp = panel.getComponent();
 					// todo: help
 					//SHelp.setupHelp(comp, getHelpID());
-					panels.put(exta.getIdentifier(), panel);
-					detail.add(comp, exta.getIdentifier());
+					panels.put(exta.getId(), panel);
+					detail.add(comp, exta.getId());
 					comptree.getModel().fireNodeChanged(node);
 				}
 			});

@@ -725,7 +725,7 @@ public abstract class Plan
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return agent.getIdentifier();
+		return agent.getId();
 	}
 	
 	/**

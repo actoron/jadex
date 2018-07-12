@@ -310,7 +310,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(ia.getIdentifier());
+			mev.setSourceIdentifier(ia.getId());
 			mev.setTime(time);
 			
 			BeliefInfo info = BeliefInfo.createBeliefInfo(ia, mbel, ia.getClassLoader());
@@ -1562,7 +1562,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 			for(MBelief mbel: mbels)
 			{
 				BeliefInfo info = BeliefInfo.createBeliefInfo(getComponent(), mbel, getComponent().getClassLoader());
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -1576,7 +1576,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 			for(RGoal goal: goals)
 			{
 				GoalInfo info = GoalInfo.createGoalInfo(goal);
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(goal.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -1590,7 +1590,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 			for(RPlan plan: plans)
 			{
 				PlanInfo info = PlanInfo.createPlanInfo(plan);
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(plan.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -1773,7 +1773,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public String getAgentName()
 	{
-		return getComponent().getIdentifier().getLocalName();
+		return getComponent().getId().getLocalName();
 	}
 
 	/**
@@ -1791,7 +1791,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return getComponent().getIdentifier();
+		return getComponent().getId();
 	}
 
 	/**

@@ -51,7 +51,7 @@ public abstract class SendHandler
 	 */
 	public void startSendBehavior()
 	{
-		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getIdentifier().getLocalName());
+		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getId().getLocalName());
 		this.sendid = sendid;	
 		
 		agent.getMicroAgent().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()

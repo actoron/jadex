@@ -191,7 +191,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters.add(MediaType.TEXT_PLAIN, tostrc);
 		converters.add("*/*", tostrc);
     	
-    	final Long to = (Long)Starter.getPlatformValue(component.getIdentifier(), Starter.DATA_DEFAULT_REMOTE_TIMEOUT);
+    	final Long to = (Long)Starter.getPlatformValue(component.getId(), Starter.DATA_DEFAULT_REMOTE_TIMEOUT);
 		System.out.println("Using default client timeout: "+to);
     	
     	requestspercall = new MultiCollection<String, AsyncContext>()
@@ -486,7 +486,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //				        				System.out.println("checking "+result);
 				        				// if timeout -> cancel future.
 				        				// TODO: which timeout? (client vs server).
-				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getRemoteDefaultTimeout(component.getIdentifier()))
+				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getRemoteDefaultTimeout(component.getId()))
 				        				{
 //				        					System.out.println("terminating "+result);
 				        					rinfo.setTerminated();
@@ -1411,7 +1411,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			ret.append("<div class=\"header\">");
 			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
-			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
+			String ifacename = ((IService)service).getId().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
 			ret.append("\n");

@@ -98,7 +98,7 @@ public class ExecutionService implements IExecutionService
 					for (Object obj : result)
 					{
 						IExecutionService service = (IExecutionService) obj;
-						if (((IService) service).getServiceIdentifier().equals(info.getExecutionServiceId()))
+						if (((IService) service).getId().equals(info.getExecutionServiceId()))
 						{
 							targetservice = service;
 							break;

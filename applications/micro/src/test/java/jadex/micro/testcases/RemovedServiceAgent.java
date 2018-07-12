@@ -117,7 +117,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 		final IntermediateFuture<TestReport>	testfut	= new IntermediateFuture<TestReport>();
 		
 		// Create agent to call service on.
-		cms.createComponent(null, agentname, new CreationInfo(agent.getIdentifier()), null)
+		cms.createComponent(null, agentname, new CreationInfo(agent.getId()), null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(testfut)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)

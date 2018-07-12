@@ -65,7 +65,7 @@ public class ChatServiceD1 implements IChatService
 	 */
 	public void message(final String sender, final String text)
 	{
-		System.out.println(agent.getIdentifier().getLocalName()+" received at "
+		System.out.println(agent.getId().getLocalName()+" received at "
 			+format.format(new Date(clock.getTime()))+" from: "+sender+" message: "+text);
 	}
 }

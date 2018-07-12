@@ -62,7 +62,7 @@ public class SuperpeerRegistrySynchronizationAgent
 			if(pser!=null)
 			{
 				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				cms.destroyComponent(((IService)pser).getServiceIdentifier().getProviderId());
+				cms.destroyComponent(((IService)pser).getId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)
@@ -84,7 +84,7 @@ public class SuperpeerRegistrySynchronizationAgent
 	@AgentKilled
 	public void terminate()
 	{
-		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getIdentifier());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getId());
 		
 		// Remove all remote services handled by the registry 
 		//TODO

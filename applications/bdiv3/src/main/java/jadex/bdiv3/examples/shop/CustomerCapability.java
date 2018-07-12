@@ -115,11 +115,11 @@ public class CustomerCapability
 			throw new RuntimeException("Not enough money to buy: "+big.name);
 		
 		// Buy the item at the shop (the shop is a service at another agent)
-		System.out.println(capa.getAgent().getIdentifier().getName()+" buying item: "+big.name);
+		System.out.println(capa.getAgent().getId().getName()+" buying item: "+big.name);
 		IFuture<ItemInfo>	future	= big.shop.buyItem(big.name, big.price);
-		System.out.println(capa.getAgent().getIdentifier().getName()+" getting item: "+future);
+		System.out.println(capa.getAgent().getId().getName()+" getting item: "+future);
 		ItemInfo item = (ItemInfo)future.get();
-		System.out.println(capa.getAgent().getIdentifier().getName()+" bought item: "+item);
+		System.out.println(capa.getAgent().getId().getName()+" bought item: "+item);
 		
 		// Update the customer inventory 
 		ItemInfo ii = null;

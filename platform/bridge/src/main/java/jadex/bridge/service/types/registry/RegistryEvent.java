@@ -92,7 +92,7 @@ public class RegistryEvent extends ARegistryEvent
 //			addedservices = new HashSet<IServiceIdentifier>();
 //			for(IService ser: services)
 //			{
-//				addedservices.add(ser.getServiceIdentifier());
+//				addedservices.add(ser.getId());
 //			}
 //		}
 	}
@@ -117,7 +117,7 @@ public class RegistryEvent extends ARegistryEvent
 //			removedservices = new HashSet<IServiceIdentifier>();
 //			for(IService ser: services)
 //			{
-//				removedservices.add(ser.getServiceIdentifier());
+//				removedservices.add(ser.getId());
 //			}
 //		}
 	}

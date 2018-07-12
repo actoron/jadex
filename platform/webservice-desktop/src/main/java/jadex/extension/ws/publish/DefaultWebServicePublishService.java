@@ -72,14 +72,14 @@ public class DefaultWebServicePublishService implements IPublishService
 	{
 		// Java dynamic proxy cannot be used as @WebService annotation cannot be added.
 		
-//		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
+//		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getId().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
 		IService service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(serviceid.getServiceType(), pi.getPublishScope(), null, null)).get();
 		
 		ClassLoader cl = null;
 		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, Binding.SCOPE_PLATFORM));
-		if (serviceid.getProviderId().getPlatformName().equals(component.getIdentifier().getPlatformName()))
+		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
 			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
@@ -102,7 +102,7 @@ public class DefaultWebServicePublishService implements IPublishService
 		
 		if(endpoints==null)
 			endpoints = new HashMap<IServiceIdentifier, Endpoint>();
-		endpoints.put(service.getServiceIdentifier(), endpoint);
+		endpoints.put(service.getId(), endpoint);
 		return IFuture.DONE;
 		
 //		try
@@ -147,7 +147,7 @@ public class DefaultWebServicePublishService implements IPublishService
 	 */
 	protected Object createProxy(IService service, ClassLoader classloader, Class<?> type)
 	{
-//		System.out.println("createProxy: "+service.getServiceIdentifier());
+//		System.out.println("createProxy: "+service.getId());
 		Object ret = null;
 		try
 		{

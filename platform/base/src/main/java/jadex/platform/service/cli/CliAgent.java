@@ -394,7 +394,7 @@ public class CliAgent implements ICliService, IInternalCliService
 		if(tup==null)
 		{
 //			System.out.println("created new shell for session: "+sessionid);
-			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getIdentifier().getRoot().getName(), sessionid, agent.getClassLoader());
+			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getId().getRoot().getName(), sessionid, agent.getClassLoader());
 			shell.addAllCommandsFromClassPath(); // agent.getClassLoader()
 			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, Long.valueOf(System.currentTimeMillis())));
 		}

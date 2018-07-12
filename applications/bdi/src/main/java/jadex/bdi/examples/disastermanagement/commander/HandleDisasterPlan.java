@@ -104,7 +104,7 @@ public class HandleDisasterPlan extends Plan
 //					while(chemicals>chemicalunits.size() && it.hasNext())
 //					{
 //						final IClearChemicalsService ccs = (IClearChemicalsService)it.next();
-//						final Object provid = ccs.getServiceIdentifier().getProviderId();
+//						final Object provid = ccs.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);
@@ -141,7 +141,7 @@ public class HandleDisasterPlan extends Plan
 //					while(fire>fireunits.size() && it.hasNext())
 //					{
 //						final IExtinguishFireService fes = (IExtinguishFireService)it.next();
-//						final Object provid = fes.getServiceIdentifier().getProviderId();
+//						final Object provid = fes.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);
@@ -179,7 +179,7 @@ public class HandleDisasterPlan extends Plan
 //					while(victims>ambulanceunits.size() && it.hasNext())
 //					{
 //						final ITreatVictimsService tvs = (ITreatVictimsService)it.next();
-//						final Object provid = tvs.getServiceIdentifier().getProviderId();
+//						final Object provid = tvs.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);

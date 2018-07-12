@@ -109,8 +109,8 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	 */
 	public boolean	isLocal()
 	{
-		return ((IService)getService()).getServiceIdentifier().getProviderId().getRoot()
-			.equals(getJCC().getJCCAccess().getIdentifier().getRoot());
+		return ((IService)getService()).getId().getProviderId().getRoot()
+			.equals(getJCC().getJCCAccess().getId().getRoot());
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.getExternalAccess(((IService)getService()).getServiceIdentifier().getProviderId())
+				cms.getExternalAccess(((IService)getService()).getId().getProviderId())
 					.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 			}
 		});

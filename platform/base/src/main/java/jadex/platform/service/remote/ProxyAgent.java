@@ -81,7 +81,7 @@ public class ProxyAgent	implements IProxyAgentService
 //				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //				next.setProperty("debugsource", "ProxyAgent.agentCreated()");
 				
-				cms.getExternalAccess(agent.getIdentifier().getRoot())
+				cms.getExternalAccess(agent.getId().getRoot())
 					.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess pl)
@@ -93,7 +93,7 @@ public class ProxyAgent	implements IProxyAgentService
 								Boolean b = (Boolean)args.get("sensors");
 								if(b!=null && b.booleanValue())
 								{
-									INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+									INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getId());
 									LatencyProperty lt = new LatencyProperty(agent, (IService)rcms, null);
 									nfpp.addNFProperty(lt).addResultListener(new IResultListener<Void>()
 									{
@@ -145,7 +145,7 @@ public class ProxyAgent	implements IProxyAgentService
 //	public IFuture<Void> agentKilled()
 //	{
 //		Future<Void> ret = new Future<Void>();
-//			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+//			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getId());
 //			nfpp.removeNFProperty(LatencyProperty.NAME).addResultListener(new DelegationResultListener<Void>(ret));
 //		return ret;
 //	}
@@ -275,7 +275,7 @@ public class ProxyAgent	implements IProxyAgentService
 	{
 		if(rcms!=null && injected)
 		{
-			INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+			INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getId());
 			return nfpp.getNFPropertyValue(LatencyProperty.NAME);
 		}
 		else

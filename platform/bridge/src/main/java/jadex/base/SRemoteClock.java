@@ -50,7 +50,7 @@ public class SRemoteClock
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
-//						cms.getExternalAccess(((IService)cs).getServiceIdentifier().getProviderId())
+//						cms.getExternalAccess(((IService)cs).getId().getProviderId())
 //							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 //						{
 //							public void customResultAvailable(IExternalAccess csexta)
@@ -94,7 +94,7 @@ public class SRemoteClock
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
-//						cms.getExternalAccess(((IService)cs).getServiceIdentifier().getProviderId())
+//						cms.getExternalAccess(((IService)cs).getId().getProviderId())
 //							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 //						{
 //							public void customResultAvailable(IExternalAccess csexta)

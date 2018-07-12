@@ -178,7 +178,7 @@ public class ServiceHandler implements InvocationHandler
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-				ci.setParent(component.getIdentifier());
+				ci.setParent(component.getId());
 				ci.setImports(component.getModel().getAllImports());
 				// Worker services are exposed with scope parent only to hinder others finding directly the worker services
 				ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
@@ -352,11 +352,11 @@ public class ServiceHandler implements InvocationHandler
 	{
 		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		
-//		System.out.println("Using worker: "+service.getServiceIdentifier());
+//		System.out.println("Using worker: "+service.getId());
 		
 //		System.out.println("non-func in pool: "+method.getName()+" "+(call!=null? call.getProperties(): "null"));
 //		if(call!=null && call.getProperties()!=null)
-//			System.out.println("call: "+call.hashCode()+" "+System.identityHashCode(call.getProperties())+" "+service.getServiceIdentifier());
+//			System.out.println("call: "+call.hashCode()+" "+System.identityHashCode(call.getProperties())+" "+service.getId());
 		
 		try
 		{
@@ -411,7 +411,7 @@ public class ServiceHandler implements InvocationHandler
 	//						System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
 	//						exception.printStackTrace();
 						boolean remove	= strategy.taskFinished();
-						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceIdentifier().getProviderId());
+						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getId().getProviderId());
 						proceed(remove || killed);
 					}
 					
@@ -460,7 +460,7 @@ public class ServiceHandler implements InvocationHandler
 	//					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
 	//					exception.printStackTrace();
 						boolean remove	= strategy.taskFinished();
-						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceIdentifier().getProviderId());
+						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getId().getProviderId());
 						proceed(remove || killed);
 					}
 					
@@ -499,7 +499,7 @@ public class ServiceHandler implements InvocationHandler
 		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		final IInternalAccess inta = component;
 		
-		final IComponentIdentifier workercid = service.getServiceIdentifier().getProviderId();
+		final IComponentIdentifier workercid = service.getId().getProviderId();
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		

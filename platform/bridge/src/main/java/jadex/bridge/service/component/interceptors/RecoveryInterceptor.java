@@ -75,7 +75,7 @@ public class RecoveryInterceptor //extends AbstractApplicableInterceptor
 //							if(exception instanceof ComponentTerminatedException 
 //								|| exception instanceof ServiceInvalidException)
 //							{
-////								System.out.println("exception: "+((IService)sic.getObject()).getServiceIdentifier());
+////								System.out.println("exception: "+((IService)sic.getObject()).getId());
 //								rebind(sic).addResultListener(new DelegationResultListener(ret));
 //							}
 //							else
@@ -138,7 +138,7 @@ public class RecoveryInterceptor //extends AbstractApplicableInterceptor
 //		{
 //			public void customResultAvailable(Object result) 
 //			{
-////				System.out.println("rebind: "+((IService)result).getServiceIdentifier()+Thread.currentThread());
+////				System.out.println("rebind: "+((IService)result).getId()+Thread.currentThread());
 //				BasicServiceInvocationHandler handler =  (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(result);
 //				Object rawservice = handler.getService();
 //				sic.setObject(rawservice);

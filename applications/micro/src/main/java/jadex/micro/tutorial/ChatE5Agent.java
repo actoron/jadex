@@ -68,7 +68,7 @@ public class ChatE5Agent
 		{
 			public void resultAvailable(final IRegistryServiceE3 rs)
 			{
-				rs.register(agent.getIdentifier(), nickname);
+				rs.register(agent.getId(), nickname);
 				
 				agent.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
@@ -92,7 +92,7 @@ public class ChatE5Agent
 										public void resultAvailable(IChatService cs)
 										{
 											System.out.println("is on: "+IComponentIdentifier.LOCAL.get());
-											cs.message(agent.getIdentifier().toString(), "Private hello from: "+nickname);
+											cs.message(agent.getId().toString(), "Private hello from: "+nickname);
 										}
 									});
 								}

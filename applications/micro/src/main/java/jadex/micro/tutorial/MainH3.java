@@ -38,7 +38,7 @@ public class MainH3
 		// Wait until the platform has started and retrieve the platform access.
 //		ThreadSuspendable	sus	= new ThreadSuspendable();
 		IExternalAccess	platform	= platfut.get();
-		System.out.println("Started platform: "+platform.getIdentifier());
+		System.out.println("Started platform: "+platform.getId());
 		
 		// Get the CMS service from the platform
 		IComponentManagementService	cms	= platform.searchService(

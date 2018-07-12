@@ -120,7 +120,7 @@ public class JavaWrapperAgent	implements	IJavaWrapperService
 		{
 			File	file	= new File(jarfile).getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getIdentifier().getRoot(), file.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getId().getRoot(), file.toURI().toURL()), null);
 			ret	= executeJava(rid, args);
 		}
 		catch(Exception e)

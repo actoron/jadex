@@ -156,7 +156,7 @@ public class CreationBDI
 			{
 				public void resultAvailable(IComponentManagementService result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getIdentifier()), "jadex.bdiv3.benchmarks.CreationBDI.class",
+					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getId()), "jadex.bdiv3.benchmarks.CreationBDI.class",
 						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
 				}
 			});
@@ -191,8 +191,8 @@ public class CreationBDI
 					{
 						public void resultAvailable(IComponentManagementService cms)
 						{
-							String	initial	= createPeerName(0, agent.getIdentifier());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getIdentifier().getRoot());
+							String	initial	= createPeerName(0, agent.getId());
+							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
 							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
@@ -235,12 +235,12 @@ public class CreationBDI
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera)
 	{
-		final String name = createPeerName(cnt, agent.getIdentifier());
+		final String name = createPeerName(cnt, agent.getId());
 		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
 				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)

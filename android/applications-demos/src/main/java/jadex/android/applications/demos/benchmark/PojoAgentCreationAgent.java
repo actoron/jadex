@@ -117,7 +117,7 @@ public class PojoAgentCreationAgent
 					args.put("num", Integer.valueOf(num));
 					args.put("starttime", Long.valueOf(starttime));
 					args.put("startmem", Long.valueOf(startmem));
-					cms.createComponent(createPeerName(num+1, agent.getIdentifier()),
+					cms.createComponent(createPeerName(num+1, agent.getId()),
 						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
 				}
@@ -154,8 +154,8 @@ public class PojoAgentCreationAgent
 					{
 						public void resultAvailable(IComponentManagementService cms)
 						{
-							String	initial	= createPeerName(1, agent.getIdentifier());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getIdentifier().getRoot());
+							String	initial	= createPeerName(1, agent.getId());
+							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
 							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
@@ -213,12 +213,12 @@ public class PojoAgentCreationAgent
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera)
 	{
-		final String name = createPeerName(cnt, agent.getIdentifier());
+		final String name = createPeerName(cnt, agent.getId());
 		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
 				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)

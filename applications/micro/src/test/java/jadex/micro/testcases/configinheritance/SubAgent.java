@@ -57,7 +57,7 @@ public class SubAgent extends MainAgent
 	public void	execute(final IInternalAccess agent)
 	{
 		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-		IComponentDescription[] descs = cms.getChildrenDescriptions(agent.getIdentifier()).get();
+		IComponentDescription[] descs = cms.getChildrenDescriptions(agent.getId()).get();
 		
 		TestReport tr = new TestReport("#1", "Test if inheritance of a configuration works");
 		if(descs.length==4)

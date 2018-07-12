@@ -168,7 +168,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	{
 		busy = true;
 		getModel().fireNodeChanged(ComponentTreeNode.this);
-		// if(getIdentifier().getName().indexOf("Garbage")!=-1)
+		// if(getId().getName().indexOf("Garbage")!=-1)
 		// System.out.println("searchChildren: "+getId());
 		searchChildren(cms, getIdentifier()).addResultListener(new IResultListener<List<ITreeNode>>()
 		{
@@ -205,7 +205,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName())
 			// Only create proxy nodes for local proxy components to avoid
 			// infinite nesting.
-					&& ((IActiveComponentTreeNode) getModel().getRoot()).getIdentifier().getName().equals(desc.getName().getPlatformName());
+					&& ((IActiveComponentTreeNode) getModel().getRoot()).getId().equals(desc.getName().getRoot());
 			if (proxy)
 			{
 				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, access);
@@ -381,7 +381,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 												
 												for(int i=0; i<reqs.length; i++)
 												{
-													String nid = ea.getIdentifier()+"."+reqs[i].getName();
+													String nid = ea.getId()+"."+reqs[i].getName();
 													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
 													if(sn==null)
 														sn	= new RequiredServiceNode(scn, getModel(), reqs[i], nid);

@@ -81,7 +81,7 @@ public class DisplayAgent
 //				addService(new DisplayService(this));
 				
 				final IExternalAccess	access	= agent.getExternalAccess();
-				final JFrame	frame	= new JFrame(agent.getIdentifier().getName());
+				final JFrame	frame	= new JFrame(agent.getId().getName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 
 				JTextPane helptext = new JTextPane();

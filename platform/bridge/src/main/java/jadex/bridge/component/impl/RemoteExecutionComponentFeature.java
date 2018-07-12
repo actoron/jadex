@@ -126,7 +126,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		final String rxid = SUtil.createUniqueId("");
 //		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
-		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getIdentifier());
+		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getId());
 		
 		// TODO: Merge with DecouplingInterceptor code.
 		@SuppressWarnings("unchecked")
@@ -228,11 +228,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  @param command	The command to be executed.
 	 *  @return	The result(s) of the command, if any.
 	 */
+	// TODO: remove method and use remote registry service instead!!!
 	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
 	{
 		Long timeout	= null;	// TODO: custom search timeout?
 		@SuppressWarnings({"rawtypes"})
-		Class	clazz	= query.isMultiple()
+		Class	clazz	= query.getMultiplicity().getTo()!=-1
 			? IIntermediateFuture.class
 			: IFuture.class;
 		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
@@ -343,7 +344,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						// Local is used to set the caller in the new service call context
 						sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
 						// After call creation it can be reset
-						IComponentIdentifier.LOCAL.set(getComponent().getIdentifier());
+						IComponentIdentifier.LOCAL.set(getComponent().getId());
 					}
 					final ServiceCall	fsc	= sc;
 					

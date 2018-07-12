@@ -2,15 +2,22 @@ package jadex.platform.service.serialization;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITypedComponentStep;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IRemoteExecutionFeature;
 import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.ISwitchCall;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -1143,6 +1150,35 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 	public int hashCode()
 	{
 		return 31 + pr.getRemoteReference().hashCode();
+	}
+
+	/**
+	 *  Create a proxy object for a remote service.
+	 *  
+	 *  @param localcomp	The local component for sending/receiving messages.
+	 *  @param remotesvc	ID of the remote service.
+	 */
+	public static IService	createRemoteServiceProxy(IInternalAccess localcomp, IServiceIdentifier remotesvc)
+	{
+		Collection<Class<?>> interfaces	= new LinkedHashSet<>();
+		interfaces.add(remotesvc.getServiceType().getType(localcomp.getClassLoader()));
+		interfaces.add(IService.class);
+		if(remotesvc.getServiceSuperTypes()!=null)
+		{
+			for(ClassInfo ci: remotesvc.getServiceSuperTypes())
+			{
+				interfaces.add(ci.getType(localcomp.getClassLoader()));
+			}
+		}
+		Class<?>[]	ainterfaces	= interfaces.toArray(new Class[interfaces.size()]);
+		 
+		// TODO: reduce number of required objects for remote reference?
+		ProxyInfo pi = new ProxyInfo(ainterfaces);
+		RemoteReference rr = new RemoteReference(remotesvc.getProviderId(), remotesvc);
+		ProxyReference pr = new ProxyReference(pi, rr);
+		
+		return (IService)ProxyFactory.newProxyInstance(localcomp.getClassLoader(), 
+			ainterfaces, new RemoteMethodInvocationHandler(localcomp, pr));
 	}
 }
 

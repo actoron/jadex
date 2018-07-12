@@ -272,7 +272,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		};
 		
 		// Event collector for partners (superpeers of same level)
-		partnercol = new MultiEventCollector(component.getIdentifier(), new AgentDelayRunner(component))
+		partnercol = new MultiEventCollector(component.getId(), new AgentDelayRunner(component))
 		{
 			@Override
 			public void notifyObservers(ARegistryEvent event)
@@ -293,7 +293,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// Event collector for the supersuperpeer (contacting the ssp and send bunch updates from clients and myself)
 		if(level==1)
 		{
-			parentcol = new MultiEventCollector(component.getIdentifier(), new AgentDelayRunner(component))
+			parentcol = new MultiEventCollector(component.getId(), new AgentDelayRunner(component))
 			{
 				@Override
 				public void notifyObservers(ARegistryEvent event)
@@ -460,7 +460,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					requestClientFullState();
 				SuperpeerRegistrySynchronizationService.this.ssp = ssp;
 				
-//				System.out.println("Send update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
+//				System.out.println("Send update to ssp: "+((IService)ssp).getId().getProviderId()+" "+event);
 				ssp.updateClientData(event).addResultListener(new IResultListener<ARegistryResponseEvent>()
 				{
 					public void resultAvailable(ARegistryResponseEvent revent)
@@ -502,14 +502,14 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 							event.setClientType(ARegistryEvent.CLIENTTYPE_SUPERPEER_LEVEL1);
 //							event.addAddedService((IService)component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class)));
 							ssp.updateClientData(event).addResultListener(this);
-//							System.out.println("Send full update to ssp: "+((IService)ssp).getServiceIdentifier().getProviderId()+" "+event);
+//							System.out.println("Send full update to ssp: "+((IService)ssp).getId().getProviderId()+" "+event);
 						}
 						
 						// Tell client (not only superpeer!) to send full update
 						// Forwards response event to real (indirect) client
-						if(revent.getReceiver()!=null && !getComponent().getIdentifier().getRoot().equals(revent.getReceiver()))
+						if(revent.getReceiver()!=null && !getComponent().getId().getRoot().equals(revent.getReceiver()))
 						{
-							System.out.println("indirect answer: "+revent.getReceiver()+" "+getComponent().getIdentifier().getRoot());
+							System.out.println("indirect answer: "+revent.getReceiver()+" "+getComponent().getId().getRoot());
 							PeerInfo pi = getClient(revent.getReceiver());
 							if(pi!=null)
 							{
@@ -572,10 +572,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected void newPlatformFound(final ISuperpeerRegistrySynchronizationService regser, final long leasetime)
 	{
-		final IComponentIdentifier cid = ((IService)regser).getServiceIdentifier().getProviderId().getRoot();
+		final IComponentIdentifier cid = ((IService)regser).getId().getProviderId().getRoot();
 
 		// Do not announce platform itself
-		if(cid.equals(component.getIdentifier().getRoot()))
+		if(cid.equals(component.getId().getRoot()))
 			return;
 		
 //		System.out.println("Informed about platform: "+cid+" (I am: "+component.getComponentIdentifier()+"), lease="+leasetime);
@@ -620,9 +620,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					if(level==result.intValue())
 					{
 						// Subscribe to the new remote registry
-						boolean unr = ((IService)regser).getServiceIdentifier().isUnrestricted();
+						boolean unr = ((IService)regser).getId().isUnrestricted();
 
-						System.out.println("Found registry service on: "+cid+(unr? " unrestricted": " default")+" (I am: "+component.getIdentifier()+")");
+						System.out.println("Found registry service on: "+cid+(unr? " unrestricted": " default")+" (I am: "+component.getId()+")");
 						
 						ISubscriptionIntermediateFuture<ARegistryEvent> fut = regser.subscribeToEvents();
 						final PeerInfo info = new PeerInfo(cid, fut);
@@ -672,7 +672,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 								{
 									if(!(exception instanceof FutureTerminatedException)) // ignore terminate
 									{
-										System.out.println("Exception in my subscription with: "+cid+" (I am: "+component.getIdentifier()+")");
+										System.out.println("Exception in my subscription with: "+cid+" (I am: "+component.getId()+")");
 //										exception.printStackTrace();
 									}
 									removeBlacklistedPlatforms(cid);
@@ -683,7 +683,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					}
 					else
 					{	
-						System.out.println("Found superpeer of other level: "+level+" "+((IService)regser).getServiceIdentifier()+" "+result);
+						System.out.println("Found superpeer of other level: "+level+" "+((IService)regser).getId()+" "+result);
 					}
 				}
 
@@ -784,7 +784,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					if(checkScope(ser))
 					{
 						System.out.println("added ser: "+ser);
-						reg.addService(ser.getServiceIdentifier());
+						reg.addService(ser.getId());
 					}
 					else
 					{
@@ -792,7 +792,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					}
 					
 					if(plat==null)
-						plat = ser.getServiceIdentifier().getProviderId().getRoot();
+						plat = ser.getId().getProviderId().getRoot();
 				}
 			}
 			
@@ -802,10 +802,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				for(IService ser: removed)
 				{
 					System.out.println("removed ser due to event: "+ser);
-					reg.removeService(ser.getServiceIdentifier());
+					reg.removeService(ser.getId());
 					
 					if(plat==null)
-						plat = ser.getServiceIdentifier().getProviderId().getRoot();
+						plat = ser.getId().getProviderId().getRoot();
 				}
 			}
 			
@@ -833,7 +833,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		boolean ret = true;
 		
-		String scope = ser.getServiceIdentifier().getScope();
+		String scope = ser.getId().getScope();
 		// SSP L0
 		if(level==0)
 		{
@@ -929,7 +929,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// The current state consists of those parts that are managed as clients
 		ARegistryEvent mre = getCurrentStateEvent();
 		
-		System.out.println("Sending full state: "+component.getIdentifier()+": "+mre);
+		System.out.println("Sending full state: "+component.getId()+": "+mre);
 		
 		ret.addIntermediateResult(mre);
 		
@@ -952,11 +952,11 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			mre.addEvent(ev);
 		}
 		
-		RegistryEvent ev = lrobs.getCurrentStateEvent(getComponent().getIdentifier());
+		RegistryEvent ev = lrobs.getCurrentStateEvent(getComponent().getId());
 		mre.addEvent(ev);
 		mre.setClients(internalGetClients());
-		mre.addClient(getComponent().getIdentifier().getRoot());
-		mre.setSender(getComponent().getIdentifier().getRoot());
+		mre.addClient(getComponent().getId().getRoot());
+		mre.setSender(getComponent().getId().getRoot());
 		
 		return mre;
 	}
@@ -1139,7 +1139,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				added = new HashSet<IService>();
 				for(IService ser: event.getAddedServices())
 				{
-					String scope = ser.getServiceIdentifier().getScope();
+					String scope = ser.getId().getScope();
 					if(Binding.SCOPE_GLOBAL.equals(scope)
 						|| Binding.SCOPE_APPLICATION_GLOBAL.equals((scope)))
 					{
@@ -1154,7 +1154,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				rem = new HashSet<IService>();
 				for(IService ser: event.getRemovedServices())
 				{
-					String scope = ser.getServiceIdentifier().getScope();
+					String scope = ser.getId().getScope();
 					if(Binding.SCOPE_GLOBAL.equals(scope)
 						|| Binding.SCOPE_APPLICATION_GLOBAL.equals((scope)))
 					{
@@ -1189,7 +1189,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// If I am a level 0 superpeer, I inform others about all known level 1 registries
 		if(level==0)
 		{
-			ServiceQuery<IService> query = new ServiceQuery<IService>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, component.getIdentifier(), null);
+			ServiceQuery<IService> query = new ServiceQuery<IService>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, component.getId(), null);
 //			IMsgSecurityInfos secinfo = (IMsgSecurityInfos)ServiceCall.getCurrentInvocation().getProperty("securityinfo");
 			query.setNetworkNames(networknames);
 			
@@ -1408,7 +1408,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected IServiceRegistry getRegistry()
 	{
-		return ServiceRegistry.getRegistry(component.getIdentifier());
+		return ServiceRegistry.getRegistry(component.getId());
 	}
 
 	/**

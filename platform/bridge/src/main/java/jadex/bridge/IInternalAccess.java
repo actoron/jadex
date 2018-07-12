@@ -32,7 +32,7 @@ public interface IInternalAccess
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getIdentifier();
+	public IComponentIdentifier	getId();
 	
 	/**
 	 *  Get a feature of the component.

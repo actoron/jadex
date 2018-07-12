@@ -43,7 +43,7 @@ public class PeerRegistrySynchronizationAgent
 			if(spser!=null)
 			{
 				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-				cms.destroyComponent(((IService)spser).getServiceIdentifier().getProviderId());
+				cms.destroyComponent(((IService)spser).getId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)

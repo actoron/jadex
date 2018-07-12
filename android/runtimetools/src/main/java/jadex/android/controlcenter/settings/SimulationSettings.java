@@ -298,7 +298,7 @@ public class SimulationSettings extends AServiceSettings {
 			}
 		};
 
-		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getServiceIdentifier();
+		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getId();
 
 		getComponentForService().addResultListener(new DefaultResultListener<IExternalAccess>() {
 
@@ -334,7 +334,7 @@ public class SimulationSettings extends AServiceSettings {
 					public void customResultAvailable(IComponentManagementService cms) {
 						// IComponentManagementService cms =
 						// (IComponentManagementService)result;
-						cms.getExternalAccess((IComponentIdentifier) ((IService)simService).getServiceIdentifier().getProviderId()).addResultListener(
+						cms.getExternalAccess((IComponentIdentifier) ((IService)simService).getId().getProviderId()).addResultListener(
 								new DelegationResultListener<IExternalAccess>(ret));
 					}
 				});

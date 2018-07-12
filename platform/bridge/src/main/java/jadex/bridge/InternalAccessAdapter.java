@@ -152,9 +152,9 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getIdentifier()
+	public IComponentIdentifier	getId()
 	{
-		return access.getIdentifier();
+		return access.getId();
 	}
 	
 	/**

@@ -42,7 +42,7 @@ public class SJCC
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.getExternalAccess((IComponentIdentifier)access.getIdentifier().getRoot())
+				cms.getExternalAccess((IComponentIdentifier)access.getId().getRoot())
 					.addResultListener(new SwingDelegationResultListener<IExternalAccess>(ret));
 			}
 		});

@@ -21,6 +21,115 @@ import jadex.commons.Tuple3;
  */
 public class ServiceQuery<T>
 {
+	//-------- query multiplicity --------
+	
+	/**
+	 *  Define cases for multiplicity.
+	 */
+	public static class	Multiplicity
+	{
+		//-------- constants --------
+		
+		/** '0..1' multiplicity for single optional service. */
+		public static Multiplicity	ZERO_ONE	= new Multiplicity(0, 1);
+		
+		/** '1' multiplicity for required service (default for searchService methods). */
+		public static Multiplicity	ONE			= new Multiplicity(1, 1);
+		
+		/** '0..*' multiplicity for optional multi service (default for searchServices methods). */
+		public static Multiplicity	ZERO_MANY	= new Multiplicity(0, -1);
+
+		/** '1..*' multiplicity for required service (default for searchService methods). */
+		public static Multiplicity	ONE_MANY	= new Multiplicity(1, -1);
+		
+		//-------- attributes --------
+		
+		/** The minimal number of services required. Otherwise search ends with ServiceNotFoundException. */
+		private int	from;
+		
+		/** The maximal number of services returned. Afterwards search/query will terminate. */
+		private int to;
+		
+		//-------- constructors --------
+
+		/**
+		 *  Bean constructor.
+		 *  Not meant for direct use.
+		 *  Defaults to invalid multiplicity ('0..0')!
+		 */
+		public Multiplicity()
+		{
+		}
+		
+		/**
+		 *  Create a multiplicity.
+		 *  @param from The minimal number of services for the search/query being considered successful (positive integer or 0).
+		 *  @param to The maximal number of services returned by the search/query (positive integer or -1 for unlimited).
+		 */
+		public Multiplicity(int from, int to)
+		{
+			setFrom(from);
+			setTo(to);
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Get the 'from' value, i.e. the minimal number of services required.
+		 *  Otherwise search ends with ServiceNotFoundException. 
+		 */
+		public int getFrom()
+		{
+			return from;
+		}
+		
+		/**
+		 *  Set the 'from' value, i.e. the minimal number of services required.
+		 *  Otherwise search ends with ServiceNotFoundException. 
+		 *  @param from Positive integer or 0
+		 */
+		public void setFrom(int from)
+		{
+			if(from<0)
+				throw new IllegalArgumentException("'from' must be a positive value or 0.");
+				
+			this.from = from;
+		}
+		
+		/**
+		 *  Get the 'to' value, i.e. The maximal number of services returned.
+		 *  Afterwards search/query will terminate.
+		 */
+		public int getTo()
+		{
+			return to;
+		}
+		
+		/**
+		 *  Get the 'to' value, i.e. The maximal number of services returned.
+		 *  Afterwards search/query will terminate.
+		 *  @param to	Positive integer or -1 for unlimited.
+		 */
+		public void setTo(int to)
+		{
+			if(to!=-1 && to<1)
+				throw new IllegalArgumentException("'to' must be a positive value or -1.");
+			
+			this.to = to;
+		}
+		
+		/**
+		 *  Get a string representation of the multiplicity.		
+		 */
+		@Override
+		public String toString()
+		{
+			return from==to ? Integer.toString(from) : from + ".." + (to==-1 ? "*" : Integer.toString(to));
+		}
+	}
+	
+	//-------- constants --------
+	
 	/** Marker for networks not set. */
 	//Hack!!! should not be public??? 
 	public static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
@@ -63,7 +172,7 @@ public class ServiceQuery<T>
 	protected boolean excludeowner;
 	
 	/** The multiple flag. Search for multiple services */
-	protected boolean multiple;
+	protected Multiplicity	multiplicity;
 	
 	/** The return type. Tell registry to return services or service events. */
 	protected ClassInfo returntype;
@@ -468,21 +577,21 @@ public class ServiceQuery<T>
 	}
 	
 	/**
-	 *  Get the multiple.
-	 *  @return the multiple
+	 *  Get the multiplicity.
+	 *  @return the multiplicity
 	 */
-	public boolean isMultiple()
+	public Multiplicity	getMultiplicity()
 	{
-		return multiple;
+		return multiplicity;
 	}
 
 	/**
-	 *  Set the multiple.
-	 *  @param multiple The multiple to set
+	 *  Set the multiplicity.
+	 *  @param multiplicity The multiplicity to set
 	 */
-	public ServiceQuery<T> setMultiple(boolean multiple)
+	public ServiceQuery<T> setMultiplicity(Multiplicity multiplicity)
 	{
-		this.multiple = multiple;
+		this.multiplicity = multiplicity;
 		return this;
 	}
 
@@ -710,8 +819,68 @@ public class ServiceQuery<T>
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", searchstart=" + searchstart + ", platform=" + platform 
-			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", scope=" + scope + ", owner=" + owner
-			+ ", id=" + id + ")";
+		StringBuffer	ret	= new StringBuffer("ServiceQuery(");
+		if(servicetype!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("servicetype=");
+			ret.append(servicetype);
+		}
+		
+		if(multiplicity!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("multiplicity=");
+			ret.append(multiplicity);
+		}
+		
+		if(servicetags!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("servicetags=");
+			ret.append(Arrays.toString(servicetags));
+		}
+		if(searchstart!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("searchstart=");
+			ret.append(searchstart);
+		}
+		if(platform!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("platform=");
+			ret.append(platform);
+		}
+		if(networknames!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("networknames=");
+			ret.append(Arrays.toString(networknames));
+		}
+
+		if(unrestricted!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("unrestricted=");
+			ret.append(unrestricted);
+		}
+
+		if(scope!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("scope=");
+			ret.append(scope);
+		}
+
+		if(owner!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("owner=");
+			ret.append(owner);
+		}
+			
+		ret.append(")");
+		return ret.toString();
 	}
 }

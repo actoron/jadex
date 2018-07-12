@@ -112,7 +112,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 				String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
 //					info += context.getArguments();
 				// Todo: creation time.
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getIdentifier(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
 					info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
 				
 //					if(context.getMethod().getName().indexOf("method")!=-1)
@@ -237,7 +237,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 					ServiceCall sc = sic.getNextServiceCall();
 					Cause cause = sc==null? null: sc.getCause();
 					// Todo: creation time.
-					monser.publishEvent(new MonitoringEvent(getComponent().getIdentifier(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
+					monser.publishEvent(new MonitoringEvent(getComponent().getId(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
 						sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
 				}
 			}

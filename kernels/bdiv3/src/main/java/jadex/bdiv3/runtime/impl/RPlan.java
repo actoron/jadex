@@ -1976,7 +1976,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(getAgent().getIdentifier());
+			mev.setSourceIdentifier(getAgent().getId());
 			mev.setTime(time);
 			
 			PlanInfo info = PlanInfo.createPlanInfo(this);

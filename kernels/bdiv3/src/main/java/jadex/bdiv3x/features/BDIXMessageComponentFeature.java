@@ -114,20 +114,20 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 
 		if(events.size()==0)
 		{
-			getComponent().getLogger().severe(getComponent().getIdentifier()+" cannot process message, no message event matches: "+body+", "+header);
+			getComponent().getLogger().severe(getComponent().getId()+" cannot process message, no message event matches: "+body+", "+header);
 		}
 		else
 		{
 			if(events.size()>1)
 			{
 				// Multiple matches of highest degree.
-				getComponent().getLogger().severe(getComponent().getIdentifier()+" cannot decide which event matches message, " +
+				getComponent().getLogger().severe(getComponent().getId()+" cannot decide which event matches message, " +
 					"using first: "+body+", "+header+", "+events);
 			}
 			else if(matched.size()>1)
 			{
 				// Multiple matches but different degrees.
-				getComponent().getLogger().info(getComponent().getIdentifier()+" multiple events matching message, using " +
+				getComponent().getLogger().info(getComponent().getId()+" multiple events matching message, using " +
 					"message event with highest specialization degree: "+body+", "+header+" ("+degree+"), "+events.get(0)+", "+matched);
 			}
 				

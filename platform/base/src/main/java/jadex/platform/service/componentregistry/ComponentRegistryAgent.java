@@ -187,7 +187,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
 	        		                            	{
 	        		                            		@SuppressWarnings("unchecked")
-														IFuture<IService> fut = (IFuture<IService>)exta.searchService( new ServiceQuery<>(servicetype).setProvider(exta.getIdentifier()));
+														IFuture<IService> fut = (IFuture<IService>)exta.searchService( new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
 	        											{
 	        		                        				public void customResultAvailable(IService service) throws Exception
@@ -201,7 +201,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            
 	        		                            return ret;
 	        	                            }
-	        	                            else if(method.getName().equals("getServiceIdentifier"))
+	        	                            else if(method.getName().equals("getId"))
 	        	                            {
 	        	                            	return fsid;
 	        	                            }
@@ -213,7 +213,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getIdentifier()));
+	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
@@ -271,7 +271,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         	components.put(info.getFilename(), ret);
             final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
-            	info.setParent(agent.getIdentifier());
+            	info.setParent(agent.getId());
             cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)

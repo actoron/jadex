@@ -148,7 +148,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					public void resultAvailable(final IComponentManagementService ces)
 					{
 //						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
-						dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getIdentifier().getParent());
+						dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getId().getParent());
 						dealertf.setText(dealeraid.getName());
 					}
 					public void exceptionOccurred(Exception exception)
@@ -380,7 +380,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 							public void customResultAvailable(Object result)
 							{
 								final IComponentManagementService	cms	= (IComponentManagementService)result;
-								cms.destroyComponent(agent.getIdentifier().getParent());
+								cms.destroyComponent(agent.getId().getParent());
 							}
 						});
 
@@ -453,7 +453,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
 					.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 				cms.createComponent("BlackjackDealer", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml",
-					new CreationInfo(ia.getIdentifier().getParent()))
+					new CreationInfo(ia.getId().getParent()))
 				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					@Override
@@ -668,7 +668,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
 						cms.createComponent(player.getName(), "jadex/bdi/examples/blackjack/player/Player.agent.xml",
-							new CreationInfo(args, ia.getIdentifier().getParent()))
+							new CreationInfo(args, ia.getId().getParent()))
 						.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
 							@Override

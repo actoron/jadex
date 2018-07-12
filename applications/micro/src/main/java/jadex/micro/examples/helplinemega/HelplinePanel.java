@@ -283,12 +283,12 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new BasicComponentIdentifier(person, ia.getIdentifier())));
+					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new BasicComponentIdentifier(person, ia.getId())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getIdentifier());
+					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId());
 					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(ci, person, HelplineAgent.class.getName()+".class")
 						.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 					{

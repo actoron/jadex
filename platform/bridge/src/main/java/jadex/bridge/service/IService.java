@@ -24,7 +24,7 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	 *  Get the service identifier.
 	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getServiceIdentifier();
+	public IServiceIdentifier getId();
 	
 	/**
 	 *  Test if the service is valid.

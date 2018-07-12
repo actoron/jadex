@@ -43,6 +43,7 @@ import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -268,7 +269,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Todo: synchronize with last step!
 			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
 			{
-				ret.setException(new ComponentTerminatedException(getComponent().getIdentifier()));
+				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
 			{
@@ -399,26 +400,33 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			// OK to fetch sync even from external access because everything thread safe.
 			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
-			ITimedObject	to	= new ITimedObject()
+			if(cs!=null)
 			{
-				public void timeEventOccurred(long currenttime)
+				ITimedObject	to	= new ITimedObject()
 				{
-//						System.out.println("step: "+step);
-					scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
-				}
-				
-				public String toString()
+					public void timeEventOccurred(long currenttime)
+					{
+	//						System.out.println("step: "+step);
+						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
+					}
+					
+					public String toString()
+					{
+						return "waitForDelay[Step]("+getComponent().getId()+")";
+					}
+				};
+				if(realtime)
 				{
-					return "waitForDelay[Step]("+getComponent().getIdentifier()+")";
+					cs.createRealtimeTimer(delay, to);
 				}
-			};
-			if(realtime)
-			{
-				cs.createRealtimeTimer(delay, to);
+				else
+				{
+					cs.createTimer(delay, to);					
+				}
 			}
 			else
 			{
-				cs.createTimer(delay, to);					
+				ret.setException(new ServiceNotFoundException("Clock service not found."));
 			}
 		}
 		else
@@ -461,7 +469,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						
 						public String toString()
 						{
-							return "waitForDelay("+getComponent().getIdentifier()+")";
+							return "waitForDelay("+getComponent().getId()+")";
 						}
 					}).addResultListener(new IResultListener<Void>()
 					{
@@ -483,7 +491,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				public String toString()
 				{
-					return "waitForDelay("+getComponent().getIdentifier()+")";
+					return "waitForDelay("+getComponent().getId()+")";
 				}
 			};
 			
@@ -613,7 +621,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// Todo w/o proxy???
 				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 //				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false));
-				cms.getExternalAccess(getComponent().getIdentifier().getParent())
+				cms.getExternalAccess(getComponent().getId().getParent())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
@@ -665,7 +673,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(!bootstrap)
 				{
 					bootstrap	= true;
-					Starter.scheduleRescueStep(getComponent().getIdentifier().getRoot(), new Runnable()
+					Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
 					{
 						public void run()
 						{
@@ -750,7 +758,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			if(!IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
 			{
-				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getIdentifier()));
+				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getId()));
 			}
 			else if(this.stepinfo!=null || stepfuture!=null)
 			{
@@ -777,7 +785,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		return Thread.currentThread()==getComponentThread() || 
 			IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState())
-				&& Starter.isRescueThread(getComponent().getIdentifier());
+				&& Starter.isRescueThread(getComponent().getId());
 	}
 	
 	/**
@@ -928,8 +936,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(executing)
 					{
-						System.err.println(getComponent().getIdentifier()+": double execution");
-						new RuntimeException("executing: "+getComponent().getIdentifier()).printStackTrace();
+						System.err.println(getComponent().getId()+": double execution");
+						new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
 					}
 					this.executing	= true;
 				}
@@ -1008,8 +1016,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			if(executing)
 			{
-				System.err.println(getComponent().getIdentifier()+": double execution"+" "+Thread.currentThread()+" "+getComponentThread());
-				new RuntimeException("executing: "+getComponent().getIdentifier()).printStackTrace();
+				System.err.println(getComponent().getId()+": double execution"+" "+Thread.currentThread()+" "+getComponentThread());
+				new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
 			}
 			executing	= true;
 		}
@@ -1286,7 +1294,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(ex instanceof StepAborted)
 				{
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
-					ex	= new ComponentTerminatedException(component.getIdentifier());
+					ex	= new ComponentTerminatedException(component.getId());
 				}
 				else if(ex instanceof ThreadDeath)
 				{
@@ -1300,7 +1308,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// Hard step failure with uncatched exception is shown also when no debug.
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
-					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getIdentifier()))
+					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getId()))
 					&& !(ex instanceof StepInvalidException) && !(ex instanceof StepAbortedException))
 				{
 					final Throwable fex = ex;
@@ -1352,7 +1360,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null && 
 									getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 								{
-									getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getIdentifier(), 
+									getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getId(), 
 										getComponent().getDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
 										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 									// null was step.getCause()
@@ -1407,7 +1415,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 												if(!bootstrap)
 												{
 													bootstrap	= true;
-													Starter.scheduleRescueStep(getComponent().getIdentifier().getRoot(), new Runnable()
+													Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
 													{
 														public void run()
 														{
@@ -1584,7 +1592,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		// Remember execution thread.
 		setComponentThread(Thread.currentThread());
 //		this.componentthread	= Thread.currentThread();
-		IComponentIdentifier.LOCAL.set(getComponent().getIdentifier());
+		IComponentIdentifier.LOCAL.set(getComponent().getId());
 		IInternalExecutionFeature.LOCAL.set(getComponent());
 		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(component.getClassLoader());
@@ -1690,7 +1698,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
 			&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			MonitoringEvent event = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+			MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
 			// null was step.getCause()
 			event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 			event.setProperty("details", getStepDetails(step));
@@ -1805,7 +1813,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE)
 					{
-						MonitoringEvent event = new MonitoringEvent(getComponent().getIdentifier(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+						MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
 						// null was step.getCause()
 						event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 						event.setProperty("details", getStepDetails(step));
@@ -2179,6 +2187,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public String toString()
 	{
-		return "ExecutionFeature("+getComponent().getIdentifier()+")";
+		return "ExecutionFeature("+getComponent().getId()+")";
 	}
 }

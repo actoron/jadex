@@ -40,7 +40,7 @@ public class UserAgent
 				{
 					public void resultAvailable(Object result)
 					{
-						System.out.println("add service result: "+result+" "+agent.getIdentifier().getLocalName());
+						System.out.println("add service result: "+result+" "+agent.getId().getLocalName());
 					}
 					
 					public void exceptionOccurred(Exception exception)

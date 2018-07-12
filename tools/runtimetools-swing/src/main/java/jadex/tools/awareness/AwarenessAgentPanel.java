@@ -157,7 +157,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.getExternalAccess(service.getServiceIdentifier().getProviderId())
+				cms.getExternalAccess(service.getId().getProviderId())
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
 					public void customResultAvailable(IExternalAccess result)
@@ -395,7 +395,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel, IServiceViewe
 		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
 		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(jcc.getJCCAccess().getIdentifier().getRoot()));
+		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(jcc.getJCCAccess().getId().getRoot()));
 		updateDiscoveryInfos(jtdis);
 		jtdis.addMouseListener(new MouseAdapter()
 		{
