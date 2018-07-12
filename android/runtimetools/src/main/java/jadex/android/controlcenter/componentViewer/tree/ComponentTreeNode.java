@@ -170,7 +170,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 		// if(getId().getName().indexOf("Garbage")!=-1)
 		// System.out.println("searchChildren: "+getId());
-		searchChildren(cms, getId()).addResultListener(new IResultListener<List<ITreeNode>>()
+		searchChildren(cms, getIdentifier()).addResultListener(new IResultListener<List<ITreeNode>>()
 		{
 			public void resultAvailable(List<ITreeNode> result)
 			{
@@ -205,7 +205,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName())
 			// Only create proxy nodes for local proxy components to avoid
 			// infinite nesting.
-					&& ((IActiveComponentTreeNode) getModel().getRoot()).getId().getName().equals(desc.getName().getPlatformName());
+					&& ((IActiveComponentTreeNode) getModel().getRoot()).getIdentifier().getName().equals(desc.getName().getPlatformName());
 			if (proxy)
 			{
 				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, access);
@@ -236,7 +236,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	/**
 	 * Get the component id.
 	 */
-	public IComponentIdentifier getId()
+	public IComponentIdentifier getIdentifier()
 	{
 		return desc != null ? desc.getName() : null;
 	}
@@ -500,7 +500,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 
 						// System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
 						final ComponentTreeNode parentnode = desc.getName().getParent() == null ? null : desc.getName().getParent()
-								.equals(getId()) ? ComponentTreeNode.this // For
+								.equals(getIdentifier()) ? ComponentTreeNode.this // For
 																							// proxy
 																							// nodes.
 								: (ComponentTreeNode) getModel().getAddedNode(desc.getName().getParent());
