@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -399,7 +400,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				};
 
 				// For local call: fetch timeout to decide if undone. ignored for remote.
-				final long timeout = !sic.isRemoteCall() ? sic.getNextServiceCall().getTimeout() : Timeout.NONE;
+				final long timeout = !sic.isRemoteCall()
+					// TODO: why can be null?
+					? sic.getNextServiceCall()!=null ? sic.getNextServiceCall().getTimeout() : Starter.getLocalDefaultTimeout(ea.getComponentIdentifier()) 
+					: Timeout.NONE;
 
 				FutureFunctionality func = new FutureFunctionality(ia.getLogger())
 				{
