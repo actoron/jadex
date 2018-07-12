@@ -103,7 +103,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			RequiredServiceInfo[] cs = cinfo.getServices();
 			for(int i=0; i<cs.length; i++)
 			{
-				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(/*getServicePrefix()+*/cs[i].getName());
+				RequiredServiceInfo rsi = sermap.get(/*getServicePrefix()+*/cs[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
 					new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties(), ms[i].getTags());
 				sermap.put(rsi.getName(), newrsi);
@@ -116,14 +116,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		{
 			for(int i=0; i<bindings.length; i++)
 			{
-				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
+				RequiredServiceInfo rsi = sermap.get(bindings[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
 					new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties(), ms[i].getTags());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
 		
-		RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
+		RequiredServiceInfo[]	rservices	= sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
 		addRequiredServiceInfos(rservices);
 		
 		// Todo: Create place holder required service properties		
@@ -428,7 +428,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //			throw new ComponentTerminatedException(id);
 
 		return requiredserviceinfos==null? new RequiredServiceInfo[0]: 
-			(RequiredServiceInfo[])requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
+			requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
 	}
 	
 	/**
@@ -525,13 +525,13 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		Future<T>	ret;
 		
 		// Try to find locally
-		@SuppressWarnings("unchecked")
-		T service	=  (T)ServiceRegistry.getRegistry(getComponent())
-			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
-		if(service!=null)
+		IServiceIdentifier	sid	= ServiceRegistry.getRegistry(getComponent()).searchService(query);
+		if(sid!=null)
 		{
 			ret	= new TerminableFuture<>();
-			ret.setResult(createServiceProxy(service, info));			
+			@SuppressWarnings("unchecked")
+			T	t	= (T)createServiceProxy(sid, info);
+			ret.setResult(t);
 		}
 		
 		// If not found -> try to find remotely
@@ -546,8 +546,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 					@Override
 					public Object handleResult(Object result) throws Exception
 					{
-						return createServiceProxy(
-							ServiceRegistry.getRegistry(getComponent()).getLocalService((IServiceIdentifier)result), info);
+						return createServiceProxy(result, info);
 					}
 				});				
 			}
@@ -573,17 +572,17 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		enhanceQuery(query, false);
 		
-		@SuppressWarnings("unchecked")
-		T ret	=  (T)ServiceRegistry.getRegistry(getComponent())
-			.getLocalService(ServiceRegistry.getRegistry(getComponent()).searchService(query));
+		IServiceIdentifier	sid	= ServiceRegistry.getRegistry(getComponent()).searchService(query);
 		
-		if(ret==null && query.getMultiplicity().getFrom()>0)
+		if(sid==null && query.getMultiplicity().getFrom()>0)
 		{
 			throw new ServiceNotFoundException(query.toString());
 		}
 		
-		// Wraps result in proxy, if required. 
-		return ret!=null ? createServiceProxy(ret, info) : null;
+		// Fetches service and wraps result in proxy, if required. 
+		@SuppressWarnings("unchecked")
+		T	ret	= sid!=null ? (T)createServiceProxy(sid, info) : null;
+		return ret;
 	}
 	
 	/**
@@ -599,13 +598,13 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// Find remote matches
 		ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		ITerminableIntermediateFuture<T>	remotes	= sqms!=null ? sqms.searchServices(query) : new TerminableIntermediateFuture<>();	// Dummy future if no sqms
-		TerminableIntermediateFuture<T>	ret	= (TerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(remotes, new FutureFunctionality(getComponent().getLogger())
+		@SuppressWarnings("unchecked")
+		ITerminableIntermediateFuture<T>	ret	= (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(remotes, new FutureFunctionality(getComponent().getLogger())
 		{
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
 			{
-				return createServiceProxy(
-					ServiceRegistry.getRegistry(getComponent()).getLocalService((IServiceIdentifier)result), info);
+				return createServiceProxy(result, info);
 			}
 		});
 			
@@ -616,12 +615,16 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		{
 			@SuppressWarnings("unchecked")
 			T	t	= (T)result;
-			ret.addIntermediateResultIfUndone(t);
+			@SuppressWarnings("unchecked")
+			IntermediateFuture<T>	fut	= (IntermediateFuture<T>)ret;
+			fut.addIntermediateResultIfUndone(t);
 		}
 		
 		if(sqms==null)
 		{
-			ret.setFinished();
+			@SuppressWarnings("unchecked")
+			IntermediateFuture<T>	fut	= (IntermediateFuture<T>)ret;
+			fut.setFinished();
 		}
 		
 		return ret;
@@ -646,7 +649,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		for(IServiceIdentifier result: results)
 		{
 			@SuppressWarnings("unchecked")
-			T	service	= (T)createServiceProxy(registry.getLocalService(result), info);
+			T	service	= (T)createServiceProxy(result, info);
 			ret.add(service);
 		}
 		
@@ -678,16 +681,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
 			{
-				// If service identifier -> fetch service and create proxy (TODO: proxy for remote service???)
-				if(result instanceof IServiceIdentifier)
-				{
-					T	service	= (T)registry.getLocalService((IServiceIdentifier)result);
-					result	= createServiceProxy(service, info);
-				}
-				
-				// else service event -> just return event, as desired by user (specified in query return type)
-				
-				return result;
+				return createServiceProxy(result, info);
 			}
 			
 			@Override
@@ -780,30 +774,39 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	}
 	
 	/**
-	 *  Create a required service proxy
+	 *  Create the user-facing object from the received search or query result.
+	 *  Result may be service object, service identifier (local or remote), or event.
+	 *  User object is either event or service (with or without required proxy).
 	 */
-	protected <T>	T	createServiceProxy(T service, RequiredServiceInfo info)
+	protected Object	createServiceProxy(Object service, RequiredServiceInfo info)
 	{
-//		// If service identifier -> fetch service and create proxy (TODO: proxy for remote service???)
-//		if(service instanceof IServiceIdentifier)
-//		{
-//			T	service	= (T)ServiceRegistry.getRegistry(getComponent()).getLocalService((IServiceIdentifier)service);
-//			result	= createServiceProxy(service, info);
-//		}
-//		
-//		// else service event -> just return event, as desired by user (specified in query return type)
+		// If service identifier -> find/create service object or proxy
+		if(service instanceof IServiceIdentifier)
+		{
+			IServiceIdentifier	sid	= (IServiceIdentifier)service;
+			
+			// Local component -> fetch local service object.
+			if(sid.getProviderId().getRoot().equals(component.getIdentifier().getRoot()))
+			{
+				service	= ServiceRegistry.getRegistry(getComponent()).getLocalService(sid);				
+			}
+		}
+		
+		// else service event -> just return event, as desired by user (specified in query return type)
 		
 
-		
-		if(info!=null)
+		// Add required service proxy if specified.
+		if(service instanceof IService && info!=null)
 		{
-			IService	iservice	= (IService)BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+			service	= BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
 				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getIdentifier()));
 			
+			
 			// Check if no property provider has been created before and then create and init properties
-			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(iservice.getServiceIdentifier()))
+			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getServiceIdentifier()))
 			{
-				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(iservice.getServiceIdentifier());
+				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class)
+					.getRequiredServicePropertyProvider(((IService)service).getServiceIdentifier());
 				
 				List<NFRPropertyInfo> nfprops = info.getNFRProperties();
 				if(nfprops!=null && nfprops.size()>0)
@@ -812,7 +815,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 					{
 						MethodInfo mi = nfprop.getMethodInfo();
 						Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), iservice, nfprop.getMethodInfo(), nfprop.getParameters());
+						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), (IService)service, nfprop.getMethodInfo(), nfprop.getParameters());
 						if(mi==null)
 						{
 							nfpp.addNFProperty(nfp);
@@ -824,10 +827,6 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 					}
 				}
 			}
-			
-			@SuppressWarnings("unchecked")
-			T	ret	= (T)iservice;
-			service	= ret;
 		}
 		return service;
 	}
