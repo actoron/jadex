@@ -3,14 +3,11 @@ package jadex.platform.service.message.relaytransport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -18,7 +15,6 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -26,9 +22,6 @@ import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MsgHeader;
-import jadex.bridge.component.impl.remotecommands.ProxyInfo;
-import jadex.bridge.component.impl.remotecommands.ProxyReference;
-import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -38,8 +31,6 @@ import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.address.ITransportAddressService;
-import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -51,7 +42,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.PassiveLeaseTimeSet;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -794,22 +784,14 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (ret == null)
 		{
 			IComponentIdentifier relay = getRtComponent(relayplatform);
-			Class<?>[] interfaces = new Class[] { IRoutingService.class, IService.class };
-			
-			ProxyInfo pi = new ProxyInfo(interfaces);
 			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, new ClassInfo(IRoutingService.class), null, "routing", null, Binding.SCOPE_GLOBAL, null, true);
-			RemoteReference rr = new RemoteReference(relay, si);
-			ProxyReference pr = new ProxyReference(pi, rr);
-			
-			ret = (IRoutingService) ProxyFactory.newProxyInstance(agent.getClassLoader(), 
-				interfaces, new RemoteMethodInvocationHandler(agent, pr));
-			
+			ret = (IRoutingService)RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, si);
 			routingservicecache.put(relayplatform, ret);
 		}
 		
 		return ret;
 	}
-	
+
 	/**
 	 *  Gets a route from cache.
 	 *  

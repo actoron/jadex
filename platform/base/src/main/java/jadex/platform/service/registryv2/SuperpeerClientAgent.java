@@ -2,25 +2,33 @@ package jadex.platform.service.registryv2;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IRemoteExecutionFeature;
+import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
@@ -30,11 +38,14 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -46,7 +57,7 @@ import jadex.micro.annotation.Binding;
  */
 @Agent(autoprovide=Boolean3.TRUE)
 @Service
-public class SuperpeerClientAgent
+public class SuperpeerClientAgent	implements ISearchQueryManagerService
 {
 	//-------- attributes --------
 	
@@ -100,16 +111,274 @@ public class SuperpeerClientAgent
 		}
 	}
 	
-	//-------- query handling --------
+	//-------- ISearchQueryManagerService interface --------
 	
 	/**
-	 *  Add a query to relevant super peers.
+	 *  Search for matching services using available remote information sources and provide first result.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> ISubscriptionIntermediateFuture<T>	addQuery(ServiceQuery<T> query)
+	public <T> ITerminableFuture<T> searchService(ServiceQuery<T> query)
+	{
+		TerminableFuture<T>	ret	= new TerminableFuture<>();
+		AtomicInteger	track	= new AtomicInteger(1);
+		boolean	foundsuperpeer	= false;
+		
+		// TODO: search all if networks==null???
+		for(String networkname: query.getNetworkNames())
+		{
+			NetworkManager	manager	= connections.get(networkname);
+			if(manager!=null)
+			{
+				if(manager.superpeer!=null)
+				{
+					foundsuperpeer	= true;
+					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
+					track.incrementAndGet();
+					IFuture<IServiceIdentifier>	fut	= manager.superpeer.searchService(query);
+					fut.addResultListener(new IResultListener<IServiceIdentifier>()
+					{
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							// Forward exception only of last finished future...
+							if(track.decrementAndGet()==0)
+							{
+								ret.setExceptionIfUndone(exception);
+							}
+						}
+						
+						@SuppressWarnings("unchecked")
+						@Override
+						public void resultAvailable(IServiceIdentifier result)
+						{
+							// Forward result if first
+							ret.setResultIfUndone((T)result);
+						}
+					});
+				}
+				
+				// else not connected -> ignore
+			}
+			
+			// else ignore unknown network
+			
+			// TODO: allow selective/hybrid polling fallback for unknown/unconnected networks?			
+		}
+		
+		// polling fallback when no superpeers
+		if(!foundsuperpeer)
+		{
+			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<T>()
+			{
+				@Override
+				public void intermediateResultAvailable(T result)
+				{
+					// Forward result if first
+					ret.setResultIfUndone(result);					
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+				@Override
+				public void finished()
+				{
+					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
+				}
+			});
+		}
+		
+		else if(track.decrementAndGet()==0)
+		{
+			ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
+		}
+
+		return ret;
+	}
+	
+	/**
+	 *  Search for all matching services.
+	 *  @param query	The search query.
+	 *  @return Each service as an intermediate result or a collection of services as final result.
+	 */
+	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
+	{
+		TerminableIntermediateFuture<T>	ret	= new TerminableIntermediateFuture<>();
+		AtomicInteger	track	= new AtomicInteger(1);
+		boolean	foundsuperpeer	= false;
+		
+		// TODO: search all if networks==null???
+		for(String networkname: query.getNetworkNames())
+		{
+			NetworkManager	manager	= connections.get(networkname);
+			if(manager!=null)
+			{
+				if(manager.superpeer!=null)
+				{
+					foundsuperpeer	= true;
+					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
+					track.incrementAndGet();
+					IFuture<Set<IServiceIdentifier>>	fut	= manager.superpeer.searchServices(query);
+					fut.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
+					{
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							if(track.decrementAndGet()==0)
+							{
+								ret.setFinishedIfUndone();
+							}
+						}
+						
+						@SuppressWarnings("unchecked")
+						@Override
+						public void resultAvailable(Set<IServiceIdentifier> result)
+						{
+							if(!ret.isDone())
+							{
+								for(IServiceIdentifier sid: result)
+								{
+									ret.addIntermediateResultIfUndone((T)sid);
+								}
+							}
+							
+							if(track.decrementAndGet()==0)
+							{
+								ret.setFinishedIfUndone();
+							}
+						}
+					});
+				}
+				
+				// else not connected -> ignore
+			}
+			
+			// else ignore unknown network
+			
+			// TODO: allow selective/hybrid polling fallback for unknown/unconnected networks?			
+		}
+		
+		// polling fallback when no superpeers
+		if(!foundsuperpeer)
+		{
+			return searchRemoteServices(query);
+		}
+		
+		else if(track.decrementAndGet()==0)
+		{
+			ret.setFinishedIfUndone();
+		}
+
+		return ret;
+	}
+	
+	/**
+	 *  Add a service query.
+	 *  Continuously searches for matching services using available remote information sources.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
 		// todo: remember and terminate managed queries on shutdown?
 		QueryManager<T>	qinfo	= new QueryManager<>(query);
 		return qinfo.getReturnFuture();
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Search for services on remote platforms using the polling fallback and awareness.
+	 */
+	protected <T> TerminableIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
+	{
+		// TODO: termination
+		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		
+		// Check for awareness service
+		Collection<IPassiveAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
+			.searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
+		if(!pawas.isEmpty())
+		{
+			IPassiveAwarenessService	pawa	= pawas.iterator().next();
+			// Count awa search + platform searches (+ async filtering, if any).
+			final AtomicInteger	cnt	= new AtomicInteger(1);
+			
+			// Search for other platforms
+			pawa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
+			{
+				@Override
+				public void intermediateResultAvailable(final IComponentIdentifier platform)
+				{
+//					System.out.println(getComponent() + " searching remote platform: "+platform+", "+query);
+					
+					// Only (continue to) search remote when future not yet finished or cancelled.
+					if(!ret.isDone())
+					{
+						cnt.incrementAndGet();
+						// TODO: use remote registry service
+						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
+								.executeRemoteSearch(platform, query);
+						
+//						System.out.println(cid + " searching remote platform3: "+platform+", "+query);
+						remotesearch.addResultListener(new IResultListener<Collection<T>>()
+						{
+							public void resultAvailable(Collection<T> result)
+							{
+//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+result);
+								if(result != null)
+								{
+									for(Iterator<T> it = result.iterator(); it.hasNext(); )
+									{
+										T ser = it.next();
+										ret.addIntermediateResultIfUndone(ser);
+									}
+								}
+								doFinished();
+							}
+
+							public void exceptionOccurred(Exception exception)
+							{
+//								System.out.println(getComponent() + " searched remote platform: "+platform+", "+exception);
+								doFinished();
+							}
+						});
+					}
+				}
+				
+				@Override
+				public void finished()
+				{
+					doFinished();
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					// ignore exception
+					doFinished();
+				}
+				
+				private void doFinished()
+				{
+					if(cnt.decrementAndGet()==0)
+					{
+						// Undone, because gets terminated on first result for search one
+						ret.setFinishedIfUndone();
+					}
+				}
+			});
+		}
+		else
+		{
+			ret.setFinished();
+		}
+		
+		return ret;
 	}
 	
 	//-------- helper classes --------
@@ -498,6 +767,7 @@ public class SuperpeerClientAgent
 			Set<ISuperpeerService>	newsuperpeers	= networkspersuperpeer.isEmpty() ? null : new LinkedHashSet<>();
 			
 			// Fill multicollection with relevant superpeers for networks
+			// TODO: search all if networks==null???
 			for(String networkname: networknames)
 			{
 				NetworkManager	manager	= connections.get(networkname);

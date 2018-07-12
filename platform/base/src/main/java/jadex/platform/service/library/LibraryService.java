@@ -47,6 +47,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.IDependencyService;
@@ -1351,20 +1352,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(Void result) 
 			{
-				component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
+				ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+				if(settings!=null)
 				{
-					public void customResultAvailable(ISettingsService settings)
-					{
-						settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-							.addResultListener(new DelegationResultListener<Void>(ret));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						// No settings service: ignore
-						ret.setResult(null);
-					}
-				});
+					settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
+						.addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					// No settings service: ignore
+					ret.setResult(null);
+				}
 			}
 		});
 		return ret;
@@ -1380,20 +1378,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 //		System.out.println("shut");
 		final Future<Void>	saved	= new Future<Void>();
-		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(saved)
+		ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		if(settings!=null)
 		{
-			public void customResultAvailable(ISettingsService settings)
-			{
-				settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
-					.addResultListener(new DelegationResultListener<Void>(saved));
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore
-				saved.setResult(null);
-			}
-		});
+			settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
+				.addResultListener(new DelegationResultListener<Void>(saved));
+		}
+		else
+		{
+			// No settings service: ignore
+			saved.setResult(null);
+		}
 		
 		final Future<Void>	ret	= new Future<Void>();
 		saved.addResultListener(new DelegationResultListener<Void>(ret)
