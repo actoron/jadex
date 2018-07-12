@@ -819,8 +819,68 @@ public class ServiceQuery<T>
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(servicetype=" + servicetype + ", multiplicity=" +multiplicity + ", servicetags=" + Arrays.toString(servicetags) + ", searchstart=" + searchstart + ", platform=" + platform 
-			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", scope=" + scope + ", owner=" + owner
-			+ ", id=" + id + ")";
+		StringBuffer	ret	= new StringBuffer("ServiceQuery(");
+		if(servicetype!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("servicetype=");
+			ret.append(servicetype);
+		}
+		
+		if(multiplicity!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("multiplicity=");
+			ret.append(multiplicity);
+		}
+		
+		if(servicetags!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("servicetags=");
+			ret.append(Arrays.toString(servicetags));
+		}
+		if(searchstart!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("searchstart=");
+			ret.append(searchstart);
+		}
+		if(platform!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("platform=");
+			ret.append(platform);
+		}
+		if(networknames!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("networknames=");
+			ret.append(Arrays.toString(networknames));
+		}
+
+		if(unrestricted!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("unrestricted=");
+			ret.append(unrestricted);
+		}
+
+		if(scope!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("scope=");
+			ret.append(scope);
+		}
+
+		if(owner!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("owner=");
+			ret.append(owner);
+		}
+			
+		ret.append(")");
+		return ret.toString();
 	}
 }
