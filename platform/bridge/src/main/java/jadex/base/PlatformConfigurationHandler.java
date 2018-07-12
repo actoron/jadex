@@ -832,8 +832,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		IPlatformConfiguration config = getDefault();
 		config.setGui(false);
 		config.getExtendedPlatformConfiguration().setChat(false);
-		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, 
-			IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_BPMN, IPlatformConfiguration.KERNEL_BDIV3);
+		config.setValue("kernel_multi", false);
+		config.setValue("kernel_component", true);
+		config.setValue("kernel_micro", true);
+		config.setValue("kernel_bpmn", true);
+		config.setValue("kernel_bdiv3", true);
+
 		config.setLoggingLevel(Level.INFO);
 		// config.setDebugFutures(true);
 		return config;
@@ -863,7 +867,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
 
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
+		config.setValue("kernel_multi", false);
+		config.setValue("kernel_micro", true);
 		// rootConfig.setThreadpoolClass(null);
 		// rootConfig.setContextServiceClass(null);
 

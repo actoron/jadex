@@ -934,7 +934,6 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		baseconfig.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 //		baseconfig.setGui(true);
 //		baseconfig.setLogging(true);
-		baseconfig.setValue("awa", false);
 		
 		// Super peer base configuration
 		IPlatformConfiguration	spbaseconfig	= baseconfig.clone();

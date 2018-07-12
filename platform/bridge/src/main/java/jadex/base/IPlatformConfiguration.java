@@ -98,14 +98,14 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 //    public static final Set<String> RESERVED = PlatformConfigurationHandler.createReserved();
     
     //-------- Kernel constants. --------
-  	public static final String KERNEL_COMPONENT = "component";
-  	public static final String KERNEL_APPLICATION = "application";
-  	public static final String KERNEL_MICRO = "micro";
-  	public static final String KERNEL_BPMN = "bpmn";
-  	public static final String KERNEL_BDIV3 = "bdiv3";
-  	public static final String KERNEL_BDI = "bdi";
-  	public static final String KERNEL_BDIBPMN = "bdibpmn";
-  	public static final String KERNEL_MULTI = "multi";
+//  	public static final String KERNEL_COMPONENT = "component";
+//  	public static final String KERNEL_APPLICATION = "application";
+//  	public static final String KERNEL_MICRO = "micro";
+//  	public static final String KERNEL_BPMN = "bpmn";
+//  	public static final String KERNEL_BDIV3 = "bdiv3";
+//  	public static final String KERNEL_BDI = "bdi";
+//  	public static final String KERNEL_BDIBPMN = "bdibpmn";
+//  	public static final String KERNEL_MULTI = "multi";
 
   	//-------- Awareness mechanisms. --------
   	/** Uses IPv4 broadcast to announce awareness infos in local networks.
@@ -802,20 +802,20 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      */
     public void setSuperpeerClient(boolean value);
     
-//  /**
-//  *  Get the kernel names.
-//  *  @return The kernel names.
-//  */
-//// public IRootComponentConfiguration.KERNEL[] getKernels();
-    public String[] getKernels();
-//
-// /**
-//  *  Set the kernel names.
-//  *  @param value The kernel names.
-//  */
-    public void setKernels(String... value);
-//
-//// public void setKernels(IRootComponentConfiguration.KERNEL... value);
+////  /**
+////  *  Get the kernel names.
+////  *  @return The kernel names.
+////  */
+////// public IRootComponentConfiguration.KERNEL[] getKernels();
+//    public String[] getKernels();
+////
+//// /**
+////  *  Set the kernel names.
+////  *  @param value The kernel names.
+////  */
+//    public void setKernels(String... value);
+////
+////// public void setKernels(IRootComponentConfiguration.KERNEL... value);
 	
 	 /**
      *  Get the network name (used at startup).
