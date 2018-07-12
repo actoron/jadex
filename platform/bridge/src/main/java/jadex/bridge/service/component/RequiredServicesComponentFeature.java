@@ -171,7 +171,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public IFuture<Void> shutdown()
 	{
 		// Remove the persistent queries
-		ServiceRegistry.getRegistry(component).removeQueries(getComponent().getIdentifier());
+		ServiceRegistry.getRegistry(component).removeQueries(getComponent().getId());
 		return IFuture.DONE;
 	}
 	
@@ -725,8 +725,9 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 //		info.getDefaultBinding().getComponentName();
 //		info.getDefaultBinding().getComponentType();
 		
-		ServiceQuery<T>	ret	= new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), getComponent().getIdentifier());
+		ServiceQuery<T>	ret	= new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), getComponent().getId());
 		ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
+		
 		if(info.getTags()!=null)
 		{
 			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), getComponent().getExternalAccess());
@@ -786,7 +787,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			IServiceIdentifier	sid	= (IServiceIdentifier)service;
 			
 			// Local component -> fetch local service object.
-			if(sid.getProviderId().getRoot().equals(component.getIdentifier().getRoot()))
+			if(sid.getProviderId().getRoot().equals(component.getId().getRoot()))
 			{
 				service	= ServiceRegistry.getRegistry(getComponent()).getLocalService(sid);				
 			}
@@ -799,14 +800,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		if(service instanceof IService && info!=null)
 		{
 			service	= BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
-				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getIdentifier()));
+				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
 			
 			
 			// Check if no property provider has been created before and then create and init properties
-			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getServiceIdentifier()))
+			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getId()))
 			{
 				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class)
-					.getRequiredServicePropertyProvider(((IService)service).getServiceIdentifier());
+					.getRequiredServicePropertyProvider(((IService)service).getId());
 				
 				List<NFRPropertyInfo> nfprops = info.getNFRProperties();
 				if(nfprops!=null && nfprops.size()>0)
@@ -847,7 +848,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// Set owner if not set
 		if(query.getOwner()==null)
 		{
-			query.setOwner(getComponent().getIdentifier());
+			query.setOwner(getComponent().getId());
 		}
 		
 		// Set scope if not set
@@ -882,7 +883,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 				{
 					// Not unrestricted -> only find services from my local networks
 					@SuppressWarnings("unchecked")
-					Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
+					Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_NETWORKNAMESCACHE);
 					query.setNetworkNames(nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY);
 				}
 			}

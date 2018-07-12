@@ -172,7 +172,7 @@ public class StatusAgent implements IStatusService
 	{
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
 		IntermediateFuture<ServiceQuery<?>>	ret	= new IntermediateFuture<ServiceQuery<?>>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getIdentifier());
+		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
 		for(ServiceQueryInfo<?> sqi: reg.getAllQueries())
 		{
 			if(scopes==null || scopes.contains(sqi.getQuery().getScope()))
@@ -195,7 +195,7 @@ public class StatusAgent implements IStatusService
 	{
 		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
 		IntermediateFuture<IServiceIdentifier>	ret	= new IntermediateFuture<IServiceIdentifier>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getIdentifier());
+		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
 		for(IServiceIdentifier ser: reg.getAllServices())
 		{
 			if(scopes==null || scopes.contains(ser.getScope()))

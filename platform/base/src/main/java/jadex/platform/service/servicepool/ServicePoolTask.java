@@ -84,7 +84,7 @@ public class ServicePoolTask implements ITask
 		final Future<Void>	ret	= new Future<Void>();
 
 		IComponentManagementService cms	= process.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
-		CreationInfo ci = new CreationInfo(process.getIdentifier());
+		CreationInfo ci = new CreationInfo(process.getId());
 		cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{

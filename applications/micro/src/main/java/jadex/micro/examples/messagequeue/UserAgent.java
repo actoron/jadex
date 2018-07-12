@@ -51,7 +51,7 @@ public class UserAgent
 		{
 			public void intermediateResultAvailable(Event event)
 			{
-				System.out.println("Received: "+agent.getIdentifier()+" "+event);
+				System.out.println("Received: "+agent.getId()+" "+event);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -65,7 +65,7 @@ public class UserAgent
 			final int[] cnt = new int[1];
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				mq.publish(topic, new Event("some type", cnt[0]++, agent.getIdentifier()));
+				mq.publish(topic, new Event("some type", cnt[0]++, agent.getId()));
 				if(cnt[0]<10)
 				{
 					agent.getFeature(IExecutionFeature.class).waitForDelay(1000, this);

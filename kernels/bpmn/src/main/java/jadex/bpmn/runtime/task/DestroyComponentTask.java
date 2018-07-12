@@ -51,7 +51,7 @@ public class DestroyComponentTask implements ITask
 			if(name.indexOf("@")==-1)
 				cid = new BasicComponentIdentifier(name);
 			else
-				cid = new BasicComponentIdentifier(name, instance.getIdentifier().getParent());
+				cid = new BasicComponentIdentifier(name, instance.getId().getParent());
 		}
 		
 		IFuture<Map<String, Object>> tmp = cms.destroyComponent(cid);

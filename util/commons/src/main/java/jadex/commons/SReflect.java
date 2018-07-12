@@ -469,7 +469,7 @@ public class SReflect
 	 *  Also beautifies names of arrays (eg 'String[]' instead of '[LString;').
 	 *  @return The unqualified (without package) name of a class.
 	 */
-	public static String	getUnqualifiedClassName(Class clazz)
+	public static String getUnqualifiedClassName(Class clazz)
 	{
 		String	classname	= getClassName(clazz);
 		return getUnqualifiedTypeName(classname);

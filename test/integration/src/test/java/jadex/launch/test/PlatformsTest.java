@@ -112,7 +112,7 @@ public class PlatformsTest //extends TestCase
 			
 			long start = System.currentTimeMillis();
 			IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(args).get(timeout);
-			timeout = Starter.getLocalDefaultTimeout(platform.getIdentifier());
+			timeout = Starter.getLocalDefaultTimeout(platform.getId());
 			starttimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Started platform: "+i);
 			
@@ -127,7 +127,7 @@ public class PlatformsTest //extends TestCase
 			
 			final Future<Void>	fut	= new Future<Void>();
 			IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
-			cms.listenToComponent(platform.getIdentifier()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
+			cms.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)

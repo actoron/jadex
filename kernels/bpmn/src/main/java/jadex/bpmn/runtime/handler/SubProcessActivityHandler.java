@@ -211,7 +211,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			
 			IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
 				? (IComponentIdentifier)thread.getPropertyValue("parent")
-				: instance.getIdentifier();
+				: instance.getId();
 			if(info.getParent()==null && parent!=null)
 				info.setParent(parent);
 			
@@ -269,7 +269,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				{
 					// Hack!!! Ignore exception, when component already terminated.
 					if(!(exception instanceof ComponentTerminatedException)
-						|| !instance.getIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
+						|| !instance.getId().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 					{
 //								System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 //								exception.printStackTrace();
@@ -281,7 +281,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				public String toString()
 				{
-					return "lis: "+instance.getIdentifier()+" "+file;
+					return "lis: "+instance.getId()+" "+file;
 				}
 			}));
 		}

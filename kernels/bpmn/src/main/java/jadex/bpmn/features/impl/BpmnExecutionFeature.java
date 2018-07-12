@@ -255,7 +255,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 //				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 			
 			IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.destroyComponent(getComponent().getIdentifier()); // todo: listener?
+			cms.destroyComponent(getComponent().getId()); // todo: listener?
 		}
 		
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));

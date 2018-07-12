@@ -243,7 +243,7 @@ public class JavaWrapperTestAgent
 			
 			File	url	= new File("../jadex-platform-extension-management/src/test/testapp/testapp-0.0.1.jar").getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getIdentifier().getRoot(), url.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getId().getRoot(), url.toURI().toURL()), null);
 			
 			wrapperservice.executeJava(rid, null)
 				.addResultListener(new IResultListener<Void>()
@@ -283,7 +283,7 @@ public class JavaWrapperTestAgent
 			
 			File	url	= new File("../jadex-platform-extension-management/src/test/testapp/testapp-0.0.1.jar").getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getIdentifier().getRoot(), url.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getId().getRoot(), url.toURI().toURL()), null);
 			
 			wrapperservice.executeJava(rid, new String[]{"fail"})
 				.addResultListener(new IResultListener<Void>()

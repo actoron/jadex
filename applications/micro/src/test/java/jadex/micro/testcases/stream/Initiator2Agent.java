@@ -69,7 +69,7 @@ public class Initiator2Agent extends TestAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno)
 	{
-		return performTest(agent.getIdentifier().getRoot(), testno);
+		return performTest(agent.getId().getRoot(), testno);
 	}
 	
 	/**
@@ -83,7 +83,7 @@ public class Initiator2Agent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-               	performTest(exta.getIdentifier(), testno)
+               	performTest(exta.getId(), testno)
                		.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
@@ -123,7 +123,7 @@ public class Initiator2Agent extends TestAgent
 			{
 				agent.getLogger().severe("Testagent create receiver done: "+agent.getDescription());
 				IMessageFeature mf = agent.getFeature(IMessageFeature.class);
-				mf.createInputConnection(agent.getIdentifier(), cid, null)
+				mf.createInputConnection(agent.getId(), cid, null)
 					.addResultListener(new ExceptionDelegationResultListener<IInputConnection, TestReport>(ret)
 				{
 					public void customResultAvailable(final IInputConnection icon) 

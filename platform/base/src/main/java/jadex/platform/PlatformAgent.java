@@ -39,15 +39,17 @@ import static jadex.base.IPlatformConfiguration.WSPUBLISH;
 import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
 
 import java.io.File;
+import java.util.Map;
 import java.util.logging.Level;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -55,11 +57,9 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.Boolean3;
-import jadex.micro.KernelComponentAgent;
-import jadex.micro.KernelMicroAgent;
-import jadex.micro.KernelMultiAgent;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -75,22 +75,14 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.sensor.SensorHolderAgent;
 import jadex.platform.service.address.TransportAddressAgent;
-import jadex.platform.service.awareness.management.AwarenessManagementAgent;
 import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.context.ContextAgent;
-import jadex.platform.service.df.DirectoryFacilitatorAgent;
-import jadex.platform.service.filetransfer.FileTransferAgent;
 import jadex.platform.service.library.LibraryAgent;
 import jadex.platform.service.monitoring.MonitoringAgent;
-import jadex.platform.service.registry.AutoConfigRegistryAgent;
-import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
-import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.settings.SettingsAgent;
 import jadex.platform.service.simulation.SimulationAgent;
-import jadex.platform.service.transport.tcp.TcpTransportAgent;
 
 /**
  *	Basic standalone platform services provided as a micro agent. 
@@ -164,78 +156,31 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 
 	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
 
-	@Argument(name="kernel_multi", clazz=Boolean.class, defaultvalue="true"),
-	@Argument(name="kernel_micro", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_component", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_application", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bdiv3", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bdi", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bpmn", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bpmn", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bdibpmn", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_gpmn", clazz=Boolean.class, defaultvalue="false"),
-	
-	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="mon", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="df", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="simul", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="filetransfer", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="security", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="library", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="settings", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="context", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="address", clazz=boolean.class, defaultvalue="true"),
-	
-	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="superpeerclient", clazz=boolean.class),//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
-	@Argument(name="acr", clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
 	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
-	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
-	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
-	@ComponentType(name="kernel_micro", clazz=KernelMicroAgent.class), // filename="jadex/micro/KernelMicroAgent.class"),
-	@ComponentType(name="kernel_bdiv3", filename="jadex/bdiv3/KernelBDIV3Agent.class"),
-	@ComponentType(name="kernel_bdi", filename="jadex/bdiv3x/KernelBDIX.component.xml"),
-	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
-	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),
-	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
-	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
-	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
-	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
-	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
-	@ComponentType(name="rspublish", filename="%{$args.rspublishcomponent}"),
-//	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/ExternalRSPublishAgent.class"),
-//	@ComponentType(name="rspublish_grizzly", filename="jadex/extension/rs/publish/GrizzlyRSPublishAgent.class"),
-//	@ComponentType(name="rspublish_jetty", filename="jadex/extension/rs/publish/JettyRSPublishAgent.class"),
-	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class"),
-	@ComponentType(name="cli", filename="jadex/platform/service/cli/CliAgent.class"),
-	@ComponentType(name="sensor", clazz=SensorHolderAgent.class), //filename="jadex/platform/sensor/SensorHolderAgent.class")
-	@ComponentType(name="df", clazz=DirectoryFacilitatorAgent.class),
 	@ComponentType(name="clock", clazz=ClockAgent.class),
 	@ComponentType(name="simulation", clazz=SimulationAgent.class),
-	@ComponentType(name="filetransfer", clazz=FileTransferAgent.class),
 	@ComponentType(name="security", clazz=SecurityAgent.class),
 	@ComponentType(name="library", clazz=LibraryAgent.class),
 	@ComponentType(name="settings", clazz=SettingsAgent.class),
 	@ComponentType(name="address", clazz=TransportAddressAgent.class),
 	@ComponentType(name="context", clazz=ContextAgent.class),
-	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
-	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
-	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
-	@ComponentType(name="tcp", clazz=TcpTransportAgent.class),
-	@ComponentType(name="ws", filename="jadex/platform/service/message/websockettransport/WebSocketTransportAgent.class"),
-	@ComponentType(name="rt", filename="jadex/platform/service/message/relaytransport/RelayTransportAgent.class"),
-	@ComponentType(name="acr", clazz=AutoConfigRegistryAgent.class)
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
-	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
@@ -258,45 +203,11 @@ import jadex.platform.service.transport.tcp.TcpTransportAgent;
 		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0"),
 		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0"),
 		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
-		//@Component(name="%{jadex.base.IPlatformConfiguration.MONITORINGCOMP}", type="monitor", daemon=Boolean3.TRUE, number="$args.get(jadex.base.IPlatformConfiguration.MONITORINGCOMP)? 1 : 0"),
 		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.mon? 1 : 0"),
-		
-		@Component(name="kernel_multi", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.kernel_multi? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.kernel_micro? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.kernel_component? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.kernel_application? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.kernel_bdiv3? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.kernel_bdi? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.kernel_bpmn? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.kernel_bdibpmn? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.kernel_gpmn? 1 : 0"),
-
-//		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, number="$args.compregistry? 1 : 0"),
-		
 		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
 		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0"),
 		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
 		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
-		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
-		
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0"),
-		
-		//@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
-		//@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1: $args.getArguments().get(\"superpeerclient\")==null && !$args.superpeer && !$args.supersuperpeer? 1 : 0"),
-		
-		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
-		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0"),
-		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
-		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
-		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0"),
-		
-		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0"),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0"),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
-		
-		@Component(name="acr", type="acr", daemon=Boolean3.TRUE, number="$args.acr? 1 : 0")
 	})
 })
 @Agent
@@ -312,38 +223,82 @@ public class PlatformAgent
 //		return PlatformConfigurationHandler.getArguments();
 //	}
 	
-//	/**
-//	 *  Called when platform startup finished.
-//	 */
-//	@AgentCreated
-//	public void init()
-//	{
-//		System.out.println("Start scanning...");
-//		long start = System.currentTimeMillis();
-//		FastClasspathScanner scanner = new FastClasspathScanner() 
-//			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
-//			.matchClassesWithAnnotation(Agent.class, c -> 
-//			{
-//				try
-//				{
-//					System.out.println("Found Agent annotation on class: "+ c.getName());
-//					Boolean3 autostart = c.getAnnotation(Agent.class).autostart();
-//					if(autostart.toBoolean()!=null && autostart.toBoolean().booleanValue())
-//					{					
-//						IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class);
-//						cms.createComponent(c.getName()+".class", (CreationInfo)null);
-//					}
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//			});
-//		ScanResult res = scanner.scan(); 
-//		long end = System.currentTimeMillis();
-//		System.out.println("Needed: "+(end-start)/1000);
-////		System.out.println(res.getNamesOfClassesWithAnnotation(Agent.class));
-//	}
+	/**
+	 *  Called when platform startup finished.
+	 */
+	@AgentCreated
+	public void init()
+	{
+		System.out.println("Start scanning...");
+		long start = System.currentTimeMillis();
+		FastClasspathScanner scanner = new FastClasspathScanner() 
+			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
+			.matchClassesWithAnnotation(Agent.class, c -> 
+		{
+			try
+			{
+//				System.out.println("Found Agent annotation on class: "+ c.getName());
+				Agent aan = c.getAnnotation(Agent.class);
+				Boolean3 autostart = aan.autostart();
+				if(autostart.toBoolean()!=null)
+				{		
+					IComponentManagementService cms =agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
+//						CreationInfo ci = new CreationInfo();
+					
+					Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
+					
+					String name = aan.autostartname().length()==0? null: aan.autostartname();
+					
+					boolean ok = autostart.toBoolean().booleanValue();
+					if(name!=null)
+					{
+						if(argsmap.containsKey("-"+name))
+							ok = (boolean)argsmap.get("-"+name);
+					}
+					else
+					{
+						// check classname as parameter
+						name = SReflect.getInnerClassName(c);
+						if(argsmap.containsKey(name))
+						{	
+							ok = (boolean)argsmap.get(name.toLowerCase());
+						}
+						else
+						{
+							// check classname - suffix (BDI/Agent etc) in lowercase
+							int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+							if(suf>0)
+							{
+								name = name.substring(0, suf).toLowerCase();
+								if(argsmap.containsKey(name))
+								{	
+									ok = (boolean)argsmap.get(name);
+								}
+							}
+						}
+					}
+					
+					if(ok)
+					{
+						cms.createComponent(name, c.getName()+".class", (CreationInfo)null);
+						System.out.println("Auto starting: "+name);
+					}
+					else
+					{
+						System.out.println("Not starting: "+name);
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		});
+		ScanResult res = scanner.scan(); 
+		long end = System.currentTimeMillis();
+		System.out.println("Needed: "+(end-start)/1000);
+//		System.out.println(res.getNamesOfClassesWithAnnotation(Agent.class));
+	}
 	
 	/**
 	 *  Called when platform startup finished.
@@ -353,12 +308,5 @@ public class PlatformAgent
 //	public void body()
 //	{
 //		System.out.println("Start scanning...");
-//		long start = System.currentTimeMillis();
-//		FastClasspathScanner scanner = new FastClasspathScanner() 
-//			.matchClassesWithAnnotation(Agent.class, c -> System.out.println("Found RestHandler annotation on class: "+ c.getName()));
-//		ScanResult res = scanner.scan(); 
-//		long end = System.currentTimeMillis();
-//		System.out.println("Needed: "+(end-start)/1000);
-//		System.out.println(res.getNamesOfClassesWithAnnotation(Agent.class));
 //	}
 }

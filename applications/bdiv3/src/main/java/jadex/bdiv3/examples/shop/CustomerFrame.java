@@ -29,7 +29,7 @@ public class CustomerFrame extends JFrame
 	 */
 	public CustomerFrame(final ICapability capa)
 	{
-		super(capa.getAgent().getExternalAccess().getIdentifier().getName());
+		super(capa.getAgent().getExternalAccess().getId().getName());
 		
 		add(new CustomerPanel(capa));
 		pack();

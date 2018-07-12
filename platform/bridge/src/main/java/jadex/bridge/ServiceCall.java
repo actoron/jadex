@@ -33,6 +33,9 @@ public class ServiceCall
 	/** The inherit constant. */
 	public static final String INHERIT = "inherit";
 	
+	/** The security infos constant. */
+	public static final String SECURITY_INFOS = "secinfos";
+	
 	/** The current service calls mapped to threads. */
 	protected static final ThreadLocal<ServiceCall> CURRENT = new ThreadLocal<ServiceCall>();
 	

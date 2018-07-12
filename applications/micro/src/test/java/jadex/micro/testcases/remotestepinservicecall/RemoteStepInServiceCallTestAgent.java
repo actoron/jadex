@@ -71,7 +71,7 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getIdentifier().getRoot(), testno)
+		performTest(agent.getId().getRoot(), testno)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
@@ -95,7 +95,7 @@ public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITes
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getIdentifier(), testno)
+				performTest(platform.getId(), testno)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));

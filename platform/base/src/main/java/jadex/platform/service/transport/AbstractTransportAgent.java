@@ -211,7 +211,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentCreated
 	protected IFuture<Void>	init()
 	{
-		this.codec = MessageComponentFeature.getSerializationServices(agent.getIdentifier().getRoot());
+		this.codec = MessageComponentFeature.getSerializationServices(agent.getId().getRoot());
 		this.secser	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
 		this.cms	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		this.impl = createTransportImpl();
@@ -233,7 +233,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						// Announce connection addresses.
 						InetAddress[] addresses = SUtil.getNetworkAddresses();
 //						String[] saddresses = new String[addresses.length];
-						IComponentIdentifier platformid = agent.getIdentifier().getRoot();
+						IComponentIdentifier platformid = agent.getId().getRoot();
 						List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
 						for(int i = 0; i < addresses.length; i++)
 						{
@@ -251,7 +251,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
 						
-						agent.getLogger().info("Platform "+agent.getIdentifier().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
+						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
 
 //						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
 //						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
@@ -589,7 +589,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if (created)
 		{
 			agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
-			impl.sendMessage(con, new byte[0], agent.getIdentifier().getPlatformName().getBytes(SUtil.UTF8));
+			impl.sendMessage(con, new byte[0], agent.getId().getPlatformName().getBytes(SUtil.UTF8));
 		}
 		
 		return cand;
@@ -986,7 +986,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			return clientcon == o.clientcon ? 0 :
 			// the current is client then name<target or the current is server
 			// then name>target
-				(clientcon ? 1 : -1) * agent.getIdentifier().getPlatformName().compareTo(target.getName());
+				(clientcon ? 1 : -1) * agent.getId().getPlatformName().compareTo(target.getName());
 		}
 	}
 
@@ -1224,7 +1224,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 *  Get the service identifier.
 	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getServiceIdentifier()
+	public IServiceIdentifier getId()
 	{
 		return sid;
 	}

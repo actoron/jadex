@@ -98,7 +98,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getIdentifier());
+				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getId());
 				
 				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();	
@@ -193,7 +193,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getIdentifier().getRoot(), testno, delay, max);
+		return performTest(agent.getId().getRoot(), testno, delay, max);
 	}
 	
 	/**
@@ -209,7 +209,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		{
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getIdentifier().getPlatformPrefix()+"_*",
+			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
 				"-gui", "false", "-simulation", "false", "-printpass", "false",
@@ -224,7 +224,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getIdentifier(), testno, delay, max)
+							performTest(platform.getId(), testno, delay, max)
 								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 							{
 								public void customResultAvailable(final TestReport result)
@@ -284,8 +284,8 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
-				final boolean	local	= root.equals(agent.getIdentifier().getRoot());
-				jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getIdentifier() : root, rid);
+				final boolean	local	= root.equals(agent.getId().getRoot());
+				jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getId() : root, rid);
 				cms.createComponent(null, AAgent.class.getName()+".class", ci, null)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 				{	
@@ -296,7 +296,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 						{
 							public void customResultAvailable(IAService service)
 							{
-								System.out.println("found service: "+((IService)service).getServiceIdentifier());
+								System.out.println("found service: "+((IService)service).getId());
 								
 //								IFuture<IFuture<String>> futa = service.methodA();
 //								futa.addResultListener(new DefaultResultListener<IFuture<String>>()

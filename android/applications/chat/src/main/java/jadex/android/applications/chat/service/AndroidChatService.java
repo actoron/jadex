@@ -438,7 +438,7 @@ public class AndroidChatService extends JadexPlatformService
 					@Override
 					public void resultAvailable(String nickName)
 					{
-						IServiceIdentifier sid = ((IService) chatService).getServiceIdentifier();
+						IServiceIdentifier sid = ((IService) chatService).getId();
 						chatUser.setNickName(nickName);
 						chatUser.setCid(sid.getProviderId());
 						resLis.resultAvailable(null);

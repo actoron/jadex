@@ -299,7 +299,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	protected void addPeer(ISuperpeerCollaborationService peer)
 	{
 		final ServiceRegistry regcache = new ServiceRegistry();
-		final Set<String> nwnames = ((IService) peer).getServiceIdentifier().getNetworkNames();
+		final Set<String> nwnames = ((IService) peer).getId().getNetworkNames();
 		ServiceQuery<ServiceEvent<IServiceIdentifier>> query = new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>) null);
 		query.setReturnType(ServiceEvent.CLASSINFO);
 		ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> sub = peer.addIntransitiveQuery(query);

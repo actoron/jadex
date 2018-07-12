@@ -67,7 +67,7 @@ public class UserAgent
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
-						IFuture<IMathService> fut = rms.getServiceProxy(agent.getIdentifier(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+						IFuture<IMathService> fut = rms.getServiceProxy(agent.getId(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
 						fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMathService>()
 						{
 							public void resultAvailable(IMathService service)

@@ -318,7 +318,7 @@ public class CronAgent implements ICronService
 			{
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
-					CreationInfo ci = new CreationInfo(agent.getIdentifier());
+					CreationInfo ci = new CreationInfo(agent.getId());
 //					cms.createComponent(null, "invocation", ci, null)
 					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
 						.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)

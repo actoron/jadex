@@ -89,7 +89,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, ia.getIdentifier()), null)
+				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, ia.getId()), null)
 					.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
 				{
 					public void customResultAvailable(IComponentIdentifier result)

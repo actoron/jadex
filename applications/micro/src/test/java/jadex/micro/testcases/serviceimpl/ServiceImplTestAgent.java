@@ -56,7 +56,7 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		try
 		{
 			IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getIdentifier()), null).get();
+			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getId()), null).get();
 			IInfoService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class).setProvider(cid)).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);

@@ -127,7 +127,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<Collection<TestReport>> testLocal(int testno, long delay)
 	{
-		return performTest(agent.getIdentifier().getRoot(), testno, delay);
+		return performTest(agent.getId().getRoot(), testno, delay);
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		{
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getIdentifier().getPlatformPrefix()+"_*",
+			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
 				"-gui", "false", "-simulation", "false", "-printpass", "false",
@@ -158,7 +158,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getIdentifier(), testno, delay)
+							performTest(platform.getId(), testno, delay)
 								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
 							{
 								public void customResultAvailable(final Collection<TestReport> result)
@@ -261,7 +261,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport>	testTerminate(int testno, ITerminableService service, long delay)
 	{
-		System.out.println(agent.getIdentifier()+": testTerminate1");
+		System.out.println(agent.getId()+": testTerminate1");
 		
 		final Future<Void> tmp = new Future<Void>();
 		ITerminableFuture<String> fut = service.getResult(delay);
@@ -269,12 +269,12 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		{
 			public void resultAvailable(String result)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminate2");
+				System.out.println(agent.getId()+": testTerminate2");
 				tmp.setException(new RuntimeException("Termination did not occur: "+result));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminate3");
+				System.out.println(agent.getId()+": testTerminate3");
 				if(exception instanceof FutureTerminatedException)
 				{
 					tmp.setResult(null);
@@ -293,13 +293,13 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(Void result)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminate4");
+				System.out.println(agent.getId()+": testTerminate4");
 				tr.setSucceeded(true);
 				ret.setResult(tr);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminate5");
+				System.out.println(agent.getId()+": testTerminate5");
 				tr.setFailed(exception.getMessage());
 				ret.setResult(tr);
 			}
@@ -313,7 +313,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport>	testTerminateAction(int testno, ITerminableService service, long delay)
 	{
-		System.out.println(agent.getIdentifier()+": testTerminateAction1");
+		System.out.println(agent.getId()+": testTerminateAction1");
 		
 		final Future<Void> tmp = new Future<Void>();
 		
@@ -326,12 +326,12 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 			}
 			public void customResultAvailable(Collection<Void> result)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminateAction2");
+				System.out.println(agent.getId()+": testTerminateAction2");
 				tmp.setResult(null);
 			}
 			public void finished()
 			{
-				System.out.println(agent.getIdentifier()+": testTerminateAction3");
+				System.out.println(agent.getId()+": testTerminateAction3");
 				tmp.setResult(null);
 			}
 		});
@@ -342,13 +342,13 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(Void result)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminateAction4");
+				System.out.println(agent.getId()+": testTerminateAction4");
 				tr.setSucceeded(true);
 				ret.setResult(tr);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getIdentifier()+": testTerminateAction5");
+				System.out.println(agent.getId()+": testTerminateAction5");
 				tr.setFailed(exception.getMessage());
 				ret.setResult(tr);
 			}

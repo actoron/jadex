@@ -463,7 +463,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ownerid	= new BasicComponentIdentifier((String)owner);
 					else
 //						ownerid	= ces.createComponentIdentifier((String)owner, true);
-						ownerid	= new BasicComponentIdentifier((String)owner, ia.getIdentifier());
+						ownerid	= new BasicComponentIdentifier((String)owner, ia.getId());
 					
 					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
 					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
@@ -648,7 +648,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					{
 						public void resultAvailable(final Object result)
 						{
-							((IComponentManagementService)result).listenToComponent(getExternalAccess().getIdentifier())
+							((IComponentManagementService)result).listenToComponent(getExternalAccess().getId())
 								.addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 							{
 								@Override
@@ -1716,7 +1716,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
 //									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
 									// todo: can fail?
-									IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getIdentifier());
+									IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
 //									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
 									// Hack!!! Should have actual description and not just name and local type!?
 									CMSComponentDescription desc = new CMSComponentDescription();
@@ -1725,7 +1725,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									setOwner(ret.getId(), desc);
 //									System.out.println("env create: "+cid);
 									IFuture	future	= cms.createComponent(cid.getLocalName(), filename,
-										new CreationInfo(null, null, getExternalAccess().getIdentifier(), false, getExternalAccess().getModel().getAllImports()), null);
+										new CreationInfo(null, null, getExternalAccess().getId(), false, getExternalAccess().getModel().getAllImports()), null);
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)

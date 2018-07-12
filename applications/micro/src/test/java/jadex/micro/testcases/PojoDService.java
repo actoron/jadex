@@ -48,7 +48,7 @@ public class PojoDService implements IDService
 				{	
 //					IComponentManagementService cms = (IComponentManagementService)result;
 					cms.createComponent(null, "jadex.micro.testcases.ServiceParameterAgent.class", 
-						new CreationInfo("second", null, agent.getIdentifier()), null)
+						new CreationInfo("second", null, agent.getId()), null)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier cid)

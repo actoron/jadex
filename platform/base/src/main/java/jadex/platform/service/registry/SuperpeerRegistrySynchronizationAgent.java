@@ -11,6 +11,7 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Kill peer agent if present.
  *  Starts peer agent on terminate.
  */
-@Agent
+@Agent(autostart=Boolean3.FALSE, autostartname="superpeer")
 @ProvidedServices(@ProvidedService(type=ISuperpeerRegistrySynchronizationService.class, 
 	implementation=@Implementation(expression="new SuperpeerRegistrySynchronizationService(SuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS, $args.supersuperpeer? 0: 1)")))
 // TODO: publication scope.
@@ -60,7 +61,7 @@ public class SuperpeerRegistrySynchronizationAgent
 			if(pser!=null)
 			{
 				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				cms.destroyComponent(((IService)pser).getServiceIdentifier().getProviderId());
+				cms.destroyComponent(((IService)pser).getId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)
@@ -82,7 +83,7 @@ public class SuperpeerRegistrySynchronizationAgent
 	@AgentKilled
 	public void terminate()
 	{
-		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getIdentifier());
+		IServiceRegistry reg = ServiceRegistry.getRegistry(component.getId());
 		
 		// Remove all remote services handled by the registry 
 		//TODO

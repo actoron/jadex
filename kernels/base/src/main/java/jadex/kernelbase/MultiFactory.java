@@ -598,7 +598,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				for (IComponentFactory fac : facs)
 				{
-					if(!((IService)fac).getServiceIdentifier().equals(sid))
+					if(!((IService)fac).getId().equals(sid))
 					{
 						icon = fac.getComponentTypeIcon(type).get();
 					
@@ -864,7 +864,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		for (Iterator it = factories.iterator(); it.hasNext(); )
 		{
 			final IComponentFactory factory = (IComponentFactory)it.next();
-			if(((IService)factory).getServiceIdentifier().equals(sid))
+			if(((IService)factory).getId().equals(sid))
 			{
 //						if(model.indexOf("ich")!=-1)
 //							System.out.println("removed: "+factory);
@@ -1068,7 +1068,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //								System.out.println("Starting kernel2: " + kernelmodel);
 								final IModelInfo	info	= (IModelInfo)result;
 								IComponentManagementService cms	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-								final CreationInfo ci = new CreationInfo(ia.getIdentifier());
+								final CreationInfo ci = new CreationInfo(ia.getId());
 								String	name	= info.getName().toLowerCase();
 								if(name.startsWith("kernel"))
 									name	= name.substring(6);
@@ -1735,7 +1735,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public boolean equals(Object obj)
 	{
 		if(obj instanceof IService)
-			return sid.equals(((IService) obj).getServiceIdentifier());
+			return sid.equals(((IService) obj).getId());
 		return false;
 	}
 }

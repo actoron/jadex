@@ -83,7 +83,7 @@ public class BlocksworldGui	extends JFrame
 //		{
 //		}
 		
-		setTitle(agent.getIdentifier().getName());
+		setTitle(agent.getId().getName());
 		final JPanel worlds = new JPanel(new GridLayout(1, 2));
 		
 		agent.scheduleStep(new IComponentStep<Void>()

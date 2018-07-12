@@ -73,7 +73,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		
 //				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
 		
-		final IComponentIdentifier	cid	= instance.getIdentifier();
+		final IComponentIdentifier	cid	= instance.getId();
 		final IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
 		{
 			public IFuture<Void> execute(final Object event)
@@ -134,7 +134,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 					{
 						IInternalProcessEngineService ipes = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 						
-						System.out.println("Cancel event matcher1: "+instance.getIdentifier());
+						System.out.println("Cancel event matcher1: "+instance.getId());
 						
 						ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
 						{

@@ -111,7 +111,7 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(component.getIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(component.getId(), new Runnable()
 				{
 					public void run()
 					{

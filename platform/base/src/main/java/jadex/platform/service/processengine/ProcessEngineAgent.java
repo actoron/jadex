@@ -159,7 +159,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						{
 							// load the bpmn model
 							BpmnModelLoader loader = new BpmnModelLoader();
-							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getIdentifier().getRoot()});
+							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getId().getRoot()});
 							
 							// Find all instance wait activities
 							// register waitqueue events
@@ -520,7 +520,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				CreationInfo info = new CreationInfo(agent.getIdentifier(), det.getRid());
+				CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
 				info.setArguments(args);
@@ -591,7 +591,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Set<Object>	fwq	= wq;
 		final String	ftype	= type;
 		
-		long to = Starter.getLocalDefaultTimeout(agent.getIdentifier());
+		long to = Starter.getLocalDefaultTimeout(agent.getId());
 		if(to>0)
 		{
 			agent.getFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()

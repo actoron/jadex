@@ -102,7 +102,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public BDIAgentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getIdentifier(), IComponentFactory.class, properties);
+		super(provider.getId(), IComponentFactory.class, properties);
 
 		this.provider = provider;
 //		this.properties = properties;
@@ -143,7 +143,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = component.getIdentifier();
+		this.providerid = component.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "Bootstrap Factory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}

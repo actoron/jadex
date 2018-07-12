@@ -172,7 +172,7 @@ public class DaemonService implements IDaemonService
 				// Change arguments to include responder agent for handshake.
 				final String	pid	= UUID.randomUUID().toString();
 				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("cid", agent.getIdentifier());
+				args.put("cid", agent.getId());
 				args.put("content", pid);
 				String	argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 				argsstr	= SUtil.escapeString(argsstr);	// First: escape string

@@ -206,14 +206,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		proxyrwlock.writeLock().lock();
 		try
 		{
-			localserviceproxies.put(service.getServiceIdentifier(), service);
+			localserviceproxies.put(service.getId(), service);
 		}
 		finally
 		{
 			proxyrwlock.writeLock().unlock();
 		}
 		
-		addService(service.getServiceIdentifier());
+		addService(service.getId());
 	}
 	
 	/**
@@ -901,7 +901,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
-		return getRegistry(ia.getIdentifier());
+		return getRegistry(ia.getId());
 	}
 	
 	/**

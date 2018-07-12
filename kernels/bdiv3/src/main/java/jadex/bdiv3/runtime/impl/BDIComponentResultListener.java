@@ -79,7 +79,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(agent.getIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(agent.getId(), new Runnable()
 				{
 					public void run()
 					{
@@ -107,7 +107,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	 */
 	public void exceptionOccurred(final Exception exception)
 	{
-		if(!agent.getFeature(IExecutionFeature.class).isComponentThread() && !Starter.isRescueThread(agent.getIdentifier()))
+		if(!agent.getFeature(IExecutionFeature.class).isComponentThread() && !Starter.isRescueThread(agent.getId()))
 		{
 			try
 			{

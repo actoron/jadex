@@ -93,7 +93,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 			}
 			
 			// todo:
-//					ClassInfo[] supertypes = service.getServiceIdentifier().getServiceSuperTypes();
+//					ClassInfo[] supertypes = service.getId().getServiceSuperTypes();
 //					if (supertypes != null)
 //					{
 //						for (ClassInfo supertype : supertypes)

@@ -3,6 +3,7 @@ package jadex.extension.rs.publish;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
@@ -12,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Agent that publishes the rs publication service.
  */
-@Agent
+@Agent(autostart=Boolean3.TRUE)
 @ProvidedServices(
 {
 	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 

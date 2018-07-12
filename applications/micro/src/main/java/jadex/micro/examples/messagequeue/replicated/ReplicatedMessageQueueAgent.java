@@ -74,7 +74,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscriptions = new HashMap<String, List<ReplicationSubscription>>();
-		this.id = agent.getIdentifier().getName();
+		this.id = agent.getId().getName();
 	}
 
 	@AgentBody

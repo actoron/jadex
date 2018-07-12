@@ -859,7 +859,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						@Override
 						public String toString()
 						{
-							return "updateBelief("+mbel.getName()+"@"+component.getIdentifier()+")";
+							return "updateBelief("+mbel.getName()+"@"+component.getId()+")";
 						}
 						
 //						public void exceptionOccurred(Exception exception)

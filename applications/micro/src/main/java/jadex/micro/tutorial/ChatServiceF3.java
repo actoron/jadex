@@ -44,7 +44,7 @@ public class ChatServiceF3 implements IChatService
 					for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 					{
 						IChatService cs = it.next();
-						cs.message(agent.getIdentifier().getName(), chatbot.getReply()+": "+sender);
+						cs.message(agent.getId().getName(), chatbot.getReply()+": "+sender);
 					}
 				}
 			});

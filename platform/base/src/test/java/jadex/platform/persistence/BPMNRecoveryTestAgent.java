@@ -76,7 +76,7 @@ public class BPMNRecoveryTestAgent
 		
 		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
 		IExternalAccess	exta	= cms.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResults().get().containsKey("running"))

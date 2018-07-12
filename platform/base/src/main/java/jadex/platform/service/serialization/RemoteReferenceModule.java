@@ -717,12 +717,12 @@ public class RemoteReferenceModule
 			}
 			else if(target instanceof IExternalAccess)
 			{
-				ret = new RemoteReference(((IExternalAccess)target).getIdentifier(), ((IExternalAccess)target).getIdentifier());
+				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
 //				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)
 			{
-				ret = new RemoteReference(((IService)target).getServiceIdentifier().getProviderId(), ((IService)target).getServiceIdentifier());
+				ret = new RemoteReference(((IService)target).getId().getProviderId(), ((IService)target).getId());
 //				System.out.println("service ref: "+ret);
 			}
 			else if(target instanceof ServiceInfo)
@@ -734,7 +734,7 @@ public class RemoteReferenceModule
 				}
 				else
 				{
-					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getServiceIdentifier().getProviderId(), ((ServiceInfo)target).getManagementService().getServiceIdentifier());
+					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getId().getProviderId(), ((ServiceInfo)target).getManagementService().getId());
 	//				System.out.println("service ref: "+ret);
 				}
 			}
@@ -831,7 +831,7 @@ public class RemoteReferenceModule
 			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
 			}
-			if(!access.getIdentifier().equals(sid.getProviderId()))
+			if(!access.getId().equals(sid.getProviderId()))
 			{
 				throw new IllegalStateException("Must be request for service of component that received remote execution message.");				
 			}
@@ -869,7 +869,7 @@ public class RemoteReferenceModule
 			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
 			}
-			if(!access.getIdentifier().equals(cid))
+			if(!access.getId().equals(cid))
 			{
 				throw new IllegalStateException("Must be request for access of component that received remote execution message.");				
 			}
@@ -1714,11 +1714,11 @@ public class RemoteReferenceModule
 			{
 				// Hack!!! Should not need class loader at all?
 				// getType0 required, cf. ServiceCallTest (why wrong class loader?)
-				Class<?> serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType0();
+				Class<?> serviceinterface = ((IService)object).getId().getServiceType().getType0();
 				if(serviceinterface==null)
 				{
 					// getType(cl) required, cf. RemoteReferenceTest (remote proxy with only typename) -> use ClassInfo in ProxyInfo instead of Class<?>
-					serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
+					serviceinterface = ((IService)object).getId().getServiceType().getType(cl);
 				}
 				assert serviceinterface!=null;
 				if(!ret.contains(serviceinterface))

@@ -244,7 +244,7 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 				final Future<Void> ret = new Future<>();
 				ServiceQuery<IService> query = new ServiceQuery<>((Class<IService>)null);//, Binding.SCOPE_PLATFORM, null, null,	ViewableFilter.VIEWABLE_FILTER);
 				ITerminableIntermediateFuture<IService> services = ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
-//				ISubscriptionIntermediateFuture services = registry.searchServicesAsync(null, extAcc.getIdentifier(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
+//				ISubscriptionIntermediateFuture services = registry.searchServicesAsync(null, extAcc.getId(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
 
 				services.addResultListener(new IntermediateExceptionDelegationResultListener<IService, Void>(ret) {
 

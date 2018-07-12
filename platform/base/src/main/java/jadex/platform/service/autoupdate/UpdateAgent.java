@@ -169,7 +169,7 @@ public class UpdateAgent implements IUpdateService
 										
 										public void resultAvailable(String newversion)
 										{
-											String text	= "Shutting down old platform "+agent.getIdentifier().getRoot()
+											String text	= "Shutting down old platform "+agent.getId().getRoot()
 													+" ("+getLocalVersionInfo()+") for new platform "+newcid+" ("+newversion+")";
 											
 											notifyUpdateResult(text)
@@ -178,7 +178,7 @@ public class UpdateAgent implements IUpdateService
 												public void resultAvailable(Void result) 
 												{
 													// Kill platform.
-													cms.destroyComponent(agent.getIdentifier().getRoot());	
+													cms.destroyComponent(agent.getId().getRoot());	
 												}
 												
 												public void exceptionOccurred(Exception exception) 
@@ -192,7 +192,7 @@ public class UpdateAgent implements IUpdateService
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									String text	= "Update of platform "+agent.getIdentifier().getRoot()
+									String text	= "Update of platform "+agent.getId().getRoot()
 											+" ("+getLocalVersionInfo()+") failed due to "+exception;
 									
 									notifyUpdateResult(text)
@@ -351,7 +351,7 @@ public class UpdateAgent implements IUpdateService
 			public void customResultAvailable(IChatGuiService chatser)
 			{
 				// Only wait 2 secs for sending status before continuing.
-				chatser.message(agent.getIdentifier().getName()+": "+text, null, true)
+				chatser.message(agent.getId().getName()+": "+text, null, true)
 					.addResultListener(new TimeoutResultListener<Collection<IChatService>>(2000, agent.getExternalAccess(),
 					new IResultListener<Collection<IChatService>>()
 				{
@@ -443,7 +443,7 @@ public class UpdateAgent implements IUpdateService
 		// todo: create new classpath for new version 
 		
 		Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();//new HashMap<String, Object>();
-		args.put("creator", agent.getIdentifier());
+		args.put("creator", agent.getId());
 		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 //		String argsstr = JavaWriter.objectToXML(args, null);
 		argsstr = argsstr.replaceAll("\"", "\\\\\"");
@@ -467,7 +467,7 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				IComponentIdentifier cid = result.getIdentifier();
+				IComponentIdentifier cid = result.getId();
 				ret.setResult(cid);
 //				acknowledgeUpdate(cid.getRoot());
 			}
@@ -545,7 +545,7 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.getExternalAccess(agent.getIdentifier().getRoot())
+				cms.getExternalAccess(agent.getId().getRoot())
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
 				{
 					public void customResultAvailable(IExternalAccess plat)

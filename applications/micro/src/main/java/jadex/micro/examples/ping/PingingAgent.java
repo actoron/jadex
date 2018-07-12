@@ -79,7 +79,7 @@ public class PingingAgent
 				}
 				else
 				{
-					String convid = SUtil.createUniqueId(agent.getIdentifier().getName());
+					String convid = SUtil.createUniqueId(agent.getId().getName());
 					Map<String, Object> msg = new HashMap<String, Object>();
 					msg.put(SFipa.CONTENT, content);
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
@@ -97,7 +97,7 @@ public class PingingAgent
 		
 		if(receiver==null)
 		{
-			receiver = new BasicComponentIdentifier("Ping", agent.getIdentifier().getParent());
+			receiver = new BasicComponentIdentifier("Ping", agent.getId().getParent());
 		}
 //			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 //			{

@@ -101,7 +101,7 @@ public class MessagePerformanceAgent
 				final int msgsize = ((Integer)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("size")).intValue();
 				boolean auto = ((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("auto")).booleanValue();
 				IComponentIdentifier receiver = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("echo")!=null
-					? (IComponentIdentifier)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("echo") : agent.getIdentifier();
+					? (IComponentIdentifier)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("echo") : agent.getId();
 				final boolean usecodec = ((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("codec")).booleanValue();
 				
 				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(msgcnt, true, new IResultListener<Void>()
@@ -235,7 +235,7 @@ public class MessagePerformanceAgent
 //			{
 //				public void resultAvailable(IEchoService result)
 //				{
-//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//					ret.setResult(((IService)result).getId().getProviderId());
 //				}
 //				
 //				public void exceptionOccurred(Exception exception)

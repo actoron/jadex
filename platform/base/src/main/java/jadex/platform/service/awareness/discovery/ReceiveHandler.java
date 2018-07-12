@@ -130,7 +130,7 @@ public abstract class ReceiveHandler
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												agent.getMicroAgent().getLogger().warning("Could not execute receive step: "+agent.getMicroAgent().getIdentifier());
+												agent.getMicroAgent().getLogger().warning("Could not execute receive step: "+agent.getMicroAgent().getId());
 											}
 										});
 									}

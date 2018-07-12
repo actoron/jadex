@@ -146,7 +146,7 @@ public class WatchdogAgent	implements IWatchdogService
 	 */
 	public String	getInfo()
 	{
-		return agent.getIdentifier().getName();
+		return agent.getId().getName();
 	}
 	
 	/**

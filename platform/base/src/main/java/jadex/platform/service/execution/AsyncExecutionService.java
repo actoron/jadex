@@ -67,7 +67,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public AsyncExecutionService(IInternalAccess component, Map<String, Object> properties)//, int max)
 	{
-		super(component.getIdentifier(), IExecutionService.class, properties);
+		super(component.getId(), IExecutionService.class, properties);
 
 		this.component = component;
 		this.executors	= SCollection.createHashMap();
@@ -155,7 +155,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				// Hack!!! Skip shutdown of platform executor for "boot unstrapping" -> executor will finish after no more steps
 				public IFuture<Void> shutdown()
 				{
-					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getIdentifier().equals(getServiceIdentifier().getProviderId()))
+					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getId().equals(getId().getProviderId()))
 					{
 						return IFuture.DONE;
 					}

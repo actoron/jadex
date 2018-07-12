@@ -166,7 +166,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public String getAgentName()
 	{
-		return agent.getIdentifier().getLocalName();
+		return agent.getId().getLocalName();
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return agent.getIdentifier();
+		return agent.getId();
 	}
 
 	/**

@@ -93,7 +93,7 @@ public class UserAgent
 		{
 			public void customResultAvailable(final IServicePoolService sps)
 			{
-//				if(!agent.getComponentIdentifier().equals(((IService)sps).getServiceIdentifier().getProviderId().getParent()))
+//				if(!agent.getComponentIdentifier().equals(((IService)sps).getId().getProviderId().getParent()))
 //					System.out.println("gasjjjjjjjashjfha");
 				
 				sps.addServiceType(IAService.class, new DefaultPoolStrategy(5, 35000, 10), "jadex.platform.service.servicepool.example.AAgent.class")

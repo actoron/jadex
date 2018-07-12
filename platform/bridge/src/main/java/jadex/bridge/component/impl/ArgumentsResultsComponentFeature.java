@@ -84,7 +84,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		}
 		
 		// Get the reverse name (agent1@app1.plat1 -> app1.agent1.<argname>)
-		IComponentIdentifier cid = getComponent().getIdentifier();
+		IComponentIdentifier cid = getComponent().getId();
 		String dotname = cid.getDotName();
 		int idx = dotname.lastIndexOf(".");
 		if(idx!=-1)
@@ -93,7 +93,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			dotname = getReverseName(dotname);
 		}
 		
-		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getIdentifier().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
+		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getId().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
 		if(platformargs!=null)
 		{
 			IArgument[] margs = component.getModel().getArguments();
@@ -165,7 +165,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				postEvent(key, newvalue);
 			}
 		};
-		results.put(IComponentIdentifier.RESULTCID, getComponent().getIdentifier());
+		results.put(IComponentIdentifier.RESULTCID, getComponent().getId());
 		
 		initDefaultResults();
 

@@ -9,6 +9,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Peer registry synchronization agent. 
  */
-@Agent
+@Agent(autostart=Boolean3.FALSE, autostartname="peer")
 @ProvidedServices(@ProvidedService(type=IPeerRegistrySynchronizationService.class, implementation=@Implementation(PeerRegistrySynchronizationService.class)))
 //@Properties(value=@NameValue(name="system", value="true"))
 public class PeerRegistrySynchronizationAgent
@@ -41,7 +42,7 @@ public class PeerRegistrySynchronizationAgent
 			if(spser!=null)
 			{
 				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-				cms.destroyComponent(((IService)spser).getServiceIdentifier().getProviderId());
+				cms.destroyComponent(((IService)spser).getId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)

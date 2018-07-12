@@ -56,7 +56,7 @@ public class TesterAgent implements ITestService
 
 		if(agent.getConfiguration().equals("created"))
 		{
-			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(agent.getIdentifier().getParent())).get();
+			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(agent.getId().getParent())).get();
 			tsa.test(0).get();
 		}
 		else
@@ -85,7 +85,7 @@ public class TesterAgent implements ITestService
 						ThreadSuspendable sus = new ThreadSuspendable();
 						
 						CreationInfo ci = new CreationInfo("created", null);
-						ci.setParent(agent.getIdentifier());
+						ci.setParent(agent.getId());
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						

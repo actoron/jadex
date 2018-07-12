@@ -209,7 +209,7 @@ public class ServicePoolManager
 				{
 //					System.out.println("wurksn3");
 					IService	service	= (IService)result;
-					if(!busy.containsKey(service.getServiceIdentifier()) && !free.containsKey(service.getServiceIdentifier()) && handler.selectService(service))
+					if(!busy.containsKey(service.getId()) && !free.containsKey(service.getId()) && handler.selectService(service))
 					{
 						addService(service);
 					}
@@ -252,7 +252,7 @@ public class ServicePoolManager
 					// If component still active, create new services when there are remaining tasks.
 					// Has to ensure that ComponentTerminatedException does not belong to underlying component.
 					if(!(exception instanceof ComponentTerminatedException && 
-						((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getIdentifier())))
+						((ComponentTerminatedException)exception).getComponentIdentifier().equals(component.getId())))
 					{
 						createServices();
 					}
@@ -278,38 +278,38 @@ public class ServicePoolManager
 	 */
 	protected void addService(final IService service)
 	{
-		assert !busy.containsKey(service.getServiceIdentifier()) && !free.containsKey(service.getServiceIdentifier()); 
+		assert !busy.containsKey(service.getId()) && !free.containsKey(service.getId()); 
 		
 		if(tasks.isEmpty())
 		{
-//			System.out.println("service free: "+service.getServiceIdentifier());
-			free.put(service.getServiceIdentifier(), service);
+//			System.out.println("service free: "+service.getId());
+			free.put(service.getId(), service);
 		}
 		else
 		{
-			busy.put(service.getServiceIdentifier(), service);
+			busy.put(service.getId(), service);
 			final Object task	=	this.tasks.keySet().iterator().next();
 			final AllocationData	ad	= (AllocationData)this.tasks.remove(task);
-//			System.out.println("started service: "+service.getServiceIdentifier()+", "+task);
+//			System.out.println("started service: "+service.getId()+", "+task);
 			
 			handler.invokeService(service, task, ad.getUserData()).addResultListener(
 				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-//					System.out.println("service finished: "+service.getServiceIdentifier()+", "+task);
+//					System.out.println("service finished: "+service.getId()+", "+task);
 					
 					// Add result of task execution.
 					ad.taskFinished(result);
 					
 					// Invoke service again, if there are more tasks.
-					busy.remove(service.getServiceIdentifier());
+					busy.remove(service.getId());
 					addService(service);
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//					System.out.println("service failed: "+service.getServiceIdentifier()+", "+task);
+//					System.out.println("service failed: "+service.getId()+", "+task);
 					
 					if(ad.isRetry())
 					{
@@ -324,7 +324,7 @@ public class ServicePoolManager
 					}
 					
 					// Remove service on failure and do not continue working on tasks with it.
-					busy.remove(service.getServiceIdentifier());
+					busy.remove(service.getId());
 				}
 			}));
 		}
@@ -344,11 +344,11 @@ public class ServicePoolManager
 				public void resultAvailable(Object result)
 				{
 					creating	= false;
-//					System.out.println("created service: "+((IService)result).getServiceIdentifier());
+//					System.out.println("created service: "+((IService)result).getId());
 					
 					// Add if not already found by concurrent search.
 					IService	service	= (IService)result;
-					if(!busy.containsKey(service.getServiceIdentifier()) && !free.containsKey(service.getServiceIdentifier()))
+					if(!busy.containsKey(service.getId()) && !free.containsKey(service.getId()))
 						addService((IService)result);
 					
 					// Create more services, if needed.

@@ -233,7 +233,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	@Override
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
-		this.platformId = platform.getIdentifier();
+		this.platformId = platform.getId();
 	}
 	
 

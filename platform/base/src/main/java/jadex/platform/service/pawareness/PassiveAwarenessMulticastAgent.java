@@ -157,7 +157,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 				{
 					// TODO: timeout from service call
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(Starter.getRemoteDefaultTimeout(agent.getIdentifier()), true)
+						.waitForDelay(Starter.getRemoteDefaultTimeout(agent.getId()), true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override
@@ -266,7 +266,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 					if(addresses!=null && !addresses.isEmpty())
 					{
 						IComponentIdentifier	sender	= addresses.iterator().next().getPlatformId();
-						if(!agent.getIdentifier().getRoot().equals(sender))
+						if(!agent.getId().getRoot().equals(sender))
 						{
 							agent.getLogger().info("discovered: " + addresses);
 							agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()

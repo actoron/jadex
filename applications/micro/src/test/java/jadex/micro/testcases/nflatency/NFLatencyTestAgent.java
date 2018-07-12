@@ -85,7 +85,7 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		performTest(agent.getIdentifier().getRoot(), testno, true)
+		performTest(agent.getId().getRoot(), testno, true)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
@@ -119,7 +119,7 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
 							{
-								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getIdentifier()}));
+								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getId()}));
 								cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
 									new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
 		//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
@@ -213,7 +213,7 @@ public class NFLatencyTestAgent extends TestAgent
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)
 			{
-				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
+				if(cid.equals(((IService)result).getId().getProviderId()))
 				{
 					called = true;
 					callService(result);
@@ -251,7 +251,7 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							MethodInfo mi = new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class}));
 							System.out.println("service: "+ts);
-							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getServiceIdentifier(), mi, LatencyProperty.NAME).get();
+							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getId(), mi, LatencyProperty.NAME).get();
 //							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 //							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 							System.out.println("latency: "+lat);

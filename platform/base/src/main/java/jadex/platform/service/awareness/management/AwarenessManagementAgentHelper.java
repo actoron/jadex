@@ -69,7 +69,7 @@ public class AwarenessManagementAgentHelper
 							IExternalAccess exta = it.next();
 							if(type.equals(exta.getLocalType()))
 							{
-								found = exta.getIdentifier();
+								found = exta.getId();
 								break;
 							}
 						}
@@ -82,7 +82,7 @@ public class AwarenessManagementAgentHelper
 							{
 								public void customResultAvailable(IComponentManagementService cms)
 								{
-									CreationInfo info = new CreationInfo(ia.getIdentifier());
+									CreationInfo info = new CreationInfo(ia.getId());
 									cms.createComponent(null, type, info, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 									{
 										public void customResultAvailable(IComponentIdentifier result)
@@ -299,7 +299,7 @@ public class AwarenessManagementAgentHelper
 				{
 					final IComponentManagementService cms = (IComponentManagementService)result;
 
-					cms.getChildren(component.getIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+					cms.getChildren(component.getId()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier[] children)
 						{

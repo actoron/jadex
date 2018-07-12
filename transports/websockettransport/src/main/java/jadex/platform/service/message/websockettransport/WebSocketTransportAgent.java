@@ -5,7 +5,9 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -16,6 +18,7 @@ import jadex.platform.service.transport.ITransport;
  *  Agent implementing the web socket transport.
  *
  */
+@Agent(autostart=Boolean3.TRUE, autostartname="ws")
 public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketConnection>
 {
 	/** Maximum size of websocket frame payloads. */

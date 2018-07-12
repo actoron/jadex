@@ -64,7 +64,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 //			{
 //				ongoing++;
 //				
-//				if(!((IService)ss).getServiceIdentifier().equals(secser.getServiceIdentifier()))
+//				if(!((IService)ss).getId().equals(secser.getServiceIdentifier()))
 //				{
 //					ss.getPlatformCertificate(cid).addResultListener(new IResultListener<Certificate>()
 //					{

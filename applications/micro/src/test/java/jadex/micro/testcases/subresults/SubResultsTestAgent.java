@@ -43,7 +43,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 	public void body()
 	{
 		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getIdentifier())).getFirstResult();
+		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getId())).getFirstResult();
 		IExternalAccess ea = cms.getExternalAccess(cid).get();
 		
 		final TestReport tr = new TestReport("#1", "Test if intermediate results are retrieved.");

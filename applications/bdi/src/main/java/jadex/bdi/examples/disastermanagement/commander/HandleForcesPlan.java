@@ -41,7 +41,7 @@ public abstract class HandleForcesPlan extends Plan
 				while(number>getParameterSet("units").size() && it.hasNext())
 				{
 					final IService force = (IService)it.next();
-					final Object provid = force.getServiceIdentifier().getProviderId();
+					final Object provid = force.getId().getProviderId();
 					if(!busy.containsFact(provid))
 					{
 //						as++;
@@ -65,7 +65,7 @@ public abstract class HandleForcesPlan extends Plan
 							public void exceptionOccurred(Exception exception)
 							{
 //								exception.printStackTrace();
-//								System.out.println("keeping unit busy, goal failed: " + force.getServiceIdentifier().getProviderId() + " " + exception.getMessage());
+//								System.out.println("keeping unit busy, goal failed: " + force.getId().getProviderId() + " " + exception.getMessage());
 								getParameterSet("units").removeValue(force);
 								busy.removeFact(provid);
 //								exception.printStackTrace();
@@ -133,7 +133,7 @@ public abstract class HandleForcesPlan extends Plan
 //				while(number>getParameterSet("units").size() && it.hasNext())
 //				{
 //					final IService force = (IService)it.next();
-//					final Object provid = force.getServiceIdentifier().getProviderId();
+//					final Object provid = force.getId().getProviderId();
 //					if(!busy.containsFact(provid))
 //					{
 //						as++;

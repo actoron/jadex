@@ -104,7 +104,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 		{
 			public void customResultAvailable(final IService ser) 
 			{
-//				System.out.println("invoking on: "+ser.getServiceIdentifier()+" "+cnt);
+//				System.out.println("invoking on: "+ser.getId()+" "+cnt);
 				try
 				{
 					final Object res = sic.getMethod().invoke(ser, sic.getArgumentArray());
@@ -140,7 +140,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getServiceIdentifier(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+										invoke(ser.getId(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 									else
 									{
@@ -188,7 +188,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getServiceIdentifier(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+										invoke(ser.getId(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 									else
 									{
@@ -256,7 +256,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 				ser = (IService)service;
 			}
 			
-//			if(ser.getServiceIdentifier().getServiceType().getTypeName().indexOf("ITestService")!=-1)
+//			if(ser.getId().getServiceType().getTypeName().indexOf("ITestService")!=-1)
 //				System.out.println("reached");
 			
 			Class<ITargetResolver> cl = (Class<ITargetResolver>)ser.getPropertyMap().get(ITargetResolver.TARGETRESOLVER);
@@ -347,7 +347,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getServiceIdentifier(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+										invoke(ser.getId(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
 									}
 									else
 									{
@@ -383,7 +383,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getServiceIdentifier(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+										invoke(ser.getId(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
 									}
 									else
 									{

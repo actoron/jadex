@@ -82,7 +82,7 @@ public class ServiceQueryCommand extends ACliCommand
 				final String[] tags = (String[])args.get("-tags");
 				
 				if(owner==null)
-					owner = ia.getIdentifier().getRoot();
+					owner = ia.getId().getRoot();
 				
 				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, owner, null).setProvider(provider);
 				if(tags!=null)
@@ -159,7 +159,7 @@ public class ServiceQueryCommand extends ACliCommand
 				{
 					for(IService s: c)
 					{
-						buf.append(s.getServiceIdentifier()).append(SUtil.LF);
+						buf.append(s.getId()).append(SUtil.LF);
 					}
 				}
 				

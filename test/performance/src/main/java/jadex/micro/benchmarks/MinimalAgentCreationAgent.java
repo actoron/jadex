@@ -125,8 +125,8 @@ public class MinimalAgentCreationAgent
 //				System.out.println("Args: "+num+" "+args);
 
 			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-			cms.createComponent(createPeerName(num+1, agent.getIdentifier()), MinimalAgentCreationAgent.this.getClass().getName()+".class",
-				new CreationInfo(null, args, nested ? agent.getIdentifier() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
+			cms.createComponent(createPeerName(num+1, agent.getId()), MinimalAgentCreationAgent.this.getClass().getName()+".class",
+				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
 		}
 		else
 		{
@@ -161,8 +161,8 @@ public class MinimalAgentCreationAgent
 //				else
 			{
 				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-				String	initial	= createPeerName(1, agent.getIdentifier());
-				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getIdentifier().getRoot());
+				String	initial	= createPeerName(1, agent.getId());
+				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
 				cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
@@ -208,10 +208,10 @@ public class MinimalAgentCreationAgent
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera, final int max, final boolean nested)
 	{
-		final String name = createPeerName(cnt, agent.getIdentifier());
+		final String name = createPeerName(cnt, agent.getId());
 //			System.out.println("Destroying peer: "+name);
 		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
 		cms.destroyComponent(aid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> results)

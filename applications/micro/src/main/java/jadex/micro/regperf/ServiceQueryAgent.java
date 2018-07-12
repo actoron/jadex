@@ -59,14 +59,14 @@ public class ServiceQueryAgent
 					
 					public void intermediateResultAvailable(IExampleService result)
 					{
-						plats.add(((IService)result).getServiceIdentifier().getProviderId().getRoot());
+						plats.add(((IService)result).getId().getProviderId().getRoot());
 						cnt++;
 					}
 					
 					public void finished()
 					{
 						long end = System.currentTimeMillis();
-						System.out.println(agent.getIdentifier()+" found services: "+cnt+" took ms: "+(end-start)+" "+plats);
+						System.out.println(agent.getId()+" found services: "+cnt+" took ms: "+(end-start)+" "+plats);
 						cnt = 0;
 					}
 				});

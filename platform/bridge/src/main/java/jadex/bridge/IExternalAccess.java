@@ -46,7 +46,7 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getIdentifier();
+	public IComponentIdentifier	getId();
 	
 //	/**
 //	 *  Get the id of the component including addresses.

@@ -188,7 +188,7 @@ public class IntraVMDiscoveryAgent implements IDiscoveryService
 	 */
 	protected AwarenessInfo getAwarenessInfo()
 	{
-		IComponentIdentifier root = agent.getIdentifier().getRoot();
+		IComponentIdentifier root = agent.getId().getRoot();
 		List<TransportAddress> addr = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class)).getAddresses().get();
 		AwarenessInfo info = new AwarenessInfo(root, addr, running ? AwarenessInfo.STATE_ONLINE : AwarenessInfo.STATE_OFFLINE, Timeout.NONE, null, null, null, "IntraVM");
 		return info;

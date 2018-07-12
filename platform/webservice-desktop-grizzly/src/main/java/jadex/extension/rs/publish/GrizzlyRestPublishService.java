@@ -75,7 +75,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
             HttpServer server = (HttpServer)getHttpServer(uri, info);
             System.out.println("Adding http handler to server: "+uri.getPath());
 
-            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
+            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getId(), info);
 
         	HttpHandler handler = new HttpHandler()
 			{
@@ -137,7 +137,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
 
             if(sidservers==null)
                 sidservers = new HashMap<IServiceIdentifier, HttpServer>();
-            sidservers.put(service.getServiceIdentifier(), server);
+            sidservers.put(service.getId(), server);
         }
         catch(Exception e)
         {

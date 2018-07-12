@@ -70,7 +70,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Map properties, Boolean simulation)
 	{
-		super(component.getIdentifier(), IClockService.class, properties);
+		super(component.getId(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
 		this.component = component;
@@ -348,7 +348,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 //							{
 //								// No settings service: ignore.
 //								ret.setResult(null);
-////								ret.setResult(getServiceIdentifier());
+////								ret.setResult(getId());
 //							}
 //						});
 					}

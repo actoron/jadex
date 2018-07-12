@@ -23,6 +23,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -50,7 +51,7 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent
+@Agent(autostart=Boolean3.TRUE)
 @Service
 @Arguments(
 {
@@ -392,7 +393,7 @@ public class CliAgent implements ICliService, IInternalCliService
 		if(tup==null)
 		{
 //			System.out.println("created new shell for session: "+sessionid);
-			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getIdentifier().getRoot().getName(), sessionid, agent.getClassLoader());
+			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getId().getRoot().getName(), sessionid, agent.getClassLoader());
 			shell.addAllCommandsFromClassPath(); // agent.getClassLoader()
 			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, Long.valueOf(System.currentTimeMillis())));
 		}

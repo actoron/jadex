@@ -153,7 +153,7 @@ public class BrokenTestAgent extends JunitAgentTest
 					}
 				};
 				
-				cms.createComponent(null, model, new CreationInfo(agent.getIdentifier()), lis)
+				cms.createComponent(null, model, new CreationInfo(agent.getId()), lis)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)

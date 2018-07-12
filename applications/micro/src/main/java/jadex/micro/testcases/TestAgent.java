@@ -230,8 +230,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 			{
 //				IResourceIdentifier	rid	= new ResourceIdentifier(
 //					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-				boolean	local = root.equals(agent.getIdentifier().getRoot());
-				CreationInfo ci	= new CreationInfo(local? agent.getIdentifier(): root, agent.getModel().getResourceIdentifier());
+				boolean	local = root.equals(agent.getId().getRoot());
+				CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
 				ci.setArguments(args);
 				ci.setConfiguration(config);
 				ITuple2Future<IComponentIdentifier,Map<String,Object>> cmsfut = cms.createComponent(null, filename, ci);
@@ -270,8 +270,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 			{
 //					IResourceIdentifier	rid	= new ResourceIdentifier(
 //						new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-				boolean	local = root.equals(agent.getIdentifier().getRoot());
-				CreationInfo ci	= new CreationInfo(local? agent.getIdentifier(): root, agent.getModel().getResourceIdentifier());
+				boolean	local = root.equals(agent.getId().getRoot());
+				CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
 				ci.setArguments(args);
 				ci.setConfiguration(config);
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> cmsfut = cms.createComponent(null, filename, ci);
@@ -318,7 +318,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 */
 	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename,  IResultListener<Map<String,Object>> reslis)
 	{
-		return createComponent(filename, agent.getIdentifier().getRoot(), reslis);
+		return createComponent(filename, agent.getId().getRoot(), reslis);
 	}
 	
 	/**
@@ -339,7 +339,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 //                {
 //                    public void customResultAvailable(ITransportComponentIdentifier cid)
 //                    {
-						createComponent(filename, null, config, exta.getIdentifier(), reslis)
+						createComponent(filename, null, config, exta.getId(), reslis)
 							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 //                    }
 //                });

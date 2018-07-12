@@ -246,11 +246,11 @@ public class RestWebSocket extends Endpoint
 					
 					if(val instanceof IService)
 					{
-						cid = ((IService)val).getServiceIdentifier().getProviderId();
+						cid = ((IService)val).getId().getProviderId();
 					}				
 					else if(val instanceof IExternalAccess)
 					{
-						cid = ((IExternalAccess)val).getIdentifier();
+						cid = ((IExternalAccess)val).getId();
 					}
 					else if(val instanceof IComponentIdentifier)
 					{
@@ -265,7 +265,7 @@ public class RestWebSocket extends Endpoint
 					{
 						IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 						cms.destroyComponent(cid);
-						System.out.println("Killing session component: "+((IService)val).getServiceIdentifier().getProviderId());
+						System.out.println("Killing session component: "+((IService)val).getId().getProviderId());
 					}
 				}
 			}
@@ -405,7 +405,7 @@ public class RestWebSocket extends Endpoint
 					{
 						public void intermediateResultAvailable(IService service)
 						{
-							System.out.println("Found service: "+service.getServiceIdentifier());
+							System.out.println("Found service: "+service.getId());
 //							addService(service);
 							// End of call with finished() thus no addResultListener()
 							sendResult(service, ssc.getCallid(), session, false);//.addResultListener(new DelegationResultListener<String>(ret));
@@ -487,7 +487,7 @@ public class RestWebSocket extends Endpoint
 					{
 						// todo: fundamental problem class loader.
 						// Only the target component should need to know the service classes
-						Class<?> serclazz = service.getServiceIdentifier().getServiceType().getType(RestWebSocket.class.getClassLoader());
+						Class<?> serclazz = service.getId().getServiceType().getType(RestWebSocket.class.getClassLoader());
 
 						// decoded parameters
 						Object[] decparams = new Object[sim.getParameterValues().length];
@@ -803,7 +803,7 @@ public class RestWebSocket extends Endpoint
 							public void customResultAvailable(Void result) throws Exception
 							{
 								IService ser = (IService)ia.getFeature(IProvidedServicesFeature.class).getProvidedService(sertype);
-								final IServiceIdentifier sid = ser.getServiceIdentifier();
+								final IServiceIdentifier sid = ser.getId();
 								mysid[0] = sid;
 
 								String[] tags = spm.getTags();

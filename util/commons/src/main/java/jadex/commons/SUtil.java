@@ -5853,6 +5853,23 @@ public class SUtil
 	}
 	
 	/**
+	 *  Find index of last upper case letter.
+	 *  @param str The string.
+	 *  @return The index (or -1).
+	 */
+	public static int inndexOfLastUpperCaseCharacter(String str) 
+	{        
+	    for(int i=str.length()-1; i>=0; i--) 
+	    {
+	        if(Character.isUpperCase(str.charAt(i))) 
+	        {
+	            return i;
+	        }
+	    }
+	    return -1;
+	}
+	
+	/**
 	 *  Tests if the OS is Windows.
 	 *  @return True, if Windows.
 	 */

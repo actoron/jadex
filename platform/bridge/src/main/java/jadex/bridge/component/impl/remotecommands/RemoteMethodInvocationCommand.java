@@ -113,7 +113,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			if(sid.getProviderId().equals(access.getIdentifier()))
+			if(sid.getProviderId().equals(access.getId()))
 			{
 				try
 				{
@@ -139,13 +139,13 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			}
 			else
 			{
-				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getIdentifier()+", "+sid));
+				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getId()+", "+sid));
 			}
 		}
 		else if(target instanceof IComponentIdentifier)
 		{
 			IComponentIdentifier	cid	= (IComponentIdentifier)target;
-			if(cid.equals(access.getIdentifier()))
+			if(cid.equals(access.getId()))
 			{
 				try
 				{
@@ -159,7 +159,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			}
 			else
 			{
-				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getIdentifier()+", "+cid));
+				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getId()+", "+cid));
 			}			
 		}
 		

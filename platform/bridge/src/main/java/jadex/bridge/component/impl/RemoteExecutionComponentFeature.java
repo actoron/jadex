@@ -126,7 +126,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		final String rxid = SUtil.createUniqueId("");
 //		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
-		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getIdentifier());
+		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getId());
 		
 		// TODO: Merge with DecouplingInterceptor code.
 		@SuppressWarnings("unchecked")
@@ -335,15 +335,16 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					ServiceCall	sc	= null;
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
-						Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)cmd).getProperties();
+						// Create new hashmap to prevent remote manipulation of the map object
+						Map<String, Object>	nonfunc	= new HashMap<>(SUtil.safeMap(((AbstractInternalRemoteCommand)cmd).getProperties()));
 //						if(nonfunc==null)
 //							nonfunc = new HashMap<String, Object>();
-//						nonfunc.put("securityinfo", secinfos);
+						nonfunc.put(ServiceCall.SECURITY_INFOS, secinfos);
 						IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
 						// Local is used to set the caller in the new service call context
 						sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
 						// After call creation it can be reset
-						IComponentIdentifier.LOCAL.set(getComponent().getIdentifier());
+						IComponentIdentifier.LOCAL.set(getComponent().getId());
 					}
 					final ServiceCall	fsc	= sc;
 					
@@ -473,21 +474,20 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					{
 						if(msg instanceof AbstractInternalRemoteCommand)
 						{
-							Map<String, Object>	nonfunc	= ((AbstractInternalRemoteCommand)msg).getProperties();
-							if(nonfunc!=null)
+							// Create new hashmap to prevent remote manipulation of the map object
+							Map<String, Object>	nonfunc	= new HashMap(SUtil.safeMap(((AbstractInternalRemoteCommand)msg).getProperties()));
+							nonfunc.put(ServiceCall.SECURITY_INFOS, secinfos);
+							ServiceCall sc = ServiceCall.getLastInvocation();
+							if(sc==null)
 							{
-								ServiceCall sc = ServiceCall.getLastInvocation();
-								if(sc==null)
+								// TODO: why null?
+								sc	= CallAccess.createServiceCall((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), nonfunc);
+							}
+							else
+							{
+								for(String name: nonfunc.keySet())
 								{
-									// TODO: why null?
-									sc	= CallAccess.createServiceCall((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), nonfunc);
-								}
-								else
-								{
-									for(String name: nonfunc.keySet())
-									{
-										sc.setProperty(name, nonfunc.get(name));
-									}
+									sc.setProperty(name, nonfunc.get(name));
 								}
 							}
 						}

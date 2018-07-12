@@ -195,7 +195,7 @@ public abstract class TestAgent
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{
 //			"-libpath", url,
-			"-platformname", agent.getIdentifier().getPlatformPrefix()+"_*",
+			"-platformname", agent.getId().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",
@@ -267,7 +267,7 @@ public abstract class TestAgent
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 //				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-				CreationInfo ci	= new CreationInfo(root==null? agent.getIdentifier(): root, rid);
+				CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
 				ci.setArguments(args);
 				ci.setConfiguration(config);
 				cms.createComponent(null, filename, ci, reslis)
@@ -315,7 +315,7 @@ public abstract class TestAgent
 	 */
 	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
 	{
-		return createComponent(filename, agent.getIdentifier().getRoot(), reslis);
+		return createComponent(filename, agent.getId().getRoot(), reslis);
 	}
 	
 	/**
@@ -369,7 +369,7 @@ public abstract class TestAgent
 							{
 								if(filename!=null)
 								{
-									createComponent(filename, null, config, exta.getIdentifier(), reslis)
+									createComponent(filename, null, config, exta.getId(), reslis)
 										.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 								}
 								else

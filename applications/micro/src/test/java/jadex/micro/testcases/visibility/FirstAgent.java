@@ -53,7 +53,7 @@ public class FirstAgent
 			Iterator<IMessageService> it = services.iterator();
 			for(int i=0; i<services.size(); i++)
 			{
-				res[i] = ((IService)it.next()).getServiceIdentifier();
+				res[i] = ((IService)it.next()).getId();
 			}
 			ia.getFeature(IArgumentsResultsFeature.class).getResults().put("found", res);
 			if(selfkill)

@@ -40,7 +40,7 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	public IFuture<Void> start()
 	{
 		serviceregistry = (ServiceRegistry) ServiceRegistry.getRegistry(ia);
-		platformid = ia.getIdentifier().getRoot();
+		platformid = ia.getId().getRoot();
 		return IFuture.DONE;
 	}
 	

@@ -94,7 +94,7 @@ public class ParallelAgentCreationAgent
 											{
 												String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-												final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getIdentifier().getRoot());
+												final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getId().getRoot());
 												cms.destroyComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
 												{
 													public void resultAvailable(Map<String, Object> result)
@@ -206,7 +206,7 @@ public class ParallelAgentCreationAgent
 	 */
 	protected String createPeerName(int num)
 	{
-		return agent.getIdentifier().getLocalName() + "Peer_#" + num;
+		return agent.getId().getLocalName() + "Peer_#" + num;
 	}
 	
 //	/**

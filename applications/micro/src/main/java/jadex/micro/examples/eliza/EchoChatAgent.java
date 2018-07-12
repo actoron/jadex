@@ -74,7 +74,7 @@ public class EchoChatAgent
 //		{
 //		}
 		
-		final IComponentIdentifier	self = ((IService)chat).getServiceIdentifier().getProviderId();
+		final IComponentIdentifier	self = ((IService)chat).getId().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)

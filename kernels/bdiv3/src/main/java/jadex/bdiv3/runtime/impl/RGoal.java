@@ -1420,7 +1420,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(getAgent().getIdentifier());
+			mev.setSourceIdentifier(getAgent().getId());
 			mev.setTime(time);
 			
 			GoalInfo info = GoalInfo.createGoalInfo(this);

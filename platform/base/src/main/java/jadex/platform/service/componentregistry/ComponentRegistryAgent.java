@@ -30,6 +30,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
@@ -52,7 +53,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The component registry is a component for creating proxy services.
  *  Real services/components are created on demand on service call.
  */
-@Agent
+@Agent(autostart=Boolean3.FALSE, autostartname="serviceproxy")
 @Service
 @Imports("jadex.bridge.service.types.cms.*")
 @Arguments(
@@ -185,7 +186,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
 	        		                            	{
 	        		                            		@SuppressWarnings("unchecked")
-														IFuture<IService> fut = (IFuture<IService>)exta.searchService( new ServiceQuery<>(servicetype).setProvider(exta.getIdentifier()));
+														IFuture<IService> fut = (IFuture<IService>)exta.searchService( new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
 	        											{
 	        		                        				public void customResultAvailable(IService service) throws Exception
@@ -199,7 +200,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            
 	        		                            return ret;
 	        	                            }
-	        	                            else if(method.getName().equals("getServiceIdentifier"))
+	        	                            else if(method.getName().equals("getId"))
 	        	                            {
 	        	                            	return fsid;
 	        	                            }
@@ -211,7 +212,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getIdentifier()));
+	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
@@ -269,7 +270,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         	components.put(info.getFilename(), ret);
             final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
-            	info.setParent(agent.getIdentifier());
+            	info.setParent(agent.getId());
             cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)

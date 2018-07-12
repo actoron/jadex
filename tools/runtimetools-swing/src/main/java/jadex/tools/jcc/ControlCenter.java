@@ -103,7 +103,7 @@ public class ControlCenter
 		this.window = new ControlCenterWindow(this);
 		
 		this.pcc	= new PlatformControlCenter();
-		pccs.put(platformaccess.getIdentifier(), pcc);
+		pccs.put(platformaccess.getId(), pcc);
 		pcc.init(platformaccess, ControlCenter.this, plugin_classes)
 			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -134,7 +134,7 @@ public class ControlCenter
 	public IFuture<Void>	loadSettings()
 	{
 		// Only load GUI settings as platform settings are loaded on platform startup and every tool init as required.
-		return loadSettings(new File(jccaccess.getIdentifier().getLocalName() + SETTINGS_EXTENSION));
+		return loadSettings(new File(jccaccess.getId().getLocalName() + SETTINGS_EXTENSION));
 	}
 	
 	/**
@@ -213,7 +213,7 @@ public class ControlCenter
 		final Future<Void>	ret	= new Future<Void>();
 //		System.out.println("Saving JCC settings");
 		// Save settings of GUI and currently selected platform (todo: all platforms?)
-		saveSettings(new File(jccaccess.getIdentifier().getLocalName() + SETTINGS_EXTENSION))
+		saveSettings(new File(jccaccess.getId().getLocalName() + SETTINGS_EXTENSION))
 			.addResultListener(new SwingDelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -528,14 +528,14 @@ public class ControlCenter
 	public void	showPlatform(IExternalAccess platformaccess)
 	{
 		final Future	newpcc	= new Future();
-		if(pccs.containsKey(platformaccess.getIdentifier()))
+		if(pccs.containsKey(platformaccess.getId()))
 		{
-			newpcc.setResult(pccs.get(platformaccess.getIdentifier()));
+			newpcc.setResult(pccs.get(platformaccess.getId()));
 		}
 		else
 		{
 			final PlatformControlCenter	tmp	= new PlatformControlCenter();
-			pccs.put(platformaccess.getIdentifier(), tmp);
+			pccs.put(platformaccess.getId(), tmp);
 			tmp.init(platformaccess, this, plugin_classes)
 				.addResultListener(new SwingDelegationResultListener(newpcc)
 			{
@@ -577,12 +577,12 @@ public class ControlCenter
 	 */
 	public void closePlatform(final PlatformControlCenter pcc)
 	{
-		pccs.remove(pcc.getPlatformAccess().getIdentifier());
-		window.getStatusBar().setText("Saving platform settings for: "+pcc.getPlatformAccess().getIdentifier().getPlatformName());
+		pccs.remove(pcc.getPlatformAccess().getId());
+		window.getStatusBar().setText("Saving platform settings for: "+pcc.getPlatformAccess().getId().getPlatformName());
 		window.closePlatformPanel(pcc);
 		
 		// Do not save settings when closing remote platform window
-		boolean allowed = pcc.getPlatformAccess().getIdentifier().getRoot().equals(jccaccess.getIdentifier().getRoot());
+		boolean allowed = pcc.getPlatformAccess().getId().getRoot().equals(jccaccess.getId().getRoot());
 //		System.out.println("allowed: "+allowed);
 		
 		IFuture	saved	= isSaveOnExit() && allowed? pcc.savePlatformProperties() : IFuture.DONE;
@@ -590,7 +590,7 @@ public class ControlCenter
 		{
 			public void customResultAvailable(Object result)
 			{
-				window.getStatusBar().setText("Saved platform settings for: "+pcc.getPlatformAccess().getIdentifier().getPlatformName());
+				window.getStatusBar().setText("Saved platform settings for: "+pcc.getPlatformAccess().getId().getPlatformName());
 				pcc.dispose();
 			}
 			public void customExceptionOccurred(Exception exception)

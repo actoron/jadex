@@ -205,7 +205,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 							LazyNode ln = (LazyNode)node;
 							Object o = ((LazyNode)node).getMyUserObject();
 							IResourceIdentifier parid = (IResourceIdentifier)(ln.getParent()!=null? ((LazyNode)ln.getParent()).getMyUserObject(): null);
-							final boolean rem = !jcc.getJCCAccess().getIdentifier().getRoot().equals(jcc.getPlatformAccess().getIdentifier().getRoot());
+							final boolean rem = !jcc.getJCCAccess().getId().getRoot().equals(jcc.getPlatformAccess().getId().getRoot());
 							JPopupMenu popup = new JPopupMenu();
 						
 							if(LibraryService.SYSTEMCPRID.equals(parid))
@@ -317,7 +317,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											if(obj instanceof File)
 											{
 												URL url = ((File)obj).getCanonicalFile().toURI().toURL();
-												IComponentIdentifier cid = getExternalAccess().getIdentifier().getRoot();
+												IComponentIdentifier cid = getExternalAccess().getId().getRoot();
 												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 												rid = new ResourceIdentifier(lid, null);
 											}
@@ -862,7 +862,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 						ilist.add(icons.getIcon("folder"));
 					}
 					
-					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getIdentifier().getRoot()))
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getId().getRoot()))
 					{
 						ilist.add(icons.getIcon("oglobal"));
 					}
@@ -1139,7 +1139,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					ret = lrid.getUri().toString();
 					
-					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getIdentifier().getRoot()))
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getId().getRoot()))
 					{
 						ret += " ("+((IResourceIdentifier)o).getLocalIdentifier().getComponentIdentifier()+")";
 					}

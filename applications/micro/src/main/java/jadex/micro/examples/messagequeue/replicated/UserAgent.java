@@ -54,7 +54,7 @@ public class UserAgent
 			public void intermediateResultAvailable(Event event)
 			{
 				System.out.println("Received: "
-						+ agent.getIdentifier() + " " + event);
+						+ agent.getId() + " " + event);
 			}
 
 			public void exceptionOccurred(Exception exception)
@@ -72,12 +72,12 @@ public class UserAgent
 				if(!(cnt[0] % 2 == 0))
 				{
 					// publish also remote
-					mq.publish(topic, new Event("some type", cnt[0]++, agent.getIdentifier()), true);
+					mq.publish(topic, new Event("some type", cnt[0]++, agent.getId()), true);
 				}
 				else
 				{
 					// just publish local
-					mq.publish(topic,new Event("some type", cnt[0]++, agent.getIdentifier()), false);
+					mq.publish(topic,new Event("some type", cnt[0]++, agent.getId()), false);
 				}
 				
 				if(cnt[0] < 10)

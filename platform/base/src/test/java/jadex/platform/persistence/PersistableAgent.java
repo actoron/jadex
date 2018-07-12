@@ -47,7 +47,7 @@ public class PersistableAgent
 		{
 			public void customResultAvailable(IPersistenceService result)
 			{
-				IFuture<IPersistInfo> fut = result.snapshot(agent.getIdentifier());
+				IFuture<IPersistInfo> fut = result.snapshot(agent.getId());
 				fut.addResultListener(new IResultListener<IPersistInfo>()
 				{
 					public void resultAvailable(IPersistInfo result)
