@@ -2410,36 +2410,6 @@ public class ComponentManagementService implements IComponentManagementService
 	}
 	
 	/**
-	 *  Get the parent component of a component.
-	 *  @param cid The component identifier.
-	 *  @return The parent component identifier.
-	 */
-	public IFuture<IComponentIdentifier> getParent(final IComponentIdentifier cid)
-	{
-//		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
-		
-//		if(isRemoteComponent(cid))
-//		{
-//			getRemoteCMS(cid).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-//			{
-//				public void customResultAvailable(IComponentManagementService rcms)
-//				{
-//					rcms.getParent(cid).addResultListener(createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
-//				}
-//			}));
-//		}
-//		else
-//		{
-//			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
-//			ret.setResult(desc!=null? desc.getName().getParent(): null);
-//		}
-		
-//		return ret;
-	
-		return new Future<IComponentIdentifier>(cid.getParent());
-	}
-	
-	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
