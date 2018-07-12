@@ -42,6 +42,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	{
 		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
 		
+		// hack??? TODO: clean up default configurations
+		namemappings.put("awareness", "awa");
+		namemappings.put("tcptransport", "tcp");
+		namemappings.put("wstransport", "ws");
+		namemappings.put("relaytransport", "rt");
+		
 		// This stuff must be in the configuration because it configures the starter (not the platform component itself)
 //		defvalues.put(IPlatformConfiguration.PLATFORM_NAME, "jadex");
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_NAME, "auto");
@@ -842,6 +848,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		IPlatformConfiguration config = getDefault();
 		config.setWelcome(false);
 		config.setGui(false);
+		config.setSensors(false);
 		config.getExtendedPlatformConfiguration().setCli(false);
 		config.getExtendedPlatformConfiguration().setCliConsole(false);
 

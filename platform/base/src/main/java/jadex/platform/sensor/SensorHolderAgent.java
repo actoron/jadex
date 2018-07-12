@@ -13,7 +13,7 @@ import jadex.micro.annotation.Properties;
 /**
  *  Component that holds the sensors in the platform.
  */
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.TRUE, autostartname="sensors")
 @ComponentTypes(
 {
 	@ComponentType(name="cpusensor", filename="jadex/platform/sensor/system/SystemSensorAgent.class")
