@@ -195,17 +195,17 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			ret = readonly;
 		}
-		else if(mname.equals("getSuperpeerClient") || mname.equals("isSuperpeerClient"))
-		{
-			Boolean spc = (Boolean)values.get("superpeerclient");
-			if(spc==null)
-			{
-				Boolean sp = (Boolean)values.get("superpeer");
-				Boolean ssp = (Boolean)values.get("supersuperpeer");
-				spc =  sp==null && ssp==null? true: sp!=null && sp.booleanValue() || ssp!=null && ssp.booleanValue();
-			}
-			return spc;
-		}
+//		else if(mname.equals("getSuperpeerClient") || mname.equals("isSuperpeerClient"))
+//		{
+//			Boolean spc = (Boolean)values.get("superpeerclient");
+//			if(spc==null)
+//			{
+//				Boolean sp = (Boolean)values.get("superpeer");
+//				Boolean ssp = (Boolean)values.get("supersuperpeer");
+//				spc =  sp==null && ssp==null? true: sp!=null && sp.booleanValue() || ssp!=null && ssp.booleanValue();
+//			}
+//			return spc;
+//		}
 		else if(mname.equals("setValue"))
 		{
 			checkReadOnly();
@@ -903,7 +903,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		config.setValue("rtdebug", true);
 
 		// Registry & Awareness
-//		config.setSuperpeerClient(true);
+		config.setSuperpeerClient(true);
+		config.setValue("superpeerclient.awaonly", true);
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 		config.setAwareness(false);	// disable old awareness

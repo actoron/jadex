@@ -27,6 +27,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
@@ -49,6 +50,7 @@ import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Binding;
@@ -56,7 +58,7 @@ import jadex.micro.annotation.Binding;
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent(autoprovide=Boolean3.TRUE, autostart=Boolean3.TRUE)
 @Service
 public class SuperpeerClientAgent	implements ISearchQueryManagerService
 {
@@ -70,6 +72,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	/** The agent. */
 	@Agent
 	protected IInternalAccess	agent;
+	
+	/** Use only awareness for remote search, i.e. no superpeers at all. */
+	@AgentArgument
+	protected boolean	awaonly;
 	
 	/** The managed connections for each network. */
 	protected Map<String, NetworkManager>	connections;
@@ -85,23 +91,37 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		Future<Void>	ret	= new Future<>();
 		connections	= new LinkedHashMap<>();
 		
-		ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class));
-		secser.getNetworkNames().addResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
+		if(!awaonly)
 		{
-			@Override
-			public void customResultAvailable(Set<String> networks) throws Exception
+			ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			if(secser!=null)
 			{
-				assert agent.getFeature(IExecutionFeature.class).isComponentThread();
-				
-				for(String network: networks)
+				secser.getNetworkNames().addResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
 				{
-					connections.put(network, new NetworkManager(network));
-					connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
-				}
-					
-				ret.setResult(null);
+					@Override
+					public void customResultAvailable(Set<String> networks) throws Exception
+					{
+						assert agent.getFeature(IExecutionFeature.class).isComponentThread();
+						
+						for(String network: networks)
+						{
+							connections.put(network, new NetworkManager(network));
+							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
+						}
+							
+						ret.setResult(null);
+					}
+				});
 			}
-		});
+			else
+			{
+				// TODO: global network?
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}
