@@ -43,6 +43,7 @@ import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -399,26 +400,33 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			// OK to fetch sync even from external access because everything thread safe.
 			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
-			ITimedObject	to	= new ITimedObject()
+			if(cs!=null)
 			{
-				public void timeEventOccurred(long currenttime)
+				ITimedObject	to	= new ITimedObject()
 				{
-//						System.out.println("step: "+step);
-					scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
-				}
-				
-				public String toString()
+					public void timeEventOccurred(long currenttime)
+					{
+	//						System.out.println("step: "+step);
+						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
+					}
+					
+					public String toString()
+					{
+						return "waitForDelay[Step]("+getComponent().getId()+")";
+					}
+				};
+				if(realtime)
 				{
-					return "waitForDelay[Step]("+getComponent().getId()+")";
+					cs.createRealtimeTimer(delay, to);
 				}
-			};
-			if(realtime)
-			{
-				cs.createRealtimeTimer(delay, to);
+				else
+				{
+					cs.createTimer(delay, to);					
+				}
 			}
 			else
 			{
-				cs.createTimer(delay, to);					
+				ret.setException(new ServiceNotFoundException("Clock service not found."));
 			}
 		}
 		else
