@@ -146,20 +146,20 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}
 
-	@Override
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels) {
-		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
-		config.setKernels(kernels);
-		return startJadexPlatform(config);
-	}
-
-	@Override
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId) {
-		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
-		config.setKernels(kernels);
-		config.setPlatformName(platformId);
-		return startJadexPlatform(config);
-	}
+//	@Override
+//	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels) {
+//		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
+//		config.setKernels(kernels);
+//		return startJadexPlatform(config);
+//	}
+//
+//	@Override
+//	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId) {
+//		IPlatformConfiguration config = PlatformConfigurationHandler.getDefault();
+//		config.setKernels(kernels);
+//		config.setPlatformName(platformId);
+//		return startJadexPlatform(config);
+//	}
 
 	public IFuture<IExternalAccess> startJadexPlatform() {
 		return startJadexPlatform(PlatformConfigurationHandler.getAndroidDefault());

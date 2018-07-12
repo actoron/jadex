@@ -110,15 +110,15 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 		return service.startJadexPlatform();
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
-	{
-		return service.startJadexPlatform(kernels);
-	}
-
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
-	{
-		return service.startJadexPlatform(kernels, platformId);
-	}
+//	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
+//	{
+//		return service.startJadexPlatform(kernels);
+//	}
+//
+//	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
+//	{
+//		return service.startJadexPlatform(kernels, platformId);
+//	}
 
 	public IFuture<IExternalAccess> startJadexPlatform(IPlatformConfiguration config)
 	{
