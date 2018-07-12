@@ -56,6 +56,7 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -114,7 +115,7 @@ import jadex.micro.annotation.RequiredServices;
 //	@GuiClassName("jadex.android.controlcenter.settings.AwarenessSettingsScreen"),
 //	@GuiClassName("jadex.tools.awareness.AwarenessAgentPanel") 
 //})
-@Agent(autostart=Boolean3.TRUE, autostartname="awa")
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="awa"))
 public class AwarenessManagementAgent	implements IPropertiesProvider, IAwarenessManagementService
 {
 	//-------- attributes --------

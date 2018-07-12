@@ -11,6 +11,8 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Autostart;
+import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.ITransport;
 
@@ -18,7 +20,7 @@ import jadex.platform.service.transport.ITransport;
  *  Agent implementing the web socket transport.
  *
  */
-@Agent(autostart=Boolean3.TRUE, autostartname="ws")
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="ws", predecessors=TransportAddressAgent.class))
 public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketConnection>
 {
 	/** Maximum size of websocket frame payloads. */

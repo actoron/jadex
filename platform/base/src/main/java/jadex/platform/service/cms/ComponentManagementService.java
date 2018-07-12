@@ -378,8 +378,6 @@ public class ComponentManagementService implements IComponentManagementService
 		return ret;
 	}
 	
-	
-	
 	/**
 	 *  Create a new component on the platform.
 	 *  @param name The component name.

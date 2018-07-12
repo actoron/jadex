@@ -38,6 +38,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -51,7 +52,7 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=@Autostart(Boolean3.TRUE))
 @Service
 @Arguments(
 {

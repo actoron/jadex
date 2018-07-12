@@ -3,14 +3,11 @@ package jadex.platform.service.message.relaytransport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -38,8 +35,6 @@ import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.address.ITransportAddressService;
-import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -51,7 +46,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.PassiveLeaseTimeSet;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -64,6 +58,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
@@ -76,7 +71,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  *  Agent implementing relay routing.
  */
 //@Agent(autoprovide=Boolean3.TRUE)
-@Agent(autostart=Boolean3.TRUE, autostartname="rt")
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt"))
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),

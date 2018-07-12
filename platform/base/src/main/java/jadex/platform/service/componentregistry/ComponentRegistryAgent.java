@@ -45,6 +45,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -53,7 +54,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The component registry is a component for creating proxy services.
  *  Real services/components are created on demand on service call.
  */
-@Agent(autostart=Boolean3.FALSE, autostartname="serviceproxy")
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="serviceproxy"))
 @Service
 @Imports("jadex.bridge.service.types.cms.*")
 @Arguments(

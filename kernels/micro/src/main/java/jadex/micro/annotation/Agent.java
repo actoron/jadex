@@ -66,10 +66,5 @@ public @interface Agent
 	/**
 	 *  Auto-start this agent on platform startup.
 	 */
-	public Boolean3 autostart() default Boolean3.NULL;
-	
-	/**
-	 *  Name for the started component.
-	 */
-	public String autostartname() default "";
+	public Autostart autostart() default @Autostart();
 }

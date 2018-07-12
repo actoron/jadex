@@ -4,9 +4,11 @@ package jadex.platform.service.library;
 
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -15,7 +17,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Agent that provides the library service.
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors=Object.class))
 @Arguments({
 	@Argument(name="libpath", clazz=String.class),
 	@Argument(name="baseclassloader", clazz=ClassLoader.class),
