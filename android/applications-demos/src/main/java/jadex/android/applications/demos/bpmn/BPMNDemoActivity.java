@@ -33,7 +33,8 @@ public class BPMNDemoActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setDefaultTimeout(-1);
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_BPMN);
+		config.setValue("kernel_component", "true");
+		config.setValue("kernel_bpmn", "true");
 		config.setPlatformName("bpmnDemoPlatform");
 	}
 	
