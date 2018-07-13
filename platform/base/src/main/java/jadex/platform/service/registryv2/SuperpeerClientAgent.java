@@ -66,7 +66,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	//-------- constants --------
 	
 	/** The fallback polling search rate as factor of the default remote timeout. */
-	public static final double	POLLING_RATE	= 0.33333333;	// 30 secs / 3 -> 10 secs.
+	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
 	
 	//-------- attributes --------
 	
@@ -75,6 +75,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	protected IInternalAccess	agent;
 	
 	/** Use only awareness for remote search, i.e. no superpeers at all. */
+	// Used for tests for now
 	@AgentArgument
 	protected boolean	awaonly;
 	
@@ -946,14 +947,14 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		config	= spbaseconfig.clone();
 		config.setPlatformName("SPAB_*");
 		config.setNetworkNames("network-a", "network-b");
-		config.setNetworkSecrets("secret-a", "secret-b");
+		config.setNetworkSecrets("secret-a1234", "secret-b1234");
 		Starter.createPlatform(config, args).get();
 		
 		// Super peer BC
 		config	= spbaseconfig.clone();
 		config.setPlatformName("SPBC_*");
 		config.setNetworkNames("network-c", "network-b");
-		config.setNetworkSecrets("secret-c", "secret-b");
+		config.setNetworkSecrets("secret-c1234", "secret-b1234");
 		Starter.createPlatform(config, args).get();
 
 		// Client ABC
@@ -961,7 +962,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		config.addComponent(SuperpeerClientAgent.class);
 		config.setPlatformName("ClientABC_*");
 		config.setNetworkNames("network-a", "network-b", "network-c");
-		config.setNetworkSecrets("secret-a", "secret-b", "secret-c");
+		config.setNetworkSecrets("secret-a1234", "secret-b1234", "secret-c1234");
 		Starter.createPlatform(config, args).get();
 	}
 }

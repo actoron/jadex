@@ -102,7 +102,6 @@ public class AndroidChatService extends JadexPlatformService
 		newMessages = new LinkedList<ChatEvent>();
 
 		setPlatformAutostart(true);
-		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO);
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalComm();
 		config.setLogging(false);
 		config.setNetworkNames("jadexnetwork");

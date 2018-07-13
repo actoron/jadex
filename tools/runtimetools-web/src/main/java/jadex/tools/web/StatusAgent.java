@@ -230,7 +230,10 @@ public class StatusAgent implements IStatusService
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
 		config.addComponent(StatusAgent.class);
 //		config.setLogging(true);
-		config.getExtendedPlatformConfiguration().setRsPublish(true);
+
+//		config.getExtendedPlatformConfiguration().setRsPublish(true);
+		config.setValue("jettyrspublish", true);
+		
 		Starter.createPlatform(config).get();
 	}
 }

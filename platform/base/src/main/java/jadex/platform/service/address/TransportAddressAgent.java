@@ -17,6 +17,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -380,18 +381,13 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	protected void updateFromLocalAwareness(IComponentIdentifier platformid)
 	{
-		try
+		IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class)
+			.searchLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		if(awa!=null)
 		{
-			IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IAwarenessManagementService.class);
-			if(awa!=null)
-			{
-				DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
-				if (info != null)
-					addAddresses(info.getAddresses());
-			}
-		}
-		catch (Exception e)
-		{
+			DiscoveryInfo info = awa.getCachedPlatformInfo(platformid).get();
+			if (info != null)
+				addAddresses(info.getAddresses());
 		}
 	}
 	
@@ -490,18 +486,16 @@ public class TransportAddressAgent implements ITransportAddressService
 			return null;
 		
 		List<TransportAddress> ret = null;
-		try
+		IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class)
+			.searchLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		if(awa!=null)
 		{
-			IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class));
 			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
 			if (info != null)
 				ret = info.getAddresses();
+
+			addAddresses(ret);
 		}
-		catch (Exception e)
-		{
-		}
-		
-		addAddresses(ret);
 		
 		return ret;
 	}

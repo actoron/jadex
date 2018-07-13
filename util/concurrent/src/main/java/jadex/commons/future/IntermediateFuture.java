@@ -355,7 +355,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener)
 	{
-		addIntermediateResultListener(intermediateListener, null);
+		addIntermediateResultListener(intermediateListener, null, null);
 	}
 
 	/**
@@ -371,6 +371,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	{
 		addIntermediateResultListener(intermediateListener, finishedListener, null);
 	}
+	
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener)
+    {    	
+		addIntermediateResultListener(intermediateListener, null, exceptionListener);
+    }
 
 	/**
 	 * Add a functional result listener, which called on intermediate results.

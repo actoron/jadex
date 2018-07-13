@@ -38,7 +38,8 @@ public class BDIDemoActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("bdiDemoPlatform");
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_BDI);
+		config.setValue("kernel_component", "true");
+		config.setValue("kernel_bdiv3", "true");
 	}
 
 	@Override

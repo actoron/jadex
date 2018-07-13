@@ -39,7 +39,6 @@ public class EventDemoActivity extends JadexAndroidActivity
 	{
 		super();
 		IPlatformConfiguration config = getPlatformConfiguration();
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
 		config.setPlatformName("eventDemoPlatform");
 		setPlatformAutostart(true);
 	}

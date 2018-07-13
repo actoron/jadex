@@ -43,6 +43,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
 		
 		// hack??? TODO: clean up default configurations
+		namemappings.put("gui", "jcc");
 		namemappings.put("awareness", "awa");
 		namemappings.put("tcptransport", "tcp");
 		namemappings.put("wstransport", "ws");
@@ -889,6 +890,10 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setSupersuperpeer(false);
 		config.setValue("acr", false);
 
+		// TODO: not in distribution-standard?
+		config.setValue("grizzlyrspublish", false);
+		config.setValue("jettyrspublish", false);
+		
 		return config;
 	}
 

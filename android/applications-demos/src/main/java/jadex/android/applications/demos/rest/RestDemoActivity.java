@@ -61,7 +61,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("restDemoPlatform");
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT);
+		config.setValue("kernel_component", "true");
 	}
 
 	@Override

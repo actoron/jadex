@@ -827,6 +827,13 @@ public class ServiceQuery<T>
 			ret.append(servicetype);
 		}
 		
+		if(serviceidentifier!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("serviceidentifier=");
+			ret.append(serviceidentifier);
+		}
+		
 		if(multiplicity!=null)
 		{
 			ret.append(ret.length()==13?"":", ");

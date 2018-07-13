@@ -59,7 +59,6 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 		super();
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("benchmarkDemoPlatform");
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
 		setPlatformAutostart(true);
 	}
 	
