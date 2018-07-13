@@ -294,12 +294,15 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					public void customResultAvailable(ClassLoader cl)
 					{
 						List<AnnotationInfo> ans = SFastClassUtils.getAnnotationInfos(model, cl);
-						for(AnnotationInfo ai: ans)
+						if(ans!=null)
 						{
-							System.out.println(ai);
-							if("Agent".equals(ai.getAnnotationName()))
-								ret.setResult(Boolean.TRUE);
-							break;
+							for(AnnotationInfo ai: ans)
+							{
+								System.out.println(ai);
+								if("Agent".equals(ai.getAnnotationName()))
+									ret.setResult(Boolean.TRUE);
+								break;
+							}
 						}
 						
 						if(!ret.isDone())
@@ -309,6 +312,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			}
 			else
 			{
+				// Must be supported for bootstrapping the platform (no library service)
 				boolean isa = model.toLowerCase().endsWith("agent.class");
 				ret.setResult(isa);
 			}
