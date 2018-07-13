@@ -852,6 +852,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	{
 		IPlatformConfiguration config = getDefault();
 		config.setWelcome(false);
+		config.setPrintSecret(false);
 		config.setGui(false);
 		config.setSensors(false);
 		config.getExtendedPlatformConfiguration().setCli(false);
