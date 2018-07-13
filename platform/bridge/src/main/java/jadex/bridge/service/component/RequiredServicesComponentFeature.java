@@ -862,34 +862,23 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			query.setMultiplicity(multi ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
 		}
 		
-		// Set networks if not set for remote queries
-		// TODO: more extensible way of checking for remote query
-		if(query.isRemote())
+		// Network names not set by user?
+		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
 		{
-			// Network names not set by user?
-			if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
+			// Local or unrestricted?
+			if(!query.isRemote() || Boolean.TRUE.equals(query.isUnrestricted())
+				|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(getComponent(), query.getServiceType().getType(getComponent().getClassLoader()))) 
 			{
-				// Unrestricted?
-				if(Boolean.TRUE.equals(query.isUnrestricted())
-					|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(getComponent(), query.getServiceType().getType(getComponent().getClassLoader()))) 
-				{
-					// Unrestricted -> Don't check networks.
-					query.setNetworkNames((String[])null);
-				}
-				else
-				{
-					// Not unrestricted -> only find services from my local networks
-					@SuppressWarnings("unchecked")
-					Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_NETWORKNAMESCACHE);
-					query.setNetworkNames(nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY);
-				}
+				// Unrestricted -> Don't check networks.
+				query.setNetworkNames((String[])null);
+			}
+			else
+			{
+				// Not unrestricted -> only find services from my local networks
+				@SuppressWarnings("unchecked")
+				Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_NETWORKNAMESCACHE);
+				query.setNetworkNames(nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY);
 			}
 		}
-		
-		// Disable local checks by default
-		else if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
-		{
-			query.setNetworkNames((String[])null);
-		}			
 	}	
 }
