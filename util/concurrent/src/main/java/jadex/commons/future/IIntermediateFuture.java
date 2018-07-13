@@ -99,6 +99,15 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 * Add a functional result listener, which called on intermediate results.
 	 * 
 	 * @param intermediateListener The intermediate listener.
+	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener);
+
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
 	 * @param finishedListener The finished listener, called when no more
 	 *        intermediate results will arrive. If <code>null</code>, the finish
 	 *        event will be ignored.
