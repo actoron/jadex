@@ -49,7 +49,8 @@ public class SFastClassUtils
 		InputStream is = null;
 		try
 		{
-			is = cl.getResourceAsStream(filepath);
+			ResourceInfo ri = SUtil.getResourceInfo0(filepath, cl);
+			is = ri.getInputStream();
 			
 			ScanSpec spec = new ScanSpec(new String[0], null);
 			
