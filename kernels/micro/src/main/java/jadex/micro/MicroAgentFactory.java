@@ -1,13 +1,17 @@
 package jadex.micro;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.AnnotationInfo;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -21,6 +25,7 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.SFastClassUtils;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -29,6 +34,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.kernelbase.IBootstrapFactory;
+import jadex.micro.annotation.Agent;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroMessageComponentFeature;
@@ -45,7 +51,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 	/** The supported component types (file extensions).
 	 *  Convention used by platform config panel. */
-	public static final String[]	FILETYPES	= new String[]{"Agent.class"};
+	public static final String[] FILETYPES = new String[]{".class"};
 	
 	/** The micro agent file type. */
 	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
@@ -82,7 +88,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 	/** The standard + micro component features. */
 	protected Collection<IComponentFeatureFactory>	features;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -266,9 +272,53 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("isLoadable (micro): "+model);
+		Future<Boolean> ret = new Future<Boolean>();
 		
-		boolean ret = model.toLowerCase().endsWith("agent.class");
+		System.out.println("isLoadable (micro): "+model+" "+rid);
+		
+//		final boolean[] ret = new boolean[1];
+//		FastClasspathScanner scanner = new FastClasspathScanner()
+//			.matchFilenamePath(model, (File c, String d) -> System.out.println("Found: "+c))
+//			//.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
+//			.matchClassesWithAnnotation(Agent.class, c -> { System.out.println("Found: "+c); ret[0] = true;});
+//		scanner.scan();
+		
+		if(model.toLowerCase().endsWith(".class"))
+		{
+			ILibraryService libservice = getLibraryService();
+			if(libservice!=null)
+			{
+				libservice.getClassLoader(rid)
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl)
+					{
+						List<AnnotationInfo> ans = SFastClassUtils.getAnnotationInfos(model, cl);
+						for(AnnotationInfo ai: ans)
+						{
+							System.out.println(ai);
+							if("Agent".equals(ai.getAnnotationName()))
+								ret.setResult(Boolean.TRUE);
+							break;
+						}
+						
+						if(!ret.isDone())
+							ret.setResult(Boolean.FALSE);
+					}
+				});
+			}
+			else
+			{
+				boolean isa = model.toLowerCase().endsWith("agent.class");
+				ret.setResult(isa);
+			}
+		}
+		else
+		{
+			ret.setResult(Boolean.FALSE);
+		}
+		
+//		boolean ret = model.toLowerCase().endsWith("agent.class");
 //		if(model.toLowerCase().endsWith("Agent.class"))
 //		{
 //			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
@@ -277,7 +327,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
 //			System.out.println(clname+" "+cma+" "+ret);
 //		}
-		return ret ? IFuture.TRUE : IFuture.FALSE;
+//		return ret ? IFuture.TRUE : IFuture.FALSE;
+		
+		return ret;
 	}
 	
 	/**
@@ -314,7 +366,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 								catch(Exception e)
 								{
 									fut.setResult(Boolean.FALSE);
-//											ret.setException(e);
+//									ret.setException(e);
 								}
 							}
 						});		
@@ -337,10 +389,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				
 				public void exceptionOccurred(Exception exception)
 				{
-//							exception.printStackTrace();
+//					exception.printStackTrace();
 					Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.toString());
 					fut.setResult(Boolean.FALSE);
-//							super.exceptionOccurred(exception);
+//					super.exceptionOccurred(exception);
 				}
 			});
 		}
