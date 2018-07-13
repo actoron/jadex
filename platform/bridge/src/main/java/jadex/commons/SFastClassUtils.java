@@ -22,6 +22,7 @@ import jadex.bytecode.vmhacks.VmHacks;
  */
 public class SFastClassUtils
 {
+	/** Flag if class has lazily initialized. */
 	protected volatile static boolean INITIALIZED = false;
 	
 	/** Constructor for ClassfileBinaryParser */
@@ -30,9 +31,16 @@ public class SFastClassUtils
 	/** Method readClassInfoFromClassfileHeader. */
 	protected static MethodHandle READCLASSINFOFROMCLASSFILEHEADER;
 	
+	/** Field for the annotation infos. */
 	protected static MethodHandle CLASSANNOTATIONS_FIELD;
 	
-	@SuppressWarnings("unchecked")
+	/**
+	 *  Get the annotation infos for a class.
+	 *  
+	 *  @param filepath The file path to the class.
+	 *  @param cl The classloader.
+	 *  @return The annotation infos.
+	 */
 	public static List<AnnotationInfo> getAnnotationInfos(String filepath, ClassLoader cl)
 	{
 		initialize();
@@ -41,7 +49,8 @@ public class SFastClassUtils
 		InputStream is = null;
 		try
 		{
-			is = cl.getResourceAsStream(filepath);
+			ResourceInfo ri = SUtil.getResourceInfo0(filepath, cl);
+			is = ri.getInputStream();
 			
 			ScanSpec spec = new ScanSpec(new String[0], null);
 			
