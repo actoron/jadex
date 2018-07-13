@@ -52,7 +52,11 @@ public class SFastClassUtils
 		try
 		{
 			ResourceInfo ri = SUtil.getResourceInfo0(filepath, cl);
-			String relpath = filepath.substring(0, filepath.length()-6).replace('.', '/')+".class";
+			String relpath = filepath;
+			if(filepath.indexOf("/")==-1 && filepath.indexOf("\\")==-1)
+				relpath = filepath.substring(0, filepath.length()-6).replace('.', '/')+".class";
+			else if(filepath.indexOf("\\")!=-1)
+				relpath = filepath.substring(0, filepath.length()-6).replace('\\', '/')+".class";
 			if (ri == null)
 				throw new FileNotFoundException("Could not load file " + filepath + " from classloader " + cl);
 			is = ri.getInputStream();
