@@ -1,5 +1,6 @@
 package jadex.commons;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -14,6 +15,7 @@ import io.github.lukehutch.fastclasspathscanner.scanner.AnnotationInfo;
 import io.github.lukehutch.fastclasspathscanner.scanner.ScanSpec;
 import io.github.lukehutch.fastclasspathscanner.utils.LogNode;
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.javaparser.javaccimpl.ParseException;
 
 /**
  *  Class using the internal fast class path scanner to provide
@@ -50,12 +52,18 @@ public class SFastClassUtils
 		try
 		{
 			ResourceInfo ri = SUtil.getResourceInfo0(filepath, cl);
+			String relpath = filepath.substring(0, filepath.length()-6).replace('.', '/')+".class";
+			if (ri == null)
+				throw new FileNotFoundException("Could not load file " + filepath + " from classloader " + cl);
 			is = ri.getInputStream();
 			
 			ScanSpec spec = new ScanSpec(new String[0], null);
 			
 			Object cbp = CLASSFILEBINARYPARSER_CON.invokeExact();
-			Object ciu = READCLASSINFOFROMCLASSFILEHEADER.invoke(cbp, null, filepath, is, spec, null);
+			Object ciu = READCLASSINFOFROMCLASSFILEHEADER.invoke(cbp, null, relpath, is, spec, null);
+			
+			if (ciu == null)
+				throw new ParseException("Could not parse class: " + filepath);
 			
 			ret = (List<AnnotationInfo>) CLASSANNOTATIONS_FIELD.invoke(ciu);
 		}
