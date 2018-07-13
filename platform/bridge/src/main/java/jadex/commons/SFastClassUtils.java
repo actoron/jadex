@@ -9,6 +9,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.CharBuffer;
 import java.util.List;
 
 import io.github.lukehutch.fastclasspathscanner.scanner.AnnotationInfo;
@@ -60,7 +61,29 @@ public class SFastClassUtils
 			ScanSpec spec = new ScanSpec(new String[0], null);
 			
 			Object cbp = CLASSFILEBINARYPARSER_CON.invokeExact();
-			Object ciu = READCLASSINFOFROMCLASSFILEHEADER.invoke(cbp, null, relpath, is, spec, null);
+			String[] dummclassname = new String[1];
+			LogNode ln = new LogNode()
+			{
+				public LogNode log(String msg)
+				{
+					int ind = msg.indexOf(" is at incorrect relative path");
+					if (ind > 0)
+					{ 
+						dummclassname[0] = msg.substring(0, ind).substring(6).replace('.', '/');
+					}
+					return this;
+				}
+			};
+			Object ciu = READCLASSINFOFROMCLASSFILEHEADER.invoke(cbp, null, relpath, is, spec, ln);
+			if (dummclassname[0] != null)
+			{
+				// Reload after we figured out the relpath length.
+				relpath = dummclassname[0] + ".class";
+				SUtil.close(is);
+				ri = SUtil.getResourceInfo0(filepath, cl);
+				is = ri.getInputStream();
+				ciu = READCLASSINFOFROMCLASSFILEHEADER.invoke(cbp, null, relpath, is, spec, ln);
+			}
 			
 			if (ciu == null)
 				throw new ParseException("Could not parse class: " + filepath);
