@@ -6,7 +6,9 @@ import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -113,6 +115,8 @@ public class PlatformAgent
 //			}
 //		}
 		
+		final Set<Class> set;
+		
 		FastClasspathScanner scanner = new FastClasspathScanner() 
 			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
 			.matchClassesWithAnnotation(Agent.class, c -> 
@@ -187,6 +191,11 @@ public class PlatformAgent
 			}
 		});
 		ScanResult res = scanner.scan(); 
+		Set<String> agentclnames = new HashSet<String>(res.getNamesOfClassesWithAnnotation(Agent.class));
+		
+		for(String cl: agentclnames)
+			System.out.println(cl);
+		
 		long end = System.currentTimeMillis();
 		System.out.println("Scanning needed: "+(end-start)/1000);
 		
