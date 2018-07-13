@@ -38,7 +38,6 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalIntermediateResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -698,16 +697,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// Add remote results to future (functionality handles wrapping)
 		if(remotes!=null)
 		{
-			remotes.addIntermediateResultListener(new IFunctionalIntermediateResultListener<T>()
-			{
-				@SuppressWarnings("unchecked")
-				@Override
-				public void intermediateResultAvailable(T result)
+			remotes.addIntermediateResultListener(
+				result->
 				{
-					// Hack!!!
-					((IntermediateFuture<T>)ret).addIntermediateResult(result);
-				}
-			});
+					@SuppressWarnings("unchecked")
+					IntermediateFuture<T>	fut	= (IntermediateFuture<T>)ret;
+					fut.addIntermediateResult(result);
+				},
+				exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
 		return ret;
