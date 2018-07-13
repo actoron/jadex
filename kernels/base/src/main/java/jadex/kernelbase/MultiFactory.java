@@ -1149,7 +1149,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																	{
 																		public void resultAvailable(byte[] result)
 																		{
-//																					System.out.println("adding icon: "+types[fi]);
+//																			System.out.println("adding icon: "+types[fi]);
 																			iconcache.put(types[fi], result);
 																			typecounter.resultAvailable(null);
 																		}

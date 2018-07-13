@@ -1352,6 +1352,13 @@ public class SUtil
 		if(ret == null)
 		{
 			URL url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+			
+			if(url==null && name.endsWith(".class"))
+			{
+				name = name.substring(0, name.length()-6).replace('.', '/')+".class";
+				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+			}
+			
 			// System.out.println("Classloader: "+classloader+" "+name+" "+url+" "+classloader.getParent());
 			// if(classloader instanceof URLClassLoader)
 			// System.out.println("URLs: "+SUtil.arrayToString(((URLClassLoader)classloader).getURLs()));
