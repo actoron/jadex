@@ -138,7 +138,7 @@ public class PlatformAgent
 					{
 						// check classname as parameter
 						name = SReflect.getInnerClassName(c);
-						if(argsmap.containsKey(name))
+						if(argsmap.containsKey(name.toLowerCase()))
 						{	
 							ok = (boolean)argsmap.get(name.toLowerCase());
 						}
