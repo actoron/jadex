@@ -947,14 +947,14 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		config	= spbaseconfig.clone();
 		config.setPlatformName("SPAB_*");
 		config.setNetworkNames("network-a", "network-b");
-		config.setNetworkSecrets("secret-a", "secret-b");
+		config.setNetworkSecrets("secret-a1234", "secret-b1234");
 		Starter.createPlatform(config, args).get();
 		
 		// Super peer BC
 		config	= spbaseconfig.clone();
 		config.setPlatformName("SPBC_*");
 		config.setNetworkNames("network-c", "network-b");
-		config.setNetworkSecrets("secret-c", "secret-b");
+		config.setNetworkSecrets("secret-c1234", "secret-b1234");
 		Starter.createPlatform(config, args).get();
 
 		// Client ABC
@@ -962,7 +962,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		config.addComponent(SuperpeerClientAgent.class);
 		config.setPlatformName("ClientABC_*");
 		config.setNetworkNames("network-a", "network-b", "network-c");
-		config.setNetworkSecrets("secret-a", "secret-b", "secret-c");
+		config.setNetworkSecrets("secret-a1234", "secret-b1234", "secret-c1234");
 		Starter.createPlatform(config, args).get();
 	}
 }
