@@ -28,6 +28,7 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
 import jadex.tools.awareness.AwarenessServicePlugin;
@@ -48,7 +49,7 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(autostart=Boolean3.TRUE, autostartname="jcc")
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc"))
 @Properties(@NameValue(name="system", value="true"))
 public class JCCAgent	implements IComponentStep<Void>
 {

@@ -66,16 +66,16 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return instance;
 	}
 
-	private static Map<String, String> kernelClassNames = new HashMap<String, String>();
-
-	static {
-		kernelClassNames.put(IPlatformConfiguration.KERNEL_MICRO, "jadex.micro.MicroAgentFactory");
-		kernelClassNames.put(IPlatformConfiguration.KERNEL_BDIV3, "jadex.bdiv3.BDIAgentFactory");
-		kernelClassNames.put(IPlatformConfiguration.KERNEL_BPMN, "jadex.bpmn.BpmnFactory");
-		kernelClassNames.put(IPlatformConfiguration.KERNEL_COMPONENT, "jadex.component.ComponentComponentFactory");
-		kernelClassNames.put(IPlatformConfiguration.KERNEL_BDI, "jadex.bdiv3x.BDIXComponentFactory");
-		kernelClassNames.put(IPlatformConfiguration.KERNEL_MULTI, "jadex.kernelbase.MultiFactory");
-	}
+//	private static Map<String, String> kernelClassNames = new HashMap<String, String>();
+//
+//	static {
+//		kernelClassNames.put(IPlatformConfiguration.KERNEL_MICRO, "jadex.micro.MicroAgentFactory");
+//		kernelClassNames.put(IPlatformConfiguration.KERNEL_BDIV3, "jadex.bdiv3.BDIAgentFactory");
+//		kernelClassNames.put(IPlatformConfiguration.KERNEL_BPMN, "jadex.bpmn.BpmnFactory");
+//		kernelClassNames.put(IPlatformConfiguration.KERNEL_COMPONENT, "jadex.component.ComponentComponentFactory");
+//		kernelClassNames.put(IPlatformConfiguration.KERNEL_BDI, "jadex.bdiv3x.BDIXComponentFactory");
+//		kernelClassNames.put(IPlatformConfiguration.KERNEL_MULTI, "jadex.kernelbase.MultiFactory");
+//	}
 
 	private JadexPlatformManager()
 	{
@@ -271,7 +271,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			public void run()
 			{
 
-				checkKernels(config.getKernels());
+//				checkKernels(config.getKernels());
 
 //				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
 //						+ (platformName != null ? platformName : getRandomPlatformName()) + (options == null ? "" : " " + options);
@@ -289,7 +289,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 //					config.getRootConfig().setKernels(kernelList.toArray(new RootComponentConfiguration.KERNEL[kernelList.size()]));
 //				}
 
-				Logger.i("Used kernels: " + Arrays.toString(config.getKernels()));
+//				Logger.i("Used kernels: " + Arrays.toString(config.getKernels()));
 
 				IFuture<IExternalAccess> future = createPlatformWithClassloader(config, this.getClass().getClassLoader());
 				Logger.d("Waiting for platform startup...");
@@ -343,25 +343,25 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		return ret;
 	}
 
-	private void checkKernels(String[] kernels) {
-		// make sure default kernels all exist in classpath
-		ArrayList<String> kernelList = new ArrayList<String>();
-		ClassLoader myCL = getClass().getClassLoader();
-
-		for (String k : kernels) {
-			String className = kernelClassNames.get(k);
-			boolean found = false;
-			if (className != null) {
-				Class<?> clazz = SReflect.classForName0(className, myCL);
-				if (clazz != null) {
-					found = true;
-				}
-			}
-			if (!found) {
-				throw new JadexAndroidError("Could not find factory for requested kernel: " + k);
-			}
-		}
-	}
+//	private void checkKernels(String[] kernels) {
+//		// make sure default kernels all exist in classpath
+//		ArrayList<String> kernelList = new ArrayList<String>();
+//		ClassLoader myCL = getClass().getClassLoader();
+//
+//		for (String k : kernels) {
+//			String className = kernelClassNames.get(k);
+//			boolean found = false;
+//			if (className != null) {
+//				Class<?> clazz = SReflect.classForName0(className, myCL);
+//				if (clazz != null) {
+//					found = true;
+//				}
+//			}
+//			if (!found) {
+//				throw new JadexAndroidError("Could not find factory for requested kernel: " + k);
+//			}
+//		}
+//	}
 
 	@SuppressWarnings("unchecked")
 	protected static IFuture<IExternalAccess> createPlatformWithClassloader(IPlatformConfiguration config, ClassLoader cl)

@@ -4,6 +4,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.component.ComponentComponentFactory($component)"))
 })
-@Agent(autostart=Boolean3.FALSE, autostartname="kernel_component")
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_component"))
 public class KernelComponentAgent
 {
 }

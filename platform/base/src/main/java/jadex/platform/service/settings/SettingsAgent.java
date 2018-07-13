@@ -30,12 +30,14 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.Autostart;
+import jadex.platform.service.context.ContextAgent;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Agent that provides the settings service.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, predecessors=ContextAgent.class))
 public class SettingsAgent	implements ISettingsService
 {
 	// -------- constants --------

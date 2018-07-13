@@ -12,6 +12,7 @@ import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationServ
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Peer registry synchronization agent. 
  */
-@Agent(autostart=Boolean3.FALSE, autostartname="peer")
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="peer"))
 @ProvidedServices(@ProvidedService(type=IPeerRegistrySynchronizationService.class, implementation=@Implementation(PeerRegistrySynchronizationService.class)))
 //@Properties(value=@NameValue(name="system", value="true"))
 public class PeerRegistrySynchronizationAgent

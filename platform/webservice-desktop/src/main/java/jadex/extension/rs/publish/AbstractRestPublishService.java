@@ -192,7 +192,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters.add("*/*", tostrc);
     	
     	final Long to = (Long)Starter.getPlatformValue(component.getId(), Starter.DATA_DEFAULT_REMOTE_TIMEOUT);
-		System.out.println("Using default client timeout: "+to);
+		component.getLogger().info("Using default client timeout: "+to);
     	
     	requestspercall = new MultiCollection<String, AsyncContext>()
         {

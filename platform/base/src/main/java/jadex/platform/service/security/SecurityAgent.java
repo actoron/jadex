@@ -34,6 +34,7 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -47,11 +48,13 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.KeySecret;
@@ -65,7 +68,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 /**
  *  Agent that provides the security service.
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors=ClockAgent.class))
 @Arguments(value={
 	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
 	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),

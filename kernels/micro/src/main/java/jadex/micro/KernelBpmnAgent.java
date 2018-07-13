@@ -4,6 +4,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -28,7 +29,7 @@ import jadex.micro.annotation.ProvidedServices;
 	+		"})"
 	+	")"))
 })
-@Agent(autostart=Boolean3.FALSE, autostartname="kernel_bpmn")
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_bpmn"))
 public class KernelBpmnAgent
 {
 }

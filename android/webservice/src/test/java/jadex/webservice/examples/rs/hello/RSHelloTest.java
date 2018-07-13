@@ -92,7 +92,7 @@ public class RSHelloTest
 		}
 
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_MICRO);
+		config.setValue("kernel_component", true);
 		config.getExtendedPlatformConfiguration().setTcpTransport(false);
 		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);

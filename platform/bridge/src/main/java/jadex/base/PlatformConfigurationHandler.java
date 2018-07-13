@@ -42,6 +42,13 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	{
 		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
 		
+		// hack??? TODO: clean up default configurations
+		namemappings.put("gui", "jcc");
+		namemappings.put("awareness", "awa");
+		namemappings.put("tcptransport", "tcp");
+		namemappings.put("wstransport", "ws");
+		namemappings.put("relaytransport", "rt");
+		
 		// This stuff must be in the configuration because it configures the starter (not the platform component itself)
 //		defvalues.put(IPlatformConfiguration.PLATFORM_NAME, "jadex");
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_NAME, "auto");
@@ -189,17 +196,17 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			ret = readonly;
 		}
-		else if(mname.equals("getSuperpeerClient") || mname.equals("isSuperpeerClient"))
-		{
-			Boolean spc = (Boolean)values.get("superpeerclient");
-			if(spc==null)
-			{
-				Boolean sp = (Boolean)values.get("superpeer");
-				Boolean ssp = (Boolean)values.get("supersuperpeer");
-				spc =  sp==null && ssp==null? true: sp!=null && sp.booleanValue() || ssp!=null && ssp.booleanValue();
-			}
-			return spc;
-		}
+//		else if(mname.equals("getSuperpeerClient") || mname.equals("isSuperpeerClient"))
+//		{
+//			Boolean spc = (Boolean)values.get("superpeerclient");
+//			if(spc==null)
+//			{
+//				Boolean sp = (Boolean)values.get("superpeer");
+//				Boolean ssp = (Boolean)values.get("supersuperpeer");
+//				spc =  sp==null && ssp==null? true: sp!=null && sp.booleanValue() || ssp!=null && ssp.booleanValue();
+//			}
+//			return spc;
+//		}
 		else if(mname.equals("setValue"))
 		{
 			checkReadOnly();
@@ -826,8 +833,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		IPlatformConfiguration config = getDefault();
 		config.setGui(false);
 		config.getExtendedPlatformConfiguration().setChat(false);
-		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, 
-			IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_BPMN, IPlatformConfiguration.KERNEL_BDIV3);
+		config.setValue("kernel_multi", false);
+		config.setValue("kernel_component", true);
+		config.setValue("kernel_micro", true);
+		config.setValue("kernel_bpmn", true);
+		config.setValue("kernel_bdiv3", true);
+
 		config.setLoggingLevel(Level.INFO);
 		// config.setDebugFutures(true);
 		return config;
@@ -842,6 +853,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		IPlatformConfiguration config = getDefault();
 		config.setWelcome(false);
 		config.setGui(false);
+		config.setSensors(false);
 		config.getExtendedPlatformConfiguration().setCli(false);
 		config.getExtendedPlatformConfiguration().setCliConsole(false);
 
@@ -856,7 +868,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
 
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
+		config.setValue("kernel_multi", false);
+		config.setValue("kernel_micro", true);
 		// rootConfig.setThreadpoolClass(null);
 		// rootConfig.setContextServiceClass(null);
 
@@ -877,6 +890,10 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setSupersuperpeer(false);
 		config.setValue("acr", false);
 
+		// TODO: not in distribution-standard?
+		config.setValue("grizzlyrspublish", false);
+		config.setValue("jettyrspublish", false);
+		
 		return config;
 	}
 
@@ -896,7 +913,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		config.setValue("rtdebug", true);
 
 		// Registry & Awareness
-//		config.setSuperpeerClient(true);
+		config.setSuperpeerClient(true);
+		config.setValue("superpeerclient.awaonly", true);
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
 		config.setAwareness(false);	// disable old awareness

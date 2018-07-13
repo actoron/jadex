@@ -81,7 +81,7 @@ public class SComponentFactory
 	
 	/**
 	 *  Build an ordered list of component features.
-	 *  @param facss	A list of component feature lists.
+	 *  @param facss A list of component feature lists.
 	 *  @return An ordered list of component features.
 	 */
 	public static Collection<IComponentFeatureFactory> orderComponentFeatures(String name, Collection<Collection<IComponentFeatureFactory>> facss)

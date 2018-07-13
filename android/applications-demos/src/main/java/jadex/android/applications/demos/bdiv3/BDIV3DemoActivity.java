@@ -24,10 +24,9 @@ public class BDIV3DemoActivity extends JadexAndroidActivity
 		super();
 		setPlatformAutostart(true);
 
-		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO);//, JadexPlatformOptions.KERNEL_BDIV3);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("bdiV3DemoPlatform");
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_BDIV3);
+		config.setValue("kernel_bdiv3", "true");
 	}
 
 	@Override

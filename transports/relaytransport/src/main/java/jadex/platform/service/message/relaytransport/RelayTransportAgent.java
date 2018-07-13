@@ -54,6 +54,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
@@ -66,7 +67,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  *  Agent implementing relay routing.
  */
 //@Agent(autoprovide=Boolean3.TRUE)
-@Agent(autostart=Boolean3.TRUE, autostartname="rt")
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt"))
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),

@@ -919,8 +919,10 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	 */
 	public DelegatingTerminableDelegationFuture(ITerminableFuture<?> src, FutureFunctionality func)
 	{
-		super(src);
+		// Cannot use super because it triggers and func is still null
+//		super(src);
 		this.func = func;
+		src.addResultListener(new TerminableDelegationResultListener(this, src));
 	}
 	
 	/**

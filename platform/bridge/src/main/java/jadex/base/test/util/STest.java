@@ -39,14 +39,16 @@ public class STest {
     public static IPlatformConfiguration getDefaultTestConfig() 
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setKernels(IPlatformConfiguration.KERNEL_MULTI);
+		config.setValue("kernel_multi", true);
+		config.setValue("kernel_micro", false);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
 		// Enable new awareness
+		config.setSuperpeerClient(true);
+		config.setValue("superpeerclient.awaonly", true);
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
-		config.addComponent("jadex.platform.service.registryv2.SuperpeerClientAgent.class");
 		config.setAwareness(false);	// disable old awareness
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);

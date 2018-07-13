@@ -7,6 +7,7 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -44,7 +45,7 @@ import jadex.micro.annotation.ProvidedServices;
 		@Component(name="kernel_micro", type="KernelMicro")
 	})
 })
-@Agent(autostart=Boolean3.TRUE, autostartname="kernel_multi")
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="kernel_multi"))
 @Properties(@NameValue(name="system", value="true"))
 public class KernelMultiAgent
 {
