@@ -890,6 +890,10 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setSupersuperpeer(false);
 		config.setValue("acr", false);
 
+		// TODO: not in distribution-standard?
+		config.setValue("grizzlyrspublish", false);
+		config.setValue("jettyrspublish", false);
+		
 		return config;
 	}
 
