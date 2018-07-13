@@ -66,7 +66,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	//-------- constants --------
 	
 	/** The fallback polling search rate as factor of the default remote timeout. */
-	public static final double	POLLING_RATE	= 0.33333333;	// 30 secs / 3 -> 10 secs.
+	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
 	
 	//-------- attributes --------
 	
@@ -75,6 +75,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	protected IInternalAccess	agent;
 	
 	/** Use only awareness for remote search, i.e. no superpeers at all. */
+	// Used for tests for now
 	@AgentArgument
 	protected boolean	awaonly;
 	
