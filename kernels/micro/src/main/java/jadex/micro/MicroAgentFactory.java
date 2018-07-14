@@ -274,7 +274,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
-		System.out.println("isLoadable (micro): "+model+" "+rid);
+		if(model.indexOf("VisibilityTestAgent")!=-1)
+			System.out.println("isLoadable (micro): "+model+" "+rid);
 		
 //		final boolean[] ret = new boolean[1];
 //		FastClasspathScanner scanner = new FastClasspathScanner()
@@ -299,9 +300,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 							for(AnnotationInfo ai: ans)
 							{
 								System.out.println(ai);
-								if("Agent".equals(ai.getAnnotationName()))
+								if(Agent.class.getName().equals(ai.getAnnotationName()))
+								{
 									ret.setResult(Boolean.TRUE);
-								break;
+									break;
+								}
 							}
 						}
 						
