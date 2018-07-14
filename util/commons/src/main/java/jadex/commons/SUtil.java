@@ -1359,7 +1359,7 @@ public class SUtil
 				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
 			}
 			
-			System.out.println("url: "+url);
+			//System.out.println("url: "+url);
 			
 			// System.out.println("Classloader: "+classloader+" "+name+" "+url+" "+classloader.getParent());
 			// if(classloader instanceof URLClassLoader)
