@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import io.github.lukehutch.fastclasspathscanner.scanner.AnnotationInfo;
 import jadex.base.Starter;
+import jadex.bpmn.features.impl.BpmnComponentFeature;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -35,6 +37,10 @@ import jadex.bridge.service.types.security.IMsgSecurityInfos;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Boolean3;
+import jadex.commons.ResourceInfo;
+import jadex.commons.SFastClassUtils;
+import jadex.commons.SFastClassUtilsWithADifferentName;
+import jadex.commons.SFastClassUtilsWithADifferentName.AnnotationInfos;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -1635,5 +1641,40 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		return ret;
 	}
-
+	
+	public static void main(String[] args) throws Throwable
+	{
+//		ClassLoader cl = SecurityAgent.class.getClassLoader();
+//		String classname = SecurityAgent.class.getCanonicalName();
+		ClassLoader cl = BpmnComponentFeature.class.getClassLoader();
+		String classname = BpmnComponentFeature.class.getCanonicalName();
+		String relpath = classname.replace('.', '/') + ".class";
+		
+		//List<AnnotationInfo> ainfos = null;
+		List<AnnotationInfos> ainfos = null;
+		
+		List<AnnotationInfo> infos = SFastClassUtils.getAnnotationInfos(relpath, cl);
+		
+		
+		int reads = 100000;
+		
+		long ts = System.currentTimeMillis();
+		for (int i = 0; i < reads; ++i)
+		{
+//			ainfos = SFastClassUtils.getAnnotationInfos(relpath, cl);;
+//			SFastClassUtils.getAnnotationInfos(relpath, cl);
+			ResourceInfo ri = SUtil.getResourceInfo0(relpath, cl);
+			//ainfos = SFastClassUtilsWithADifferentName.getAnnotationInfos(ri.getInputStream(), false);
+			boolean res = SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(ri.getInputStream(), "jadex.micro.annotation.Agent");
+			//ainfos = SFastClassUtils.getAnnotationNames(ri.getInputStream());
+		}
+		ts = System.currentTimeMillis() - ts;
+		System.out.println("TIME " + ts + " " + reads/(ts/1000.0));
+		
+		for (AnnotationInfos info : SUtil.safeList(ainfos))
+		{
+			System.out.println("ANN " + info.getType());
+		}
+		
+	}
 }

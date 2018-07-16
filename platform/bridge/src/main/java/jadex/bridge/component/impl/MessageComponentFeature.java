@@ -811,7 +811,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		long[] convid = new long[4];
 		for (int i = 0; i < convid.length; ++i)
-			convid[i] = SUtil.SECURE_RANDOM.nextLong();
+			convid[i] = SUtil.getSecureRandom().nextLong();
 		return convid;
 	}
 	

@@ -132,7 +132,8 @@ public class SFastClassUtils
 				Lookup lookup = MethodHandles.lookup();
 				Class<?> cbpclazz = Class.forName("io.github.lukehutch.fastclasspathscanner.scanner.ClassfileBinaryParser");
 				Constructor<?> cbpcon = cbpclazz.getDeclaredConstructor();
-				VmHacks.get().setAccessible(cbpcon, true);
+				//VmHacks.get().setAccessible(cbpcon, true);
+				cbpcon.setAccessible(true);
 				CLASSFILEBINARYPARSER_CON = lookup.unreflectConstructor(cbpcon).asType(MethodType.genericMethodType(0));
 				
 				Class<?> ceclazz = Class.forName("io.github.lukehutch.fastclasspathscanner.scanner.ClasspathElement");
@@ -140,11 +141,13 @@ public class SFastClassUtils
 				Class<?> ciuclazz = Class.forName("io.github.lukehutch.fastclasspathscanner.scanner.ClassInfoUnlinked");
 				
 				Method readclassinfofromclassfileheader = cbpclazz.getDeclaredMethod("readClassInfoFromClassfileHeader", ceclazz, String.class, InputStream.class, ScanSpec.class, LogNode.class);
-				VmHacks.get().setAccessible(readclassinfofromclassfileheader, true);
+				//VmHacks.get().setAccessible(readclassinfofromclassfileheader, true);
+				readclassinfofromclassfileheader.setAccessible(true);
 				READCLASSINFOFROMCLASSFILEHEADER = lookup.unreflect(readclassinfofromclassfileheader);
 				
 				Field classannotations = ciuclazz.getDeclaredField("classAnnotations");
-				VmHacks.get().setAccessible(classannotations, true);
+//				VmHacks.get().setAccessible(classannotations, true);
+				classannotations.setAccessible(true);
 				CLASSANNOTATIONS_FIELD = lookup.unreflectGetter(classannotations);
 				
 				INITIALIZED = true;
