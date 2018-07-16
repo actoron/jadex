@@ -545,6 +545,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 													{
 														try
 														{
+															System.out.println("Sending service event to superpeer: "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
