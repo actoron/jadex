@@ -115,8 +115,6 @@ public class PlatformAgent
 //			}
 //		}
 		
-		final Set<Class> set;
-		
 		FastClasspathScanner scanner = new FastClasspathScanner() 
 			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
 			.matchClassesWithAnnotation(Agent.class, c -> 
@@ -193,8 +191,8 @@ public class PlatformAgent
 		ScanResult res = scanner.scan(); 
 		Set<String> agentclnames = new HashSet<String>(res.getNamesOfClassesWithAnnotation(Agent.class));
 		
-		for(String cl: agentclnames)
-			System.out.println(cl);
+		//for(String cl: agentclnames)
+		//	System.out.println(cl);
 		
 		long end = System.currentTimeMillis();
 		System.out.println("Scanning needed: "+(end-start)/1000);

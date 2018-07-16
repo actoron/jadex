@@ -1,6 +1,5 @@
 package jadex.micro;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import io.github.lukehutch.fastclasspathscanner.scanner.AnnotationInfo;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -264,6 +262,18 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return ret;
 	}
 	
+	
+//	/**
+//	 *  Test if a model can be loaded by the factory.
+//	 *  @param model The model (e.g. file name).
+//	 *  @param The imports (if any).
+//	 *  @return True, if model can be loaded.
+//	 */
+//	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+//	{
+//		return model.toLowerCase().endsWith("agent.class")? Future.TRUE: Future.FALSE;
+//	}
+	
 	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
@@ -276,13 +286,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		
 //		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
-//		final boolean[] ret = new boolean[1];
-//		FastClasspathScanner scanner = new FastClasspathScanner()
-//			.matchFilenamePath(model, (File c, String d) -> System.out.println("Found: "+c))
-//			//.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
-//			.matchClassesWithAnnotation(Agent.class, c -> { System.out.println("Found: "+c); ret[0] = true;});
-//		scanner.scan();
-		
 		if(model.toLowerCase().endsWith(".class"))
 		{
 			ILibraryService libservice = getLibraryService();
@@ -293,22 +296,30 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
-						List<AnnotationInfo> ans = SFastClassUtils.getAnnotationInfos(model, cl);
-						if(ans!=null)
+						try
 						{
-							for(AnnotationInfo ai: ans)
+							List<AnnotationInfo> ans = SFastClassUtils.getAnnotationInfos(model, cl);
+							if(ans!=null)
 							{
-								if(Agent.class.getName().equals(ai.getAnnotationName()))
+								for(AnnotationInfo ai: ans)
 								{
-									ret.setResult(Boolean.TRUE);
-									System.out.println("isLoadable true for: "+model);
+									if(Agent.class.getName().equals(ai.getAnnotationName()))
+									{
+										ret.setResult(Boolean.TRUE);
+										break;
+									}
 								}
-								break;
 							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
 						}
 						
 						if(!ret.isDone())
 							ret.setResult(Boolean.FALSE);
+		
+						//System.out.println("isLoadable (micro): "+model+" "+ret.get());
 					}
 				});
 			}
