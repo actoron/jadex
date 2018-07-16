@@ -219,7 +219,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					platformsecret = KeySecret.createRandom();
 					savesettings = true;
-					System.out.println("Generated new platform access key: "+platformsecret.toString().substring(KeySecret.PREFIX.length() + 1));
+//					System.out.println("Generated new platform access key: "+platformsecret.toString().substring(KeySecret.PREFIX.length() + 1));
 				}
 				
 				if (printsecret && platformsecret != null)
