@@ -19,15 +19,15 @@ public class SFastClassUtilsWithADifferentName
 	/**
 	 *  Gets the annotation infos of a class file for the class.
 	 * 
-	 *  @param origis The input stream with the class file data.
-	 *  @return Annotation infos for the class.
+	 *  @param inputstream The input stream of the class file. 
+	 *  @return The annotations of the class.
 	 */
-	public static final List<AnnotationInfos> getAnnotationInfos(InputStream origis)
+	public static final List<AnnotationInfos> getAnnotationInfos(InputStream inputstream)
 	{
 		try
 		{
-			DataInputStream is = new DataInputStream(new BufferedInputStream(origis, 16384));
-			if (0xCAFEBABE != is.readInt())
+			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
+			if (0xCAFEBABE != readInt(is))
 				throw new IllegalArgumentException("Not a class file.");
 			
 			is.skip(4);
@@ -36,15 +36,13 @@ public class SFastClassUtilsWithADifferentName
 			
 			is.skip(6);
 			
-			int ifacecount = is.readUnsignedShort();
+			int ifacecount = readShort(is);
 			
 			is.skip(ifacecount << 1);
 			
-			skipFieldsOrMethods(is, strings);
+			skipFieldsOrMethods(is);
 			
-			skipFieldsOrMethods(is, strings);
-			
-//			SUtil.readStream(buf, 0, 2, is);
+			skipFieldsOrMethods(is);
 			
 			return readVisibleAnnotations(is, strings);
 		}
@@ -54,20 +52,101 @@ public class SFastClassUtilsWithADifferentName
 		}
 		finally
 		{
-			SUtil.close(origis);
+			SUtil.close(inputstream);
 		}
 	}
 	
+	/**
+	 *  Gets the annotation infos of a class file for the class.
+	 * 
+	 *  @param inputstream The input stream of the class file. 
+	 *  @return The annotations of the class.
+	 */
+	public static final boolean hasTopLevelAnnotation(InputStream inputstream, String annotation)
+	{
+		try
+		{
+			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
+			if (0xCAFEBABE != readInt(is))
+				throw new IllegalArgumentException("Not a class file.");
+			
+			is.skip(4);
+			
+			Map<Integer, String> strings = readConstantPoolStrings(is);
+			
+			is.skip(6);
+			
+			int ifacecount = readShort(is);
+			
+			is.skip(ifacecount << 1);
+			
+			skipFieldsOrMethods(is);
+			
+			skipFieldsOrMethods(is);
+			
+			int ac = readShort(is);
+			for (int i = 0; i < ac; ++i)
+			{
+				int nameref = readShort(is);
+				if ("RuntimeVisibleAnnotations".equals(strings.get(nameref)))
+				{
+					is.skip(4);
+					
+					int anocount = readShort(is);
+					for (int j = 0; j < anocount; ++j)
+					{
+						int typeref = readShort(is);
+						int paircount = readShort(is);
+						
+						String type = strings.get(typeref);
+						if (type != null)
+							type = type.substring(1, type.length() - 1).replace('/', '.');
+						
+						if (annotation.equals(type))
+							return true;
+						
+						for (int k = 0; k < paircount; ++k)
+						{
+							is.skip(2);
+							readAnnotationValue(is, strings);
+						}
+					}
+					
+					break;
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+		finally
+		{
+			SUtil.close(inputstream);
+		}
+		return false;
+	}
+	
+	/**
+	 *  Reads strings from the constant pool.
+	 * 
+	 *  @param is The input stream.
+	 *  @return The constant pool strings.
+	 */
 	protected static final Map<Integer, String> readConstantPoolStrings(DataInputStream is) throws IOException
 	{
 		Map<Integer, String> ret = new HashMap<>();
-		int cpcount = is.readUnsignedShort();
+		int cpcount = readShort(is);
 		for (int i = 1; i < cpcount; ++i)
 		{
             byte tag = (byte) is.read();
             switch (tag)
             {
 	            case 1:
+	                //int len = readUnsignedShort(is);
+	                
+	                //is.skip(len);
+	                //ret.put(i, "dummy");
 	            	ret.put(i, is.readUTF());
 	                break;
 	            case 3:
@@ -101,9 +180,16 @@ public class SFastClassUtilsWithADifferentName
 		return ret;
 	}
 	
-	protected static final void skipFieldsOrMethods(DataInputStream is, Map<Integer, String> strings) throws IOException
+	/**
+	 *  Skips the field or method section of the class file.
+	 *  
+	 *  @param is The input stream.
+	 *  @param strings
+	 * @throws IOException
+	 */
+	protected static final void skipFieldsOrMethods(InputStream is) throws IOException
 	{
-		int fcount = is.readUnsignedShort();
+		int fcount = readShort(is);
 		
 		for (int i = 0; i < fcount; ++i)
 		{
@@ -112,13 +198,13 @@ public class SFastClassUtilsWithADifferentName
 		}
 	}
 	
-	protected static final void skipAttributes(DataInputStream is) throws IOException
+	protected static final void skipAttributes(InputStream is) throws IOException
 	{
-		int ac = is.readUnsignedShort();
+		int ac = readShort(is);
 		for (int i = 0; i < ac; ++i)
 		{
 			is.skip(2);
-			int len = is.readInt();
+			int len = readInt(is);
 			is.skip(len);
 		}
 	}
@@ -126,10 +212,10 @@ public class SFastClassUtilsWithADifferentName
 	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, String> strings) throws IOException
 	{
 		List<AnnotationInfos> ret = null;
-		int ac = is.readUnsignedShort();
+		int ac = readShort(is);
 		for (int i = 0; i < ac; ++i)
 		{
-			int nameref = is.readUnsignedShort();
+			int nameref = readShort(is);
 			if ("RuntimeVisibleAnnotations".equals(strings.get(nameref)))
 			{
 				is.skip(4);
@@ -139,17 +225,17 @@ public class SFastClassUtilsWithADifferentName
 			else
 			{
 //				System.out.println("Skipping " + strings.get(nameref) + " " + i);
-				int len = is.readInt();
+				int len = readInt(is);
 				is.skip(len);
 			}
 		}
 		return ret;
 	}
 	
-	public static final List<AnnotationInfos> readAnnotations(DataInputStream is, Map<Integer, String> strings) throws IOException
+	protected static final List<AnnotationInfos> readAnnotations(DataInputStream is, Map<Integer, String> strings) throws IOException
 	{
 		List<AnnotationInfos> ret = new ArrayList<>();
-		int anocount = is.readUnsignedShort();
+		int anocount = readShort(is);
 		for (int i = 0; i < anocount; ++i)
 		{
 			ret.add(readAnnotation(is, strings));
@@ -159,8 +245,8 @@ public class SFastClassUtilsWithADifferentName
 	
 	protected final static AnnotationInfos readAnnotation(DataInputStream is,  Map<Integer, String> strings) throws IOException
 	{
-		int typeref = is.readUnsignedShort();
-		int paircount = is.readUnsignedShort();
+		int typeref = readShort(is);
+		int paircount = readShort(is);
 		
 		String type = strings.get(typeref);
 //		if (type == null)
@@ -170,7 +256,7 @@ public class SFastClassUtilsWithADifferentName
 		
 		for (int i = 0; i < paircount; ++i)
 		{
-			int nameind = is.readUnsignedShort();
+			int nameind = readShort(is);
 			String name = strings.get(nameind);
 			if (name != null)
 			{
@@ -193,7 +279,7 @@ public class SFastClassUtilsWithADifferentName
 	}
 	
     /** Read an annotation value. */
-    private static final  Object readAnnotationValue(DataInputStream is, Map<Integer, String> strings) throws IOException
+    protected static final  Object readAnnotationValue(DataInputStream is, Map<Integer, String> strings) throws IOException
     {
     	Object ret = null;
         int tag = is.read() & 0xFF;
@@ -218,7 +304,7 @@ public class SFastClassUtilsWithADifferentName
 	            ret = readAnnotation(is, strings);
 	            break;
 	        case '[':
-				int count = is.readUnsignedShort();
+				int count = readShort(is);
 				ret = new Object[count];
 	            for (int i = 0; i < count; ++i)
 	            	((Object[]) ret)[i] = readAnnotationValue(is, strings);
@@ -277,5 +363,31 @@ public class SFastClassUtilsWithADifferentName
     			nestedannotations = new HashMap<>();
     		nestedannotations.put(name, nestedannotation);
     	}
+    }
+    
+    /**
+     *  Reads an integer from the stream.
+     * 
+     *  @param is The stream.
+     *  @return The integer.
+     */
+    protected static final int readInt(InputStream is) throws IOException
+    {
+    	int ret = is.read() & 0xFF;
+    	ret <<= 8;
+    	ret |= is.read() & 0xFF;
+    	ret <<= 8;
+    	ret |= is.read() & 0xFF;
+    	ret <<= 8;
+    	ret |= is.read() & 0xFF;
+    	return ret;
+    }
+    
+    protected static final int readShort(InputStream is) throws IOException
+    {
+    	int ret = is.read() & 0xFF;
+    	ret <<= 8;
+    	ret |= is.read() & 0xFF;
+    	return ret;
     }
 }
