@@ -610,8 +610,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<URL>> getAllURLs()
 	{
-		final long	start	= System.currentTimeMillis();
-		
+//		final long	start	= System.currentTimeMillis();
 		final Future<List<URL>> ret = new Future<List<URL>>();
 		
 		getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, List<URL>>(ret)
@@ -642,6 +641,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				ret.setResult(res);
 			}
 		});
+		
 		return ret;
 	}
 		

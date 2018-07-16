@@ -1715,7 +1715,7 @@ public class SReflect
 	/**
 	 *  Scan for files in a given list of urls.
 	 */
-	public static String[] scanForFiles(URL[] urls, IFilter filter)
+	public static String[] scanForFiles(URL[] urls, IFilter<Object> filter)
 	{
 		Set<String>	ret	= new HashSet<String>();
 		for(int i=0; i<urls.length; i++)
@@ -1733,7 +1733,7 @@ public class SReflect
 						jar	= new JarFile(f);
 						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
 						{
-							JarEntry	je	= e.nextElement();
+							JarEntry je	= e.nextElement();
 							if(filter.filter(je))	
 							{
 								ret.add(je.getName());
@@ -1770,9 +1770,76 @@ public class SReflect
 	}
 	
 	/**
+	 *  Scan for files in a given list of urls.
+	 */
+	public static Map<String, Set<String>> scanForFiles2(URL[] urls, IFilter<Object> filter)
+	{
+		Map<String, Set<String>> ret = new HashMap<>();
+		Set<String>	topset = new HashSet<String>();
+		
+		for(int i=0; i<urls.length; i++)
+		{
+//			System.out.println("Scanning: "+entry);
+			try
+			{
+//				System.out.println("url: "+urls[i].toURI());
+				File f = new File(urls[i].toURI());
+				if(f.getName().endsWith(".jar"))
+				{
+					JarFile	jar = null;
+					try
+					{
+						jar	= new JarFile(f);
+						Set<String>	set	= new HashSet<String>();
+						
+						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+						{
+							JarEntry je	= e.nextElement();
+							if(filter.filter(je))	
+							{
+								set.add(je.getName());
+							}
+						}
+						jar.close();
+					
+						if(set.size()>0)
+							ret.put(f.getAbsolutePath(), set);
+					}
+					catch(Exception e)
+					{
+//						System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
+					}
+					finally
+					{
+						if(jar!=null)
+						{
+							jar.close();
+						}
+					}
+				}
+				else if(f.isDirectory())
+				{
+					scanDir2(urls, f, filter, topset, new ArrayList<String>());
+//					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("scan problem with: "+urls[i]);
+//				e.printStackTrace();
+			}
+		}
+		
+		if(topset.size()>0)
+			ret.put(null, topset);
+		
+		return ret;
+	}
+	
+	/**
 	 *  Scan directories.
 	 */
-	public static void scanDir(URL[] urls, File file, IFilter filter, Collection<String> results, List<String> donedirs)
+	public static void scanDir(URL[] urls, File file, IFilter<Object> filter, Collection<String> results, List<String> donedirs)
 	{
 		File[] files = file.listFiles(new FileFilter()
 		{
@@ -1807,6 +1874,49 @@ public class SReflect
 				if(!donedirs.contains(dir.getAbsolutePath()))
 				{
 					scanDir(urls, dir, filter, results, donedirs);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Scan directories.
+	 */
+	public static void scanDir2(URL[] urls, File file, IFilter<Object> filter, Collection<String> results, List<String> donedirs)
+	{
+		File[] files = file.listFiles(new FileFilter()
+		{
+			public boolean accept(File f)
+			{
+				return !f.isDirectory();
+			}
+		});
+		for(File fi: files)
+		{
+			if(filter.filter(fi))
+			{
+				//String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+//				System.out.println("fn: "+fi.getName());
+				results.add(fi.getAbsolutePath());
+			}
+		}
+		
+		if(file.isDirectory())
+		{
+			donedirs.add(file.getAbsolutePath());
+			File[] sudirs = file.listFiles(new FileFilter()
+			{
+				public boolean accept(File f)
+				{
+					return f.isDirectory();
+				}
+			});
+			
+			for(File dir: sudirs)
+			{
+				if(!donedirs.contains(dir.getAbsolutePath()))
+				{
+					scanDir2(urls, dir, filter, results, donedirs);
 				}
 			}
 		}
