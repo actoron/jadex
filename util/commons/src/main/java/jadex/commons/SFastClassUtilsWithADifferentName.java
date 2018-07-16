@@ -64,6 +64,7 @@ public class SFastClassUtilsWithADifferentName
 	 */
 	public static final boolean hasTopLevelAnnotation(InputStream inputstream, String annotation)
 	{
+		annotation = "L" + annotation.replace('.', '/') + ";";
 		try
 		{
 			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
@@ -99,8 +100,8 @@ public class SFastClassUtilsWithADifferentName
 						int paircount = readShort(is);
 						
 						String type = strings.get(typeref);
-						if (type != null)
-							type = type.substring(1, type.length() - 1).replace('/', '.');
+//						if (type != null)
+//							type = type.substring(1, type.length() - 1).replace('/', '.');
 						
 						if (annotation.equals(type))
 							return true;
