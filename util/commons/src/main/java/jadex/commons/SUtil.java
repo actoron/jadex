@@ -130,23 +130,7 @@ public class SUtil
 	public static final Random FAST_RANDOM = new FastThreadedRandom();
 	
 	/** Access to secure random source. */
-	public static final SecureRandom SECURE_RANDOM;
-	static
-	{
-		SecureRandom secrand = null;
-		try
-		{
-			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
-			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
-			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
-		}
-		catch (Exception e)
-		{
-			secrand = new SecureRandom();
-		}
-		SECURE_RANDOM = secrand;
-		
-	}
+	protected static SecureRandom SECURE_RANDOM = null;
 	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
@@ -423,6 +407,30 @@ public class SUtil
 			}
 		});
 		RESOURCEINFO_MAPPERS	= mappers.toArray(new IResultCommand[mappers.size()]);
+	}
+	
+	/**
+	 *  Gets the global secure random.
+	 *  
+	 *  @return The secure random.
+	 */
+	public static final SecureRandom getSecureRandom()
+	{
+		if (SECURE_RANDOM == null)
+		{
+			try
+			{
+				Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+				Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
+				SECURE_RANDOM = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+			}
+			catch (Exception e)
+			{
+				SECURE_RANDOM = new SecureRandom();
+			}
+		}
+		
+		return SECURE_RANDOM;
 	}
 
 	/**
@@ -2031,7 +2039,7 @@ public class SUtil
 		chars[o++] = '_';
 		
 		byte[] precached = new byte[32];
-		SECURE_RANDOM.nextBytes(precached);
+		getSecureRandom().nextBytes(precached);
 		
 		long rndlong = SUtil.bytesToLong(precached, 0);
 		for (int i = 0; i < 11; ++i)

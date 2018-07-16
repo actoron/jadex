@@ -28,18 +28,18 @@ public class SFastClassUtilsWithADifferentName
 		try
 		{
 			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
-			if (0xCAFEBABE != readInt(is))
+			if (0xCAFEBABE != is.readInt())
 				throw new IllegalArgumentException("Not a class file.");
 			
-			is.skip(4);
+			skip(is, 4);
 			
 			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
 			
-			is.skip(6);
+			skip(is, 6);
 			
-			int ifacecount = readShort(is);
+			int ifacecount = is.readUnsignedShort();
 			
-			is.skip(ifacecount << 1);
+			skip(is, ifacecount << 1);
 			
 			skipFieldsOrMethods(is);
 			
@@ -69,36 +69,36 @@ public class SFastClassUtilsWithADifferentName
 		try
 		{
 			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
-			if (0xCAFEBABE != readInt(is))
+			if (0xCAFEBABE != is.readInt())
 				throw new IllegalArgumentException("Not a class file.");
 			
-			is.skip(4);
+			skip(is, 4);
 			
 			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
 			
-			is.skip(6);
+			skip(is, 6);
 			
-			int ifacecount = readShort(is);
+			int ifacecount = is.readUnsignedShort();
 			
-			is.skip(ifacecount << 1);
-			
-			skipFieldsOrMethods(is);
+			skip(is, ifacecount << 1);
 			
 			skipFieldsOrMethods(is);
 			
-			int ac = readShort(is);
+			skipFieldsOrMethods(is);
+			
+			int ac = is.readUnsignedShort();
 			for (int i = 0; i < ac; ++i)
 			{
-				int nameref = readShort(is);
+				int nameref = is.readUnsignedShort();
 				if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
 				{
-					is.skip(4);
+					skip(is, 4);
 					
-					int anocount = readShort(is);
+					int anocount = is.readUnsignedShort();
 					for (int j = 0; j < anocount; ++j)
 					{
-						int typeref = readShort(is);
-						int paircount = readShort(is);
+						int typeref = is.readUnsignedShort();
+						int paircount = is.readUnsignedShort();
 						
 						String type = decodeModifiedUtf8(strings.get(typeref));
 //						if (type != null)
@@ -109,7 +109,7 @@ public class SFastClassUtilsWithADifferentName
 						
 						for (int k = 0; k < paircount; ++k)
 						{
-							is.skip(2);
+							skip(is, 2);
 							readAnnotationValue(is, strings);
 						}
 					}
@@ -118,8 +118,8 @@ public class SFastClassUtilsWithADifferentName
 				}
 				else
 				{
-					int len = readInt(is);
-					is.skip(len);
+					int len = is.readInt();
+					skip(is, len);
 				}
 			}
 		}
@@ -143,7 +143,7 @@ public class SFastClassUtilsWithADifferentName
 	protected static final Map<Integer, byte[]> readConstantPoolStrings(DataInputStream is) throws IOException
 	{
 		Map<Integer, byte[]> ret = new HashMap<>();
-		int cpcount = readShort(is);
+		int cpcount = is.readUnsignedShort();
 		for (int i = 1; i < cpcount; ++i)
 		{
             byte tag = (byte) is.read();
@@ -160,8 +160,9 @@ public class SFastClassUtilsWithADifferentName
 	    				read = is.read(buf, off, len - read);
 	    				off += read;
 	    			}
+	    			ret.put(i, buf);
 	                
-	                //is.skip(len);
+	                //skip(is, len);
 	                //ret.put(i, "dummy");
 	            	
 //	            	ret.put(i, is.readUTF());
@@ -173,11 +174,11 @@ public class SFastClassUtilsWithADifferentName
 	            case 11:
 	            case 12:
 	            case 18:
-	                is.skip(4);
+	                skip(is, 4);
 	                break;
 	            case 5:
 	            case 6:
-	            	is.skip(8);
+	            	skip(is, 8);
 	                i++;
 	                break;
 	            case 7:
@@ -185,10 +186,10 @@ public class SFastClassUtilsWithADifferentName
 	            case 16:
 	            case 19:
 	            case 20:
-	            	is.skip(2);
+	            	skip(is, 2);
 	                break;
 	            case 15:
-	                is.skip(3);
+	                skip(is, 3);
 	                break;
 	            default:
 	                throw new RuntimeException("Unknown constant pool tag: " + tag);
@@ -204,45 +205,46 @@ public class SFastClassUtilsWithADifferentName
 	 *  @param strings
 	 * @throws IOException
 	 */
-	protected static final void skipFieldsOrMethods(InputStream is) throws IOException
+	protected static final void skipFieldsOrMethods(DataInputStream is) throws IOException
 	{
-		int fcount = readShort(is);
+		int fcount = is.readUnsignedShort();
 		
 		for (int i = 0; i < fcount; ++i)
 		{
-			is.skip(6);
+			skip(is, 6);
 			skipAttributes(is);
 		}
 	}
 	
-	protected static final void skipAttributes(InputStream is) throws IOException
+	protected static final void skipAttributes(DataInputStream is) throws IOException
 	{
-		int ac = readShort(is);
+		int ac = is.readUnsignedShort();
 		for (int i = 0; i < ac; ++i)
 		{
-			is.skip(2);
-			int len = readInt(is);
-			is.skip(len);
+			//skip(is, 2);
+			int index = is.readUnsignedShort();
+			int len = is.readInt();
+			skip(is, len);
 		}
 	}
 	
 	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
 		List<AnnotationInfos> ret = null;
-		int ac = readShort(is);
+		int ac = is.readUnsignedShort();
 		for (int i = 0; i < ac; ++i)
 		{
-			int nameref = readShort(is);
+			int nameref = is.readUnsignedShort();
 			if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
 			{
-				is.skip(4);
+				skip(is, 4);
 				ret = readAnnotations(is, strings);
 				break;
 			}
 			else
 			{
-				int len = readInt(is);
-				is.skip(len);
+				int len = is.readInt();
+				skip(is, len);
 			}
 		}
 		return ret;
@@ -251,7 +253,7 @@ public class SFastClassUtilsWithADifferentName
 	protected static final List<AnnotationInfos> readAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
 		List<AnnotationInfos> ret = new ArrayList<>();
-		int anocount = readShort(is);
+		int anocount = is.readUnsignedShort();
 		for (int i = 0; i < anocount; ++i)
 		{
 			ret.add(readAnnotation(is, strings));
@@ -261,8 +263,8 @@ public class SFastClassUtilsWithADifferentName
 	
 	protected final static AnnotationInfos readAnnotation(DataInputStream is,  Map<Integer, byte[]> strings) throws IOException
 	{
-		int typeref = readShort(is);
-		int paircount = readShort(is);
+		int typeref = is.readUnsignedShort();
+		int paircount = is.readUnsignedShort();
 		
 		String type = decodeModifiedUtf8(strings.get(typeref));
 //		if (type == null)
@@ -272,7 +274,7 @@ public class SFastClassUtilsWithADifferentName
 		
 		for (int i = 0; i < paircount; ++i)
 		{
-			int nameind = readShort(is);
+			int nameind = is.readUnsignedShort();
 			String name = decodeModifiedUtf8(strings.get(nameind));
 			if (name != null)
 			{
@@ -311,16 +313,16 @@ public class SFastClassUtilsWithADifferentName
 	        case 'Z':
 	        case 'c':
 	        case 's':
-	        	is.skip(2);
+	        	skip(is, 2);
 	        	break;
 	        case 'e':
-	            is.skip(4);
+	            skip(is, 4);
 	            break;
 	        case '@':
 	            ret = readAnnotation(is, strings);
 	            break;
 	        case '[':
-				int count = readShort(is);
+				int count = is.readUnsignedShort();
 				ret = new Object[count];
 	            for (int i = 0; i < count; ++i)
 	            	((Object[]) ret)[i] = readAnnotationValue(is, strings);
@@ -350,6 +352,12 @@ public class SFastClassUtilsWithADifferentName
     	{
     		throw SUtil.throwUnchecked(e);
     	}
+    }
+    
+    protected static final void skip(DataInputStream is, int len) throws IOException
+    {
+    	while (len > 0)
+    		len -= is.skip(len);
     }
     
     /**
@@ -400,31 +408,5 @@ public class SFastClassUtilsWithADifferentName
     			nestedannotations = new HashMap<>();
     		nestedannotations.put(name, nestedannotation);
     	}
-    }
-    
-    /**
-     *  Reads an integer from the stream.
-     * 
-     *  @param is The stream.
-     *  @return The integer.
-     */
-    protected static final int readInt(InputStream is) throws IOException
-    {
-    	int ret = is.read() & 0xFF;
-    	ret <<= 8;
-    	ret |= is.read() & 0xFF;
-    	ret <<= 8;
-    	ret |= is.read() & 0xFF;
-    	ret <<= 8;
-    	ret |= is.read() & 0xFF;
-    	return ret;
-    }
-    
-    protected static final int readShort(InputStream is) throws IOException
-    {
-    	int ret = is.read() & 0xFF;
-    	ret <<= 8;
-    	ret |= is.read() & 0xFF;
-    	return ret;
     }
 }

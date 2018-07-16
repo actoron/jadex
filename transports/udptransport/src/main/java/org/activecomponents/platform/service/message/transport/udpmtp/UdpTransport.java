@@ -147,7 +147,7 @@ public class UdpTransport implements ITransport
 	 */
 	public UdpTransport(IInternalAccess component, Integer port, Integer secureport)
 	{
-		SUdpUtil.RANDOM = SUtil.SECURE_RANDOM;
+		SUdpUtil.RANDOM = SUtil.getSecureRandom();
 		
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.addHandler(new Handler()

@@ -32,7 +32,7 @@ public class STest {
     static
     {
     	byte[] key = new byte[32];
-    	SUtil.SECURE_RANDOM.nextBytes(key);
+    	SUtil.getSecureRandom().nextBytes(key);
     	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
     }
     

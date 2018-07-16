@@ -118,6 +118,12 @@ public class SSecurity
 	/** Enable this to test the seeding fallback, do not change, used by tests only. */
 	protected static boolean TEST_ENTROPY_FALLBACK = false;
 	
+	static
+	{
+		// Initialize SUtil
+		SUtil.getSecureRandom();
+	}
+	
 	/**
 	 *  Gets access to the common secure PRNG.
 	 *  @return Common secure PRNG.
