@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,7 @@ public class SFastClassUtilsWithADifferentName
 			
 			is.skip(4);
 			
-			Map<Integer, String> strings = readConstantPoolStrings(is);
+			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
 			
 			is.skip(6);
 			
@@ -64,6 +65,7 @@ public class SFastClassUtilsWithADifferentName
 	 */
 	public static final boolean hasTopLevelAnnotation(InputStream inputstream, String annotation)
 	{
+		annotation = "L" + annotation.replace('.', '/') + ";";
 		try
 		{
 			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
@@ -72,7 +74,7 @@ public class SFastClassUtilsWithADifferentName
 			
 			is.skip(4);
 			
-			Map<Integer, String> strings = readConstantPoolStrings(is);
+			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
 			
 			is.skip(6);
 			
@@ -88,7 +90,7 @@ public class SFastClassUtilsWithADifferentName
 			for (int i = 0; i < ac; ++i)
 			{
 				int nameref = readShort(is);
-				if ("RuntimeVisibleAnnotations".equals(strings.get(nameref)))
+				if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
 				{
 					is.skip(4);
 					
@@ -98,9 +100,9 @@ public class SFastClassUtilsWithADifferentName
 						int typeref = readShort(is);
 						int paircount = readShort(is);
 						
-						String type = strings.get(typeref);
-						if (type != null)
-							type = type.substring(1, type.length() - 1).replace('/', '.');
+						String type = decodeModifiedUtf8(strings.get(typeref));
+//						if (type != null)
+//							type = type.substring(1, type.length() - 1).replace('/', '.');
 						
 						if (annotation.equals(type))
 							return true;
@@ -138,9 +140,9 @@ public class SFastClassUtilsWithADifferentName
 	 *  @param is The input stream.
 	 *  @return The constant pool strings.
 	 */
-	protected static final Map<Integer, String> readConstantPoolStrings(DataInputStream is) throws IOException
+	protected static final Map<Integer, byte[]> readConstantPoolStrings(DataInputStream is) throws IOException
 	{
-		Map<Integer, String> ret = new HashMap<>();
+		Map<Integer, byte[]> ret = new HashMap<>();
 		int cpcount = readShort(is);
 		for (int i = 1; i < cpcount; ++i)
 		{
@@ -148,11 +150,21 @@ public class SFastClassUtilsWithADifferentName
             switch (tag)
             {
 	            case 1:
-	                //int len = readUnsignedShort(is);
+	                int len = is.readUnsignedShort();
+	                byte[] buf = new byte[2 + len];
+	                SUtil.shortIntoBytes(len, buf, 0);
+	                int off = 2;
+	                int read = 0;
+	    			while (read < len)
+	    			{
+	    				read = is.read(buf, off, len - read);
+	    				off += read;
+	    			}
 	                
 	                //is.skip(len);
 	                //ret.put(i, "dummy");
-	            	ret.put(i, is.readUTF());
+	            	
+//	            	ret.put(i, is.readUTF());
 	                break;
 	            case 3:
 	            case 4:
@@ -214,14 +226,14 @@ public class SFastClassUtilsWithADifferentName
 		}
 	}
 	
-	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, String> strings) throws IOException
+	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
 		List<AnnotationInfos> ret = null;
 		int ac = readShort(is);
 		for (int i = 0; i < ac; ++i)
 		{
 			int nameref = readShort(is);
-			if ("RuntimeVisibleAnnotations".equals(strings.get(nameref)))
+			if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
 			{
 				is.skip(4);
 				ret = readAnnotations(is, strings);
@@ -236,7 +248,7 @@ public class SFastClassUtilsWithADifferentName
 		return ret;
 	}
 	
-	protected static final List<AnnotationInfos> readAnnotations(DataInputStream is, Map<Integer, String> strings) throws IOException
+	protected static final List<AnnotationInfos> readAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
 		List<AnnotationInfos> ret = new ArrayList<>();
 		int anocount = readShort(is);
@@ -247,12 +259,12 @@ public class SFastClassUtilsWithADifferentName
 		return ret;
 	}
 	
-	protected final static AnnotationInfos readAnnotation(DataInputStream is,  Map<Integer, String> strings) throws IOException
+	protected final static AnnotationInfos readAnnotation(DataInputStream is,  Map<Integer, byte[]> strings) throws IOException
 	{
 		int typeref = readShort(is);
 		int paircount = readShort(is);
 		
-		String type = strings.get(typeref);
+		String type = decodeModifiedUtf8(strings.get(typeref));
 //		if (type == null)
 //			continue;
 		type = type.substring(1, type.length() - 1).replace('/', '.');
@@ -261,7 +273,7 @@ public class SFastClassUtilsWithADifferentName
 		for (int i = 0; i < paircount; ++i)
 		{
 			int nameind = readShort(is);
-			String name = strings.get(nameind);
+			String name = decodeModifiedUtf8(strings.get(nameind));
 			if (name != null)
 			{
 				Object value = readAnnotationValue(is, strings);
@@ -283,7 +295,7 @@ public class SFastClassUtilsWithADifferentName
 	}
 	
     /** Read an annotation value. */
-    protected static final  Object readAnnotationValue(DataInputStream is, Map<Integer, String> strings) throws IOException
+    protected static final Object readAnnotationValue(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
     {
     	Object ret = null;
         int tag = is.read() & 0xFF;
@@ -317,6 +329,27 @@ public class SFastClassUtilsWithADifferentName
 	            throw new RuntimeException("Unknown Annotation tag: " + tag);
         }
         return ret;
+    }
+    
+    /**
+     *  Decodes a Java-style modified UTF8 string as used
+     *  in class files.
+     * 
+     *  @param data The string data.
+     *  @return The string.
+     */
+    protected static final String decodeModifiedUtf8(byte[] data)
+    {
+    	if (data == null)
+    		return null;
+    	try
+    	{
+    		return (new DataInputStream(new ByteArrayInputStream(data))).readUTF();
+    	}
+    	catch (Exception e)
+    	{
+    		throw SUtil.throwUnchecked(e);
+    	}
     }
     
     /**
