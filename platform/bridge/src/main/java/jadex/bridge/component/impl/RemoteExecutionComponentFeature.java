@@ -72,6 +72,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		add(RemoteForwardCmdCommand.class);
 		add(RemoteIntermediateResultCommand.class);
 		add(RemotePullCommand.class);
+		add(RemoteBackwardCommand.class);
 		add(RemoteResultCommand.class);
 		add(RemoteTerminationCommand.class);
 
