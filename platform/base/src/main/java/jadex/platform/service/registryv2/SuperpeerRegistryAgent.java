@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -22,6 +23,7 @@ import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.ISuperpeerCollaborationService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.collection.MultiCollection;
@@ -29,8 +31,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -47,8 +47,9 @@ import jadex.micro.annotation.ProvidedServices;
 @Service
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=Binding.SCOPE_GLOBAL),
-		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=Binding.SCOPE_GLOBAL)})
-public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerCollaborationService
+		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=Binding.SCOPE_GLOBAL),
+		   @ProvidedService(type=ISuperpeerStatusService.class)})
+public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerCollaborationService, ISuperpeerStatusService
 {
 	/** The agent. */
 	@Agent
@@ -77,6 +78,11 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	public ISubscriptionIntermediateFuture<Void> registerClient(String networkname)
 	{
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
+		clients.add(client);
+		for(SubscriptionIntermediateFuture<IComponentIdentifier> reglis: reglisteners)
+		{
+			reglis.addIntermediateResult(client);
+		}
 		System.out.println(agent+": Initiating super peer connection with client "+client+" for network "+networkname);
 		
 		SubscriptionIntermediateFuture<Void>	ret	= new SubscriptionIntermediateFuture<>(new TerminationCommand()
@@ -87,6 +93,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
 				// TODO: when connection is lost, remove all services and queries from client.
 				// FIXME: Terminate on error/timeout?
+				clients.remove(client);
 				clientqueries.remove(client);
 				serviceregistry.removeQueriesOfPlatform(client.getRoot());
 				for (IServiceRegistry reg : getApplicablePeers(null))
@@ -416,5 +423,35 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			default:
 				agent.getLogger().log(Level.SEVERE, "Unknown ServiceEvent: " + event.getType());
 		}
+	}
+	
+	//-------- superpeer status service --------
+	
+	protected Set<SubscriptionIntermediateFuture<IComponentIdentifier>>	reglisteners	= new LinkedHashSet<>();
+	protected Set<IComponentIdentifier>	clients	= new LinkedHashSet<>();
+	
+	/**
+	 *  Get the clients that are currently registered to super peer.
+	 */
+	public ISubscriptionIntermediateFuture<IComponentIdentifier>	getRegisteredClients()
+	{
+		SubscriptionIntermediateFuture<IComponentIdentifier>	reglis	= new SubscriptionIntermediateFuture<>();
+		reglis.setTerminationCommand(new TerminationCommand()
+		{
+			@Override
+			public void terminated(Exception reason)
+			{
+				reglisteners.remove(reglis);
+			}
+		});
+		
+		reglisteners.add(reglis);
+		
+		for(IComponentIdentifier client: clients)
+		{
+			reglis.addIntermediateResult(client);
+		}
+		
+		return reglis;
 	}
 }
