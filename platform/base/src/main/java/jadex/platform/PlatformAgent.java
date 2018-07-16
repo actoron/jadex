@@ -107,191 +107,88 @@ public class PlatformAgent
 		Map<Class<?>, String> names = new HashMap<Class<?>, String>();
 		DependencyResolver<Class<?>> dr = new DependencyResolver<Class<?>>();
 
-		// visualize feature dependencies for debugging
-//		Class<?> cl = SReflect.classForName0("jadex.tools.featuredeps.DepViewerPanel", null);
-//		if(cl!=null)
+//		URL[] urls = new URL[0];
+//		ClassLoader cloader = PlatformAgent.class.getClassLoader();
+//		if(cloader instanceof URLClassLoader)
+//			urls = ((URLClassLoader)cloader).getURLs();
+//		
+//		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, new FileFilter("$", false, ".class"));
+//		
+//		Set<Class<?>> agents = new HashSet<>();
+//		
+//		int cnt = 0;
+//		for(Map.Entry<String, Set<String>> entry: files.entrySet())
 //		{
-//			try
+//			String jarname = entry.getKey();
+//			if(jarname!=null)
 //			{
-//				Method m = cl.getMethod("createFrame", new Class[]{String.class, DependencyResolver.class});
-//				m.invoke(null, new Object[]{"deps", dr});
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-//		}
-		
-		URL[] urls = new URL[0];
-		ClassLoader cl = PlatformAgent.class.getClassLoader();
-		if(cl instanceof URLClassLoader)
-			urls = ((URLClassLoader)cl).getURLs();
-		
-//		SReflect.scanForFiles(urls, new FileFilter("$", false, ".class")
-//		{
-//			public boolean filter(Object obj)
-//			{
-//				if(super.filter(obj))
+//				try(JarFile jar	= new JarFile(jarname))
 //				{
-//					InputStream is;
-//					if(obj instanceof File)
+//					for(String jename: entry.getValue())
 //					{
-//						File f = (File)obj;
-//						is = new FileInputStream(f);
+//						System.out.println("aa"+cnt);
+//						JarEntry je = jar.getJarEntry(jename);
+//						System.out.println("bb"+cnt);
+//						InputStream is = jar.getInputStream(je);
+//						System.out.println("cc"+cnt);
+//						if(SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(is, Agent.class.getName()))
+//						{
+//							System.out.println("dd"+cnt);
+//							String	clname	= je.getName().substring(0, je.getName().length()-6).replace('/', '.');
+//							System.out.println("Found candidate: "+clname);
+//							Class<?> clazz = SReflect.findClass0(clname, null, cloader);
+//							System.out.println("ee"+cnt);
+//							agents.add(clazz);
+//						}
+//						System.out.println("f"+cnt++);
 //					}
-//					else if(obj instanceof JarEntry)
-//					{
-//						JarFile jar	= new JarFile(f);
-//						JarEntry je = (JarEntry)obj;
-//						is = jar.getInputStream(je);
-//					}
-////					SFastClassUtilsWithADifferentName.getAnnotationInfos()
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
 //				}
 //			}
-//		});
+//			else
+//			{
+//				for(String filename: entry.getValue())
+//				{
+//					try(FileInputStream is = new FileInputStream(filename))
+//					{
+//						System.out.println("a"+cnt+" "+filename);
+//						if(SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(is, Agent.class.getName()))
+//						{
+//							System.out.println("b"+cnt);
+//							String	clname	= filename.substring(0, filename.length()-6).replace('/', '.');
+//							System.out.println("Found candidate: "+clname);
+//							Class<?> clazz = SReflect.findClass0(clname, null, cloader);
+//							System.out.println("c"+cnt);
+//							agents.add(clazz);
+//						}
+//						System.out.println("d"+cnt++);
+//					}
+//					catch(Exception e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		}
+//
+//		for(Class<?> cl: agents)
+//			addComponentToLevels(dr, cl, names);
 		
-		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, new FileFilter("$", false, ".class"));
-		
-		Set<Class<?>> agents = new HashSet<>();
-		
-		int cnt = 0;
-		for(Map.Entry<String, Set<String>> entry: files.entrySet())
-		{
-			String jarname = entry.getKey();
-			if(jarname!=null)
-			{
-				try(JarFile jar	= new JarFile(jarname))
-				{
-					for(String jename: entry.getValue())
-					{
-						System.out.println("aa"+cnt);
-						JarEntry je = jar.getJarEntry(jename);
-						System.out.println("bb"+cnt);
-						InputStream is = jar.getInputStream(je);
-						System.out.println("cc"+cnt);
-						if(SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(is, Agent.class.getName()))
-						{
-							System.out.println("dd"+cnt);
-							String	clname	= je.getName().substring(0, je.getName().length()-6).replace('/', '.');
-							System.out.println("Found candidate: "+clname);
-							Class<?> clazz = SReflect.findClass0(clname, null, cl);
-							System.out.println("ee"+cnt);
-							agents.add(clazz);
-						}
-						System.out.println("f"+cnt++);
-					}
-					//jar.close();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			else
-			{
-				for(String filename: entry.getValue())
-				{
-					try(FileInputStream is = new FileInputStream(filename))
-					{
-						System.out.println("a"+cnt);
-						if(SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(is, Agent.class.getName()))
-						{
-							System.out.println("b"+cnt);
-							String	clname	= filename.substring(0, filename.length()-6).replace('/', '.');
-							System.out.println("Found candidate: "+clname);
-							Class<?> clazz = SReflect.findClass0(clname, null, cl);
-							System.out.println("c"+cnt);
-							agents.add(clazz);
-						}
-						System.out.println("d"+cnt++);
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-//		
-		System.out.println("cls: "+files.size()+" "+agents.size());
-		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
-		
+//		System.out.println("cls: "+files.size()+" "+agents.size());
+//		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
 		
 		FastClasspathScanner scanner = new FastClasspathScanner() 
 			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
 			.matchClassesWithAnnotation(Agent.class, c -> 
 		{
-			try
-			{
-//				System.out.println("Found Agent annotation on class: "+ c.getName());
-				Agent aan = c.getAnnotation(Agent.class);
-				Autostart autostart = aan.autostart();
-				if(autostart.value().toBoolean()!=null)
-				{		
-					Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
-					
-					String name = autostart.name().length()==0? null: autostart.name();
-					
-					boolean ok = autostart.value().toBoolean().booleanValue();
-					if(name!=null)
-					{
-						if(argsmap.containsKey(name))
-							ok = (boolean)argsmap.get(name);
-					}
-					else
-					{
-						// check classname as parameter
-						name = SReflect.getInnerClassName(c);
-						if(argsmap.containsKey(name.toLowerCase()))
-						{	
-							ok = (boolean)argsmap.get(name.toLowerCase());
-						}
-						else
-						{
-							// check classname - suffix (BDI/Agent etc) in lowercase
-							int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
-							if(suf>0)
-							{
-								name = name.substring(0, suf).toLowerCase();
-								if(argsmap.containsKey(name))
-								{	
-									ok = (boolean)argsmap.get(name);
-								}
-							}
-						}
-					}
-					
-					if(ok)
-					{
-						dr.addNode(c);
-						for(Class<?> pre: autostart.predecessors())
-						{
-							// Object as placeholder for no deps, because no entries should not mean no deps
-							if(!Object.class.equals(pre))
-								dr.addDependency(c, pre);
-						}
-						for(Class<?> suc: autostart.successors())
-							dr.addDependency(suc, c);
-						
-						// if no predecessors are defined add SecurityAgent
-						if(autostart.predecessors().length==0)
-							dr.addDependency(c, SecurityAgent.class);
-						
-						names.put(c, name);
-					}
-					else
-					{
-//						System.out.println("Not starting: "+name);
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+			addComponentToLevels(dr, c, names);
 		});
+		
 		ScanResult res = scanner.scan(); 
-		Set<String> agentclnames = new HashSet<String>(res.getNamesOfClassesWithAnnotation(Agent.class));
+//		Set<String> agentclnames = new HashSet<String>(res.getNamesOfClassesWithAnnotation(Agent.class));
 		
 		//for(String cl: agentclnames)
 		//	System.out.println(cl);
@@ -302,7 +199,84 @@ public class PlatformAgent
 		Collection<Set<Class<?>>> levels = dr.resolveDependenciesWithLevel();
 		
 		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
+		
 		return startComponents(cms, levels.iterator(), names);
+	}
+	
+	/**
+	 *  Add a components to the dependency resolver to build start levels.
+	 *  Components of the same level can be started in parallel.
+	 */
+	protected void addComponentToLevels(DependencyResolver<Class<?>> dr, Class<?> cl, Map<Class<?>, String> names)
+	{
+		try
+		{
+//			System.out.println("Found Agent annotation on class: "+ cl.getName());
+			Agent aan = cl.getAnnotation(Agent.class);
+			Autostart autostart = aan.autostart();
+			if(autostart.value().toBoolean()!=null)
+			{		
+				Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
+				
+				String name = autostart.name().length()==0? null: autostart.name();
+				
+				boolean ok = autostart.value().toBoolean().booleanValue();
+				if(name!=null)
+				{
+					if(argsmap.containsKey(name))
+						ok = (boolean)argsmap.get(name);
+				}
+				else
+				{
+					// check classname as parameter
+					name = SReflect.getInnerClassName(cl);
+					if(argsmap.containsKey(name.toLowerCase()))
+					{	
+						ok = (boolean)argsmap.get(name.toLowerCase());
+					}
+					else
+					{
+						// check classname - suffix (BDI/Agent etc) in lowercase
+						int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+						if(suf>0)
+						{
+							name = name.substring(0, suf).toLowerCase();
+							if(argsmap.containsKey(name))
+							{	
+								ok = (boolean)argsmap.get(name);
+							}
+						}
+					}
+				}
+				
+				if(ok)
+				{
+					dr.addNode(cl);
+					for(Class<?> pre: autostart.predecessors())
+					{
+						// Object as placeholder for no deps, because no entries should not mean no deps
+						if(!Object.class.equals(pre))
+							dr.addDependency(cl, pre);
+					}
+					for(Class<?> suc: autostart.successors())
+						dr.addDependency(suc, cl);
+					
+					// if no predecessors are defined add SecurityAgent
+					if(autostart.predecessors().length==0)
+						dr.addDependency(cl, SecurityAgent.class);
+					
+					names.put(cl, name);
+				}
+				else
+				{
+//					System.out.println("Not starting: "+name);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
