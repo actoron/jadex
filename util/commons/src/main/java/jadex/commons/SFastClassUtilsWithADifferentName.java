@@ -20,10 +20,9 @@ public class SFastClassUtilsWithADifferentName
 	 *  Gets the annotation infos of a class file for the class.
 	 * 
 	 *  @param origis The input stream with the class file data.
-	 *  @param toponly If true, skips checking for nested annotations.
 	 *  @return Annotation infos for the class.
 	 */
-	public static final List<AnnotationInfos> getAnnotationInfos(InputStream origis, boolean toponly)
+	public static final List<AnnotationInfos> getAnnotationInfos(InputStream origis)
 	{
 		try
 		{
