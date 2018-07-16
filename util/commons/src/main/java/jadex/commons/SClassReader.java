@@ -15,7 +15,7 @@ import java.util.Map;
  *  some utility methods for inspecting raw binary classes.
  *
  */
-public class SFastClassUtilsWithADifferentName
+public class SClassReader
 {
 	/**
 	 *  Gets the annotation infos of a class file for the class.
@@ -140,7 +140,7 @@ public class SFastClassUtilsWithADifferentName
 	 *  @param inputstream The input stream of the class file. 
 	 *  @return The annotations of the class.
 	 */
-	public static final Tuple2<String, Boolean> hasTopLevelAnnotationWithClassName(InputStream inputstream, String annotation)
+	public static final Tuple2<Boolean, String> hasTopLevelAnnotationWithClassName(InputStream inputstream, String annotation)
 	{
 		String classname = null;
 		annotation = "L" + annotation.replace('.', '/') + ";";
@@ -195,7 +195,7 @@ public class SFastClassUtilsWithADifferentName
 //							type = type.substring(1, type.length() - 1).replace('/', '.');
 						
 						if (annotation.equals(type))
-							return new Tuple2<String, Boolean>(classname, true);
+							return new Tuple2<Boolean, String>(true, classname);
 						
 						for (int k = 0; k < paircount; ++k)
 						{
@@ -221,7 +221,7 @@ public class SFastClassUtilsWithADifferentName
 		{
 			SUtil.close(inputstream);
 		}
-		return new Tuple2<String, Boolean>(classname, false);
+		return new Tuple2<Boolean, String>(false, classname);
 	}
 	
 	/**

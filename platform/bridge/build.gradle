@@ -9,5 +9,4 @@ dependencies
 	api project(':rules:eca') // Remove this stuff, don't know how :-(
 
 	api 'junit:junit:4.11'	// required for component test suite classes
-	api 'io.github.lukehutch:fast-classpath-scanner:3.1.6'
 }

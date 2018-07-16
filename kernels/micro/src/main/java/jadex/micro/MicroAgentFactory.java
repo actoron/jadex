@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import io.github.lukehutch.fastclasspathscanner.scanner.AnnotationInfo;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -23,7 +23,9 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
-import jadex.commons.SFastClassUtils;
+import jadex.commons.ResourceInfo;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfos;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -298,22 +300,28 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					{
 						try
 						{
-							List<AnnotationInfo> ans = SFastClassUtils.getAnnotationInfos(model, cl);
-							if(ans!=null)
+							ResourceInfo ri = SUtil.getResourceInfo0(model, cl);
+							if(ri==null)
+								ret.setResult(Boolean.FALSE);
+							else
 							{
-								for(AnnotationInfo ai: ans)
+								List<AnnotationInfos> ans = SClassReader.getAnnotationInfos(ri.getInputStream());
+								if(ans!=null)
 								{
-									if(Agent.class.getName().equals(ai.getAnnotationName()))
+									for(AnnotationInfos ai: ans)
 									{
-										ret.setResult(Boolean.TRUE);
-										break;
+										if(Agent.class.getName().equals(ai.getType()))
+										{
+											ret.setResult(Boolean.TRUE);
+											break;
+										}
 									}
 								}
 							}
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							ret.setResult(Boolean.FALSE);
 						}
 						
 						if(!ret.isDone())
