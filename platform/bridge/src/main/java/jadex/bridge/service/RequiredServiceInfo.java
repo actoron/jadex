@@ -300,7 +300,7 @@ public class RequiredServiceInfo
 	 */
 	public static boolean isScopeOnLocalPlatform(String scope)
 	{
-		return SCOPE_NONE.equals(scope) || SCOPE_COMPONENT_ONLY.equals(scope) || SCOPE_COMPONENT.equals(scope)
+		return scope==null || SCOPE_NONE.equals(scope) || SCOPE_COMPONENT_ONLY.equals(scope) || SCOPE_COMPONENT.equals(scope)
 			|| SCOPE_APPLICATION.equals(scope) || SCOPE_PLATFORM.equals(scope) || SCOPE_PARENT.equals(scope);
 	}
 }
