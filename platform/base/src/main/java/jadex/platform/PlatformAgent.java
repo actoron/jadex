@@ -4,13 +4,18 @@ import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
@@ -27,6 +32,8 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.FileFilter;
+import jadex.commons.SFastClassUtilsWithADifferentName;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
@@ -115,7 +122,100 @@ public class PlatformAgent
 //			}
 //		}
 		
-		final Set<Class> set;
+		URL[] urls = new URL[0];
+		ClassLoader cl = PlatformAgent.class.getClassLoader();
+		if(cl instanceof URLClassLoader)
+			urls = ((URLClassLoader)cl).getURLs();
+		
+//		SReflect.scanForFiles(urls, new FileFilter("$", false, ".class")
+//		{
+//			public boolean filter(Object obj)
+//			{
+//				if(super.filter(obj))
+//				{
+//					InputStream is;
+//					if(obj instanceof File)
+//					{
+//						File f = (File)obj;
+//						is = new FileInputStream(f);
+//					}
+//					else if(obj instanceof JarEntry)
+//					{
+//						JarFile jar	= new JarFile(f);
+//						JarEntry je = (JarEntry)obj;
+//						is = jar.getInputStream(je);
+//					}
+////					SFastClassUtilsWithADifferentName.getAnnotationInfos()
+//				}
+//			}
+//		});
+		
+		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, new FileFilter("$", false, ".class"));
+		
+		Set<Class<?>> agents = new HashSet<>();
+		
+		int cnt = 0;
+		for(Map.Entry<String, Set<String>> entry: files.entrySet())
+		{
+			String jarname = entry.getKey();
+			if(jarname!=null)
+			{
+				try(JarFile jar	= new JarFile(jarname))
+				{
+					for(String jename: entry.getValue())
+					{
+						System.out.println("aa"+cnt);
+						JarEntry je = jar.getJarEntry(jename);
+						System.out.println("bb"+cnt);
+						InputStream is = jar.getInputStream(je);
+						System.out.println("cc"+cnt);
+						if(SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(is, Agent.class.getName()))
+						{
+							System.out.println("dd"+cnt);
+							String	clname	= je.getName().substring(0, je.getName().length()-6).replace('/', '.');
+							System.out.println("Found candidate: "+clname);
+							Class<?> clazz = SReflect.findClass0(clname, null, cl);
+							System.out.println("ee"+cnt);
+							agents.add(clazz);
+						}
+						System.out.println("f"+cnt++);
+					}
+					//jar.close();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				for(String filename: entry.getValue())
+				{
+					try(FileInputStream is = new FileInputStream(filename))
+					{
+						System.out.println("a"+cnt);
+						if(SFastClassUtilsWithADifferentName.hasTopLevelAnnotation(is, Agent.class.getName()))
+						{
+							System.out.println("b"+cnt);
+							String	clname	= filename.substring(0, filename.length()-6).replace('/', '.');
+							System.out.println("Found candidate: "+clname);
+							Class<?> clazz = SReflect.findClass0(clname, null, cl);
+							System.out.println("c"+cnt);
+							agents.add(clazz);
+						}
+						System.out.println("d"+cnt++);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+//		
+		System.out.println("cls: "+files.size()+" "+agents.size());
+		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
+		
 		
 		FastClasspathScanner scanner = new FastClasspathScanner() 
 			.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
@@ -193,8 +293,8 @@ public class PlatformAgent
 		ScanResult res = scanner.scan(); 
 		Set<String> agentclnames = new HashSet<String>(res.getNamesOfClassesWithAnnotation(Agent.class));
 		
-		for(String cl: agentclnames)
-			System.out.println(cl);
+		//for(String cl: agentclnames)
+		//	System.out.println(cl);
 		
 		long end = System.currentTimeMillis();
 		System.out.println("Scanning needed: "+(end-start)/1000);

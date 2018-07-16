@@ -77,8 +77,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.random.FastThreadedRandom;
@@ -1084,92 +1082,6 @@ public class SUtil
 	}
 
 	/**
-	 * Extract the values out of an sl message.
-	 * 
-	 * @param message The sl message.
-	 * @return The extracted properties. / // obsolete ??? public static
-	 *         Properties parseSLToPropertiesFast(String message) { Properties
-	 *         props = new Properties(); int index = message.indexOf(':');
-	 *         while(index!=-1) { // Hack !!! Assume space separated slots. int
-	 *         index2 = message.indexOf(' ', index); String name =
-	 *         message.substring(index+1, index2); index = message.indexOf('"',
-	 *         index2); index2 = message.indexOf('"', index+1); String value =
-	 *         message.substring(index+1, index2); props.setProperty(name,
-	 *         value); index = message.indexOf(':', index2); } return props; }
-	 */
-	/**
-	 * Extract the value(s) out of an sl message.
-	 * 
-	 * @param message The sl message.
-	 * @return The extracted value(s) as string, index map or array list.
-	 * @see #toSLString(Object) / public static Object fromSLString(String
-	 *      message) { Object ret; // Parse map. if(message.startsWith("(Map ")
-	 *      && message.endsWith(")")) { message = message.substring(5,
-	 *      message.length()-1); ExpressionTokenizer exto = new
-	 *      ExpressionTokenizer(message, " \t\r\n", new String[]{"\"\"", "()"});
-	 *      Map map = new IndexMap().getAsMap(); // Hack???
-	 *      while(exto.hasMoreTokens()) { // Check for ":" as start of slot
-	 *      name. String slot = exto.nextToken(); if(!slot.startsWith(":") ||
-	 *      !exto.hasMoreTokens()) throw new
-	 *      RuntimeException("Invalid SL: "+message); slot = slot.substring(1);
-	 *      //if(slot.equals("2")) // System.out.println("Da1!"); map.put(slot,
-	 *      fromSLString(exto.nextToken())); } ret = map; } // Parse sequence to
-	 *      collection object. else if(message.startsWith("(sequence ") &&
-	 *      message.endsWith(")")) { message = message.substring(10,
-	 *      message.length()-1); ExpressionTokenizer exto2 = new
-	 *      ExpressionTokenizer(message, " \t\r\n", new String[]{"\"\"", "()"});
-	 *      List list = new ArrayList(); while(exto2.hasMoreTokens()) {
-	 *      list.add(fromSLString(exto2.nextToken())); } ret = list; } // Simple
-	 *      slot message. else { // Remove quotes from message.
-	 *      if(message.startsWith("\"") && message.endsWith("\"")) message =
-	 *      message.substring(1, message.length()-1); // Replace escaped quotes.
-	 *      message = SUtil.replace(message, "\\\"", "\""); ret = message; }
-	 *      return ret; }
-	 */
-
-	/**
-	 * Convert an object to an SL string. When the value is of type
-	 * java.util.Map the key value pairs are extracted as slots. Keys must be
-	 * valid slot names. Values of type java.util.Collection are stored as
-	 * sequence.
-	 * 
-	 * @return A string representation in SL. / public static String
-	 *         toSLString(Object o) { StringBuffer sbuf = new StringBuffer();
-	 *         toSLString(o, sbuf); return sbuf.toString(); }
-	 */
-
-	/**
-	 * Convert an object to an SL string. When the value is of type
-	 * java.util.Map the key value pairs are extracted as slots. Keys must be
-	 * valid slot names. Values of type java.util.Collection are stored as
-	 * sequence.
-	 * 
-	 * @param o The object to convert to SL.
-	 * @param sbuf The buffer to convert into. / public static void
-	 *        toSLString(Object o, StringBuffer sbuf) { // Get mapo from
-	 *        encodable object. /*if(o instanceof IEncodable) { o =
-	 *        ((IEncodable)o).getEncodableRepresentation(); }* / // Write
-	 *        contents as slot value pairs. if(o instanceof Map) { Map contents
-	 *        = (Map)o; sbuf.append("(Map "); for(Iterator
-	 *        i=contents.keySet().iterator(); i.hasNext();) { Object key =
-	 *        i.next(); Object val = contents.get(key); if(val!=null &&
-	 *        !"null".equals(val)) // Hack ??? { // Check if key is valid slot
-	 *        identifier. String keyval = key.toString();
-	 *        if(keyval.indexOf(' ')!=-1 || keyval.indexOf('\t')!=-1 ||
-	 *        keyval.indexOf('\r')!=-1 || keyval.indexOf('\n')!=-1) { throw new
-	 *        RuntimeException("Encoding error: Invalid slot name "+keyval); }
-	 *        sbuf.append(" :"); sbuf.append(keyval); sbuf.append(" ");
-	 *        toSLString(val, sbuf); } } sbuf.append(")"); } // Write collection
-	 *        value as sequence. else if(o instanceof Collection) { Collection
-	 *        coll = (Collection)o; sbuf.append(" (sequence "); for(Iterator
-	 *        j=coll.iterator(); j.hasNext(); ) { sbuf.append(" ");
-	 *        toSLString(j.next(), sbuf); } sbuf.append(")"); } // Write normal
-	 *        slot value as string. else { sbuf.append("\""); // Escape quotes
-	 *        (directly writes to string buffer). SUtil.replace(""+o, sbuf,
-	 *        "\"", "\\\""); sbuf.append("\""); } }
-	 */
-
-	/**
 	 * Parse a source string replacing occurrences and storing the result in the
 	 * given string buffer. This is a fast alternative to String.replaceAll(),
 	 * because it does not use regular expressions.
@@ -1353,11 +1265,11 @@ public class SUtil
 		{
 			URL url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
 			
-			if(url==null && name.endsWith(".class") && name.indexOf("/")==-1)
-			{
-				name = name.substring(0, name.length()-6).replace('.', '/')+".class";
-				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
-			}
+//			if(url==null && name.endsWith(".class") && name.indexOf("/")==-1)
+//			{
+//				name = name.substring(0, name.length()-6).replace('.', '/')+".class";
+//				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+//			}
 			
 			//System.out.println("url: "+url);
 			
@@ -2601,16 +2513,21 @@ public class SUtil
 				{
 					port = Integer.parseInt(transporturi.substring(portdiv+1));
 				}
-				try {
-					ret =  new URI(scheme, null, hostname, port, null, null, null);
-//					System.out.println("silently converted wrongly formatted URI: " + transporturi);
-				} catch (URISyntaxException e1) {
-					e1.printStackTrace();
+					try 
+					{
+						ret =  new URI(scheme, null, hostname, port, null, null, null);
+//						System.out.println("silently converted wrongly formatted URI: " + transporturi);
+					} 
+					catch (URISyntaxException e1) 
+					{
+						e1.printStackTrace();
+						rethrowAsUnchecked(e);
+					}
+				} 
+				else 
+				{
 					rethrowAsUnchecked(e);
 				}
-			} else {
-				rethrowAsUnchecked(e);
-			}
 		}
 		return ret;
 	}

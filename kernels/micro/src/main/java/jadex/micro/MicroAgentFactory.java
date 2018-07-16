@@ -283,13 +283,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
-
-//		final boolean[] ret = new boolean[1];
-//		FastClasspathScanner scanner = new FastClasspathScanner()
-//			.matchFilenamePath(model, (File c, String d) -> System.out.println("Found: "+c))
-//			//.matchFilenameExtension(".class", (File c, String d) -> System.out.println("Found file"+d))
-//			.matchClassesWithAnnotation(Agent.class, c -> { System.out.println("Found: "+c); ret[0] = true;});
-//		scanner.scan();
+		
+//		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
 		if(model.toLowerCase().endsWith(".class"))
 		{
@@ -324,8 +319,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						if(!ret.isDone())
 							ret.setResult(Boolean.FALSE);
 		
-						System.out.println("isLoadable (micro): "+model+" "+ret.get());
-
+						//System.out.println("isLoadable (micro): "+model+" "+ret.get());
 					}
 				});
 			}

@@ -44,7 +44,7 @@ public class SFastClassUtils
 	 *  @param cl The classloader.
 	 *  @return The annotation infos.
 	 */
-	public static List<AnnotationInfo> getAnnotationInfos(String filepath, ClassLoader cl)
+	public static List<AnnotationInfo> getAnnotationInfos(final String filepath, ClassLoader cl)
 	{
 		initialize();
 		
@@ -52,7 +52,12 @@ public class SFastClassUtils
 		InputStream is = null;
 		try
 		{
-			ResourceInfo ri = SUtil.getResourceInfo0(filepath, cl);
+			String fp = filepath;
+			if(fp.endsWith(".class") && fp.indexOf("/")==-1 && fp.indexOf("\\")==-1)
+				fp = fp.substring(0, fp.length()-6).replace('.', '/')+".class";
+			
+			ResourceInfo ri = SUtil.getResourceInfo0(fp, cl);
+			
 			String relpath = filepath;
 			if(filepath.indexOf("/")==-1 && filepath.indexOf("\\")==-1)
 				relpath = filepath.substring(0, filepath.length()-6).replace('.', '/')+".class";
