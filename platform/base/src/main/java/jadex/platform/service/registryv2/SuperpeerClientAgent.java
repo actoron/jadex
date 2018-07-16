@@ -476,7 +476,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			assert connection==null;
 			assert localquery==null;
 			
-			System.out.println(agent+" searching for super peers for network "+networkname);
+//			System.out.println(agent+" searching for super peers for network "+networkname);
 			
 			// Also finds and adds locally available super peers -> locaL registry only contains local services, (local/remote) super peer manages separate registry
 			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut	= agent.getFeature(IRequiredServicesFeature.class)
@@ -491,7 +491,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				{
 					if(running)
 					{
-						System.out.println(agent+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
+						agent.getLogger().info("Rrequesting super peer connection for network "+networkname+" from super peer: "+sp);
 						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
 						regfut.addResultListener(new IIntermediateResultListener<Void>()
 						{
@@ -503,7 +503,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 								// First connected super peer -> remember connection and stop search
 								if(running && superpeer==null)
 								{
-									System.out.println(agent+" accepting super peer connection for network "+networkname+" from super peer: "+sp);
+									agent.getLogger().info("Accepting super peer connection for network "+networkname+" from super peer: "+sp);
 									
 									// Stop ongoing search, if any
 									stopSuperpeerSearch();
@@ -545,6 +545,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 													{
 														try
 														{
+															System.out.println("Sending service event to superpeer: "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
@@ -686,7 +687,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		{
 			if(superpeerquery!=null)
 			{
-				System.out.println(agent+" stopping search for super peers for network: "+networkname);
+				agent.getLogger().info("Stopping search for super peers for network: "+networkname);
 				// Remove before terminate to avoid auto-start of new search on error.
 				ISubscriptionIntermediateFuture<ISuperpeerService>	tmp	= superpeerquery;
 				superpeerquery	=  null;
@@ -698,7 +699,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		{
 			if(connection!=null)
 			{
-				System.out.println(agent+" dropping super peer connection for network "+networkname+" from super peer: "+superpeer);
+				agent.getLogger().info("Dropping super peer connection for network "+networkname+" from super peer: "+superpeer);
 				assert localquery!=null;
 				assert !localquery.isDone();
 				assert connection!=null;

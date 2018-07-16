@@ -57,6 +57,8 @@ public class STest {
         config.getExtendedPlatformConfiguration().setSimulation(true);
         
         config.setValue("settings.readonly", true);
+        
+//        config.setLogging(true);
                 
         return config;
     }
