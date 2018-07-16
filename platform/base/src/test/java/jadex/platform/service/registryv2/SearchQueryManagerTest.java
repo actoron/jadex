@@ -32,6 +32,9 @@ public class SearchQueryManagerTest
 {
 	//-------- constants --------
 	
+	/** The delay time as factor of the default remote timeout. */
+	public static final double	WAITFACTOR	= 0.01;	// 30 * 0.01 secs  -> 300 millis.
+	
 	/** Client configuration for platform used for searching. */
 	public static final IPlatformConfiguration	CLIENTCONF;
 
@@ -87,12 +90,12 @@ public class SearchQueryManagerTest
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
-		System.out.println("Small wait to allow initial service events...");
-		client.waitForDelay(300, new IComponentStep<Void>()
+		client.waitForDelay(Starter.getScaledRemoteDefaultTimeout(client.getId(), WAITFACTOR), new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("Small wait to allow initial service events...");
 				return IFuture.DONE;
 			}
 		}, true).get();
@@ -122,16 +125,16 @@ public class SearchQueryManagerTest
 		// 1) add query -> not found (test if works with no superpeers and no other platforms)
 		IExternalAccess	client	= Starter.createPlatform(CLIENTCONF).get();
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
-		System.out.println("Small wait to make sure initial search has been run...");
-		client.waitForDelay(300, new IComponentStep<Void>()
+		client.waitForDelay(Starter.getScaledRemoteDefaultTimeout(client.getId(), WAITFACTOR), new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("Small wait to make sure initial search has been run...");
 				return IFuture.DONE;
 			}
 		}, true).get();
-		Assert.assertFalse(results.hasNextIntermediateResult());
+		Assert.assertFalse(results.hasNextIntermediateResult());	// TODO check w/o wait or allow get next intermediate with timeout
 		
 		// 2) start remote platform, wait for service -> test if awa fallback works with one platform, also checks local duplicate removal over time
 		IExternalAccess	pro1	= Starter.createPlatform(PROCONF).get();
@@ -151,12 +154,12 @@ public class SearchQueryManagerTest
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
-		System.out.println("Small wait to allow initial service events...");
-		client.waitForDelay(300, new IComponentStep<Void>()
+		client.waitForDelay(Starter.getScaledRemoteDefaultTimeout(client.getId(), WAITFACTOR), new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("Small wait to allow initial service events...");
 				return IFuture.DONE;
 			}
 		}, true).get();
