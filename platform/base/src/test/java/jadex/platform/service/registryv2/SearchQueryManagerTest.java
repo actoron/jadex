@@ -81,6 +81,7 @@ public class SearchQueryManagerTest
 		IExternalAccess	sp	= Starter.createPlatform(SPCONF).get();
 		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
+		connected.getNextIntermediateResult();	// Self-connection + client + 2x provider
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
@@ -144,6 +145,7 @@ public class SearchQueryManagerTest
 		IExternalAccess	sp	= Starter.createPlatform(SPCONF).get();
 		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
+		connected.getNextIntermediateResult();	// Self-connection + client + 2x provider
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
