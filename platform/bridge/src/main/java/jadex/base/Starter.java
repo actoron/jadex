@@ -1,25 +1,17 @@
 package jadex.base;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.rmi.server.SocketSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;

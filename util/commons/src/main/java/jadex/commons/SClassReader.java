@@ -15,7 +15,7 @@ import java.util.Map;
  *  some utility methods for inspecting raw binary classes.
  *
  */
-public class SFastClassUtilsWithADifferentName
+public class SClassReader
 {
 	/**
 	 *  Gets the annotation infos of a class file for the class.
@@ -135,6 +135,96 @@ public class SFastClassUtilsWithADifferentName
 	}
 	
 	/**
+	 *  Gets the annotation infos of a class file for the class.
+	 * 
+	 *  @param inputstream The input stream of the class file. 
+	 *  @return The annotations of the class.
+	 */
+	public static final Tuple2<Boolean, String> hasTopLevelAnnotationWithClassName(InputStream inputstream, String annotation)
+	{
+		String classname = null;
+		annotation = "L" + annotation.replace('.', '/') + ";";
+		try
+		{
+			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
+			if (0xCAFEBABE != is.readInt())
+				throw new IllegalArgumentException("Not a class file.");
+			
+			skip(is, 4);
+			
+			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
+			
+			skip(is, 2);
+			
+			int classnameindex = is.readUnsignedShort();
+			try
+			{
+				classname = decodeModifiedUtf8(strings.get(SUtil.bytesToShort(strings.get(classnameindex), 0) & 0xFFFF));
+				classname = classname.replace('/', '.');
+			}
+			catch (Exception e)
+			{
+			}
+			
+			skip(is, 2);
+			
+			int ifacecount = is.readUnsignedShort();
+			
+			skip(is, ifacecount << 1);
+			
+			skipFieldsOrMethods(is);
+			
+			skipFieldsOrMethods(is);
+			
+			int ac = is.readUnsignedShort();
+			for (int i = 0; i < ac; ++i)
+			{
+				int nameref = is.readUnsignedShort();
+				if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
+				{
+					skip(is, 4);
+					
+					int anocount = is.readUnsignedShort();
+					for (int j = 0; j < anocount; ++j)
+					{
+						int typeref = is.readUnsignedShort();
+						int paircount = is.readUnsignedShort();
+						
+						String type = decodeModifiedUtf8(strings.get(typeref));
+//						if (type != null)
+//							type = type.substring(1, type.length() - 1).replace('/', '.');
+						
+						if (annotation.equals(type))
+							return new Tuple2<Boolean, String>(true, classname);
+						
+						for (int k = 0; k < paircount; ++k)
+						{
+							skip(is, 2);
+							readAnnotationValue(is, strings);
+						}
+					}
+					
+					break;
+				}
+				else
+				{
+					int len = is.readInt();
+					skip(is, len);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+		finally
+		{
+			SUtil.close(inputstream);
+		}
+		return new Tuple2<Boolean, String>(false, classname);
+	}
+	
+	/**
 	 *  Reads strings from the constant pool.
 	 * 
 	 *  @param is The input stream.
@@ -182,6 +272,13 @@ public class SFastClassUtilsWithADifferentName
 	                i++;
 	                break;
 	            case 7:
+	            	buf = new byte[2];
+	            	int clen = 2;
+	            	int cread = 0;
+	    			while (cread < clen)
+		    			cread += is.read(buf, cread, clen - cread);
+	    			ret.put(i, buf);
+	    			break;
 	            case 8:
 	            case 16:
 	            case 19:
