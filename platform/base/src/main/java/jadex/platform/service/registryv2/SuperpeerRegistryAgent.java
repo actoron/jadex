@@ -119,6 +119,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			public void execute(Object obj)
 			{
 				ServiceEvent<IServiceIdentifier> event = (ServiceEvent<IServiceIdentifier>) obj;
+				System.out.println(agent+" received client event: "+event);
 				dispatchEventToRegistry(serviceregistry, event);
 			}
 		});
