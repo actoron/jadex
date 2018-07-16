@@ -164,6 +164,13 @@ public class FutureFunctionality
 	}
 	
 	/**
+	 *  Optionally augment backward command behavior.
+	 */
+	public void	handleBackwardCommand(Object info)
+	{
+	}
+	
+	/**
 	 *  Optionally augment pull behavior.
 	 */
 	public void	handlePull()
@@ -474,6 +481,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -625,6 +633,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingPullIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -758,6 +767,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -892,6 +902,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -989,6 +1000,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingTerminableDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});

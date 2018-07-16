@@ -26,6 +26,7 @@ import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.component.impl.remotecommands.AbstractInternalRemoteCommand;
 import jadex.bridge.component.impl.remotecommands.AbstractResultCommand;
 import jadex.bridge.component.impl.remotecommands.ISecuredRemoteCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteBackwardCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
@@ -151,7 +152,11 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				sendRxMessage(target, rxid, new RemotePullCommand<T>());
 			}
 			
-			// TODO: send backward command
+			@Override
+			public void handleBackwardCommand(Object info)
+			{
+				sendRxMessage(target, rxid, new RemoteBackwardCommand<T>(info));
+			}
 			
 			// cleanup on finished:
 			
