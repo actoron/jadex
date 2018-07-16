@@ -114,6 +114,11 @@ public class SFastClassUtilsWithADifferentName
 					
 					break;
 				}
+				else
+				{
+					int len = readInt(is);
+					is.skip(len);
+				}
 			}
 		}
 		catch (Exception e)
@@ -224,7 +229,6 @@ public class SFastClassUtilsWithADifferentName
 			}
 			else
 			{
-//				System.out.println("Skipping " + strings.get(nameref) + " " + i);
 				int len = readInt(is);
 				is.skip(len);
 			}
