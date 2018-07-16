@@ -1353,13 +1353,11 @@ public class SUtil
 		{
 			URL url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
 			
-			if(url==null && name.endsWith(".class") && name.indexOf("/")==-1)
-			{
-				name = name.substring(0, name.length()-6).replace('.', '/')+".class";
-				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
-			}
-			
-			System.out.println("url: "+url);
+//			if(url==null && name.endsWith(".class") && name.indexOf("/")==-1)
+//			{
+//				name = name.substring(0, name.length()-6).replace('.', '/')+".class";
+//				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+//			}
 			
 			// System.out.println("Classloader: "+classloader+" "+name+" "+url+" "+classloader.getParent());
 			// if(classloader instanceof URLClassLoader)
