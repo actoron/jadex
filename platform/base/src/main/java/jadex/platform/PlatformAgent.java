@@ -34,7 +34,6 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -299,7 +298,7 @@ public class PlatformAgent
 				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
 				
 				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c.getName()+".class", null, null);
-				fut.addResultListener(res -> {lis.resultAvailable(null);});
+				fut.addResultListener(res -> {lis.resultAvailable(null);}, exception -> {lis.exceptionOccurred(exception);});
 				
 //				System.out.println("Auto starting: "+names.get(c));
 			}
