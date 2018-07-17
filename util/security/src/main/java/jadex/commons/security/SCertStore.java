@@ -1,20 +1,16 @@
 package jadex.commons.security;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import jadex.commons.Base64;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.security.SSecurity;
 
 /**
  *  Class for loading / saving the certificate store.
@@ -22,19 +18,27 @@ import jadex.commons.security.SSecurity;
  */
 public class SCertStore
 {
-	public static final List<Tuple2<String, String>> loadCertStore(String path)
+	/** Prefix for encoded names. */
+	protected static final String ENCODED_NAME_PREFIX = "___encodedname___"; 
+	
+	/**
+	 *  Loads the cert store.
+	 *  
+	 *  @param storedata Cert store as binary.
+	 *  @return return Certs.
+	 */
+	public static final Map<String, PemKeyPair> loadCertStore(byte[] storedata)
 	{
-		File file = new File(path);
-		List<Tuple2<String, String>> ret = null;
+		ZipInputStream zis = null;
+		Map<String, PemKeyPair> ret = new HashMap<>();
 		
-		if (file.exists())
+		if (storedata != null && storedata.length > 0)
 		{
-			ZipInputStream zis = null;
 			try
 			{
-				zis = new ZipInputStream(new FileInputStream(file));
-				Map<String, String[]> map = new HashMap<String, String[]>();
-				ret = new ArrayList<Tuple2<String,String>>();
+				ByteArrayInputStream bais = new ByteArrayInputStream(storedata);
+				zis = new ZipInputStream(bais);
+				ret = new HashMap<>();
 				
 				ZipEntry entry = null;
 				while((entry = zis.getNextEntry()) != null)
@@ -42,34 +46,30 @@ public class SCertStore
 					if (entry.getName().endsWith(".crt") || entry.getName().endsWith(".key"))
 					{
 						String basename = entry.getName().substring(0, entry.getName().length() - 4);
-						String[] tup = map.get(basename);
-						if (tup == null)
+						if (basename.startsWith(ENCODED_NAME_PREFIX))
 						{
-							tup = new String[2];
-							map.put(basename, tup);
+							basename = basename.substring(ENCODED_NAME_PREFIX.length());
+							basename = new String(Base64.decodeNoPadding(basename.getBytes(SUtil.UTF8)), SUtil.UTF8);
+						}
+						PemKeyPair keypair = ret.get(basename);
+						if (keypair == null)
+						{
+							keypair = new PemKeyPair();
+							ret.put(basename, keypair);
 						}
 						
 						if (entry.getName().endsWith(".crt"))
 						{
 							String crt = new String(SUtil.readStream(zis), SUtil.UTF8);
-							tup[0] = crt;
+							keypair.setCertificate(crt);
 						}
 						else if (entry.getName().endsWith(".key"))
 						{
 							String key = new String(SUtil.readStream(zis), SUtil.UTF8);
-							tup[1] = key;
+							keypair.setKey(key);
 						}
 					}
 				}
-				
-				for (String[] val : map.values())
-				{
-					if (val[0] != null)
-						ret.add(new Tuple2<String, String>(val[0], val[1]));
-				}
-				
-				zis.close();
-				zis = null;
 			}
 			catch (Exception e)
 			{
@@ -78,78 +78,77 @@ public class SCertStore
 			}
 			finally
 			{
-				try
-				{
-					if (zis != null)
-						zis.close();
-				}
-				catch(Exception e)
-				{
-				}
+				SUtil.close(zis);
 			}
 		}
 		
 		return ret;
 	}
 	
-	public static void saveCertStore(String path, Collection<Tuple2<String, String>> certs)
+	/**
+	 *  Saves the cert store.
+	 *  
+	 *  @param certs The certs.
+	 *  @return Cert store as binary.
+	 */
+	public static byte[] saveCertStore(Collection<PemKeyPair> certs)
 	{
+		byte[] ret = null;
 		ZipOutputStream zos = null;
 		try
 		{
-			File tmpfile = File.createTempFile("certstore", ".zip");
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			zos = new ZipOutputStream(baos);
 			
-			zos = new ZipOutputStream(new FileOutputStream(tmpfile));
-			
-			for (Tuple2<String, String> cert : certs)
+			for (PemKeyPair cert : certs)
 			{
-				String name = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
+				String name = SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject().toString();
+				
+				if (!SUtil.ASCII.newEncoder().canEncode(name) || name.contains("/") || name.contains("."))
+					name = ENCODED_NAME_PREFIX + new String(Base64.encodeNoPadding(name.getBytes(SUtil.UTF8)), SUtil.UTF8);
 				
 				ZipEntry entry = new ZipEntry(name + ".crt");
 				zos.putNextEntry(entry);
-				zos.write(cert.getFirstEntity().getBytes(SUtil.UTF8));
+				zos.write(cert.getCertificate().getBytes(SUtil.UTF8));
 				zos.closeEntry();
 				
-				if (cert.getSecondEntity() != null)
+				if (cert.getKey() != null)
 				{
 					entry = new ZipEntry(name + ".key");
 					zos.putNextEntry(entry);
-					zos.write(cert.getSecondEntity().getBytes(SUtil.UTF8));
+					zos.write(cert.getKey().getBytes(SUtil.UTF8));
 					zos.closeEntry();
 				}
 			}
 			
-			zos.close();
-			zos = null;
-			
-			File file = new File(path);
-			SUtil.moveFile(tmpfile, file);
+			ret = baos.toByteArray();
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			throw SUtil.throwUnchecked(e);
 		}
 		finally
 		{
-			try
-			{
-				if (zos != null)
-					zos.close();
-			}
-			catch(Exception e)
-			{
-			}
+			SUtil.close(zos);
 		}
-	}
-	
-	public static final Map<String, Tuple2<String, String>> convertToSubjectMap(Collection<Tuple2<String, String>> certs)
-	{
-		Map<String, Tuple2<String, String>> ret = new HashMap<String, Tuple2<String,String>>();
-		for (Tuple2<String, String> cert : certs)
-		{
-			String key = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
-			ret.put(key, cert);
-		}
+		
 		return ret;
 	}
+	
+	/**
+	 *  Converts certificates to a lookup-manp
+	 *  @param certs The certificates.
+	 *  @return Lookup map.
+	 */
+//	public static final Map<String, PemKeyPair> convertToSubjectMap(Collection<PemKeyPair> certs)
+//	{
+//		Map<String, PemKeyPair> ret = new HashMap<>();
+//		for (PemKeyPair cert : certs)
+//		{
+//			String key = SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject().toString();
+//			ret.put(key, cert);
+//		}
+//		return ret;
+//	}
 }
