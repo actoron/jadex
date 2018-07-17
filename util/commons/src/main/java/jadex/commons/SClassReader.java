@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,132 +19,15 @@ import java.util.Map;
 public class SClassReader
 {
 	/**
-	 *  Gets the annotation infos of a class file for the class.
+	 *  Get infos about a class.
 	 * 
 	 *  @param inputstream The input stream of the class file. 
-	 *  @return The annotations of the class.
+	 *  @return The class infos.
 	 */
-	public static final List<AnnotationInfos> getAnnotationInfos(InputStream inputstream)
+	public static final ClassInfo getClassInfo(InputStream inputstream)
 	{
-		try
-		{
-			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
-			if (0xCAFEBABE != is.readInt())
-				throw new IllegalArgumentException("Not a class file.");
-			
-			skip(is, 4);
-			
-			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
-			
-			skip(is, 6);
-			
-			int ifacecount = is.readUnsignedShort();
-			
-			skip(is, ifacecount << 1);
-			
-			skipFieldsOrMethods(is);
-			
-			skipFieldsOrMethods(is);
-			
-			return readVisibleAnnotations(is, strings);
-		}
-		catch (Exception e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
-		finally
-		{
-			SUtil.close(inputstream);
-		}
-	}
-	
-	/**
-	 *  Gets the annotation infos of a class file for the class.
-	 * 
-	 *  @param inputstream The input stream of the class file. 
-	 *  @return The annotations of the class.
-	 */
-	public static final boolean hasTopLevelAnnotation(InputStream inputstream, String annotation)
-	{
-		annotation = "L" + annotation.replace('.', '/') + ";";
-		try
-		{
-			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
-			if (0xCAFEBABE != is.readInt())
-				throw new IllegalArgumentException("Not a class file.");
-			
-			skip(is, 4);
-			
-			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
-			
-			skip(is, 6);
-			
-			int ifacecount = is.readUnsignedShort();
-			
-			skip(is, ifacecount << 1);
-			
-			skipFieldsOrMethods(is);
-			
-			skipFieldsOrMethods(is);
-			
-			int ac = is.readUnsignedShort();
-			for (int i = 0; i < ac; ++i)
-			{
-				int nameref = is.readUnsignedShort();
-				if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
-				{
-					skip(is, 4);
-					
-					int anocount = is.readUnsignedShort();
-					for (int j = 0; j < anocount; ++j)
-					{
-						int typeref = is.readUnsignedShort();
-						int paircount = is.readUnsignedShort();
-						
-						String type = decodeModifiedUtf8(strings.get(typeref));
-//						if (type != null)
-//							type = type.substring(1, type.length() - 1).replace('/', '.');
-						
-						if (annotation.equals(type))
-							return true;
-						
-						for (int k = 0; k < paircount; ++k)
-						{
-							skip(is, 2);
-							readAnnotationValue(is, strings);
-						}
-					}
-					
-					break;
-				}
-				else
-				{
-					int len = is.readInt();
-					skip(is, len);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
-		finally
-		{
-			SUtil.close(inputstream);
-		}
-		return false;
-	}
-	
-	/**
-	 *  Gets the annotation infos of a class file for the class.
-	 * 
-	 *  @param inputstream The input stream of the class file. 
-	 *  @return The annotations of the class.
-	 */
-	public static final Tuple2<Boolean, String> hasTopLevelAnnotationWithClassName(InputStream inputstream, String annotation)
-	{
-		String classname = null;
-		annotation = "L" + annotation.replace('.', '/') + ";";
+		ClassInfo ret = new ClassInfo();
+		
 		try
 		{
 			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
@@ -159,8 +43,9 @@ public class SClassReader
 			int classnameindex = is.readUnsignedShort();
 			try
 			{
-				classname = decodeModifiedUtf8(strings.get(SUtil.bytesToShort(strings.get(classnameindex), 0) & 0xFFFF));
+				String classname = decodeModifiedUtf8(strings.get(SUtil.bytesToShort(strings.get(classnameindex), 0) & 0xFFFF));
 				classname = classname.replace('/', '.');
+				ret.setClassname(classname);
 			}
 			catch (Exception e)
 			{
@@ -176,42 +61,8 @@ public class SClassReader
 			
 			skipFieldsOrMethods(is);
 			
-			int ac = is.readUnsignedShort();
-			for (int i = 0; i < ac; ++i)
-			{
-				int nameref = is.readUnsignedShort();
-				if ("RuntimeVisibleAnnotations".equals(decodeModifiedUtf8(strings.get(nameref))))
-				{
-					skip(is, 4);
-					
-					int anocount = is.readUnsignedShort();
-					for (int j = 0; j < anocount; ++j)
-					{
-						int typeref = is.readUnsignedShort();
-						int paircount = is.readUnsignedShort();
-						
-						String type = decodeModifiedUtf8(strings.get(typeref));
-//						if (type != null)
-//							type = type.substring(1, type.length() - 1).replace('/', '.');
-						
-						if (annotation.equals(type))
-							return new Tuple2<Boolean, String>(true, classname);
-						
-						for (int k = 0; k < paircount; ++k)
-						{
-							skip(is, 2);
-							readAnnotationValue(is, strings);
-						}
-					}
-					
-					break;
-				}
-				else
-				{
-					int len = is.readInt();
-					skip(is, len);
-				}
-			}
+			List<AnnotationInfos> annos = readVisibleAnnotations(is, strings);
+			ret.setAnnotations(annos);
 		}
 		catch (Exception e)
 		{
@@ -221,7 +72,8 @@ public class SClassReader
 		{
 			SUtil.close(inputstream);
 		}
-		return new Tuple2<Boolean, String>(false, classname);
+		
+		return ret;
 	}
 	
 	/**
@@ -272,6 +124,7 @@ public class SClassReader
 	                i++;
 	                break;
 	            case 7:
+	            case 8:
 	            	buf = new byte[2];
 	            	int clen = 2;
 	            	int cread = 0;
@@ -279,7 +132,6 @@ public class SClassReader
 		    			cread += is.read(buf, cread, clen - cread);
 	    			ret.put(i, buf);
 	    			break;
-	            case 8:
 	            case 16:
 	            case 19:
 	            case 20:
@@ -376,9 +228,14 @@ public class SClassReader
 			if (name != null)
 			{
 				Object value = readAnnotationValue(is, strings);
+				
 				if (value instanceof AnnotationInfos)
 				{
 					ret.addNestedAnnotations(name, (AnnotationInfos) value);
+				}
+				else if (value instanceof String)
+				{
+					ret.addStringValue(name, (String) value);
 				}
 //				else if (value instanceof Object[])
 //				{
@@ -409,8 +266,17 @@ public class SClassReader
 	        case 'S':
 	        case 'Z':
 	        case 'c':
-	        case 's':
 	        	skip(is, 2);
+	        	break;
+	        case 's':
+	        	int strind = is.readUnsignedShort();
+	        	byte[] enc = strings.get(strind);
+	        	if (enc != null)
+	        	{
+	        		enc = strings.get(strind);
+	        		if (enc != null)
+	        			ret = decodeModifiedUtf8(enc);
+	        	}
 	        	break;
 	        case 'e':
 	            skip(is, 4);
@@ -458,8 +324,71 @@ public class SClassReader
     }
     
     /**
+     *  Class for infos about a class.
+     */
+    public static class ClassInfo
+    {
+    	/** The class name. */
+    	protected String classname;
+    	
+    	/** The annotations. */
+    	protected Collection<AnnotationInfos> annotations;
+
+    	/**
+    	 *  Create a new classinfo.
+    	 */
+		public ClassInfo()
+		{
+		}
+    	
+    	/**
+    	 *  Create a new classinfo.
+    	 */
+		public ClassInfo(String classname, Collection<AnnotationInfos> annotations)
+		{
+			this.classname = classname;
+			this.annotations = annotations;
+		}
+
+		/**
+		 *  Get the classname.
+		 *  @return the classname.
+		 */
+		public String getClassname()
+		{
+			return classname;
+		}
+
+		/**
+		 *  Set the classname.
+		 *  @param classname the classname to set
+		 */
+		public void setClassname(String classname)
+		{
+			this.classname = classname;
+		}
+
+		/**
+		 *  Get the annotations.
+		 *  @return the annotations
+		 */
+		public Collection<AnnotationInfos> getAnnotations()
+		{
+			return annotations;
+		}
+
+		/**
+		 *  Set the annotations.
+		 *  @param annotations the annotations to set
+		 */
+		public void setAnnotations(Collection<AnnotationInfos> annotations)
+		{
+			this.annotations = annotations;
+		}
+    }
+    
+    /**
      *  Class containing annotation infos.
-     *
      */
     public static class AnnotationInfos
     {
@@ -468,6 +397,9 @@ public class SClassReader
     	
     	/** Annotations nested in this annotation. */
     	Map<String, AnnotationInfos> nestedannotations;
+    	
+    	/** Annotations nested in this annotation. */
+    	Map<String, String> stringvalues;
     	
     	/**
     	 *  Creates the info.
@@ -493,6 +425,28 @@ public class SClassReader
 		{
 			return nestedannotations;
 		}
+    	
+    	/**
+    	 *  Returns the contained string values.
+    	 *  
+    	 *  @return The contained string values.
+    	 */
+    	public Map<String, String> getStringValues()
+		{
+			return stringvalues;
+		}
+    	
+    	/**
+    	 *  Adds a string value.
+    	 *  @param name Name of the value.
+    	 *  @param value The value.
+    	 */
+    	protected void addStringValue(String name, String value)
+    	{
+    		if (stringvalues == null)
+    			stringvalues = new HashMap<>();
+    		stringvalues.put(name, value);
+    	}
     	
     	/**
     	 *  Adds a nested annotation.

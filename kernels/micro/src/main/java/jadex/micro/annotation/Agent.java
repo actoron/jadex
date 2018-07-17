@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Boolean3;
+import jadex.micro.MicroAgentFactory;
 
 
 /**
@@ -67,4 +68,9 @@ public @interface Agent
 	 *  Auto-start this agent on platform startup.
 	 */
 	public Autostart autostart() default @Autostart();
+	
+	/**
+	 *  The agent type. 
+	 */
+	public String type() default MicroAgentFactory.FILETYPE_MICROAGENT;
 }
