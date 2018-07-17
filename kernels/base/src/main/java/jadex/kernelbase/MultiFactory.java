@@ -124,6 +124,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** Unloadable kernel locations that may become loadable later. */
 	protected Set<String> potentialkernellocations;
 	
+	protected Set<String> runningkerneltypes = new HashSet<>();
+	
 	/** Call Multiplexer */
 	protected CallMultiplexer multiplexer;
 	
@@ -157,6 +159,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public MultiFactory(String[] defaultLocations, String[] potentiallocs, String[] kernelblacklist, String[] extensionblacklist)
 	{
+		runningkerneltypes.add("Agent.class");
 		//super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
 		//this.ia = ia;
 		this.factorycache = new HashMap<String, IComponentFactory>();
@@ -934,12 +937,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		final Future ret = new Future();
 		
 //		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
-		Tuple2<String, Object> cachedkernels = getCacheKeyValueForModel(model, (Map) kernellocationcache);
+		final Tuple2<String, Object> cachedkernels = getCacheKeyValueForModel(model, (Map) kernellocationcache);
 		final Object kernelsext = cachedkernels != null? cachedkernels.getFirstEntity(): null;
 		Collection kernels = cachedkernels != null? (Collection) cachedkernels.getSecondEntity() : null;
 		String cachedresult = null;
 		if(kernels != null && !kernels.isEmpty())
-			cachedresult = (String) kernels.iterator().next();
+				cachedresult = (String) kernels.iterator().next();
 		
 		if(cachedresult != null)
 		{
@@ -949,6 +952,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			startLoadableKernel(model, imports, rid, kernelmodel)
 				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 			{
+				public void customResultAvailable(Object result)
+				{
+					runningkerneltypes.add(cachedkernels.getFirstEntity());
+					super.customResultAvailable(result);
+				}
+				
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("remove: "+kernelsext+", "+kernelmodel);
@@ -1714,12 +1723,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			for (Map.Entry<String, Object> entry : map.entrySet())
 			{
-				String ext = entry.getKey();
-				if (model.endsWith(ext))
+				String oext = entry.getKey();
+				if (!runningkerneltypes.contains(oext))
 				{
-					ret = new Tuple2<String, Object>(entry.getKey(), entry.getValue());
-					
-					break;
+					String ext = oext.substring(oext.indexOf('.'));
+					if (model.endsWith(ext))
+					{
+						ret = new Tuple2<String, Object>(entry.getKey(), entry.getValue());
+						break;
+					}
 				}
 			}
 		}
