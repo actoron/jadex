@@ -452,9 +452,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		try
+		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		if(cs!=null)
 		{
-			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 			ITimedObject	to	=  	new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -504,9 +504,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				cs.createTimer(delay, to);
 			}
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			ret.setException(new IllegalStateException("No clockservice found"));
 		}
 		
 		return ret;
