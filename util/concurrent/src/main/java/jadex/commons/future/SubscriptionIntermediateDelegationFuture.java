@@ -3,7 +3,6 @@ package jadex.commons.future;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +47,11 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 *  @param result The result.
 	 */
 	
-	protected void addResult(E result)
+	protected void storeResult(E result)
 	{
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
-			super.addResult(result);
+			super.storeResult(result);
 		
 		if(ownresults!=null)
 		{
@@ -115,7 +114,24 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			results=null;
 		}
     }
-    
+    /**
+     *  Iterate over the intermediate results in a blocking fashion.
+     *  Manages results independently for different callers, i.e. when called
+     *  from different threads, each thread receives all intermediate results.
+     *  
+     *  The operation is guaranteed to be non-blocking, if hasNextIntermediateResult()
+     *  has returned true before for the same caller. Otherwise the caller is blocked
+     *  until a result is available or the future is finished.
+     *  
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+	@Override
+    public E getNextIntermediateResult(long timeout, boolean realtime)
+    {
+    	return doGetNextIntermediateResult(0, timeout, realtime);
+    }
+
     /**
      *  Check if there are more results for iteration for the given caller.
      *  If there are currently no unprocessed results and future is not yet finished,
@@ -124,7 +140,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
      *  
      *  @return	True, when there are more intermediate results for the caller.
      */
-    @Override
+	@Override
     public boolean hasNextIntermediateResult()
     {
     	boolean	ret;
@@ -136,17 +152,32 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	   	}
 
 		List<E>	ownres;
+
     	synchronized(this)
     	{
-    		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
-    		if(index==null)
-    		{
-    			index	= Integer.valueOf(0);
-    		}
-    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
-    		
-    		ret	= results!=null && results.size()>index.intValue()
-    			|| ownres!=null && !ownres.isEmpty();
+			if(storeforfirst)
+			{
+				storeforfirst	= false;
+				ownres	= results;
+				results	= null;
+			}
+			else
+			{
+	    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+			}
+
+			if(ownres==null)
+			{
+    			ownres	= new LinkedList<E>();
+			}
+			
+			if(ownresults==null || !ownresults.containsKey(Thread.currentThread()))
+			{
+				ownresults	= ownresults!=null ? ownresults : new HashMap<Thread, List<E>>();
+				ownresults.put(Thread.currentThread(), ownres);
+			}
+			
+    		ret	= !ownres.isEmpty();
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -160,19 +191,6 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	
     	if(suspend)
     	{
-    		synchronized(this)
-    		{
-    			if(ownres==null)
-    			{
-	    			ownres	= new LinkedList<E>();
-	    			if(ownresults==null)
-	    			{
-	    				ownresults	= new HashMap<Thread, List<E>>();
-	    			}
-	    			ownresults.put(Thread.currentThread(), ownres);
-    			}
-    		}
-    		
 	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 	    	synchronized(mon)
 	    	{
@@ -183,14 +201,14 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	    		// todo: realtime as method parameter?!
     				caller.suspend(this, UNSET, false);
     	    	   	icallers.remove(caller);
-    		    	ret	= hasNextIntermediateResult();
     			}
     			// else already resumed.
     		}
+	    	ret	= hasNextIntermediateResult();
     	}
     	
     	return ret;
-    }	
+    }
 	
     /**
      *  Perform the get without increasing the index.
@@ -206,22 +224,35 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	   		caller = new ThreadSuspendable();
 	   	}
 
-    	List<E>	ownres;
+		List<E>	ownres;
+
     	synchronized(this)
     	{
-    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
-    		if(ownres!=null && !ownres.isEmpty())
+			if(storeforfirst)
+			{
+				storeforfirst	= false;
+				ownres	= results;
+				results	= null;
+			}
+			else
+			{
+	    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+			}
+
+			if(ownres==null)
+			{
+    			ownres	= new LinkedList<E>();
+			}
+			
+			if(ownresults==null || !ownresults.containsKey(Thread.currentThread()))
+			{
+				ownresults	= ownresults!=null ? ownresults : new HashMap<Thread, List<E>>();
+				ownresults.put(Thread.currentThread(), ownres);
+			}
+			
+    		if(!ownres.isEmpty())
     		{
     			ret	= ownres.remove(0);
-    		}
-    		else if(results!=null && results.size()>index)
-    		{
-    			// Hack!!! it there a better way to access the i-est element?
-    			Iterator<E>	it	= results.iterator();
-    			for(int i=0; i<=index; i++)
-    			{
-    				ret	= it.next();
-    			}
     		}
     		else if(isDone())
     		{
@@ -236,23 +267,10 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	    	   	}
 	    	   	icallers.put(caller, CALLER_QUEUED);
     		}
-   		}
+    	}
     	
     	if(suspend)
     	{
-    		synchronized(this)
-    		{
-    			if(ownres==null)
-    			{
-	    			ownres	= new LinkedList<E>();
-	    			if(ownresults==null)
-	    			{
-	    				ownresults	= new HashMap<Thread, List<E>>();
-	    			}
-	    			ownresults.put(Thread.currentThread(), ownres);
-    			}
-    		}
-
 	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 	    	synchronized(mon)
 	    	{
