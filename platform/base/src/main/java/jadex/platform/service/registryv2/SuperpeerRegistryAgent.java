@@ -83,14 +83,14 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		{
 			reglis.addIntermediateResult(client);
 		}
-		System.out.println(agent+": Initiating super peer connection with client "+client+" for network "+networkname);
+//		System.out.println(agent+": Initiating super peer connection with client "+client+" for network "+networkname);
 		
 		SubscriptionIntermediateFuture<Void>	ret	= new SubscriptionIntermediateFuture<>(new TerminationCommand()
 		{
 			@Override
 			public void terminated(Exception reason)
 			{
-				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
+//				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
 				// TODO: when connection is lost, remove all services and queries from client.
 				// FIXME: Terminate on error/timeout?
 				clients.remove(client);
@@ -408,7 +408,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		switch(event.getType())
 		{
 			case ServiceEvent.SERVICE_ADDED:
-				System.out.println("Superpeer added service: " + event.getService());
+//				System.out.println("Superpeer added service: " + event.getService());
 				registry.addService(event.getService());
 				break;
 				
