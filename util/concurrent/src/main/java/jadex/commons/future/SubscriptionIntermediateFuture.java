@@ -68,6 +68,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	 *  Add a result.
 	 *  @param result The result.
 	 */
+	@Override
 	protected void addResult(E result)
 	{
 		// Store results only if necessary for first listener.
@@ -105,6 +106,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
      *  Add a result listener.
      *  @param listsner The listener.
      */
+	@Override
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(!(listener instanceof IIntermediateResultListener))
@@ -134,6 +136,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
      *  
      *  @return	True, when there are more intermediate results for the caller.
      */
+	@Override
     public boolean hasNextIntermediateResult()
     {
     	boolean	ret;
@@ -214,7 +217,8 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index)
+    @Override
+    protected E doGetNextIntermediateResult(int index, long timeout, boolean realtime)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
@@ -225,14 +229,9 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	   	}
 
     	List<E>	ownres;
-    	boolean first;
-
     	synchronized(this)
     	{
-			first = storeforfirst;
-			storeforfirst	= false;
-
-			ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
     		if(ownres!=null && !ownres.isEmpty())
     		{
     			ret	= ownres.remove(0);
@@ -261,11 +260,6 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		}
    		}
     	
-		if(first)
-		{
-			results=null;
-		}
-    	
     	if(suspend)
     	{
     		synchronized(this)
@@ -288,20 +282,14 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    		// todo: realtime as method parameter?!
-    				caller.suspend(this, UNSET, false);
+    				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
+    		    	ret	= doGetNextIntermediateResult(index, timeout, realtime);
     			}
     			// else already resumed.
-    		}
-	    	
-	    	ret	= doGetNextIntermediateResult(index);
-    		synchronized(this)
-    		{
-    			ownresults.remove(Thread.currentThread());
     		}
     	}
     	
     	return ret;
-    }	
+    }
 }

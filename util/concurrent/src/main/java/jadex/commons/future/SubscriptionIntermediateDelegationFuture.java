@@ -47,6 +47,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 *  Add a result.
 	 *  @param result The result.
 	 */
+	
 	protected void addResult(E result)
 	{
 		// Store results only if necessary for first listener.
@@ -123,6 +124,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
      *  
      *  @return	True, when there are more intermediate results for the caller.
      */
+    @Override
     public boolean hasNextIntermediateResult()
     {
     	boolean	ret;
@@ -193,7 +195,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index)
+    @Override
+    protected E doGetNextIntermediateResult(int index, long timeout, boolean realtime)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
@@ -227,12 +230,6 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		else
     		{
     			suspend	= true;
-    			if(caller==null)
-    				caller	= ISuspendable.SUSPENDABLE.get();
-    	    	if(caller==null)
-    	    	{
-    		   		throw new RuntimeException("No suspendable element.");
-    	    	}
 	    	   	if(icallers==null)
 	    	   	{
 	    	   		icallers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
@@ -263,10 +260,9 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    		// todo: realtime as method parameter?!
-    				caller.suspend(this, UNSET, false);
+    				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
-    		    	ret	= doGetNextIntermediateResult(index);
+    		    	ret	= doGetNextIntermediateResult(index, timeout, realtime);
     			}
     			// else already resumed.
     		}
@@ -274,4 +270,4 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	
     	return ret;
     }
-   }
+}
