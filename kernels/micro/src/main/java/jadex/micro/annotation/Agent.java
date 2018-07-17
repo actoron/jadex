@@ -72,5 +72,5 @@ public @interface Agent
 	/**
 	 *  The agent type. 
 	 */
-	public String type() default MicroAgentFactory.FILETYPE_MICROAGENT;
+	public String type() default MicroAgentFactory.TYPE;
 }
