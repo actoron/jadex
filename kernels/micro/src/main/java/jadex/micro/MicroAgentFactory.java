@@ -2,6 +2,7 @@ package jadex.micro;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import jadex.commons.LazyResource;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -306,7 +308,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 								ret.setResult(Boolean.FALSE);
 							else
 							{
-								List<AnnotationInfos> ans = SClassReader.getAnnotationInfos(ri.getInputStream());
+								ClassInfo ci = SClassReader.getClassInfo(ri.getInputStream());
+								Collection<AnnotationInfos> ans = ci.getAnnotations();
 								if(ans!=null)
 								{
 									for(AnnotationInfos ai: ans)
@@ -314,15 +317,27 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 										if(Agent.class.getName().equals(ai.getType()))
 										{
 											// Check type in agent annotation
+											Map<String, String> vals = ai.getStringValues();
+											String type;
+											if(vals==null)
+											{
+												Method method = Agent.class.getMethod("type");
+												type = (String)method.getDefaultValue();
+											}
+											else
+											{
+												type = vals.get("type");
+											}
+											ret.setResult(TYPE.equals(type));
 											
 											// todo: remove
 											// Check suffix of file
-											String part = model.toLowerCase().substring(0, model.length()-6);
-											if(part.endsWith("bdi"))
-												ret.setResult(Boolean.FALSE);
-											else
-												ret.setResult(Boolean.TRUE);
-											break;
+//											String part = model.toLowerCase().substring(0, model.length()-6);
+//											if(part.endsWith("bdi"))
+//												ret.setResult(Boolean.FALSE);
+//											else
+//												ret.setResult(Boolean.TRUE);
+//											break;
 										}
 									}
 								}

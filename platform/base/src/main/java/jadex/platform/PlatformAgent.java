@@ -31,6 +31,7 @@ import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.FileFilter;
 import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -146,13 +147,13 @@ public class PlatformAgent
 					{
 						JarEntry je = jar.getJarEntry(jename);
 						InputStream is = jar.getInputStream(je);
-						Tuple2<Boolean, String> tup = SClassReader.hasTopLevelAnnotationWithClassName(is, Agent.class.getName());
-						if(tup.getFirstEntity())
+						ClassInfo ci = SClassReader.getClassInfo(is);
+						if(ci.hasAnnotation( Agent.class.getName()))
 						{
 //							System.out.println("Found candidate: "+tup.getSecondEntity());
-							Class<?> clazz = SReflect.findClass0(tup.getSecondEntity(), null, classloader);
+							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
 							if(clazz==null)
-								throw new RuntimeException("Could not load class: "+tup.getSecondEntity());
+								throw new RuntimeException("Could not load class: "+ci.getClassname());
 							components.add(clazz);
 						}
 //						System.out.println(cnt++);
@@ -169,13 +170,13 @@ public class PlatformAgent
 				{
 					try(FileInputStream is = new FileInputStream(filename))
 					{
-						Tuple2<Boolean, String> tup = SClassReader.hasTopLevelAnnotationWithClassName(is, Agent.class.getName());
-						if(tup.getFirstEntity())
+						ClassInfo ci = SClassReader.getClassInfo(is);
+						if(ci.hasAnnotation( Agent.class.getName()))
 						{
-//							System.out.println("Found candidate: "+tup.getSecondEntity());
-							Class<?> clazz = SReflect.findClass0(tup.getSecondEntity(), null, classloader);
+	//						System.out.println("Found candidate: "+tup.getSecondEntity());
+							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
 							if(clazz==null)
-								throw new RuntimeException("Could not load class: "+tup.getSecondEntity());
+								throw new RuntimeException("Could not load class: "+ci.getClassname());
 							components.add(clazz);
 						}
 //						System.out.println(cnt++);
