@@ -1,6 +1,5 @@
 package jadex.commons;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -10,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -39,7 +37,9 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -130,7 +130,22 @@ public class SUtil
 	public static final Random FAST_RANDOM = new FastThreadedRandom();
 	
 	/** Access to secure random source. */
-	protected static SecureRandom SECURE_RANDOM = null;
+	public static SecureRandom SECURE_RANDOM = null;
+	
+	static
+	{
+		if (Security.getProvider("Jadex") == null)
+		{
+			Security.insertProviderAt(new Provider("Jadex", 1.0, "")
+			{
+				{
+					putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.JadexSecureRandomSpi", null, null));
+				}
+				private static final long serialVersionUID = -3208767101511459503L;
+				
+			}, 1);
+		}
+	}
 	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
