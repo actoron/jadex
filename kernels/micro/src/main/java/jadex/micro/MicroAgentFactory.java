@@ -312,6 +312,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 									{
 										if(Agent.class.getName().equals(ai.getType()))
 										{
+											
 											ret.setResult(Boolean.TRUE);
 											break;
 										}

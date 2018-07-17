@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +223,64 @@ public class SClassReader
 			SUtil.close(inputstream);
 		}
 		return new Tuple2<Boolean, String>(false, classname);
+	}
+	
+	/**
+	 *  Get infos about a class.
+	 * 
+	 *  @param inputstream The input stream of the class file. 
+	 *  @return The class infos.
+	 */
+	public static final ClassInfo getClassInfo(InputStream inputstream)
+	{
+		ClassInfo ret = new ClassInfo();
+		
+		try
+		{
+			DataInputStream is = new DataInputStream(new BufferedInputStream(inputstream, 16384));
+			if (0xCAFEBABE != is.readInt())
+				throw new IllegalArgumentException("Not a class file.");
+			
+			skip(is, 4);
+			
+			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
+			
+			skip(is, 2);
+			
+			int classnameindex = is.readUnsignedShort();
+			try
+			{
+				String classname = decodeModifiedUtf8(strings.get(SUtil.bytesToShort(strings.get(classnameindex), 0) & 0xFFFF));
+				classname = classname.replace('/', '.');
+				ret.setClassname(classname);
+			}
+			catch (Exception e)
+			{
+			}
+			
+			skip(is, 2);
+			
+			int ifacecount = is.readUnsignedShort();
+			
+			skip(is, ifacecount << 1);
+			
+			skipFieldsOrMethods(is);
+			
+			skipFieldsOrMethods(is);
+			
+			List<AnnotationInfos> annos = readVisibleAnnotations(is, strings);
+			ret.setAnnotations(annos);
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+		finally
+		{
+			SUtil.close(inputstream);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -458,8 +517,71 @@ public class SClassReader
     }
     
     /**
+     *  Class for infos about a class.
+     */
+    public static class ClassInfo
+    {
+    	/** The class name. */
+    	protected String classname;
+    	
+    	/** The annotations. */
+    	protected Collection<AnnotationInfos> annotations;
+
+    	/**
+    	 *  Create a new classinfo.
+    	 */
+		public ClassInfo()
+		{
+		}
+    	
+    	/**
+    	 *  Create a new classinfo.
+    	 */
+		public ClassInfo(String classname, Collection<AnnotationInfos> annotations)
+		{
+			this.classname = classname;
+			this.annotations = annotations;
+		}
+
+		/**
+		 *  Get the classname.
+		 *  @return the classname.
+		 */
+		public String getClassname()
+		{
+			return classname;
+		}
+
+		/**
+		 *  Set the classname.
+		 *  @param classname the classname to set
+		 */
+		public void setClassname(String classname)
+		{
+			this.classname = classname;
+		}
+
+		/**
+		 *  Get the annotations.
+		 *  @return the annotations
+		 */
+		public Collection<AnnotationInfos> getAnnotations()
+		{
+			return annotations;
+		}
+
+		/**
+		 *  Set the annotations.
+		 *  @param annotations the annotations to set
+		 */
+		public void setAnnotations(Collection<AnnotationInfos> annotations)
+		{
+			this.annotations = annotations;
+		}
+    }
+    
+    /**
      *  Class containing annotation infos.
-     *
      */
     public static class AnnotationInfos
     {
