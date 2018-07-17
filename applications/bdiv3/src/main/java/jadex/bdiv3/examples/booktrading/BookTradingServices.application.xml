@@ -22,8 +22,8 @@
 	</imports>
 	
 	<componenttypes>
-		<componenttype name="Buyer" filename="jadex/bdiv3/examples/booktrading/buyer/BuyerBDI.class"/>
-		<componenttype name="Seller" filename="jadex/bdiv3/examples/booktrading/seller/SellerBDI.class"/>
+		<componenttype name="Buyer" filename="jadex/bdiv3/examples/booktrading/buyer/BuyerAgent.class"/>
+		<componenttype name="Seller" filename="jadex/bdiv3/examples/booktrading/seller/SellerAgent.class"/>
 	</componenttypes>
 	
 	<configurations>

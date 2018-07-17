@@ -147,8 +147,8 @@ public class MicroClassReader
 //		System.out.println("read micro: "+cma);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
-		if(name.endsWith("Agent"))
-			name = name.substring(0, name.lastIndexOf("Agent"));
+		//if(name.endsWith("Agent"))
+		//	name = name.substring(0, name.lastIndexOf("Agent"));
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);

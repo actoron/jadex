@@ -160,8 +160,8 @@ public class BDIClassReader extends MicroClassReader
 		ret.setPojoClass(new ClassInfo(cma.getName()));
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
-		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
-			name = name.substring(0, name.lastIndexOf(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
+//		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
+//			name = name.substring(0, name.lastIndexOf(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 //		modelinfo.setName(name+"BDI");
 		modelinfo.setName(name);

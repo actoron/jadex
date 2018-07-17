@@ -1,5 +1,6 @@
 package jadex.web.examples.hellobdiv3;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
@@ -9,7 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 public abstract class HelloWorldBDI implements IBDIAgent, IHelloService
 {
 	/**

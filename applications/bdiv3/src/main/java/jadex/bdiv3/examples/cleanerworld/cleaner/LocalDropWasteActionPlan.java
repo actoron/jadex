@@ -5,7 +5,7 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.DropWasteAction;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.DropWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.IEnvironment;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
@@ -21,7 +21,7 @@ import jadex.commons.future.IFuture;
 public class LocalDropWasteActionPlan
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;

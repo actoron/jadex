@@ -22,7 +22,7 @@ public class InformNewTargetPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected ProducerBDI producer;
+	protected ProducerAgent producer;
 	
 	@PlanAPI
 	protected IPlan rplan;

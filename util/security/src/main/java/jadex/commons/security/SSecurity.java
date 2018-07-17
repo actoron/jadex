@@ -310,6 +310,7 @@ public class SSecurity
 								}
 								catch(Throwable e)
 								{
+									e.printStackTrace();
 									ret = null;
 								}
 							}

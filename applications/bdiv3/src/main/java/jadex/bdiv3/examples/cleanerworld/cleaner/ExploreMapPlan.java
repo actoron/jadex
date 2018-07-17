@@ -11,7 +11,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.MapPoint;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -29,7 +29,7 @@ import jadex.commons.future.IFuture;
 public class ExploreMapPlan 
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -73,7 +73,7 @@ public class ExploreMapPlan
 //		MapPoint mp = mps[(int)(Math.random()*mps.length)];
 
 		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(mp.getLocation()));
-		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{

@@ -13,7 +13,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdiv3.examples.disastermanagement.DisasterType;
 import jadex.bdiv3.examples.disastermanagement.TreatVictimTask;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
+import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceAgent.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
@@ -33,7 +33,7 @@ public class TreatVictimPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected AmbulanceBDI capa;
+	protected AmbulanceAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;

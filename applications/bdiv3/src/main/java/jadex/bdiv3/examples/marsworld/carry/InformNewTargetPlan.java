@@ -20,7 +20,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 public class InformNewTargetPlan 
 {
 	@PlanCapability
-	protected CarryBDI carry;
+	protected CarryAgent carry;
 	
 	@PlanAPI
 	protected IPlan rplan;

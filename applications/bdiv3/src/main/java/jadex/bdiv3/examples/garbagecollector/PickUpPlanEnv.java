@@ -23,7 +23,7 @@ public class PickUpPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected BaseAgentBDI agent;
+	protected BaseAgent agent;
 		
 	@PlanAPI
 	protected IPlan rplan;

@@ -5,7 +5,7 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
@@ -20,7 +20,7 @@ import jadex.commons.future.IFuture;
 public class MoveToLocationPlan
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;

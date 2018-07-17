@@ -9,7 +9,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.examples.marsworld.BaseBDI;
+import jadex.bdiv3.examples.marsworld.BaseAgent;
 import jadex.bdiv3.examples.marsworld.SVector;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.producer.IProduceService;
@@ -34,7 +34,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices(@ProvidedService(type=ITargetAnnouncementService.class, implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices(@RequiredService(name="produceser", multiple=true, type=IProduceService.class))
-public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
+public class SentryBDI extends BaseAgent implements ITargetAnnouncementService
 {
 	/**
 	 * 

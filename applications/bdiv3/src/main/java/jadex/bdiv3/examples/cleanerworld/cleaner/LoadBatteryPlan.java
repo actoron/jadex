@@ -16,9 +16,9 @@ public class LoadBatteryPlan
 	 *  The plan body.
 	 */
 	@PlanBody
-	public void body(CleanerBDI agentapi, IPlan planapi)
+	public void body(CleanerAgent agentapi, IPlan planapi)
 	{
-		Chargingstation station = ((CleanerBDI.QueryChargingStation)planapi.dispatchSubgoal(agentapi.new QueryChargingStation()).get()).getStation();
+		Chargingstation station = ((CleanerAgent.QueryChargingStation)planapi.dispatchSubgoal(agentapi.new QueryChargingStation()).get()).getStation();
 		planapi.dispatchSubgoal(agentapi.new AchieveMoveTo(station.getLocation())).get();
 		
 		double charge = agentapi.getMyChargestate();

@@ -213,8 +213,8 @@
 	
 	<!-- Agent types of the application. -->
 	<componenttypes>
-		<componenttype name="Collector" filename="jadex/bdiv3/examples/garbagecollector/GarbageCollectorBDI.class"/>
-		<componenttype name="Burner" filename="jadex/bdiv3/examples/garbagecollector/GarbageBurnerBDI.class"/>
+		<componenttype name="Collector" filename="jadex/bdiv3/examples/garbagecollector/GarbageCollectorAgent.class"/>
+		<componenttype name="Burner" filename="jadex/bdiv3/examples/garbagecollector/GarbageBurnerAgent.class"/>
 	</componenttypes>
 	
 	<!-- Application instance definitions. -->

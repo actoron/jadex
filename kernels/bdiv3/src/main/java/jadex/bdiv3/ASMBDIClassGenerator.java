@@ -137,7 +137,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 							}
 						}
 					}
-					if(implbdiagent && name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
+					if(implbdiagent) // hmm needed? && name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
 					{
 						// erase abstract modifier
 //						access = ~Opcodes.ACC_ABSTRACT & access;

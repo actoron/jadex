@@ -12,7 +12,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.marsworld.carry.ICarryService;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
-import jadex.bdiv3.examples.marsworld.producer.ProducerBDI.ProduceOre;
+import jadex.bdiv3.examples.marsworld.producer.ProducerAgent.ProduceOre;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -34,7 +34,7 @@ public class ProduceOrePlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected ProducerBDI producer;
+	protected ProducerAgent producer;
 	
 	@PlanAPI
 	protected IPlan rplan;

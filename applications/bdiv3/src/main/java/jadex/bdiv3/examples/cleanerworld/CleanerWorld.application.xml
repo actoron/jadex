@@ -11,8 +11,8 @@
 	name="CleanerWorld" package="jadex.bdiv3.examples.cleanerworld">
 	
 	<componenttypes>
-		<componenttype name="EnvironmentLocal" filename="jadex/bdiv3/examples/cleanerworld/environment/EnvironmentLocalBDI.class"/>
-		<componenttype name="CleanerLocal" filename="jadex/bdiv3/examples/cleanerworld/cleaner/CleanerBDI.class"/>
+		<componenttype name="EnvironmentLocal" filename="jadex/bdiv3/examples/cleanerworld/environment/EnvironmentLocalAgent.class"/>
+		<componenttype name="CleanerLocal" filename="jadex/bdiv3/examples/cleanerworld/cleaner/CleanerAgent.class"/>
 	</componenttypes>
 	
 	<configurations>

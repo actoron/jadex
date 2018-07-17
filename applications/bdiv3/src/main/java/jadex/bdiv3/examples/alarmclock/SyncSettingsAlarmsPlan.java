@@ -15,7 +15,7 @@ public class SyncSettingsAlarmsPlan
 	
 	/** The scope. */
 	@PlanCapability
-	protected AlarmclockBDI	scope;
+	protected AlarmclockAgent	scope;
 	
 	//-------- methods ----------
 

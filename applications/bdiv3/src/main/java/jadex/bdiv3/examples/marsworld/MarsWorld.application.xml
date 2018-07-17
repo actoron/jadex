@@ -194,9 +194,9 @@
 	</extensiontypes>
 
 	<componenttypes>
-		<componenttype name="Sentry" filename="jadex/bdiv3/examples/marsworld/sentry/SentryBDI.class"/>
-		<componenttype name="Producer" filename="jadex/bdiv3/examples/marsworld/producer/ProducerBDI.class"/>
-		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryBDI.class"/>
+		<componenttype name="Sentry" filename="jadex/bdiv3/examples/marsworld/sentry/SentryAgent.class"/>
+		<componenttype name="Producer" filename="jadex/bdiv3/examples/marsworld/producer/ProducerAgent.class"/>
+		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryAgent.class"/>
 	</componenttypes>
 	
 	<!-- <properties>

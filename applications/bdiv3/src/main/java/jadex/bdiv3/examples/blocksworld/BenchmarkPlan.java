@@ -9,7 +9,7 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
+import jadex.bdiv3.examples.blocksworld.BlocksworldAgent.ConfigureGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -31,7 +31,7 @@ public class BenchmarkPlan
 	protected int	goals;
 
 	@PlanCapability
-	protected BlocksworldBDI capa;
+	protected BlocksworldAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
