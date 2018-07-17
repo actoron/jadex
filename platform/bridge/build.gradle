@@ -9,4 +9,6 @@ dependencies
 	api project(':rules:eca') // Remove this stuff, don't know how :-(
 
 	api 'junit:junit:4.11'	// required for component test suite classes
+	
+	api group: 'net.cinnom', name: 'nano-cuckoo', version: '1.0.0'	// required for sliding cuckoo filter
 }
