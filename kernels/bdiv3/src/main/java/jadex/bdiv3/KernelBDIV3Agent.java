@@ -16,6 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Component kernel.
  */
 //@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}")})
+// multi factory only uses .class (and BDI.class as marker to know which kernels have been started)
 @Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(

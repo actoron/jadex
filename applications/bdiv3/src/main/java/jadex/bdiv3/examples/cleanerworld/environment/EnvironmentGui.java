@@ -137,7 +137,7 @@ public class EnvironmentGui	extends JFrame
 				
 //				System.out.println(((IPojoMicroAgent)ia).getPojoAgent().getClass().getClassLoader());
 							
-				final Environment env = ((EnvironmentLocalBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
+				final Environment env = ((EnvironmentLocalAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
 				
 //				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 				SwingUtilities.invokeLater(new Runnable()
@@ -429,7 +429,7 @@ public class EnvironmentGui	extends JFrame
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										final Environment env = ((EnvironmentLocalBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
+										final Environment env = ((EnvironmentLocalAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
 //										Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 										
 										Waste[] wastes = env.getWastes();

@@ -4,9 +4,9 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI;
-import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeBDI.ClearChemicals;
-import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeBDI.ExtinguishFire;
+import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceAgent;
+import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeAgent.ClearChemicals;
+import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeAgent.ExtinguishFire;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -23,13 +23,13 @@ public class FireBrigadePlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected AmbulanceBDI capa;
+	protected AmbulanceAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
 
 	@PlanCapability
-	protected FireBrigadeBDI fireBrigadeBDI;
+	protected FireBrigadeAgent fireBrigadeBDI;
 
 //	@PlanReason
 //	protected TreatVictims goal;

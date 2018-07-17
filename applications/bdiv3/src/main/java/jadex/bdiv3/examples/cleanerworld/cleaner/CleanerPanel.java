@@ -215,7 +215,7 @@ class CleanerPanel extends JPanel
 	{
 		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
-			CleanerBDI cleaner = (CleanerBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+			CleanerAgent cleaner = (CleanerAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 			DrawData	drawdata	= new DrawData();
 			drawdata.daytime = cleaner.isDaytime();
 			drawdata.visited_positions = cleaner.getVisitedPositions().toArray(new MapPoint[0]);
@@ -230,9 +230,9 @@ class CleanerPanel extends JPanel
 			drawdata.my_chargestate = cleaner.getMyChargestate();
 			drawdata.my_location = cleaner.getMyLocation();
 			drawdata.my_waste = cleaner.getCarriedWaste()!=null;
-			Collection<CleanerBDI.AchieveMoveTo> goals = cleaner.getAgent().getFeature(IBDIAgentFeature.class).getGoals(CleanerBDI.AchieveMoveTo.class);
+			Collection<CleanerAgent.AchieveMoveTo> goals = cleaner.getAgent().getFeature(IBDIAgentFeature.class).getGoals(CleanerAgent.AchieveMoveTo.class);
 			drawdata.dests = new Location[goals.size()];
-			Iterator<CleanerBDI.AchieveMoveTo>	goalit	= goals.iterator();
+			Iterator<CleanerAgent.AchieveMoveTo>	goalit	= goals.iterator();
 			for(int i=0; i<goals.size(); i++)
 			{
 				drawdata.dests[i] = goalit.next().getLocation();

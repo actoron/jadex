@@ -21,7 +21,7 @@ public class MemorizePositionsPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;

@@ -7,7 +7,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.examples.garbagecollector.GarbageBurnerBDI.Pick;
+import jadex.bdiv3.examples.garbagecollector.GarbageBurnerAgent.Pick;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,7 +23,7 @@ public class BurnPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageBurnerBDI burner;
+	protected GarbageBurnerAgent burner;
 	
 	@PlanAPI
 	protected IPlan rplan;

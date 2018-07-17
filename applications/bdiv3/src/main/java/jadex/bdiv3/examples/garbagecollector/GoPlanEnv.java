@@ -9,7 +9,7 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorAgent.Go;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
@@ -30,7 +30,7 @@ public class GoPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageCollectorBDI collector;
+	protected GarbageCollectorAgent collector;
 	
 	@PlanAPI
 	protected IPlan rplan;

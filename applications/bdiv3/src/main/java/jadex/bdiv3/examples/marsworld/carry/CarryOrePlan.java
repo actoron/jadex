@@ -8,7 +8,7 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.marsworld.carry.CarryBDI.CarryOre;
+import jadex.bdiv3.examples.marsworld.carry.CarryAgent.CarryOre;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.examples.marsworld.producer.ProduceOreTask;
@@ -32,7 +32,7 @@ public class CarryOrePlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected CarryBDI carry;
+	protected CarryAgent carry;
 	
 	@PlanAPI
 	protected IPlan rplan;

@@ -1,13 +1,11 @@
 package jadex.micro;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -305,7 +303,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						{
 							ResourceInfo ri = SUtil.getResourceInfo0(model, cl);
 							if(ri==null)
+							{
 								ret.setResult(Boolean.FALSE);
+							}
 							else
 							{
 								ClassInfo ci = SClassReader.getClassInfo(ri.getInputStream());
@@ -328,7 +328,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 											{
 												type = vals.get("type");
 											}
-											ret.setResult(TYPE.equals(type));
+											ret.setResult(getTypeName().equals(type));
+											
+											System.out.println("isLoadMicro: "+model+" "+getTypeName().equals(type));
 											
 											// todo: remove
 											// Check suffix of file
@@ -367,17 +369,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			ret.setResult(Boolean.FALSE);
 		}
 		
-//		boolean ret = model.toLowerCase().endsWith("agent.class");
-//		if(model.toLowerCase().endsWith("Agent.class"))
-//		{
-//			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
-//			String clname = model.substring(0, model.indexOf(".class"));
-//			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
-//			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
-//			System.out.println(clname+" "+cma+" "+ret);
-//		}
-//		return ret ? IFuture.TRUE : IFuture.FALSE;
-		
 		return ret;
 	}
 	
@@ -409,7 +400,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 							{
 								try
 								{
-									Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
+									Class<?> clazz = SReflect.classForName(mi.getFullName(), cl);
 									fut.setResult(!Modifier.isInterface(clazz.getModifiers()) && !Modifier.isAbstract(clazz.getModifiers()));
 								}
 								catch(Exception e)
@@ -425,13 +416,12 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						try
 						{
 							ClassLoader cl = getClass().getClassLoader();
-							Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
+							Class<?> clazz = SReflect.classForName(mi.getFullName(), cl);
 							fut.setResult(!Modifier.isAbstract(clazz.getModifiers()));
 						}
 						catch(Exception e)
 						{
 							fut.setResult(Boolean.FALSE);
-//									ret.setException(e);
 						}
 					}
 				}
@@ -606,25 +596,25 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return new Future(null);
 	}*/
 	
-	/**
-	 *  Get the mirco agent class.
-	 */
-	// todo: make use of cache
-	protected Class<?> getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
-	{
-		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
-//		System.out.println(clname+" "+cma+" "+ret);
-		int idx;
-		while(ret==null && (idx=clname.indexOf('.'))!=-1)
-		{
-			clname	= clname.substring(idx+1);
-			ret = SReflect.findClass0(clname, imports, classloader);
-//			System.out.println(clname+" "+cma+" "+ret);
-		}
-		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-			throw new RuntimeException("No micro agent file: "+clname);
-		return ret;
-	}
+//	/**
+//	 *  Get the mirco agent class.
+//	 */
+//	// todo: make use of cache
+//	protected Class<?> getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+//	{
+//		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
+////		System.out.println(clname+" "+cma+" "+ret);
+//		int idx;
+//		while(ret==null && (idx=clname.indexOf('.'))!=-1)
+//		{
+//			clname	= clname.substring(idx+1);
+//			ret = SReflect.findClass0(clname, imports, classloader);
+////			System.out.println(clname+" "+cma+" "+ret);
+//		}
+//		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
+//			throw new RuntimeException("No micro agent file: "+clname);
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the library service
@@ -632,5 +622,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected ILibraryService getLibraryService()
 	{
 		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+	}
+	
+	/**
+	 *  Get the agent type name.
+	 *  @return The type name.
+	 */
+	public String getTypeName()
+	{
+		return TYPE;
 	}
 }

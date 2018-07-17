@@ -6,10 +6,10 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.ClearChemicals;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.ExtinguishFires;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.HandleDisaster;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.TreatVictims;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.ClearChemicals;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.ExtinguishFires;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.HandleDisaster;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.TreatVictims;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -23,7 +23,7 @@ public class HandleDisasterPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected CommanderBDI capa;
+	protected CommanderAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;

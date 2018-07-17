@@ -11,7 +11,7 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.NotifyGoal;
+import jadex.bdiv3.examples.alarmclock.AlarmclockAgent.NotifyGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.SUtil;
 
@@ -24,7 +24,7 @@ public class BeepPlan
 	//-------- attributes --------
 	
 	@PlanCapability
-	protected AlarmclockBDI	scope;
+	protected AlarmclockAgent	scope;
 	
 	@PlanAPI
 	protected IPlan	plan;

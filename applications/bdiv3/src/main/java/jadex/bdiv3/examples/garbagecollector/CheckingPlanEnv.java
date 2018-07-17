@@ -4,7 +4,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorAgent.Go;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -19,7 +19,7 @@ public class CheckingPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageCollectorBDI collector;
+	protected GarbageCollectorAgent collector;
 	
 	@PlanAPI
 	protected IPlan rplan;

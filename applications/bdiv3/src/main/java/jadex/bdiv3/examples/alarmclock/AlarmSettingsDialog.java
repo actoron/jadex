@@ -26,7 +26,7 @@ import javax.swing.UIDefaults;
 
 import com.toedter.calendar.JDateChooser;
 
-import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.PlaySongGoal;
+import jadex.bdiv3.examples.alarmclock.AlarmclockAgent.PlaySongGoal;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;

@@ -2,7 +2,7 @@ package jadex.bdiv3.examples.blocksworld;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanPrecondition;
-import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ClearGoal;
+import jadex.bdiv3.examples.blocksworld.BlocksworldAgent.ClearGoal;
 
 /**
  *  Clear a block.

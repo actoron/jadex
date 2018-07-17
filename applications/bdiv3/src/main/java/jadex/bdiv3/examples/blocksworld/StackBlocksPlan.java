@@ -5,8 +5,8 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ClearGoal;
-import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.StackGoal;
+import jadex.bdiv3.examples.blocksworld.BlocksworldAgent.ClearGoal;
+import jadex.bdiv3.examples.blocksworld.BlocksworldAgent.StackGoal;
 import jadex.bdiv3.runtime.IPlan;
 
 
@@ -19,7 +19,7 @@ public class StackBlocksPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected BlocksworldBDI capa;
+	protected BlocksworldAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -49,12 +49,12 @@ public class StackBlocksPlan
 
 		
 		// Maybe wait before moving block.
-		if(capa.getMode().equals(BlocksworldBDI.Mode.SLOW))
+		if(capa.getMode().equals(BlocksworldAgent.Mode.SLOW))
 		{
 			rplan.waitFor(1000).get();
 //			waitFor(1000);
 		}
-		else if(capa.getMode().equals(BlocksworldBDI.Mode.STEP))
+		else if(capa.getMode().equals(BlocksworldAgent.Mode.STEP))
 		{
 			capa.steps.getNextIntermediateResult();
 //			waitForInternalEvent("step");

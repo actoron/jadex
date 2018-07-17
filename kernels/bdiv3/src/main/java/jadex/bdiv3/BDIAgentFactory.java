@@ -1,6 +1,7 @@
 package jadex.bdiv3;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,13 +35,19 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.ResourceInfo;
+import jadex.commons.SClassReader;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.MicroAgentFactory;
+import jadex.micro.annotation.Agent;
 
 
 /**
@@ -239,30 +246,132 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		return ret;
 	}
 		
+//	/**
+//	 *  Test if a model can be loaded by the factory.
+//	 *  @param model The model (e.g. file name).
+//	 *  @param The imports (if any).
+//	 *  @return True, if model can be loaded.
+//	 */
+//	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+//	{
+////		System.out.println("isLoadable: "+model);
+////		boolean ret = model.toLowerCase().endsWith("bdi.class");
+//		boolean ret = model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3);
+//		
+////		if(ret)
+////			System.out.println("isLoadable: "+model+" "+ret);
+//		
+////		if(model.toLowerCase().endsWith("Agent.class"))
+////		{
+////			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
+////			String clname = model.substring(0, model.indexOf(".class"));
+////			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
+////			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
+////			System.out.println(clname+" "+cma+" "+ret);
+////		}
+//		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
+//	}
+	
 	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
+	// todo: reuse code from MicroAgentFactory :-(
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("isLoadable: "+model);
-//		boolean ret = model.toLowerCase().endsWith("bdi.class");
-		boolean ret = model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3);
+		Future<Boolean> ret = new Future<Boolean>();
 		
-//		if(ret)
-//			System.out.println("isLoadable: "+model+" "+ret);
+//		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
-//		if(model.toLowerCase().endsWith("Agent.class"))
-//		{
-//			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
-//			String clname = model.substring(0, model.indexOf(".class"));
-//			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
-//			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
-//			System.out.println(clname+" "+cma+" "+ret);
-//		}
-		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
+		if(model.toLowerCase().endsWith(".class"))
+		{
+			ILibraryService libservice = getLibraryService();
+			if(libservice!=null)
+			{
+				libservice.getClassLoader(rid)
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl)
+					{
+						try
+						{
+							ResourceInfo ri = SUtil.getResourceInfo0(model, cl);
+							if(ri==null)
+							{
+								ret.setResult(Boolean.FALSE);
+							}
+							else
+							{
+								ClassInfo ci = SClassReader.getClassInfo(ri.getInputStream());
+								Collection<AnnotationInfos> ans = ci.getAnnotations();
+								if(ans!=null)
+								{
+									for(AnnotationInfos ai: ans)
+									{
+										if(Agent.class.getName().equals(ai.getType()))
+										{
+											// Check type in agent annotation
+											Map<String, String> vals = ai.getStringValues();
+											String type;
+											if(vals==null)
+											{
+												Method method = Agent.class.getMethod("type");
+												type = (String)method.getDefaultValue();
+											}
+											else
+											{
+												type = vals.get("type");
+											}
+											ret.setResult(getTypeName().equals(type));
+											
+											System.out.println("isLoad: "+model+" "+getTypeName().equals(type));
+											
+											// todo: remove
+											// Check suffix of file
+//											String part = model.toLowerCase().substring(0, model.length()-6);
+//											if(part.endsWith("bdi"))
+//												ret.setResult(Boolean.FALSE);
+//											else
+//												ret.setResult(Boolean.TRUE);
+//											break;
+										}
+									}
+								}
+							}
+						}
+						catch(Exception e)
+						{
+							ret.setResult(Boolean.FALSE);
+						}
+						
+						if(!ret.isDone())
+							ret.setResult(Boolean.FALSE);
+		
+						//System.out.println("isLoadable (micro): "+model+" "+ret.get());
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(Boolean.FALSE);
+			}
+		}
+		else
+		{
+			ret.setResult(Boolean.FALSE);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the library service
+	 */
+	protected ILibraryService getLibraryService()
+	{
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 	
 	/**
@@ -452,25 +561,25 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		return new Future(null);
 	}*/
 	
-	/**
-	 *  Get the mirco agent class.
-	 */
-	// todo: make use of cache
-	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
-	{
-		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
-//		System.out.println("getMAC:"+clname+" "+SUtil.arrayToString(imports)+" "+ret);
-		int idx;
-		while(ret==null && (idx=clname.indexOf('.'))!=-1)
-		{
-			clname	= clname.substring(idx+1);
-			ret = SReflect.findClass0(clname, imports, classloader);
-//			System.out.println(clname+" "+cma+" "+ret);
-		}
-		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-			throw new RuntimeException("No bdi agent file: "+clname+" "+classloader);
-		return ret;
-	}
+//	/**
+//	 *  Get the mirco agent class.
+//	 */
+//	// todo: make use of cache
+//	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+//	{
+//		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
+////		System.out.println("getMAC:"+clname+" "+SUtil.arrayToString(imports)+" "+ret);
+//		int idx;
+//		while(ret==null && (idx=clname.indexOf('.'))!=-1)
+//		{
+//			clname	= clname.substring(idx+1);
+//			ret = SReflect.findClass0(clname, imports, classloader);
+////			System.out.println(clname+" "+cma+" "+ret);
+//		}
+//		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
+//			throw new RuntimeException("No bdi agent file: "+clname+" "+classloader);
+//		return ret;
+//	}
 	
 	/**
 	 *  Add excluded methods.
@@ -494,5 +603,14 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		{
 			props.put("remote_excluded", excludes);
 		}
+	}
+	
+	/**
+	 *  Get the agent type name.
+	 *  @return The type name.
+	 */
+	public String getTypeName()
+	{
+		return TYPE;
 	}
 }
