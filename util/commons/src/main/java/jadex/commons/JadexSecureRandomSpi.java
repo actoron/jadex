@@ -1,5 +1,7 @@
-package jadex.commons.security;
+package jadex.commons;
 
+import java.lang.reflect.Method;
+import java.security.SecureRandom;
 import java.security.SecureRandomSpi;
 
 /**
@@ -26,13 +28,25 @@ public class JadexSecureRandomSpi extends SecureRandomSpi
 	protected void engineNextBytes(byte[] bytes)
 	{
 //		System.out.println("Called next bytes");
-		SSecurity.SECURE_RANDOM.nextBytes(bytes);
+		SUtil.getSecureRandom().nextBytes(bytes);
 	}
 
 	protected byte[] engineGenerateSeed(int numbytes)
 	{
 		byte[] ret = new byte[numbytes];
-		SSecurity.getEntropySource().getEntropy(ret);
+		try
+		{
+			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+			Method getEntropySource = ssecurity.getDeclaredMethod("getEntropySource", new Class[0]);
+			Method getEntropy = ssecurity.getDeclaredMethod("getEntropy", byte[].class);
+			Object es = getEntropySource.invoke(null);
+			getEntropy.invoke(es, ret);
+		}
+		catch (Exception e)
+		{
+			ret = SecureRandom.getSeed(numbytes);
+		}
+		
 		return ret;
 	}
 }

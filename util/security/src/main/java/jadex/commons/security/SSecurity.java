@@ -120,8 +120,10 @@ public class SSecurity
 	
 	static
 	{
-		// Initialize SUtil
-		SUtil.getSecureRandom();
+		if (SUtil.SECURE_RANDOM != getSecureRandom())
+		{
+			SUtil.SECURE_RANDOM = SECURE_RANDOM;
+		}
 	}
 	
 	/**
@@ -140,18 +142,6 @@ public class SSecurity
 						SECURE_RANDOM = generateParanoidSecureRandom();
 					else
 						SECURE_RANDOM = generateSecureRandom();
-				}
-				
-				if (Security.getProvider("Jadex") == null)
-				{
-					Security.insertProviderAt(new Provider("Jadex", 1.0, "")
-					{
-						{
-							putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.security.JadexSecureRandomSpi", null, null));
-						}
-						private static final long serialVersionUID = -3208767101511459503L;
-						
-					}, 1);
 				}
 				
 				// Attempt to overwrite UUID secure random.
@@ -335,7 +325,8 @@ public class SSecurity
 									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
-								ret = SecureRandom.getSeed(output.length);
+								ret = getDefaultSecureRandom().generateSeed(output.length);
+//								ret = SecureRandom.getSeed(output.length);
 							}
 							
 							System.arraycopy(ret, 0, output, 0, output.length);
