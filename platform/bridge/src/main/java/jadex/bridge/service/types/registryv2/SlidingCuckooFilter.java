@@ -1,4 +1,4 @@
-package jadex.platform.service.registryv2;
+package jadex.bridge.service.types.registryv2;
 
 import jadex.commons.SUtil;
 import net.cinnom.nanocuckoo.ConcurrentSwapSafety;
@@ -74,7 +74,7 @@ public class SlidingCuckooFilter
 	 */
 	public boolean contains(String string)
 	{
-		return currentfilter.contains(string) || expiringfilter != null ? expiringfilter.contains(string) : false;
+		return currentfilter.contains(string) || (expiringfilter!=null ? expiringfilter.contains(string) : false);
 	}
 	
 	/**
