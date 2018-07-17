@@ -35,6 +35,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.gui.JBusyRing;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.SGUI;
+import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -50,7 +51,7 @@ public class AddCertPanel extends JPanel
 	protected static final int DS = GroupLayout.DEFAULT_SIZE;
 	
 	/** Certificate of the issuer, if available. */
-	protected Tuple2<String, String> issuercert;
+	protected PemKeyPair issuercert;
 	
 	/** Button group of certificate type (CA, self-signed, etc.). */
 	protected ButtonGroup certtypes;
@@ -88,7 +89,7 @@ public class AddCertPanel extends JPanel
 	/**
 	 * 
 	 */
-	public AddCertPanel(Tuple2<String, String> selectedcert, ActionListener listener)
+	public AddCertPanel(PemKeyPair selectedcert, ActionListener listener)
 	{
 		this.listener = listener;
 		this.issuercert = selectedcert;
@@ -170,13 +171,17 @@ public class AddCertPanel extends JPanel
 	/**
 	 *  Gets the certificate from the panel.
 	 */
-	public Tuple2<String, String> getCertificate()
+	public PemKeyPair getCertificate()
 	{
-		Tuple2<String, String> ret = null;
+		PemKeyPair ret = null;
 		String cert = ((JTextArea) certarea.getViewport().getView()).getText();
 		String key = ((JTextArea) keyarea.getViewport().getView()).getText();
 		if (cert != null && cert.length() > 0 && key != null && key.length() > 0)
-			ret = new Tuple2<String, String>(cert, key);
+		{
+			ret = new PemKeyPair();
+			ret.setCertificate(cert);
+			ret.setKey(key);
+		}
 		return ret;
 	}
 	
@@ -184,7 +189,7 @@ public class AddCertPanel extends JPanel
 	{
 		if (issuercert != null)
 		{
-			if (!SSecurity.isCaCertificate(issuercert.getFirstEntity()))
+			if (!SSecurity.isCaCertificate(issuercert.getCertificate()))
 			{
 				issuercert = null;
 			}
@@ -503,10 +508,10 @@ public class AddCertPanel extends JPanel
 								tmp = SSecurity.createRootCaCertificate(subjectdn, -1, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
 								break;
 							case 2:
-								tmp = SSecurity.createIntermediateCaCertificate(issuercert.getFirstEntity(), issuercert.getSecondEntity(), subjectdn, 0, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
+								tmp = SSecurity.createIntermediateCaCertificate(issuercert.getCertificate(), issuercert.getKey(), subjectdn, 0, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
 								break;
 							case 3:
-								tmp = SSecurity.createCertificate(issuercert.getFirstEntity(), issuercert.getSecondEntity(), subjectdn, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
+								tmp = SSecurity.createCertificate(issuercert.getCertificate(), issuercert.getKey(), subjectdn, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
 						}
 						final Tuple2<String, String> res = tmp;
 						

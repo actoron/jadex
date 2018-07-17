@@ -120,8 +120,10 @@ public class SSecurity
 	
 	static
 	{
-		// Initialize SUtil
-		SUtil.getSecureRandom();
+		if (SUtil.SECURE_RANDOM != getSecureRandom())
+		{
+			SUtil.SECURE_RANDOM = SECURE_RANDOM;
+		}
 	}
 	
 	/**
@@ -140,18 +142,6 @@ public class SSecurity
 						SECURE_RANDOM = generateParanoidSecureRandom();
 					else
 						SECURE_RANDOM = generateSecureRandom();
-				}
-				
-				if (Security.getProvider("Jadex") == null)
-				{
-					Security.insertProviderAt(new Provider("Jadex", 1.0, "")
-					{
-						{
-							putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.security.JadexSecureRandomSpi", null, null));
-						}
-						private static final long serialVersionUID = -3208767101511459503L;
-						
-					}, 1);
 				}
 				
 				// Attempt to overwrite UUID secure random.
@@ -335,7 +325,8 @@ public class SSecurity
 									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
-								ret = SecureRandom.getSeed(output.length);
+								ret = SUtil.getJavaDefaultSecureRandom().generateSeed(output.length);
+//								ret = SecureRandom.getSeed(output.length);
 							}
 							
 							System.arraycopy(ret, 0, output, 0, output.length);
@@ -855,7 +846,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(getDefaultSecureRandom());
+		prngs.add(SUtil.getJavaDefaultSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
@@ -1195,34 +1186,6 @@ public class SSecurity
 			return obj.toASN1Primitive().getEncoded(ASN1Encoding.DER);
 		}
 		catch (IOException e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
-	}
-	
-	/**
-	 *  Creates default algorithm secure random.
-	 */
-	private static final SecureRandom getDefaultSecureRandom()
-	{
-		String alg = "SHA1PRNG";
-		Provider p = Security.getProvider("SUN");
-		if (p != null)
-		{
-			for (Service serv : p.getServices())
-			{
-	            if (serv.getType().equals("SecureRandom"))
-	            {
-	                alg = serv.getAlgorithm();
-	                break;
-	            }
-	        }
-		}
-		try
-		{
-			return SecureRandom.getInstance(alg);
-		}
-		catch (NoSuchAlgorithmException e)
 		{
 			throw SUtil.throwUnchecked(e);
 		}

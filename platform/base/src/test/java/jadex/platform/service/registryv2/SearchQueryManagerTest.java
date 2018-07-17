@@ -2,6 +2,7 @@ package jadex.platform.service.registryv2;
 
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -134,17 +135,17 @@ public class SearchQueryManagerTest
 				return IFuture.DONE;
 			}
 		}, true).get();
-		Assert.assertFalse(results.hasNextIntermediateResult());	// TODO check w/o wait or allow get next intermediate with timeout
+		Assert.assertEquals("1) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 2) start remote platform, wait for service -> test if awa fallback works with one platform, also checks local duplicate removal over time
 		IExternalAccess	pro1	= Starter.createPlatform(PROCONF).get();
 		ITestService	svc	= results.getNextIntermediateResult();
-		Assert.assertEquals(""+svc, pro1.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		Assert.assertEquals("2) "+svc, pro1.getId(), ((IService)svc).getId().getProviderId().getRoot());
 		
 		// 3) start remote platform, wait for service -> test if awa fallback works with two platforms 
 		IExternalAccess	pro2	= Starter.createPlatform(PROCONF).get();
 		svc	= results.getNextIntermediateResult();
-		Assert.assertEquals(""+svc, pro2.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		Assert.assertEquals("3) "+svc, pro2.getId(), ((IService)svc).getId().getProviderId().getRoot());
 		
 		// 4) start SP, wait for connection from remote platforms and local platform, should get no service-> test if duplicate removal still works
 		IExternalAccess	sp	= Starter.createPlatform(SPCONF).get();
@@ -163,7 +164,7 @@ public class SearchQueryManagerTest
 				return IFuture.DONE;
 			}
 		}, true).get();
-		Assert.assertFalse(results.hasNextIntermediateResult());
+		Assert.assertEquals("4) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 5) add second query -> wait for two services (test if works when already SP)
 		ISubscriptionIntermediateFuture<ITestService>	results2	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
@@ -175,7 +176,7 @@ public class SearchQueryManagerTest
 		Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 		providers2.add(pro1.getId());
 		providers2.add(pro2.getId());
-		Assert.assertFalse(results2.hasNextIntermediateResult());
+		Assert.assertEquals("5) ", Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 		Assert.assertEquals(providers1, providers2);
 		
 		// 6) start remote platform, wait for service in both queries -> test if works for existing queries (before and after SP)

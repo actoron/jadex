@@ -23,11 +23,13 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import jadex.commons.Base64;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
+import jadex.commons.security.PemKeyPair;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.auth.PasswordSecret;
@@ -60,14 +62,18 @@ public class SecretWizard extends JWizard
 	/** Entity which is the secret owner. */
 	protected String entity;
 	
+	/** The current certificate store. */
+	protected byte[] certstore;
+	
 	/** Current secret. */
 	protected AbstractAuthenticationSecret secret;
 	
 	/** Final result. */
 	protected AbstractAuthenticationSecret result;
 	
-	public SecretWizard()
+	public SecretWizard(byte[] certstore)
 	{
+		this.certstore = certstore;
 		String[] stypes = new String[] { "Key", "Password", "X509 Certificates", "Enter Encoded Secret" };
 		start = new ChoiceNode("Select Secret Type", stypes)
 		{
@@ -107,9 +113,22 @@ public class SecretWizard extends JWizard
 		return result;
 	}
 	
+	/**
+	 *  Gets the entity.
+	 *  @return The entity.
+	 */
 	public String getEntity()
 	{
 		return entity;
+	}
+	
+	/**
+	 *  Gets the cert store.
+	 *  @return The certificate store.
+	 */
+	public byte[] getCertstore()
+	{
+		return certstore;
 	}
 	
 	/**
@@ -379,8 +398,23 @@ public class SecretWizard extends JWizard
 	 */
 	protected WizardNode createPasswordX509Node()
 	{
-		final CertTree trusttree = new CertTree(SecuritySettingsPanel.DEFAULT_CERT_STORE);
-		final CertTree certtree = new CertTree(SecuritySettingsPanel.DEFAULT_CERT_STORE);
+		final CertTree trusttree = new CertTree();
+		final CertTree certtree = new CertTree();
+		trusttree.load(certstore);
+		certtree.load(certstore);
+		
+		ICommand<byte[]> savecommand = new ICommand<byte[]>()
+		{
+			public void execute(byte[] storedata)
+			{
+				certstore = storedata;
+				trusttree.load(storedata);
+				certtree.load(storedata);
+			}
+		};
+		
+		trusttree.setSaveCommand(savecommand);
+		certtree.setSaveCommand(savecommand);
 		
 		JPanel trustpanel = new JPanel();
 		trustpanel.setBorder(BorderFactory.createTitledBorder("Trust Anchor"));
@@ -409,7 +443,7 @@ public class SecretWizard extends JWizard
 			public void actionPerformed(ActionEvent e)
 			{
 				boolean valid = trusttree.getSelectedCert() != null;
-				valid &= validonly.isSelected() | (certtree.getSelectedCert() != null && certtree.getSelectedCert().getSecondEntity() != null);
+				valid &= validonly.isSelected() | (certtree.getSelectedCert() != null && certtree.getSelectedCert().getKey() != null);
 				setEnableNext(valid);
 			}
 		};
@@ -437,14 +471,14 @@ public class SecretWizard extends JWizard
 			
 			protected void onNext()
 			{
-				Tuple2<String, String> trust = trusttree.getSelectedCert();
-				Tuple2<String, String> cert = certtree.getSelectedCert();
+				PemKeyPair trust = trusttree.getSelectedCert();
+				PemKeyPair cert = certtree.getSelectedCert();
 				
 				X509PemSecret s = null;
 				if (validonly.isSelected())
-					s = new X509PemSecret(trust.getFirstEntity(), null, null);
+					s = new X509PemSecret(trust.getCertificate(), null, null);
 				else
-					s = new X509PemSecret(trust.getFirstEntity(), cert.getFirstEntity(), cert.getSecondEntity());
+					s = new X509PemSecret(trust.getCertificate(), cert.getCertificate(), cert.getKey());
 				
 				secret = s;
 			}

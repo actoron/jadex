@@ -29,14 +29,18 @@ import javax.swing.WindowConstants;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.ICommand;
 import jadex.commons.Properties;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
@@ -52,10 +56,13 @@ import jadex.commons.gui.jtable.StringArrayTableModel;
  */
 public class SecuritySettingsPanel implements IServiceViewerPanel
 {
-	protected static final String DEFAULT_CERT_STORE = "jadex_certstore.zip";
+	protected static final String DEFAULT_CERT_STORE = "certstore.zip";
 	
 	/** Access to jcc component. */
 	protected IExternalAccess jccaccess;
+	
+	/** The settings service. */
+	protected ISettingsService settingsservice;
 	
 	/** The security service. */
 	protected ISecurityService secservice;
@@ -77,6 +84,9 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	/** Text area to display the platform secret. */
 	protected JTextArea pfsecret;
 	
+	/** The main certificate tree. */
+	protected CertTree certtree;
+	
 	/**
 	 *  Called once to initialize the panel.
 	 *  Called on the swing thread.
@@ -96,7 +106,12 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<ISecurityService>)null).setServiceIdentifier(sid)).get();
+				//secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<ISecurityService>)null).setServiceIdentifier(sid)).get();
+//				secservice = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class));
+//				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+				IComponentIdentifier targetpf = sid.getProviderId().getRoot();
+				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
+				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -110,7 +125,16 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						
 						main.add("Roles", createRolePanel());
 						
-						main.add("Certificate Store", new CertTree(DEFAULT_CERT_STORE));
+						certtree = new CertTree();
+						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+						certtree.setSaveCommand(new ICommand<byte[]>()
+						{
+							public void execute(byte[] store)
+							{
+								settingsservice.saveFile(DEFAULT_CERT_STORE, store).get();
+							}
+						});
+						main.add("Certificate Store", certtree);
 						
 						jccaccess.scheduleStep(new IComponentStep<Void>()
 						{
@@ -222,7 +246,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 
 			public void actionPerformed(ActionEvent e)
 			{
-				SecretWizard wizard = new SecretWizard();
+				SecretWizard wizard = new SecretWizard(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
 				
 				wizard.addTerminationListener(new AbstractAction()
 				{
@@ -232,7 +256,9 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 					{
 						if (JWizard.FINISH_ID == e.getID())
 						{
-							final String secret = ((SecretWizard) e.getSource()).getResult().toString();
+							SecretWizard wizard = ((SecretWizard) e.getSource());
+							writeCertStore(wizard.getCertstore());
+							final String secret = wizard.getResult().toString();
 							jccaccess.scheduleStep(new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
@@ -652,7 +678,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected void setNetwork()
 	{
-		SecretWizard wizard = new SecretWizard();
+		SecretWizard wizard = new SecretWizard(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
 		//wizard.setEntity(nwn);
 		wizard.setEntityType("the network name");
 		
@@ -664,8 +690,10 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			{
 				if (e.getID() == JWizard.FINISH_ID)
 				{
-					final String nw = ((SecretWizard) e.getSource()).getEntity();
-					final String secret = ((SecretWizard) e.getSource()).getResult().toString();
+					SecretWizard wizard = (SecretWizard) e.getSource();
+					writeCertStore(wizard.getCertstore());
+					final String nw = wizard.getEntity();
+					final String secret = wizard.getResult().toString();
 					
 					jccaccess.scheduleStep(new IComponentStep<Void>()
 					{
@@ -682,6 +710,16 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		});
 		
 		JWizard.createFrame("Network Authentication Secret", wizard).setVisible(true);;
+	}
+	
+	/**
+	 *  Writes the cert store.
+	 *  @param newstore The content.
+	 */
+	protected void writeCertStore(byte[] newstore)
+	{
+		settingsservice.saveFile(DEFAULT_CERT_STORE, newstore).get();
+		certtree.load(newstore);
 	}
 	
 	/**

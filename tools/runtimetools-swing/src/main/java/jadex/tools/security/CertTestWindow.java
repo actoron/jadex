@@ -13,6 +13,10 @@ import jadex.commons.gui.JWizard;
 
 public class CertTestWindow extends JFrame
 {
+	/** ID */
+	private static final long serialVersionUID = -7352829740448705005L;
+
+
 	public CertTestWindow()
 	{
 		try {
@@ -33,7 +37,7 @@ public class CertTestWindow extends JFrame
 		{
 		}
 		
-		final CertTree certtree = new CertTree(SecuritySettingsPanel.DEFAULT_CERT_STORE);
+		final CertTree certtree = new CertTree();
 		
 		JScrollPane scrollpane = new JScrollPane(certtree);
 		getContentPane().add(scrollpane);
@@ -41,7 +45,7 @@ public class CertTestWindow extends JFrame
 		setVisible(true);
 		setSize(1024, 768);
 		
-		final SecretWizard wizard = new SecretWizard();
+		final SecretWizard wizard = new SecretWizard(null);
 		JFrame dia = JWizard.createFrame("TestWizard", wizard);
 		dia.setVisible(true);
 		wizard.addTerminationListener(new AbstractAction()

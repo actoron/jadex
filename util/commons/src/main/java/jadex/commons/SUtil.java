@@ -1,6 +1,5 @@
 package jadex.commons;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -10,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -39,7 +37,11 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Provider.Service;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -130,7 +132,22 @@ public class SUtil
 	public static final Random FAST_RANDOM = new FastThreadedRandom();
 	
 	/** Access to secure random source. */
-	protected static SecureRandom SECURE_RANDOM = null;
+	public static SecureRandom SECURE_RANDOM = null;
+	
+	static
+	{
+		if (Security.getProvider("Jadex") == null)
+		{
+			Security.insertProviderAt(new Provider("Jadex", 1.0, "")
+			{
+				{
+					putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.JadexSecureRandomSpi", null, null));
+				}
+				private static final long serialVersionUID = -3208767101511459503L;
+				
+			}, 1);
+		}
+	}
 	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
@@ -426,7 +443,7 @@ public class SUtil
 			}
 			catch (Exception e)
 			{
-				SECURE_RANDOM = new SecureRandom();
+				SECURE_RANDOM = getJavaDefaultSecureRandom();
 			}
 		}
 		
@@ -2962,6 +2979,37 @@ public class SUtil
 //		return ret;
 	}
 
+	/**
+	 *  Get the file location for a class (either filename or jar url).
+	 */
+	public static String	getClassFileLocation(Class<?> clazz)
+	{
+		String	ret;
+
+		URL sourceloc = clazz.getProtectionDomain()==null ? null 
+			: clazz.getProtectionDomain().getCodeSource().getLocation();
+			
+		// in robolectric testcases, location is null
+		if(sourceloc==null)
+		{
+			// Hack: pseudo class location?
+			ret	= "/"+SReflect.getClassName(clazz).replace('.', '/')+".class";
+		}
+		
+		// Jar url
+		else if(sourceloc.getPath().endsWith(".jar"))
+		{
+			ret	= "jar:file:"+sourceloc.getPath()+"!/"+SReflect.getClassName(clazz).replace('.', '/')+".class";
+		}
+		
+		// default case
+		else
+		{
+			ret	= SUtil.convertURLToString(sourceloc) + File.separator + SReflect.getClassName(clazz).replace('.', File.separatorChar)+".class";
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Convert an URL to a local file name.
@@ -5801,6 +5849,34 @@ public class SUtil
 	        }
 	    }
 	    return -1;
+	}
+	
+	/**
+	 *  Creates Java default algorithm secure random.
+	 */
+	public static final SecureRandom getJavaDefaultSecureRandom()
+	{
+		String alg = "SHA1PRNG";
+		Provider p = Security.getProvider("SUN");
+		if (p != null)
+		{
+			for (Service serv : p.getServices())
+			{
+	            if (serv.getType().equals("SecureRandom"))
+	            {
+	                alg = serv.getAlgorithm();
+	                break;
+	            }
+	        }
+		}
+		try
+		{
+			return SecureRandom.getInstance(alg);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 	
 	/**

@@ -2,9 +2,12 @@ package jadex.platform.service.settings;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -467,7 +470,7 @@ public class SettingsAgent	implements ISettingsService
 	{
 		if (!readonly)
 		{
-			FileOutputStream os = null;
+			OutputStream os = null;
 			
 			File file = (new File(settingsdir, id + ".json")).getAbsoluteFile();
 			File tmpfile = null;
@@ -531,6 +534,67 @@ public class SettingsAgent	implements ISettingsService
 			ret.setResultIfUndone(null);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Directly saves a file in the settings directory.
+	 *  
+	 *  @param filename Name of the file.
+	 *  @param content The file content.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> saveFile(String filename, byte[] content)
+	{
+		Future<Void> ret = new Future<>();
+		File file = (new File(settingsdir, filename)).getAbsoluteFile();
+		OutputStream os = null;
+		try
+		{
+			File tmpfile = File.createTempFile(filename, ".tmp");
+			os =  new FileOutputStream(tmpfile);
+			os.write(content);
+			SUtil.close(os);
+			SUtil.moveFile(tmpfile, file);
+			ret.setResult(null);
+		}
+		catch (Exception e)
+		{
+			ret.setException(e);
+		}
+		finally
+		{
+			SUtil.close(os);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Directly loads a file from the settings directory.
+	 *  
+	 *  @param filename Name of the file.
+	 *  @return Content of the file or null if not found.
+	 */
+	public IFuture<byte[]> loadFile(String filename)
+	{
+		Future<byte[]> ret = new Future<>();
+		File file = (new File(settingsdir, filename)).getAbsoluteFile();
+		if (file.exists())
+		{
+			try
+			{
+				byte[] content = SUtil.readFile(file);
+				ret.setResult(content);
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		return ret;
 	}
 }

@@ -34,6 +34,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
+import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -664,6 +665,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T>  ISubscriptionIntermediateFuture<T> resolveQuery(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, true);
+		SlidingCuckooFilter	scf	= new SlidingCuckooFilter();
 		
 		// Query remote
 		ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
@@ -680,7 +682,16 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
 			{
-				return createServiceProxy(result, info);
+				// Drop result when already in cuckoo filter
+				if(scf.contains(result.toString()))
+				{
+					return DROP_INTERMEDIATE_RESULT;
+				}
+				else
+				{
+					scf.insert(result.toString());
+					return createServiceProxy(result, info);
+				}
 			}
 			
 			@Override
