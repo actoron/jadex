@@ -325,7 +325,7 @@ public class SSecurity
 									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
-								ret = getDefaultSecureRandom().generateSeed(output.length);
+								ret = SUtil.getJavaDefaultSecureRandom().generateSeed(output.length);
 //								ret = SecureRandom.getSeed(output.length);
 							}
 							
@@ -846,7 +846,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(getDefaultSecureRandom());
+		prngs.add(SUtil.getJavaDefaultSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
@@ -1186,34 +1186,6 @@ public class SSecurity
 			return obj.toASN1Primitive().getEncoded(ASN1Encoding.DER);
 		}
 		catch (IOException e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
-	}
-	
-	/**
-	 *  Creates default algorithm secure random.
-	 */
-	private static final SecureRandom getDefaultSecureRandom()
-	{
-		String alg = "SHA1PRNG";
-		Provider p = Security.getProvider("SUN");
-		if (p != null)
-		{
-			for (Service serv : p.getServices())
-			{
-	            if (serv.getType().equals("SecureRandom"))
-	            {
-	                alg = serv.getAlgorithm();
-	                break;
-	            }
-	        }
-		}
-		try
-		{
-			return SecureRandom.getInstance(alg);
-		}
-		catch (NoSuchAlgorithmException e)
 		{
 			throw SUtil.throwUnchecked(e);
 		}

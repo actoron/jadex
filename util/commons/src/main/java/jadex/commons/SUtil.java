@@ -37,9 +37,11 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.Provider.Service;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -441,7 +443,7 @@ public class SUtil
 			}
 			catch (Exception e)
 			{
-				SECURE_RANDOM = new SecureRandom();
+				SECURE_RANDOM = getJavaDefaultSecureRandom();
 			}
 		}
 		
@@ -5847,6 +5849,34 @@ public class SUtil
 	        }
 	    }
 	    return -1;
+	}
+	
+	/**
+	 *  Creates Java default algorithm secure random.
+	 */
+	public static final SecureRandom getJavaDefaultSecureRandom()
+	{
+		String alg = "SHA1PRNG";
+		Provider p = Security.getProvider("SUN");
+		if (p != null)
+		{
+			for (Service serv : p.getServices())
+			{
+	            if (serv.getType().equals("SecureRandom"))
+	            {
+	                alg = serv.getAlgorithm();
+	                break;
+	            }
+	        }
+		}
+		try
+		{
+			return SecureRandom.getInstance(alg);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 	
 	/**
