@@ -303,7 +303,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					{
 						try
 						{
-							ResourceInfo ri = SUtil.getResourceInfo0(model, cl);
+							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 								ret.setResult(Boolean.FALSE);
 							else
