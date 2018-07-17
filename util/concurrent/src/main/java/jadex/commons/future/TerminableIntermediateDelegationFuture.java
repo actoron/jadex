@@ -119,14 +119,15 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 		if(mynotify)
 			src.terminate(reason);
 	
-		if(storedinfos!=null)
-		{
-			for(Object info: storedinfos)
-			{
-				src.sendBackwardCommand(info);
-			}
-			storedinfos = null;
-		}
+		// TODO: why stored infos after terminate? -> should be done in set source??? 
+//		if(storedinfos!=null)
+//		{
+//			for(Object info: storedinfos)
+//			{
+//				src.sendBackwardCommand(info);
+//			}
+//			storedinfos = null;
+//		}
 	}
 	
 	/**

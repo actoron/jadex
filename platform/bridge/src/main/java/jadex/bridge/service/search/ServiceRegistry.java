@@ -473,36 +473,43 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> fut = new SubscriptionIntermediateFuture<>();
-		ServiceQueryInfo<T> ret = null;
-		
-		fut.setTerminationCommand(new TerminationCommand()
+		if(query.getOwner()==null)
 		{
-			public void terminated(Exception reason)
-			{
-				removeQuery(query);
-			}
-		});
-		
-		rwlock.writeLock().lock();
-		Set<IServiceIdentifier> sers = null;
-		try
+			fut.setException(new IllegalArgumentException("Query owner must not null: "+query));
+		}
+		else
 		{
-			ret = new ServiceQueryInfo<T>((ServiceQuery<T>) query, fut);
-			queries.addValue((ServiceQueryInfo)ret);
+			ServiceQueryInfo<T> ret = null;
 			
-			// We need the write lock during read for consistency
-			// This works because rwlock is reentrant.
-			// deliver currently available services
-			sers = (Set<IServiceIdentifier>)getServices(query);
-		}
-		finally
-		{
-			rwlock.writeLock().unlock();
-		}
-		
-		for (IServiceIdentifier ser : SUtil.safeSet(sers))
-		{
-			dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
+			fut.setTerminationCommand(new TerminationCommand()
+			{
+				public void terminated(Exception reason)
+				{
+					removeQuery(query);
+				}
+			});
+			
+			rwlock.writeLock().lock();
+			Set<IServiceIdentifier> sers = null;
+			try
+			{
+				ret = new ServiceQueryInfo<T>((ServiceQuery<T>) query, fut);
+				queries.addValue((ServiceQueryInfo)ret);
+				
+				// We need the write lock during read for consistency
+				// This works because rwlock is reentrant.
+				// deliver currently available services
+				sers = (Set<IServiceIdentifier>)getServices(query);
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			for (IServiceIdentifier ser : SUtil.safeSet(sers))
+			{
+				dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
+			}
 		}
 		
 		return fut;
@@ -705,11 +712,11 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		if (query.getReturnType() != null && ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
-			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResult(event);
+			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResultIfUndone(event);
 		}
 		else if (ServiceEvent.SERVICE_ADDED==eventtype)
 		{
-			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResult(ser);
+			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
 		}
 	}
 	
