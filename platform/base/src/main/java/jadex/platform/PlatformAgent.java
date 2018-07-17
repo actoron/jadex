@@ -151,9 +151,9 @@ public class PlatformAgent
 						{
 //							System.out.println("Found candidate: "+tup.getSecondEntity());
 							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-							if(clazz==null)
-								throw new RuntimeException("Could not load class: "+ci.getClassname());
-							components.add(clazz);
+							if(clazz!=null)
+								components.add(clazz);
+							agent.getLogger().warning("Could not load class: "+ci.getClassname());
 						}
 //						System.out.println(cnt++);
 					}
