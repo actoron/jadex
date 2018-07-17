@@ -74,12 +74,4 @@ public class BDIClassReaderAndroid extends BDIClassReader
 //		
 //		return ret;
 //	}
-	
-
-	@Override
-	protected String getFileName(Class< ? > cma, String model)
-	{
-		return model;
-	}
-
 }
