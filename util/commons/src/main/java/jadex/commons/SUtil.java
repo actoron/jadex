@@ -2962,6 +2962,37 @@ public class SUtil
 //		return ret;
 	}
 
+	/**
+	 *  Get the file location for a class (either filename or jar url).
+	 */
+	public static String	getClassFileLocation(Class<?> clazz)
+	{
+		String	ret;
+
+		URL sourceloc = clazz.getProtectionDomain()==null ? null 
+			: clazz.getProtectionDomain().getCodeSource().getLocation();
+			
+		// in robolectric testcases, location is null
+		if(sourceloc==null)
+		{
+			// Hack: pseudo class location?
+			ret	= "/"+SReflect.getClassName(clazz).replace('.', '/')+".class";
+		}
+		
+		// Jar url
+		else if(sourceloc.getPath().endsWith(".jar"))
+		{
+			ret	= "jar:file:"+sourceloc.getPath()+"!/"+SReflect.getClassName(clazz).replace('.', '/')+".class";
+		}
+		
+		// default case
+		else
+		{
+			ret	= SUtil.convertURLToString(sourceloc) + File.separator + SReflect.getClassName(clazz).replace('.', File.separatorChar)+".class";
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Convert an URL to a local file name.

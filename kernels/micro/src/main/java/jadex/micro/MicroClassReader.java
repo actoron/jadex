@@ -153,16 +153,7 @@ public class MicroClassReader
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
 		
-		// in robolectric testcases, location is null
-		URL sourceLocation = (cma.getProtectionDomain()!=null 
-			&& cma.getProtectionDomain().getCodeSource().getLocation() != null) 
-			? cma.getProtectionDomain().getCodeSource().getLocation() : null;
-			
-		String src = (sourceLocation != null) 
-			? SUtil.convertURLToString(sourceLocation) + File.separator : "/";
-//			: ('/' + cma.getPackage().getName().replace('.', '/') + '/');
-//		modelinfo.setFilename(src+File.separatorChar+model);
-		modelinfo.setFilename(src+SReflect.getClassName(cma).replace('.', cma.getProtectionDomain()!=null? File.separatorChar: '/')+".class");
+		modelinfo.setFilename(SUtil.getClassFileLocation(cma));
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
@@ -174,6 +165,9 @@ public class MicroClassReader
 			URL url	= null;
 			try
 			{
+				URL sourceLocation = cma.getProtectionDomain()==null ? null 
+					: cma.getProtectionDomain().getCodeSource().getLocation();
+
 				url	= (sourceLocation != null) 
 					? sourceLocation 
 					: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
