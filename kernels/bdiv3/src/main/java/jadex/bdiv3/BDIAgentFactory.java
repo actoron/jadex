@@ -51,7 +51,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	//-------- constants --------
 	
 	/** The bdi agent file type. */
-	public static final String	FILETYPE_BDIAGENT	= "BDIV3 Agent";
+	public static final String	FILETYPE_BDIAGENT = "BDIV3 Agent";
+	public static final String	TYPE = "bdi";
 	
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(BDIAgentFactory.class, "/jadex/bdiv3/images/bdi_agent.png");

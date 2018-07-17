@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.helloworld;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -10,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Imports;
@@ -23,7 +25,7 @@ import jadex.micro.annotation.Properties;
  *  are added to the agent type and conditions to eca rule system 
  *  class is rewritten to announce belief changes (field accesses and annotated methods)
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Imports({"java.util.logging.*"})
 @Properties({@NameValue(name="logging.level", value="Level.INFO")})
 public class HelloWorldBDI

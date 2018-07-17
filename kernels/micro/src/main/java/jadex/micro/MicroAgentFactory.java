@@ -54,7 +54,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public static final String[] FILETYPES = new String[]{".class"};
 	
 	/** The micro agent file type. */
-	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
+	public static final String FILETYPE_MICROAGENT = "Micro Agent";
+	public static final String TYPE = "micro";
 	
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png");
@@ -312,8 +313,15 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 									{
 										if(Agent.class.getName().equals(ai.getType()))
 										{
+											// Check type in agent annotation
 											
-											ret.setResult(Boolean.TRUE);
+											// todo: remove
+											// Check suffix of file
+											String part = model.toLowerCase().substring(0, model.length()-6);
+											if(part.endsWith("bdi"))
+												ret.setResult(Boolean.FALSE);
+											else
+												ret.setResult(Boolean.TRUE);
 											break;
 										}
 									}
