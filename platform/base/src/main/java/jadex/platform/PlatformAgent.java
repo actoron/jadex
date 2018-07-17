@@ -288,7 +288,7 @@ public class PlatformAgent
 
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("ex: "+exception);
+					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
 					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
@@ -298,7 +298,9 @@ public class PlatformAgent
 				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
 				
 				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c.getName()+".class", null, null);
-				fut.addResultListener(res -> {lis.resultAvailable(null);}, exception -> {lis.exceptionOccurred(exception);});
+				fut.addResultListener(
+					res -> {lis.resultAvailable(null);},
+					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c.getName()+".class", exception));});
 				
 //				System.out.println("Auto starting: "+names.get(c));
 			}
