@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -27,7 +28,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 /**
  *  Test search and query managing functionality.
  */
-//@Ignore
+@Ignore
 public class SearchQueryManagerTest
 {
 	//-------- constants --------
