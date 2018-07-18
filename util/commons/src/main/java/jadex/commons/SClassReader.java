@@ -409,6 +409,27 @@ public class SClassReader
 			}
 			return ret;
 		}
+		
+		/**
+		 *  Test if this class has an annotation.
+		 *  @param annname The annotation name.
+		 */
+		public AnnotationInfos getAnnotation(String anname)
+		{
+			AnnotationInfos ret = null;
+			if(annotations!=null)
+			{
+				for(AnnotationInfos ai: annotations)
+				{
+					if(anname.equals(ai.getType()))
+					{
+						ret = ai;
+						break;
+					}
+				}
+			}
+			return ret;
+		}
     }
     
     /**

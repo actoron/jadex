@@ -289,6 +289,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		
 //		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
+		if(model.indexOf("WebSocket")!=-1)
+			System.out.println("here");
+		
 		if(model.toLowerCase().endsWith(".class"))
 		{
 			ILibraryService libservice = getLibraryService();
@@ -317,16 +320,16 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 										if(Agent.class.getName().equals(ai.getType()))
 										{
 											// Check type in agent annotation
-											Map<String, String> vals = ai.getStringValues();
+											Map<String, Object> vals = ai.getValues();
 											String type;
-											if(vals==null)
+											if(vals==null || vals.get("type")==null)
 											{
 												Method method = Agent.class.getMethod("type");
 												type = (String)method.getDefaultValue();
 											}
 											else
 											{
-												type = vals.get("type");
+												type = (String)vals.get("type");
 											}
 											ret.setResult(getTypeName().equals(type));
 											
