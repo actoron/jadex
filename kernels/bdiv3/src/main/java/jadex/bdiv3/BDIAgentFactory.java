@@ -313,7 +313,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 										if(Agent.class.getName().equals(ai.getType()))
 										{
 											// Check type in agent annotation
-											Map<String, String> vals = ai.getStringValues();
+											Map<String, Object> vals = ai.getValues();
 											String type;
 											if(vals==null)
 											{
@@ -322,7 +322,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 											}
 											else
 											{
-												type = vals.get("type");
+												type = (String)vals.get("type");
 											}
 											ret.setResult(getTypeName().equals(type));
 											
