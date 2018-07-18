@@ -111,7 +111,7 @@ public class PlatformAgent
 		if(classloader instanceof URLClassLoader)
 			urls = ((URLClassLoader)classloader).getURLs();
 		
-		Set<Class<?>> components = scanForComponents(urls, classloader);
+		Set<Class<?>> components = scanForAgents(urls, classloader);
 
 		for(Class<?> cl: components)
 			addComponentToLevels(dr, cl, names);
@@ -129,7 +129,7 @@ public class PlatformAgent
 	/**
 	 *  Scan for component classes in the classpath.
 	 */
-	protected Set<Class<?>> scanForComponents(URL[] urls, ClassLoader classloader)
+	public static Set<Class<?>> scanForAgents(URL[] urls, ClassLoader classloader)
 	{
 		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, new FileFilter("$", false, ".class"));
 		
@@ -148,7 +148,7 @@ public class PlatformAgent
 						JarEntry je = jar.getJarEntry(jename);
 						InputStream is = jar.getInputStream(je);
 						ClassInfo ci = SClassReader.getClassInfo(is);
-						if(ci.hasAnnotation( Agent.class.getName()))
+						if(ci.hasAnnotation(Agent.class.getName()))
 						{
 //							System.out.println("Found candidate: "+tup.getSecondEntity());
 							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
@@ -171,7 +171,7 @@ public class PlatformAgent
 					try(FileInputStream is = new FileInputStream(filename))
 					{
 						ClassInfo ci = SClassReader.getClassInfo(is);
-						if(ci.hasAnnotation( Agent.class.getName()))
+						if(ci.hasAnnotation(Agent.class.getName()))
 						{
 	//						System.out.println("Found candidate: "+tup.getSecondEntity());
 							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
