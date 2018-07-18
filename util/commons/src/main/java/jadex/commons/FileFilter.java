@@ -1,6 +1,8 @@
 package jadex.commons;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.JarEntry;
 
 /**
@@ -8,14 +10,17 @@ import java.util.jar.JarEntry;
  */
 public class FileFilter implements IFilter<Object>
 {
-	/** The filename. */
-	protected String filename;
+//	/** The filename. */
+//	protected String filename;
+//	
+//	/** The contains flag. */
+//	protected boolean contains;
+//	
+//	/** The suffix string. */
+//	protected String suffix;
 	
-	/** The contains flag. */
-	protected boolean contains;
-	
-	/** The suffix string. */
-	protected String suffix;
+	/** The filename filters. */
+	protected List<IFilter<String>> filters;
 	
 	/**
 	 *  Create a new file filter.
@@ -36,11 +41,44 @@ public class FileFilter implements IFilter<Object>
 	/**
 	 *  Create a new file filter.
 	 */
-	public FileFilter(String filename, boolean contains, String suffix)
+	public FileFilter(String filename, boolean contains, final String suffix)
 	{
-		this.filename = filename;
-		this.contains = contains;
-		this.suffix = suffix;
+//		this.filename = filename;
+//		this.contains = contains;
+//		this.suffix = suffix;
+		
+		if(suffix!=null)
+		{
+			addFilenameFilter(new IFilter<String>()
+			{
+				public boolean filter(String fn)
+				{
+					return fn.endsWith(suffix);
+				}
+			});
+		}
+		
+		if(filename!=null)
+		{
+			addFilenameFilter(new IFilter<String>()
+			{
+				public boolean filter(String fn)
+				{
+					return contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1;
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Add a filename filter
+	 *  @param filter The filter.
+	 */
+	public void addFilenameFilter(IFilter<String> filter)
+	{
+		if(filters==null)
+			filters = new ArrayList<>();
+		filters.add(filter);
 	}
 	
 	/**
@@ -48,8 +86,7 @@ public class FileFilter implements IFilter<Object>
 	 */
 	public boolean filter(Object obj)
 	{
-		if(filename==null)
-			return true;
+		boolean ret = true;
 		
 		String	fn	= "";
 		if(obj instanceof File)
@@ -63,6 +100,21 @@ public class FileFilter implements IFilter<Object>
 			fn	= je.getName();
 		}
 		
-		return fn.endsWith(suffix) && (filename==null || (contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1));
+		if(filters!=null)
+		{
+			for(IFilter<String> filter: filters)
+			{
+				if(!filter.filter(fn))
+				{
+					ret = false;
+					break;
+				}
+			}
+		}
+		
+		return ret;
+//		return fn.endsWith(suffix) && (filename==null || (contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1));
 	}
+	
+	
 }
