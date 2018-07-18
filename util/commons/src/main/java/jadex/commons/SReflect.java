@@ -2,6 +2,7 @@ package jadex.commons;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -14,7 +15,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +33,7 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakValueMap;
 
@@ -1767,6 +1768,69 @@ public class SReflect
 		}
 		
 		return ret.toArray(new String[ret.size()]);
+	}
+	
+	/**
+	 *  Scan for component classes in the classpath.
+	 */
+	public static Set<ClassInfo> scanForClassInfos(URL[] urls, ClassLoader classloader, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
+	{
+		Set<ClassInfo> ret = new HashSet<ClassInfo>();
+			
+		if(filefilter==null)
+			filefilter = new jadex.commons.FileFilter("$", false, ".class");
+		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, filefilter);
+		
+		//int cnt = 0;
+		for(Map.Entry<String, Set<String>> entry: files.entrySet())
+		{
+			String jarname = entry.getKey();
+			if(jarname!=null)
+			{
+				try(JarFile jar	= new JarFile(jarname))
+				{
+					for(String jename: entry.getValue())
+					{
+						if(jename.indexOf("Kernel")!=-1)
+							System.out.println(jename);
+						JarEntry je = jar.getJarEntry(jename);
+						InputStream is = jar.getInputStream(je);
+						ClassInfo ci = SClassReader.getClassInfo(is);
+						if(classfilter.filter(ci))
+						{
+							ret.add(ci);
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				for(String filename: entry.getValue())
+				{
+					try(FileInputStream is = new FileInputStream(filename))
+					{
+						if(filename.indexOf("Kernel")!=-1)
+							System.out.println(filename);
+						ClassInfo ci = SClassReader.getClassInfo(is);
+						if(classfilter.filter(ci))
+						{
+							ret.add(ci);
+						}
+//						System.out.println(cnt++);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**

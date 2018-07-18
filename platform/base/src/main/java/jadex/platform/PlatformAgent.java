@@ -30,6 +30,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.FileFilter;
+import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
@@ -110,10 +111,23 @@ public class PlatformAgent
 		if(classloader instanceof URLClassLoader)
 			urls = ((URLClassLoader)classloader).getURLs();
 		
-		Set<Class<?>> components = scanForAgents(urls, classloader);
-
-		for(Class<?> cl: components)
-			addComponentToLevels(dr, cl, names);
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, classloader, null, new IFilter<SClassReader.ClassInfo>()
+		{
+			public boolean filter(ClassInfo ci)
+			{
+				return ci.hasAnnotation(Agent.class.getName());
+			}
+		});
+		
+		for(ClassInfo ci: cis)
+		{
+			System.out.println("Found: "+ci.getClassname());
+			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
+			if(clazz==null)
+				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
+			else
+				addComponentToLevels(dr, clazz, names);
+		}
 		
 //		System.out.println("cls: "+files.size()+" "+components.size());
 		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
@@ -125,71 +139,71 @@ public class PlatformAgent
 		return startComponents(cms, levels.iterator(), names);
 	}
 	
-	/**
-	 *  Scan for component classes in the classpath.
-	 */
-	public static Set<Class<?>> scanForAgents(URL[] urls, ClassLoader classloader)
-	{
-		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, new FileFilter("$", false, ".class"));
-		
-		Set<Class<?>> components = new HashSet<>();
-		
-//		int cnt = 0;
-		for(Map.Entry<String, Set<String>> entry: files.entrySet())
-		{
-			String jarname = entry.getKey();
-			if(jarname!=null)
-			{
-				try(JarFile jar	= new JarFile(jarname))
-				{
-					for(String jename: entry.getValue())
-					{
-						JarEntry je = jar.getJarEntry(jename);
-						InputStream is = jar.getInputStream(je);
-						ClassInfo ci = SClassReader.getClassInfo(is);
-						if(ci.hasAnnotation(Agent.class.getName()))
-						{
-//							System.out.println("Found candidate: "+tup.getSecondEntity());
-							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-							if(clazz!=null)
-								components.add(clazz);
-							agent.getLogger().warning("Could not load class: "+ci.getClassname());
-						}
-//						System.out.println(cnt++);
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			else
-			{
-				for(String filename: entry.getValue())
-				{
-					try(FileInputStream is = new FileInputStream(filename))
-					{
-						ClassInfo ci = SClassReader.getClassInfo(is);
-						if(ci.hasAnnotation(Agent.class.getName()))
-						{
-	//						System.out.println("Found candidate: "+tup.getSecondEntity());
-							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-							if(clazz==null)
-								throw new RuntimeException("Could not load class: "+ci.getClassname());
-							components.add(clazz);
-						}
-//						System.out.println(cnt++);
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
-		return components;
-	}
+//	/**
+//	 *  Scan for component classes in the classpath.
+//	 */
+//	public static Set<Class<?>> scanForAgents(URL[] urls, ClassLoader classloader)
+//	{
+//		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, new FileFilter("$", false, ".class"));
+//		
+//		Set<Class<?>> components = new HashSet<>();
+//		
+////		int cnt = 0;
+//		for(Map.Entry<String, Set<String>> entry: files.entrySet())
+//		{
+//			String jarname = entry.getKey();
+//			if(jarname!=null)
+//			{
+//				try(JarFile jar	= new JarFile(jarname))
+//				{
+//					for(String jename: entry.getValue())
+//					{
+//						JarEntry je = jar.getJarEntry(jename);
+//						InputStream is = jar.getInputStream(je);
+//						ClassInfo ci = SClassReader.getClassInfo(is);
+//						if(ci.hasAnnotation(Agent.class.getName()))
+//						{
+////							System.out.println("Found candidate: "+tup.getSecondEntity());
+//							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
+//							if(clazz!=null)
+//								components.add(clazz);
+//							agent.getLogger().warning("Could not load class: "+ci.getClassname());
+//						}
+////						System.out.println(cnt++);
+//					}
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//			else
+//			{
+//				for(String filename: entry.getValue())
+//				{
+//					try(FileInputStream is = new FileInputStream(filename))
+//					{
+//						ClassInfo ci = SClassReader.getClassInfo(is);
+//						if(ci.hasAnnotation(Agent.class.getName()))
+//						{
+//	//						System.out.println("Found candidate: "+tup.getSecondEntity());
+//							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
+//							if(clazz==null)
+//								throw new RuntimeException("Could not load class: "+ci.getClassname());
+//							components.add(clazz);
+//						}
+////						System.out.println(cnt++);
+//					}
+//					catch(Exception e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		}
+//		
+//		return components;
+//	}
 	
 	
 	/**
