@@ -34,16 +34,12 @@ public class WinCrypt
 		try
 		{
 			ULONGByReference hProv = new WinDef.ULONGByReference();
-			System.out.println("Trying Wincrypt 0");
 			if (CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0))
 			{
-				System.out.println("Trying Wincrypt 1");
 				Memory buf = new Memory(numBytes);
 				if (CryptGenRandom(hProv.getValue(), numBytes, buf))
 				{
-					System.out.println("Trying Wincrypt 2");
 					CryptReleaseContext(hProv.getValue(), 0);
-					System.out.println("Trying Wincrypt 3");
 					ret = buf.getByteArray(0, numBytes);
 				}
 			}
