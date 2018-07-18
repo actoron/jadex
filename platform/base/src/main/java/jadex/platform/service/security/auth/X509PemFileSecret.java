@@ -102,6 +102,32 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	}
 	
 	/**
+	 *  Hashcode.
+	 */
+	public int hashCode()
+	{
+		int ret = cert != null ? cert.hashCode() : 0;
+		ret = 31 * ret + key != null ? key.hashCode() : 0;
+		ret = 31 * ret + cacert != null ? cacert.hashCode() : 0;
+		return ret;
+	}
+	
+	/**
+	 *  Equals.
+	 */
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof X509PemFileSecret)
+		{
+			X509PemFileSecret other = (X509PemFileSecret) obj;
+			return SUtil.equals(cacert, other.cacert) &&
+				   SUtil.equals(cert, other.cert) &&
+				   SUtil.equals(key, other.key);
+		}
+		return false;
+	}
+	
+	/**
 	 *  Converts to encoded string.
 	 */
 	public String toString()

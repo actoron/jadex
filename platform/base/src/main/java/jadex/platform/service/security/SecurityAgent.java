@@ -118,6 +118,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
 	protected MultiCollection<String, AbstractAuthenticationSecret> networks = new MultiCollection<>();
 	
+	/** The platform name certificate if available. */
+	protected AbstractX509PemSecret platformnamecertificate;
+	
+	/** Trusted authorities for certifying platform names. */
 	protected Set<AbstractX509PemSecret> nameauthorities = new HashSet<>();
 	
 	/** Available crypt suites. */
@@ -166,6 +170,29 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				usesecret = getProperty("usesecret", args, settings, usesecret);
 				printsecret = getProperty("printsecret", args, settings, usesecret);
 				refuseunauth = getProperty("refuseunauth", args, settings, refuseunauth);
+				
+				if (args.get("platformnamecertificate") != null)
+					platformnamecertificate = (AbstractX509PemSecret) AbstractAuthenticationSecret.fromString((String) args.get("platformnamecertificate"), true);
+				else
+					platformnamecertificate = getProperty("platformnamecertificate", args, settings, platformnamecertificate);
+				
+				if (args.get("nameauthorities") != null)
+				{
+					nameauthorities = new HashSet<>();
+					String authstr = (String) args.get("nameauthorities");
+					String[] split = authstr.split(",");
+					for (int i = 0; i < split.length; ++i)
+					{
+						if (split[i].length() > 0)
+						{
+							nameauthorities.add((AbstractX509PemSecret) AbstractAuthenticationSecret.fromString((String) args.get("platformnamecertificate"), true));
+						}
+					}
+				}
+				else
+				{
+					nameauthorities = getProperty("nameauthorities", args, settings, nameauthorities);
+				}
 				
 				if (args.get("platformsecret") != null)
 					platformsecret = AbstractAuthenticationSecret.fromString((String) args.get("platformsecret"), false);
@@ -950,6 +977,22 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
+	 *  Gets the name authorities.
+	 */
+	public Set<AbstractX509PemSecret> getInternalNameAuthorities()
+	{
+		return nameauthorities;
+	}
+	
+	/**
+	 *  Get the platform name certificate.
+	 */
+	public AbstractX509PemSecret getInternalPlatformNameCertificate()
+	{
+		return platformnamecertificate;
+	}
+	
+	/**
 	 *  Gets the role map.
 	 * 
 	 *  @return The role map.
@@ -1236,6 +1279,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			settings.put("remoteplatformsecrets", remoteplatformsecrets);
 		if (roles != null && roles.size() > 0)
 			settings.put("roles", roles);
+		if (platformnamecertificate != null)
+			settings.put("platformnamecertificate", platformnamecertificate);
+		if (nameauthorities != null && nameauthorities.size() > 0)
+			settings.put("nameauthorities", nameauthorities);
 		
 		getSettingsService().saveState(PROPERTIES_ID, settings);
 		

@@ -1,6 +1,5 @@
 package jadex.commons.security;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,18 +9,12 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Provider.Service;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
@@ -360,14 +353,7 @@ public class SSecurity
 		try
 		{
 			byte[] certdata = SUtil.readStream(pemcert);
-			pemcert.close();
 			X509CertificateHolder cert = readCertificateFromPEM(new String(certdata, SUtil.UTF8));
-			
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			GZIPOutputStream gos = new GZIPOutputStream(baos);
-			gos.write(certdata);
-			gos.close();
-			certdata = baos.toByteArray();
 			
 			String pemkeystr = new String(SUtil.readStream(pemkey), SUtil.UTF8);
 			pemkey.close();
@@ -379,7 +365,7 @@ public class SSecurity
 			
 			byte[] sig = signer.getSignature();
 			
-			ret = SUtil.mergeData(certdata, sig);
+			ret = sig;
 		}
 		catch (Exception e)
 		{
@@ -387,21 +373,7 @@ public class SSecurity
 		}
 		finally
 		{
-			try
-			{
-				pemcert.close();
-			}
-			catch (Exception e)
-			{
-			}
-			
-			try
-			{
-				pemkey.close();
-			}
-			catch (Exception e)
-			{
-			}
+			SUtil.close(pemcert);
 		}
 		
 		return ret;
@@ -412,10 +384,11 @@ public class SSecurity
 	 * 
 	 *  @param msghash The message hash.
 	 *  @param token The authentication token.
+	 *  @param signingcert The signing certificate.
 	 *  @param trustedpemcert The PEM certificate trust anchor.
 	 *  @return True, if the certificate chain and signature is valid.
 	 */
-	public static final boolean verifyWithPEM(byte[] msghash, byte[] token, InputStream trustedpemcert)
+	public static final boolean verifyWithPEM(byte[] msghash, byte[] token, String signingcert, InputStream trustedpemcert)
 	{
 		try
 		{
@@ -426,19 +399,7 @@ public class SSecurity
 			if (!trustedcrtholder.isValidOn(now))
 				return false;
 			
-			List<byte[]> splitdata = SUtil.splitData(token);
-			if (splitdata.size() != 2)
-				return false;
-			
-			byte[] certdata = splitdata.get(0);
-			ByteArrayInputStream bais = new ByteArrayInputStream(certdata);
-			GZIPInputStream gis = new GZIPInputStream(bais);
-			certdata = SUtil.readStream(gis);
-			byte[] sig = splitdata.get(1);
-			
-			
-			
-			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(new String(certdata, SUtil.UTF8));
+			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(signingcert);
 			// Verify certificate chain
 			for (int i = 0; i < certchain.size() - 1; ++i)
 			{
@@ -466,7 +427,7 @@ public class SSecurity
 			ContentVerifier cv = getDefaultVerifier(certchain.get(0));
 			cv.getOutputStream().write(msghash);
 			cv.getOutputStream().close();
-			return cv.verify(sig);
+			return cv.verify(token);
 		}
 		catch (Exception e)
 		{
