@@ -229,14 +229,17 @@ public class SClassReader
 			{
 				Object value = readAnnotationValue(is, strings);
 				
-				if (value instanceof AnnotationInfos)
-				{
-					ret.addNestedAnnotations(name, (AnnotationInfos) value);
-				}
-				else if (value instanceof String)
-				{
-					ret.addStringValue(name, (String) value);
-				}
+				if (value != null)
+					ret.addValue(name, value);
+				
+//				if (value instanceof AnnotationInfos)
+//				{
+//					ret.addNestedAnnotations(name, (AnnotationInfos) value);
+//				}
+//				else if (value instanceof String)
+//				{
+//					ret.addStringValue(name, (String) value);
+//				}
 //				else if (value instanceof Object[])
 //				{
 //					Object[] arr = (Object[]) value;
@@ -438,10 +441,7 @@ public class SClassReader
     	protected String type;
     	
     	/** Annotations nested in this annotation. */
-    	Map<String, AnnotationInfos> nestedannotations;
-    	
-    	/** Annotations nested in this annotation. */
-    	Map<String, String> stringvalues;
+    	Map<String, Object> values;
     	
     	/**
     	 *  Creates the info.
@@ -459,47 +459,35 @@ public class SClassReader
     	}
     	
     	/**
-    	 *  Returns the nested annotations.
+    	 *  Returns a contained value.
     	 *  
-    	 *  @return The nested annotations.
+    	 *  @return The contained  value.
     	 */
-    	public Map<String, AnnotationInfos> getNestedannotations()
+    	public Object getValue(String name)
 		{
-			return nestedannotations;
+    		return SUtil.safeMap(values).get(name);
 		}
     	
     	/**
-    	 *  Returns the contained string values.
+    	 *  Returns the contained values.
     	 *  
-    	 *  @return The contained string values.
+    	 *  @return The contained values.
     	 */
-    	public Map<String, String> getStringValues()
+    	public Map<String, Object> getValues()
 		{
-			return stringvalues;
+			return values;
 		}
     	
     	/**
-    	 *  Adds a string value.
+    	 *  Adds a value.
     	 *  @param name Name of the value.
     	 *  @param value The value.
     	 */
-    	protected void addStringValue(String name, String value)
+    	protected void addValue(String name, Object value)
     	{
-    		if (stringvalues == null)
-    			stringvalues = new HashMap<>();
-    		stringvalues.put(name, value);
-    	}
-    	
-    	/**
-    	 *  Adds a nested annotation.
-    	 *  
-    	 *  @param nestedannotation The nested annotation. 
-    	 */
-    	protected void addNestedAnnotations(String name, AnnotationInfos nestedannotation)
-    	{
-    		if (nestedannotations == null)
-    			nestedannotations = new HashMap<>();
-    		nestedannotations.put(name, nestedannotation);
+    		if (values == null)
+    			values = new HashMap<>();
+    		values.put(name, value);
     	}
     }
 }
