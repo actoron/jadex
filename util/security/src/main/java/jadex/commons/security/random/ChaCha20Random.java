@@ -173,4 +173,14 @@ public class ChaCha20Random extends SecureRandom
 		ChaChaEngine.chachaCore(20, state, state);
 		Pack.intToLittleEndian(state, outputblock, 0);
 	}
+	
+	/**
+	 *  Generates a seed value from OS source.
+	 */
+	public byte[] generateSeed(int numbytes)
+	{
+		byte[] ret = new byte[numbytes];
+		SSecurity.getEntropySource().getEntropy(ret);
+		return ret;
+	}
 }

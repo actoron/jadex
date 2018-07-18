@@ -78,6 +78,16 @@ public class OpenSslAesCtrRandom extends SecureRandom
 		numbytes = buffer.length;
 	}
 	
+	/**
+	 *  Generates a seed value from OS source.
+	 */
+	public byte[] generateSeed(int numbytes)
+	{
+		byte[] ret = new byte[numbytes];
+		SSecurity.getEntropySource().getEntropy(ret);
+		return ret;
+	}
+	
 	/** Checks if the library is in a usable state. */
 	public static final boolean isEnabled()
 	{

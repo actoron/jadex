@@ -132,7 +132,7 @@ public class SUtil
 	public static final Random FAST_RANDOM = new FastThreadedRandom();
 	
 	/** Access to secure random source. */
-	public static SecureRandom SECURE_RANDOM = null;
+	public static volatile SecureRandom SECURE_RANDOM = null;
 	
 	static
 	{
@@ -436,15 +436,21 @@ public class SUtil
 	{
 		if (SECURE_RANDOM == null)
 		{
-			try
+			synchronized(SUtil.class)
 			{
-				Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
-				Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
-				SECURE_RANDOM = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
-			}
-			catch (Exception e)
-			{
-				SECURE_RANDOM = getJavaDefaultSecureRandom();
+				if (SECURE_RANDOM == null)
+				{
+					try
+					{
+						Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+						Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
+						SECURE_RANDOM = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+					}
+					catch (Exception e)
+					{
+						SECURE_RANDOM = getJavaDefaultSecureRandom();
+					}
+				}
 			}
 		}
 		
@@ -5852,32 +5858,45 @@ public class SUtil
 	    return -1;
 	}
 	
+	/** The Java default secure random. */
+	protected static volatile SecureRandom JAVA_DEFAULT_SECURE_RANDOM;
+	
 	/**
 	 *  Creates Java default algorithm secure random.
 	 */
 	public static final SecureRandom getJavaDefaultSecureRandom()
 	{
-		String alg = "SHA1PRNG";
-		Provider p = Security.getProvider("SUN");
-		if (p != null)
+		if (JAVA_DEFAULT_SECURE_RANDOM == null)
 		{
-			for (Service serv : p.getServices())
+			synchronized(SUtil.class)
 			{
-	            if (serv.getType().equals("SecureRandom"))
-	            {
-	                alg = serv.getAlgorithm();
-	                break;
-	            }
-	        }
+				if (JAVA_DEFAULT_SECURE_RANDOM == null)
+				{
+					String alg = "SHA1PRNG";
+					Provider p = Security.getProvider("SUN");
+					if (p != null)
+					{
+						for (Service serv : p.getServices())
+						{
+				            if (serv.getType().equals("SecureRandom"))
+				            {
+				                alg = serv.getAlgorithm();
+				                break;
+				            }
+				        }
+					}
+					try
+					{
+						JAVA_DEFAULT_SECURE_RANDOM = SecureRandom.getInstance(alg);
+					}
+					catch (NoSuchAlgorithmException e)
+					{
+						throw SUtil.throwUnchecked(e);
+					}
+				}
+			}
 		}
-		try
-		{
-			return SecureRandom.getInstance(alg);
-		}
-		catch (NoSuchAlgorithmException e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
+		return JAVA_DEFAULT_SECURE_RANDOM;
 	}
 	
 	/**

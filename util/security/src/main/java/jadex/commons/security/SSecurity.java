@@ -329,7 +329,6 @@ public class SSecurity
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
 								ret = SUtil.getJavaDefaultSecureRandom().generateSeed(output.length);
-//								ret = SecureRandom.getSeed(output.length);
 							}
 							
 							System.arraycopy(ret, 0, output, 0, output.length);
