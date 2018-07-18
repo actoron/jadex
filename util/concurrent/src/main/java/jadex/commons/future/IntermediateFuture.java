@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -20,7 +21,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	//-------- attributes --------
 	
 	/** The intermediate results. */
-	protected Collection<E> results;
+	protected List<E> results;
 	
 	/** Flag indicating that addIntermediateResult()has been called. */
 	protected boolean intermediate;
@@ -144,7 +145,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		addResult(result);
+	    		storeResult(result);
 	    		notify	= true;
 	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 				{
@@ -173,7 +174,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected void addResult(E result)
+	protected void storeResult(E result)
 	{
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
@@ -200,7 +201,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
        		boolean	ret	= super.doSetResult(result, undone);
        		if(ret)
        		{
-       			this.results	= result;
+       			this.results	= new ArrayList<>(result);
        		}
        		return ret;
 		}
@@ -244,7 +245,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		// because getIntermediateResults() returns empty list when results==null.
     		if(results==null)
     		{
-    			results	= res;
+    			results	= Collections.emptyList();
     		}
 		}
 

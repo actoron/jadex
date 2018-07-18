@@ -254,12 +254,13 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				});
 				
 				// Add timeout in case cleanup takes too long.
-				final Number	timeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
-				if(timeout==null || timeout.longValue()!=Timeout.NONE)
+				Number	ntimeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
+				long	timeout	= ntimeout!=null ? ntimeout.longValue() : Starter.getLocalDefaultTimeout(getId());
+				if(timeout!=Timeout.NONE)
 				{
 					if(getFeature0(IExecutionFeature.class)!=null)
 					{
-						getFeature(IExecutionFeature.class).waitForDelay(timeout!=null ? timeout.longValue() : Starter.getLocalDefaultTimeout(getId()), true)
+						getFeature(IExecutionFeature.class).waitForDelay(timeout, true)
 							.addResultListener(new IResultListener<Void>()
 						{
 							@Override

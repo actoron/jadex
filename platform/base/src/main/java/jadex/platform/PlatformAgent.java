@@ -34,7 +34,6 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -152,9 +151,9 @@ public class PlatformAgent
 						{
 //							System.out.println("Found candidate: "+tup.getSecondEntity());
 							Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-							if(clazz==null)
-								throw new RuntimeException("Could not load class: "+ci.getClassname());
-							components.add(clazz);
+							if(clazz!=null)
+								components.add(clazz);
+							agent.getLogger().warning("Could not load class: "+ci.getClassname());
 						}
 //						System.out.println(cnt++);
 					}
@@ -289,7 +288,7 @@ public class PlatformAgent
 
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("ex: "+exception);
+					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
 					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
@@ -299,7 +298,9 @@ public class PlatformAgent
 				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
 				
 				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c.getName()+".class", null, null);
-				fut.addResultListener(res -> {lis.resultAvailable(null);});
+				fut.addResultListener(
+					res -> {lis.resultAvailable(null);},
+					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c.getName()+".class", exception));});
 				
 //				System.out.println("Auto starting: "+names.get(c));
 			}
