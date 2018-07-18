@@ -258,6 +258,9 @@ public class SSecurity
 							}
 						}
 						
+						/**
+						 *  Gets low-level entropy, preferably from OS.
+						 */
 						public synchronized void getEntropy(byte[] output)
 						{
 //							bcount += ret.length;
@@ -310,7 +313,6 @@ public class SSecurity
 								}
 								catch(Throwable e)
 								{
-									e.printStackTrace();
 									ret = null;
 								}
 							}

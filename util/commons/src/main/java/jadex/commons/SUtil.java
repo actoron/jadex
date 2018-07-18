@@ -136,6 +136,7 @@ public class SUtil
 	
 	static
 	{
+		getSecureRandom();
 		if (Security.getProvider("Jadex") == null)
 		{
 			Security.insertProviderAt(new Provider("Jadex", 1.0, "")
