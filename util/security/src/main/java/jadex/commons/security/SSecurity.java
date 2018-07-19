@@ -609,6 +609,17 @@ public class SSecurity
 	}
 	
 	/**
+	 *  Returns the subject ID of a certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return The subject ID.
+	 */
+	public static final String getSubjectId(X509CertificateHolder cert)
+	{
+		return cert.getSubject().toString();
+	}
+	
+	/**
 	 *  Writes a certificate as PEM-encoded string.
 	 *  
 	 *  @param cert The certificate.
@@ -989,14 +1000,23 @@ public class SSecurity
 				else
 					curvname = "brainpoolp256r1";
 			}
+			else if ("NIST K".equals(algconf.toUpperCase()))
+			{
+				if (strength > 384)
+					curvname = "K-571";
+				else if (strength > 256)
+					curvname = "K-409";
+				else
+					curvname = "K-283";
+			}
 			else
 			{
 				if (strength > 384)
-					curvname = "secp521k1";
+					curvname = "P-521";
 				else if (strength > 256)
-					curvname = "secp384k1";
+					curvname = "P-384";
 				else
-					curvname = "secp256k1";
+					curvname = "P-256";
 			}
 			
 			X9ECParameters x9 = CustomNamedCurves.getByName(curvname);

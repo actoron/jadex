@@ -17,7 +17,7 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 	{
 		AbstractAuthenticationSecret.SECRET_TYPES.put(PasswordSecret.PREFIX, PasswordSecret.class);
 		AbstractAuthenticationSecret.SECRET_TYPES.put(KeySecret.PREFIX, KeySecret.class);
-		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemFileSecret.PREFIX, X509PemFileSecret.class);
+		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemStringsSecret.PREFIX, X509PemStringsSecret.class);
 		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemSecret.PREFIX, X509PemSecret.class);
 	}
 	

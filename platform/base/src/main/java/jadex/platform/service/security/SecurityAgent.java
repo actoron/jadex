@@ -751,6 +751,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		});
 	}
 	
+	/** 
+	 *  Adds an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Set<String>> getNameAuthorities()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				Set<String> ret = new HashSet<>();
+				for (AbstractX509PemSecret secret : SUtil.safeSet(nameauthorities))
+					ret.add(secret.toString());
+				return new Future<>(ret);
+			}
+		});
+	}
+	
 //	/**
 //	 *  Gets the current network names. 
 //	 *  @return The current networks names.

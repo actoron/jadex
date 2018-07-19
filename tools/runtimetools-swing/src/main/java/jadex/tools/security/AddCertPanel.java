@@ -44,6 +44,9 @@ import jadex.commons.security.SSecurity;
 @SuppressWarnings("rawtypes") // Bad JComboBox, BAD!
 public class AddCertPanel extends JPanel
 {
+	/** Serial */
+	private static final long serialVersionUID = 8626220123653845241L;
+
 	/** Shorthand for GL-size. */
 	protected static final int PS = GroupLayout.PREFERRED_SIZE;
 	
@@ -253,15 +256,16 @@ public class AddCertPanel extends JPanel
 		GroupLayout layout = createGroupLayout(cryptsettings);
 		cryptsettings.setLayout(layout);
 		
-		JLabel sigalgstrlb = new JLabel("Key Strength");
+		JLabel sigalgstrlb = new JLabel("Key Strength (min.)");
 		sigalgstr = new JComboBox();
 		sigalgstr.setEditable(false);
 		sigalgstr.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalgconflb = new JLabel("Curve");
 		sigalgconf = new JComboBox();
+		sigalgconf.addItem("NIST P");
+		sigalgconf.addItem("NIST K");
 		sigalgconf.addItem("Brainpool");
-		sigalgconf.addItem("NIST");
 		sigalgconf.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalglb = new JLabel("Algorithm");
