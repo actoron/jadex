@@ -161,7 +161,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames())
+		for(String networkname: query.getNetworkNames()!=null
+			? query.getNetworkNames()
+			: connections.keySet().toArray(new String[connections.size()]))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -248,7 +250,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames())
+		for(String networkname: query.getNetworkNames()!=null
+			? query.getNetworkNames()
+			: connections.keySet().toArray(new String[connections.size()]))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -780,7 +784,11 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			});
 			
 			// Start handling
-			updateQuery(query.getNetworkNames());
+			// TODO: search all if networks==null???
+			String[]	networknames	= query.getNetworkNames()!=null
+				? query.getNetworkNames()
+				: connections.keySet().toArray(new String[connections.size()]);
+			updateQuery(networknames);
 		}
 		
 		//-------- methods --------
@@ -805,7 +813,6 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			Set<ISuperpeerService>	newsuperpeers	= networkspersuperpeer.isEmpty() ? null : new LinkedHashSet<>();
 			
 			// Fill multicollection with relevant superpeers for networks
-			// TODO: search all if networks==null???
 			for(String networkname: networknames)
 			{
 				NetworkManager	manager	= connections.get(networkname);
@@ -827,6 +834,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				
 				// else ignore unknown network
 			}
+			// TODO: global network
 			newsuperpeers	= newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet();
 			
 			// Add queries for each relevant superpeer
