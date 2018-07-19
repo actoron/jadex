@@ -49,6 +49,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	
 	protected void storeResult(E result)
 	{
+//		System.out.println("store: "+result);
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
 			super.storeResult(result);
@@ -83,7 +84,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	
 	/**
      *  Add a result listener.
-     *  @param listsner The listener.
+     *  @param listener The listener.
      */
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
@@ -256,7 +257,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results.");
+    			throw new NoSuchElementException("No more intermediate results: exception="+getException());
     		}
     		else
     		{
