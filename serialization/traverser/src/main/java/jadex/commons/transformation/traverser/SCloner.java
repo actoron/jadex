@@ -1,6 +1,12 @@
 package jadex.commons.transformation.traverser;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.List;
+
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 public class SCloner
 {
@@ -60,6 +66,88 @@ public class SCloner
 	{
 		traverser = traverser != null? traverser:Traverser.getInstance();
 		return traverser.traverse(object, null, null, processors == null? Traverser.getDefaultProcessors():processors, Traverser.MODE.PLAIN, targetcl, new CloneContext());
+	}
+	
+	/**
+	 *  Creates a bean object from class.
+	 *  
+	 *  @param intro Bean introspector to use.
+	 *  @param clazz The class.
+	 *  @return Instantiated bean object.
+	 */
+	public static final Object createBeanObject(IBeanIntrospector intro, Class<?> clazz)
+	{
+		Object bean = null;
+		
+		MethodHandle mcon = intro.getBeanConstructor(clazz, true, false);
+		if (mcon == null)
+		{
+			// Allow non-public bean constructors
+			Constructor<?> c = null;
+			try
+			{
+				c = clazz.getDeclaredConstructor();
+			}
+			catch (Exception e)
+			{
+			}
+			
+			if (c != null)
+			{
+				try
+				{
+					if(!Modifier.isPublic(c.getModifiers()) || !Modifier.isPublic(clazz.getModifiers()))
+					{
+						c.setAccessible(true);
+					}
+					bean = c.newInstance();
+				}
+				catch (Exception e)
+				{
+					throw SUtil.throwUnchecked(e);
+				}
+			}
+			else
+			{
+				c = clazz.getDeclaredConstructors()[0];
+				c.setAccessible(true);
+				Class<?>[] paramtypes = c.getParameterTypes();
+				Object[] paramvalues = new Object[paramtypes.length];
+				for(int i=0; i<paramtypes.length; i++)
+				{
+					if(paramtypes[i].equals(boolean.class))
+					{
+						paramvalues[i] = Boolean.FALSE;
+					}
+					else if(SReflect.isBasicType(paramtypes[i]))
+					{
+						paramvalues[i] = 0;
+					}
+				}
+				
+				try
+				{
+					bean = c.newInstance(paramvalues);
+				}
+				catch (Exception e)
+				{
+					throw SUtil.throwUnchecked(e);
+				}
+			}
+		}
+		else
+		{
+			try
+			{
+				bean = mcon.invokeExact();
+			}
+			catch (Throwable e)
+			{
+				throw SUtil.throwUnchecked(e);
+			}
+		}
+		
+		return bean;
 	}
 	
 	/** Extendable clone context. */

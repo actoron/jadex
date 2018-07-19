@@ -1,5 +1,6 @@
 package jadex.commons.transformation.traverser;
 
+import java.lang.invoke.MethodHandle;
 import java.util.Map;
 
 
@@ -9,6 +10,11 @@ import java.util.Map;
  */
 public interface IBeanIntrospector
 {
+	/**
+	 * Get the bean constructor for a specific clazz.
+	 */
+	public MethodHandle getBeanConstructor(Class<?> clazz, boolean includemethods, boolean includefields);
+	
 	/** 
 	 *  Get the bean properties for a class.
 	 *  @param clazz The class to inspect.
