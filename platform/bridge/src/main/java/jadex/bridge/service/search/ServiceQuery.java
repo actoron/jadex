@@ -192,7 +192,7 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	protected ServiceQuery()
+	public ServiceQuery()
 	{
 		// Not public to not encourage user to use it.
 		// Here it does NOT set the networknames automatically because used for serialization.
@@ -678,15 +678,6 @@ public class ServiceQuery<T>
 		return this;
 	}
 
-	/**
-	 *  Check if a query is potentially remote.
-	 *  @return True, if scope is set to a remote scope (e.g. global or network).
-	 */
-	public boolean isRemote()
-	{
-		return scope!=null && (scope.contains("global") || scope.contains("network"));
-	}
-	
 	/**
 	 *  Tests if the query keys matches a service.
 	 *  
