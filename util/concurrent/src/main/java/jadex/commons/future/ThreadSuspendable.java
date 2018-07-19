@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.ThreadPool;
 
 /**
@@ -86,8 +87,8 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 	 *  Get the default timeout.
 	 *  @return The default timeout (-1 for none).
 	 */
-	public long getDefaultTimeout()
+	protected long getDefaultTimeout()
 	{
-		return -1;
+		return SUtil.DEFTIMEOUT;
 	}
 }

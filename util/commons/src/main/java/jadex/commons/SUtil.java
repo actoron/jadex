@@ -427,6 +427,38 @@ public class SUtil
 		RESOURCEINFO_MAPPERS	= mappers.toArray(new IResultCommand[mappers.size()]);
 	}
 	
+	/** Default timeout e.g. from environment. */
+	public static final long DEFTIMEOUT;
+	static
+	{
+		// Set deftimeout from environment, if set.
+	    String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
+	    if(dtoprop==null)
+	    	dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
+	    if(dtoprop==null)
+	    	dtoprop	= System.getProperty("jadex_timeout", System.getenv("jadex_timeout"));
+//	    if(dtoprop!=null)
+//	    {
+//	        System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
+//	    }
+//	    else
+//	    {
+//	        dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
+//	    }
+	    if(dtoprop!=null)
+	    {
+//	        DEFAULT_REMOTE_TIMEOUT = (Long.parseLong(dtoprop));
+//	        DEFAULT_LOCAL_TIMEOUT = (Long.parseLong(dtoprop));
+	        System.out.println("Setting jadex_timeout: "+dtoprop);
+	    }
+		
+		Long ret = dtoprop!=null? Long.parseLong(dtoprop): null;
+		if(ret==null)
+			ret = SReflect.isAndroid() ? 60000L : 30000;
+		DEFTIMEOUT	= ret;
+	}
+
+	
 	/**
 	 *  Gets the global secure random.
 	 *  

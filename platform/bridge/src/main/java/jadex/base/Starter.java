@@ -42,6 +42,7 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
@@ -1054,11 +1055,9 @@ public class Starter
 	 */
 	public static long getRemoteDefaultTimeout(IComponentIdentifier platform)
 	{
-		if(platform == null)
-			return PlatformConfigurationHandler.getDefaultTimeout();
-
-		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue() : PlatformConfigurationHandler.getDefaultTimeout();
+		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)
+			? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue()
+			: SUtil.DEFTIMEOUT;
 	}
 
 	/**
@@ -1075,11 +1074,9 @@ public class Starter
 	 */
 	public static long getLocalDefaultTimeout(IComponentIdentifier platform)
 	{
-		if(platform == null)
-			return PlatformConfigurationHandler.getDefaultTimeout();
-
-		platform = platform.getRoot();
-		return hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT) ? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue() : PlatformConfigurationHandler.getDefaultTimeout();
+		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)
+			? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue()
+			: SUtil.DEFTIMEOUT;
 	}
 
 	/**
