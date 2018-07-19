@@ -23,6 +23,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -157,9 +158,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 				
 				RemoteReference rr = new RemoteReference(providerid, sid);
 				ProxyReference pr = new ProxyReference(pi, rr);
-				Class<?> h = SReflect.classForName0("jadex.platform.service.serialization.RemoteMethodInvocationHandler", null);
-				Constructor<?> c = h.getConstructor(new Class[]{IInternalAccess.class, ProxyReference.class});
-				InvocationHandler handler = (InvocationHandler)c.newInstance(new Object[]{component, pr});
+				InvocationHandler handler = new RemoteMethodInvocationHandler(component, pr);
 				ret = (S)ProxyFactory.newProxyInstance(component.getClassLoader(), 
 					interfaces, handler);
 //				ret = (S)ProxyFactory.newProxyInstance(component.getClassLoader(), 
