@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import jadex.commons.SUtil;
+
 
 /**
  * 
@@ -49,6 +51,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	
 	protected void storeResult(E result)
 	{
+//		System.out.println("store: "+result);
 		// Store results only if necessary for first listener.
 		if(storeforfirst)
 			super.storeResult(result);
@@ -83,7 +86,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	
 	/**
      *  Add a result listener.
-     *  @param listsner The listener.
+     *  @param listener The listener.
      */
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
@@ -114,6 +117,36 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 			results=null;
 		}
     }
+    /**
+     *  Get the intermediate results that are available.
+     *  Note: The semantics of this method is different to the normal intermediate future
+     *  due to the fire-and-forget-semantics!
+     *  
+     *  @return
+     *  1) <i>Non-blocking</I> access only: An empty collection, unless if the future is in "store-for-first" mode (default)
+     *  	and no listeners has yet been added, in which case the results until now are returned.<br>
+     *  2) Also <i>blocking</i> access from same thread: All results since the first blocking access
+     *  	that have not yet been consumed by getNextIntermediateResult().
+     */
+	public Collection<E> getIntermediateResults()
+	{
+		List<E>	ret;
+
+    	synchronized(this)
+    	{
+			if(storeforfirst)
+			{
+				ret	= results;
+			}
+			else
+			{
+	    		ret	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+			}
+    	}
+
+    	return ret!=null ? ret : Collections.emptyList();
+	}
+	
     /**
      *  Iterate over the intermediate results in a blocking fashion.
      *  Manages results independently for different callers, i.e. when called
@@ -256,7 +289,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results.");
+    			throw new NoSuchElementException("No more intermediate results"
+    				+ (getException()==null ? "." : ": exception="+SUtil.getExceptionStacktrace(getException())));
     		}
     		else
     		{

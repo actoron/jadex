@@ -518,7 +518,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
 		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
 	{
-		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope);
+		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope);
 	}
 	
 	/**

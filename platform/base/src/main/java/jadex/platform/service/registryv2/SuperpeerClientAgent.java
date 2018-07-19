@@ -72,6 +72,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	@Agent
 	protected IInternalAccess	agent;
 	
+	/** The fallback polling search rate as factor of the default remote timeout. */
+	@AgentArgument
+	protected double	pollingrate	= POLLING_RATE;
+	
 	/** Use only awareness for remote search, i.e. no superpeers at all. */
 	// Used for tests for now
 	@AgentArgument
@@ -90,6 +94,11 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	{
 		Future<Void>	ret	= new Future<>();
 		connections	= new LinkedHashMap<>();
+		
+		if(pollingrate!=POLLING_RATE)
+		{
+			System.out.println(agent+" using polling rate: "+pollingrate);
+		}
 		
 		if(!awaonly)
 		{
@@ -152,7 +161,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames())
+		for(String networkname: query.getNetworkNames()!=null
+			? query.getNetworkNames()
+			: connections.keySet().toArray(new String[connections.size()]))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -239,7 +250,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames())
+		for(String networkname: query.getNetworkNames()!=null
+			? query.getNetworkNames()
+			: connections.keySet().toArray(new String[connections.size()]))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -771,7 +784,11 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			});
 			
 			// Start handling
-			updateQuery(query.getNetworkNames());
+			// TODO: search all if networks==null???
+			String[]	networknames	= query.getNetworkNames()!=null
+				? query.getNetworkNames()
+				: connections.keySet().toArray(new String[connections.size()]);
+			updateQuery(networknames);
 		}
 		
 		//-------- methods --------
@@ -796,7 +813,6 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			Set<ISuperpeerService>	newsuperpeers	= networkspersuperpeer.isEmpty() ? null : new LinkedHashSet<>();
 			
 			// Fill multicollection with relevant superpeers for networks
-			// TODO: search all if networks==null???
 			for(String networkname: networknames)
 			{
 				NetworkManager	manager	= connections.get(networkname);
@@ -818,6 +834,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 				
 				// else ignore unknown network
 			}
+			// TODO: global network
 			newsuperpeers	= newsuperpeers!=null ? newsuperpeers : networkspersuperpeer.keySet();
 			
 			// Add queries for each relevant superpeer
@@ -833,7 +850,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						public void intermediateResultAvailable(T result)
 						{
 							// Forward result to user query
-							retfut.addIntermediateResult(result);
+							retfut.addIntermediateResultIfUndone(result);
 						}
 						
 						@Override
@@ -881,7 +898,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						{
 							// Schedule next search
 							agent.getFeature(IExecutionFeature.class)
-								.waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), POLLING_RATE), step, true);
+								.waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), pollingrate), step, true);
 							
 							// Start current search
 							searchRemoteServices(query)

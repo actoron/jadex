@@ -25,7 +25,7 @@ public interface IAuthenticationSuite
 	 *  @param key The key used for authentication.
 	 *  @return Authentication token.
 	 */
-	public byte[] createAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key);
+	public AuthToken createAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key);
 	
 	/**
 	 *  Creates an authentication token for a message based on an abstract 
@@ -36,7 +36,7 @@ public interface IAuthenticationSuite
 	 *  @param authtoken Authentication token.
 	 *  @return True if authenticated, false otherwise.
 	 */
-	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key, byte[] authtoken);
+	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret key, AuthToken authtoken);
 	
 	/** 
 	 *  Gets the first round of the password-authenticated key-exchange.

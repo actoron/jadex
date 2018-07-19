@@ -26,8 +26,11 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.AbstractX509PemSecret;
+import jadex.platform.service.security.auth.AuthToken;
 import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
 import jadex.platform.service.security.auth.IAuthenticationSuite;
+import jadex.platform.service.security.auth.X509AuthToken;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 
@@ -227,6 +230,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 				reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
 			reply.setNetworkSigs(getNetworkSignatures(pubkey, agent.getInternalNetworks()));
 			
+			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
+			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 3;
 		}
@@ -246,10 +251,15 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			remotepublickey = kx.getPublicKey();
 			
+			String remotepfname = kx.getSender().getRoot().toString();
+			String authenticatedpfname = null;
+			if (verifyPlatformNameSignature(remotepublickey, kx.getPlatformNameSig(), agent.getInternalNameAuthorities(), remotepfname))
+				authenticatedpfname = remotepfname;
+			
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
 			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
-			setupSecInfos(remoteid, authnets, platformauth, agent);
+			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
 			if (agent.getInternalRefuseUnauth() && !secinf.isAuthenticated())
 				throw new SecurityException("Unauthenticated connection not allowed.");
@@ -265,6 +275,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 					reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
 			reply.setNetworkSigs(getNetworkSignatures(pubkey, agent.getInternalNetworks()));
 			
+			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
+			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 4;
 		}
@@ -276,10 +288,15 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			remotepublickey = kx.getPublicKey();
 			
+			String remotepfname = kx.getSender().getRoot().toString();
+			String authenticatedpfname = null;
+			if (verifyPlatformNameSignature(remotepublickey, kx.getPlatformNameSig(), agent.getInternalNameAuthorities(), remotepfname))
+				authenticatedpfname = remotepfname;
+			
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
 			platformauth &= agent.getInternalUsePlatformSecret();
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
-			setupSecInfos(remoteid, authnets, platformauth, agent);
+			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
 			if (agent.getInternalRefuseUnauth() && !secinf.isAuthenticated())
 				throw new SecurityException("Unauthenticated connection not allowed.");
@@ -353,20 +370,20 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return Tuple of signatures local/remote.
 	 */
-	protected Tuple2<byte[], byte[]> getPlatformSignatures(byte[] pubkey, SecurityAgent agent, IComponentIdentifier remoteid)
+	protected Tuple2<AuthToken, AuthToken> getPlatformSignatures(byte[] pubkey, SecurityAgent agent, IComponentIdentifier remoteid)
 	{
-		byte[] local = null;
+		AuthToken local = null;
 		AbstractAuthenticationSecret ps = agent.getInternalPlatformSecret();
 		if (ps != null && ps.canSign())
 			local = signKey(challenge, pubkey, ps);
 		
-		byte[] remote = null;
+		AuthToken remote = null;
 		ps = agent.getInternalPlatformSecret(remoteid);
 		if (ps != null && ps.canSign())
 			remote = signKey(challenge, pubkey, ps);
 		
 		if (local != null || remote != null)
-			return new Tuple2<byte[], byte[]>(local, remote);
+			return new Tuple2<>(local, remote);
 		
 		return null;
 	}
@@ -378,7 +395,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param networksigs The signatures.
 	 *  @return List of network that authenticated the key.
 	 */
-	protected boolean verifyPlatformSignatures(byte[] key, Tuple2<byte[], byte[]> sigs, AbstractAuthenticationSecret localsecret)
+	protected boolean verifyPlatformSignatures(byte[] key, Tuple2<AuthToken, AuthToken> sigs, AbstractAuthenticationSecret localsecret)
 	{
 		boolean ret = false;
 		if (sigs != null)
@@ -397,6 +414,46 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	}
 	
 	/**
+	 *  Generates a token verifying the platform name.
+	 *  
+	 *  @param key The key.
+	 *  @param secret The name certificate.
+	 *  @return The token.
+	 */
+	public AuthToken getPlatformNameSignature(byte[] key, AbstractX509PemSecret secret)
+	{
+		AuthToken ret = null;
+		if (secret != null)
+		{
+			ret = signKey(challenge, key, secret);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Verifies a token verifying the platform name.
+	 */
+	public boolean verifyPlatformNameSignature(byte[] key, AuthToken platformnamesig, Set<AbstractX509PemSecret> nameauthorities, String platformname)
+	{
+		boolean ret = false;
+		if (platformnamesig instanceof X509AuthToken)
+		{
+			X509AuthToken sig = (X509AuthToken) platformnamesig;
+			for (AbstractX509PemSecret nameauthority : nameauthorities)
+			{
+				boolean verified = verifyKey(challenge, key, nameauthority, sig);
+				if (verified)
+				{
+					ret = platformname.equals(SSecurity.readCertificateFromPEM(sig.getCertificate()).getSubject().toString());
+					if (ret)
+						break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Signs a key with network secrets.
 	 *  
 	 *  @param key The key (public key).
@@ -404,9 +461,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return Map hashed network name -> signature.
 	 */
-	protected MultiCollection<ByteArrayWrapper, byte[]> getNetworkSignatures(byte[] key, MultiCollection<String, AbstractAuthenticationSecret> networks)
+	protected MultiCollection<ByteArrayWrapper, AuthToken> getNetworkSignatures(byte[] key, MultiCollection<String, AbstractAuthenticationSecret> networks)
 	{
-		MultiCollection<ByteArrayWrapper, byte[]> networksigs = new MultiCollection<ByteArrayWrapper, byte[]>();
+		MultiCollection<ByteArrayWrapper, AuthToken> networksigs = new MultiCollection<>();
 		
 		if (hashednetworknames.size() > 0)
 		{
@@ -420,7 +477,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 					{
 						if (secret.canSign())
 						{
-							byte[] sig = signKey(challenge, key, secret);
+							AuthToken sig = signKey(challenge, key, secret);
 							if (sig != null)
 								networksigs.add(entry.getKey(), sig);
 						}
@@ -438,13 +495,13 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param networksigs The signatures.
 	 *  @return List of network that authenticated the key.
 	 */
-	protected List<String> verifyNetworkSignatures(byte[] key, MultiCollection<ByteArrayWrapper, byte[]> networksigs, MultiCollection<String, AbstractAuthenticationSecret> networks)
+	protected List<String> verifyNetworkSignatures(byte[] key, MultiCollection<ByteArrayWrapper, AuthToken> networksigs, MultiCollection<String, AbstractAuthenticationSecret> networks)
 	{
 		List<String> ret = new ArrayList<String>();
 		
 		if (networksigs != null)
 		{
-			for (Map.Entry<ByteArrayWrapper, Collection<byte[]>> nwsig : networksigs.entrySet())
+			for (Map.Entry<ByteArrayWrapper, Collection<AuthToken>> nwsig : networksigs.entrySet())
 			{
 				String networkname = hashednetworknames.get(nwsig.getKey());
 				if (networkname != null)
@@ -456,7 +513,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 						sigcheck:
 						for (AbstractAuthenticationSecret secret : secrets)
 						{
-							for (byte[] sig : nwsig.getValue())
+							for (AuthToken sig : nwsig.getValue())
 							{
 								authenticated = verifyKey(challenge, key, secret, sig);
 								if (authenticated)
@@ -482,7 +539,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param secret Secret used for authentication.
 	 *  @return Signature.
 	 */
-	protected byte[] signKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret)
+	protected AuthToken signKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret)
 	{
 		byte[] sigmsg = new byte[key.length + challenge.length];
 		System.arraycopy(key, 0, sigmsg, 0, key.length);
@@ -498,7 +555,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param secret Secret used for authentication.
 	 *  @return True, if authenticated.
 	 */
-	protected boolean verifyKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret, byte[] authtoken)
+	protected boolean verifyKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret, AuthToken authtoken)
 	{
 		byte[] sigmsg = new byte[key.length + challenge.length];
 		System.arraycopy(key, 0, sigmsg, 0, key.length);
@@ -933,11 +990,14 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		/** Public key of the exchange. */
 		protected byte[] publickey;
 		
+		/** Signatures for verifying the platform name. */
+		protected AuthToken platformnamesig;
+		
 		/** Signatures based on the local and remote platform access secrets. */
-		protected Tuple2<byte[], byte[]> platformsecretsigs;
+		protected Tuple2<AuthToken, AuthToken> platformsecretsigs;
 		
 		/** Network signatures of the public key. */
-		protected MultiCollection<ByteArrayWrapper, byte[]> networksigs;
+		protected MultiCollection<ByteArrayWrapper, AuthToken> networksigs;
 		
 		/** PAKE round 2 data. */
 		protected byte[] pakeround2data;
@@ -1002,7 +1062,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @return The network signatures of the public key.
 		 */
-		public MultiCollection<ByteArrayWrapper, byte[]> getNetworkSigs()
+		public MultiCollection<ByteArrayWrapper, AuthToken> getNetworkSigs()
 		{
 			return networksigs;
 		}
@@ -1012,7 +1072,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @param networksigs The network signatures of the public key.
 		 */
-		public void setNetworkSigs(MultiCollection<ByteArrayWrapper, byte[]> networksigs)
+		public void setNetworkSigs(MultiCollection<ByteArrayWrapper, AuthToken> networksigs)
 		{
 			this.networksigs = networksigs;
 		}
@@ -1022,7 +1082,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *
 		 *  @return The platform secret signatures.
 		 */
-		public Tuple2<byte[], byte[]> getPlatformSecretSigs()
+		public Tuple2<AuthToken, AuthToken> getPlatformSecretSigs()
 		{
 			return platformsecretsigs;
 		}
@@ -1032,9 +1092,29 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *
 		 *  @param platformsecretsigs The platform secret signatures.
 		 */
-		public void setPlatformSecretSigs(Tuple2<byte[], byte[]> platformsecretsigs)
+		public void setPlatformSecretSigs(Tuple2<AuthToken, AuthToken> platformsecretsigs)
 		{
 			this.platformsecretsigs = platformsecretsigs;
+		}
+		
+		/**
+		 *  Gets the platform name signature.
+		 *  
+		 *  @return The signature.
+		 */
+		public AuthToken getPlatformNameSig()
+		{
+			return platformnamesig;
+		}
+		
+		/**
+		 *  Gets the platform name signature.
+		 *  
+		 *  @return The signature.
+		 */
+		public void setPlatformNameSig(AuthToken platformnamesig)
+		{
+			this.platformnamesig = platformnamesig;
 		}
 	}
 	

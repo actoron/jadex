@@ -1,13 +1,16 @@
 package jadex.micro.testcases.subscriptionlistener;
 
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.Boolean3;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent
 @Service
+@ProvidedServices(@ProvidedService(type=ITestService.class, scope=Binding.SCOPE_NETWORK))
 public class ProviderAgent implements ITestService
 {
 	/**

@@ -1,6 +1,5 @@
 package jadex.commons.transformation.traverser;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +17,7 @@ public class BeanProcessor implements ITraverseProcessor
 {
 //	protected BeanReflectionIntrospector intro = new BeanReflectionIntrospector();
 	/** Bean introspector for inspecting beans. */
-	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(5000);
+	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(20000);
 	
 	/**
 	 *  Test if the processor is applicable.
@@ -123,40 +122,42 @@ public class BeanProcessor implements ITraverseProcessor
 			if(targetcl!=null)
 				clazz	= SReflect.classForName0(clazz.getName(), targetcl);
 			
-			Constructor	c;
-			
-			try
-			{
-				c	= clazz.getConstructor(new Class[0]);
-			}
-			catch(NoSuchMethodException nsme)
-			{
-				c	= clazz.getDeclaredConstructors()[0];
-			}
-
-			try
-			{
-				c.setAccessible(true);
-				Class[] paramtypes = c.getParameterTypes();
-				Object[] paramvalues = new Object[paramtypes.length];
-				for(int i=0; i<paramtypes.length; i++)
-				{
-					if(paramtypes[i].equals(boolean.class))
-					{
-						paramvalues[i] = Boolean.FALSE;
-					}
-					else if(SReflect.isBasicType(paramtypes[i]))
-					{
-						paramvalues[i] = 0;
-					}
-				}
-				ret = c.newInstance(paramvalues);
-			}
-			catch(Exception e)
-			{
-				System.out.println("beanproc ex: "+object+" "+c);
-				throw new RuntimeException(e);
-			}
+			ret = SCloner.createBeanObject(intro, clazz);
+//			
+//			Constructor	c;
+//			
+//			try
+//			{
+//				c	= clazz.getConstructor(new Class[0]);
+//			}
+//			catch(NoSuchMethodException nsme)
+//			{
+//				c	= clazz.getDeclaredConstructors()[0];
+//			}
+//
+//			try
+//			{
+//				c.setAccessible(true);
+//				Class[] paramtypes = c.getParameterTypes();
+//				Object[] paramvalues = new Object[paramtypes.length];
+//				for(int i=0; i<paramtypes.length; i++)
+//				{
+//					if(paramtypes[i].equals(boolean.class))
+//					{
+//						paramvalues[i] = Boolean.FALSE;
+//					}
+//					else if(SReflect.isBasicType(paramtypes[i]))
+//					{
+//						paramvalues[i] = 0;
+//					}
+//				}
+//				ret = c.newInstance(paramvalues);
+//			}
+//			catch(Exception e)
+//			{
+//				System.out.println("beanproc ex: "+object+" "+c);
+//				throw new RuntimeException(e);
+//			}
 		}
 		return ret;
 	}

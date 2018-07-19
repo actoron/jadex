@@ -1,9 +1,7 @@
 package jadex.binary;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,11 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.BeanIntrospectorFactory;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.SCloner;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
@@ -60,64 +60,23 @@ public class BeanCodec extends AbstractCodec
 			{
 				clazz = findCorrectInnerClass(0, SReflect.getClassName(clazz), correctcl, context.getClassloader());
 			}
-			if (clazz != null)
-			{
-				Constructor<?>	c	= clazz.getDeclaredConstructors()[0];
-				c.setAccessible(true);
-				Class<?>[] paramtypes = c.getParameterTypes();
-				Object[] paramvalues = new Object[paramtypes.length];
-				for(int i=0; i<paramtypes.length; i++)
-				{
-					if(paramtypes[i].equals(boolean.class))
-					{
-						paramvalues[i] = Boolean.FALSE;
-					}
-					else if(SReflect.isBasicType(paramtypes[i]))
-					{
-						paramvalues[i] = 0;
-					}
-				}
-				
-				try
-				{
-					bean = c.newInstance(paramvalues);
-				}
-				catch (Exception e)
-				{
-					context.getErrorReporter().exceptionOccurred(e);
-					//throw new RuntimeException(e);
-				}
-			}
-			else
-			{
-				context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Inner Class not found: " + context.getCurrentClassName() + " Converted: " + cl));
-			}
 			
+		}
+		
+		if (clazz != null)
+		{
+			try
+			{
+				bean = SCloner.createBeanObject(intro, clazz);
+			}
+			catch (Exception e)
+			{
+				context.getErrorReporter().exceptionOccurred(SUtil.convertToRuntimeException(e));
+			}
 		}
 		else
 		{
-			if (clazz != null)
-			{
-				try
-				{
-					// Allow non-public bean constructors
-					Constructor<?>	c	= clazz.getDeclaredConstructor();
-					if(!Modifier.isPublic(c.getModifiers()) || !Modifier.isPublic(clazz.getModifiers()))
-					{
-						c.setAccessible(true);
-					}
-					bean = c.newInstance();
-				}
-				catch (Exception e)
-				{
-					context.getErrorReporter().exceptionOccurred(e);
-					//throw new RuntimeException(e);
-				}
-			}
-			else
-			{
-				context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Class not found: " + context.getCurrentClassName()));
-			}
+			context.getErrorReporter().exceptionOccurred(new ClassNotFoundException("Class not found: " + context.getCurrentClassName()));
 		}
 		
 		return bean;

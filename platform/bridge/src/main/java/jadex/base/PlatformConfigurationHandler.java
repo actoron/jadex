@@ -16,7 +16,6 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 
@@ -57,9 +56,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		defvalues.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
 		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
-		Long	timeout	= PlatformConfigurationHandler.getDefaultTimeout();
-		defvalues.put("localdefaulttimeout", timeout);
-		defvalues.put("remotedefaulttimeout", timeout);
+		defvalues.put("localdefaulttimeout", SUtil.DEFTIMEOUT);
+		defvalues.put("remotedefaulttimeout", SUtil.DEFTIMEOUT);
 
 		//		defvalues.put("components", new ArrayList<String>());
 //		defvalues.put(GUI, Boolean.TRUE);
@@ -760,46 +758,6 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //        RESERVED.add(IPlatformConfiguration.PRINTEXCEPTIONS);
 //        return RESERVED;
 //	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static Long getEnvironmentDefaultTimeout()
-	{
-		// Set deftimeout from environment, if set.
-	    String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
-	    if(dtoprop==null)
-	    	dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-	    if(dtoprop==null)
-	    	dtoprop	= System.getProperty("jadex_timeout", System.getenv("jadex_timeout"));
-//	    if(dtoprop!=null)
-//	    {
-//	        System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
-//	    }
-//	    else
-//	    {
-//	        dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-//	    }
-	    if(dtoprop!=null)
-	    {
-//	        DEFAULT_REMOTE_TIMEOUT = (Long.parseLong(dtoprop));
-//	        DEFAULT_LOCAL_TIMEOUT = (Long.parseLong(dtoprop));
-	        System.out.println("Setting jadex_timeout: "+dtoprop);
-	    }
-	    return dtoprop!=null? Long.parseLong(dtoprop): null;
-	}
-	
-	/**
-	 * 
-	 */
-	public static Long getDefaultTimeout()
-	{
-		Long ret = getEnvironmentDefaultTimeout();
-		if(ret==null)
-			ret = SReflect.isAndroid() ? 60000L : 30000;
-		return ret;
-	}
 	
 	/**
 	 * Returns a PlatformConfiguration with the default parameters.

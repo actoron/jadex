@@ -83,7 +83,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	 *  @param platformauth Flag if the platform name itself was authenticated
 	 *  @param agent The security agent.
 	 */
-	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, SecurityAgent agent)
+	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, String authenticatedplatformname, SecurityAgent agent)
 	{
 		secinf = new MsgSecurityInfos();
 		secinf.setPlatformAuthenticated(platformauth);
@@ -91,6 +91,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 			secinf.setAuthenticatedPlatformName(remoteid.toString());
 		secinf.setTrustedPlatform(false);
 		secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+		secinf.setAuthenticatedPlatformName(authenticatedplatformname);
 		
 		Map<String, Set<String>> rolemap = agent.getInternalRoles();
 		Set<String> roles = new HashSet<String>();

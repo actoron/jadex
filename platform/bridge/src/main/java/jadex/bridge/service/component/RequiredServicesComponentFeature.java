@@ -522,7 +522,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	public <T> ITerminableFuture<T> resolveService(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, false);
-		Future<T>	ret;
+		Future<T>	ret	= null;
 		
 		// Try to find locally
 		IServiceIdentifier	sid	= ServiceRegistry.getRegistry(getComponent()).searchService(query);
@@ -535,7 +535,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		}
 		
 		// If not found -> try to find remotely
-		else
+		else if(isRemote(query))
 		{
 			ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 			if(sqms!=null)
@@ -550,12 +550,22 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 					}
 				});				
 			}
+		}
+		
+		// Not found locally and query not remote or no remote search manager available
+		if(ret==null)
+		{
+			ret	= new TerminableFuture<>();
+			if(query.getMultiplicity().getFrom()==0)
+			{
+				ret.setResult(null);
+			}
 			else
 			{
-				ret	= new TerminableFuture<>();
-				ret.setException(new ServiceNotFoundException(query.toString()));
+				ret.setException(new ServiceNotFoundException(query.toString()));					
 			}
 		}
+		
 		@SuppressWarnings("unchecked")
 		ITerminableFuture<T>	iret	= (ITerminableFuture<T>)ret;
 		return iret;
@@ -595,38 +605,62 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		enhanceQuery(query, true);
 		
+		ITerminableIntermediateFuture<T>	ret	= null;
+		
 		// Find remote matches
-		ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-		ITerminableIntermediateFuture<T>	remotes	= sqms!=null ? sqms.searchServices(query) : new TerminableIntermediateFuture<>();	// Dummy future if no sqms
-		@SuppressWarnings("unchecked")
-		ITerminableIntermediateFuture<T>	ret	= (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(remotes, new FutureFunctionality(getComponent().getLogger())
+		if(isRemote(query))
 		{
-			@Override
-			public Object handleIntermediateResult(Object result) throws Exception
+			ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			if(sqms!=null)
 			{
-				return createServiceProxy(result, info);
+				ITerminableIntermediateFuture<T>	remotes	= sqms.searchServices(query);
+				Future<Collection<T>>	fut	= FutureFunctionality.getDelegationFuture(remotes, new FutureFunctionality(getComponent().getLogger())
+				{
+					@Override
+					public Object handleIntermediateResult(Object result) throws Exception
+					{
+						return createServiceProxy(result, info);
+					}
+				});
+				
+				@SuppressWarnings("unchecked")
+				ITerminableIntermediateFuture<T>	tmp	= (ITerminableIntermediateFuture<T>)fut;
+				ret	= tmp;
 			}
-		});
-			
-		// Add local matches (on same thread, thus before remote results)
+		}
+		
+		// Find local matches.
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
 		Collection<IServiceIdentifier> localresults	=  registry.searchServices(query);
-		for(IServiceIdentifier result: localresults)
-		{
-			@SuppressWarnings("unchecked")
-			T	t	= (T)result;
-			@SuppressWarnings("unchecked")
-			IntermediateFuture<T>	fut	= (IntermediateFuture<T>)ret;
-			fut.addIntermediateResultIfUndone(t);
-		}
 		
-		if(sqms==null)
+		// No remote matches -> create simple result future.
+		if(ret==null)
 		{
-			@SuppressWarnings("unchecked")
-			IntermediateFuture<T>	fut	= (IntermediateFuture<T>)ret;
+			TerminableIntermediateFuture<T>	fut	= new TerminableIntermediateFuture<>();
+			for(IServiceIdentifier result: localresults)
+			{
+				@SuppressWarnings("unchecked")
+				T	t	= (T)createServiceProxy(result, info);
+				fut.addIntermediateResult(t);
+			}
 			fut.setFinished();
+			ret	= fut;
 		}
 		
+		// Merge remote and local matches using delegation future functionality  (on same thread, thus local before remote results, if any)
+		else
+		{
+			@SuppressWarnings("unchecked")
+			IntermediateFuture<T>	fut	= (IntermediateFuture<T>)ret;
+			
+			for(IServiceIdentifier result: localresults)
+			{
+				@SuppressWarnings("unchecked")
+				T	t	= (T)result;	// Hack!!! Isn't really <T> but ignored at runtime anyways and converted by future functionality
+				fut.addIntermediateResultIfUndone(t);
+			}
+		}
+				
 		return ret;
 	}
 	
@@ -669,7 +703,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		
 		// Query remote
 		ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-		ISubscriptionIntermediateFuture<T>	remotes	= sqms!=null ? sqms.addQuery(query) : null;
+		ISubscriptionIntermediateFuture<T>	remotes	= isRemote(query) && sqms!=null ? sqms.addQuery(query) : null;
 		
 		// Query local registry
 		IServiceRegistry	registry	= ServiceRegistry.getRegistry(getComponent());
@@ -795,9 +829,15 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			IServiceIdentifier	sid	= (IServiceIdentifier)service;
 			
 			// Local component -> fetch local service object.
-			if(sid.getProviderId().getRoot().equals(component.getId().getRoot()))
+			if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
 			{
 				service	= ServiceRegistry.getRegistry(getComponent()).getLocalService(sid);				
+			}
+			
+			// Remote component -> create remote proxy
+			else
+			{
+				service	= RemoteMethodInvocationHandler.createRemoteServiceProxy(getComponent(), sid);
 			}
 		}
 		
@@ -877,7 +917,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
 		{
 			// Local or unrestricted?
-			if(!query.isRemote() || Boolean.TRUE.equals(query.isUnrestricted())
+			if(!isRemote(query) || Boolean.TRUE.equals(query.isUnrestricted())
 				|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(getComponent(), query.getServiceType().getType(getComponent().getClassLoader()))) 
 			{
 				// Unrestricted -> Don't check networks.
@@ -888,8 +928,18 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 				// Not unrestricted -> only find services from my local networks
 				@SuppressWarnings("unchecked")
 				Set<String> nnames = (Set<String>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_NETWORKNAMESCACHE);
-				query.setNetworkNames(nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY);
+				query.setNetworkNames(nnames!=null? nnames.toArray(new String[nnames.size()]): SUtil.EMPTY_STRING_ARRAY);
 			}
 		}
-	}	
+	}
+	
+	/**
+	 *  Check if a query is potentially remote.
+	 *  @return True, if scope is set to a remote scope (e.g. global or network).
+	 */
+	public boolean isRemote(ServiceQuery<?> query)
+	{
+		return query.getSearchStart()!=null && query.getSearchStart().getRoot()!=getComponent().getId().getRoot()
+			|| !RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope());
+	}
 }
