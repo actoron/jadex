@@ -192,7 +192,7 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery()
+	protected ServiceQuery()
 	{
 		// Not public to not encourage user to use it.
 		// Here it does NOT set the networknames automatically because used for serialization.

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import jadex.commons.SUtil;
+
 
 /**
  * 
@@ -287,7 +289,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results: exception="+getException());
+    			throw new NoSuchElementException("No more intermediate results"
+    				+ (getException()==null ? "." : ": exception="+SUtil.getExceptionStacktrace(getException())));
     		}
     		else
     		{

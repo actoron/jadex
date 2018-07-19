@@ -41,10 +41,4 @@ public interface ISuspendable
 	 *  @return The monitor.
 	 */
 	public Object getMonitor();
-	
-//	/**
-//	 *  Get the default timeout.
-//	 *  @return The default timeout (-1 for none).
-//	 */
-//	public long getDefaultTimeout();
 }

@@ -201,7 +201,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
        		boolean	ret	= super.doSetResult(result, undone);
        		if(ret)
        		{
-       			this.results	= new ArrayList<>(result);
+       			this.results	= result!=null ? new ArrayList<>(result) : null;
        		}
        		return ret;
 		}

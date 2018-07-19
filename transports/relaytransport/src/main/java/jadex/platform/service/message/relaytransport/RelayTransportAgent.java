@@ -30,6 +30,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.IMsgSecurityInfos;
@@ -60,7 +61,6 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.serialization.RemoteMethodInvocationHandler;
 import jadex.platform.service.transport.AbstractTransportAgent;
 
 /**

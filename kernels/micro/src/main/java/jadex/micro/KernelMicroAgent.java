@@ -20,7 +20,7 @@ import jadex.micro.annotation.ProvidedServices;
 	expression="new MicroAgentFactory($component, SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.micro.MicroDebuggerPanel\"}))"))
 })
 @Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_micro"))
-@Properties(@NameValue(name="system", value="true"))
+@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\".class\"}")})
 public class KernelMicroAgent
 {
 }

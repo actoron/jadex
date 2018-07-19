@@ -14,14 +14,14 @@ public interface IMultiKernelNotifierService
 	 *  @param listener The listener.
 	 *  @return Null, when done.
 	 */
-	public IFuture addKernelListener(IMultiKernelListener listener);
+	public IFuture<Void> addKernelListener(IMultiKernelListener listener);
 	
 	/**
 	 *  Removes a kernel listener.
 	 *  @param listener The listener.
 	 *  @return Null, when done.
 	 */
-	public IFuture removeKernelListener(IMultiKernelListener listener);
+	public IFuture<Void> removeKernelListener(IMultiKernelListener listener);
 	
 	// TODO: Temporary, until service references become available.
 	//public IFuture fireTypesAdded(String[] types);

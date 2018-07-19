@@ -326,7 +326,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 											}
 											ret.setResult(getTypeName().equals(type));
 											
-											System.out.println("isLoad: "+model+" "+getTypeName().equals(type));
+											//System.out.println("isLoad: "+model+" "+getTypeName().equals(type));
 											
 											// todo: remove
 											// Check suffix of file

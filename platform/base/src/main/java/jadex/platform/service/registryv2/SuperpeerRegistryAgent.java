@@ -226,6 +226,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 
 			public void intermediateResultAvailable(T result)
 			{
+				ret.addIntermediateResultIfUndone(result);
 			}
 
 			public void finished()
