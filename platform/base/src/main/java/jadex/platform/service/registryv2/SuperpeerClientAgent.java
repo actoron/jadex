@@ -842,7 +842,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						public void intermediateResultAvailable(T result)
 						{
 							// Forward result to user query
-							retfut.addIntermediateResult(result);
+							retfut.addIntermediateResultIfUndone(result);
 						}
 						
 						@Override
