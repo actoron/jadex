@@ -51,7 +51,7 @@ public class SearchQueryManagerTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.pollingrate", 0.005); 	// 30 * 0.005 secs  -> 150 millis.
+		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// 30 * 0.005 secs  -> 150 millis.
 		
 		CLIENTCONF	= baseconf.clone();
 		
@@ -102,6 +102,18 @@ public class SearchQueryManagerTest
 		platforms.remove(platform);
 	}
 	
+	protected void wait(IExternalAccess platform)
+	{
+		platform.waitForDelay(Starter.getScaledRemoteDefaultTimeout(platform.getId(), WAITFACTOR), new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return IFuture.DONE;
+			}
+		}, true).get();
+	}
+	
 	//-------- test cases --------
 	
 	/**
@@ -137,15 +149,7 @@ public class SearchQueryManagerTest
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
-		client.waitForDelay(Starter.getScaledRemoteDefaultTimeout(client.getId(), WAITFACTOR), new IComponentStep<Void>()
-		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				System.out.println("Small wait to allow initial service events...");
-				return IFuture.DONE;
-			}
-		}, true).get();
+		wait(client);
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertEquals(""+result, 2, result.size());
 		
@@ -171,15 +175,7 @@ public class SearchQueryManagerTest
 		System.out.println("1) add query");
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
-		client.waitForDelay(Starter.getScaledRemoteDefaultTimeout(client.getId(), WAITFACTOR), new IComponentStep<Void>()
-		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				System.out.println("Small wait to make sure initial search has been run...");
-				return IFuture.DONE;
-			}
-		}, true).get();
+		wait(client);
 		Assert.assertEquals("1) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 2) start remote platform, wait for service -> test if awa fallback works with one platform, also checks local duplicate removal over time
@@ -203,15 +199,7 @@ public class SearchQueryManagerTest
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
 		connected.getNextIntermediateResult();
-		client.waitForDelay(Starter.getScaledRemoteDefaultTimeout(client.getId(), WAITFACTOR), new IComponentStep<Void>()
-		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				System.out.println("Small wait to allow initial service events...");
-				return IFuture.DONE;
-			}
-		}, true).get();
+		wait(client);
 		Assert.assertEquals("4) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 5) add second query -> wait for two services (test if works when already SP)
@@ -247,7 +235,6 @@ public class SearchQueryManagerTest
 //		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
 	}
 
-	
 	//-------- main for testing --------
 	
 	/**
