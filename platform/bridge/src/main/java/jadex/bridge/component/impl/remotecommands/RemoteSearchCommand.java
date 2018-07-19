@@ -59,17 +59,8 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
 	{
 //		System.out.println("Remote search command triggered: " + query.toString());
-//		if((""+query.getServiceType()).indexOf("IClock")!=-1)
+//		if((""+query.getServiceType()).indexOf("ITestService")!=-1)
 //			System.out.println("Executing requested remote search: "+access.getId()+", "+query);
-		
-//		// No recursive global search -> change global scope to platform, and owner to local platform.
-//		if(!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()))
-//		{
-//			System.out.println("Performing remote global search (should only happen on superpeers): "+query);
-////			if(query.getOwner()!=null && !access.getComponentIdentifier().getRoot().equals(query.getOwner().getRoot()))
-////				query.setOwner(access.getComponentIdentifier().getRoot());
-////			query.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
-//		}
 		
 		return new Future<Collection<T>>(((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).resolveLocalServices(getQuery(), null));				
 	}
