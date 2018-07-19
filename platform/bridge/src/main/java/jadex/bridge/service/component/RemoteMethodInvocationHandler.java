@@ -1,4 +1,4 @@
-package jadex.platform.service.serialization;
+package jadex.bridge.service.component;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

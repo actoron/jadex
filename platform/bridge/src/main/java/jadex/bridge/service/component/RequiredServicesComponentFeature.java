@@ -829,9 +829,15 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			IServiceIdentifier	sid	= (IServiceIdentifier)service;
 			
 			// Local component -> fetch local service object.
-			if(sid.getProviderId().getRoot().equals(component.getId().getRoot()))
+			if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
 			{
 				service	= ServiceRegistry.getRegistry(getComponent()).getLocalService(sid);				
+			}
+			
+			// Remote component -> create remote proxy
+			else
+			{
+				service	= RemoteMethodInvocationHandler.createRemoteServiceProxy(getComponent(), sid);
 			}
 		}
 		

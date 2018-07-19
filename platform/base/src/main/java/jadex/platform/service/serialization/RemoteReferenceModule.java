@@ -46,6 +46,7 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -706,7 +707,7 @@ public class RemoteReferenceModule
 				else if(handler instanceof RemoteMethodInvocationHandler)
 				{
 					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
-					ret	= rmih.pr.getRemoteReference();
+					ret	= rmih.getProxyReference().getRemoteReference();
 				}
 				else
 				{
