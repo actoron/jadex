@@ -116,6 +116,36 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 		}
     }
     /**
+     *  Get the intermediate results that are available.
+     *  Note: The semantics of this method is different to the normal intermediate future
+     *  due to the fire-and-forget-semantics!
+     *  
+     *  @return
+     *  1) <i>Non-blocking</I> access only: An empty collection, unless if the future is in "store-for-first" mode (default)
+     *  	and no listeners has yet been added, in which case the results until now are returned.<br>
+     *  2) Also <i>blocking</i> access from same thread: All results since the first blocking access
+     *  	that have not yet been consumed by getNextIntermediateResult().
+     */
+	public Collection<E> getIntermediateResults()
+	{
+		List<E>	ret;
+
+    	synchronized(this)
+    	{
+			if(storeforfirst)
+			{
+				ret	= results;
+			}
+			else
+			{
+	    		ret	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+			}
+    	}
+
+    	return ret!=null ? ret : Collections.emptyList();
+	}
+	
+    /**
      *  Iterate over the intermediate results in a blocking fashion.
      *  Manages results independently for different callers, i.e. when called
      *  from different threads, each thread receives all intermediate results.
