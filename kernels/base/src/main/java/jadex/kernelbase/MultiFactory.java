@@ -291,7 +291,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		for(URL url: SUtil.getClasspathURLs(basecl, true))
 		{
 			// Hack to avoid at least some Java junk.
-			if (!url.toString().contains("jre/lib/ext"))
+			if(!url.toString().contains("jre/lib/ext"))
 			{
 				try
 				{
@@ -724,8 +724,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		IResultListener counter = ia.getFeature(IExecutionFeature.class).createResultListener(
 			new CounterResultListener(ls.length, true, ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
 		for (int i = 0; i < ls.length; ++i)
-			ls[i].componentTypesAdded(types).addResultListener(counter);
-		return ret;
+			ls[i].componentTypesAdded(types);//.addResultListener(counter);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -740,8 +740,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		IResultListener counter = ia.getFeature(IExecutionFeature.class).createResultListener(
 			new CounterResultListener(ls.length, true, ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
 		for (int i = 0; i < ls.length; ++i)
-			ls[i].componentTypesAdded(types).addResultListener(counter);
-		return ret;
+			ls[i].componentTypesAdded(types);//.addResultListener(counter);
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -875,7 +875,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				continue;
 			}
 			
-//					System.out.println("Trying isloadable :" + factory + " for " + model);
+			System.out.println("Trying isloadable :" + factory + " for " + model);
 			factory.isLoadable(model, imports, rid).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)

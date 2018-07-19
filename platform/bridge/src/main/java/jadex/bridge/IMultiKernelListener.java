@@ -14,11 +14,11 @@ public interface IMultiKernelListener //extends IRemotable
 	 *  Called when new component types become available.
 	 *  @param types Added component types.
 	 */
-	public IFuture componentTypesAdded(String[] types);
+	public void componentTypesAdded(String[] types);
 	
 	/**
 	 *  Called when component types become unavailable.
 	 *  @param types Removed component types.
 	 */
-	public IFuture componentTypesRemoved(String[] types);
+	public void componentTypesRemoved(String[] types);
 }

@@ -47,22 +47,20 @@ public class TreePanelKernelListener implements IMultiKernelListener
 	 *  Called when new component types become available.
 	 *  @param types Added component types.
 	 */
-	public IFuture componentTypesRemoved(String[] types)
+	public void componentTypesRemoved(String[] types)
 	{
 //		System.out.println("types removed: "+SUtil.arrayToString(types));
 		SwingUtilities.invokeLater(refresh);
-		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Called when component types become unavailable.
 	 *  @param types Removed component types.
 	 */
-	public IFuture componentTypesAdded(String[] types)
+	public void componentTypesAdded(String[] types)
 	{
 //		System.out.println("types added: "+SUtil.arrayToString(types));
 		SwingUtilities.invokeLater(refresh);
-		return IFuture.DONE;
 	}
 	
 	/**

@@ -17,13 +17,13 @@ import jadex.micro.annotation.ProvidedServices;
  */
 //@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}")})
 // multi factory only uses .class (and BDI.class as marker to know which kernels have been started)
-@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\"BDI.class\"}")})
+@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\".class\"}")})
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(
 //	expression="new jadex.bdiv3.BDIAgentFactory($component)"))
 	expression="new jadex.bdiv3.BDIAgentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel\"}))"))
 })
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="kernel_bdi"))
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_bdi"))
 public class KernelBDIV3Agent 
 {
 }

@@ -15,12 +15,12 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Properties({
 	@NameValue(name="system", value="true"),
-	@NameValue(name="kernel.types", value="new String[] {\"component.xml\"}")
+	@NameValue(name="kernel.types", value="new String[] {\"application.xml\"}")
 })
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.component.ComponentComponentFactory($component)"))
+	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.application.ApplicationComponentFactory($component)"))
 })
-@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_component"))
-public class KernelComponentAgent
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_application"))
+public class KernelApplicationAgent
 {
 }

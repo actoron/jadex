@@ -1791,8 +1791,6 @@ public class SReflect
 				{
 					for(String jename: entry.getValue())
 					{
-						if(jename.indexOf("Kernel")!=-1)
-							System.out.println(jename);
 						JarEntry je = jar.getJarEntry(jename);
 						InputStream is = jar.getInputStream(je);
 						ClassInfo ci = SClassReader.getClassInfo(is);
@@ -1813,8 +1811,6 @@ public class SReflect
 				{
 					try(FileInputStream is = new FileInputStream(filename))
 					{
-						if(filename.indexOf("Kernel")!=-1)
-							System.out.println(filename);
 						ClassInfo ci = SClassReader.getClassInfo(is);
 						if(classfilter.filter(ci))
 						{

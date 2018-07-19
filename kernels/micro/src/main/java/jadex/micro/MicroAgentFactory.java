@@ -289,9 +289,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		
 //		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
-		if(model.indexOf("WebSocket")!=-1)
-			System.out.println("here");
-		
 		if(model.toLowerCase().endsWith(".class"))
 		{
 			ILibraryService libservice = getLibraryService();
@@ -333,7 +330,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 											}
 											ret.setResult(getTypeName().equals(type));
 											
-											System.out.println("isLoadMicro: "+model+" "+getTypeName().equals(type));
+											//System.out.println("isLoadMicro: "+model+" "+getTypeName().equals(type));
 											
 											// todo: remove
 											// Check suffix of file

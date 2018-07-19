@@ -178,7 +178,8 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 								{
 									public void resultAvailable(byte[] img)
 									{
-										ff.setIcon(new ImageIcon(img));
+										if(img!=null)
+											ff.setIcon(new ImageIcon(img));
 									}
 									
 									public void exceptionOccurred(Exception exception)
@@ -260,9 +261,8 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 									{
 										public void resultAvailable(byte[] img)
 										{
-											if(ff==null)
-												System.out.println("hhh");
-											ff.setIcon(new ImageIcon(img));
+											if(img!=null)
+												ff.setIcon(new ImageIcon(img));
 										}
 										
 										public void exceptionOccurred(Exception exception)
