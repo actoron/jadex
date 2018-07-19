@@ -72,6 +72,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	@Agent
 	protected IInternalAccess	agent;
 	
+	/** The fallback polling search rate as factor of the default remote timeout. */
+	@AgentArgument
+	protected double	pollingrate	= POLLING_RATE;
+	
 	/** Use only awareness for remote search, i.e. no superpeers at all. */
 	// Used for tests for now
 	@AgentArgument
@@ -90,6 +94,11 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	{
 		Future<Void>	ret	= new Future<>();
 		connections	= new LinkedHashMap<>();
+		
+		if(pollingrate!=POLLING_RATE)
+		{
+			System.out.println(agent+" using polling rate: "+pollingrate);
+		}
 		
 		if(!awaonly)
 		{
@@ -881,7 +890,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						{
 							// Schedule next search
 							agent.getFeature(IExecutionFeature.class)
-								.waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), POLLING_RATE), step, true);
+								.waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), pollingrate), step, true);
 							
 							// Start current search
 							searchRemoteServices(query)
