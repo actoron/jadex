@@ -31,6 +31,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SClassReader.AnnotationInfos;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
@@ -80,6 +81,14 @@ public class MultiFactory2 implements IComponentFactory, IMultiKernelNotifierSer
 
 	public static final Map<String, Object> props = SUtil.createHashMap(new String[]{MULTIFACTORY}, new Object[]{Boolean.TRUE});
 
+	protected Sequentializer<IComponentFactory> getnewfac = new Sequentializer<IComponentFactory>(new IResultCommand<IFuture<IComponentFactory>, Object[]>()
+	{
+		public IFuture<IComponentFactory> execute(Object[] args)
+		{
+			return getNewFactory((String)args[0], (String[])args[1], (IResourceIdentifier)args[2]);
+		}
+	});
+	
 	/**
 	 *  Starts the service.
 	 */
@@ -185,7 +194,8 @@ public class MultiFactory2 implements IComponentFactory, IMultiKernelNotifierSer
 
 			public void exceptionOccurred(Exception exception)
 			{
-				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+				getnewfac.call(new Object[]{model, imports, rid}).addResultListener(new DelegationResultListener<>(ret));
+//				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 			}
 		});
 		
@@ -654,37 +664,54 @@ public class MultiFactory2 implements IComponentFactory, IMultiKernelNotifierSer
 		scanForKernels();
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public static class Sequentializer<T>
-//	{
-//		protected IFuture<T> currentcall;
-//		protected List<IFuture<T>> calls;
-//		protected IResultCommand<IFuture<T>, Object[]> call;
-//		
-//		public IFuture<T> call(Object[] args)
-//		{
-//			if(currentcall==null)
-//			{
-//				currentcall = call.execute(args);
-//				currentcall.addResultListener(new IResultListener<T>()
-//				{
-//					public void resultAvailable(T result)
-//					{
-//						
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//					}
-//				});
-//				return currentcall;
-//			}
-//			else
-//			{
-//				
-//			}
-//		}
-//	}
+	/**
+	 * 
+	 */
+	public static class Sequentializer<T>
+	{
+		public Sequentializer(IResultCommand<IFuture<T>, Object[]> call)
+		{
+			this.call = call;
+		}
+		
+		//int cnt = 0;
+		
+		protected IFuture<T> currentcall;
+		protected List<Tuple2<Object[], Future<T>>> calls = new ArrayList<>();
+		protected IResultCommand<IFuture<T>, Object[]> call;
+		
+		public IFuture<T> call(Object[] args)
+		{
+			//cnt++;
+			if(currentcall==null)
+			{
+				currentcall = call.execute(args);
+				currentcall.addResultListener(res -> {proceed();}, ex -> {proceed();});
+				return currentcall;
+			}
+			else
+			{
+				Future<T> ret = new Future<>();
+				calls.add(new Tuple2<Object[], Future<T>>(args, ret));
+				return ret;
+			}
+		}
+		
+		protected void proceed()
+		{
+			//cnt--;
+			//System.out.println("call count: "+cnt);
+			if(calls.size()>0)
+			{
+				Tuple2<Object[], Future<T>> next = calls.remove(0);
+				IFuture<T> fut = call.execute(next.getFirstEntity());
+				fut.addResultListener(new DelegationResultListener<T>(next.getSecondEntity()));
+				fut.addResultListener(res -> {proceed();}, ex -> {proceed();});
+			}
+			else
+			{
+				currentcall = null;
+			}
+		}
+	}
 }

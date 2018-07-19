@@ -367,7 +367,7 @@ public class SComponentFactory
 		
 //				final long start = System.currentTimeMillis(); 
 				final Future<Boolean> ret = new Future<Boolean>();
-				ea.searchServices( new ServiceQuery<>(IComponentFactory.class))
+				ea.searchServices(new ServiceQuery<>(IComponentFactory.class))
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
 					public void customResultAvailable(Collection<IComponentFactory> facs)
@@ -444,6 +444,24 @@ public class SComponentFactory
 					}
 				}
 			}, ea));
+			
+//			facts[i].isLoadable(model, null, rid)
+//				.addResultListener(createResultListener(new DelegationResultListener<Boolean>(ret)
+//			{
+//				public void customResultAvailable(Boolean result)
+//				{
+//					System.out.println("model: "+model+" "+result+" "+facts[i]);
+//					if(result!=null)
+//					{
+//						ret.setResult(result);
+//					}
+//					else
+//					{
+//						checkComponentType(model, facts, i+1, ea, rid, allowedtypes)
+//							.addResultListener(createResultListener(new DelegationResultListener<Boolean>(ret), ea));
+//					}
+//				}
+//			}, ea));
 		}
 		return ret;
 	}
