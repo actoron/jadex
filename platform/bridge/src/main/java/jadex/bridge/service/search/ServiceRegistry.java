@@ -921,14 +921,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		String ret = cid.getName();
 		int idx;
 		// If it is a direct subcomponent
-		if((idx = ret.lastIndexOf('.')) != -1)
+		if((idx = ret.lastIndexOf(':')) != -1)
 		{
 			// cut off platform name
 			ret = ret.substring(0, idx);
 			// cut off local name 
 			if((idx = ret.indexOf('@'))!=-1)
 				ret = ret.substring(idx + 1);
-			if((idx = ret.indexOf('.'))!=-1)
+			if((idx = ret.indexOf(':'))!=-1)
 				ret = ret.substring(idx + 1);
 		}
 		else
@@ -957,8 +957,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public static String getDotName(IComponentIdentifier cid)
 	{
-		return cid.getName().replace('@', '.');
-//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+		return cid.getName().replace('@', ':');
+//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+":"+getSubcomponentName(cid);
 	}
 
 	/**
