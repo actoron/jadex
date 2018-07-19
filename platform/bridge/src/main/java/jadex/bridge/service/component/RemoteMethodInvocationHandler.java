@@ -16,9 +16,12 @@ import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.component.ISwitchCall;
+import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 
@@ -86,6 +89,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 //			return pi;
 		if(method.getName().equals("getProxyReference"))
 			return pr;
+		
+		// Hack until cleanup of remote references
+		if((args==null || args.length==0) && "getId".equals(method.getName()))
+		{
+			return pr.getRemoteReference().getTargetIdentifier();
+		}
+		else if((args==null || args.length==0) && "toString".equals(method.getName()))
+		{
+			return pr.getRemoteReference().getTargetIdentifier().toString();
+		}
+
 		
 		// Determine if call goes to
 		// a) cached method
