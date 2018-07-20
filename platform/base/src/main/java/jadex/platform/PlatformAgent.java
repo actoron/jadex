@@ -94,7 +94,7 @@ public class PlatformAgent
 	@AgentCreated
 	public IFuture<Void> init()
 	{
-		System.out.println("Start scanning...");
+//		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
 		
 		Map<Class<?>, String> names = new HashMap<Class<?>, String>();
@@ -124,7 +124,7 @@ public class PlatformAgent
 		}
 		
 //		System.out.println("cls: "+files.size()+" "+components.size());
-		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
+//		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
 		
 		Collection<Set<Class<?>>> levels = dr.resolveDependenciesWithLevel();
 		

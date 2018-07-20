@@ -30,9 +30,6 @@ public class ChatC4Agent
 	@Agent
 	protected IInternalAccess agent;
 
-	/** The required services feature. */
-	@AgentFeature
-	protected IRequiredServicesFeature requiredServicesFeature;
 	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
@@ -41,13 +38,14 @@ public class ChatC4Agent
 	public void executeBody()
 	{
 		IAsyncFilter<IComponentFactory>	filter	= new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT);
-		Future<IComponentFactory>	factory	= new Future<>();
-		ITerminableIntermediateFuture<IComponentFactory>	search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentFactory.class));
+		Future<IComponentFactory> factory = new Future<>();
+		ITerminableIntermediateFuture<IComponentFactory> search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentFactory.class));
 		search.addResultListener(new IntermediateExceptionDelegationResultListener<IComponentFactory, IComponentFactory>(factory)
 		{
 			@Override
 			public void intermediateResultAvailable(IComponentFactory fac)
 			{
+				System.out.println("factory: "+fac);
 				filter.filter(fac).addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(factory)
 				{
 					@Override
