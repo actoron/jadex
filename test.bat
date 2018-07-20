@@ -4,8 +4,6 @@
 CMD /C gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas
 
 @set builderror=%ERRORLEVEL%
-@echo Generating Test Report...
-@CMD /C gradlew testReport >NUL
-@IF /I "%builderror%" NEQ "0" (START "" "testreport\index.html")
+@IF /I "%builderror%" NEQ "0" (@echo Generating Test Report... & @CMD /C gradlew testReport >NUL & START "" "testreport\index.html")
 
 @pause
