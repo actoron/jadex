@@ -1,17 +1,16 @@
-package jadex.micro.examples.microservice.async;
+package jadex.microservice.examples.sync;
 
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.future.IFuture;
 
 /**
  *  Example interface for service.
  */
 @Service
-public interface IAsyncService
+public interface ISyncService
 {
 	/**
 	 *  Say hello method.
 	 *  @param name The name.
 	 */
-	public IFuture<String> sayMeHello(String name);
+	public String sayHello(String name);
 }

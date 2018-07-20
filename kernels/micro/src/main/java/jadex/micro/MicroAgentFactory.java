@@ -487,7 +487,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<String>(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
+//		return new Future<String>(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
+		return new Future<String>(model.toLowerCase().endsWith(FILETYPES[0]) ? FILETYPE_MICROAGENT: null);
 	}
 	
 	/**

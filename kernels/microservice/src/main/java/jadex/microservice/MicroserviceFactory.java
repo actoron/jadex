@@ -1,6 +1,7 @@
 package jadex.microservice;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,8 +21,12 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.ResourceInfo;
+import jadex.commons.SClassReader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -31,6 +36,8 @@ import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModelLoader;
+import jadex.micro.annotation.Agent;
+import jadex.microservice.annotation.Microservice;
 
 
 /**
@@ -42,7 +49,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	
 	/** The supported component types (file extensions).
 	 *  Convention used by platform config panel. */
-	public static final String[] FILETYPES = new String[]{"Microservice.class"};
+	public static final String[] FILETYPES = new String[]{".class"};
 	
 	/** The micro agent file type. */
 	public static final String	FILETYPE_MICROSERVICE = "Micro Service";
@@ -105,7 +112,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 //			System.out.println("no library listener on: "+this);
 //		}
 		
-		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES));
+		features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MicroAgentFactory.MICRO_FEATURES));
 	}
 	
 	/**
@@ -221,6 +228,28 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 		return ret;
 	}
 	
+//	/**
+//	 *  Test if a model can be loaded by the factory.
+//	 *  @param model The model (e.g. file name).
+//	 *  @param The imports (if any).
+//	 *  @return True, if model can be loaded.
+//	 */
+//	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+//	{
+////		System.out.println("isLoadable (micro): "+model);
+//		
+//		boolean ret = model.toLowerCase().endsWith("microservice.class");
+////		if(model.toLowerCase().endsWith("Agent.class"))
+////		{
+////			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
+////			String clname = model.substring(0, model.indexOf(".class"));
+////			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
+////			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
+////			System.out.println(clname+" "+cma+" "+ret);
+////		}
+//		return ret ? IFuture.TRUE : IFuture.FALSE;
+//	}
+	
 	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
@@ -229,19 +258,68 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("isLoadable (micro): "+model);
+		Future<Boolean> ret = new Future<Boolean>();
 		
-		boolean ret = model.toLowerCase().endsWith("microservice.class");
-//		if(model.toLowerCase().endsWith("Agent.class"))
-//		{
-//			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
-//			String clname = model.substring(0, model.indexOf(".class"));
-//			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
-//			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
-//			System.out.println(clname+" "+cma+" "+ret);
-//		}
-		return ret ? IFuture.TRUE : IFuture.FALSE;
+	//	System.out.println("isLoadable (micro): "+model+" "+rid);
+		
+		if(model.toLowerCase().endsWith(".class"))
+		{
+			ILibraryService libservice = getLibraryService();
+			if(libservice!=null)
+			{
+				libservice.getClassLoader(rid)
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl)
+					{
+						try
+						{
+							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
+							if(ri==null)
+							{
+								ret.setResult(Boolean.FALSE);
+							}
+							else
+							{
+								ClassInfo ci = SClassReader.getClassInfo(ri.getInputStream());
+								Collection<AnnotationInfos> ans = ci.getAnnotations();
+								if(ans!=null)
+								{
+									for(AnnotationInfos ai: ans)
+									{
+										if(Microservice.class.getName().equals(ai.getType()))
+										{
+											ret.setResult(Boolean.TRUE);
+										}
+									}
+								}
+							}
+						}
+						catch(Exception e)
+						{
+							ret.setResult(Boolean.FALSE);
+						}
+						
+						if(!ret.isDone())
+							ret.setResult(Boolean.FALSE);
+		
+						//System.out.println("isLoadable (micro): "+model+" "+ret.get());
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(Boolean.FALSE);
+			}
+		}
+		else
+		{
+			ret.setResult(Boolean.FALSE);
+		}
+		
+		return ret;
 	}
+	
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
@@ -271,13 +349,12 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 							{
 								try
 								{
-									Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Microservice", null, cl);
+									Class<?> clazz = getMicroAgentClass(mi.getFullName(), null, cl);
 									fut.setResult(!Modifier.isInterface(clazz.getModifiers()) && !Modifier.isAbstract(clazz.getModifiers()));
 								}
 								catch(Exception e)
 								{
 									fut.setResult(Boolean.FALSE);
-//											ret.setException(e);
 								}
 							}
 						});		
@@ -287,13 +364,12 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 						try
 						{
 							ClassLoader cl = getClass().getClassLoader();
-							Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Microservice", null, cl);
+							Class<?> clazz = getMicroAgentClass(mi.getFullName(), null, cl);
 							fut.setResult(!Modifier.isAbstract(clazz.getModifiers()));
 						}
 						catch(Exception e)
 						{
 							fut.setResult(Boolean.FALSE);
-//									ret.setException(e);
 						}
 					}
 				}
@@ -359,7 +435,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return new Future<String>(model.toLowerCase().endsWith("microservice.class") ? FILETYPE_MICROSERVICE: null);
+		return new Future<String>(model.toLowerCase().endsWith(FILETYPES[0]) ? FILETYPE_MICROSERVICE: null);
 	}
 	
 	/**

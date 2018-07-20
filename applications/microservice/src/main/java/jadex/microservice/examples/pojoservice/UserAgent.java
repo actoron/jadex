@@ -1,4 +1,4 @@
-package jadex.micro.examples.microservice.pojoservice;
+package jadex.microservice.examples.pojoservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;

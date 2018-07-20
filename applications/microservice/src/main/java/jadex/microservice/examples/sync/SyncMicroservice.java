@@ -1,9 +1,11 @@
-package jadex.micro.examples.microservice.sync;
+package jadex.microservice.examples.sync;
+
+import jadex.microservice.annotation.Microservice;
 
 /**
  *  Microservice example with synchronous interface.
  */
-//@Microservice
+@Microservice
 public class SyncMicroservice implements ISyncService
 {
 	/**

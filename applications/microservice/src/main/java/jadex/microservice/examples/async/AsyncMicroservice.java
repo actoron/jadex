@@ -1,12 +1,13 @@
-package jadex.micro.examples.microservice.async;
+package jadex.microservice.examples.async;
 
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.microservice.annotation.Microservice;
 
 /**
  *  Microservice example with asynchronous interface.
  */
-//@Microservice
+@Microservice
 public class AsyncMicroservice implements IAsyncService
 {
 	/**

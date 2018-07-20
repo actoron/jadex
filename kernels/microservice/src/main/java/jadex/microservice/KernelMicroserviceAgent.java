@@ -14,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Properties({
 	@NameValue(name="system", value="true"),
-	@NameValue(name="kernel.types", value="new String[] { \"Microservice.class\"}")
+	@NameValue(name="kernel.types", value="new String[] {\".class\"}")
 })
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.microservice.MicroserviceFactory($component, null)"))

@@ -4,7 +4,7 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.commons.Boolean3;
-import jadex.kernelbase.MultiFactory2;
+import jadex.kernelbase.MultiFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -24,7 +24,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Multi kernel.
  */
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(MultiFactory2.class)),
+	@ProvidedService(type=IComponentFactory.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(MultiFactory.class)),
 	@ProvidedService(type=IMultiKernelNotifierService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
 @ComponentTypes({

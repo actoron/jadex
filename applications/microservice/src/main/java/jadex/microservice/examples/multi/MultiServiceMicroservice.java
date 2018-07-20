@@ -1,14 +1,16 @@
-package jadex.micro.examples.microservice.multi;
+package jadex.microservice.examples.multi;
 
 
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.examples.microservice.async.IAsyncService;
-import jadex.micro.examples.microservice.sync.ISyncService;
+import jadex.microservice.annotation.Microservice;
+import jadex.microservice.examples.async.IAsyncService;
+import jadex.microservice.examples.sync.ISyncService;
 
 /**
- *  This example shows a microservice as Java pojo
+ *  This example shows multiple microservices implemented in one Java pojo
  */
+@Microservice
 public class MultiServiceMicroservice implements ISyncService, IAsyncService
 {
 	protected int cnt;
