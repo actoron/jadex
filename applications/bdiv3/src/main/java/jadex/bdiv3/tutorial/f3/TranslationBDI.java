@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.f3;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.AgentCreated;
  *  
  *  BDI goal that is automatically published as service.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 @Goals(@Goal(clazz=TranslationGoal.class, 
 	publish=@Publish(type=ITranslationService.class)))//, method="translateEnglishGerman")))

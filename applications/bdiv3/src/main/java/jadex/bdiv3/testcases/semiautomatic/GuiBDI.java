@@ -4,10 +4,11 @@ import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.micro.annotation.Agent;
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @GuiClass(GuiPanel.class)
 public class GuiBDI
 {

@@ -123,7 +123,9 @@ public class ModelTreePanel extends FileTreePanel
 				{
 					rids.put(SUtil.toURL0(entry.getKey()), entry.getValue());
 				}
-				return new ModelFileFilter(mic.isAll(), mic.getSelectedComponentTypes(), rids, exta);
+				return new ModelFileFilter(mic.isAll(), rids, exta);
+//				return new ModelFileFilter(mic.isAll(), mic.getSelectedComponentTypes(), rids, exta);
+
 			}
 		});
 		ModelIconCache ic = new ModelIconCache(exta, getTree());

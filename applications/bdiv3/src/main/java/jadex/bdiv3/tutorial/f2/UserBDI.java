@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -28,7 +29,7 @@ import jadex.micro.annotation.Description;
  *  User agent that presents a gui for using the 
  *  translation service of the translation agent.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("User agent that presents a gui for using the translation service of the translation agent.")
 public class UserBDI
 {

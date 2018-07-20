@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
@@ -18,7 +19,7 @@ import jadex.rules.eca.ChangeInfo;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class MethodBeliefAgentBDI
 {

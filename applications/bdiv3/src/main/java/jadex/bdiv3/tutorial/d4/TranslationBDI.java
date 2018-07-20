@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -25,7 +26,7 @@ import jadex.micro.annotation.Description;
  *  Using a creation goal condition.
  */
 @Description("Translation agent D4. <br>  This translation agent using a creation condition.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 public class TranslationBDI
 {

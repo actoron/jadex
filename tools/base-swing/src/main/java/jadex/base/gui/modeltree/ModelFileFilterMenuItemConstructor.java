@@ -39,12 +39,13 @@ import jadex.commons.gui.future.SwingResultListener;
 /**
  *  Dynamically create a new menu item structure for starting components.
  */
-public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor, IPropertiesProvider
+public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor //, IPropertiesProvider
 {
 	//-------- attributes --------
 	
 	/** Constant for select all menu item. */
 	public static final String SELECT_ALL = "all";
+	public static final String SELECT_ALL_MODELS = "all_models";
 	
 	/** The root node. */
 	protected TreeModel treemodel;
@@ -70,27 +71,48 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 		
 		menu = new JMenu("File Filter");
 		filetypes = new HashMap<String, JCheckBoxMenuItem>();
-		JCheckBoxMenuItem all = new JCheckBoxMenuItem();
+		final JCheckBoxMenuItem all = new JCheckBoxMenuItem();
 		menu.add(all);
+		final JCheckBoxMenuItem allmo = new JCheckBoxMenuItem();
+		menu.add(allmo);
 		menu.addSeparator();
 		filetypes.put(SELECT_ALL, all);
+		filetypes.put(SELECT_ALL_MODELS, allmo);
 		
 		all.setAction(new AbstractAction("All files")
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				for(int i=2; i<menu.getItemCount(); i++)
-				{
-					JMenuItem item = (JMenuItem)menu.getItem(i);
-					if(item!=null)
-						item.setEnabled(!isAll());
-				}
+//				for(int i=2; i<menu.getItemCount(); i++)
+//				{
+//					JMenuItem item = (JMenuItem)menu.getItem(i);
+//					if(item!=null)
+//						item.setEnabled(!isAll());
+//				}
+				allmo.setSelected(false);
 				((ISwingTreeNode)treemodel.getRoot()).refresh(true);
 			}
 		});
 		
+		allmo.setAction(new AbstractAction("All loadable models")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+//				for(int i=2; i<menu.getItemCount(); i++)
+//				{
+//					JMenuItem item = (JMenuItem)menu.getItem(i);
+//					if(item!=null)
+//						item.setEnabled(!isAll());
+//				}
+				all.setSelected(false);
+				((ISwingTreeNode)treemodel.getRoot()).refresh(true);
+			}
+		});
+		
+		allmo.setSelected(true);
+		
 		// Init menu
-		getMenuItem();
+//		getMenuItem();
 	}
 	
 	//-------- methods --------
@@ -104,32 +126,32 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 		return ((JCheckBoxMenuItem)filetypes.get(SELECT_ALL)).isSelected();
 	}
 	
-	/**
-	 *  Get all selected component types.
-	 *  @return A list of component types.
-	 */
-	public List<String> getSelectedComponentTypes()
-	{
-		List<String> ret = new ArrayList<String>();
-		
-//		if(!isAll())
-		{
-			for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
-			{
-				String key = it.next();
-//				if(!SELECT_ALL.equals(key))
-				{
-					JCheckBoxMenuItem cb = filetypes.get(key);
-					if(cb.isSelected())
-					{
-						ret.add(key);
-					}
-				}
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get all selected component types.
+//	 *  @return A list of component types.
+//	 */
+//	public List<String> getSelectedComponentTypes()
+//	{
+//		List<String> ret = new ArrayList<String>();
+//		
+////		if(!isAll())
+//		{
+//			for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
+//			{
+//				String key = it.next();
+////				if(!SELECT_ALL.equals(key))
+//				{
+//					JCheckBoxMenuItem cb = filetypes.get(key);
+//					if(cb.isSelected())
+//					{
+//						ret.add(key);
+//					}
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Select a set of menu items.
@@ -145,79 +167,79 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 		}
 	}
 	
-	/**
-	 *  Returns the supported component types.
-	 *  @return The supported component types.
-	 */
-	public IFuture<Set<String>> getSupportedComponentTypes()
-	{
-		final Future<Set<String>> ret = new Future<Set<String>>();
-		exta.searchServices( new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new SwingExceptionDelegationResultListener<Collection<IComponentFactory>, Set<String>>(ret)
-		{
-			public void customResultAvailable(Collection<IComponentFactory> facts)
-			{
-				Set<String> supported = new HashSet<String>();
-				supported.add(SELECT_ALL);
-				if(facts!=null)
-				{
-					for(Iterator<IComponentFactory> it=facts.iterator(); it.hasNext(); )
-					{
-						IComponentFactory fac = it.next();
-						
-						String[] fts = fac.getComponentTypes();
-						
-						// add new file types
-						for(int i=0; i<fts.length; i++)
-						{
-							supported.add(fts[i]);
-							if(!filetypes.containsKey(fts[i]))
-							{
-								final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
-								fac.getComponentTypeIcon(fts[i]).addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
-								{
-									public void resultAvailable(byte[] img)
-									{
-										if(img!=null)
-											ff.setIcon(new ImageIcon(img));
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										// ignore...
-									}
-								}));
-								
-								menu.add(ff);
-								ff.addActionListener(new ActionListener()
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										((ISwingTreeNode)treemodel.getRoot()).refresh(true);
-									}
-								});
-								filetypes.put(fts[i], ff);
-							}
-						}
-					}
-				}
-				
-				// remove obsolete filetypes
-				for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
-				{
-					String next = it.next();
-					if(!supported.contains(next))
-					{
-						JMenuItem rem = (JMenuItem)filetypes.get(next);
-						menu.remove(rem);
-						it.remove();
-					}
-				}
-				ret.setResult(filetypes.keySet());
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Returns the supported component types.
+//	 *  @return The supported component types.
+//	 */
+//	public IFuture<Set<String>> getSupportedComponentTypes()
+//	{
+//		final Future<Set<String>> ret = new Future<Set<String>>();
+//		exta.searchServices( new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			.addResultListener(new SwingExceptionDelegationResultListener<Collection<IComponentFactory>, Set<String>>(ret)
+//		{
+//			public void customResultAvailable(Collection<IComponentFactory> facts)
+//			{
+//				Set<String> supported = new HashSet<String>();
+//				supported.add(SELECT_ALL);
+//				if(facts!=null)
+//				{
+//					for(Iterator<IComponentFactory> it=facts.iterator(); it.hasNext(); )
+//					{
+//						IComponentFactory fac = it.next();
+//						
+//						String[] fts = fac.getComponentTypes();
+//						
+//						// add new file types
+//						for(int i=0; i<fts.length; i++)
+//						{
+//							supported.add(fts[i]);
+//							if(!filetypes.containsKey(fts[i]))
+//							{
+//								final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
+//								fac.getComponentTypeIcon(fts[i]).addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
+//								{
+//									public void resultAvailable(byte[] img)
+//									{
+//										if(img!=null)
+//											ff.setIcon(new ImageIcon(img));
+//									}
+//									
+//									public void exceptionOccurred(Exception exception)
+//									{
+//										// ignore...
+//									}
+//								}));
+//								
+//								menu.add(ff);
+//								ff.addActionListener(new ActionListener()
+//								{
+//									public void actionPerformed(ActionEvent e)
+//									{
+//										((ISwingTreeNode)treemodel.getRoot()).refresh(true);
+//									}
+//								});
+//								filetypes.put(fts[i], ff);
+//							}
+//						}
+//					}
+//				}
+//				
+//				// remove obsolete filetypes
+//				for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
+//				{
+//					String next = it.next();
+//					if(!supported.contains(next))
+//					{
+//						JMenuItem rem = (JMenuItem)filetypes.get(next);
+//						menu.remove(rem);
+//						it.remove();
+//					}
+//				}
+//				ret.setResult(filetypes.keySet());
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Get or create a new menu item (struture).
@@ -225,88 +247,97 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	 */
 	public JMenuItem getMenuItem()
 	{
-		if(isEnabled())
-		{
-			exta.searchServices( new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
-//				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
-				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
-			{
-				public void resultAvailable(Collection<IComponentFactory> facts)
-				{
-					Set<String> supported = new HashSet<String>();
-					supported.add(SELECT_ALL);
-					if(facts!=null)
-					{
-						for(Iterator<IComponentFactory> it=facts.iterator(); it.hasNext(); )
-						{
-							Object o = it.next();
-							if(!(o instanceof IComponentFactory))
-							{
-								System.out.println("debug: "+o);
-								SUtil.arrayToString("interfaces:"+o.getClass().getInterfaces());
-							}
-							
-							IComponentFactory fac = (IComponentFactory)o;//it.next();
-							
-							String[] fts = fac.getComponentTypes();
-							
-							// add new file types
-							for(int i=0; i<fts.length; i++)
-							{
-								supported.add(fts[i]);
-								if(!filetypes.containsKey(fts[i]))
-								{
-									final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
-									fac.getComponentTypeIcon(fts[i]).addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
-									{
-										public void resultAvailable(byte[] img)
-										{
-											if(img!=null)
-												ff.setIcon(new ImageIcon(img));
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											// ignore...
-										}
-									}));
-									
-									menu.add(ff);
-									ff.addActionListener(new ActionListener()
-									{
-										public void actionPerformed(ActionEvent e)
-										{
-											((ISwingTreeNode)treemodel.getRoot()).refresh(true);
-										}
-									});
-									filetypes.put(fts[i], ff);
-								}
-							}
-						}
-					}
-					
-					// remove obsolete filetypes
-					for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
-					{
-						String next = it.next();
-						if(!supported.contains(next))
-						{
-							JMenuItem rem = (JMenuItem)filetypes.get(next);
-							menu.remove(rem);
-							it.remove();
-						}
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// ignore...
-				}
-			}));
-		}
-		
 		return isEnabled()? menu: null;
 	}
+	
+//	/**
+//	 *  Get or create a new menu item (struture).
+//	 *  @return The menu item (structure).
+//	 */
+//	public JMenuItem getMenuItem()
+//	{
+//		if(isEnabled())
+//		{
+//			exta.searchServices( new ServiceQuery<>(IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM))
+////				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
+//				.addResultListener(new SwingResultListener<Collection<IComponentFactory>>(new IResultListener<Collection<IComponentFactory>>()
+//			{
+//				public void resultAvailable(Collection<IComponentFactory> facts)
+//				{
+//					Set<String> supported = new HashSet<String>();
+//					supported.add(SELECT_ALL);
+//					if(facts!=null)
+//					{
+//						for(Iterator<IComponentFactory> it=facts.iterator(); it.hasNext(); )
+//						{
+//							Object o = it.next();
+//							if(!(o instanceof IComponentFactory))
+//							{
+//								System.out.println("debug: "+o);
+//								SUtil.arrayToString("interfaces:"+o.getClass().getInterfaces());
+//							}
+//							
+//							IComponentFactory fac = (IComponentFactory)o;//it.next();
+//							
+//							String[] fts = fac.getComponentTypes();
+//							
+//							// add new file types
+//							for(int i=0; i<fts.length; i++)
+//							{
+//								supported.add(fts[i]);
+//								if(!filetypes.containsKey(fts[i]))
+//								{
+//									final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(fts[i], true);
+//									fac.getComponentTypeIcon(fts[i]).addResultListener(new SwingResultListener<byte[]>(new IResultListener<byte[]>()
+//									{
+//										public void resultAvailable(byte[] img)
+//										{
+//											if(img!=null)
+//												ff.setIcon(new ImageIcon(img));
+//										}
+//										
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											// ignore...
+//										}
+//									}));
+//									
+//									menu.add(ff);
+//									ff.addActionListener(new ActionListener()
+//									{
+//										public void actionPerformed(ActionEvent e)
+//										{
+//											((ISwingTreeNode)treemodel.getRoot()).refresh(true);
+//										}
+//									});
+//									filetypes.put(fts[i], ff);
+//								}
+//							}
+//						}
+//					}
+//					
+//					// remove obsolete filetypes
+//					for(Iterator<String> it=filetypes.keySet().iterator(); it.hasNext(); )
+//					{
+//						String next = it.next();
+//						if(!supported.contains(next))
+//						{
+//							JMenuItem rem = (JMenuItem)filetypes.get(next);
+//							menu.remove(rem);
+//							it.remove();
+//						}
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					// ignore...
+//				}
+//			}));
+//		}
+//		
+//		return isEnabled()? menu: null;
+//	}
 
 	/**
 	 *  Test if action is available in current context.
@@ -317,42 +348,42 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 		return true;
 	}
 	
-	/**
-	 *  Write current state into properties.
-	 */
-	public IFuture<Properties> getProperties()
-	{
-		final Future<Properties> ret = new Future<Properties>();
-		Properties	filterprops	= new Properties();
-		List<String> ctypes = getSelectedComponentTypes();
-		for(int i=0; i<ctypes.size(); i++)
-		{
-			String ctype = ctypes.get(i);
-			filterprops.addProperty(new Property(ctype, "true"));
-		}
-		ret.setResult(filterprops);
-		
-		return ret;
-	}
+//	/**
+//	 *  Write current state into properties.
+//	 */
+//	public IFuture<Properties> getProperties()
+//	{
+//		final Future<Properties> ret = new Future<Properties>();
+//		Properties	filterprops	= new Properties();
+//		List<String> ctypes = getSelectedComponentTypes();
+//		for(int i=0; i<ctypes.size(); i++)
+//		{
+//			String ctype = ctypes.get(i);
+//			filterprops.addProperty(new Property(ctype, "true"));
+//		}
+//		ret.setResult(filterprops);
+//		
+//		return ret;
+//	}
 
-	/**
-	 *  Update tool from given properties.
-	 */
-	public IFuture<Void> setProperties(final Properties props)
-	{
-		if(props!=null)
-		{
-			Property[] mps = props.getProperties();
-			Set<String> selected = new HashSet<String>();
-			for(int i=0; i<mps.length; i++)
-			{
-				if(Boolean.parseBoolean(mps[i].getValue())) 
-					selected.add(mps[i].getType());
-			}
-			setSelectedComponentTypes(selected);
-		}
-		return IFuture.DONE;
-	}
+//	/**
+//	 *  Update tool from given properties.
+//	 */
+//	public IFuture<Void> setProperties(final Properties props)
+//	{
+//		if(props!=null)
+//		{
+//			Property[] mps = props.getProperties();
+//			Set<String> selected = new HashSet<String>();
+//			for(int i=0; i<mps.length; i++)
+//			{
+//				if(Boolean.parseBoolean(mps[i].getValue())) 
+//					selected.add(mps[i].getType());
+//			}
+//			setSelectedComponentTypes(selected);
+//		}
+//		return IFuture.DONE;
+//	}
 	
 	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that tests if injection works for plan reason.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public abstract class PlanReasonInjectionBDI implements IBDIAgent
 {

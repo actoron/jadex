@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
@@ -31,7 +32,7 @@ import jadex.micro.annotation.Results;
  *  are added to the agent type and conditions to eca rule system 
  *  class is rewritten to announce belief changes (field accesses and annotated methods)
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Imports({"java.util.logging.*"})
 @Properties({@NameValue(name="logging.level", value="Level.INFO")})
 @Results(@Result(name="testresults", clazz=Testcase.class))

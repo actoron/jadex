@@ -16,17 +16,16 @@ import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+
 @Agent
-@Goals(@Goal(clazz=StampGoal.class))
-@RequiredServices(@RequiredService(name="stampser", type=IStampService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-@Plans(@Plan(trigger=@Trigger(goals=StampGoal.class), body=@Body(service=@ServicePlan(name="stampser"))))
-public class WorkpieceBDI 
+@Goals(@Goal(clazz = StampGoal.class))
+@RequiredServices(@RequiredService(name = "stampser", type = IStampService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)))
+@Plans(@Plan(trigger = @Trigger(goals = StampGoal.class), body = @Body(service = @ServicePlan(name = "stampser"))))
+public class WorkpieceBDI
 {
 	@AgentBody
-	public void body(IInternalAccess agent) 
+	public void body(IInternalAccess agent)
 	{
-		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new StampGoal(agent.getId(), 
-			"date: "+System.currentTimeMillis())).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new StampGoal(agent.getId(), "date: " + System.currentTimeMillis())).get();
 	}
 }

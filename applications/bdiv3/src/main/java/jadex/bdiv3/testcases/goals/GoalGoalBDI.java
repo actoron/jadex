@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalFinished;
 import jadex.bdiv3.annotation.GoalParameter;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that uses a goal with a goal as plan (direct subgoal).
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalGoalBDI
 {

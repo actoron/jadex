@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.b6;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.commons.future.IFuture;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.Description;
  *  
  *  Declare and activate an inline plan (declared as method).
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("The translation agent B3. <br>  Declare and activate an inline plan (declared as method).")
 //@BDIConfigurations(@BDIConfiguration(name="default", 
 //	initialplans=@NameValue(name="translateEnglishGerman")))

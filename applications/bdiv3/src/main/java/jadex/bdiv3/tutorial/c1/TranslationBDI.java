@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.c1;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -18,8 +19,8 @@ import jadex.rules.eca.ChangeInfo;
  *  This translation agent allows for adding word pairs to extend
  *  its dictionary.
  */
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("The translation agent C1. <br>  This translation agent allows for adding word pairs to extend its dictionary.")
-@Agent
 public class TranslationBDI
 {
 	//-------- attributes --------

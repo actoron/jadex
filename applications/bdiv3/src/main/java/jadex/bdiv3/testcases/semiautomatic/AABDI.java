@@ -1,9 +1,10 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.micro.annotation.Agent;
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public abstract class AABDI
 {
 //	static

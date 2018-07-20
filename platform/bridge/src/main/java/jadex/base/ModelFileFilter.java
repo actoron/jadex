@@ -27,8 +27,8 @@ public class ModelFileFilter implements IAsyncFilter
 	/** The all selected flag. */
 	protected boolean all;
 	
-	/** The list of selected component names. */
-	protected List<String> selectedcomponents;
+//	/** The list of selected component names. */
+//	protected List<String> selectedcomponents;
 	
 	/** The resource identifiers of the tree's root entries. */
 	protected Map<URL, IResourceIdentifier>	rids;
@@ -49,10 +49,11 @@ public class ModelFileFilter implements IAsyncFilter
 	/**
 	 *  Create a new filter.
 	 */
-	public ModelFileFilter(boolean all, List<String> selectedcomponents, Map<URL, IResourceIdentifier> rids, IExternalAccess exta)
+//	public ModelFileFilter(boolean all, List<String> selectedcomponents, Map<URL, IResourceIdentifier> rids, IExternalAccess exta)
+	public ModelFileFilter(boolean all, Map<URL, IResourceIdentifier> rids, IExternalAccess exta)
 	{
 		this.all	= all;
-		this.selectedcomponents	=  selectedcomponents;
+//		this.selectedcomponents	=  selectedcomponents;
 		this.rids	= rids;
 		this.exta = exta;
 	}
@@ -77,23 +78,23 @@ public class ModelFileFilter implements IAsyncFilter
 		return all;
 	}
 
-	/**
-	 *  Get the list of selected components.
-	 *  @return The list of components.
-	 */
-	public List<String> getSelectedComponents()
-	{
-		return selectedcomponents;
-	}
-
-	/**
-	 *  Set the list of selected components.
-	 *  @param selectedcomponents The list of selcted components.
-	 */
-	public void setSelectedComponents(List<String> selectedcomponents)
-	{
-		this.selectedcomponents = selectedcomponents;
-	}
+//	/**
+//	 *  Get the list of selected components.
+//	 *  @return The list of components.
+//	 */
+//	public List<String> getSelectedComponents()
+//	{
+//		return selectedcomponents;
+//	}
+//
+//	/**
+//	 *  Set the list of selected components.
+//	 *  @param selectedcomponents The list of selcted components.
+//	 */
+//	public void setSelectedComponents(List<String> selectedcomponents)
+//	{
+//		this.selectedcomponents = selectedcomponents;
+//	}
 	
 	/**
 	 *  Get the resource identifiers for the root path entries.
@@ -169,7 +170,8 @@ public class ModelFileFilter implements IAsyncFilter
 //				ret.setResult(Boolean.TRUE);
 				
 				final long start = System.currentTimeMillis();
-				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+//				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+				SComponentFactory.isModelType(exta, file.getAbsolutePath(), rid)
 					.addResultListener(new DelegationResultListener<Boolean>(ret)
 				{
 					public void customResultAvailable(Boolean val)

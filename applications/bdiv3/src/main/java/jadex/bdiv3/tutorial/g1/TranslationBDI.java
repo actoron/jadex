@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -34,7 +35,7 @@ Direct your browser to e.g.
 <a href="http://localhost:9099/dog">http://localhost:9099/dog</a>
 to perform a translation.
 */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class TranslationBDI
 {
 	//-------- attributes --------

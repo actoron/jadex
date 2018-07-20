@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -30,7 +31,7 @@ import jadex.rules.eca.ChangeInfo;
 /**
  *  Agent that tests plan waiting for fact added and removed.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitPlan")))
 //@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitqueuePlan")))

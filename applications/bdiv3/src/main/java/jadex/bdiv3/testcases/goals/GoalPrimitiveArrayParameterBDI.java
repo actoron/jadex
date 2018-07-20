@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if changes of goal multi parameters can be detected in goal conditions.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalPrimitiveArrayParameterBDI
 {
