@@ -35,7 +35,7 @@ public class SearchQueryManagerTest
 	//-------- constants --------
 	
 	/** The delay time as factor of the default remote timeout. */
-	public static final double	WAITFACTOR	= 0.01;	// 30 * 0.01 secs  -> 300 millis.
+	public static final double	WAITFACTOR	= 0.05;	// 30 * 0.05 secs  -> 1500 millis.
 	
 	/** Client configuration for platform used for searching. */
 	public static final IPlatformConfiguration	CLIENTCONF;
@@ -50,7 +50,7 @@ public class SearchQueryManagerTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// 30 * 0.005 secs  -> 150 millis.
+		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 750 millis.
 		
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
