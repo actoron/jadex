@@ -3,7 +3,6 @@ package jadex.micro.testcases.servicequeries;
 import java.util.Collection;
 import java.util.Map;
 
-import org.junit.Ignore;
 
 import jadex.base.Starter;
 import jadex.base.test.TestReport;

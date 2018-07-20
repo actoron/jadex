@@ -3,7 +3,7 @@ package jadex.commons;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
+import java.util.zip.ZipEntry;
 
 /**
  *  Filter for files and jar entries.
@@ -94,10 +94,17 @@ public class FileFilter implements IFilter<Object>
 			File	f	= (File)obj;
 			fn	= f.getName();
 		}
-		else if(obj instanceof JarEntry)
+		else if(obj instanceof ZipEntry)
 		{
-			JarEntry	je	= (JarEntry)obj;
+			ZipEntry	je	= (ZipEntry)obj;
 			fn	= je.getName();
+			int idx = fn.lastIndexOf("/");
+			if(idx!=-1)
+				fn = fn.substring(idx+1);
+		}
+		else if(obj instanceof String)
+		{
+			fn = (String)obj;
 		}
 		
 		if(filters!=null)

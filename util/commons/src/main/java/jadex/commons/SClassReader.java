@@ -430,6 +430,14 @@ public class SClassReader
 			}
 			return ret;
 		}
+
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return "ClassInfo [classname=" + classname + ", annotations=" + annotations + "]";
+		}
     }
     
     /**
@@ -489,5 +497,13 @@ public class SClassReader
     			values = new HashMap<>();
     		values.put(name, value);
     	}
+
+    	/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return "AnnotationInfos [type=" + type + ", values=" + values + "]";
+		}
     }
 }
