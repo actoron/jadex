@@ -1,6 +1,5 @@
 package jadex.kernelbase;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -19,7 +17,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
@@ -54,6 +51,8 @@ import jadex.javaparser.SJavaParser;
 
 /**
  *  Multi factory for dynamically loading kernels.
+ *  
+ *  todo: fetch new classpath urls after lib service changes
  */
 @Service
 public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
@@ -387,6 +386,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public boolean filter(String fn)
 			{
+				int idx = fn.indexOf("/");
+				if(idx!=-1)
+					fn = fn.substring(idx);
 				return fn.startsWith("Kernel");
 			}
 		});
@@ -695,6 +697,20 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public static void main(String[] args)
 	{
+		FileFilter ff = new FileFilter("$", false, ".class");
+		ff.addFilenameFilter(new IFilter<String>()
+		{
+			public boolean filter(String fn)
+			{
+				int idx = fn.lastIndexOf("/");
+				if(idx!=-1)
+					fn = fn.substring(idx+1);
+				return fn.startsWith("Kernel");
+			}
+		});
+		
+		ff.filter("hall/das/ist/Klasse.class");
+		
 		scanForKernels();
 	}
 	

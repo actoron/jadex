@@ -99,6 +99,10 @@ public class FileFilter implements IFilter<Object>
 			JarEntry	je	= (JarEntry)obj;
 			fn	= je.getName();
 		}
+		else if(obj instanceof String)
+		{
+			fn = (String)obj;
+		}
 		
 		if(filters!=null)
 		{
