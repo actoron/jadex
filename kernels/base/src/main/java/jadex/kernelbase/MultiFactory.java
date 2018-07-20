@@ -42,6 +42,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.CallSequentializer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -89,7 +90,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public static final Map<String, Object> props = SUtil.createHashMap(new String[]{MULTIFACTORY}, new Object[]{Boolean.TRUE});
 
 	/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
-	protected Sequentializer<IComponentFactory> getnewfac = new Sequentializer<IComponentFactory>(new IResultCommand<IFuture<IComponentFactory>, Object[]>()
+	protected CallSequentializer<IComponentFactory> getnewfac = new CallSequentializer<IComponentFactory>(new IResultCommand<IFuture<IComponentFactory>, Object[]>()
 	{
 		public IFuture<IComponentFactory> execute(Object[] args)
 		{
@@ -386,9 +387,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public boolean filter(String fn)
 			{
-				int idx = fn.indexOf("/");
+				int idx = fn.lastIndexOf("/");
 				if(idx!=-1)
-					fn = fn.substring(idx);
+					fn = fn.substring(idx+1);
 				return fn.startsWith("Kernel");
 			}
 		});
@@ -713,55 +714,5 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		scanForKernels();
 	}
-	
-	/**
-	 * 
-	 */
-	public static class Sequentializer<T>
-	{
-		public Sequentializer(IResultCommand<IFuture<T>, Object[]> call)
-		{
-			this.call = call;
-		}
-		
-		//int cnt = 0;
-		
-		protected IFuture<T> currentcall;
-		protected List<Tuple2<Object[], Future<T>>> calls = new ArrayList<>();
-		protected IResultCommand<IFuture<T>, Object[]> call;
-		
-		public IFuture<T> call(Object[] args)
-		{
-			//cnt++;
-			if(currentcall==null)
-			{
-				currentcall = call.execute(args);
-				currentcall.addResultListener(res -> {proceed();}, ex -> {proceed();});
-				return currentcall;
-			}
-			else
-			{
-				Future<T> ret = new Future<>();
-				calls.add(new Tuple2<Object[], Future<T>>(args, ret));
-				return ret;
-			}
-		}
-		
-		protected void proceed()
-		{
-			//cnt--;
-			//System.out.println("call count: "+cnt);
-			if(calls.size()>0)
-			{
-				Tuple2<Object[], Future<T>> next = calls.remove(0);
-				IFuture<T> fut = call.execute(next.getFirstEntity());
-				fut.addResultListener(new DelegationResultListener<T>(next.getSecondEntity()));
-				fut.addResultListener(res -> {proceed();}, ex -> {proceed();});
-			}
-			else
-			{
-				currentcall = null;
-			}
-		}
-	}
+
 }
