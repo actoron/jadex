@@ -1,6 +1,7 @@
 package jadex.commons.security;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -262,11 +263,15 @@ public class SSecurity
 						 */
 						protected byte[] getEntropyFromFile(String path, int numbytes)
 						{
+							File input = new File(path);
+							if (!input.exists())
+								return null;
+							
 							InputStream is = null;
 							try
 							{
 								byte[] ret = new byte[numbytes];
-								is = new FileInputStream(path);
+								is = new FileInputStream(input);
 								int read = 0;
 								int off = 0;
 								while (read < ret.length)
