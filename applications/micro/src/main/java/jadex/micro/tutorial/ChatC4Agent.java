@@ -55,7 +55,7 @@ public class ChatC4Agent
 					{
 						if(result)
 						{
-							factory.setResult(fac);
+							factory.setResultIfUndone(fac);
 							search.terminate();
 						}
 					}

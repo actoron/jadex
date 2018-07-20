@@ -40,8 +40,8 @@ public class MicroStartTest extends ComponentTestSuite
 		"BrokenInitAgent",
 		"BrokenInit.component.xml",
 //		"CompositeCalculatorAgent",
-//		"blocking/Step",
-//		"blocking\\Step",
+		"blocking/Step",
+		"blocking\\Step",
 //		"CallAllServicesAgent",
 		
 		// Manual tests requiring interaction
