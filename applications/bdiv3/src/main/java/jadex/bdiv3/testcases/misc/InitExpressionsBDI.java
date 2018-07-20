@@ -3,6 +3,7 @@ package jadex.bdiv3.testcases.misc;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.Boolean3;
@@ -14,7 +15,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class InitExpressionsBDI
 {

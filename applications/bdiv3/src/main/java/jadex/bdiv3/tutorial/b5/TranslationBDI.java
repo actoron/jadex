@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.b5;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.Description;
  *  
  *  Using plan context conditions.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("The translation agent B5. <br>  Using plan context conditions.")
 public class TranslationBDI
 {

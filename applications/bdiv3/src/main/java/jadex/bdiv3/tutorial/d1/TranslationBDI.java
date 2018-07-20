@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.d1;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.Description;
  *  Using a translation goal.
  */
 @Description("Translation agent d1. <br>  This translation agent uses a top level goal.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class TranslationBDI
 {
 	/** The agent. */

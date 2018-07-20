@@ -158,7 +158,8 @@ public class MultiFactory2 implements IComponentFactory, IMultiKernelNotifierSer
 	 */
 	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
 	{
-		System.out.println("loadModel: "+model);
+		if(model.indexOf("AlarmclockAgent")!=-1)
+			System.out.println("loadModel: "+model);
 		
 		if(!isLoadable(model))
 			return new Future<IModelInfo>(new RuntimeException("Cannot be loaded: "+model));

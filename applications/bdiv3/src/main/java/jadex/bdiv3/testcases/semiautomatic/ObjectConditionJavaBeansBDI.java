@@ -3,6 +3,7 @@ package jadex.bdiv3.testcases.semiautomatic;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.features.IBDIAgentFeature;
@@ -13,7 +14,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Configurations({@Configuration(name="1"),@Configuration(name="2")})
 public class ObjectConditionJavaBeansBDI
 {

@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -27,7 +28,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test abort of externally waiting plan with manual "interruptable" step.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="extWait", clazz=ExtWait.class)))
 public class ExternalWait2BDI

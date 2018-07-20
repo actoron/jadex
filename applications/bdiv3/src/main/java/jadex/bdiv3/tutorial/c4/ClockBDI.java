@@ -2,6 +2,7 @@ package jadex.bdiv3.tutorial.c4;
 
 import java.text.SimpleDateFormat;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -16,7 +17,7 @@ import jadex.micro.annotation.Description;
  *  Belief with update rate.
  */
 @Description("The clock agent C4. <br>  This agent uses a getter/setter non-field belief.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class ClockBDI
 {
 	/** The date formatter. */

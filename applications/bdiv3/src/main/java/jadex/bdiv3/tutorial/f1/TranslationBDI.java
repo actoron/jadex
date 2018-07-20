@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.f1;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  returns the corresponding entry.
  */
 @Description("The translation agent F1. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 @ProvidedServices(@ProvidedService(type=ITranslationService.class))
 public class TranslationBDI implements ITranslationService

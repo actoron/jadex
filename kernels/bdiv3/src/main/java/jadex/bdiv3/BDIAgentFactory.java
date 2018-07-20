@@ -12,6 +12,7 @@ import java.util.Map;
 /* $if !android $ */
 /* $endif $ */
 
+import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
 import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
@@ -336,6 +337,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 //											else
 //												ret.setResult(Boolean.TRUE);
 //											break;
+										}
+										else if(Capability.class.getName().equals(ai.getType()))
+										{
+											ret.setResult(Boolean.TRUE);
 										}
 									}
 								}

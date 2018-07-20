@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  * 
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class BeliefSetBDI
 {

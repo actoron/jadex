@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
@@ -34,7 +35,7 @@ import jadex.rules.eca.ChangeInfo;
  *   
  *   -> problem was method not being static
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class SelectiveBeliefChangeBDI
 {
 	@Belief

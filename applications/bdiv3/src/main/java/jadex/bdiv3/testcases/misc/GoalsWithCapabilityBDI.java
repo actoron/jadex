@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if plans within a capability get executed on goal dispatch.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalsWithCapabilityBDI
 {

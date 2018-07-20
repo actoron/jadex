@@ -32,13 +32,13 @@ public class TreePanelKernelListener implements IMultiKernelListener
 		{
 			public void run()
 			{
-				mffmic.getSupportedComponentTypes().addResultListener(new SwingDefaultResultListener()
-				{
-					public void customResultAvailable(Object result)
-					{
-						((ITreeNode) tree.getModel().getRoot()).refresh(true);
-					}
-				});
+//				mffmic.getSupportedComponentTypes().addResultListener(new SwingDefaultResultListener()
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+						((ITreeNode)tree.getModel().getRoot()).refresh(true);
+//					}
+//				});
 			}
 		};
 	}

@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.goals;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
@@ -22,13 +23,13 @@ import jadex.micro.annotation.Results;
 /**
  * 
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Goals(@Goal(clazz=ExternalGoal.class, excludemode=ExcludeMode.Never))
 public class ExternalGoalBDI
 {
 	/** The bdi agent. */
-	@Agent
+	@Agent(type=BDIAgentFactory.TYPE)
 	protected IInternalAccess agent;
 	
 	/** The test report. */

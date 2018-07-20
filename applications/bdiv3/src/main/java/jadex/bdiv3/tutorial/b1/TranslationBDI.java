@@ -1,5 +1,6 @@
 package jadex.bdiv3.tutorial.b1;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
@@ -14,7 +15,7 @@ import jadex.micro.annotation.Description;
  *  
  *  Declare and activate an extra Java plan.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("The translation agent B1. <br>  Declare and activate an extra Java plan.")
 @Plans(@Plan(body=@Body(TranslationPlan.class)))
 public class TranslationBDI

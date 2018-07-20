@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
@@ -21,7 +22,7 @@ import jadex.micro.annotation.AgentFeature;
  *  
  *  Using a capability.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class TranslationBDI
 {
 	/** The bdi feature. */

@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.b2;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Description;
  *  
  *  Declare and activate an inline plan (declared as inner class).
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("The translation agent B2. <br>  Declare and activate an inline plan (declared as inner class).")
 @Plans(@Plan(body=@Body(TranslationBDI.TranslationPlan.class)))
 public class TranslationBDI

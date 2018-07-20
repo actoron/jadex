@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalTargetCondition;
@@ -12,7 +13,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class ABDI extends AABDI
 {
 //	static

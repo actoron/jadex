@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.Results;
  *  Agent that has a plan that return a value form the body.
  *  The value is then used as result value of the goal when the goal uses the @GoalResult.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalPlanResultBDI
 {

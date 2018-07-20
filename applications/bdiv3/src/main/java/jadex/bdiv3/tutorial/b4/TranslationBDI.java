@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.b4;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -20,7 +21,7 @@ import jadex.micro.annotation.Description;
  *  
  *  Using other plan methods.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("The translation agent B4. <br>  Using other plan methods.")
 public class TranslationBDI
 {

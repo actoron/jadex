@@ -1,5 +1,6 @@
 package jadex.bdiv3.quickstart.treasureisland;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -15,7 +16,7 @@ import jadex.micro.annotation.AgentBody;
  *  A treasure hunter that picks up the treasures one by one
  *  by creating a goal and thus a plan for each treasure.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class TreasureHunterB1BDI
 {
 	//-------- beliefs --------

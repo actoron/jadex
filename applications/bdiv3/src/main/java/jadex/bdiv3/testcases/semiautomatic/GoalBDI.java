@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -18,7 +19,7 @@ import jadex.rules.eca.annotations.Event;
 /**
  *  Simple agent with inline count goal.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @BDIConfigurations(
 	@BDIConfiguration(name="first", initialgoals=@NameValue(name="Count2Goal", clazz=GoalBDI.Count2Goal.class)) // todo: allow simple name
 )
@@ -108,7 +109,7 @@ public class GoalBDI
 	}
 	
 	/** The agent. */
-	@Agent
+	@Agent(type=BDIAgentFactory.TYPE)
 	protected IInternalAccess agent;
 	
 	/** The counter belief. */

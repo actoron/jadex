@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalResult;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.Results;
  *  Test if a procedural goal can be configured with 
  *  OR and AND success.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class SequentialGoalBDI
 {

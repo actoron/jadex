@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.d6;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.AgentFeature;
  *  
  *  Uses a maintain goal to limit the number of entries in its database.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class TranslationBDI
 {
 	/** The BDI feature. */
