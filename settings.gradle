@@ -38,6 +38,9 @@ projectblacklist.add(':applications:dungeonkeeper')
 projectblacklist.add(':platform:relay-standalone')
 projectblacklist.add(':platform:relay-web')
 
+// Do not include until it can be fixed.
+projectblacklist.add(':transports:udptransport')
+
 /* Distribution->Artifacts map. */
 gradle.ext.distartmap = new HashMap<String, Set<String>>();
 
