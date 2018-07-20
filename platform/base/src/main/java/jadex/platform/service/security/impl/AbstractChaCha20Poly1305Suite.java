@@ -444,9 +444,13 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 				boolean verified = verifyKey(challenge, key, nameauthority, sig);
 				if (verified)
 				{
-					ret = platformname.equals(SSecurity.readCertificateFromPEM(sig.getCertificate()).getSubject().toString());
-					if (ret)
-						break;
+					String subjectid = SSecurity.getSubjectId(SSecurity.readCertificateFromPEM(sig.getCertificate()));
+					if (subjectid.startsWith("CN="))
+					{
+						ret = platformname.equals(subjectid.substring(3));
+						if (ret)
+							break;
+					}
 				}
 			}
 		}

@@ -637,7 +637,7 @@ public class Starter
 		// Replace special characters used in component ids.
 		if(platformname!=null)
 		{
-			platformname	= platformname.replace('.', '$'); // Dot in host name on Mac !?
+			platformname	= platformname.replace(':', '$'); // Dot in host name on Mac !?
 			platformname	= platformname.replace('@', '$');
 		}
 		else

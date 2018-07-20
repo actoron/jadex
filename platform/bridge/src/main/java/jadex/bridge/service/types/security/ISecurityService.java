@@ -121,6 +121,14 @@ public interface ISecurityService
 	 */
 	public IFuture<Void> removeNameAuthority(String secret);
 	
+	/** 
+	 *  Adds an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Set<String>> getNameAuthorities();
+	
 	/**
 	 *  Gets the secret of a platform if available.
 	 * 

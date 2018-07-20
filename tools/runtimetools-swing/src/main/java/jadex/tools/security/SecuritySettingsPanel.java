@@ -2,6 +2,7 @@ package jadex.tools.security;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,6 +43,7 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.ICommand;
 import jadex.commons.Properties;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -49,6 +51,11 @@ import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.StringArrayTableModel;
+import jadex.commons.security.PemKeyPair;
+import jadex.commons.security.SSecurity;
+import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.AbstractX509PemSecret;
+import jadex.platform.service.security.auth.X509PemStringsSecret;
 
 /**
  *  Settings for security service.
@@ -67,10 +74,14 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	/** The security service. */
 	protected ISecurityService secservice;
 	
+	/** Main pane. */
 	protected JTabbedPane main;
 	
 	/** Networks table. */
 	protected JTable nwtable;
+	
+	/** Name authorities panel. */
+	protected JTable natable;
 	
 	/** Role table. */
 	protected JTable roletable;
@@ -106,9 +117,6 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				//secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<ISecurityService>)null).setServiceIdentifier(sid)).get();
-//				secservice = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class));
-//				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 				IComponentIdentifier targetpf = sid.getProviderId().getRoot();
 				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
 				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
@@ -124,6 +132,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						main.add("Networks", createNetworkPanel());
 						
 						main.add("Roles", createRolePanel());
+						
+						main.add("Name Authorities", createNameAuthoritiesPanel());
 						
 						certtree = new CertTree();
 						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
@@ -671,6 +681,149 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		return rolepanel;
 	}
 	
+	protected JPanel createNameAuthoritiesPanel()
+	{
+		natable = new JTable();
+		JScrollPane scroll = new JScrollPane(natable);
+		
+		JButton add = new JButton(new AbstractAction("Add...")
+		{
+			private static final long serialVersionUID = -181301177525012609L;
+
+			public void actionPerformed(ActionEvent e)
+			{
+				JFrame adddialog = new JFrame("Add Name Authority");
+				adddialog.getContentPane().setLayout(new BorderLayout());
+				
+				CertTree nacerttree = new CertTree();
+				certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+				
+				adddialog.getContentPane().add(nacerttree, BorderLayout.CENTER);
+				
+				JButton okbutton = new JButton(new AbstractAction("Ok")
+				{
+					private static final long serialVersionUID = -134253457623452345L;
+
+					public void actionPerformed(ActionEvent e)
+					{
+						PemKeyPair keypair = nacerttree.getSelectedCert();
+						settingsservice.saveFile(DEFAULT_CERT_STORE, nacerttree.save()).get();
+						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+						adddialog.dispose();
+						if (keypair != null)
+						{
+							X509PemStringsSecret secret = new X509PemStringsSecret(keypair.getCertificate(), keypair.getCertificate(), keypair.getKey());
+							System.out.println(secret.toString());
+							System.out.println(AbstractAuthenticationSecret.fromString(secret.toString(), true));
+							secservice.addNameAuthority(secret.toString()).get();
+						}
+						refreshNameAuthorities();
+					}
+				});
+				
+				JButton cancelbutton = new JButton(new AbstractAction("Cancel")
+				{
+					private static final long serialVersionUID = 94523452345234L;
+
+					public void actionPerformed(ActionEvent e)
+					{
+						adddialog.dispose();
+					}
+				});
+				
+				JPanel buttonpanel = new JPanel();
+				buttonpanel.add(okbutton);
+				buttonpanel.add(cancelbutton);
+				
+				adddialog.getContentPane().add(buttonpanel, BorderLayout.SOUTH);
+				
+				adddialog.setSize(800, 600);
+				adddialog.setVisible(true);
+			}
+		});
+		
+		JButton remove = new JButton(new AbstractAction("Remove")
+		{
+			private static final long serialVersionUID = 7247608829907080898L;
+
+			public void actionPerformed(ActionEvent e)
+			{
+				int[] rows = nwtable.getSelectedRows();
+				if (rows != null && rows.length > 0)
+				{
+					final String[] nasecrets = new String[rows.length];
+					for (int i = 0; i < rows.length; ++i)
+						nasecrets[i] = (String) nwtable.getModel().getValueAt(rows[i], 1);
+					
+					jccaccess.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							for (int i = 0; i < nasecrets.length; ++i)
+								secservice.removeNameAuthority(nasecrets[i]).get();
+							refreshNameAuthorities();
+							return IFuture.DONE;
+						};
+					});
+				}
+			}
+		});
+		
+		JButton refresh = new JButton(new AbstractAction("Refresh")
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				refreshNameAuthorities();
+			}
+		});
+		
+		JPanel buttonpanel = new JPanel();
+		GroupLayout l = new GroupLayout(buttonpanel);
+		buttonpanel.setLayout(l);
+		l.setAutoCreateGaps(true);
+		SequentialGroup hgroup = l.createSequentialGroup();
+		
+		ParallelGroup vgroup = l.createParallelGroup();
+		
+		for (JComponent comp : new JComponent[] { add, remove, refresh })
+		{
+			vgroup.addComponent(comp);
+			hgroup.addComponent(comp);
+		}
+		l.linkSize(SwingConstants.VERTICAL, add, remove, refresh);
+		
+		l.setVerticalGroup(vgroup);
+		l.setHorizontalGroup(hgroup);
+		
+		JPanel napanel = new JPanel();
+		
+		l = new GroupLayout(napanel);
+		napanel.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		
+		l = new GroupLayout(napanel);
+		napanel.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		ParallelGroup ohgroup = l.createParallelGroup();
+		SequentialGroup ovgroup = l.createSequentialGroup();
+		
+		for (JComponent comp : new JComponent[] { scroll, buttonpanel })
+		{
+			ovgroup.addComponent(comp);
+			ohgroup.addComponent(comp);
+		}
+		
+		l.setHorizontalGroup(ohgroup);
+		l.setVerticalGroup(ovgroup);
+		
+		refreshNetworks();
+		
+		return napanel;
+	}
+	
 	/**
 	 *  Sets secret for network.
 	 *  
@@ -845,6 +998,76 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						StringArrayTableModel model = new StringArrayTableModel(table);
 						model.setColumnNames(new String[] { "Entity", "Roles" });
 						roletable.setModel(model);
+						
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Refreshes the networks.
+	 */
+	protected void refreshNameAuthorities()
+	{
+		jccaccess.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final Set<String> nas = secservice.getNameAuthorities().get();
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String[][] table = null;
+						if (nas != null && nas.size() > 0)
+						{
+							table = new String[nas.size()][2];
+							
+							int i = 0;
+							for (String nasecret : nas)
+							{
+								AbstractX509PemSecret pemsecret = null;
+								String subjectid = null;
+								InputStream is = null;
+								try
+								{
+									pemsecret = (AbstractX509PemSecret) AbstractAuthenticationSecret.fromString(nasecret, true);
+									is = pemsecret.openCertificate();
+									String cert = new String(SUtil.readStream(is), SUtil.UTF8);
+									subjectid = SSecurity.getSubjectId(SSecurity.readCertificateFromPEM(cert));
+								}
+								catch (Exception e)
+								{
+								}
+								finally
+								{
+									SUtil.close(is);
+								}
+								
+								if (subjectid != null)
+								{
+									table[i][0] = subjectid;
+									table[i][1] = nasecret;
+								}
+								else
+								{
+									table[i][0] = "Unavailable";
+									table[i][1] = "Unavailable";
+								}
+							}
+						}
+						else
+						{
+							table = new String[0][0];
+						}
+						
+						StringArrayTableModel model = new StringArrayTableModel(table);
+						model.setColumnNames(new String[] { "Subject ID", "Secret" });
+						natable.setModel(model);
 						
 					}
 				});

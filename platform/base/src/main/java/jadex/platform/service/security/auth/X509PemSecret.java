@@ -13,7 +13,7 @@ import jadex.commons.SUtil;
 public class X509PemSecret extends AbstractX509PemSecret
 {
 	/** Prefix used to encode secret type as strings. */
-	public static final String PREFIX = "pem";
+	public static final String PREFIX = "pemfiles";
 	
 	/** The trust anchor file/ca cert. */
 	protected String cacert;
@@ -129,9 +129,9 @@ public class X509PemSecret extends AbstractX509PemSecret
 	 */
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof X509PemFileSecret)
+		if (obj instanceof X509PemStringsSecret)
 		{
-			X509PemFileSecret other = (X509PemFileSecret) obj;
+			X509PemStringsSecret other = (X509PemStringsSecret) obj;
 			return SUtil.equals(cacert, other.cacert) &&
 				   SUtil.equals(cert, other.cert) &&
 				   SUtil.equals(key, other.key);

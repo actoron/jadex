@@ -10,7 +10,7 @@ import jadex.commons.SUtil;
  *  Secret based on inline PEM-encoded X.509 certificates and key.
  *
  */
-public class X509PemFileSecret extends AbstractX509PemSecret
+public class X509PemStringsSecret extends AbstractX509PemSecret
 {
 	/** Prefix used to encode secret type as strings. */
 	public static final String PREFIX = "pem";
@@ -24,7 +24,7 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	/** The local certificate key. */
 	protected String key;
 	
-	public X509PemFileSecret(String encodedstring)
+	public X509PemStringsSecret(String encodedstring)
 	{
 		String basestring = encodedstring.substring(PREFIX.length() + 1);
 		String[] toks = basestring.split(":");
@@ -46,7 +46,7 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 *  @param cert Path to the local certificate.
 	 *  @param key Path to the local certificate key.
 	 */
-	public X509PemFileSecret(String cacert, String cert, String key)
+	public X509PemStringsSecret(String cacert, String cert, String key)
 	{
 		this.cacert = cacert;
 		this.cert = cert;
@@ -117,9 +117,9 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 */
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof X509PemFileSecret)
+		if (obj instanceof X509PemStringsSecret)
 		{
-			X509PemFileSecret other = (X509PemFileSecret) obj;
+			X509PemStringsSecret other = (X509PemStringsSecret) obj;
 			return SUtil.equals(cacert, other.cacert) &&
 				   SUtil.equals(cert, other.cert) &&
 				   SUtil.equals(key, other.key);
@@ -132,7 +132,7 @@ public class X509PemFileSecret extends AbstractX509PemSecret
 	 */
 	public String toString()
 	{
-		String ret = PREFIX + new String(Base64.encodeNoPadding(cacert.getBytes(SUtil.UTF8)), SUtil.UTF8);
+		String ret = PREFIX + ":" + new String(Base64.encodeNoPadding(cacert.getBytes(SUtil.UTF8)), SUtil.UTF8);
 		if (canSign())
 		{
 			ret += ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
