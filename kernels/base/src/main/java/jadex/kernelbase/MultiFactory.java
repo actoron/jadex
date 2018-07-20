@@ -387,9 +387,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public boolean filter(String fn)
 			{
-				int idx = fn.lastIndexOf("/");
-				if(idx!=-1)
-					fn = fn.substring(idx+1);
 				return fn.startsWith("Kernel");
 			}
 		});
