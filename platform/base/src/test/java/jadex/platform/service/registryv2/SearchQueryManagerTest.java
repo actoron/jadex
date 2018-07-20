@@ -217,7 +217,7 @@ public class SearchQueryManagerTest
 		Assert.assertEquals(providers1, providers2);
 		
 		// 6) start remote platform, wait for service in both queries -> test if works for existing queries (before and after SP)
-		System.out.println(" 6) start remote platform, wait for service in both queries");
+		System.out.println("6) start remote platform, wait for service in both queries");
 		IExternalAccess	pro3	= createPlatform(PROCONF);
 		svc	= results.getNextIntermediateResult();
 		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
