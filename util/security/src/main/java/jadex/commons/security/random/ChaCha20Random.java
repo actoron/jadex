@@ -14,7 +14,7 @@ public class ChaCha20Random extends SecureRandom
 	private static final long serialVersionUID = 0xBD611DFD65C5ABB2L;
 	
 	/** The start value of the block count. */
-	private static final long BLOCK_COUNT_START = Long.MIN_VALUE + 16;
+	private static final long BLOCK_COUNT_START = Long.MIN_VALUE + Integer.MAX_VALUE;
 	
 	/** Entropy source for seeding, use SSecurity. */
 	protected IEntropySource entropysource;
@@ -166,8 +166,8 @@ public class ChaCha20Random extends SecureRandom
 		System.arraycopy(basestate, 0, state, 4, 8);
 		state[12] = (int) blockcount;
 		state[13] = (int) (blockcount >>> 32);
-		state[14] = basestate[8];
-		state[15] = basestate[9];
+		state[14] = basestate[8] + state[12];
+		state[15] = basestate[9] + state[13];
 		++blockcount;
 		
 		ChaChaEngine.chachaCore(20, state, state);
@@ -180,7 +180,7 @@ public class ChaCha20Random extends SecureRandom
 	public byte[] generateSeed(int numbytes)
 	{
 		byte[] ret = new byte[numbytes];
-		SSecurity.getEntropySource().getEntropy(ret);
+		entropysource.getEntropy(ret);
 		return ret;
 	}
 }

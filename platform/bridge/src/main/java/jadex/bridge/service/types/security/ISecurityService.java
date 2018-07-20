@@ -39,7 +39,7 @@ public interface ISecurityService
 	 *  @param content The content
 	 *  @return Encrypted/signed message.
 	 */
-	public @Reference IFuture<byte[]> encryptAndSign(IMsgHeader header, byte[] content);
+	public IFuture<byte[]> encryptAndSign(IMsgHeader header, byte[] content);
 	
 	/**
 	 *  Decrypt and authenticates the message from a sender.
