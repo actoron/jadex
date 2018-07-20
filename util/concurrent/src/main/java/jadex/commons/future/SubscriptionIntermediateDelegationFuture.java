@@ -314,10 +314,12 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
-    		    	ret	= doGetNextIntermediateResult(index, timeout, realtime);
     			}
     			// else already resumed.
-    		}
+	    	}
+	    	
+	    	// Re-call outside synchronized!
+    		ret	= doGetNextIntermediateResult(index, timeout, realtime);
     	}
     	
     	return ret;
