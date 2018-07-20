@@ -30,7 +30,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 /**
  *  Test search and query managing functionality.
  */
-//@Ignore
 public class SearchQueryManagerTest
 {
 	//-------- constants --------
@@ -54,25 +53,35 @@ public class SearchQueryManagerTest
 		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// 30 * 0.005 secs  -> 150 millis.
 		
 		CLIENTCONF	= baseconf.clone();
+		CLIENTCONF.setPlatformName("client_*");
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(ProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
+		PROCONF.setPlatformName("provider_*");
 		
 		SPCONF	= baseconf.clone();
 		SPCONF.addComponent(SuperpeerRegistryAgent.class);
+		SPCONF.setPlatformName("SP_*");
 	}
 	
-	//-------- life cycle helper --------
+	//-------- life cycle and helpers --------
 	
+	/** Started platforms for later cleanup. */
 	protected Collection<IExternalAccess>	platforms;
 	
+	/**
+	 *  Test setup code.
+	 */
 	@Before
 	public void setup()
 	{
 		platforms	= new ArrayList<>();
 	}
 	
+	/**
+	 *  Test cleanup code.
+	 */
 	@After
 	public void tearDown()
 	{
@@ -89,6 +98,9 @@ public class SearchQueryManagerTest
 		}
 	}
 	
+	/**
+	 *  Create a platform with a given config.
+	 */
 	protected IExternalAccess	createPlatform(IPlatformConfiguration config)
 	{
 		IExternalAccess	ret	= Starter.createPlatform(config).get();
@@ -96,13 +108,19 @@ public class SearchQueryManagerTest
 		return ret;
 	}
 	
+	/**
+	 *  Stop and remove the given platform.
+	 */
 	protected void	removePlatform(IExternalAccess platform)
 	{
 		platform.killComponent().get();
 		platforms.remove(platform);
 	}
 	
-	protected void wait(IExternalAccess platform)
+	/**
+	 *  Wait a small amount of time (@see WAITFACTOR).
+	 */
+	protected void doWait(IExternalAccess platform)
 	{
 		platform.waitForDelay(Starter.getScaledRemoteDefaultTimeout(platform.getId(), WAITFACTOR), new IComponentStep<Void>()
 		{
@@ -114,56 +132,29 @@ public class SearchQueryManagerTest
 		}, true).get();
 	}
 	
-	//-------- test cases --------
-	
 	/**
-	 *  cases for testing: services
+	 *  Wait until all clients have connected to superpeer.
+	 *  @param superpeer The superpeer.
+	 *  @param platforms The platforms that need to connect.
 	 */
-	@Test
-	public void	testServices()
+	protected void	waitForSuperpeerConnections(IExternalAccess... platforms)
 	{
-		// 1) search for service -> not found (test if works with no superpeers and no other platforms)
-		System.out.println("1) search for service");
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertTrue(""+result, result.isEmpty());
-		
-		// 2) start remote platform, search for service -> test if awa fallback works with one platform 
-		System.out.println("2) start remote platform, search for service");
-		IExternalAccess	pro1	= createPlatform(PROCONF);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 1, result.size());
-		
-		// 3) start remote platform, search for service -> test if awa fallback works with two platforms 
-		System.out.println("3) start remote platform, search for service");
-		/*IExternalAccess	pro2	=*/ createPlatform(PROCONF);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 2, result.size());
-		
-		// 4) start SP, wait for connection from remote platforms and local platform, search for service -> test if SP connection works
-		System.out.println("4) start SP, wait for connection from remote platforms and local platform, search for service");
-		IExternalAccess	sp	= createPlatform(SPCONF);
-		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		ISuperpeerStatusService	status	= platforms[0].searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
-		connected.getNextIntermediateResult();	// Self-connection + client + 2x provider
-		connected.getNextIntermediateResult();
-		connected.getNextIntermediateResult();
-		connected.getNextIntermediateResult();
-		wait(client);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 2, result.size());
-		
-		// 5) kill one remote platform, search for service -> test if remote disconnection and service removal works
-		System.out.println("5) kill one remote platform, search for service");
-		removePlatform(pro1);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 1, result.size());
-
-		// 6) kill SP, search for service -> test if re-fallback to awa works
-		System.out.println("6) kill SP, search for service");
-		removePlatform(sp);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Set<IComponentIdentifier>	platformids	= new LinkedHashSet<>();
+		for(IExternalAccess ea: platforms)
+		{
+			platformids.add(ea.getId());
+		}
+		while(!platformids.isEmpty())
+		{
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult();
+			platformids.remove(cid.getRoot());
+			System.out.println("SP connected to: "+cid);
+		}
 	}
+	
+	//-------- test cases --------
 	
 	/**
 	 *  cases for testing: queries
@@ -175,7 +166,7 @@ public class SearchQueryManagerTest
 		System.out.println("1) add query");
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
-		wait(client);
+		doWait(client);
 		Assert.assertEquals("1) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 2) start remote platform, wait for service -> test if awa fallback works with one platform, also checks local duplicate removal over time
@@ -193,13 +184,8 @@ public class SearchQueryManagerTest
 		// 4) start SP, wait for connection from remote platforms and local platform -> should get no service; test if duplicate removal works with SP
 		System.out.println("4) start SP, wait for connection from remote platforms and local platform");
 		IExternalAccess	sp	= createPlatform(SPCONF);
-		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
-		connected.getNextIntermediateResult();	// Self-connection + client + 2x provider
-		connected.getNextIntermediateResult();
-		connected.getNextIntermediateResult();
-		connected.getNextIntermediateResult();
-		wait(client);
+		waitForSuperpeerConnections(sp, client, pro1, pro2);
+		doWait(client);
 		Assert.assertEquals("4) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 5) add second query -> wait for two services (test if works when already SP)
@@ -213,11 +199,12 @@ public class SearchQueryManagerTest
 		Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 		providers2.add(pro1.getId());
 		providers2.add(pro2.getId());
+		doWait(client);
 		Assert.assertEquals("5) ", Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 		Assert.assertEquals(providers1, providers2);
 		
 		// 6) start remote platform, wait for service in both queries -> test if works for existing queries (before and after SP)
-		System.out.println(" 6) start remote platform, wait for service in both queries");
+		System.out.println("6) start remote platform, wait for service in both queries");
 		IExternalAccess	pro3	= createPlatform(PROCONF);
 		svc	= results.getNextIntermediateResult();
 		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
@@ -233,6 +220,53 @@ public class SearchQueryManagerTest
 //		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
 //		svc	= results2.getNextIntermediateResult();
 //		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
+	}
+	
+	/**
+	 *  cases for testing: services
+	 */
+	@Test
+	public void	testServices()
+	{
+		// 1) search for service -> not found (test if works with no superpeers and no other platforms)
+		System.out.println("1) search for service");
+		IExternalAccess	client	= createPlatform(CLIENTCONF);
+		doWait(client);
+		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Assert.assertTrue(""+result, result.isEmpty());
+		
+		// 2) start remote platform, search for service -> test if awa fallback works with one platform 
+		System.out.println("2) start remote platform, search for service");
+		IExternalAccess	pro1	= createPlatform(PROCONF);
+		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Assert.assertEquals(""+result, 1, result.size());
+		
+		// 3) start remote platform, search for service -> test if awa fallback works with two platforms 
+		System.out.println("3) start remote platform, search for service");
+		IExternalAccess	pro2	= createPlatform(PROCONF);
+		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Assert.assertEquals(""+result, 2, result.size());
+		
+		// 4) start SP, wait for connection from remote platforms and local platform, search for service -> test if SP connection works
+		System.out.println("4) start SP, wait for connection from remote platforms and local platform, search for service");
+		IExternalAccess	sp	= createPlatform(SPCONF);
+		waitForSuperpeerConnections(sp, client, pro1, pro2);
+		doWait(client);
+		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Assert.assertEquals(""+result, 2, result.size());
+		
+		// 5) kill one remote platform, search for service -> test if remote disconnection and service removal works
+		System.out.println("5) kill one remote platform, search for service");
+		removePlatform(pro1);
+		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Assert.assertEquals(""+result, 1, result.size());
+
+		// TODO
+//		// 6) kill SP, search for service -> test if re-fallback to awa works
+//		System.out.println("6) kill SP, search for service");
+//		removePlatform(sp);
+//		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+//		Assert.assertEquals(""+result, 1, result.size());
 	}
 
 	//-------- main for testing --------

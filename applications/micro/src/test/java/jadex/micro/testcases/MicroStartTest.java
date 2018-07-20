@@ -18,6 +18,9 @@ public class MicroStartTest extends ComponentTestSuite
 	private static final String[]	EXCLUDES = 	
 		new String[]
 	{
+		// For consistency with gradle/eclipse build -> exclude testcases from start tests (not in classpath in gradle, but in eclipse)
+		"testcases",
+		
 //		// Fails on Java 9 (what is this test for anyways?)
 //		"Kill",
 //		
@@ -40,8 +43,8 @@ public class MicroStartTest extends ComponentTestSuite
 		"BrokenInitAgent",
 		"BrokenInit.component.xml",
 //		"CompositeCalculatorAgent",
-//		"blocking/Step",
-//		"blocking\\Step",
+		"blocking/Step",
+		"blocking\\Step",
 //		"CallAllServicesAgent",
 		
 		// Manual tests requiring interaction
@@ -56,6 +59,8 @@ public class MicroStartTest extends ComponentTestSuite
 		"messagequeue\\User",
 		"messagequeue/replicated/User",
 		"messagequeue\\replicated\\User",
+		"pojoservice/User",
+		"pojoservice\\User",
 		"search/User",
 		"search\\User",
 		"nfpropvis/User",

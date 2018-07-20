@@ -550,7 +550,7 @@ public class ComponentManagementService implements IComponentManagementService
 															final String name = (String)SJavaParser.evaluateExpressionPotentially(oname, lmodel.getAllImports(), null, tup.getSecondEntity());
 															
 //															System.out.print("<"+lmodel.getName()+" "+factory.getClass());
-															IFuture fut = factory.getComponentFeatures(lmodel);
+															IFuture<Collection<IComponentFeatureFactory>> fut = factory.getComponentFeatures(lmodel);
 															fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFeatureFactory>, IComponentIdentifier>(inited)
 															{
 																public void customResultAvailable(Collection<IComponentFeatureFactory> features)
@@ -750,23 +750,31 @@ public class ComponentManagementService implements IComponentManagementService
 																			public void finished()
 																			{
 																				// Wait for cleanup finished before posting results
-																				cfs.get(cid).addResultListener(new IResultListener<Map<String,Object>>()
+																				IFuture<Map<String, Object>>	fut	= cfs.get(cid);
+																				if(fut!=null)	// TODO: why null (seldom in RemoteBlockingTestAgent during gradle build)
 																				{
-																					public void resultAvailable(java.util.Map<String,Object> result)
+																					fut.addResultListener(new IResultListener<Map<String,Object>>()
 																					{
-																						Collection<Tuple2<String, Object>>	results	= new ArrayList<Tuple2<String,Object>>();
-																						for(Map.Entry<String, Object> entry: result.entrySet())
+																						public void resultAvailable(java.util.Map<String,Object> result)
 																						{
-																							results.add(new Tuple2<String, Object>(entry.getKey(), entry.getValue()));
+																							Collection<Tuple2<String, Object>>	results	= new ArrayList<Tuple2<String,Object>>();
+																							for(Map.Entry<String, Object> entry: result.entrySet())
+																							{
+																								results.add(new Tuple2<String, Object>(entry.getKey(), entry.getValue()));
+																							}
+																							resultlistener.resultAvailable(results);
 																						}
-																						resultlistener.resultAvailable(results);
-																					}
-																					
-																					public void exceptionOccurred(Exception exception)
-																					{
-																						resultlistener.exceptionOccurred(exception);																																												
-																					}
-																				});
+																						
+																						public void exceptionOccurred(Exception exception)
+																						{
+																							resultlistener.exceptionOccurred(exception);																																												
+																						}
+																					});
+																				}
+																				else
+																				{
+																					resultlistener.exceptionOccurred(new NullPointerException("No cleanup future!?"));
+																				}
 																			}
 																			
 																			public void intermediateResultAvailable(Tuple2<String, Object> result)

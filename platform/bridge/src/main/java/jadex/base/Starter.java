@@ -809,7 +809,7 @@ public class Starter
 						}
 						catch(Exception e)
 						{
-							Logger.getLogger(fcid.getLocalName()).severe("Exception during step on rescue thread: "+e);
+							Logger.getLogger(fcid.getLocalName()).severe("Exception during step on rescue thread: "+SUtil.getExceptionStacktrace(e));
 						}
 					}
 				}
@@ -886,7 +886,7 @@ public class Starter
 				}
 				catch(Exception e)
 				{
-					Logger.getLogger(cid.getLocalName()).severe("Exception during step on rescue thread: "+e);
+					Logger.getLogger(cid.getLocalName()).severe("Exception during step on rescue thread: "+SUtil.getExceptionStacktrace(e));
 				}
 			}
 		}
