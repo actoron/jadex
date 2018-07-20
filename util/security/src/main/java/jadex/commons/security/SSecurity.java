@@ -188,68 +188,6 @@ public class SSecurity
 				{
 					final IEntropySource basicsource = new IEntropySource()
 					{
-//						protected long bcount = 0;
-						
-						/** Input stream for POSIX-like systems. */
-						protected File urandom = null;
-						
-						{
-							urandom = new File("/dev/urandom");
-							FileInputStream urandomis = null;
-							if (urandom.exists())
-							{
-								try
-								{
-									urandomis = new FileInputStream(urandom);
-								}
-								catch (Exception e)
-								{
-									urandom = null;
-								}
-								finally
-								{
-									if (urandomis != null)
-									{
-										try
-										{
-											urandomis.close();
-										}
-										catch (Exception e)
-										{
-										}
-									}
-								}
-							}
-							
-							if (urandom == null)
-							{
-								urandom = new File("/dev/random");
-								if (urandom.exists())
-								{
-									try
-									{
-										urandomis = new FileInputStream(urandom);
-									}
-									catch (Exception e)
-									{
-										urandom = null;
-									}
-									finally
-									{
-										if (urandomis != null)
-										{
-											try
-											{
-												urandomis.close();
-											}
-											catch (Exception e)
-											{
-											}
-										}
-									}
-								}
-							}
-						}
 						
 						/**
 						 *  Gets low-level entropy, preferably from OS.
@@ -261,48 +199,35 @@ public class SSecurity
 //							boolean urandomworked = false;
 							byte[] empty = new byte[output.length];
 							byte[] ret = null;
-							if (urandom != null)
+							
+							// For UNIX, use UNIX API to gather entropy data
+							try
 							{
-								FileInputStream urandomis = null;
-								ret = new byte[output.length];
-								try
-								{
-									urandomis = new FileInputStream(urandom);
-									int read = 0;
-									int off = 0;
-									while (read < ret.length)
-									{
-										read = urandomis.read(ret, off, ret.length - read);
-										off += read;
-									}
-								}
-								catch (Exception e)
-								{
-									ret = null;
-								}
-								finally
-								{
-									if (urandomis != null)
-									{
-										try
-										{
-											urandomis.close();
-										}
-										catch (Exception e)
-										{
-										}
-									}
-								}
+								Class<?> unixentropyapi = Class.forName("jadex.commons.security.UnixEntropyApi");
+								Method getEntropy = unixentropyapi.getMethod("getEntropy", int.class);
+								ret = (byte[]) getEntropy.invoke(null, output.length);
 							}
+							catch(Throwable e)
+							{
+								ret = null;
+							}
+							
+							// Try /dev/urandom
+							if (ret == null || Arrays.equals(ret, empty))
+								ret = getEntropyFromFile("/dev/urandom", output.length);
+							
+							// Try /dev/urandom
+							if (ret == null || Arrays.equals(ret, empty))
+								ret = getEntropyFromFile("/dev/random", output.length);
 							
 							if (ret == null || Arrays.equals(ret, empty))
 							{
 								// For Windows, use Windows API to gather entropy data
 								try
 								{
-									Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
-									Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
-									ret = (byte[]) getrandomfromwindows.invoke(null, output.length);
+									Class<?> winentropyapi = Class.forName("jadex.commons.security.WindowsEntropyApi");
+									Method getEntropy = winentropyapi.getMethod("getEntropy", int.class);
+									ret = (byte[]) getEntropy.invoke(null, output.length);
 								}
 								catch(Throwable e)
 								{
@@ -328,6 +253,39 @@ public class SSecurity
 							
 							if (output == null || Arrays.equals(output, empty))
 								throw new SecurityException("Entropy gathering failed.");
+						}
+						
+						/**
+						 *  Gets entropy from a file.
+						 *  @param path Path of the entropy file.
+						 *  @param numbytes Number of bytes to read.
+						 *  @return Entropy data or null on failure.
+						 */
+						protected byte[] getEntropyFromFile(String path, int numbytes)
+						{
+							InputStream is = null;
+							try
+							{
+								byte[] ret = new byte[numbytes];
+								is = new FileInputStream(path);
+								int read = 0;
+								int off = 0;
+								while (read < ret.length)
+								{
+									read = is.read(ret, off, ret.length - read);
+									off += read;
+								}
+								return ret;
+								
+							}
+							catch (Exception e)
+							{
+							}
+							finally
+							{
+								SUtil.close(is);
+							}
+							return null;
 						}
 					};
 					

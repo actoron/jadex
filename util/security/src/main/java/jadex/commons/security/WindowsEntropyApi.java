@@ -12,10 +12,10 @@ import com.sun.jna.platform.win32.WinDef.ULONGByReference;
 import jadex.commons.SUtil;
 
 /**
- *  Access to windows cryptography API.
+ *  Access to windows cryptographically secure entropy.
  *
  */
-public class WinCrypt
+public class WindowsEntropyApi
 {
 	/** Library name used to access the API */
 	public static final String WIN_LIB_NAME = "Advapi32";
@@ -28,7 +28,7 @@ public class WinCrypt
 	 *  @param numBytes Number of bytes requested.
 	 *  @return Random data, null on failure.
 	 */
-	public static byte[] getRandomFromWindows(int numBytes)
+	public static byte[] getEntropy(int numbytes)
 	{
 		byte[] ret = null;
 		try
@@ -36,11 +36,11 @@ public class WinCrypt
 			ULONGByReference hProv = new WinDef.ULONGByReference();
 			if (CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0))
 			{
-				Memory buf = new Memory(numBytes);
-				if (CryptGenRandom(hProv.getValue(), numBytes, buf))
+				Memory buf = new Memory(numbytes);
+				if (CryptGenRandom(hProv.getValue(), numbytes, buf))
 				{
 					CryptReleaseContext(hProv.getValue(), 0);
-					ret = buf.getByteArray(0, numBytes);
+					ret = buf.getByteArray(0, numbytes);
 				}
 			}
 		}
