@@ -2,7 +2,6 @@ package jadex.commons.security;
 
 import com.sun.jna.Function;
 import com.sun.jna.Memory;
-import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 /**
