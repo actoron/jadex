@@ -95,10 +95,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		Future<Void>	ret	= new Future<>();
 		connections	= new LinkedHashMap<>();
 		
-		if(pollingrate!=POLLING_RATE)
-		{
-			System.out.println(agent+" using polling rate: "+pollingrate);
-		}
+//		if(pollingrate!=POLLING_RATE)
+//		{
+//			System.out.println(agent+" using polling rate: "+pollingrate);
+//		}
 		
 		if(!awaonly)
 		{
