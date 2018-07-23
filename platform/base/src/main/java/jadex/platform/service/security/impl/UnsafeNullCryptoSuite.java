@@ -5,9 +5,9 @@ import java.util.logging.Logger;
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.ICryptoSuite;
-import jadex.platform.service.security.MsgSecurityInfos;
+import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
@@ -23,7 +23,7 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	protected static final int AUTH_SUITE_ID = 523382039;
 	
 	/** The security infos. */
-	protected MsgSecurityInfos secinf;
+	protected SecurityInfo secinf;
 	
 	public UnsafeNullCryptoSuite()
 	{
@@ -83,7 +83,7 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	 *  
 	 *  @return The security infos for decrypted messages.
 	 */
-	public IMsgSecurityInfos getSecurityInfos()
+	public ISecurityInfo getSecurityInfos()
 	{
 		return secinf;
 	}
@@ -109,7 +109,7 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	 */
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage)
 	{
-		secinf = new MsgSecurityInfos();
+		secinf = new SecurityInfo();
 		secinf.setPlatformAuthenticated(true);
 		secinf.setTrustedPlatform(true);
 		secinf.setNetworks(agent.getInternalNetworks().keySet().toArray(new String[agent.getInternalNetworks().size()]));

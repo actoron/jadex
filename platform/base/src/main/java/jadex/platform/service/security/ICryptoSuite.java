@@ -1,6 +1,6 @@
 package jadex.platform.service.security;
 
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
 public interface ICryptoSuite
@@ -34,7 +34,7 @@ public interface ICryptoSuite
 	 *  
 	 *  @return The security infos for decrypted messages.
 	 */
-	public IMsgSecurityInfos getSecurityInfos();
+	public ISecurityInfo getSecurityInfos();
 	
 	/**
 	 *  Returns if the suite is expiring and should be replaced.

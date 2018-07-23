@@ -9,7 +9,7 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.platform.service.security.ICryptoSuite;
-import jadex.platform.service.security.MsgSecurityInfos;
+import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
@@ -34,7 +34,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	protected Set<Long> missingids = new LinkedHashSet<Long>();
 	
 	/** The message security info used after key exchange and authentication. */
-	protected MsgSecurityInfos secinf;
+	protected SecurityInfo secinf;
 	
 	/** Checks if a message ID is valid */
 	protected synchronized boolean isValid(long msgid)
@@ -85,7 +85,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	 */
 	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, String authenticatedplatformname, SecurityAgent agent)
 	{
-		secinf = new MsgSecurityInfos();
+		secinf = new SecurityInfo();
 		secinf.setPlatformAuthenticated(platformauth);
 		if (platformauth)
 			secinf.setAuthenticatedPlatformName(remoteid.toString());

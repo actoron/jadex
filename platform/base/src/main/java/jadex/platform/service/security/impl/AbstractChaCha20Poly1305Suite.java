@@ -18,7 +18,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -124,7 +124,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return The security infos for decrypted messages.
 	 */
-	public IMsgSecurityInfos getSecurityInfos()
+	public ISecurityInfo getSecurityInfos()
 	{
 		return secinf;
 	}

@@ -9,7 +9,7 @@ import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.component.streams.StreamPacket;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentStreamArrived;
@@ -40,7 +40,7 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	 *  Called for all messages without matching message handlers.
 	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
+	protected void processUnhandledMessage(final ISecurityInfo secinf, final IMsgHeader header, final Object body)
 	{
 		///WTF?
 //		if(body instanceof StreamPacket)

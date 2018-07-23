@@ -10,7 +10,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -104,7 +104,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	 *  Execute the method.
 	 */
 	@Override
-	public IFuture<T>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
+	public IFuture<T>	execute(IInternalAccess access, ISecurityInfo secinf)
 	{
 //		if(method.toString().toLowerCase().indexOf("transport")==-1)
 //			System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);

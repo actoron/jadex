@@ -3,13 +3,13 @@ package jadex.platform.service.security;
 import java.util.Arrays;
 import java.util.Set;
 
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 
 /**
  *  Security meta-information of a message;
  *
  */
-public class MsgSecurityInfos implements IMsgSecurityInfos
+public class SecurityInfo implements ISecurityInfo
 {
 	/** Flag if the platform secret could be authenticated. */
 	protected boolean platformauth;
@@ -29,7 +29,7 @@ public class MsgSecurityInfos implements IMsgSecurityInfos
 	/**
 	 *  Creates the infos.
 	 */
-	public MsgSecurityInfos()
+	public SecurityInfo()
 	{
 	}
 	

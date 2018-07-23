@@ -3,7 +3,7 @@ package jadex.bridge.component.impl.remotecommands;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -50,7 +50,7 @@ public class RemoteResultCommand<T>	extends AbstractResultCommand
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
 	@SuppressWarnings("unchecked")
-	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
+	public void	doExecute(IInternalAccess access, IFuture<?> future, ISecurityInfo secinf)
 	{
 		if(exception!=null)
 			((Future<T>) future).setException(exception);

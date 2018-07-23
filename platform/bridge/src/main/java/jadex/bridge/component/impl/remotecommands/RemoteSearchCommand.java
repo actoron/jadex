@@ -8,7 +8,7 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -56,7 +56,7 @@ public class RemoteSearchCommand<T> extends AbstractInternalRemoteCommand	implem
 	 *  Perform the search.
 	 */
 	@Override
-	public IFuture<Collection<T>>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
+	public IFuture<Collection<T>>	execute(IInternalAccess access, ISecurityInfo secinf)
 	{
 //		System.out.println("Remote search command triggered: " + query.toString());
 //		if((""+query.getServiceType()).indexOf("ITestService")!=-1)

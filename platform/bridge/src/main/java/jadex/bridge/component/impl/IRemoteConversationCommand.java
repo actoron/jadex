@@ -1,7 +1,7 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -15,5 +15,5 @@ public interface IRemoteConversationCommand<T>
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IFuture<T> future, IMsgSecurityInfos secinf);
+	public void	execute(IInternalAccess access, IFuture<T> future, ISecurityInfo secinf);
 }

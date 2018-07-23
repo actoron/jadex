@@ -33,7 +33,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
@@ -229,12 +229,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					return false;
 				}
 				
-				public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+				public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 				{
 					return msg instanceof Ping || (msg instanceof byte[] && header.getProperty(FORWARD_DEST) != null);
 				}
 				
-				public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+				public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 				{
 					if (msg instanceof Ping)
 					{
@@ -265,12 +265,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					return false;
 				}
 				
-				public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+				public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 				{
 					return msg instanceof byte[] && header.getProperty(FORWARD_DEST) != null;
 				}
 				
-				public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+				public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 				{
 					IComponentIdentifier fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
 					if (fwdest != null && agent.getId().getRoot().equals(fwdest))

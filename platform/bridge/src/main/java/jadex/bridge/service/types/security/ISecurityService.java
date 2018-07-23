@@ -48,7 +48,7 @@ public interface ISecurityService
 	 *  @param content The content.
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
-	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
+	public IFuture<Tuple2<ISecurityInfo,byte[]>> decryptAndAuth(IComponentIdentifier sender, byte[] content);
 	
 	/**
 	 *  Checks if platform secret is used.

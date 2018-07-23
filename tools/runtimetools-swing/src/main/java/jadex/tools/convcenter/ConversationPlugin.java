@@ -32,7 +32,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.fipa.FipaMessage;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -246,13 +246,13 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					}
 					
 					@Override
-					public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+					public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 					{
 						return true;
 					}
 					
 					@Override
-					public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+					public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 					{
 						ret.addIntermediateResultIfUndone(msg);
 					}

@@ -31,7 +31,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Boolean3;
@@ -426,7 +426,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param content The content.
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
-	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
+	public IFuture<Tuple2<ISecurityInfo,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
 	{
 		checkCleanup();
 		
@@ -439,24 +439,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			byte[] cleartext = cs.decryptAndAuth(content);
 			if (cleartext != null)
-				return new Future<Tuple2<IMsgSecurityInfos,byte[]>>(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+				return new Future<Tuple2<ISecurityInfo,byte[]>>(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), cleartext));
 		}
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Tuple2<IMsgSecurityInfos,byte[]>>()
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Tuple2<ISecurityInfo,byte[]>>()
 		{
-			public IFuture<Tuple2<IMsgSecurityInfos, byte[]>> execute(IInternalAccess ia)
+			public IFuture<Tuple2<ISecurityInfo, byte[]>> execute(IInternalAccess ia)
 			{
 				doCleanup();
 				
-				final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
+				final Future<Tuple2<ISecurityInfo, byte[]>> ret = new Future<Tuple2<ISecurityInfo,byte[]>>();
 				
 				if (content.length > 0 && content[0] == -1)
 				{
 					// Security message
 					byte[] newcontent = new byte[content.length - 1];
 					System.arraycopy(content, 1, newcontent, 0, newcontent.length);
-					MsgSecurityInfos secinfos = new MsgSecurityInfos();
-					Tuple2<IMsgSecurityInfos,byte[]> tup = new Tuple2<IMsgSecurityInfos, byte[]>(secinfos, newcontent);
+					SecurityInfo secinfos = new SecurityInfo();
+					Tuple2<ISecurityInfo,byte[]> tup = new Tuple2<ISecurityInfo, byte[]>(secinfos, newcontent);
 					ret.setResult(tup);
 				}
 				else
@@ -498,13 +498,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									byte[] cleartext = result.decryptAndAuth(fcontent);
 									if (cleartext != null)
 									{
-										ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
+										ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
 									}
 									else
 									{
 										cleartext = requestReencryption(splat, content);
 										if (cleartext != null)
-											ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
+											ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
 										else
 											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
 									}
@@ -528,7 +528,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cleartext != null)
 					{
-						ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+						ret.setResult(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), cleartext));
 					}
 				}
 				return ret;
@@ -1401,7 +1401,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		 *  Test if handler should handle a message.
 		 *  @return True if it should handle the message. 
 		 */
-		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			return isSecurityMessage(header);
 		}
@@ -1420,7 +1420,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		 *  @param header The header.
 		 *  @param msg The message.
 		 */
-		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			if (msg instanceof InitialHandshakeMessage)
 			{
@@ -1569,7 +1569,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected class ReencryptRequestHandler implements IUntrustedMessageHandler
 	{
-		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			return msg instanceof ReencryptionRequest;
 		}
@@ -1579,7 +1579,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			return false;
 		}
 		
-		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			ReencryptionRequest req = (ReencryptionRequest) msg;
 			String senderpf = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot().toString();
@@ -1591,7 +1591,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				for (Tuple2<ICryptoSuite, Long> expsuite : expsuites)
 				{
-					IMsgSecurityInfos suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
+					ISecurityInfo suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
 					
 					if (!suiteinfos.isPlatformAuthenticated() || (suiteinfos.isPlatformAuthenticated() == secinfos.isPlatformAuthenticated()))
 					{

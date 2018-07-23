@@ -25,7 +25,7 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.IMessagePreprocessor;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakList;
@@ -75,7 +75,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  Test if there are matching message events in XML description.
 	 */
 	@Override
-	protected void processUnhandledMessage(IMsgSecurityInfos secinf, IMsgHeader header, Object body)
+	protected void processUnhandledMessage(ISecurityInfo secinf, IMsgHeader header, Object body)
 	{
 		MMessageEvent mevent = null;
 			

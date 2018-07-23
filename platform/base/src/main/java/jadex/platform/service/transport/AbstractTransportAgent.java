@@ -34,7 +34,7 @@ import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.memstat.IMemstatService;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
@@ -773,10 +773,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		final Logger logger = agent.getLogger();
 		// First decrypt.
-		secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<IMsgSecurityInfos, byte[]>>()
+		secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<ISecurityInfo, byte[]>>()
 		{
 			@Override
-			public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> tup)
+			public void resultAvailable(Tuple2<ISecurityInfo, byte[]> tup)
 			{
 				if(tup.getSecondEntity() != null)
 				{

@@ -38,7 +38,7 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
@@ -356,14 +356,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 //			System.out.println("Received message: "+header);
 			
 			getSecurityService().decryptAndAuth((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), bodydata).addResultListener(
-				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<IMsgSecurityInfos,byte[]>>()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Tuple2<ISecurityInfo,byte[]>>()
 			{
-				public void resultAvailable(Tuple2<IMsgSecurityInfos, byte[]> result)
+				public void resultAvailable(Tuple2<ISecurityInfo, byte[]> result)
 				{
 					// Check if SecurityService ok'd it at all.
 					if(result != null)
 					{
-						final IMsgSecurityInfos secinf = result.getFirstEntity();
+						final ISecurityInfo secinf = result.getFirstEntity();
 						
 						Object message;
 						try
@@ -403,7 +403,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header The message header.
 	 *  @param body The message that arrived.
 	 */
-	public void messageArrived(final IMsgSecurityInfos secinfos, final IMsgHeader header, Object body)
+	public void messageArrived(final ISecurityInfo secinfos, final IMsgHeader header, Object body)
 	{
 		notifyMessageReceived(secinfos, header, body);
 		
@@ -465,7 +465,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param header Message header.
 	 *  @param body
 	 */
-	protected void handleMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
+	protected void handleMessage(final ISecurityInfo secinf, final IMsgHeader header, final Object body)
 	{
 		boolean	handled	= false;
 		boolean trusted = isTrusted(secinf);
@@ -624,7 +624,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  Called for all messages without matching message handlers.
 	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
+	protected void processUnhandledMessage(final ISecurityInfo secinf, final IMsgHeader header, final Object body)
 	{
 	}
 	
@@ -1518,7 +1518,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	/**
 	 *  Called for each received message.
 	 */
-	protected void	notifyMessageReceived(IMsgSecurityInfos secinfos, IMsgHeader header, Object body)
+	protected void	notifyMessageReceived(ISecurityInfo secinfos, IMsgHeader header, Object body)
 	{
 		if(subscriptions!=null)
 		{
@@ -1802,7 +1802,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 *  @param secinfos The security infos of the message.
 	 *  @return True, if trusted.
 	 */
-	protected boolean isTrusted(IMsgSecurityInfos secinfos)
+	protected boolean isTrusted(ISecurityInfo secinfos)
 	{
 		return secinfos == null || secinfos.isAuthenticated();
 	}

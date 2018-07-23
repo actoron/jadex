@@ -1,7 +1,7 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 
 /**
  *  Interface for intermediate (or final) commands in existing conversations. 
@@ -14,5 +14,5 @@ public interface IRemoteOrderedConversationCommand
 	 *  @param conv The active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IOrderedConversation conv, IMsgSecurityInfos secinf);
+	public void	execute(IInternalAccess access, IOrderedConversation conv, ISecurityInfo secinf);
 }

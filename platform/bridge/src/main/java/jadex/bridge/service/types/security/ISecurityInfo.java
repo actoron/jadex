@@ -6,7 +6,7 @@ import java.util.Set;
  *  Security meta-information of a message;
  *
  */
-public interface IMsgSecurityInfos
+public interface ISecurityInfo
 {
 	/**
 	 *  Checks if the platform has any authentication.

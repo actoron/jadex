@@ -41,7 +41,7 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
@@ -307,7 +307,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 *  Test if handler should handle a message.
 		 *  @return True if it should handle the message. 
 		 */
-		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			return header.getProperty(RX_ID) instanceof String;
 		}
@@ -327,7 +327,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		 *  @param msg The message.
 		 */
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
 //			System.out.println(getComponent().getComponentIdentifier() + " received remote command: "+msg+", rxid="+rxid);
@@ -547,7 +547,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		/**
 		 *  Check if it is ok to execute a command.
 		 */
-		protected boolean checkSecurity(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		protected boolean checkSecurity(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			boolean	trusted	= false;
 			
